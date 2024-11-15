@@ -1,3 +1,5 @@
+import eventlet
+eventlet.monkey_patch()
 from flask import Flask, render_template, jsonify, request, session
 from flask_socketio import SocketIO, send, emit
 from flask_cors import CORS
@@ -13,7 +15,8 @@ socketio = SocketIO(app, cors_allowed_origins=["http://localhost:3000"])
 
 connected_clients = set()
 players = []
-# http://localhost:3000 is not an accepted origin. (further occurrences of this error will be logged with level INFO)
+
+
 def getPlayer(sid):
     for player in players:
         if player.sid == sid:
@@ -38,6 +41,11 @@ def check_for_reconnect(sid, name):
             }
             return
 
+def sendPlayerList():
+    print("Sending player list to all clients")
+    emit('player_list', {'list': [player.username for player in players]}, broadcast=True, json=True, namespace='/')
+
+
 @app.route('/')
 def index():
     return "<h1>Waddup</h1>"
@@ -55,46 +63,25 @@ def handle_disconnect():
     player = getPlayer(request.sid)
     if player:
         player.active = False
-
-# @socketio.on('player_join')
-# def addPlayer(data):
-#     print("Player joined:", data)
-#     # Check if the player already exists (reconnect scenario)
-#     player = getPlayer(request.sid)
-#     if player:
-#         player.active = True
-#         print("Existing player has rejoined")
-#         return
-
-#     # If new player, add them
-#     new_player = Player(request.sid, data['username'])
-#     players.append(new_player)
-#     print(f"{len(players)} players now in game.")
-
-#     # Send success response back to the client
-#     emit('join_response', {'status': 'success', 'message': 'Joined successfully'}, to=request.sid)
+        sendPlayerList()
 
 @app.route('/player_join', methods=['POST'])
 def addPlayer():
+
     data = request.get_json()
     username = data.get('username')
-    print("Player joining...")
+
     if not username:
         return jsonify({"status": "error", "message": "Username is required"}), 400
-
-    # Check if the player already exists (simulate reconnect scenario)
-    existing_player = getPlayer(username)
-    if existing_player:
-        if existing_player.active:
-            return jsonify({"status": "error", "message": "This player is still active"}), 409
-        existing_player.active = True
-        return jsonify({"status": "success", "message": "Rejoined successfully"}), 200
 
     # If new player, add them
     new_player = Player(request.remote_addr, username)  # Use IP or request context for ID
     players.append(new_player)
     print(f"{len(players)} players now in game.")
+    sendPlayerList()
     return jsonify({"status": "success", "message": "Joined successfully"}), 200
+
+    
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=5000)
