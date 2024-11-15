@@ -1,50 +1,32 @@
 import eventlet
 eventlet.monkey_patch()
-from flask import Flask, render_template, jsonify, request, session
-from flask_socketio import SocketIO, send, emit
+from flask import Flask, request
+from flask_socketio import SocketIO, emit
 from flask_cors import CORS
+from uuid import uuid4
 from assets.player import Player
 
 app = Flask(__name__)
-#cors = CORS(app,resources={r"/*":{"origins":"*"}}) # This allows all origins. Be careful in production. Wahhh
-# Set up Flask-CORS to handle HTTP requests with CORS
 CORS(app, resources={r"/*": {"origins": '*'}})
-
-# Set up SocketIO to handle WebSocket requests with CORS
 socketio = SocketIO(app, cors_allowed_origins=["http://localhost:3000"])
 
-connected_clients = set()
 players = []
 
-
-def getPlayer(sid):
+def getPlayerBySid(sid):
     for player in players:
         if player.sid == sid:
             return player
     return None
 
-def check_for_reconnect(sid, name):
+def getPlayerById(player_id):
     for player in players:
-        if player.name == name:
-            if player.active:
-                msg = {
-                    'type': 'error',
-                    'text': 'This player is still active'
-                }
-                send(msg, to=sid, json=True)
-                return
-            player.active = True
-            player.sid = sid
-            msg = {
-                'type': 'message',
-                'text': 'Successfully rejoined'
-            }
-            return
+        if player.player_id == player_id:
+            return player
+    return None
 
 def sendPlayerList():
     print("Sending player list to all clients")
-    emit('player_list', {'list': [player.username for player in players]}, broadcast=True, json=True, namespace='/')
-
+    emit('player_list', {'list': [player.username for player in players]}, broadcast=True, json=True)
 
 @app.route('/')
 def index():
@@ -53,35 +35,47 @@ def index():
 @socketio.on('connect')
 def handle_connect():
     print('Client connected:', request.sid)
-    connected_clients.add(request.sid)
 
+@socketio.on('join')
+def handle_join(data):
+    player_id = data.get('player_id')
+    username = data.get('username')
+    sid = request.sid
+
+    if not username:
+        emit('error', {'message': 'Username is required'}, to=sid)
+        return
+
+    if player_id:
+        player = getPlayerById(player_id)
+        if player:
+            # Player reconnected
+            player.sid = sid
+            player.username = username  # Update username on reconnect
+            print(f"Player {player.username} reconnected with new username")
+        else:
+            # Invalid player_id, create new player
+            player_id = str(uuid4())
+            new_player = Player(sid=sid, player_id=player_id, username=username)
+            players.append(new_player)
+            emit('player_id', {'player_id': player_id}, to=sid)
+            print(f"New player {username} joined with new ID {player_id}")
+    else:
+        # New player
+        player_id = str(uuid4())
+        new_player = Player(sid=sid, player_id=player_id, username=username)
+        players.append(new_player)
+        emit('player_id', {'player_id': player_id}, to=sid)
+        print(f"New player {username} joined with ID {player_id}")
+
+    sendPlayerList()
 
 @socketio.on('disconnect')
 def handle_disconnect():
     print("Client disconnected:", request.sid)
-    connected_clients.remove(request.sid)
-    player = getPlayer(request.sid)
+    player = getPlayerBySid(request.sid)
     if player:
-        player.active = False
         sendPlayerList()
-
-@app.route('/player_join', methods=['POST'])
-def addPlayer():
-
-    data = request.get_json()
-    username = data.get('username')
-
-    if not username:
-        return jsonify({"status": "error", "message": "Username is required"}), 400
-
-    # If new player, add them
-    new_player = Player(request.remote_addr, username)  # Use IP or request context for ID
-    players.append(new_player)
-    print(f"{len(players)} players now in game.")
-    sendPlayerList()
-    return jsonify({"status": "success", "message": "Joined successfully"}), 200
-
-    
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=5000)

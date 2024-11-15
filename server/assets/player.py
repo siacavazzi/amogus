@@ -1,8 +1,9 @@
 class Player():
 
-    def __init__(self, id, name):
-        self.id = sid
-        self.name = name
+    def __init__(self, sid, player_id,username):
+        self.sid = sid
+        self.username = username
+        self.player_id = player_id
         self.active = True
 
         self.sus = False
