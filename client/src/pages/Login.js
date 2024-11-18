@@ -6,35 +6,17 @@ import { ENDPOINT } from '../ENDPOINT';
 
 function LoginPage() {
     const [username, setUsername] = useState('');
-    const { setPlayerState } = useContext(DataContext);
+    const { setPlayerState, socket} = useContext(DataContext);
 
     const handleJoin = async (e) => {
         e.preventDefault();
 
-        if (username.trim()) {
-            try {
-                const response = await fetch(`${ENDPOINT}/player_join`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ username }),
-                });
+        setPlayerState(prevState => ({ ...prevState, name: username }));
+        let playerId = localStorage.getItem('player_id');
 
-                const result = await response.json();
+        // Emit 'join' event with playerId and username
+        socket.emit('join', { player_id: playerId, username: username });
 
-                if (response.ok && result.status === 'success') {
-                    console.log(result.message); // "Joined successfully" or "Rejoined successfully"
-                    setPlayerState({ name: username });
-                } else {
-                    console.error(result.message);
-                    alert(result.message);
-                }
-            } catch (error) {
-                console.error('Request failed:', error);
-                alert('There was an error connecting to the server.');
-            }
-        }
     };
 
     return (

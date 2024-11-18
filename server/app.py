@@ -5,10 +5,11 @@ from flask_socketio import SocketIO, emit
 from flask_cors import CORS
 from uuid import uuid4
 from assets.player import Player
+import socket
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": '*'}})
-socketio = SocketIO(app, cors_allowed_origins=["http://localhost:3000"])
+socketio = SocketIO(app, cors_allowed_origins=["http://localhost:3000", "http://192.168.68.62:3000", '*'])
 
 players = []
 
@@ -24,9 +25,22 @@ def getPlayerById(player_id):
             return player
     return None
 
+def get_local_ip():
+    try:
+        # Create a temporary socket to find the local IP
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # Use Google's public DNS server as the target
+        s.connect(("8.8.8.8", 80))
+        local_ip = s.getsockname()[0]
+        s.close()
+        return local_ip
+    except Exception as e:
+        print("Error getting local IP:", e)
+        return "127.0.0.1"  # Fallback to localhost if unable to get IP
+    
 def sendPlayerList():
     print("Sending player list to all clients")
-    emit('player_list', {'list': [player.username for player in players]}, broadcast=True, json=True)
+    emit('player_list', {'list': [player.to_json() for player in players]}, broadcast=True, json=True)
 
 @app.route('/')
 def index():
@@ -35,6 +49,10 @@ def index():
 @socketio.on('connect')
 def handle_connect():
     print('Client connected:', request.sid)
+
+@socketio.on('start_game')
+def handle_start(data):
+    emit("start_game", {}, broadcast=True)
 
 @socketio.on('join')
 def handle_join(data):
@@ -78,4 +96,11 @@ def handle_disconnect():
         sendPlayerList()
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5000)
+    local_ip = get_local_ip()
+
+    print("Starting server...")
+    print(f" * Running on all addresses (0.0.0.0)")
+    print(f" * Running on http://127.0.0.1:5000")
+    print(f" * Running on http://{local_ip}:5000")
+    print("Press CTRL+C to quit")
+    socketio.run(app, host='0.0.0.0', port=5000, debug=False)

@@ -1,21 +1,40 @@
-// ./path-to-your-context-file.jsx
-
 import { createContext, useState, useEffect, useRef, useMemo } from 'react';
 import { io } from "socket.io-client";
 import { ENDPOINT } from './ENDPOINT';
+import { startSound } from './utils';
 
 const DataContext = createContext();
 
 export default function GameContext({ children }) {
-    // Define your state here with initial values
-    const [playerState, setPlayerState] = useState({ name: '' }); // Example initial state
-    const [gameState, setGameState] = useState({ /* initial game state */ });
+    const [playerState, setPlayerState] = useState({
+        name: '',
+        playerId: localStorage.getItem('player_id') || '',
+    });
+    const [gameState, setGameState] = useState({});
     const [connected, setConnected] = useState(false);
+    const [players, setPlayers] = useState([]);
+    const [message, setMessage] = useState(undefined)
 
-    const socketRef = useRef(null); // Use useRef to persist socket instance
+    const resetMessage = (delay) => {
+        if (message !== undefined) {
+            const timer = setTimeout(() => {
+                setMessage(undefined);
+            }, delay);
+
+            // Cleanup to prevent memory leaks if the component unmounts
+            return () => clearTimeout(timer);
+        }
+    };
 
     useEffect(() => {
-        // Initialize the socket connection only once
+        console.log(message)
+        const reset = resetMessage(5000)
+        return reset;
+    }, [message])
+
+    const socketRef = useRef(null);
+
+    useEffect(() => {
         socketRef.current = io(ENDPOINT, {
             reconnection: true,
             reconnectionAttempts: 10,
@@ -33,20 +52,47 @@ export default function GameContext({ children }) {
             setConnected(false);
         });
 
-        // Example of listening for a custom event
-        socketRef.current.on('gameUpdate', (data) => {
-            setGameState(data);
+        socketRef.current.on('start_game', () => {
+            startSound();
         });
 
-        // Cleanup the socket connection when the component unmounts
+        // Handle 'player_id' event
+        socketRef.current.on('player_id', (data) => {
+            if (data && data.player_id) {
+                localStorage.setItem('player_id', data.player_id);
+                setPlayerState(prevState => ({ ...prevState, playerId: data.player_id }));
+            }
+        });
+
+        socketRef.current.on('player_list', (data) => {
+            if (Array.isArray(data.list)) {
+                // Safely parse each player from a JSON string to an object
+                const parsedPlayers = data.list.map(player => {
+                    try {
+                        return JSON.parse(player);
+                    } catch (err) {
+                        console.error("Failed to parse player:", player, err);
+                        return null; // Handle malformed JSON
+                    }
+                }).filter(player => player !== null); // Filter out any failed parses
+
+                console.log("Active players:", parsedPlayers);
+                setPlayers(parsedPlayers);
+                console.log("Updated players state:", parsedPlayers);
+            } else {
+                console.error("Unexpected data format:", data);
+            }
+        });
+
+
+        // Cleanup on unmount
         return () => {
             if (socketRef.current) {
                 socketRef.current.disconnect();
             }
         };
-    }, []); // Empty dependency array ensures this runs once
+    }, []);
 
-    // Memoize the context value to prevent unnecessary re-renders
     const contextValue = useMemo(() => ({
         playerState,
         setPlayerState,
@@ -54,7 +100,10 @@ export default function GameContext({ children }) {
         setGameState,
         socket: socketRef.current,
         connected,
-    }), [playerState, gameState, connected]);
+        players,
+        message,
+        setMessage,
+    }), [playerState, gameState, connected, players, message]);
 
     return (
         <DataContext.Provider value={contextValue}>

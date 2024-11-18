@@ -1,0 +1,126 @@
+/* custom.css */
+
+/* Root variables for theming */
+:root {
+  --slider-color: #4caf50;       /* Default slider color */
+  --background-color: #e0e0e0;   /* Default background color */
+  --slider-height: 4rem;         /* Increased slider height */
+  --slider-handle-size: 3.5rem;  /* Increased slider handle size */
+  --slider-border-radius: 2rem;
+  --slider-text-color: #fff;
+  --slider-text-font-size: 1.25rem;
+  --slider-icon-size: 2rem;
+  --progress-width: 0%;
+}
+
+/* Main container fixed at the bottom */
+.ReactSwipeButton {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  user-select: none;
+  z-index: 1000; /* Ensure it stays above other elements */
+}
+
+/* Adjusted container to take more space */
+.rsbContainer {
+  position: relative;
+  background-color: var(--background-color);
+  border-radius: var(--slider-border-radius);
+  overflow: hidden;
+  height: var(--slider-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1rem;
+}
+
+/* Progress bar */
+.rsbContainer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--progress-width);
+  height: 100%;
+  background: var(--slider-color);
+  border-radius: var(--slider-border-radius);
+  z-index: 0;
+  transition: width 0.2s;
+}
+
+/* Slider handle */
+.rsbcSlider {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: var(--slider-handle-size);
+  height: var(--slider-handle-size);
+  background-color: var(--slider-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1;
+  transform: translate(0, -50%);
+  transition: background-color 0.2s, left 0.2s;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.rsbcSlider.unlocked {
+  left: calc(100% - var(--slider-handle-size));
+  background-color: #66bb6a;
+}
+
+.rsbcSlider:active {
+  background-color: #66bb6a;
+}
+
+/* Slider text inside the handle */
+.rsbcSliderText {
+  color: var(--slider-text-color);
+  font-size: var(--slider-text-font-size);
+  text-align: center;
+  white-space: nowrap;
+  padding: 0 0.5rem;
+  display: none; /* Hidden to make the handle simpler */
+}
+
+/* Slider icon */
+.rsbcSliderIcon {
+  width: var(--slider-icon-size);
+  height: var(--slider-icon-size);
+  color: var(--slider-text-color);
+}
+
+/* Background text */
+.rsbcText {
+  position: relative;
+  text-align: center;
+  font-size: var(--slider-text-font-size);
+  color: #666;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  z-index: 1;
+}
+
+.rsbcText.unlocked {
+  opacity: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  :root {
+    --slider-height: 5rem;          /* Increase height on mobile */
+    --slider-handle-size: 4rem;
+    --slider-text-font-size: 1.5rem;
+    --slider-icon-size: 2.5rem;
+  }
+}
+
+/* Additional styles for touch optimization */
+.rsbcSlider:active {
+  transform: scale(0.95) translate(0, -50%);
+}
