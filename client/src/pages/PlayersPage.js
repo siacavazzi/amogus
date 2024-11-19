@@ -1,11 +1,11 @@
 import React, { useContext, useEffect } from "react";
-import { Grid, Card, CardBody, CardFooter, Heading, Text, Avatar, Button, Stack } from "@chakra-ui/react";
 import { DataContext } from "../GameContext";
 import MUECustomSlider from "../components/ui/swiper";
-import { testSound } from "../utils";
+import PlayerCard from "../PlayerCard";
+import PropTypes from "prop-types";
 
 export default function PlayersPage() {
-    const { players, socket, setMessage } = useContext(DataContext);
+    const { players, socket, setMessage, setAudio } = useContext(DataContext);
 
     useEffect(() => {
         if (players && players.length > 0) {
@@ -14,40 +14,41 @@ export default function PlayersPage() {
     }, [players]);
 
     if (!players || players.length === 0) {
-        return <div>No players available</div>;
-    }
-
-    function startGame() {
-        if (players.length > 0) {
-            socket.emit('start_game', {});
-        } else {
-            setMessage({text: "At least 3 players are needed to start the game.", status: "warning"})
-        }
-    }
-
-    function PlayerCard({ player }) {
         return (
-            <Card.Root size="sm">
-                <Card.Header>
-                    <Heading size="md"> {player.username}</Heading>
-                </Card.Header>
-                <Card.Body color={player.alive ? "green" : "red"}>
-                    {player.alive ? "Alive" : "Dead"}
-                </Card.Body>
-            </Card.Root>
+            <div className="flex items-center justify-center h-screen bg-gradient-to-tr from-pink-300 to-purple-400 p-6">
+                <div className="text-center text-gray-700">
+                    <p className="text-lg">No players available</p>
+                </div>
+            </div>
         );
     }
 
+    function startGame() {
+        if (players.length >= 1) {
+            socket.emit('start_game', {});
+        } else {
+            setMessage({ text: "At least 3 players are needed to start the game.", status: "warning" });
+        }
+    }
+
     return (
-        <div>
-            <button className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors" onClick={testSound}>Test Sound</button>
-            <Grid templateColumns="repeat(3, 1fr)" gap="6">
-                {players.map((player) => (
-                    <PlayerCard key={player.id} player={player} />
-                ))}
-            </Grid>
-            <MUECustomSlider text={"Swipe to start game"} onSuccess={startGame} />;
+        <div className="min-h-screen bg-gradient-to-tr from-pink-300 to-purple-400 p-6">
+            <div className="max-w-6xl mx-auto">
+                <div className="flex flex-col items-center mb-6">
+                    <button
+                        className="mb-4 bg-blue-500 text-white py-2 px-6 rounded-full shadow hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        onClick={() => setAudio('test')}
+                    >
+                        Test Sound
+                    </button>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                    {players.map((player) => (
+                        <PlayerCard key={player.id} player={player} />
+                    ))}
+                </div>
+                    <MUECustomSlider text={"Swipe to start game"} onSuccess={startGame} />
+            </div>
         </div>
     );
-
 }

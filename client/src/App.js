@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import GameContext from './GameContext';
 import PageController from './PageController';
-import { Provider } from './components/ui/provider';
+import { Provider } from "./components/ui/provider"
 
 function App() {
 

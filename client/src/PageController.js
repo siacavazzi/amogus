@@ -5,6 +5,7 @@ import LoginPage from "./pages/Login";
 import ConnectingPage from "./pages/ConnectingPage";
 import PlayersPage from "./pages/PlayersPage";
 import { Alert } from "./components/ui/alert";
+import Modal from "./Modal";
 
 export default function PageController() {
 
@@ -12,7 +13,7 @@ export default function PageController() {
         playerState, 
         connected,
         gameState,
-        message,
+        message
     } = useContext(DataContext); // Use DataContext here
 
     console.log(message)
@@ -22,7 +23,7 @@ export default function PageController() {
             return <ConnectingPage />;
         }
     
-        if (!playerState || !playerState.name) { // Check for playerState.name
+        if (!playerState || !playerState.username) { // Check for playerState.name
             return <LoginPage />;
         }
     
@@ -33,17 +34,12 @@ export default function PageController() {
         // Render Dashboard or other components when connected and playerState exists
         return <p>Hi</p>
     }
-    
-    function HandleAlert() {
-        console.log(message)
-        if(message) {
-            console.log("message")
-        return (<Alert size="lg" status={message.status} title={message.text}/>)
-        }
-    }
+
+    // hi
     return(
         <div>
             {message && <Alert size="lg" status={message.status} title={message.text}/>}
+            <Modal/>
             <PageHandler/>
         </div>
     )

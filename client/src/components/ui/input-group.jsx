@@ -8,6 +8,8 @@ export const InputGroup = React.forwardRef(function InputGroup(props, ref) {
     endElement,
     endElementProps,
     children,
+    startOffset = '6px',
+    endOffset = '6px',
     ...rest
   } = props
 
@@ -19,8 +21,10 @@ export const InputGroup = React.forwardRef(function InputGroup(props, ref) {
         </InputElement>
       )}
       {React.cloneElement(children, {
-        ...(startElement && { ps: 'calc(var(--input-height) - 6px)' }),
-        ...(endElement && { pe: 'calc(var(--input-height) - 6px)' }),
+        ...(startElement && {
+          ps: `calc(var(--input-height) - ${startOffset})`,
+        }),
+        ...(endElement && { pe: `calc(var(--input-height) - ${endOffset})` }),
         ...children.props,
       })}
       {endElement && (

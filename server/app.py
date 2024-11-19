@@ -5,13 +5,41 @@ from flask_socketio import SocketIO, emit
 from flask_cors import CORS
 from uuid import uuid4
 from assets.player import Player
+from assets.tasks import getTasks
 import socket
+import random
+import math
+
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": '*'}})
 socketio = SocketIO(app, cors_allowed_origins=["http://localhost:3000", "http://192.168.68.62:3000", '*'])
 
 players = []
+tasks = []
+crew_points = 0
+sus_points = 0
+
+def resetRoles():
+    for player in players:
+        player.sus = False
+
+def assignRoles():
+    resetRoles()
+    global players
+    print(players)
+    
+    # 1/5 ratio
+    numImposters = math.ceil((len(players) / 5))
+    print(numImposters)
+    random.shuffle(players)
+    for i in range(0, numImposters):
+        players[i]
+        players[i].sus = True
+    random.shuffle(players)
+    print("assinging roles...")
+    print(players)
+    
 
 def getPlayerBySid(sid):
     for player in players:
@@ -38,9 +66,9 @@ def get_local_ip():
         print("Error getting local IP:", e)
         return "127.0.0.1"  # Fallback to localhost if unable to get IP
     
-def sendPlayerList():
+def sendPlayerList(action = 'player_list'):
     print("Sending player list to all clients")
-    emit('player_list', {'list': [player.to_json() for player in players]}, broadcast=True, json=True)
+    emit('game_data', {'action':action,'list': [player.to_json() for player in players]}, broadcast=True, json=True)
 
 @app.route('/')
 def index():
@@ -50,9 +78,23 @@ def index():
 def handle_connect():
     print('Client connected:', request.sid)
 
+@socketio.on('reset')
+def reset_game():
+    for player in players:
+        player.reset()
+    sendPlayerList()
+
 @socketio.on('start_game')
 def handle_start(data):
-    emit("start_game", {}, broadcast=True)
+    global tasks
+
+    assignRoles()
+    sendPlayerList('start_game')
+    tasks = getTasks()
+    # send a different task to each crewmate
+    for player in players:
+        if not player.sus:
+            emit("task", tasks.pop, to=player.sid)
 
 @socketio.on('join')
 def handle_join(data):

@@ -1,19 +1,38 @@
 import { createContext, useState, useEffect, useRef, useMemo } from 'react';
 import { io } from "socket.io-client";
 import { ENDPOINT } from './ENDPOINT';
-import { startSound } from './utils';
+import { AudioHandler } from './AudioHandler';
+import PlayerRole from './components/ui/PlayerRole';
+import EmergencyMeeting from './components/ui/EmergencyMeeting';
 
 const DataContext = createContext();
 
 export default function GameContext({ children }) {
     const [playerState, setPlayerState] = useState({
-        name: '',
+        username: '',
         playerId: localStorage.getItem('player_id') || '',
     });
     const [gameState, setGameState] = useState({});
     const [connected, setConnected] = useState(false);
     const [players, setPlayers] = useState([]);
     const [message, setMessage] = useState(undefined)
+    const [dialog, setDialog] = useState(undefined)
+    const [audio, setAudio] = useState(undefined);
+
+    useEffect(() => {
+        console.log("player state debug")
+        console.log(playerState)
+    }, [playerState])
+
+    const resetState = () => {
+        setGameState({})
+        setConnected(false)
+        setPlayers([])
+        setPlayerState({
+            username: '',
+            playerId: localStorage.getItem('player_id') || '',
+        })
+    }
 
     const resetMessage = (delay) => {
         if (message !== undefined) {
@@ -49,11 +68,11 @@ export default function GameContext({ children }) {
 
         socketRef.current.on('disconnect', () => {
             console.log("WebSocket connection disconnected");
-            setConnected(false);
+            resetState();
         });
 
-        socketRef.current.on('start_game', () => {
-            startSound();
+        socketRef.current.on('reset', () => {
+            resetState();
         });
 
         // Handle 'player_id' event
@@ -64,23 +83,48 @@ export default function GameContext({ children }) {
             }
         });
 
-        socketRef.current.on('player_list', (data) => {
-            if (Array.isArray(data.list)) {
-                // Safely parse each player from a JSON string to an object
-                const parsedPlayers = data.list.map(player => {
-                    try {
-                        return JSON.parse(player);
-                    } catch (err) {
-                        console.error("Failed to parse player:", player, err);
-                        return null; // Handle malformed JSON
+        socketRef.current.on('game_data', (data) => {
+            console.log(data)
+            let me;
+            if (data.action === "player_list" || "start_game") {
+                if (Array.isArray(data.list)) {
+                    // Safely parse each player from a JSON string to an object
+                    const parsedPlayers = data.list.map(player => {
+                        try {
+                            return JSON.parse(player);
+                        } catch (err) {
+                            console.error("Failed to parse player:", player, err);
+                            return null; // Handle malformed JSON
+                        }
+                    }).filter(player => player !== null); // Filter out any failed parses
+                    
+                    console.log("Active players:", parsedPlayers);
+                    if (playerState.playerId) {
+                        console.log(parsedPlayers[0])
+                        me = parsedPlayers.find((player) => player.player_id === playerState.playerId)
+                        if (me) {
+                            setPlayerState(me)
+                            console.log(me)
+                            console.log("found me")
+                        } else {
+                            console.log("not found")
+                        }
+                    } else {
+                        console.log("not found")
+                        setMessage({ status: "error", text: "Idk who i am :(" })
                     }
-                }).filter(player => player !== null); // Filter out any failed parses
+                    setPlayers(parsedPlayers);
+                    console.log("Updated players state:", parsedPlayers);
+                } else {
+                    console.error("Unexpected data format:", data);
+                }
 
-                console.log("Active players:", parsedPlayers);
-                setPlayers(parsedPlayers);
-                console.log("Updated players state:", parsedPlayers);
-            } else {
-                console.error("Unexpected data format:", data);
+                if(data.action === "start_game" && me) {
+                    console.log("start game")
+                    setAudio('start')
+                    setDialog({ title: "Game Started", body: <PlayerRole sus={me.sus}/> })
+
+                }
             }
         });
 
@@ -103,10 +147,14 @@ export default function GameContext({ children }) {
         players,
         message,
         setMessage,
-    }), [playerState, gameState, connected, players, message]);
+        setAudio,
+        dialog,
+        setDialog
+    }), [playerState, gameState, connected, players, message, dialog]);
 
     return (
         <DataContext.Provider value={contextValue}>
+            <AudioHandler audio={audio} setAudio={setAudio} />
             {children}
         </DataContext.Provider>
     );
