@@ -8,6 +8,7 @@ class Player:
         self.active = True
         self.sus = False
         self.alive = True
+        self.task = None
 
     def disconnect(self):
         self.active = False

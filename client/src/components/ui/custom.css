@@ -27,7 +27,6 @@
 .rsbContainer {
   position: relative;
   background-color: var(--background-color);
-  border-radius: var(--slider-border-radius);
   overflow: hidden;
   height: var(--slider-height);
   display: flex;

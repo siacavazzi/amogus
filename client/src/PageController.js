@@ -6,6 +6,8 @@ import ConnectingPage from "./pages/ConnectingPage";
 import PlayersPage from "./pages/PlayersPage";
 import { Alert } from "./components/ui/alert";
 import Modal from "./Modal";
+import ImposterPage from "./pages/ImposterPage";
+import CrewmemberPage from "./pages/CrewPage";
 
 export default function PageController() {
 
@@ -13,10 +15,9 @@ export default function PageController() {
         playerState, 
         connected,
         gameState,
-        message
+        message,
+        running
     } = useContext(DataContext); // Use DataContext here
-
-    console.log(message)
 
     function PageHandler() {
         if (!connected) {
@@ -27,8 +28,16 @@ export default function PageController() {
             return <LoginPage />;
         }
     
-        if(playerState && !gameState.isRunning) {
+        if(playerState && !running) {
             return <PlayersPage />
+        }
+
+        if(running && playerState.sus) {
+            return <ImposterPage/>
+        }
+
+        if(running && !playerState.sus) {
+            return <CrewmemberPage/>
         }
     
         // Render Dashboard or other components when connected and playerState exists

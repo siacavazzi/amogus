@@ -9,4 +9,5 @@ tasks = [
 
 
 def getTasks():
-    return random.shuffle(tasks)
+    random.shuffle(tasks)
+    return tasks

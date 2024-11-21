@@ -1,4 +1,7 @@
+// ./components/MUECustomSlider.jsx
+
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { Beforeunload } from 'react-beforeunload';
 import "./custom.css"; // Ensure your CSS is correctly imported
 
 const MUECustomSlider = ({
@@ -13,6 +16,7 @@ const MUECustomSlider = ({
   const mainTextRef = useRef(null);
 
   const [unlocked, setUnlocked] = useState(false);
+  const [isBlocking, setIsBlocking] = useState(true); // Initialize as blocking
 
   // Mutable refs to avoid re-renders
   const sliderPosition = useRef(0);
@@ -72,6 +76,7 @@ const MUECustomSlider = ({
     updateSliderTransform(containerWidth.current);
     onSuccess && onSuccess();
     setUnlocked(true);
+    setIsBlocking(false); // Stop blocking after unlock
   }, [onSuccess, updateSliderTransform]);
 
   // **Function to handle reset**
@@ -80,6 +85,7 @@ const MUECustomSlider = ({
     updateSliderTransform(0);
     setUnlocked(false);
     onReset && onReset();
+    setIsBlocking(false); // Stop blocking after reset
   }, [onReset, updateSliderTransform]);
 
   // **Function to reset slider**
@@ -94,6 +100,7 @@ const MUECustomSlider = ({
       if (!isDragging.current || unlocked) return;
 
       e.preventDefault();
+      e.stopPropagation();
 
       const clientX = e.clientX || (e.touches && e.touches[0].clientX);
       const deltaX = clientX - startX.current;
@@ -153,6 +160,8 @@ const MUECustomSlider = ({
     const clientX = e.clientX || (e.touches && e.touches[0].clientX);
     startX.current = clientX - sliderPosition.current;
     e.preventDefault(); // Prevent text selection or scrolling
+    e.stopPropagation(); // Prevent event from bubbling up
+    setIsBlocking(true); // Start blocking when dragging starts
   };
 
   // **Keyboard accessibility**
@@ -171,33 +180,46 @@ const MUECustomSlider = ({
   const containerStyle = {
     '--slider-color': sliderColor,
     '--background-color': backgroundColor,
+    'overscroll-behavior': 'none', // More restrictive to prevent all overscroll gestures
   };
 
+  // **Use the Beforeunload component from react-beforeunload**
   return (
-    <div className="ReactSwipeButton" style={containerStyle}>
-      <div className="rsbContainer" ref={containerRef}>
-        <div
-          className={`rsbcSlider ${unlocked ? "unlocked" : ""}`}
-          ref={sliderRef}
-          onPointerDown={handlePointerDown}
-          onTouchStart={handlePointerDown}
-          tabIndex={0}
-          role="slider"
-          aria-valuemin={0}
-          aria-valuemax={containerWidth.current}
-          aria-valuenow={sliderPosition.current}
-          aria-label="Slide to unlock"
-          onKeyDown={handleKeyDown}
-        >
-        </div>
-        <div
-          className={`rsbcText ${unlocked ? "unlocked" : ""}`}
-          ref={mainTextRef}
-        >
-          {text}
+    <>
+      {/* The Beforeunload component handles the beforeunload event */}
+      <Beforeunload onBeforeunload={(event) => {
+        if (isBlocking) {
+          event.preventDefault();
+          event.returnValue = ''; // Required for Chrome
+        }
+      }} />
+      <div className="ReactSwipeButton" style={containerStyle}>
+        <div className="rsbContainer" ref={containerRef}>
+          <div
+            className={`rsbcSlider ${unlocked ? "unlocked" : ""}`}
+            ref={sliderRef}
+            onPointerDown={handlePointerDown}
+            onTouchStart={handlePointerDown}
+            tabIndex={0}
+            role="slider"
+            aria-valuemin={0}
+            aria-valuemax={containerWidth.current}
+            aria-valuenow={sliderPosition.current}
+            aria-label="Slide to unlock"
+            onKeyDown={handleKeyDown}
+          >
+            {/* Optional: You can include an icon inside the slider handle */}
+            {/* <div className="rsbcSliderIcon">🔓</div> */}
+          </div>
+          <div
+            className={`rsbcText ${unlocked ? "unlocked" : ""}`}
+            ref={mainTextRef}
+          >
+            {text}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

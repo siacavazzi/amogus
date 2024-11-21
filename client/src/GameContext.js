@@ -18,10 +18,15 @@ export default function GameContext({ children }) {
     const [message, setMessage] = useState(undefined)
     const [dialog, setDialog] = useState(undefined)
     const [audio, setAudio] = useState(undefined);
+    const [running, setRunning] = useState(false);
+    const [task, setTask] = useState(undefined)
 
     useEffect(() => {
         console.log("player state debug")
         console.log(playerState)
+        if(playerState.sus && !running) {
+            setRunning(true);
+        }
     }, [playerState])
 
     const resetState = () => {
@@ -32,6 +37,8 @@ export default function GameContext({ children }) {
             username: '',
             playerId: localStorage.getItem('player_id') || '',
         })
+        setTask(undefined)
+        setRunning(false)
     }
 
     const resetMessage = (delay) => {
@@ -64,6 +71,9 @@ export default function GameContext({ children }) {
         socketRef.current.on('connect', () => {
             console.log("WebSocket connection established");
             setConnected(true);
+            socketRef.current.emit('rejoin', {
+                player_id: playerState.playerId,
+            });
         });
 
         socketRef.current.on('disconnect', () => {
@@ -75,18 +85,34 @@ export default function GameContext({ children }) {
             resetState();
         });
 
+        socketRef.current.on('task',(data) => {
+            if(!running) {
+                setRunning(true)
+            }
+            setTask(data.task);
+        })
+
+
         // Handle 'player_id' event
         socketRef.current.on('player_id', (data) => {
+            console.log("NEW ID ==")
+            console.log(data.player_id)
             if (data && data.player_id) {
+                console.log("setting new id ?")
                 localStorage.setItem('player_id', data.player_id);
                 setPlayerState(prevState => ({ ...prevState, playerId: data.player_id }));
             }
         });
 
         socketRef.current.on('game_data', (data) => {
+            console.log("SOCKET DATA!!!")
+            console.log(data)
+            if (!playerState && data.action != "rejoin") {
+                return;
+            }
             console.log(data)
             let me;
-            if (data.action === "player_list" || "start_game") {
+            if (data.action === "player_list" || data.action === "start_game" || data.action === "rejoin") {
                 if (Array.isArray(data.list)) {
                     // Safely parse each player from a JSON string to an object
                     const parsedPlayers = data.list.map(player => {
@@ -97,11 +123,10 @@ export default function GameContext({ children }) {
                             return null; // Handle malformed JSON
                         }
                     }).filter(player => player !== null); // Filter out any failed parses
-                    
+
                     console.log("Active players:", parsedPlayers);
                     if (playerState.playerId) {
-                        console.log(parsedPlayers[0])
-                        me = parsedPlayers.find((player) => player.player_id === playerState.playerId)
+                        me = parsedPlayers.find((player) => player.player_id === localStorage.getItem('player_id'))
                         if (me) {
                             setPlayerState(me)
                             console.log(me)
@@ -119,10 +144,11 @@ export default function GameContext({ children }) {
                     console.error("Unexpected data format:", data);
                 }
 
-                if(data.action === "start_game" && me) {
+                if (data.action === "start_game" && me) {
                     console.log("start game")
-                    setAudio('start')
-                    setDialog({ title: "Game Started", body: <PlayerRole sus={me.sus}/> })
+                    setAudio('start');
+                    setRunning(true);
+                    setDialog({ title: "Game Started", body: <PlayerRole sus={me.sus} /> });
 
                 }
             }
@@ -137,6 +163,7 @@ export default function GameContext({ children }) {
         };
     }, []);
 
+
     const contextValue = useMemo(() => ({
         playerState,
         setPlayerState,
@@ -149,8 +176,10 @@ export default function GameContext({ children }) {
         setMessage,
         setAudio,
         dialog,
-        setDialog
-    }), [playerState, gameState, connected, players, message, dialog]);
+        setDialog,
+        running,
+        task
+    }), [playerState, gameState, connected, players, message, dialog, running, task]);
 
     return (
         <DataContext.Provider value={contextValue}>

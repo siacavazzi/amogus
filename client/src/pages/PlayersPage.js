@@ -1,22 +1,23 @@
+// ./pages/PlayersPage.jsx
+
 import React, { useContext, useEffect } from "react";
 import { DataContext } from "../GameContext";
 import MUECustomSlider from "../components/ui/swiper";
-import PlayerCard from "../PlayerCard";
-import PropTypes from "prop-types";
+import PlayerCard from "../PlayerCard"; // Ensure this path is correct
 
 export default function PlayersPage() {
     const { players, socket, setMessage, setAudio } = useContext(DataContext);
 
-    useEffect(() => {
-        if (players && players.length > 0) {
-            console.log(players[0]?.username);
-        }
-    }, [players]);
+    // useEffect(() => {
+    //     if (players && players.length > 0) {
+    //         console.log(players[0]?.username);
+    //     }
+    // }, [players]);
 
     if (!players || players.length === 0) {
         return (
-            <div className="flex items-center justify-center h-screen bg-gradient-to-tr from-pink-300 to-purple-400 p-6">
-                <div className="text-center text-gray-700">
+            <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-gray-800 to-gray-900 p-6">
+                <div className="text-center text-gray-400">
                     <p className="text-lg">No players available</p>
                 </div>
             </div>
@@ -24,7 +25,7 @@ export default function PlayersPage() {
     }
 
     function startGame() {
-        if (players.length >= 1) {
+        if (players.length >= 0) {
             socket.emit('start_game', {});
         } else {
             setMessage({ text: "At least 3 players are needed to start the game.", status: "warning" });
@@ -32,11 +33,11 @@ export default function PlayersPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-tr from-pink-300 to-purple-400 p-6">
+        <div className="min-h-screen bg-gradient-to-tr from-gray-800 to-gray-900 p-6">
             <div className="max-w-6xl mx-auto">
                 <div className="flex flex-col items-center mb-6">
                     <button
-                        className="mb-4 bg-blue-500 text-white py-2 px-6 rounded-full shadow hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        className="mb-4 bg-indigo-600 text-white py-2 px-6 rounded-full shadow-lg hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400"
                         onClick={() => setAudio('test')}
                     >
                         Test Sound
@@ -47,7 +48,9 @@ export default function PlayersPage() {
                         <PlayerCard key={player.id} player={player} />
                     ))}
                 </div>
+                <div className="mt-8 flex justify-center p-4">
                     <MUECustomSlider text={"Swipe to start game"} onSuccess={startGame} />
+                </div>
             </div>
         </div>
     );
