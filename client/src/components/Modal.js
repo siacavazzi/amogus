@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
-import { DataContext } from "./GameContext";
+import { DataContext } from "../GameContext";
 
 const Modal = () => {
   const { dialog } = useContext(DataContext);

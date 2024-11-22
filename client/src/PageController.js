@@ -4,11 +4,11 @@ import { DataContext } from "./GameContext";
 import LoginPage from "./pages/Login";
 import ConnectingPage from "./pages/ConnectingPage";
 import PlayersPage from "./pages/PlayersPage";
-import { Alert } from "./components/ui/alert";
-import Modal from "./Modal";
+import Alert from "./components/Alert";
+import Modal from "./components/Modal";
 import ImposterPage from "./pages/ImposterPage";
 import CrewmemberPage from "./pages/CrewPage";
-import ProgressBar from "./ProgressBar";
+import ProgressBar from "./components/ProgressBar";
 import EmergencyMeetingPage from "./pages/MeetingPage";
 import DeadPage from "./pages/DeadPage";
 
@@ -22,6 +22,7 @@ export default function PageController() {
         running,
         crewScore,
         meeting,
+        taskGoal,
     } = useContext(DataContext); // Use DataContext here
 
     function PageHandler() {
@@ -54,7 +55,7 @@ export default function PageController() {
         }
     
         // Render Dashboard or other components when connected and playerState exists
-        return <p>Hi</p>
+        return <p>You're really not supposed to see this... Uhhh please go talk to sam and tell him he fucked up somewhere</p>
     }
 
     // hi
@@ -62,7 +63,7 @@ export default function PageController() {
         <div>
             {message && <Alert size="lg" status={message.status} title={message.text}/>}
             <Modal/>
-            {running && <ProgressBar score={crewScore} goalScore={10} sus={playerState.sus}/>}
+            {running && <ProgressBar score={crewScore} goalScore={taskGoal} sus={playerState.sus}/>}
             <PageHandler/>
         </div>
     )

@@ -1,7 +1,7 @@
 // ProgressBar.jsx
 import React from 'react';
 import PropTypes from 'prop-types';
-import './ProgressBar.css'; // Import the CSS for ProgressBar
+import '../CSS/ProgressBar.css';
 
 const ProgressBar = ({ score, goalScore, sus }) => {
   // Calculate percentage

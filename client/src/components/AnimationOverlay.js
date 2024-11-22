@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import './AnimationOverlay.css';
+import '../CSS/AnimationOverlay.css';
 
 const AnimationOverlay = ({ onComplete }) => {
   useEffect(() => {

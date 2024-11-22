@@ -1,0 +1,52 @@
+/* Alert.css */
+
+.alert {
+    border-radius: 4px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    margin: 16px 0;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Sizes */
+  .alert-sm {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+  
+  .alert-md {
+    padding: 16px 20px;
+    font-size: 16px;
+  }
+  
+  .alert-lg {
+    padding: 24px 28px;
+    font-size: 18px;
+  }
+  
+  /* Status Styles */
+  .alert-success {
+    background-color: #e6ffed;
+    border: 1px solid #34c759;
+    color: #2d7a2d;
+  }
+  
+  .alert-error {
+    background-color: #ffe6e6;
+    border: 1px solid #ff3b30;
+    color: #c1272d;
+  }
+  
+  .alert-info {
+    background-color: #e6f7ff;
+    border: 1px solid #007aff;
+    color: #005bb5;
+  }
+  
+  .alert-warning {
+    background-color: #fff4e6;
+    border: 1px solid #ff9500;
+    color: #b34700;
+  }
+  

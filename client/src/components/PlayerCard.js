@@ -1,5 +1,3 @@
-// ./components/PlayerCard.jsx
-
 import React from "react";
 import PropTypes from "prop-types";
 
@@ -22,15 +20,6 @@ const PlayerCard = ({ player }) => {
             </p>
         </div>
     );
-};
-
-PlayerCard.propTypes = {
-    player: PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        username: PropTypes.string.isRequired,
-        alive: PropTypes.bool.isRequired,
-        avatar: PropTypes.string,
-    }).isRequired,
 };
 
 export default PlayerCard;

@@ -4,8 +4,8 @@ import React, { useContext } from 'react';
 import './CrewmemberPage.css'; // Import CSS for styling
 import PropTypes from 'prop-types';
 import { DataContext } from '../GameContext';
-import AnimationOverlay from '../AnimationOverlay';
-import MUECustomSlider from '../components/ui/swiper';
+import AnimationOverlay from '../components/AnimationOverlay';
+import MUECustomSlider from '../components/swiper';
 
 const CrewmemberPage = () => {
   const { 

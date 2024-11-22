@@ -3,7 +3,7 @@
 import React, { useContext } from 'react';
 import { DataContext } from '../GameContext';
 import './ImposterPage.css'; // Import CSS for styling
-import MUECustomSlider from '../components/ui/swiper';
+import MUECustomSlider from '../components/swiper';
 
 const ImposterPage = () => {
     const { 

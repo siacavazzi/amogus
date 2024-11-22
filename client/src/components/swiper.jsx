@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Beforeunload } from 'react-beforeunload';
-import "./custom.css"; // Ensure your CSS is correctly imported
+import "../CSS/slider.css"; // Ensure your CSS is correctly imported
 import { FaArrowCircleRight } from "react-icons/fa";
 
 

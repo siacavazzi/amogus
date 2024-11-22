@@ -3,8 +3,8 @@
 import React, { useContext } from 'react';
 import { DataContext } from '../GameContext';
 import './MeetingPage.css'; // Import CSS for styling
-import PlayerCard from '../PlayerCard';
-import MUECustomSlider from '../components/ui/swiper';
+import PlayerCard from '../components/PlayerCard';
+import MUECustomSlider from '../components/swiper';
 
 const EmergencyMeetingPage = () => {
   const { 

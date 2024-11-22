@@ -2,9 +2,8 @@ import { createContext, useState, useEffect, useRef, useMemo } from 'react';
 import { io } from "socket.io-client";
 import { ENDPOINT } from './ENDPOINT';
 import { AudioHandler } from './AudioHandler';
-import PlayerRole from './components/ui/PlayerRole';
-import EmergencyMeeting from './components/ui/EmergencyMeeting';
-import MeetingDisplay from './MeetingDisplay';
+import PlayerRole from './components/PlayerRole';
+import MeetingDisplay from './components/MeetingDisplay';
 
 const DataContext = createContext();
 
@@ -13,6 +12,8 @@ export default function GameContext({ children }) {
         username: '',
         playerId: localStorage.getItem('player_id') || '',
     });
+
+    // united states
     const [gameState, setGameState] = useState({});
     const [connected, setConnected] = useState(false);
     const [players, setPlayers] = useState([]);
@@ -24,6 +25,7 @@ export default function GameContext({ children }) {
     const [crewScore, setCrewScore] = useState(0);
     const [showAnimation, setShowAnimation] = useState(false);
     const [meeting, setMeeting] = useState(false);
+    const [taskGoal, setTaskGoal] = useState(1);
 
     useEffect(() => {
         console.log("player state debug")
@@ -114,8 +116,10 @@ export default function GameContext({ children }) {
             setMeeting(false);
         });
 
-
-
+        socketRef.current.on('task_goal', (data) => {
+            console.log(data)
+            setTaskGoal(data)
+        });
 
         // Handle 'player_id' event
         socketRef.current.on('player_id', (data) => {
@@ -213,7 +217,8 @@ export default function GameContext({ children }) {
         setShowAnimation,
         handleCallMeeting,
         meeting,
-    }), [playerState, gameState, connected, players, message, dialog, running, task, crewScore, showAnimation, meeting]);
+        taskGoal,
+    }), [playerState, gameState, connected, players, message, dialog, running, task, crewScore, showAnimation, meeting, taskGoal]);
 
     return (
         <DataContext.Provider value={contextValue}>

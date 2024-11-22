@@ -2,8 +2,8 @@
 
 import React, { useContext, useEffect } from "react";
 import { DataContext } from "../GameContext";
-import MUECustomSlider from "../components/ui/swiper";
-import PlayerCard from "../PlayerCard"; // Ensure this path is correct
+import MUECustomSlider from "../components/swiper";
+import PlayerCard from "../components/PlayerCard"; // Ensure this path is correct
 
 export default function PlayersPage() {
     const { players, socket, setMessage, setAudio } = useContext(DataContext);
