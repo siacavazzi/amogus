@@ -4,34 +4,44 @@ import React, { useContext } from 'react';
 import './CrewmemberPage.css'; // Import CSS for styling
 import PropTypes from 'prop-types';
 import { DataContext } from '../GameContext';
+import AnimationOverlay from '../AnimationOverlay';
+import MUECustomSlider from '../components/ui/swiper';
 
 const CrewmemberPage = () => {
+  const { 
+    task,
+    setTask,
+    socket,
+    playerState,
+    setShowAnimation,
+    showAnimation,
+    handleCallMeeting,
+  } = useContext(DataContext); // Use DataContext here
+ // State for animation visibility
 
-    const { 
-        task,
-    } = useContext(DataContext); // Use DataContext here
 
-  // Placeholder function to handle calling a meeting
-  const handleCallMeeting = () => {
-    alert('Meeting called! Discuss with the crew.');
-    // Implement meeting logic here, such as navigating to a meeting page
-    // navigate('/meeting'); // Uncomment if you have a MeetingPage
-  };
-
-  // Placeholder function to handle completing a task
+  // Function to handle completing a task
   const handleCompleteTask = () => {
     if (task) {
-      alert(`Task "${task}" completed!`);
-      // Implement task completion logic here
-      // For example, update game state, notify server, etc.
+      socket.emit('complete_task', { player_id: localStorage.getItem('player_id') });
+      setTask(undefined);  
+      setShowAnimation(true); // Trigger animation first
+      console.log('Animation triggered:', showAnimation); // Debugging line
+      // Note: Do not setTask(undefined) here
     } else {
       alert('No task to complete.');
     }
   };
 
+  // Callback function to handle animation completion
+  const handleAnimationComplete = () => {
+    setShowAnimation(false); // Hide animation    // Clear the task after animation
+    console.log('Animation completed and task cleared');
+  };
+
   return (
     <div className="crewmember-page">
-      <h1>Crewmember Dashboard</h1>
+      <h2>Crewmember Dashboard</h2>
       <div className="crewmember-actions">
         <button onClick={handleCallMeeting} className="action-button call-meeting">
           Call Meeting
@@ -42,16 +52,17 @@ const CrewmemberPage = () => {
         {task ? (
           <div className="task-display">
             <p>{task}</p>
-            <button onClick={handleCompleteTask} className="action-button complete-task">
-              Complete Task
-            </button>
           </div>
         ) : (
           <div className="task-display">
             <p>No task assigned.</p>
           </div>
         )}
+        <MUECustomSlider text={"Slide to complete task"} onSuccess={handleCompleteTask}/>
       </div>
+
+      {/* Animation Overlay */}
+      {showAnimation && <AnimationOverlay  onComplete={handleAnimationComplete} />}
     </div>
   );
 };

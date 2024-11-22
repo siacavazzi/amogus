@@ -4,6 +4,7 @@ import { ENDPOINT } from './ENDPOINT';
 import { AudioHandler } from './AudioHandler';
 import PlayerRole from './components/ui/PlayerRole';
 import EmergencyMeeting from './components/ui/EmergencyMeeting';
+import MeetingDisplay from './MeetingDisplay';
 
 const DataContext = createContext();
 
@@ -19,7 +20,10 @@ export default function GameContext({ children }) {
     const [dialog, setDialog] = useState(undefined)
     const [audio, setAudio] = useState(undefined);
     const [running, setRunning] = useState(false);
-    const [task, setTask] = useState(undefined)
+    const [task, setTask] = useState(undefined);
+    const [crewScore, setCrewScore] = useState(0);
+    const [showAnimation, setShowAnimation] = useState(false);
+    const [meeting, setMeeting] = useState(false);
 
     useEffect(() => {
         console.log("player state debug")
@@ -39,6 +43,9 @@ export default function GameContext({ children }) {
         })
         setTask(undefined)
         setRunning(false)
+        setCrewScore(0);
+        setMeeting(false)
+        setDialog(undefined)
     }
 
     const resetMessage = (delay) => {
@@ -90,7 +97,24 @@ export default function GameContext({ children }) {
                 setRunning(true)
             }
             setTask(data.task);
-        })
+        });
+
+        socketRef.current.on('crew_score', (data) => {
+            console.log("# Completed tasks: ", data.score)
+            setCrewScore(data.score);
+        });
+
+        socketRef.current.on('meeting', () => {
+            setAudio('meeting')
+            setDialog({ title: "Emergency Meeting Called!", body: <MeetingDisplay/>});
+            setMeeting(true);
+        });
+
+        socketRef.current.on('end_meeting', () => {
+            setMeeting(false);
+        });
+
+
 
 
         // Handle 'player_id' event
@@ -163,6 +187,10 @@ export default function GameContext({ children }) {
         };
     }, []);
 
+    function handleCallMeeting() {
+        socketRef.current.emit("meeting");
+    }
+
 
     const contextValue = useMemo(() => ({
         playerState,
@@ -178,8 +206,14 @@ export default function GameContext({ children }) {
         dialog,
         setDialog,
         running,
-        task
-    }), [playerState, gameState, connected, players, message, dialog, running, task]);
+        task,
+        setTask,
+        crewScore,
+        showAnimation,
+        setShowAnimation,
+        handleCallMeeting,
+        meeting,
+    }), [playerState, gameState, connected, players, message, dialog, running, task, crewScore, showAnimation, meeting]);
 
     return (
         <DataContext.Provider value={contextValue}>

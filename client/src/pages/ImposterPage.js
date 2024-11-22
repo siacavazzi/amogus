@@ -1,16 +1,14 @@
 // ./pages/ImposterPage.jsx
 
-import React from 'react';
+import React, { useContext } from 'react';
+import { DataContext } from '../GameContext';
 import './ImposterPage.css'; // Import CSS for styling
+import MUECustomSlider from '../components/ui/swiper';
 
 const ImposterPage = () => {
-
-  // Mock function to handle calling a meeting
-  const handleCallMeeting = () => {
-    alert('Meeting called! Discuss with the crew.');
-    // Implement meeting logic here, such as navigating to a meeting page
-    // navigate('/meeting'); // Uncomment if you have a MeetingPage
-  };
+    const { 
+        handleCallMeeting,
+      } = useContext(DataContext);
 
   return (
     <div className="imposter-page">
@@ -28,6 +26,7 @@ const ImposterPage = () => {
           Use the button above to initiate a meeting when necessary.
         </p>
       </div>
+      <MUECustomSlider text={"Slide to pretend to do a task"} />
     </div>
   );
 };

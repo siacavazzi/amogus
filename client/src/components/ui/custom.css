@@ -70,11 +70,11 @@
 
 .rsbcSlider.unlocked {
   left: calc(100% - var(--slider-handle-size));
-  background-color: #66bb6a;
+  background-color: var(--slider-color);
 }
 
 .rsbcSlider:active {
-  background-color: #66bb6a;
+  background-color: var(--slider-color);
 }
 
 /* Slider text inside the handle */

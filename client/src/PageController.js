@@ -8,6 +8,9 @@ import { Alert } from "./components/ui/alert";
 import Modal from "./Modal";
 import ImposterPage from "./pages/ImposterPage";
 import CrewmemberPage from "./pages/CrewPage";
+import ProgressBar from "./ProgressBar";
+import EmergencyMeetingPage from "./pages/MeetingPage";
+import DeadPage from "./pages/DeadPage";
 
 export default function PageController() {
 
@@ -16,7 +19,9 @@ export default function PageController() {
         connected,
         gameState,
         message,
-        running
+        running,
+        crewScore,
+        meeting,
     } = useContext(DataContext); // Use DataContext here
 
     function PageHandler() {
@@ -30,6 +35,14 @@ export default function PageController() {
     
         if(playerState && !running) {
             return <PlayersPage />
+        }
+
+        if(playerState.alive === false) {
+            return <DeadPage />
+        }
+
+        if(meeting) {
+            return <EmergencyMeetingPage />
         }
 
         if(running && playerState.sus) {
@@ -49,6 +62,7 @@ export default function PageController() {
         <div>
             {message && <Alert size="lg" status={message.status} title={message.text}/>}
             <Modal/>
+            {running && <ProgressBar score={crewScore} goalScore={10} sus={playerState.sus}/>}
             <PageHandler/>
         </div>
     )

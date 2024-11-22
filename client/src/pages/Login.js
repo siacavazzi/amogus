@@ -2,7 +2,6 @@
 
 import React, { useState, useContext } from 'react';
 import { DataContext } from '../GameContext';
-import { FaGamepad } from 'react-icons/fa'; // Decorative icon from react-icons
 
 function LoginPage() {
     const [username, setUsername] = useState('');
@@ -23,7 +22,7 @@ function LoginPage() {
             <div className="relative bg-gray-700 bg-opacity-90 backdrop-blur-md p-8 rounded-lg shadow-lg max-w-sm w-full">
                 {/* Decorative Icon */}
                 <div className="flex flex-col items-center mb-6">
-                    <FaGamepad className="text-4xl text-indigo-500 mb-2" />
+                    <img src="https://i1.sndcdn.com/artworks-Uii8SMJvNPxy8ePA-romBoQ-t1080x1080.jpg"/>
                     <h2 className="text-2xl font-bold mb-2 text-gray-100">Join the Game</h2>
                     <p className="text-sm text-gray-300">Enter your username to start playing</p>
                 </div>

@@ -1,0 +1,105 @@
+/* ./components/AnimationOverlay.css */
+
+/* Overlay Styling */
+.animation-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(54, 57, 63, 0.8); /* Semi-transparent dark background */
+    display: flex;
+    flex-direction: column; /* Stack checkmark and text vertically */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it appears above all other elements */
+    animation: fadeIn 0.3s ease-in-out forwards; /* Faster fade-in */
+  }
+  
+  /* Container for the Checkmark SVG */
+  .checkmark-container {
+    width: 100px; /* Increased size for better visibility */
+    height: 100px;
+    position: relative;
+    margin-bottom: 20px; /* Space between checkmark and text */
+    overflow: visible; /* Ensure scaling doesn't clip the checkmark */
+  }
+  
+  /* Checkmark SVG Styling */
+  .checkmark {
+    width: 100%;
+    height: 100%;
+    stroke: #2ed573; /* Green color for the checkmark */
+    stroke-width: 4;
+    stroke-miterlimit: 10;
+    fill: none;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    /* Make the animation faster and smoother */
+    animation: draw 0.3s ease-out forwards, fadeOut 0.5s 0.3s ease-in forwards;
+    transform-origin: center center; /* Ensure scaling is centered */
+  }
+  
+  /* Circle around the Checkmark */
+  .checkmark-circle {
+    stroke: #2ed573;
+  }
+  
+  /* The actual Checkmark Path */
+  .checkmark-check {
+    stroke: #2ed573;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  
+  /* Keyframes for Drawing the Checkmark */
+  @keyframes draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  
+  /* Keyframes for Fading Out the Checkmark */
+  @keyframes fadeOut {
+    to {
+      opacity: 0;
+      transform: scale(1.2); /* Slightly less scaling to prevent cut-off */
+    }
+  }
+  
+  /* Keyframes for Fading In the Overlay */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  /* Styling for the Completion Message */
+  .animation-message {
+    color: #ffffff; /* White text */
+    font-size: 1.2rem; /* Adjusted font size */
+    font-weight: bold;
+    animation: fadeOutMessage 0.5s 0.3s forwards; /* Faster fade-out */
+    text-align: center; /* Center the text */
+    max-width: 80%; /* Prevent text from overflowing */
+  }
+  
+  /* Keyframes for Fading Out the Message */
+  @keyframes fadeOutMessage {
+    to {
+      opacity: 0;
+      transform: translateY(-10px); /* Less upward movement */
+    }
+  }
+  
+  /* Responsive Adjustments */
+  @media (min-width: 600px) {
+    .checkmark-container {
+      width: 120px; /* Larger size on bigger screens */
+      height: 120px;
+    }
+  
+    .animation-message {
+      font-size: 1.5rem; /* Larger text on bigger screens */
+    }
+  }
+  

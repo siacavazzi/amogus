@@ -20,6 +20,13 @@ tasks = []
 crew_points = 0
 sus_points = 0
 game_running = False
+crew_score = 0
+sus_score = 0
+meeting = False
+tasks = [
+    "Go find and pet my cat",
+    "Swipe the card in the cafeteria",
+]
 
 def resetRoles():
     for player in players:
@@ -36,7 +43,7 @@ def assignRoles():
     random.shuffle(players)
     for i in range(0, numImposters):
         players[i]
-        players[i].sus = True
+        players[i].sus = True ## DEBUG this should be true
     random.shuffle(players)
     print("assinging roles...")
     print(players)
@@ -89,9 +96,53 @@ def handleJoin(data):
         print("existing player joining...")
         player.sid = request.sid
         sendPlayerList("rejoin")
+        emit("crew_score", {"score":crew_score}, broadcast=True)
+        if(meeting):
+            emit("meeting")
         if(player.task):
             print("SENDING TASK!!")
             emit("task", {"task": player.task}, to=player.sid)
+
+
+@socketio.on("complete_task")
+def handleTaskComplete(data):
+    global crew_score
+    print("TASK COMPLETE ========")
+    print(data)
+    player = getPlayerById(data['player_id'])
+    if(player and len(tasks) > 0):
+        crew_score += 1
+        emit("crew_score", {"score":crew_score}, broadcast=True)
+        player.task = tasks.pop()
+        emit("task", {"task": player.task}, to=player.sid)
+    elif(player and len(tasks) == 0):
+        player.task = None
+        emit("task", {"task": "No More Tasks"}, to=player.sid)
+
+@socketio.on("meeting")
+def handleMeeting():
+    global meeting
+    if not meeting:
+        print("EMERGENCY MEETING!!!")
+        emit("meeting", broadcast=True)
+        meeting = True
+
+@socketio.on('end_meeting')
+def handleEndMeeting():
+    global meeting
+    if meeting:
+        emit("end_meeting", broadcast=True)
+        meeting = False
+
+@socketio.on('player_dead')
+def handleDeath(data):
+    global sus_score
+    player = getPlayerById(data['player_id'])
+    if player:
+        player.alive = False
+        if not player.sus:
+            sus_score += 1
+        sendPlayerList()
 
 @socketio.on('reset')
 def reset_game():
@@ -109,12 +160,6 @@ def handle_start(data):
     #tasks = getTasks()
     # print("tasks")
     # print(tasks)
-    tasks = [
-    "Go take a poop",
-    "sussy obama",
-    "Go run to the top floor, lay in someone's bed, then take of you're pants",
-    "LMAO WTF BRO WERE YOU EVEN THINKING THIS ISNT EVEN A REAL TASK??"
-]
 
     # send a different task to each crewmate
     for player in players:

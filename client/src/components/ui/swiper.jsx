@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Beforeunload } from 'react-beforeunload';
 import "./custom.css"; // Ensure your CSS is correctly imported
+import { FaArrowCircleRight } from "react-icons/fa";
+
 
 const MUECustomSlider = ({
   onSuccess,
@@ -208,6 +210,7 @@ const MUECustomSlider = ({
             aria-label="Slide to unlock"
             onKeyDown={handleKeyDown}
           >
+            <FaArrowCircleRight />
             {/* Optional: You can include an icon inside the slider handle */}
             {/* <div className="rsbcSliderIcon">🔓</div> */}
           </div>
