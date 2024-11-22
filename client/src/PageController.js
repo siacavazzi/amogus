@@ -17,7 +17,6 @@ export default function PageController() {
     const { 
         playerState, 
         connected,
-        gameState,
         message,
         running,
         crewScore,
@@ -65,6 +64,7 @@ export default function PageController() {
             <Modal/>
             {running && <ProgressBar score={crewScore} goalScore={taskGoal} sus={playerState.sus}/>}
             <PageHandler/>
+            <div style={{ height: '70px' }}></div>
         </div>
     )
 

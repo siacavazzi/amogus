@@ -9,7 +9,7 @@
   .progress-bar {
     position: relative;
     width: 95%; /* Set to 95% as per your requirement */
-    height: 50px; /* Increased height for better visibility */
+    height: 35px; /* Increased height for better visibility */
     background-color: white; /* Match main page background */
     border-radius: 12.5px;
     overflow: hidden;

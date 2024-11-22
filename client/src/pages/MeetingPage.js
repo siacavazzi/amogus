@@ -30,16 +30,17 @@ const EmergencyMeetingPage = () => {
       <h1>Emergency Meeting</h1>
       <div className="meeting-message">
         <p>An emergency meeting has been called. Discuss and decide on your next steps.</p>
+        <button onClick={handleImDead} className=" mt-6 mb-4 bg-red-600 text-white py-2 px-6 rounded-full shadow-lg hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400">
+                    I'm Dead :(
+        </button>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-3 sm:grid-cols-2 md:grid-cols-4 gap-3">
                     {players.map((player) => (
                         <PlayerCard key={player.id} player={player} />
                     ))}
                 </div>
-        <button onClick={handleImDead} className=" mt-6 mb-4 bg-red-600 text-white py-2 px-6 rounded-full shadow-lg hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400">
-                    I'm Dead
-        </button>
+
 
       <MUECustomSlider onSuccess={handleEndMeeting} sliderColor={"Tomato"} text={"Slide to end meeting"}/>
     </div>

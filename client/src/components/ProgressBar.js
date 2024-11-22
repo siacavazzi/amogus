@@ -18,7 +18,7 @@ const ProgressBar = ({ score, goalScore, sus }) => {
 
   // Determine message based on role
   const message = sus
-    ? 'Kill all players before they complete the bar'
+    ? 'Kill all players before they complete the tasks'
     : 'Complete the progress bar or remove the imposters before getting killed';
 
   return (
@@ -36,11 +36,12 @@ const ProgressBar = ({ score, goalScore, sus }) => {
           style={{ width: `${percentage}%`, backgroundColor: progressColor }}
         ></div>
       </div>
-      <div className="progress-bar-text">
-        {score} / {goalScore} ({percentage.toFixed(1)}%)
-      </div>
+
       <div className="progress-bar-message">
         {message}
+        <div className="progress-bar-text">
+        {score} / {goalScore} ({percentage.toFixed(1)}%)
+      </div>
       </div>
     </div>
   );

@@ -123,7 +123,7 @@ def handle_join(data):
     else:
         # New player
         player = game.addPlayer(sid, username)
-        emit('player_id', {'player_id': player.player_id}, to=sid)
+        emit('player_id', {'player_id': player.player_id, 'pic':player.pic}, to=sid)
         print(f"New player {username} joined with ID {player_id}")
 
     sendPlayerList()

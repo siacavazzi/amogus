@@ -15,6 +15,7 @@ class Game:
         self.meeting = False
         self.numImposters = None
         self.taskGoal = None
+        self.backgrounds = list(range(1, 15))  
 
         # crewmate to imposter ratio
         self.sus_ratio = 5
@@ -23,7 +24,16 @@ class Game:
 
     def addPlayer(self, sid, username):
         player_id = str(uuid4())
-        new_player = Player(sid=sid, player_id=player_id, username=username)
+        random_number = 1
+
+        if not self.backgrounds:
+            random_number = random.randint(1, 11)
+        else:
+            random_number = random.choice(self.backgrounds)
+            print(random_number)
+            self.backgrounds.remove(random_number)
+
+        new_player = Player(sid=sid, player_id=player_id, username=username, pic=random_number)
         self.players.append(new_player)
 
         return new_player

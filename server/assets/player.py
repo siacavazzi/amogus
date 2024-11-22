@@ -1,15 +1,16 @@
 import json
 
 class Player:
-    def __init__(self, sid, player_id, username):
+    def __init__(self, sid, player_id, username, pic):
         self.sid = sid
         self.username = username
         self.player_id = player_id
+        self.pic = pic
         self.active = True
         self.sus = False
         self.alive = True
         self.task = None
-
+        
     def disconnect(self):
         self.active = False
 
@@ -27,7 +28,8 @@ class Player:
             "username": self.username,
             "active": self.active,
             "sus": self.sus,
-            "alive": self.alive
+            "alive": self.alive,
+            "pic": self.pic
         })
 
     def __str__(self):

@@ -41,17 +41,18 @@ const CrewmemberPage = () => {
 
   return (
     <div className="crewmember-page">
-      <h2>Crewmember Dashboard</h2>
+      {/* <h2>Crewmember Dashboard</h2> */}
       <div className="crewmember-actions">
         <button onClick={handleCallMeeting} className="action-button call-meeting">
           Call Meeting
         </button>
       </div>
+      {/* <h3>Current Task</h3> */}
       <div className="task-section">
-        <h2>Current Task</h2>
+        <p>Task:</p>
         {task ? (
           <div className="task-display">
-            <p>{task}</p>
+            <h2>{task}</h2>
           </div>
         ) : (
           <div className="task-display">
