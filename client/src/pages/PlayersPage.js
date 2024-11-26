@@ -3,16 +3,14 @@
 import React, { useContext, useEffect } from "react";
 import { DataContext } from "../GameContext";
 import MUECustomSlider from "../components/swiper";
-import PlayerCard from "../components/PlayerCard"; // Ensure this path is correct
+import PlayerCard from "../components/PlayerCard";
 
 export default function PlayersPage() {
-    const { players, socket, setMessage, setAudio } = useContext(DataContext);
+    const { players, socket, setMessage, setAudio, running } = useContext(DataContext);
 
-    // useEffect(() => {
-    //     if (players && players.length > 0) {
-    //         console.log(players[0]?.username);
-    //     }
-    // }, [players]);
+    useEffect(() => {
+        window.scrollTo(0, 0)
+      }, [])
 
     if (!players || players.length === 0) {
         return (
@@ -49,7 +47,7 @@ export default function PlayersPage() {
                     ))}
                 </div>
                 <div className="mt-8 flex justify-center p-4">
-                    <MUECustomSlider text={"Swipe to start game"} onSuccess={startGame} />
+                    {!running && <MUECustomSlider text={"Swipe to start game"} onSuccess={startGame} />}
                 </div>
             </div>
         </div>

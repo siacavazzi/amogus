@@ -20,17 +20,20 @@ export default function GameContext({ children }) {
     const [message, setMessage] = useState(undefined)
     const [dialog, setDialog] = useState(undefined)
     const [audio, setAudio] = useState(undefined);
+    const [audioEnabled, setAudioEnabled] = useState(false);
     const [running, setRunning] = useState(false);
     const [task, setTask] = useState(undefined);
     const [crewScore, setCrewScore] = useState(0);
+    const [susPoints, setSusPoints] = useState(0);
     const [showAnimation, setShowAnimation] = useState(false);
     const [meeting, setMeeting] = useState(false);
     const [taskGoal, setTaskGoal] = useState(1);
+    const [hackTime, setHackTime] = useState(0);
 
     useEffect(() => {
         console.log("player state debug")
         console.log(playerState)
-        if(playerState.sus && !running) {
+        if (playerState.sus && !running) {
             setRunning(true);
         }
     }, [playerState])
@@ -94,8 +97,12 @@ export default function GameContext({ children }) {
             resetState();
         });
 
-        socketRef.current.on('task',(data) => {
-            if(!running) {
+        socketRef.current.on('sus_score', (data) => {
+            setSusPoints(data);
+        });
+
+        socketRef.current.on('task', (data) => {
+            if (!running) {
                 setRunning(true)
             }
             setTask(data.task);
@@ -106,14 +113,26 @@ export default function GameContext({ children }) {
             setCrewScore(data.score);
         });
 
+        socketRef.current.on('game_start', () => {
+            setRunning(true)
+        });
+
         socketRef.current.on('meeting', () => {
+            console.log("MEEEEETING CALLLED = = = =  = = = = = = =  = = = = =")
             setAudio('meeting')
-            setDialog({ title: "Emergency Meeting Called!", body: <MeetingDisplay/>});
+            console.log(audioEnabled)
             setMeeting(true);
+            setDialog({ title: "Emergency Meeting Called!", body: <MeetingDisplay /> });
+
         });
 
         socketRef.current.on('end_meeting', () => {
             setMeeting(false);
+        });
+
+        socketRef.current.on('hack', (data) => {
+            setHackTime(data);
+            setAudio('hack')
         });
 
         socketRef.current.on('task_goal', (data) => {
@@ -176,7 +195,7 @@ export default function GameContext({ children }) {
                     console.log("start game")
                     setAudio('start');
                     setRunning(true);
-                    setDialog({ title: "Game Started", body: <PlayerRole sus={me.sus} /> });
+                    audioEnabled && setDialog({ title: "Game Started", body: <PlayerRole sus={me.sus} /> });
 
                 }
             }
@@ -218,11 +237,17 @@ export default function GameContext({ children }) {
         handleCallMeeting,
         meeting,
         taskGoal,
-    }), [playerState, gameState, connected, players, message, dialog, running, task, crewScore, showAnimation, meeting, taskGoal]);
+        setAudioEnabled,
+        audioEnabled,
+        audio,
+        susPoints,
+        setHackTime,
+        hackTime
+    }), [hackTime, audio, playerState, gameState, connected, players, message, dialog, running, task, crewScore, showAnimation, meeting, taskGoal, susPoints]);
 
     return (
         <DataContext.Provider value={contextValue}>
-            <AudioHandler audio={audio} setAudio={setAudio} />
+            <AudioHandler />
             {children}
         </DataContext.Provider>
     );

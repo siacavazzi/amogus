@@ -2,8 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  background: #eee;
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: auto; /* or remove overflow if unnecessary */
+  height: auto; /* Avoid forcing height: 100% unless necessary */
 }
 .container {
   float: left;

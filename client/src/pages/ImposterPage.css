@@ -1,51 +1,72 @@
-/* ./pages/ImposterPage.css */
-
 .imposter-page {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 2rem;
-    background-color: #2c2f33; /* Dark background */
-    color: #ffffff; /* White text */
-    min-height: 100vh;
-  }
-  
-  .imposter-page h1 {
-    margin-bottom: 2rem;
-    font-size: 2.5rem;
-    color: #ff4757; /* Red color for emphasis */
-  }
-  
-  .imposter-actions {
-    margin-bottom: 2rem;
-  }
-  
-  .action-button {
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .action-button.call-meeting {
-    background-color: #1e90ff; /* Blue color */
-    color: #ffffff;
-  }
-  
-  .action-button.call-meeting:hover {
-    background-color: #3742fa; /* Darker blue on hover */
-  }
-  
-  .information {
-    max-width: 600px;
-    text-align: center;
-    line-height: 1.6;
-  }
-  
-  .information p {
-    margin-bottom: 1rem;
-    font-size: 1.1rem;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  background-color: #2c2f33; /* Dark background */
+  color: #ffffff; /* White text */
+  min-height: 100vh;
+}
+
+.imposter-page h1 {
+  margin-bottom: 2rem;
+  font-size: 2.5rem;
+  color: #ff4757; /* Red color for emphasis */
+}
+
+.points-display {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  color: #ffa502; /* Gold for points display */
+}
+
+.imposter-actions {
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.action-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.action-button.call-meeting {
+  background-color: #1e90ff; /* Blue color */
+  color: #ffffff;
+}
+
+.action-button.call-meeting:hover {
+  background-color: #3742fa; /* Darker blue on hover */
+}
+
+.action-button.sabotage-button {
+  background-color: #ff6348; /* Orange-red for sabotage */
+  color: #ffffff;
+}
+
+.action-button.sabotage-button.disabled {
+  background-color: #555555; /* Gray for disabled state */
+  color: #aaaaaa;
+  cursor: not-allowed;
+}
+
+.action-button.sabotage-button:not(.disabled):hover {
+  background-color: #ff4500; /* Brighter red on hover */
+}
+
+.information {
+  max-width: 600px;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.information p {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}

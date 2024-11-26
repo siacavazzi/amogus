@@ -11,6 +11,8 @@ import CrewmemberPage from "./pages/CrewPage";
 import ProgressBar from "./components/ProgressBar";
 import EmergencyMeetingPage from "./pages/MeetingPage";
 import DeadPage from "./pages/DeadPage";
+import HackedPage from "./pages/HackedPage";
+import GameRunningPage from "./pages/GameRunning";
 
 export default function PageController() {
 
@@ -22,16 +24,22 @@ export default function PageController() {
         crewScore,
         meeting,
         taskGoal,
+        hackTime,
+        setHackTime,
     } = useContext(DataContext); // Use DataContext here
 
     function PageHandler() {
         if (!connected) {
             return <ConnectingPage />;
         }
-    
-        if (!playerState || !playerState.username) { // Check for playerState.name
-            return <LoginPage />;
+
+        if(running && !playerState.username) {
+            return <GameRunningPage/>
         }
+    
+        if ((!playerState || !playerState.username) && !running) { // Check for playerState.name
+            return <LoginPage />;
+        } 
     
         if(playerState && !running) {
             return <PlayersPage />
@@ -39,6 +47,10 @@ export default function PageController() {
 
         if(playerState.alive === false) {
             return <DeadPage />
+        }
+
+        if(hackTime > 0 ) {
+            return <HackedPage hackTime={hackTime}  setHackTime={setHackTime}/>
         }
 
         if(meeting) {

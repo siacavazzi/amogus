@@ -1,41 +1,67 @@
-import React, { useEffect, useRef } from 'react';
+// AudioHandler.js
+import React, { useEffect, useContext, useCallback } from 'react';
+import { DataContext } from './GameContext';
+import { Howl, Howler } from 'howler';
+
+// Import your audio files
 import start from './audio/start.mp3';
 import test from './audio/test.mp3';
-import meeting from './audio/meeting.mp3'
+import meeting from './audio/meeting.mp3';
+import select from './audio/select.wav';
+import complete_task from './audio/task_complete.mp3';
+import hack from './audio/hack.mp3';
 
-export const AudioHandler = ({ audio, setAudio }) => {
-  // Use refs to persist audio objects across renders
-  const startAudioRef = useRef(null);
-  const testAudioRef = useRef(null);
-  const meetingAudioRef = useRef(null);
+export const AudioHandler = () => {
+  const { 
+    audio,
+    setAudio,
+    audioEnabled,
+    setAudioEnabled,
+    setDialog,
+  } = useContext(DataContext);
 
+  // Define Howler.js sounds
+  const sounds = {
+    start: new Howl({ src: [start] }),
+    test: new Howl({ src: [test] }),
+    meeting: new Howl({ src: [meeting] }),
+    select: new Howl({ src: [select] }),
+    complete_task: new Howl({ src: [complete_task] }),
+    hack: new Howl({ src: [hack] }),
+  };
+
+  // Function to initialize audio on user interaction
+  const initializeAudio = useCallback(() => {
+    // Resume the global Howler audio context
+    Howler.ctx.resume().then(() => {
+      setAudioEnabled(true);
+      setDialog(null); // Close the dialog after enabling audio
+    }).catch((err) => {
+      console.error("Error resuming Howler audio context:", err);
+    });
+  }, [setAudioEnabled, setDialog]);
+
+  // Prompt user to enable audio if not already enabled
   useEffect(() => {
-    // Initialize the audio objects once
-    startAudioRef.current = new Audio(start);
-    testAudioRef.current = new Audio(test);
-    meetingAudioRef.current = new Audio(meeting)
-
-    return () => {
-      // Clean up audio objects to prevent memory leaks
-      startAudioRef.current = null;
-      testAudioRef.current = null;
-      meetingAudioRef.current = null;
-    };
-  }, []); // Only runs on initial render
-
-  useEffect(() => {
-    // Play the correct audio based on the `audio` prop
-    if (audio) {
-      if (audio === 'test') {
-        testAudioRef.current?.play().catch((err) => console.error('Error playing test audio:', err));
-      } else if (audio === 'start') {
-        startAudioRef.current?.play().catch((err) => console.error('Error playing start audio:', err));
-      } else if(audio === 'meeting') {
-        meetingAudioRef.current?.play().catch((err) => console.error('Error playing start audio:', err));
-      }
-      setAudio(undefined)
+    if (!audioEnabled) {
+      setDialog({
+        title: "Enable Audio",
+        content: (
+          <button onClick={initializeAudio}>
+            Click to Enable Audio
+          </button>
+        ),
+      });
     }
-  }, [audio]); // Runs whenever `audio` changes
+  }, [audioEnabled, initializeAudio, setDialog]);
 
-  return <div></div>;
+  // Play audio when `audio` changes
+  useEffect(() => {
+    if (audio && audioEnabled && sounds[audio]) {
+      sounds[audio].play();
+      setAudio(undefined);
+    }
+  }, [audio, audioEnabled, sounds, setAudio]);
+
+  return null;
 };

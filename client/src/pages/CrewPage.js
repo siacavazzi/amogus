@@ -1,6 +1,6 @@
 // ./pages/CrewmemberPage.jsx
 
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import './CrewmemberPage.css'; // Import CSS for styling
 import PropTypes from 'prop-types';
 import { DataContext } from '../GameContext';
@@ -8,26 +8,29 @@ import AnimationOverlay from '../components/AnimationOverlay';
 import MUECustomSlider from '../components/swiper';
 
 const CrewmemberPage = () => {
-  const { 
+  const {
     task,
     setTask,
     socket,
-    playerState,
     setShowAnimation,
     showAnimation,
     handleCallMeeting,
+    setAudio,
   } = useContext(DataContext); // Use DataContext here
- // State for animation visibility
+  // State for animation visibility
 
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
 
   // Function to handle completing a task
   const handleCompleteTask = () => {
     if (task) {
       socket.emit('complete_task', { player_id: localStorage.getItem('player_id') });
-      setTask(undefined);  
+      setTask(undefined);
       setShowAnimation(true); // Trigger animation first
+      setAudio('complete_task');
       console.log('Animation triggered:', showAnimation); // Debugging line
-      // Note: Do not setTask(undefined) here
     } else {
       alert('No task to complete.');
     }
@@ -35,7 +38,7 @@ const CrewmemberPage = () => {
 
   // Callback function to handle animation completion
   const handleAnimationComplete = () => {
-    setShowAnimation(false); // Hide animation    // Clear the task after animation
+    setShowAnimation(false);
     console.log('Animation completed and task cleared');
   };
 
@@ -59,11 +62,11 @@ const CrewmemberPage = () => {
             <p>No task assigned.</p>
           </div>
         )}
-        <MUECustomSlider text={"Slide to complete task"} onSuccess={handleCompleteTask}/>
+        <MUECustomSlider text={"Slide to complete task"} onSuccess={handleCompleteTask} />
       </div>
 
       {/* Animation Overlay */}
-      {showAnimation && <AnimationOverlay  onComplete={handleAnimationComplete} />}
+      {showAnimation && <AnimationOverlay onComplete={handleAnimationComplete} />}
     </div>
   );
 };

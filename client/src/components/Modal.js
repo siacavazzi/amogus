@@ -2,12 +2,14 @@ import React, { useState, useEffect, useContext, useRef } from "react";
 import { DataContext } from "../GameContext";
 
 const Modal = () => {
-  const { dialog } = useContext(DataContext);
+  const { dialog, setAudio, setAudioEnabled } = useContext(DataContext);
   const [open, setOpen] = useState(false);
   const modalRef = useRef(null);
 
   useEffect(() => {
     if (dialog?.title) {
+      console.log(dialog.title)
+      console.log("OPEN")
       setOpen(true);
     } else {
       setOpen(false);
@@ -31,6 +33,12 @@ const Modal = () => {
       modalRef.current.focus();
     }
   }, [open]);
+
+  function closeModal() {
+    setAudio('select')
+    setAudioEnabled(true)
+    setOpen(false);
+  }
 
   if (!open) return null;
 
@@ -74,21 +82,28 @@ const Modal = () => {
               <p className="text-gray-700 dark:text-gray-300">{dialog.body}</p>
             ) : (
               dialog?.body || (
-                <p className="text-gray-700 dark:text-gray-300">
-                  Default body text.
-                </p>
+                null
               )
             )}
           </div>
 
           {/* Footer */}
           <div className="px-6 py-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-            <button
-              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-              onClick={() => setOpen(false)}
-            >
-              OK
-            </button>
+            {dialog?.title === "Click to enable audio" ?
+              <button
+                className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
+                onClick={() => closeModal()}
+              >
+                Enable audio
+              </button>
+              : <button
+                className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                onClick={() => closeModal()}
+              >
+                OK
+              </button>
+
+            }
           </div>
         </div>
       </div>

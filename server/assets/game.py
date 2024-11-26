@@ -3,6 +3,9 @@ import random
 from uuid import uuid4
 from assets.player import Player
 from assets.taskHandler import *
+import time
+from threading import Thread
+from flask_socketio import emit
 
 class Game:
 
@@ -10,17 +13,36 @@ class Game:
         self.players = []
         self.tasks = read_task_file()
         self.crew_score = 0
-        self.sus_score = 0
+        self.sus_score = 10 # DEBUG
         self.game_running = False
+        self.active_hack = 0
         self.meeting = False
         self.numImposters = None
         self.taskGoal = None
-        self.backgrounds = list(range(1, 15))  
+        self.backgrounds = list(range(16, 17 + 1))  
 
         # crewmate to imposter ratio
         self.sus_ratio = 5
         # tasks per player
         self.task_ratio = 10
+
+    def start_hack(self, duration):
+        if self.active_hack > 0:
+            return  # Prevent overlapping hacks
+
+        self.active_hack = duration
+        emit("hack", duration, broadcast=True)
+
+        # Start a background thread to handle the countdown
+        Thread(target=self._hack_countdown).start()
+
+    def _hack_countdown(self):
+        while self.active_hack > 0:
+            time.sleep(1)  # Wait 1 second
+            self.active_hack -= 1
+        
+        # Hack has ended
+        emit("end_hack", broadcast=True)
 
     def addPlayer(self, sid, username):
         player_id = str(uuid4())

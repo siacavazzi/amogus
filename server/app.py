@@ -10,7 +10,7 @@ from assets.utils import *
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": '*'}})
-socketio = SocketIO(app, cors_allowed_origins=["http://localhost:3000", "http://192.168.68.55:3000", '*'])
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 game = Game()
     
@@ -21,7 +21,7 @@ def sendPlayerList(action = 'player_list'):
 
 @app.route('/')
 def index():
-    return "<h1>Waddup</h1>"
+    return "<h1>You shouldnt see this. Please change your port from :5000 to :3000</h1>"
 
 @socketio.on('connect')
 def handle_connect():
@@ -30,12 +30,17 @@ def handle_connect():
 @socketio.on('rejoin')
 def handleJoin(data):
     player = game.getPlayerById(data['player_id'])
+    if(game.game_running):
+        emit('game_start')
     if(player):
         print("existing player joining...")
         player.sid = request.sid
         sendPlayerList("rejoin")
         emit("crew_score", {"score":game.crew_score})
-        emit("task_goal", game.taskGoal, broadcast=True)
+        emit("task_goal", game.taskGoal)
+        emit("sus_score", game.sus_score)
+        if(game.active_hack > 0):
+            emit("hack", game.active_hack)
         if(game.meeting):
             emit("meeting")
         if(player.task):
@@ -57,10 +62,17 @@ def handleTaskComplete(data):
         player.task = None
         emit("task", {"task": "No More Tasks"}, to=player.sid)
 
+@socketio.on("hack")
+def handleHack():
+    if game.sus_score >= 1 and not game.active_hack and not game.meeting:
+        game.sus_score -= 1
+        emit("sus_score", game.sus_score, broadcast=True)
+        game.start_hack(30)
+
+
 @socketio.on("meeting")
 def handleMeeting():
     if not game.meeting:
-        print("EMERGENCY MEETING!!!")
         emit("meeting", broadcast=True)
         game.meeting = True
 
@@ -77,6 +89,7 @@ def handleDeath(data):
         player.alive = False
         if not player.sus:
             game.sus_score += 1
+            emit("sus_score", game.sus_score, broadcast=True)
         sendPlayerList()
 
 @socketio.on('reset')
@@ -87,6 +100,8 @@ def reset_game():
 
 @socketio.on('start_game')
 def handle_start(data):
+    if(game.game_running == True):
+        return
     game.game_running = True
     game.assignRoles()
     sendPlayerList('start_game')
@@ -137,10 +152,8 @@ def handle_disconnect():
 
 if __name__ == '__main__':
     local_ip = get_local_ip()
-
+    write_ip_to_file(local_ip + ":5000")
     print("Starting server...")
-    print(f" * Running on all addresses (0.0.0.0)")
-    print(f" * Running on http://127.0.0.1:5000")
-    print(f" * Running on http://{local_ip}:5000")
+    print(f" * Please set ENDPOINT to: http://{local_ip}:5000")
     print("Press CTRL+C to quit")
     socketio.run(app, host='0.0.0.0', port=5000, debug=False)
