@@ -14,7 +14,7 @@ export default function GameContext({ children }) {
     });
 
     // united states
-    const [gameState, setGameState] = useState({});
+    const [gameState, setGameState] = useState({}); // <--- USE this PLEASE we need to refactor this shit
     const [connected, setConnected] = useState(false);
     const [players, setPlayers] = useState([]);
     const [message, setMessage] = useState(undefined)
@@ -51,6 +51,9 @@ export default function GameContext({ children }) {
         setCrewScore(0);
         setMeeting(false)
         setDialog(undefined)
+        setHackTime(0);
+        setMeeting(false)
+
     }
 
     const resetMessage = (delay) => {

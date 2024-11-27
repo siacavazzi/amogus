@@ -43,9 +43,9 @@ def handleJoin(data):
             emit("hack", game.active_hack)
         if(game.meeting):
             emit("meeting")
-        if(player.task):
+        if(player.get_task()):
             print("SENDING TASK!!")
-            emit("task", {"task": player.task}, to=player.sid)
+            emit("task", {"task": player.get_task()}, to=player.sid)
 
 
 @socketio.on("complete_task")
@@ -111,7 +111,7 @@ def handle_start(data):
     for player in game.players:
         if not player.sus and len(game.tasks) > 0:
             player.task = game.getTask()
-            emit("task", {"task": player.task}, to=player.sid)
+            emit("task", {"task": player.get_task()}, to=player.sid)
 
 @socketio.on('join')
 def handle_join(data):
@@ -146,9 +146,9 @@ def handle_join(data):
 @socketio.on('disconnect')
 def handle_disconnect():
     print("Client disconnected:", request.sid)
-    player = game.getPlayerBySid(request.sid)
-    if player:
-        sendPlayerList()
+    # player = game.getPlayerBySid(request.sid)
+    # if player:
+    #     sendPlayerList()
 
 if __name__ == '__main__':
     local_ip = get_local_ip()

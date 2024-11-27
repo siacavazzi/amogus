@@ -27,7 +27,6 @@ const CrewmemberPage = () => {
   const handleCompleteTask = () => {
     if (task) {
       socket.emit('complete_task', { player_id: localStorage.getItem('player_id') });
-      setTask(undefined);
       setShowAnimation(true); // Trigger animation first
       setAudio('complete_task');
       console.log('Animation triggered:', showAnimation); // Debugging line

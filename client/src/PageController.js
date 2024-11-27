@@ -13,6 +13,9 @@ import EmergencyMeetingPage from "./pages/MeetingPage";
 import DeadPage from "./pages/DeadPage";
 import HackedPage from "./pages/HackedPage";
 import GameRunningPage from "./pages/GameRunning";
+import ReactorMeltdown from "./pages/MeltdownPage";
+import ReactorNormal from "./pages/ReactorPage";
+import { isMobile } from "react-device-detect";
 
 export default function PageController() {
 
@@ -31,6 +34,10 @@ export default function PageController() {
     function PageHandler() {
         if (!connected) {
             return <ConnectingPage />;
+        }
+
+        if(!isMobile) {
+            return <ReactorNormal />;
         }
 
         if(running && !playerState.username) {

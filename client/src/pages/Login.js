@@ -19,6 +19,26 @@ function LoginPage() {
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-gray-800 to-gray-900 p-6">
+            
+            {/* <div className="relative bg-gray-700 bg-opacity-90 backdrop-blur-md p-8 rounded-lg shadow-lg max-w-sm w-full mx-4">
+            <h2 className="text-2xl font-bold mb-2 text-gray-100">Laptop Options: </h2>
+                                <button
+                        type="submit"
+                        className="w-full mb-4 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400 transform hover:scale-105"
+                    >
+                        Start Task Entry
+                    </button>
+
+                    <button
+                        type="submit"
+                        className="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400 transform hover:scale-105"
+                    >
+                        Use Laptop as reactor
+                    </button>
+
+                    </div> */}
+
+
             <div className="relative bg-gray-700 bg-opacity-90 backdrop-blur-md p-8 rounded-lg shadow-lg max-w-sm w-full">
                 {/* Decorative Icon */}
                 <div className="flex flex-col items-center mb-6">

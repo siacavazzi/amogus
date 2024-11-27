@@ -23,7 +23,7 @@ const PlayerCard = ({ player }) => {
 
     return (
         <div className="bg-gray-800 shadow-md rounded-lg p-6 flex flex-col items-center transition-transform transform hover:scale-105">
-            <div className="w-20 h-20 mb-2">
+            <div className="mb-2">
             <ProfilePicture imageCode={player.pic}/>
             </div>
             <h3 className="text-xl font-semibold text-gray-200">{player.username}</h3>

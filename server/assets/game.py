@@ -13,13 +13,14 @@ class Game:
         self.players = []
         self.tasks = read_task_file()
         self.crew_score = 0
-        self.sus_score = 10 # DEBUG
+        self.sus_score = 10 # DEBUG this should b 0
         self.game_running = False
         self.active_hack = 0
+        self.active_meltdown = 0
         self.meeting = False
         self.numImposters = None
         self.taskGoal = None
-        self.backgrounds = list(range(16, 17 + 1))  
+        self.backgrounds = list(range(0, 17 + 1))  
 
         # crewmate to imposter ratio
         self.sus_ratio = 5

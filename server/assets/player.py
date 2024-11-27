@@ -10,6 +10,7 @@ class Player:
         self.sus = False
         self.alive = True
         self.task = None
+        self.fake_task = None
         
     def disconnect(self):
         self.active = False
@@ -18,6 +19,13 @@ class Player:
         self.active = True
         self.sus = False
         self.alive = True
+
+
+    def get_task(self):
+        if self.fake_task is not None:
+            return self.fake_task
+        return self.task
+
 
 
     def to_json(self):
