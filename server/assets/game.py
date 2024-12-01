@@ -3,6 +3,7 @@ import random
 from uuid import uuid4
 from assets.player import Player
 from assets.taskHandler import *
+from assets.meltdown import *
 import time
 from threading import Thread
 from flask_socketio import emit
@@ -13,24 +14,27 @@ class Game:
         self.players = []
         self.tasks = read_task_file()
         self.crew_score = 0
-        self.sus_score = 10 # DEBUG this should b 0
+        self.sus_score = 0
         self.game_running = False
         self.active_hack = 0
-        self.active_meltdown = 0
+        self.active_meltdown = None
         self.meeting = False
         self.numImposters = None
         self.taskGoal = None
-        self.backgrounds = list(range(0, 17 + 1))  
+        self.backgrounds = list(range(0, 16 + 1))  
 
         # crewmate to imposter ratio
         self.sus_ratio = 5
         # tasks per player
         self.task_ratio = 10
 
+    def start_meltdown(self, duration=60):
+        self.active_meltdown = Meltdown(len(self.players), duration)
+
+
     def start_hack(self, duration):
         if self.active_hack > 0:
-            return  # Prevent overlapping hacks
-
+            return
         self.active_hack = duration
         emit("hack", duration, broadcast=True)
 

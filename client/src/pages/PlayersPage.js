@@ -12,6 +12,8 @@ export default function PlayersPage() {
         window.scrollTo(0, 0)
       }, [])
 
+      console.log(running)
+
     if (!players || players.length === 0) {
         return (
             <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-gray-800 to-gray-900 p-6">

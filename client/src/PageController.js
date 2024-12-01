@@ -36,9 +36,9 @@ export default function PageController() {
             return <ConnectingPage />;
         }
 
-        if(!isMobile) {
-            return <ReactorNormal />;
-        }
+        // if(!isMobile) {
+        //     return <ReactorNormal />;
+        // }
 
         if(running && !playerState.username) {
             return <GameRunningPage/>

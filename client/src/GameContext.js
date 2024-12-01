@@ -30,14 +30,6 @@ export default function GameContext({ children }) {
     const [taskGoal, setTaskGoal] = useState(1);
     const [hackTime, setHackTime] = useState(0);
 
-    useEffect(() => {
-        console.log("player state debug")
-        console.log(playerState)
-        if (playerState.sus && !running) {
-            setRunning(true);
-        }
-    }, [playerState])
-
     const resetState = () => {
         setGameState({})
         setConnected(false)
@@ -62,7 +54,6 @@ export default function GameContext({ children }) {
                 setMessage(undefined);
             }, delay);
 
-            // Cleanup to prevent memory leaks if the component unmounts
             return () => clearTimeout(timer);
         }
     };
@@ -117,6 +108,7 @@ export default function GameContext({ children }) {
         });
 
         socketRef.current.on('game_start', () => {
+            console.log("SET RUNNING TO TRUE")
             setRunning(true)
         });
 
@@ -145,8 +137,6 @@ export default function GameContext({ children }) {
 
         // Handle 'player_id' event
         socketRef.current.on('player_id', (data) => {
-            console.log("NEW ID ==")
-            console.log(data.player_id)
             if (data && data.player_id) {
                 console.log("setting new id ?")
                 localStorage.setItem('player_id', data.player_id);
@@ -155,8 +145,6 @@ export default function GameContext({ children }) {
         });
 
         socketRef.current.on('game_data', (data) => {
-            console.log("SOCKET DATA!!!")
-            console.log(data)
             if (!playerState && data.action != "rejoin") {
                 return;
             }
@@ -186,9 +174,11 @@ export default function GameContext({ children }) {
                         }
                     } else {
                         console.log("not found")
-                        setMessage({ status: "error", text: "Idk who i am :(" })
+                        // setMessage({ status: "error", text: "Idk who i am :(" })
                     }
-                    setPlayers(parsedPlayers);
+                    if(me) {
+                        setPlayers(parsedPlayers);
+                    }
                     console.log("Updated players state:", parsedPlayers);
                 } else {
                     console.error("Unexpected data format:", data);
@@ -198,8 +188,10 @@ export default function GameContext({ children }) {
                     console.log("start game")
                     setAudio('start');
                     setRunning(true);
-                    audioEnabled && setDialog({ title: "Game Started", body: <PlayerRole sus={me.sus} /> });
+                    setDialog({ title: "Game Started", body: <PlayerRole sus={me.sus} /> });
 
+                } else if(data.action === "start_game") {
+                    setRunning(true);
                 }
             }
         });

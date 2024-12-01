@@ -5,6 +5,7 @@ from flask_socketio import SocketIO, emit
 from flask_cors import CORS
 from uuid import uuid4
 from assets.game import Game
+from assets.sonosHandler import SonosController
 from assets.utils import *
 
 
@@ -13,6 +14,7 @@ CORS(app, resources={r"/*": {"origins": '*'}})
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 game = Game()
+speaker = SonosController()
     
 def sendPlayerList(action = 'player_list'):
     print("Sending player list to all clients")
@@ -26,12 +28,17 @@ def index():
 @socketio.on('connect')
 def handle_connect():
     print('Client connected:', request.sid)
+    if game.game_running:
+        emit("game_start")
+
+        if(game.active_hack > 0):
+            emit("hack", game.active_hack)
+        if(game.meeting):
+            emit("meeting")
 
 @socketio.on('rejoin')
 def handleJoin(data):
     player = game.getPlayerById(data['player_id'])
-    if(game.game_running):
-        emit('game_start')
     if(player):
         print("existing player joining...")
         player.sid = request.sid
@@ -39,10 +46,7 @@ def handleJoin(data):
         emit("crew_score", {"score":game.crew_score})
         emit("task_goal", game.taskGoal)
         emit("sus_score", game.sus_score)
-        if(game.active_hack > 0):
-            emit("hack", game.active_hack)
-        if(game.meeting):
-            emit("meeting")
+
         if(player.get_task()):
             print("SENDING TASK!!")
             emit("task", {"task": player.get_task()}, to=player.sid)
@@ -50,8 +54,6 @@ def handleJoin(data):
 
 @socketio.on("complete_task")
 def handleTaskComplete(data):
-    print("TASK COMPLETE ========")
-    print(data)
     player = game.getPlayerById(data['player_id'])
     if(player and len(game.tasks) > 0):
         game.crew_score += 1
@@ -73,6 +75,7 @@ def handleHack():
 @socketio.on("meeting")
 def handleMeeting():
     if not game.meeting:
+        speaker.play_sound("meeting")
         emit("meeting", broadcast=True)
         game.meeting = True
 
@@ -102,6 +105,8 @@ def reset_game():
 def handle_start(data):
     if(game.game_running == True):
         return
+    
+    speaker.play_sound("start")
     game.game_running = True
     game.assignRoles()
     sendPlayerList('start_game')
@@ -132,11 +137,15 @@ def handle_join(data):
             print(f"Player {player.username} reconnected with new username")
         else:
             # Invalid player_id, create new player
+            if game.game_running:
+                return
             player = game.addPlayer(sid, username)
             emit('player_id', {'player_id': player.player_id}, to=sid)
             print(f"New player {username} joined with new ID {player_id}")
     else:
         # New player
+        if game.game_running:
+            return
         player = game.addPlayer(sid, username)
         emit('player_id', {'player_id': player.player_id, 'pic':player.pic}, to=sid)
         print(f"New player {username} joined with ID {player_id}")

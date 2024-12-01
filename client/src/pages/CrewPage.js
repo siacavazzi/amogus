@@ -1,7 +1,7 @@
 // ./pages/CrewmemberPage.jsx
 
 import React, { useContext, useEffect } from 'react';
-import './CrewmemberPage.css'; // Import CSS for styling
+import './CrewmemberPage.css'; 
 import PropTypes from 'prop-types';
 import { DataContext } from '../GameContext';
 import AnimationOverlay from '../components/AnimationOverlay';
@@ -17,7 +17,6 @@ const CrewmemberPage = () => {
     handleCallMeeting,
     setAudio,
   } = useContext(DataContext); // Use DataContext here
-  // State for animation visibility
 
   useEffect(() => {
     window.scrollTo(0, 0)
