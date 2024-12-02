@@ -2,50 +2,74 @@ import random
 import eventlet
 
 class Meltdown:
-    def __init__(self, num_players, time, socketio):
+    def __init__(self, players, time, socketio):
+        self.players = players
+        self.num_players = len(players)
         self.socketio = socketio
         self.time_left = time
-        self.codes_needed = max(int(num_players * 0.4), 1)  # Ensure at least 1 code is needed
-        self.valid_pins = [random.randint(1000, 9999) for _ in range(num_players)]
+        self.codes_needed = max(int(self.num_players * 0.4), 1)  # Ensure at least 1 code is needed
+        self.valid_pins = [random.randint(1000, 9999) for _ in range(self.num_players)]
         self.codes_entered = 0
         self.meltdown_active = True
 
     def start_countdown(self):
         """Starts the countdown timer."""
         print(f"Meltdown initiated! {self.time_left} seconds remaining.")
+        self.socketio.emit("codes_needed", self.codes_needed)
+        self.distribute_codes()
         while self.time_left > 0:
             if self.codes_entered >= self.codes_needed:
                 self.end_meltdown(success=True)
                 return
             eventlet.sleep(1)  # Asynchronous delay
             self.time_left -= 1
-            self.socketio.emit('meltdown_update', {'time_left': self.time_left}, broadcast=True)
+            self.socketio.emit('meltdown_update', self.time_left)
 
         # If the countdown reaches 0 and the meltdown is still active
         if self.meltdown_active:
             self.end_meltdown(success=False)
 
+    def distribute_codes(self):
+        for i in range(0, self.num_players):
+            self.players[i - 1].meltdown_code = self.valid_pins[i - 1]
+            self.socketio.emit("meltdown_code", self.valid_pins[i - 1], to=self.players[i - 1].sid)
+            print(f"sending code {self.valid_pins[i - 1]} to {self.players[i - 1].sid}")
+
+
     def check_pin(self, input_pin):
+        print(f"Input PIN: {input_pin} (type: {type(input_pin)})")
+        print(f"Valid PINs: {self.valid_pins} (types: {[type(pin) for pin in self.valid_pins]})")
+    
         """Validates a PIN and increments codes entered if successful."""
+        try:
+            # Convert input_pin to integer if it's not already
+            input_pin = int(input_pin)
+        except ValueError:
+            # Handle the case where conversion fails
+            print("Invalid PIN format. PIN should be a number.")
+            self.socketio.emit("code_incorrect")
+            return False
+    
         if input_pin in self.valid_pins:
+            print("Valid PIN entered!")
             self.valid_pins.remove(input_pin)
             self.codes_entered += 1
-            self.socketio.emit(
-                'meltdown_code_entered', 
-                {'codes_entered': self.codes_entered, 'codes_needed': self.codes_needed}, 
-                broadcast=True
-            )
+            self.socketio.emit("code_correct", self.codes_needed)
             return True
+    
+        print("Invalid PIN")
+        self.socketio.emit("code_incorrect")
         return False
+
 
     def end_meltdown(self, success):
         """Ends the meltdown and emits the result."""
         self.meltdown_active = False
         if success:
             print("Meltdown averted!")
-            self.socketio.emit('meltdown_end', {'success': True}, broadcast=True)
+            self.socketio.emit('meltdown_end')
         else:
             print("Meltdown failed!")
-            self.socketio.emit('meltdown_end', {'success': False}, broadcast=True)
+            self.socketio.emit('meltdown_end', {'success': False})
 
 

@@ -11,6 +11,7 @@ class Player:
         self.alive = True
         self.task = None
         self.fake_task = None
+        self.meltdown_code = None
         
     def disconnect(self):
         self.active = False
@@ -34,7 +35,8 @@ class Player:
             "active": self.active,
             "sus": self.sus,
             "alive": self.alive,
-            "pic": self.pic
+            "pic": self.pic,
+            "meltdown_code": self.meltdown_code
         })
 
     def __str__(self):

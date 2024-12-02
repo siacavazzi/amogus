@@ -4,6 +4,8 @@ import { ENDPOINT } from './ENDPOINT';
 import { AudioHandler } from './AudioHandler';
 import PlayerRole from './components/PlayerRole';
 import MeetingDisplay from './components/MeetingDisplay';
+import MeltdownAvertedDisplay from './components/MeltdownAverted';
+import { isMobile } from 'react-device-detect';
 
 const DataContext = createContext();
 
@@ -29,6 +31,9 @@ export default function GameContext({ children }) {
     const [meeting, setMeeting] = useState(false);
     const [taskGoal, setTaskGoal] = useState(1);
     const [hackTime, setHackTime] = useState(0);
+    const [meltdownCode, setMeltdownCode] = useState(undefined);
+    const [ meltdownTimer, setMeltdownTimer] = useState(false);
+    const [codesNeeded, setCodesNeeded] = useState(undefined)
 
     const resetState = () => {
         setGameState({})
@@ -42,10 +47,12 @@ export default function GameContext({ children }) {
         setRunning(false)
         setCrewScore(0);
         setMeeting(false)
-        setDialog(undefined)
+        setDialog(undefined);
         setHackTime(0);
-        setMeeting(false)
-
+        setMeeting(false);
+        setCodesNeeded(undefined);
+        setMeltdownTimer(undefined);
+        setMeltdownCode(undefined);
     }
 
     const resetMessage = (delay) => {
@@ -87,8 +94,36 @@ export default function GameContext({ children }) {
             resetState();
         });
 
+        socketRef.current.on('code_correct', (data) => {
+            console.log("CORRECT CODE")
+            console.log(data)
+            if(data === 0 ) {
+                setMeltdownTimer(undefined)
+            }
+            setCodesNeeded(data)
+        });
+
+        socketRef.current.on('codes_needed', (data) => {
+            setCodesNeeded(data)
+        });
+
+        socketRef.current.on('meltdown_end', () => {
+            setCodesNeeded(undefined);
+            setMeltdownTimer(undefined);
+            setMeltdownCode(undefined);
+            isMobile && setDialog({ title: "Meltdown Averted!", body: <MeltdownAvertedDisplay /> });
+        });
+
         socketRef.current.on('reset', () => {
             resetState();
+        });
+
+        socketRef.current.on('meltdown_code', (data) => {
+            setMeltdownCode(data)
+        });
+
+        socketRef.current.on('meltdown_update', (data) => {
+            setMeltdownTimer(data)
         });
 
         socketRef.current.on('sus_score', (data) => {
@@ -117,9 +152,10 @@ export default function GameContext({ children }) {
             setAudio('meeting')
             console.log(audioEnabled)
             setMeeting(true);
-            setDialog({ title: "Emergency Meeting Called!", body: <MeetingDisplay /> });
+            isMobile && setDialog({ title: "Emergency Meeting Called!", body: <MeetingDisplay /> });
 
         });
+
 
         socketRef.current.on('end_meeting', () => {
             setMeeting(false);
@@ -188,7 +224,7 @@ export default function GameContext({ children }) {
                     console.log("start game")
                     setAudio('start');
                     setRunning(true);
-                    setDialog({ title: "Game Started", body: <PlayerRole sus={me.sus} /> });
+                    isMobile && setDialog({ title: "Game Started", body: <PlayerRole sus={me.sus} /> });
 
                 } else if(data.action === "start_game") {
                     setRunning(true);
@@ -237,8 +273,11 @@ export default function GameContext({ children }) {
         audio,
         susPoints,
         setHackTime,
-        hackTime
-    }), [hackTime, audio, playerState, gameState, connected, players, message, dialog, running, task, crewScore, showAnimation, meeting, taskGoal, susPoints]);
+        hackTime,
+        meltdownCode,
+        meltdownTimer,
+        codesNeeded,
+    }), [meltdownCode,codesNeeded, meltdownTimer, hackTime, audio, playerState, gameState, connected, players, message, dialog, running, task, crewScore, showAnimation, meeting, taskGoal, susPoints]);
 
     return (
         <DataContext.Provider value={contextValue}>

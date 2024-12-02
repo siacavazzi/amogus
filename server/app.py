@@ -13,8 +13,8 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": '*'}})
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-game = Game()
-speaker = SonosController()
+game = Game(socketio)
+speaker = SonosController(enabled=True)
     
 def sendPlayerList(action = 'player_list'):
     print("Sending player list to all clients")
@@ -46,6 +46,9 @@ def handleJoin(data):
         emit("crew_score", {"score":game.crew_score})
         emit("task_goal", game.taskGoal)
         emit("sus_score", game.sus_score)
+
+        if(player.meltdown_code):
+            emit("meltdown_code", player.meltdown_code, to=player.sid)
 
         if(player.get_task()):
             print("SENDING TASK!!")
@@ -84,6 +87,17 @@ def handleEndMeeting():
     if game.meeting:
         emit("end_meeting", broadcast=True)
         game.meeting = False
+
+@socketio.on('meltdown')
+def handleMeltdown():
+    game.start_meltdown()
+    game.sus_score += 1
+    emit("sus_score", game.sus_score, broadcast=True)
+
+@socketio.on("pin_entry")
+def handlePinEntry(data):
+    print("pin entered")
+    game.check_pin(data)
 
 @socketio.on('player_dead')
 def handleDeath(data):

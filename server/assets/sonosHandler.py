@@ -19,23 +19,49 @@ logger = logging.getLogger(__name__)
 
 
 class SonosController:
-    def __init__(self, max_retries=3, retry_delay=2, default_volume=50):
+    def __init__(self, max_retries=3, retry_delay=2, default_volume=50, enabled=True, ignore_bedroom_speakers=True):
         """
         Initializes the SonosController.
 
         :param max_retries: Maximum number of retries for joining speakers.
         :param retry_delay: Delay in seconds between retries.
         :param default_volume: Desired volume level (0-100) to set on the master speaker.
+        :param enabled: Flag to enable or disable the controller.
+        :param ignore_bedroom_speakers: If True, ignores any speakers with 'bed' in their name.
         """
         self.max_retries = max_retries
         self.retry_delay = retry_delay
         self.default_volume = default_volume
+        self.enabled = enabled
+        self.ignore_bedroom_speakers = ignore_bedroom_speakers  # New parameter
+
+        if not enabled:
+            logger.info("SonosController is disabled.")
+            return
 
         try:
-            self.speakers = list(discover())
-            if not self.speakers:
+            discovered_speakers = list(discover())
+            if not discovered_speakers:
                 raise ValueError("No Sonos speakers found during discovery.")
-            logger.info(f"Discovered {len(self.speakers)} Sonos speaker(s).")
+
+            logger.info(f"Discovered {len(discovered_speakers)} Sonos speaker(s).")
+
+            # Filter out bedroom speakers if the flag is set
+            if self.ignore_bedroom_speakers:
+                filtered_speakers = [
+                    speaker for speaker in discovered_speakers
+                    if 'bed' not in speaker.player_name.lower()
+                ]
+                ignored_count = len(discovered_speakers) - len(filtered_speakers)
+                self.speakers = filtered_speakers
+                logger.info(f"Ignored {ignored_count} bedroom speaker(s). {len(self.speakers)} speaker(s) remaining.")
+            else:
+                self.speakers = discovered_speakers
+                logger.info("Included all discovered speakers without filtering.")
+
+            if not self.speakers:
+                raise ValueError("No Sonos speakers available after applying bedroom speaker filter.")
+
         except Exception as e:
             logger.error(f"Error during speaker discovery: {e}")
             self.speakers = []
@@ -58,7 +84,7 @@ class SonosController:
                 # Set the desired volume after successful initialization
                 self.set_group_volume(self.default_volume)
         else:
-            logger.warning("No Sonos speakers found.")
+            logger.warning("No Sonos speakers available to control.")
 
         logger.info("=== Sonos Initialization Complete ===")
 
@@ -170,6 +196,8 @@ class SonosController:
         :param sound: Key of the sound to play from the audio dictionary.
         :return: True if sound is played successfully, False otherwise.
         """
+        if not self.enabled:
+            return False
         if not self.ready:
             logger.warning("Sonos system not ready.")
             return False

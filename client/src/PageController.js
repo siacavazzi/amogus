@@ -1,5 +1,5 @@
-
-import React, { useContext } from "react";
+// PageController.jsx
+import React, { useContext, useEffect, useState, memo } from "react";
 import { DataContext } from "./GameContext";
 import LoginPage from "./pages/Login";
 import ConnectingPage from "./pages/ConnectingPage";
@@ -16,11 +16,11 @@ import GameRunningPage from "./pages/GameRunning";
 import ReactorMeltdown from "./pages/MeltdownPage";
 import ReactorNormal from "./pages/ReactorPage";
 import { isMobile } from "react-device-detect";
+import MeltdownInfo from "./pages/MeltdownInfo";
 
-export default function PageController() {
-
-    const { 
-        playerState, 
+const PageController = () => {
+    const {
+        playerState,
         connected,
         message,
         running,
@@ -29,62 +29,123 @@ export default function PageController() {
         taskGoal,
         hackTime,
         setHackTime,
+        meltdownCode,
+        meltdownTimer,
     } = useContext(DataContext); // Use DataContext here
 
-    function PageHandler() {
+    const [currentPage, setCurrentPage] = useState("connecting");
+
+    useEffect(() => {
         if (!connected) {
-            return <ConnectingPage />;
+            setCurrentPage("connecting");
+            return;
         }
 
-        // if(!isMobile) {
-        //     return <ReactorNormal />;
-        // }
-
-        if(running && !playerState.username) {
-            return <GameRunningPage/>
-        }
-    
-        if ((!playerState || !playerState.username) && !running) { // Check for playerState.name
-            return <LoginPage />;
-        } 
-    
-        if(playerState && !running) {
-            return <PlayersPage />
+        if (!isMobile) {
+            if (meltdownTimer > 0) {
+                setCurrentPage("meltdown");
+            } else {
+                setCurrentPage("reactorNormal");
+            }
+            return;
         }
 
-        if(playerState.alive === false) {
-            return <DeadPage />
+        if (running && !playerState?.username) {
+            setCurrentPage("gameRunning");
+            return;
         }
 
-        if(hackTime > 0 ) {
-            return <HackedPage hackTime={hackTime}  setHackTime={setHackTime}/>
+        if ((!playerState || !playerState.username) && !running) {
+            setCurrentPage("login");
+            return;
         }
 
-        if(meeting) {
-            return <EmergencyMeetingPage />
+        if (playerState && !running) {
+            setCurrentPage("players");
+            return;
         }
 
-        if(running && playerState.sus) {
-            return <ImposterPage/>
+        if (playerState?.alive === false) {
+            setCurrentPage("dead");
+            return;
         }
 
-        if(running && !playerState.sus) {
-            return <CrewmemberPage/>
+        if (meltdownCode) {
+            setCurrentPage("meltdownCode");
+            return;
         }
-    
-        // Render Dashboard or other components when connected and playerState exists
-        return <p>You're really not supposed to see this... Uhhh please go talk to sam and tell him he fucked up somewhere</p>
-    }
 
-    // hi
-    return(
+        if (hackTime > 0) {
+            setCurrentPage("hacked");
+            return;
+        }
+
+        if (meeting) {
+            setCurrentPage("meeting");
+            return;
+        }
+
+        if (running && playerState?.sus) {
+            setCurrentPage("imposter");
+            return;
+        }
+
+        if (running && !playerState?.sus) {
+            setCurrentPage("crewmember");
+            return;
+        }
+
+        setCurrentPage("unknown");
+    }, [
+        connected,
+        isMobile,
+        meltdownTimer,
+        running,
+        playerState,
+        meltdownCode,
+        hackTime,
+        meeting,
+    ]);
+
+    // Mapping of page identifiers to components
+    const pages = {
+        connecting: <ConnectingPage />,
+        meltdown: <ReactorMeltdown />,
+        reactorNormal: <ReactorNormal />,
+        gameRunning: <GameRunningPage />,
+        login: <LoginPage />,
+        players: <PlayersPage />,
+        dead: <DeadPage />,
+        meltdownCode: <MeltdownInfo/>,
+        hacked: <HackedPage hackTime={hackTime} setHackTime={setHackTime} />,
+        meeting: <EmergencyMeetingPage />,
+        imposter: <ImposterPage />,
+        crewmember: <CrewmemberPage />,
+        unknown: (
+            <p>
+                You're really not supposed to see this... Uhhh please go talk to
+                Sam and tell him he fucked up somewhere
+            </p>
+        ),
+    };
+
+    return (
         <div>
-            {message && <Alert size="lg" status={message.status} title={message.text}/>}
-            <Modal/>
-            {running && <ProgressBar score={crewScore} goalScore={taskGoal} sus={playerState.sus}/>}
-            <PageHandler/>
-            <div style={{ height: '70px' }}></div>
+            {message && (
+                <Alert size="lg" status={message.status} title={message.text} />
+            )}
+            <Modal />
+            {running && (
+                <ProgressBar
+                    score={crewScore}
+                    goalScore={taskGoal}
+                    sus={playerState?.sus}
+                />
+            )}
+            {pages[currentPage]}
+            <div style={{ height: "70px" }}></div>
         </div>
-    )
+    );
+};
 
-}
+export default memo(PageController);
