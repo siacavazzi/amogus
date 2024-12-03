@@ -79,6 +79,7 @@ const MUECustomSlider = ({
     onSuccess && onSuccess();
     setUnlocked(true);
     setIsBlocking(false); // Stop blocking after unlock
+    resetSlider()
   }, [onSuccess, updateSliderTransform]);
 
   // **Function to handle reset**
