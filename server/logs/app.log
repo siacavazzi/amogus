@@ -1,0 +1,623 @@
+2024-12-02 00:49:18,503 - app_logger - INFO - Starting server...
+2024-12-02 00:49:18,503 - app_logger - INFO -  * Please set ENDPOINT to: http://192.168.1.35:5000
+2024-12-02 00:49:18,503 - app_logger - INFO - Press CTRL+C to quit
+2024-12-02 00:50:29,373 - app_logger - INFO - Starting server...
+2024-12-02 00:50:29,374 - app_logger - INFO -  * Please set ENDPOINT to: http://192.168.1.35:5000
+2024-12-02 00:50:29,374 - app_logger - INFO - Press CTRL+C to quit
+2024-12-02 00:50:49,911 - app_logger - INFO - Client connected: 2_0321_lF9jwIJSsAAAB
+2024-12-02 00:51:12,709 - app_logger - INFO - Client disconnected: 2_0321_lF9jwIJSsAAAB
+2024-12-02 22:02:01,477 - app_logger - INFO - Starting server...
+2024-12-02 22:02:01,478 - app_logger - INFO -  * Please set ENDPOINT to: http://192.168.68.52:5000
+2024-12-02 22:02:01,478 - app_logger - INFO - Press CTRL+C to quit
+2024-12-02 22:02:23,296 - app_logger - INFO - Starting server...
+2024-12-02 22:02:23,296 - app_logger - INFO -  * Please set ENDPOINT to: http://192.168.68.52:5000
+2024-12-02 22:02:23,296 - app_logger - INFO - Press CTRL+C to quit
+2024-12-02 22:07:15,209 - app_logger - INFO - Starting server...
+2024-12-02 22:07:15,210 - app_logger - INFO -  * Please set ENDPOINT to: http://192.168.68.52:5000
+2024-12-02 22:07:15,210 - app_logger - INFO - Press CTRL+C to quit
+2024-12-02 22:09:36,237 - app_logger - INFO - Client connected: pZx_S-a-w8KZIIApAAAB
+2024-12-02 22:09:59,657 - app_logger - INFO - Client connected: GIn_Db_QhTZ7QpeTAAAD
+2024-12-02 22:10:03,496 - app_logger - INFO - New player Sam joined with ID b48d5c0e-ba8e-4072-9000-ae7270f977e9
+2024-12-02 22:10:03,496 - app_logger - INFO - Sending player list to all clients
+2024-12-02 22:10:03,497 - app_logger - DEBUG - Player List: ['{"sid": "GIn_Db_QhTZ7QpeTAAAD", "player_id": "b48d5c0e-ba8e-4072-9000-ae7270f977e9", "username": "Sam", "active": true, "sus": false, "alive": true, "pic": 8, "meltdown_code": null}']
+2024-12-02 22:10:20,914 - app_logger - INFO - Client disconnected: GIn_Db_QhTZ7QpeTAAAD
+2024-12-02 22:10:21,029 - app_logger - INFO - Client connected: fJu-VAfJi7srUFQdAAAF
+2024-12-02 22:10:21,048 - app_logger - INFO - Existing player rejoining...
+2024-12-02 22:10:21,048 - app_logger - INFO - Sending player list to all clients
+2024-12-02 22:10:21,048 - app_logger - DEBUG - Player List: ['{"sid": "fJu-VAfJi7srUFQdAAAF", "player_id": "b48d5c0e-ba8e-4072-9000-ae7270f977e9", "username": "Sam", "active": true, "sus": false, "alive": true, "pic": 8, "meltdown_code": null}']
+2024-12-02 22:10:43,503 - app_logger - INFO - Sending player list to all clients
+2024-12-02 22:10:43,503 - app_logger - DEBUG - Player List: ['{"sid": "fJu-VAfJi7srUFQdAAAF", "player_id": "b48d5c0e-ba8e-4072-9000-ae7270f977e9", "username": "Sam", "active": true, "sus": true, "alive": true, "pic": 8, "meltdown_code": null}']
+2024-12-02 22:10:43,504 - app_logger - INFO - Game started
+2024-12-02 22:10:50,050 - app_logger - INFO - Meeting started
+2024-12-02 22:10:57,531 - app_logger - INFO - Meeting ended
+2024-12-02 22:10:58,965 - app_logger - INFO - Meeting started
+2024-12-02 22:11:04,579 - app_logger - INFO - Meeting ended
+2024-12-02 22:11:29,519 - app_logger - INFO - Pin entered
+2024-12-02 22:11:29,522 - app_logger - DEBUG - Pin data: 3527
+2024-12-02 22:11:30,407 - app_logger - WARNING - Meltdown occurred. Sus score increased to 1
+2024-12-02 22:11:58,819 - app_logger - INFO - Client disconnected: fJu-VAfJi7srUFQdAAAF
+2024-12-02 22:21:40,791 - app_logger - INFO - Client disconnected: pZx_S-a-w8KZIIApAAAB
+2024-12-02 22:21:58,202 - app_logger - INFO - Starting server...
+2024-12-02 22:21:58,202 - app_logger - INFO -  * Please set ENDPOINT to: http://192.168.68.52:5000
+2024-12-02 22:21:58,202 - app_logger - INFO - Press CTRL+C to quit
+2024-12-02 22:22:00,486 - app_logger - INFO - Client connected: erqe61WlPVrAdmMOAAAB
+2024-12-02 22:22:35,296 - app_logger - INFO - Client disconnected: erqe61WlPVrAdmMOAAAB
+2024-12-02 22:22:35,603 - app_logger - INFO - Client connected: ljD54XTwc4NiZBvXAAAD
+2024-12-02 22:22:42,686 - app_logger - INFO - Client connected: aL_Fl1I_XJcf9u-3AAAF
+2024-12-02 22:22:46,407 - app_logger - INFO - New player Poip joined with new ID 6f8b47df-45c4-4fef-a769-dc53e75ef93c
+2024-12-02 22:22:46,412 - app_logger - INFO - Sending player list to all clients
+2024-12-02 22:22:46,412 - app_logger - DEBUG - Player List: ['{"sid": "aL_Fl1I_XJcf9u-3AAAF", "player_id": "6f8b47df-45c4-4fef-a769-dc53e75ef93c", "username": "Poip", "active": true, "sus": false, "alive": true, "pic": 11, "meltdown_code": null}']
+2024-12-02 22:23:09,694 - app_logger - INFO - Sending player list to all clients
+2024-12-02 22:23:09,698 - app_logger - DEBUG - Player List: ['{"sid": "aL_Fl1I_XJcf9u-3AAAF", "player_id": "6f8b47df-45c4-4fef-a769-dc53e75ef93c", "username": "Poip", "active": true, "sus": true, "alive": true, "pic": 11, "meltdown_code": null}']
+2024-12-02 22:23:09,699 - app_logger - INFO - Game started
+2024-12-02 22:23:16,197 - app_logger - INFO - Meeting started
+2024-12-02 22:24:02,049 - app_logger - INFO - Pin entered
+2024-12-02 22:24:02,052 - app_logger - DEBUG - Pin data: 8663
+2024-12-02 22:24:02,353 - app_logger - WARNING - Meltdown occurred. Sus score increased to 1
+2024-12-02 22:24:05,959 - app_logger - INFO - Client disconnected: ljD54XTwc4NiZBvXAAAD
+2024-12-02 22:24:05,959 - app_logger - INFO - Client disconnected: aL_Fl1I_XJcf9u-3AAAF
+2024-12-02 22:24:26,963 - app_logger - INFO - Starting server...
+2024-12-02 22:24:26,963 - app_logger - INFO -  * Please set ENDPOINT to: http://192.168.68.52:5000
+2024-12-02 22:24:26,963 - app_logger - INFO - Press CTRL+C to quit
+2024-12-02 22:24:31,360 - app_logger - INFO - Client connected: fNxV809jAJ7fhAGyAAAB
+2024-12-02 22:24:35,607 - app_logger - INFO - New player Poo joined with new ID f4c7dd74-d968-4537-b0bf-067c633a89e7
+2024-12-02 22:24:35,608 - app_logger - INFO - Sending player list to all clients
+2024-12-02 22:24:35,608 - app_logger - DEBUG - Player List: ['{"sid": "fNxV809jAJ7fhAGyAAAB", "player_id": "f4c7dd74-d968-4537-b0bf-067c633a89e7", "username": "Poo", "active": true, "sus": false, "alive": true, "pic": 15, "meltdown_code": null}']
+2024-12-02 22:24:39,625 - app_logger - INFO - Sending player list to all clients
+2024-12-02 22:24:39,625 - app_logger - DEBUG - Player List: ['{"sid": "fNxV809jAJ7fhAGyAAAB", "player_id": "f4c7dd74-d968-4537-b0bf-067c633a89e7", "username": "Poo", "active": true, "sus": true, "alive": true, "pic": 15, "meltdown_code": null}']
+2024-12-02 22:24:39,626 - app_logger - INFO - Game started
+2024-12-02 22:24:44,958 - app_logger - INFO - Meeting started
+2024-12-02 22:24:54,244 - app_logger - INFO - Meeting ended
+2024-12-02 22:25:21,854 - app_logger - INFO - Client connected: t2kdwrKDNmS1kgB0AAAD
+2024-12-02 22:26:16,915 - app_logger - INFO - Client disconnected: fNxV809jAJ7fhAGyAAAB
+2024-12-02 22:26:23,592 - app_logger - INFO - Client disconnected: t2kdwrKDNmS1kgB0AAAD
+2024-12-02 23:19:35,356 - app_logger - INFO - Starting server...
+2024-12-02 23:19:35,356 - app_logger - INFO -  * Please set ENDPOINT to: http://192.168.68.52:5000
+2024-12-02 23:19:35,356 - app_logger - INFO - Press CTRL+C to quit
+2024-12-02 23:22:04,418 - app_logger - INFO - Client connected: JHFipiTcMzACSPAcAAAB
+2024-12-02 23:22:10,218 - app_logger - INFO - New player Sam joined with ID bf409ef1-c1cc-4d59-8cfc-71dbd3e7be5b
+2024-12-02 23:22:10,219 - app_logger - INFO - Sending player list to all clients
+2024-12-02 23:22:10,219 - app_logger - DEBUG - Player List: ['{"sid": "JHFipiTcMzACSPAcAAAB", "player_id": "bf409ef1-c1cc-4d59-8cfc-71dbd3e7be5b", "username": "Sam", "active": true, "sus": false, "alive": true, "pic": 6, "meltdown_code": null}']
+2024-12-02 23:22:20,545 - app_logger - INFO - Client disconnected: JHFipiTcMzACSPAcAAAB
+2024-12-02 23:22:21,039 - app_logger - INFO - Client connected: 2NYZ-AVVRvrrq8uGAAAD
+2024-12-02 23:22:21,058 - app_logger - INFO - Existing player rejoining...
+2024-12-02 23:22:21,060 - app_logger - INFO - Sending player list to all clients
+2024-12-02 23:22:21,060 - app_logger - DEBUG - Player List: ['{"sid": "2NYZ-AVVRvrrq8uGAAAD", "player_id": "bf409ef1-c1cc-4d59-8cfc-71dbd3e7be5b", "username": "Sam", "active": true, "sus": false, "alive": true, "pic": 6, "meltdown_code": null}']
+2024-12-02 23:22:31,191 - app_logger - INFO - Client connected: hVkSB3LghAWEzP_ZAAAF
+2024-12-02 23:22:35,266 - app_logger - INFO - New player Ham joined with new ID c89b3c4e-5ffd-4cbe-81da-6f64fb0f1dde
+2024-12-02 23:22:35,268 - app_logger - INFO - Sending player list to all clients
+2024-12-02 23:22:35,269 - app_logger - DEBUG - Player List: ['{"sid": "2NYZ-AVVRvrrq8uGAAAD", "player_id": "bf409ef1-c1cc-4d59-8cfc-71dbd3e7be5b", "username": "Sam", "active": true, "sus": false, "alive": true, "pic": 6, "meltdown_code": null}', '{"sid": "hVkSB3LghAWEzP_ZAAAF", "player_id": "c89b3c4e-5ffd-4cbe-81da-6f64fb0f1dde", "username": "Ham", "active": true, "sus": false, "alive": true, "pic": 8, "meltdown_code": null}']
+2024-12-02 23:22:51,181 - app_logger - INFO - Client connected: cIJf6u4v7S6Di0BeAAAH
+2024-12-02 23:22:58,981 - app_logger - INFO - Sending player list to all clients
+2024-12-02 23:22:58,981 - app_logger - DEBUG - Player List: ['{"sid": "2NYZ-AVVRvrrq8uGAAAD", "player_id": "bf409ef1-c1cc-4d59-8cfc-71dbd3e7be5b", "username": "Sam", "active": true, "sus": false, "alive": true, "pic": 6, "meltdown_code": null}', '{"sid": "hVkSB3LghAWEzP_ZAAAF", "player_id": "c89b3c4e-5ffd-4cbe-81da-6f64fb0f1dde", "username": "Ham", "active": true, "sus": true, "alive": true, "pic": 8, "meltdown_code": null}']
+2024-12-02 23:22:58,981 - app_logger - INFO - Game started
+2024-12-02 23:22:58,981 - app_logger - DEBUG - Assigned task to player bf409ef1-c1cc-4d59-8cfc-71dbd3e7be5b: clean something that is dirty
+2024-12-02 23:23:11,961 - app_logger - INFO - Player bf409ef1-c1cc-4d59-8cfc-71dbd3e7be5b completed a task. Crew score: 1
+2024-12-02 23:23:11,964 - app_logger - DEBUG - Assigned new task to player bf409ef1-c1cc-4d59-8cfc-71dbd3e7be5b: spin around in the office chair
+2024-12-02 23:23:21,761 - app_logger - INFO - Player bf409ef1-c1cc-4d59-8cfc-71dbd3e7be5b completed a task. Crew score: 2
+2024-12-02 23:23:21,764 - app_logger - DEBUG - Assigned new task to player bf409ef1-c1cc-4d59-8cfc-71dbd3e7be5b: recline in the movie room
+2024-12-02 23:23:52,703 - app_logger - INFO - Client disconnected: 2NYZ-AVVRvrrq8uGAAAD
+2024-12-02 23:23:52,705 - app_logger - INFO - Client disconnected: hVkSB3LghAWEzP_ZAAAF
+2024-12-02 23:23:52,705 - app_logger - INFO - Client disconnected: cIJf6u4v7S6Di0BeAAAH
+2024-12-02 23:26:23,222 - app_logger - INFO - Starting server...
+2024-12-02 23:26:23,223 - app_logger - INFO -  * Please set ENDPOINT to: http://192.168.68.52:5000
+2024-12-02 23:26:23,223 - app_logger - INFO - Press CTRL+C to quit
+2024-12-02 23:26:34,321 - app_logger - INFO - Client connected: -juZp2ES4q0Bz4SJAAAB
+2024-12-02 23:26:44,431 - app_logger - INFO - Client connected: fDAtx7z4hQzHYDMbAAAD
+2024-12-02 23:26:47,039 - app_logger - INFO - New player Djdnd joined with new ID bbbd3613-f94c-49ae-aa0e-3694e67ecc29
+2024-12-02 23:26:47,040 - app_logger - INFO - Sending player list to all clients
+2024-12-02 23:26:47,040 - app_logger - DEBUG - Player List: ['{"sid": "fDAtx7z4hQzHYDMbAAAD", "player_id": "bbbd3613-f94c-49ae-aa0e-3694e67ecc29", "username": "Djdnd", "active": true, "sus": false, "alive": true, "pic": 14, "meltdown_code": null}']
+2024-12-02 23:27:04,499 - app_logger - INFO - Client disconnected: -juZp2ES4q0Bz4SJAAAB
+2024-12-02 23:27:04,502 - app_logger - INFO - Client disconnected: fDAtx7z4hQzHYDMbAAAD
+2024-12-02 23:27:09,725 - app_logger - INFO - Starting server...
+2024-12-02 23:27:09,726 - app_logger - INFO -  * Please set ENDPOINT to: http://192.168.68.52:5000
+2024-12-02 23:27:09,726 - app_logger - INFO - Press CTRL+C to quit
+2024-12-02 23:27:12,484 - app_logger - INFO - Client connected: 76qBLIST2C4IsGxTAAAB
+2024-12-02 23:27:14,396 - app_logger - INFO - Client connected: npSdw3kYc0mmcSagAAAD
+2024-12-02 23:27:17,872 - app_logger - INFO - New player Ham joined with new ID e22e4b44-13fc-49ef-b428-67c6de5ea1ea
+2024-12-02 23:27:17,873 - app_logger - INFO - Sending player list to all clients
+2024-12-02 23:27:17,873 - app_logger - DEBUG - Player List: ['{"sid": "76qBLIST2C4IsGxTAAAB", "player_id": "e22e4b44-13fc-49ef-b428-67c6de5ea1ea", "username": "Ham", "active": true, "sus": false, "alive": true, "pic": 4, "meltdown_code": null}']
+2024-12-02 23:27:27,893 - app_logger - INFO - Client connected: LjEwnMVoNzzpcOVBAAAF
+2024-12-02 23:27:35,069 - app_logger - INFO - New player Sam joined with new ID 986465e6-6307-40eb-a0c6-55c6c3aa5b2d
+2024-12-02 23:27:35,073 - app_logger - INFO - Sending player list to all clients
+2024-12-02 23:27:35,073 - app_logger - DEBUG - Player List: ['{"sid": "76qBLIST2C4IsGxTAAAB", "player_id": "e22e4b44-13fc-49ef-b428-67c6de5ea1ea", "username": "Ham", "active": true, "sus": false, "alive": true, "pic": 4, "meltdown_code": null}', '{"sid": "LjEwnMVoNzzpcOVBAAAF", "player_id": "986465e6-6307-40eb-a0c6-55c6c3aa5b2d", "username": "Sam", "active": true, "sus": false, "alive": true, "pic": 8, "meltdown_code": null}']
+2024-12-02 23:27:45,320 - app_logger - INFO - Sending player list to all clients
+2024-12-02 23:27:45,320 - app_logger - DEBUG - Player List: ['{"sid": "LjEwnMVoNzzpcOVBAAAF", "player_id": "986465e6-6307-40eb-a0c6-55c6c3aa5b2d", "username": "Sam", "active": true, "sus": false, "alive": true, "pic": 8, "meltdown_code": null}', '{"sid": "76qBLIST2C4IsGxTAAAB", "player_id": "e22e4b44-13fc-49ef-b428-67c6de5ea1ea", "username": "Ham", "active": true, "sus": true, "alive": true, "pic": 4, "meltdown_code": null}']
+2024-12-02 23:27:45,321 - app_logger - INFO - Game started
+2024-12-02 23:27:45,322 - app_logger - DEBUG - Assigned task to player 986465e6-6307-40eb-a0c6-55c6c3aa5b2d: Do a little dance outside G and Paps room
+2024-12-02 23:28:09,153 - app_logger - INFO - Player 986465e6-6307-40eb-a0c6-55c6c3aa5b2d completed a task. Crew score: 1
+2024-12-02 23:28:09,155 - app_logger - DEBUG - Assigned new task to player 986465e6-6307-40eb-a0c6-55c6c3aa5b2d: Read a book from fishy room book shelf
+2024-12-02 23:28:15,890 - app_logger - INFO - Player 986465e6-6307-40eb-a0c6-55c6c3aa5b2d completed a task. Crew score: 2
+2024-12-02 23:28:15,892 - app_logger - DEBUG - Assigned new task to player 986465e6-6307-40eb-a0c6-55c6c3aa5b2d: collect 5 leaves from the yard (sorry its cold)
+2024-12-02 23:29:02,765 - app_logger - INFO - Pin entered
+2024-12-02 23:29:02,768 - app_logger - DEBUG - Pin data: 2162
+2024-12-02 23:29:02,951 - app_logger - WARNING - Meltdown occurred. Sus score increased to 1
+2024-12-02 23:29:17,382 - app_logger - INFO - Pin entered
+2024-12-02 23:29:17,385 - app_logger - DEBUG - Pin data: 8812
+2024-12-02 23:29:18,237 - app_logger - WARNING - Meltdown occurred. Sus score increased to 2
+2024-12-02 23:29:31,037 - app_logger - INFO - Pin entered
+2024-12-02 23:29:31,039 - app_logger - DEBUG - Pin data: 4553
+2024-12-02 23:29:31,608 - app_logger - WARNING - Meltdown occurred. Sus score increased to 3
+2024-12-02 23:29:37,944 - app_logger - INFO - Meeting started
+2024-12-02 23:29:42,140 - app_logger - INFO - Meeting ended
+2024-12-02 23:29:55,525 - app_logger - INFO - Meeting started
+2024-12-02 23:30:04,111 - app_logger - INFO - Player e22e4b44-13fc-49ef-b428-67c6de5ea1ea marked as dead
+2024-12-02 23:30:09,113 - app_logger - INFO - Player e22e4b44-13fc-49ef-b428-67c6de5ea1ea marked as dead
+2024-12-02 23:30:09,660 - app_logger - INFO - Player e22e4b44-13fc-49ef-b428-67c6de5ea1ea marked as dead
+2024-12-02 23:30:09,842 - app_logger - INFO - Player e22e4b44-13fc-49ef-b428-67c6de5ea1ea marked as dead
+2024-12-02 23:30:09,992 - app_logger - INFO - Player e22e4b44-13fc-49ef-b428-67c6de5ea1ea marked as dead
+2024-12-02 23:30:37,199 - app_logger - INFO - Client disconnected: LjEwnMVoNzzpcOVBAAAF
+2024-12-02 23:30:45,457 - app_logger - INFO - Client disconnected: 76qBLIST2C4IsGxTAAAB
+2024-12-02 23:30:45,457 - app_logger - INFO - Client disconnected: npSdw3kYc0mmcSagAAAD
+2024-12-02 23:30:49,268 - app_logger - INFO - Starting server...
+2024-12-02 23:30:49,268 - app_logger - INFO -  * Please set ENDPOINT to: http://192.168.68.52:5000
+2024-12-02 23:30:49,268 - app_logger - INFO - Press CTRL+C to quit
+2024-12-02 23:30:50,706 - app_logger - INFO - Client connected: Io48ZAARl6VxajjQAAAB
+2024-12-02 23:30:55,788 - app_logger - INFO - Client disconnected: Io48ZAARl6VxajjQAAAB
+2024-12-02 23:31:58,895 - app_logger - INFO - Starting server...
+2024-12-02 23:31:58,896 - app_logger - INFO -  * Please set ENDPOINT to: http://192.168.68.52:5000
+2024-12-02 23:31:58,896 - app_logger - INFO - Press CTRL+C to quit
+2024-12-02 23:32:02,672 - app_logger - INFO - Client connected: xFVa94ZA2t2mNQQeAAAB
+2024-12-02 23:32:06,841 - app_logger - INFO - New player Poop joined with new ID 534f785f-a357-433c-b394-285d6b7ef133
+2024-12-02 23:32:06,842 - app_logger - INFO - Sending player list to all clients
+2024-12-02 23:32:06,842 - app_logger - DEBUG - Player List: ['{"sid": "xFVa94ZA2t2mNQQeAAAB", "player_id": "534f785f-a357-433c-b394-285d6b7ef133", "username": "Poop", "active": true, "sus": false, "alive": true, "pic": 13, "meltdown_code": null}']
+2024-12-02 23:32:13,233 - app_logger - INFO - Client connected: _VlkWYs7WaQqybovAAAD
+2024-12-02 23:32:13,475 - app_logger - INFO - Client disconnected: _VlkWYs7WaQqybovAAAD
+2024-12-02 23:32:13,787 - app_logger - INFO - Client connected: A9p5lIRZIqwmpJYgAAAF
+2024-12-02 23:32:17,373 - app_logger - INFO - New player Ween joined with new ID 27fcd876-27f3-4feb-91cb-841fab6e91bc
+2024-12-02 23:32:17,374 - app_logger - INFO - Sending player list to all clients
+2024-12-02 23:32:17,375 - app_logger - DEBUG - Player List: ['{"sid": "xFVa94ZA2t2mNQQeAAAB", "player_id": "534f785f-a357-433c-b394-285d6b7ef133", "username": "Poop", "active": true, "sus": false, "alive": true, "pic": 13, "meltdown_code": null}', '{"sid": "A9p5lIRZIqwmpJYgAAAF", "player_id": "27fcd876-27f3-4feb-91cb-841fab6e91bc", "username": "Ween", "active": true, "sus": false, "alive": true, "pic": 16, "meltdown_code": null}']
+2024-12-02 23:32:21,819 - app_logger - INFO - Sending player list to all clients
+2024-12-02 23:32:21,821 - app_logger - DEBUG - Player List: ['{"sid": "xFVa94ZA2t2mNQQeAAAB", "player_id": "534f785f-a357-433c-b394-285d6b7ef133", "username": "Poop", "active": true, "sus": true, "alive": true, "pic": 13, "meltdown_code": null}', '{"sid": "A9p5lIRZIqwmpJYgAAAF", "player_id": "27fcd876-27f3-4feb-91cb-841fab6e91bc", "username": "Ween", "active": true, "sus": false, "alive": true, "pic": 16, "meltdown_code": null}']
+2024-12-02 23:32:21,822 - app_logger - INFO - Game started
+2024-12-02 23:32:21,822 - app_logger - DEBUG - Assigned task to player 27fcd876-27f3-4feb-91cb-841fab6e91bc: slide a shuffleboard
+2024-12-02 23:32:28,902 - app_logger - INFO - Client connected: jyojqopcozXCvEyZAAAH
+2024-12-02 23:32:39,977 - app_logger - INFO - Pin entered
+2024-12-02 23:32:39,979 - app_logger - DEBUG - Pin data: 8061
+2024-12-02 23:32:49,650 - app_logger - INFO - Client disconnected: jyojqopcozXCvEyZAAAH
+2024-12-02 23:32:49,849 - app_logger - INFO - Client connected: WTBY5I59ZmuRfa38AAAJ
+2024-12-02 23:32:59,366 - app_logger - INFO - Pin entered
+2024-12-02 23:32:59,367 - app_logger - DEBUG - Pin data: 6360
+2024-12-02 23:33:00,277 - app_logger - WARNING - Meltdown occurred. Sus score increased to 1
+2024-12-02 23:33:11,338 - app_logger - INFO - Pin entered
+2024-12-02 23:33:11,341 - app_logger - DEBUG - Pin data: 7190
+2024-12-02 23:33:22,401 - app_logger - INFO - Pin entered
+2024-12-02 23:33:22,406 - app_logger - DEBUG - Pin data: 4695
+2024-12-02 23:33:23,352 - app_logger - WARNING - Meltdown occurred. Sus score increased to 2
+2024-12-02 23:33:30,981 - app_logger - INFO - Pin entered
+2024-12-02 23:33:30,982 - app_logger - DEBUG - Pin data: 5464
+2024-12-02 23:33:57,679 - app_logger - WARNING - Meltdown occurred. Sus score increased to 3
+2024-12-02 23:34:12,927 - app_logger - INFO - Client disconnected: xFVa94ZA2t2mNQQeAAAB
+2024-12-02 23:34:14,642 - app_logger - INFO - Client disconnected: A9p5lIRZIqwmpJYgAAAF
+2024-12-02 23:34:14,643 - app_logger - INFO - Client disconnected: WTBY5I59ZmuRfa38AAAJ
+2024-12-02 23:53:18,741 - app_logger - INFO - Starting server...
+2024-12-02 23:53:18,742 - app_logger - INFO -  * Please set ENDPOINT to: http://192.168.68.52:5000
+2024-12-02 23:53:18,742 - app_logger - INFO - Press CTRL+C to quit
+2024-12-02 23:53:42,548 - app_logger - INFO - Client connected: GzBtAZZNV-ZmCqs4AAAB
+2024-12-02 23:53:56,738 - app_logger - INFO - Client disconnected: GzBtAZZNV-ZmCqs4AAAB
+2024-12-02 23:53:57,125 - app_logger - INFO - Client connected: 2fT7RboNsw74FggdAAAD
+2024-12-02 23:54:21,551 - app_logger - INFO - Client connected: QOLV7LVjRbAoZ5o6AAAF
+2024-12-02 23:54:24,474 - app_logger - INFO - New player Dingus joined with new ID 3684ba2c-293e-482a-b149-914cedb3d3e9
+2024-12-02 23:54:24,475 - app_logger - INFO - Sending player list to all clients
+2024-12-02 23:54:24,476 - app_logger - DEBUG - Player List: ['{"sid": "QOLV7LVjRbAoZ5o6AAAF", "player_id": "3684ba2c-293e-482a-b149-914cedb3d3e9", "username": "Dingus", "active": true, "sus": false, "alive": true, "pic": 9, "meltdown_code": null}']
+2024-12-02 23:54:31,844 - app_logger - INFO - Client connected: np2eYrnyFwipe-_xAAAH
+2024-12-02 23:54:31,926 - app_logger - INFO - Client connected: SzGti9yWOT2maJYLAAAJ
+2024-12-02 23:54:31,954 - app_logger - INFO - Client disconnected: SzGti9yWOT2maJYLAAAJ
+2024-12-02 23:54:32,110 - app_logger - INFO - Client connected: i9p-n06CRrizh0PRAAAL
+2024-12-02 23:54:32,141 - app_logger - INFO - Client disconnected: i9p-n06CRrizh0PRAAAL
+2024-12-02 23:54:32,303 - app_logger - INFO - Client connected: bbv-q9NqSlUv4-frAAAN
+2024-12-02 23:54:32,323 - app_logger - INFO - Client disconnected: bbv-q9NqSlUv4-frAAAN
+2024-12-02 23:54:32,357 - app_logger - INFO - Client connected: aZuOux3AEgyJ6PZPAAAP
+2024-12-02 23:54:32,361 - app_logger - INFO - Client disconnected: aZuOux3AEgyJ6PZPAAAP
+2024-12-02 23:54:32,399 - app_logger - INFO - Client connected: CyMvBviVHyBAx_iKAAAR
+2024-12-02 23:54:32,405 - app_logger - INFO - Client disconnected: CyMvBviVHyBAx_iKAAAR
+2024-12-02 23:54:32,822 - app_logger - INFO - Client connected: gmSEhXQezezIs2rSAAAW
+2024-12-02 23:54:32,971 - app_logger - INFO - Client disconnected: gmSEhXQezezIs2rSAAAW
+2024-12-02 23:54:33,156 - app_logger - INFO - Client connected: yNJiRSxBfowDH3LhAAAY
+2024-12-02 23:54:33,159 - app_logger - INFO - Client disconnected: yNJiRSxBfowDH3LhAAAY
+2024-12-02 23:54:33,175 - app_logger - INFO - Client disconnected: np2eYrnyFwipe-_xAAAH
+2024-12-02 23:54:33,807 - app_logger - INFO - Client connected: U2WVyveR5WE2s4ZiAAAb
+2024-12-02 23:54:39,407 - app_logger - INFO - New player Poop joined with new ID 83288a7c-364e-4522-b955-86a4fcecb6e5
+2024-12-02 23:54:39,408 - app_logger - INFO - Sending player list to all clients
+2024-12-02 23:54:39,409 - app_logger - DEBUG - Player List: ['{"sid": "QOLV7LVjRbAoZ5o6AAAF", "player_id": "3684ba2c-293e-482a-b149-914cedb3d3e9", "username": "Dingus", "active": true, "sus": false, "alive": true, "pic": 9, "meltdown_code": null}', '{"sid": "U2WVyveR5WE2s4ZiAAAb", "player_id": "83288a7c-364e-4522-b955-86a4fcecb6e5", "username": "Poop", "active": true, "sus": false, "alive": true, "pic": 15, "meltdown_code": null}']
+2024-12-02 23:54:43,602 - app_logger - INFO - Sending player list to all clients
+2024-12-02 23:54:43,602 - app_logger - DEBUG - Player List: ['{"sid": "U2WVyveR5WE2s4ZiAAAb", "player_id": "83288a7c-364e-4522-b955-86a4fcecb6e5", "username": "Poop", "active": true, "sus": true, "alive": true, "pic": 15, "meltdown_code": null}', '{"sid": "QOLV7LVjRbAoZ5o6AAAF", "player_id": "3684ba2c-293e-482a-b149-914cedb3d3e9", "username": "Dingus", "active": true, "sus": false, "alive": true, "pic": 9, "meltdown_code": null}']
+2024-12-02 23:54:43,603 - app_logger - INFO - Game started
+2024-12-02 23:54:43,603 - app_logger - DEBUG - Assigned task to player 3684ba2c-293e-482a-b149-914cedb3d3e9: Eat any snack in the kitchen
+2024-12-02 23:54:47,625 - app_logger - INFO - Meeting started
+2024-12-02 23:54:54,051 - app_logger - INFO - Player 83288a7c-364e-4522-b955-86a4fcecb6e5 marked as dead
+2024-12-02 23:54:54,054 - app_logger - INFO - Sending player list to all clients
+2024-12-02 23:54:54,054 - app_logger - DEBUG - Player List: ['{"sid": "U2WVyveR5WE2s4ZiAAAb", "player_id": "83288a7c-364e-4522-b955-86a4fcecb6e5", "username": "Poop", "active": true, "sus": true, "alive": false, "pic": 15, "meltdown_code": null}', '{"sid": "QOLV7LVjRbAoZ5o6AAAF", "player_id": "3684ba2c-293e-482a-b149-914cedb3d3e9", "username": "Dingus", "active": true, "sus": false, "alive": true, "pic": 9, "meltdown_code": null}']
+2024-12-02 23:55:28,633 - app_logger - INFO - Client disconnected: U2WVyveR5WE2s4ZiAAAb
+2024-12-02 23:55:36,621 - app_logger - INFO - Client disconnected: QOLV7LVjRbAoZ5o6AAAF
+2024-12-02 23:57:54,361 - app_logger - INFO - Client disconnected: 2fT7RboNsw74FggdAAAD
+2024-12-02 23:57:58,142 - app_logger - INFO - Starting server...
+2024-12-02 23:57:58,142 - app_logger - INFO -  * Please set ENDPOINT to: http://192.168.68.52:5000
+2024-12-02 23:57:58,142 - app_logger - INFO - Press CTRL+C to quit
+2024-12-02 23:58:04,414 - app_logger - INFO - Client connected: O4Tvb_J8_IZxYVi-AAAB
+2024-12-02 23:58:10,307 - app_logger - INFO - Client connected: K1DIjywG7uGSPN0HAAAD
+2024-12-02 23:58:15,977 - app_logger - INFO - New player Sisjs joined with new ID c5a9ed26-6e4d-414e-8fea-ea8c6248ac64
+2024-12-02 23:58:15,979 - app_logger - INFO - Sending player list to all clients
+2024-12-02 23:58:15,979 - app_logger - DEBUG - Player List: ['{"sid": "K1DIjywG7uGSPN0HAAAD", "player_id": "c5a9ed26-6e4d-414e-8fea-ea8c6248ac64", "username": "Sisjs", "active": true, "sus": false, "alive": true, "pic": 3, "meltdown_code": null}']
+2024-12-02 23:58:23,239 - app_logger - INFO - Client connected: 8PxkEtG-R22k8LS-AAAF
+2024-12-02 23:58:26,723 - app_logger - INFO - New player Ham joined with new ID 649a36b4-d664-42ad-8fa8-99dba48687d7
+2024-12-02 23:58:26,725 - app_logger - INFO - Sending player list to all clients
+2024-12-02 23:58:26,726 - app_logger - DEBUG - Player List: ['{"sid": "K1DIjywG7uGSPN0HAAAD", "player_id": "c5a9ed26-6e4d-414e-8fea-ea8c6248ac64", "username": "Sisjs", "active": true, "sus": false, "alive": true, "pic": 3, "meltdown_code": null}', '{"sid": "8PxkEtG-R22k8LS-AAAF", "player_id": "649a36b4-d664-42ad-8fa8-99dba48687d7", "username": "Ham", "active": true, "sus": false, "alive": true, "pic": 1, "meltdown_code": null}']
+2024-12-02 23:58:29,860 - app_logger - INFO - Sending player list to all clients
+2024-12-02 23:58:29,862 - app_logger - DEBUG - Player List: ['{"sid": "8PxkEtG-R22k8LS-AAAF", "player_id": "649a36b4-d664-42ad-8fa8-99dba48687d7", "username": "Ham", "active": true, "sus": true, "alive": true, "pic": 1, "meltdown_code": null}', '{"sid": "K1DIjywG7uGSPN0HAAAD", "player_id": "c5a9ed26-6e4d-414e-8fea-ea8c6248ac64", "username": "Sisjs", "active": true, "sus": false, "alive": true, "pic": 3, "meltdown_code": null}']
+2024-12-02 23:58:29,862 - app_logger - INFO - Game started
+2024-12-02 23:58:29,862 - app_logger - DEBUG - Assigned task to player c5a9ed26-6e4d-414e-8fea-ea8c6248ac64: play 1 round of any arcade game
+2024-12-02 23:58:37,376 - app_logger - INFO - Meeting started
+2024-12-02 23:58:45,761 - app_logger - INFO - Player 649a36b4-d664-42ad-8fa8-99dba48687d7 marked as dead
+2024-12-02 23:59:15,686 - app_logger - INFO - Client disconnected: K1DIjywG7uGSPN0HAAAD
+2024-12-02 23:59:27,325 - app_logger - INFO - Client disconnected: O4Tvb_J8_IZxYVi-AAAB
+2024-12-02 23:59:27,327 - app_logger - INFO - Client disconnected: 8PxkEtG-R22k8LS-AAAF
+2024-12-02 23:59:30,858 - app_logger - INFO - Starting server...
+2024-12-02 23:59:30,858 - app_logger - INFO -  * Please set ENDPOINT to: http://192.168.68.52:5000
+2024-12-02 23:59:30,858 - app_logger - INFO - Press CTRL+C to quit
+2024-12-02 23:59:35,358 - app_logger - INFO - Client connected: fVo9d7zLG6wziSMjAAAB
+2024-12-02 23:59:35,373 - app_logger - INFO - Client disconnected: fVo9d7zLG6wziSMjAAAB
+2024-12-02 23:59:36,054 - app_logger - INFO - Client connected: c7eOr443Sa7TVIvWAAAD
+2024-12-02 23:59:39,046 - app_logger - INFO - New player Pop joined with new ID c58bb71f-215b-486b-9b63-fb79f182741d
+2024-12-02 23:59:39,047 - app_logger - INFO - Sending player list to all clients
+2024-12-02 23:59:39,048 - app_logger - DEBUG - Player List: ['{"sid": "c7eOr443Sa7TVIvWAAAD", "player_id": "c58bb71f-215b-486b-9b63-fb79f182741d", "username": "Pop", "active": true, "sus": false, "alive": true, "pic": 3, "meltdown_code": null}']
+2024-12-02 23:59:42,481 - app_logger - INFO - Client connected: opkF7X1ujMcSvXrfAAAG
+2024-12-02 23:59:45,647 - app_logger - INFO - New player Ghbb joined with new ID 767cadfc-19b3-4448-aa0b-9f72955b35fd
+2024-12-02 23:59:45,650 - app_logger - INFO - Sending player list to all clients
+2024-12-02 23:59:45,650 - app_logger - DEBUG - Player List: ['{"sid": "c7eOr443Sa7TVIvWAAAD", "player_id": "c58bb71f-215b-486b-9b63-fb79f182741d", "username": "Pop", "active": true, "sus": false, "alive": true, "pic": 3, "meltdown_code": null}', '{"sid": "opkF7X1ujMcSvXrfAAAG", "player_id": "767cadfc-19b3-4448-aa0b-9f72955b35fd", "username": "Ghbb", "active": true, "sus": false, "alive": true, "pic": 9, "meltdown_code": null}']
+2024-12-02 23:59:48,227 - app_logger - INFO - Client connected: O-8eMqFH0NK5XYamAAAI
+2024-12-02 23:59:50,509 - app_logger - INFO - Sending player list to all clients
+2024-12-02 23:59:50,511 - app_logger - DEBUG - Player List: ['{"sid": "c7eOr443Sa7TVIvWAAAD", "player_id": "c58bb71f-215b-486b-9b63-fb79f182741d", "username": "Pop", "active": true, "sus": true, "alive": true, "pic": 3, "meltdown_code": null}', '{"sid": "opkF7X1ujMcSvXrfAAAG", "player_id": "767cadfc-19b3-4448-aa0b-9f72955b35fd", "username": "Ghbb", "active": true, "sus": false, "alive": true, "pic": 9, "meltdown_code": null}']
+2024-12-02 23:59:50,512 - app_logger - INFO - Game started
+2024-12-02 23:59:50,512 - app_logger - DEBUG - Assigned task to player 767cadfc-19b3-4448-aa0b-9f72955b35fd: recline in the movie room
+2024-12-02 23:59:55,327 - app_logger - INFO - Meeting started
+2024-12-02 23:59:59,271 - app_logger - INFO - Player c58bb71f-215b-486b-9b63-fb79f182741d marked as dead
+2024-12-02 23:59:59,271 - app_logger - INFO - Game over: victory
+2024-12-02 23:59:59,271 - app_logger - INFO - Sending player list to all clients
+2024-12-02 23:59:59,271 - app_logger - DEBUG - Player List: ['{"sid": "c7eOr443Sa7TVIvWAAAD", "player_id": "c58bb71f-215b-486b-9b63-fb79f182741d", "username": "Pop", "active": true, "sus": true, "alive": false, "pic": 3, "meltdown_code": null}', '{"sid": "opkF7X1ujMcSvXrfAAAG", "player_id": "767cadfc-19b3-4448-aa0b-9f72955b35fd", "username": "Ghbb", "active": true, "sus": false, "alive": true, "pic": 9, "meltdown_code": null}']
+2024-12-03 00:00:21,736 - app_logger - INFO - Client disconnected: c7eOr443Sa7TVIvWAAAD
+2024-12-03 00:00:22,009 - app_logger - INFO - Client connected: dSu7LxSX0PTGU0qiAAAK
+2024-12-03 00:00:22,009 - app_logger - INFO - Game over: victory
+2024-12-03 00:00:22,009 - app_logger - DEBUG - Meeting is active
+2024-12-03 00:00:22,050 - app_logger - INFO - Existing player rejoining...
+2024-12-03 00:00:22,050 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:00:22,051 - app_logger - DEBUG - Player List: ['{"sid": "dSu7LxSX0PTGU0qiAAAK", "player_id": "c58bb71f-215b-486b-9b63-fb79f182741d", "username": "Pop", "active": true, "sus": true, "alive": false, "pic": 3, "meltdown_code": null}', '{"sid": "opkF7X1ujMcSvXrfAAAG", "player_id": "767cadfc-19b3-4448-aa0b-9f72955b35fd", "username": "Ghbb", "active": true, "sus": false, "alive": true, "pic": 9, "meltdown_code": null}']
+2024-12-03 00:00:31,638 - app_logger - INFO - Client disconnected: opkF7X1ujMcSvXrfAAAG
+2024-12-03 00:00:52,746 - app_logger - INFO - Client disconnected: dSu7LxSX0PTGU0qiAAAK
+2024-12-03 00:00:54,435 - app_logger - INFO - Client disconnected: O-8eMqFH0NK5XYamAAAI
+2024-12-03 00:00:54,444 - app_logger - INFO - Client connected: pQjhe2-UVQE8nUbAAAAM
+2024-12-03 00:00:54,445 - app_logger - INFO - Game over: victory
+2024-12-03 00:00:54,445 - app_logger - DEBUG - Meeting is active
+2024-12-03 00:00:59,295 - app_logger - INFO - Client disconnected: pQjhe2-UVQE8nUbAAAAM
+2024-12-03 00:00:59,786 - app_logger - INFO - Client connected: VKuMokVCnbOdGfohAAAO
+2024-12-03 00:00:59,787 - app_logger - INFO - Game over: victory
+2024-12-03 00:00:59,789 - app_logger - DEBUG - Meeting is active
+2024-12-03 00:01:04,553 - app_logger - INFO - Client connected: 7EekfOLGdVhx4mFuAAAQ
+2024-12-03 00:01:04,554 - app_logger - INFO - Game over: victory
+2024-12-03 00:01:04,554 - app_logger - DEBUG - Meeting is active
+2024-12-03 00:01:04,599 - app_logger - INFO - Existing player rejoining...
+2024-12-03 00:01:04,599 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:01:04,599 - app_logger - DEBUG - Player List: ['{"sid": "7EekfOLGdVhx4mFuAAAQ", "player_id": "c58bb71f-215b-486b-9b63-fb79f182741d", "username": "Pop", "active": true, "sus": true, "alive": false, "pic": 3, "meltdown_code": null}', '{"sid": "opkF7X1ujMcSvXrfAAAG", "player_id": "767cadfc-19b3-4448-aa0b-9f72955b35fd", "username": "Ghbb", "active": true, "sus": false, "alive": true, "pic": 9, "meltdown_code": null}']
+2024-12-03 00:01:04,600 - app_logger - INFO - Client disconnected: 7EekfOLGdVhx4mFuAAAQ
+2024-12-03 00:01:04,734 - app_logger - INFO - Client connected: 9X1SrztQN6_S2xgoAAAS
+2024-12-03 00:01:04,735 - app_logger - INFO - Game over: victory
+2024-12-03 00:01:04,737 - app_logger - DEBUG - Meeting is active
+2024-12-03 00:01:04,754 - app_logger - INFO - Existing player rejoining...
+2024-12-03 00:01:04,755 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:01:04,755 - app_logger - DEBUG - Player List: ['{"sid": "9X1SrztQN6_S2xgoAAAS", "player_id": "c58bb71f-215b-486b-9b63-fb79f182741d", "username": "Pop", "active": true, "sus": true, "alive": false, "pic": 3, "meltdown_code": null}', '{"sid": "opkF7X1ujMcSvXrfAAAG", "player_id": "767cadfc-19b3-4448-aa0b-9f72955b35fd", "username": "Ghbb", "active": true, "sus": false, "alive": true, "pic": 9, "meltdown_code": null}']
+2024-12-03 00:01:05,268 - app_logger - INFO - Client disconnected: 9X1SrztQN6_S2xgoAAAS
+2024-12-03 00:01:05,638 - app_logger - INFO - Client connected: TA90Q63gwI28NI6hAAAU
+2024-12-03 00:01:05,639 - app_logger - INFO - Game over: victory
+2024-12-03 00:01:05,639 - app_logger - DEBUG - Meeting is active
+2024-12-03 00:01:05,754 - app_logger - INFO - Existing player rejoining...
+2024-12-03 00:01:05,755 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:01:05,755 - app_logger - DEBUG - Player List: ['{"sid": "TA90Q63gwI28NI6hAAAU", "player_id": "c58bb71f-215b-486b-9b63-fb79f182741d", "username": "Pop", "active": true, "sus": true, "alive": false, "pic": 3, "meltdown_code": null}', '{"sid": "opkF7X1ujMcSvXrfAAAG", "player_id": "767cadfc-19b3-4448-aa0b-9f72955b35fd", "username": "Ghbb", "active": true, "sus": false, "alive": true, "pic": 9, "meltdown_code": null}']
+2024-12-03 00:01:11,757 - app_logger - INFO - Client connected: uuLjKLporbW8uBrcAAAW
+2024-12-03 00:01:11,758 - app_logger - INFO - Game over: victory
+2024-12-03 00:01:11,758 - app_logger - DEBUG - Meeting is active
+2024-12-03 00:01:11,774 - app_logger - INFO - Existing player rejoining...
+2024-12-03 00:01:11,774 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:01:11,774 - app_logger - DEBUG - Player List: ['{"sid": "TA90Q63gwI28NI6hAAAU", "player_id": "c58bb71f-215b-486b-9b63-fb79f182741d", "username": "Pop", "active": true, "sus": true, "alive": false, "pic": 3, "meltdown_code": null}', '{"sid": "uuLjKLporbW8uBrcAAAW", "player_id": "767cadfc-19b3-4448-aa0b-9f72955b35fd", "username": "Ghbb", "active": true, "sus": false, "alive": true, "pic": 9, "meltdown_code": null}']
+2024-12-03 00:01:11,775 - app_logger - INFO - Sending task to player
+2024-12-03 00:01:15,102 - app_logger - INFO - Meeting ended
+2024-12-03 00:01:17,290 - app_logger - INFO - Meeting started
+2024-12-03 00:01:19,020 - app_logger - INFO - Player 767cadfc-19b3-4448-aa0b-9f72955b35fd marked as dead
+2024-12-03 00:01:19,023 - app_logger - INFO - Game over: sus_victory
+2024-12-03 00:01:19,024 - app_logger - DEBUG - Player 767cadfc-19b3-4448-aa0b-9f72955b35fd was not suspicious. Sus score increased to 1
+2024-12-03 00:01:19,024 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:01:19,024 - app_logger - DEBUG - Player List: ['{"sid": "TA90Q63gwI28NI6hAAAU", "player_id": "c58bb71f-215b-486b-9b63-fb79f182741d", "username": "Pop", "active": true, "sus": true, "alive": false, "pic": 3, "meltdown_code": null}', '{"sid": "uuLjKLporbW8uBrcAAAW", "player_id": "767cadfc-19b3-4448-aa0b-9f72955b35fd", "username": "Ghbb", "active": true, "sus": false, "alive": false, "pic": 9, "meltdown_code": null}']
+2024-12-03 00:02:16,065 - app_logger - INFO - Client disconnected: TA90Q63gwI28NI6hAAAU
+2024-12-03 00:02:18,833 - app_logger - INFO - Client disconnected: uuLjKLporbW8uBrcAAAW
+2024-12-03 00:02:19,192 - app_logger - INFO - Client disconnected: VKuMokVCnbOdGfohAAAO
+2024-12-03 00:02:19,204 - app_logger - INFO - Client connected: yXtMQdHVOC7Jtz9mAAAY
+2024-12-03 00:02:19,205 - app_logger - INFO - Game over: sus_victory
+2024-12-03 00:02:19,205 - app_logger - DEBUG - Meeting is active
+2024-12-03 00:02:22,653 - app_logger - INFO - Client disconnected: yXtMQdHVOC7Jtz9mAAAY
+2024-12-03 00:02:22,665 - app_logger - INFO - Client connected: GBDZpJbiRJyt9dktAAAa
+2024-12-03 00:02:22,665 - app_logger - INFO - Game over: sus_victory
+2024-12-03 00:02:22,665 - app_logger - DEBUG - Meeting is active
+2024-12-03 00:02:23,923 - app_logger - INFO - Client disconnected: GBDZpJbiRJyt9dktAAAa
+2024-12-03 00:02:23,930 - app_logger - INFO - Client connected: lYJ4ryFDuuAw6hDAAAAc
+2024-12-03 00:02:23,931 - app_logger - INFO - Game over: sus_victory
+2024-12-03 00:02:23,931 - app_logger - DEBUG - Meeting is active
+2024-12-03 00:02:30,672 - app_logger - INFO - Client disconnected: lYJ4ryFDuuAw6hDAAAAc
+2024-12-03 00:02:31,164 - app_logger - INFO - Client connected: OhRPV1bc6eKTqGlHAAAe
+2024-12-03 00:02:31,164 - app_logger - INFO - Game over: sus_victory
+2024-12-03 00:02:31,164 - app_logger - DEBUG - Meeting is active
+2024-12-03 00:04:03,359 - app_logger - INFO - Client disconnected: OhRPV1bc6eKTqGlHAAAe
+2024-12-03 00:04:03,912 - app_logger - INFO - Client connected: d5zFAJrBnqKxXwpNAAAg
+2024-12-03 00:04:03,917 - app_logger - INFO - Game over: sus_victory
+2024-12-03 00:04:03,918 - app_logger - DEBUG - Meeting is active
+2024-12-03 00:04:38,815 - app_logger - INFO - Client connected: pjiScCbaxo4071eYAAAi
+2024-12-03 00:04:38,817 - app_logger - INFO - Game over: sus_victory
+2024-12-03 00:04:38,818 - app_logger - DEBUG - Meeting is active
+2024-12-03 00:04:38,835 - app_logger - INFO - Client disconnected: pjiScCbaxo4071eYAAAi
+2024-12-03 00:04:39,215 - app_logger - INFO - Client connected: dr0CufehSKxkARfvAAAm
+2024-12-03 00:04:39,218 - app_logger - INFO - Game over: sus_victory
+2024-12-03 00:04:39,219 - app_logger - DEBUG - Meeting is active
+2024-12-03 00:04:39,252 - app_logger - INFO - Existing player rejoining...
+2024-12-03 00:04:39,252 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:04:39,253 - app_logger - DEBUG - Player List: ['{"sid": "dr0CufehSKxkARfvAAAm", "player_id": "c58bb71f-215b-486b-9b63-fb79f182741d", "username": "Pop", "active": true, "sus": true, "alive": false, "pic": 3, "meltdown_code": null}', '{"sid": "uuLjKLporbW8uBrcAAAW", "player_id": "767cadfc-19b3-4448-aa0b-9f72955b35fd", "username": "Ghbb", "active": true, "sus": false, "alive": false, "pic": 9, "meltdown_code": null}']
+2024-12-03 00:04:39,791 - app_logger - INFO - Client disconnected: dr0CufehSKxkARfvAAAm
+2024-12-03 00:04:40,425 - app_logger - INFO - Client connected: QsZTmOVgzk7cIa7SAAAo
+2024-12-03 00:04:40,426 - app_logger - INFO - Game over: sus_victory
+2024-12-03 00:04:40,426 - app_logger - DEBUG - Meeting is active
+2024-12-03 00:04:40,448 - app_logger - INFO - Existing player rejoining...
+2024-12-03 00:04:40,448 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:04:40,448 - app_logger - DEBUG - Player List: ['{"sid": "QsZTmOVgzk7cIa7SAAAo", "player_id": "c58bb71f-215b-486b-9b63-fb79f182741d", "username": "Pop", "active": true, "sus": true, "alive": false, "pic": 3, "meltdown_code": null}', '{"sid": "uuLjKLporbW8uBrcAAAW", "player_id": "767cadfc-19b3-4448-aa0b-9f72955b35fd", "username": "Ghbb", "active": true, "sus": false, "alive": false, "pic": 9, "meltdown_code": null}']
+2024-12-03 00:05:14,657 - app_logger - INFO - Client disconnected: QsZTmOVgzk7cIa7SAAAo
+2024-12-03 00:05:25,282 - app_logger - INFO - Client disconnected: d5zFAJrBnqKxXwpNAAAg
+2024-12-03 00:05:30,832 - app_logger - INFO - Client connected: GVd_oszM1FYp3xsPAAAq
+2024-12-03 00:05:30,832 - app_logger - INFO - Game over: sus_victory
+2024-12-03 00:05:30,832 - app_logger - DEBUG - Meeting is active
+2024-12-03 00:06:06,216 - app_logger - INFO - Client disconnected: GVd_oszM1FYp3xsPAAAq
+2024-12-03 00:06:06,660 - app_logger - INFO - Client connected: 5bmd6M0PvU14XqNTAAAs
+2024-12-03 00:06:06,669 - app_logger - INFO - Game over: sus_victory
+2024-12-03 00:06:06,669 - app_logger - DEBUG - Meeting is active
+2024-12-03 00:06:38,797 - app_logger - INFO - Client disconnected: 5bmd6M0PvU14XqNTAAAs
+2024-12-03 00:06:38,924 - app_logger - INFO - Client connected: je_UDfKgvnJoxbulAAAu
+2024-12-03 00:06:38,924 - app_logger - INFO - Game over: sus_victory
+2024-12-03 00:06:38,924 - app_logger - DEBUG - Meeting is active
+2024-12-03 00:06:41,287 - app_logger - INFO - Client disconnected: je_UDfKgvnJoxbulAAAu
+2024-12-03 00:06:41,755 - app_logger - INFO - Client connected: gOEe4t7ebU7G54r4AAAw
+2024-12-03 00:06:41,755 - app_logger - INFO - Game over: sus_victory
+2024-12-03 00:06:41,755 - app_logger - DEBUG - Meeting is active
+2024-12-03 00:07:01,102 - app_logger - INFO - Client connected: JIvunUJ9j3V7nLn5AAAy
+2024-12-03 00:07:01,105 - app_logger - INFO - Game over: sus_victory
+2024-12-03 00:07:01,106 - app_logger - DEBUG - Meeting is active
+2024-12-03 00:07:06,448 - app_logger - INFO - Client disconnected: JIvunUJ9j3V7nLn5AAAy
+2024-12-03 00:07:54,986 - app_logger - INFO - Client disconnected: gOEe4t7ebU7G54r4AAAw
+2024-12-03 00:07:55,515 - app_logger - INFO - Client connected: wvVB6gTSyqX_MVn8AAA0
+2024-12-03 00:07:55,516 - app_logger - INFO - Game over: sus_victory
+2024-12-03 00:07:55,516 - app_logger - DEBUG - Meeting is active
+2024-12-03 00:09:39,351 - app_logger - INFO - Client connected: EoXUynMo_UXROsw1AAA2
+2024-12-03 00:09:39,359 - app_logger - INFO - Game over: sus_victory
+2024-12-03 00:09:39,360 - app_logger - DEBUG - Meeting is active
+2024-12-03 00:09:39,705 - app_logger - INFO - Existing player rejoining...
+2024-12-03 00:09:39,707 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:09:39,707 - app_logger - DEBUG - Player List: ['{"sid": "EoXUynMo_UXROsw1AAA2", "player_id": "c58bb71f-215b-486b-9b63-fb79f182741d", "username": "Pop", "active": true, "sus": true, "alive": false, "pic": 3, "meltdown_code": null}', '{"sid": "uuLjKLporbW8uBrcAAAW", "player_id": "767cadfc-19b3-4448-aa0b-9f72955b35fd", "username": "Ghbb", "active": true, "sus": false, "alive": false, "pic": 9, "meltdown_code": null}']
+2024-12-03 00:09:39,798 - app_logger - INFO - Client disconnected: EoXUynMo_UXROsw1AAA2
+2024-12-03 00:09:41,015 - app_logger - INFO - Client connected: QUlyCX_Y5dVnEZk2AAA4
+2024-12-03 00:09:41,017 - app_logger - INFO - Game over: sus_victory
+2024-12-03 00:09:41,019 - app_logger - DEBUG - Meeting is active
+2024-12-03 00:09:41,072 - app_logger - INFO - Existing player rejoining...
+2024-12-03 00:09:41,073 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:09:41,073 - app_logger - DEBUG - Player List: ['{"sid": "QUlyCX_Y5dVnEZk2AAA4", "player_id": "c58bb71f-215b-486b-9b63-fb79f182741d", "username": "Pop", "active": true, "sus": true, "alive": false, "pic": 3, "meltdown_code": null}', '{"sid": "uuLjKLporbW8uBrcAAAW", "player_id": "767cadfc-19b3-4448-aa0b-9f72955b35fd", "username": "Ghbb", "active": true, "sus": false, "alive": false, "pic": 9, "meltdown_code": null}']
+2024-12-03 00:10:01,723 - app_logger - INFO - Client disconnected: wvVB6gTSyqX_MVn8AAA0
+2024-12-03 00:10:01,724 - app_logger - INFO - Client disconnected: QUlyCX_Y5dVnEZk2AAA4
+2024-12-03 00:10:04,041 - app_logger - INFO - Starting server...
+2024-12-03 00:10:04,041 - app_logger - INFO -  * Please set ENDPOINT to: http://192.168.68.52:5000
+2024-12-03 00:10:04,041 - app_logger - INFO - Press CTRL+C to quit
+2024-12-03 00:10:04,272 - app_logger - INFO - Client connected: Jk4ZYBVTJVaxnyScAAAB
+2024-12-03 00:10:11,224 - app_logger - INFO - Client connected: BIvpZ5HRkhbNwF48AAAD
+2024-12-03 00:10:15,140 - app_logger - INFO - New player Poop joined with new ID ea13dd3b-1099-4e83-9887-22f45b5d2f31
+2024-12-03 00:10:15,140 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:10:15,140 - app_logger - DEBUG - Player List: ['{"sid": "BIvpZ5HRkhbNwF48AAAD", "player_id": "ea13dd3b-1099-4e83-9887-22f45b5d2f31", "username": "Poop", "active": true, "sus": false, "alive": true, "pic": 1, "meltdown_code": null}']
+2024-12-03 00:10:19,799 - app_logger - INFO - Client connected: I6gipvsIMCKteQ6TAAAF
+2024-12-03 00:10:22,855 - app_logger - INFO - New player Dingus joined with new ID c24d637c-2854-4cf0-b578-a135fa532abc
+2024-12-03 00:10:22,857 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:10:22,857 - app_logger - DEBUG - Player List: ['{"sid": "BIvpZ5HRkhbNwF48AAAD", "player_id": "ea13dd3b-1099-4e83-9887-22f45b5d2f31", "username": "Poop", "active": true, "sus": false, "alive": true, "pic": 1, "meltdown_code": null}', '{"sid": "I6gipvsIMCKteQ6TAAAF", "player_id": "c24d637c-2854-4cf0-b578-a135fa532abc", "username": "Dingus", "active": true, "sus": false, "alive": true, "pic": 0, "meltdown_code": null}']
+2024-12-03 00:10:31,754 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:10:31,754 - app_logger - DEBUG - Player List: ['{"sid": "I6gipvsIMCKteQ6TAAAF", "player_id": "c24d637c-2854-4cf0-b578-a135fa532abc", "username": "Dingus", "active": true, "sus": true, "alive": true, "pic": 0, "meltdown_code": null}', '{"sid": "BIvpZ5HRkhbNwF48AAAD", "player_id": "ea13dd3b-1099-4e83-9887-22f45b5d2f31", "username": "Poop", "active": true, "sus": false, "alive": true, "pic": 1, "meltdown_code": null}']
+2024-12-03 00:10:31,754 - app_logger - INFO - Game started
+2024-12-03 00:10:31,754 - app_logger - DEBUG - Assigned task to player ea13dd3b-1099-4e83-9887-22f45b5d2f31: Go pet Archie
+2024-12-03 00:10:38,009 - app_logger - INFO - Meeting started
+2024-12-03 00:10:40,827 - app_logger - INFO - Player c24d637c-2854-4cf0-b578-a135fa532abc marked as dead
+2024-12-03 00:10:40,828 - app_logger - INFO - Game over: victory
+2024-12-03 00:10:40,828 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:10:40,828 - app_logger - DEBUG - Player List: ['{"sid": "I6gipvsIMCKteQ6TAAAF", "player_id": "c24d637c-2854-4cf0-b578-a135fa532abc", "username": "Dingus", "active": true, "sus": true, "alive": false, "pic": 0, "meltdown_code": null}', '{"sid": "BIvpZ5HRkhbNwF48AAAD", "player_id": "ea13dd3b-1099-4e83-9887-22f45b5d2f31", "username": "Poop", "active": true, "sus": false, "alive": true, "pic": 1, "meltdown_code": null}']
+2024-12-03 00:10:59,062 - app_logger - INFO - Client disconnected: Jk4ZYBVTJVaxnyScAAAB
+2024-12-03 00:10:59,062 - app_logger - INFO - Client disconnected: BIvpZ5HRkhbNwF48AAAD
+2024-12-03 00:10:59,062 - app_logger - INFO - Client disconnected: I6gipvsIMCKteQ6TAAAF
+2024-12-03 00:11:01,745 - app_logger - INFO - Starting server...
+2024-12-03 00:11:01,745 - app_logger - INFO -  * Please set ENDPOINT to: http://192.168.68.52:5000
+2024-12-03 00:11:01,745 - app_logger - INFO - Press CTRL+C to quit
+2024-12-03 00:11:02,840 - app_logger - INFO - Client connected: qzylxm4qw0aG-NSFAAAB
+2024-12-03 00:12:21,864 - app_logger - INFO - Client connected: Cec9V_hCkqkaDZMkAAAG
+2024-12-03 00:12:26,155 - app_logger - INFO - New player Gg joined with new ID 187f9f24-75a7-47b0-92b6-1a3db09390d9
+2024-12-03 00:12:26,156 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:12:26,156 - app_logger - DEBUG - Player List: ['{"sid": "Cec9V_hCkqkaDZMkAAAG", "player_id": "187f9f24-75a7-47b0-92b6-1a3db09390d9", "username": "Gg", "active": true, "sus": false, "alive": true, "pic": 2, "meltdown_code": null}']
+2024-12-03 00:12:28,077 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:12:28,078 - app_logger - DEBUG - Player List: ['{"sid": "Cec9V_hCkqkaDZMkAAAG", "player_id": "187f9f24-75a7-47b0-92b6-1a3db09390d9", "username": "Gg", "active": true, "sus": true, "alive": true, "pic": 2, "meltdown_code": null}']
+2024-12-03 00:12:28,078 - app_logger - INFO - Game started
+2024-12-03 00:13:01,350 - app_logger - WARNING - Meltdown occurred. Sus score increased to 1
+2024-12-03 00:13:21,665 - app_logger - INFO - Client disconnected: qzylxm4qw0aG-NSFAAAB
+2024-12-03 00:13:21,666 - app_logger - INFO - Client disconnected: Cec9V_hCkqkaDZMkAAAG
+2024-12-03 00:15:58,522 - app_logger - INFO - Starting server...
+2024-12-03 00:15:58,522 - app_logger - INFO -  * Please set ENDPOINT to: http://192.168.68.52:5000
+2024-12-03 00:15:58,522 - app_logger - INFO - Press CTRL+C to quit
+2024-12-03 00:16:09,809 - app_logger - INFO - Client connected: HJIFcavjf3cB5ZSNAAAB
+2024-12-03 00:16:12,634 - app_logger - INFO - Client connected: DV28vJlhwhcCj6v8AAAD
+2024-12-03 00:16:13,878 - app_logger - INFO - Client disconnected: DV28vJlhwhcCj6v8AAAD
+2024-12-03 00:16:14,199 - app_logger - INFO - Client connected: vT534Y2N4yrT7ojQAAAF
+2024-12-03 00:16:18,445 - app_logger - INFO - New player Poop joined with new ID 74b42069-9c91-4bc3-8096-e50fac443db9
+2024-12-03 00:16:18,446 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:16:18,446 - app_logger - DEBUG - Player List: ['{"sid": "vT534Y2N4yrT7ojQAAAF", "player_id": "74b42069-9c91-4bc3-8096-e50fac443db9", "username": "Poop", "active": true, "sus": false, "alive": true, "pic": 4, "meltdown_code": null}']
+2024-12-03 00:16:24,393 - app_logger - INFO - Client connected: wBGlsizhua_X_j3qAAAH
+2024-12-03 00:16:30,013 - app_logger - INFO - New player Peepee joined with new ID cf5da08b-f837-45d4-ace0-80ac76439d96
+2024-12-03 00:16:30,014 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:16:30,014 - app_logger - DEBUG - Player List: ['{"sid": "vT534Y2N4yrT7ojQAAAF", "player_id": "74b42069-9c91-4bc3-8096-e50fac443db9", "username": "Poop", "active": true, "sus": false, "alive": true, "pic": 4, "meltdown_code": null}', '{"sid": "wBGlsizhua_X_j3qAAAH", "player_id": "cf5da08b-f837-45d4-ace0-80ac76439d96", "username": "Peepee", "active": true, "sus": false, "alive": true, "pic": 0, "meltdown_code": null}']
+2024-12-03 00:16:50,181 - app_logger - INFO - Client disconnected: vT534Y2N4yrT7ojQAAAF
+2024-12-03 00:17:04,554 - app_logger - INFO - Client disconnected: wBGlsizhua_X_j3qAAAH
+2024-12-03 00:19:56,199 - app_logger - INFO - Client disconnected: HJIFcavjf3cB5ZSNAAAB
+2024-12-03 00:20:00,996 - app_logger - INFO - Starting server...
+2024-12-03 00:20:00,996 - app_logger - INFO -  * Please set ENDPOINT to: http://192.168.68.52:5000
+2024-12-03 00:20:00,997 - app_logger - INFO - Press CTRL+C to quit
+2024-12-03 00:20:08,945 - app_logger - INFO - Client connected: MSr_tw3UuAuExvVvAAAB
+2024-12-03 00:20:09,066 - app_logger - INFO - Client connected: r0mBRmw_cCLpUtycAAAD
+2024-12-03 00:20:11,714 - app_logger - INFO - New player Ddd joined with new ID d717bb35-81b4-4413-a2e2-c22e06ee9ce3
+2024-12-03 00:20:11,715 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:20:11,716 - app_logger - DEBUG - Player List: ['{"sid": "MSr_tw3UuAuExvVvAAAB", "player_id": "d717bb35-81b4-4413-a2e2-c22e06ee9ce3", "username": "Ddd", "active": true, "sus": false, "alive": true, "pic": 2, "meltdown_code": null}']
+2024-12-03 00:20:15,564 - app_logger - INFO - Client connected: 4FKV9vVenbUYVGC9AAAF
+2024-12-03 00:20:18,191 - app_logger - INFO - Client disconnected: 4FKV9vVenbUYVGC9AAAF
+2024-12-03 00:20:18,366 - app_logger - INFO - Client connected: 6n16YDiWNVWjA-hNAAAH
+2024-12-03 00:20:21,341 - app_logger - INFO - New player Shhddj joined with new ID 37326fe8-b28c-45e1-a864-e12b0137a207
+2024-12-03 00:20:21,342 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:20:21,342 - app_logger - DEBUG - Player List: ['{"sid": "MSr_tw3UuAuExvVvAAAB", "player_id": "d717bb35-81b4-4413-a2e2-c22e06ee9ce3", "username": "Ddd", "active": true, "sus": false, "alive": true, "pic": 2, "meltdown_code": null}', '{"sid": "6n16YDiWNVWjA-hNAAAH", "player_id": "37326fe8-b28c-45e1-a864-e12b0137a207", "username": "Shhddj", "active": true, "sus": false, "alive": true, "pic": 5, "meltdown_code": null}']
+2024-12-03 00:20:23,817 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:20:23,817 - app_logger - DEBUG - Player List: ['{"sid": "MSr_tw3UuAuExvVvAAAB", "player_id": "d717bb35-81b4-4413-a2e2-c22e06ee9ce3", "username": "Ddd", "active": true, "sus": true, "alive": true, "pic": 2, "meltdown_code": null}', '{"sid": "6n16YDiWNVWjA-hNAAAH", "player_id": "37326fe8-b28c-45e1-a864-e12b0137a207", "username": "Shhddj", "active": true, "sus": false, "alive": true, "pic": 5, "meltdown_code": null}']
+2024-12-03 00:20:23,819 - app_logger - INFO - Game started
+2024-12-03 00:20:23,820 - app_logger - DEBUG - Assigned task to player 37326fe8-b28c-45e1-a864-e12b0137a207: Go yell something from the roof
+2024-12-03 00:20:38,097 - app_logger - INFO - Pin entered
+2024-12-03 00:20:38,098 - app_logger - DEBUG - Pin data: 8588
+2024-12-03 00:20:45,534 - app_logger - INFO - Pin entered
+2024-12-03 00:20:45,535 - app_logger - DEBUG - Pin data: 6016
+2024-12-03 00:20:45,965 - app_logger - WARNING - Meltdown occurred. Sus score increased to 1
+2024-12-03 00:20:59,182 - app_logger - INFO - Client disconnected: MSr_tw3UuAuExvVvAAAB
+2024-12-03 00:20:59,526 - app_logger - INFO - Client connected: f5iqJKCxvg8zWLpUAAAJ
+2024-12-03 00:20:59,553 - app_logger - INFO - Existing player rejoining...
+2024-12-03 00:20:59,565 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:20:59,566 - app_logger - DEBUG - Player List: ['{"sid": "f5iqJKCxvg8zWLpUAAAJ", "player_id": "d717bb35-81b4-4413-a2e2-c22e06ee9ce3", "username": "Ddd", "active": true, "sus": true, "alive": true, "pic": 2, "meltdown_code": 6016}', '{"sid": "6n16YDiWNVWjA-hNAAAH", "player_id": "37326fe8-b28c-45e1-a864-e12b0137a207", "username": "Shhddj", "active": true, "sus": false, "alive": true, "pic": 5, "meltdown_code": 8588}']
+2024-12-03 00:20:59,566 - app_logger - DEBUG - Sent meltdown code to player d717bb35-81b4-4413-a2e2-c22e06ee9ce3
+2024-12-03 00:21:05,990 - app_logger - INFO - Client disconnected: f5iqJKCxvg8zWLpUAAAJ
+2024-12-03 00:21:06,148 - app_logger - INFO - Client connected: 429SSjsZeQK7Rx_5AAAL
+2024-12-03 00:21:06,177 - app_logger - INFO - Existing player rejoining...
+2024-12-03 00:21:06,177 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:21:06,178 - app_logger - DEBUG - Player List: ['{"sid": "429SSjsZeQK7Rx_5AAAL", "player_id": "d717bb35-81b4-4413-a2e2-c22e06ee9ce3", "username": "Ddd", "active": true, "sus": true, "alive": true, "pic": 2, "meltdown_code": 6016}', '{"sid": "6n16YDiWNVWjA-hNAAAH", "player_id": "37326fe8-b28c-45e1-a864-e12b0137a207", "username": "Shhddj", "active": true, "sus": false, "alive": true, "pic": 5, "meltdown_code": 8588}']
+2024-12-03 00:21:06,178 - app_logger - DEBUG - Sent meltdown code to player d717bb35-81b4-4413-a2e2-c22e06ee9ce3
+2024-12-03 00:21:27,667 - app_logger - INFO - Meeting started
+2024-12-03 00:21:33,272 - app_logger - INFO - Client disconnected: 429SSjsZeQK7Rx_5AAAL
+2024-12-03 00:21:33,383 - app_logger - INFO - Client connected: 3v7RjiK2gMaU2Ow6AAAN
+2024-12-03 00:21:33,383 - app_logger - DEBUG - Meeting is active
+2024-12-03 00:21:33,409 - app_logger - INFO - Existing player rejoining...
+2024-12-03 00:21:33,409 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:21:33,409 - app_logger - DEBUG - Player List: ['{"sid": "3v7RjiK2gMaU2Ow6AAAN", "player_id": "d717bb35-81b4-4413-a2e2-c22e06ee9ce3", "username": "Ddd", "active": true, "sus": true, "alive": true, "pic": 2, "meltdown_code": 6016}', '{"sid": "6n16YDiWNVWjA-hNAAAH", "player_id": "37326fe8-b28c-45e1-a864-e12b0137a207", "username": "Shhddj", "active": true, "sus": false, "alive": true, "pic": 5, "meltdown_code": 8588}']
+2024-12-03 00:21:33,410 - app_logger - DEBUG - Sent meltdown code to player d717bb35-81b4-4413-a2e2-c22e06ee9ce3
+2024-12-03 00:22:03,633 - app_logger - INFO - Client disconnected: 6n16YDiWNVWjA-hNAAAH
+2024-12-03 00:22:21,255 - app_logger - INFO - Client disconnected: 3v7RjiK2gMaU2Ow6AAAN
+2024-12-03 00:24:30,234 - app_logger - INFO - Client disconnected: r0mBRmw_cCLpUtycAAAD
+2024-12-03 00:24:34,551 - app_logger - INFO - Starting server...
+2024-12-03 00:24:34,552 - app_logger - INFO -  * Please set ENDPOINT to: http://192.168.68.52:5000
+2024-12-03 00:24:34,552 - app_logger - INFO - Press CTRL+C to quit
+2024-12-03 00:24:38,063 - app_logger - INFO - Client connected: re4IeCijrVl8uiFMAAAB
+2024-12-03 00:24:39,140 - app_logger - INFO - Client disconnected: re4IeCijrVl8uiFMAAAB
+2024-12-03 00:24:39,366 - app_logger - INFO - Client connected: trS0Lr7tuq52EQizAAAD
+2024-12-03 00:24:46,473 - app_logger - INFO - Client connected: R5X2v5-GGRROWciuAAAF
+2024-12-03 00:24:49,323 - app_logger - INFO - New player Woo joined with new ID 408f7f90-21ad-4d17-a766-48082408425d
+2024-12-03 00:24:49,326 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:24:49,327 - app_logger - DEBUG - Player List: ['{"sid": "R5X2v5-GGRROWciuAAAF", "player_id": "408f7f90-21ad-4d17-a766-48082408425d", "username": "Woo", "active": true, "sus": false, "alive": true, "pic": 9, "meltdown_code": null}']
+2024-12-03 00:24:54,807 - app_logger - INFO - Client connected: Uxq0c2Hc8VbRrv7DAAAH
+2024-12-03 00:24:57,756 - app_logger - INFO - New player Poop joined with new ID 81aa0fc5-4da2-45b2-952a-58917b475892
+2024-12-03 00:24:57,756 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:24:57,756 - app_logger - DEBUG - Player List: ['{"sid": "R5X2v5-GGRROWciuAAAF", "player_id": "408f7f90-21ad-4d17-a766-48082408425d", "username": "Woo", "active": true, "sus": false, "alive": true, "pic": 9, "meltdown_code": null}', '{"sid": "Uxq0c2Hc8VbRrv7DAAAH", "player_id": "81aa0fc5-4da2-45b2-952a-58917b475892", "username": "Poop", "active": true, "sus": false, "alive": true, "pic": 3, "meltdown_code": null}']
+2024-12-03 00:24:59,935 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:24:59,935 - app_logger - DEBUG - Player List: ['{"sid": "R5X2v5-GGRROWciuAAAF", "player_id": "408f7f90-21ad-4d17-a766-48082408425d", "username": "Woo", "active": true, "sus": true, "alive": true, "pic": 9, "meltdown_code": null}', '{"sid": "Uxq0c2Hc8VbRrv7DAAAH", "player_id": "81aa0fc5-4da2-45b2-952a-58917b475892", "username": "Poop", "active": true, "sus": false, "alive": true, "pic": 3, "meltdown_code": null}']
+2024-12-03 00:24:59,935 - app_logger - INFO - Game started
+2024-12-03 00:24:59,937 - app_logger - DEBUG - Assigned task to player 81aa0fc5-4da2-45b2-952a-58917b475892: Pet fitz
+2024-12-03 00:25:17,851 - app_logger - INFO - Client connected: SwfH1j85CMdXNIwEAAAJ
+2024-12-03 00:25:18,053 - app_logger - INFO - Client disconnected: R5X2v5-GGRROWciuAAAF
+2024-12-03 00:25:27,531 - app_logger - INFO - Client disconnected: SwfH1j85CMdXNIwEAAAJ
+2024-12-03 00:25:28,064 - app_logger - INFO - Client connected: 3yzGNhBvhNhYsHhYAAAL
+2024-12-03 00:25:28,093 - app_logger - INFO - Existing player rejoining...
+2024-12-03 00:25:28,095 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:25:28,095 - app_logger - DEBUG - Player List: ['{"sid": "3yzGNhBvhNhYsHhYAAAL", "player_id": "408f7f90-21ad-4d17-a766-48082408425d", "username": "Woo", "active": true, "sus": true, "alive": true, "pic": 9, "meltdown_code": 2676}', '{"sid": "Uxq0c2Hc8VbRrv7DAAAH", "player_id": "81aa0fc5-4da2-45b2-952a-58917b475892", "username": "Poop", "active": true, "sus": false, "alive": true, "pic": 3, "meltdown_code": 2078}']
+2024-12-03 00:25:28,096 - app_logger - DEBUG - Sent meltdown code to player 408f7f90-21ad-4d17-a766-48082408425d
+2024-12-03 00:25:35,506 - app_logger - INFO - Client disconnected: Uxq0c2Hc8VbRrv7DAAAH
+2024-12-03 00:25:40,814 - app_logger - INFO - Pin entered
+2024-12-03 00:25:40,816 - app_logger - DEBUG - Pin data: 2676
+2024-12-03 00:25:45,109 - app_logger - INFO - Client connected: 9OdW_a_rHdcBwMsRAAAN
+2024-12-03 00:25:45,305 - app_logger - INFO - Client disconnected: 9OdW_a_rHdcBwMsRAAAN
+2024-12-03 00:25:45,397 - app_logger - INFO - Client connected: ETaj7qGWCvsr5TCOAAAP
+2024-12-03 00:25:45,417 - app_logger - INFO - Existing player rejoining...
+2024-12-03 00:25:45,418 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:25:45,418 - app_logger - DEBUG - Player List: ['{"sid": "3yzGNhBvhNhYsHhYAAAL", "player_id": "408f7f90-21ad-4d17-a766-48082408425d", "username": "Woo", "active": true, "sus": true, "alive": true, "pic": 9, "meltdown_code": 2676}', '{"sid": "ETaj7qGWCvsr5TCOAAAP", "player_id": "81aa0fc5-4da2-45b2-952a-58917b475892", "username": "Poop", "active": true, "sus": false, "alive": true, "pic": 3, "meltdown_code": 2078}']
+2024-12-03 00:25:45,418 - app_logger - DEBUG - Sent meltdown code to player 81aa0fc5-4da2-45b2-952a-58917b475892
+2024-12-03 00:25:45,418 - app_logger - INFO - Sending task to player
+2024-12-03 00:25:46,182 - app_logger - WARNING - Meltdown occurred. Sus score increased to 1
+2024-12-03 00:26:01,673 - app_logger - INFO - Client disconnected: 3yzGNhBvhNhYsHhYAAAL
+2024-12-03 00:26:20,900 - app_logger - INFO - Client disconnected: ETaj7qGWCvsr5TCOAAAP
+2024-12-03 00:26:52,392 - app_logger - INFO - Client disconnected: trS0Lr7tuq52EQizAAAD
+2024-12-03 00:26:52,398 - app_logger - INFO - Client connected: 5c59AxYPi6q-uhu6AAAR
+2024-12-03 00:26:52,398 - app_logger - INFO - Game over: meltdown_fail
+2024-12-03 00:27:00,112 - app_logger - INFO - Client disconnected: 5c59AxYPi6q-uhu6AAAR
+2024-12-03 00:27:00,115 - app_logger - INFO - Client connected: ppXkyrDQf8diDduRAAAT
+2024-12-03 00:27:00,115 - app_logger - INFO - Game over: meltdown_fail
+2024-12-03 00:27:08,141 - app_logger - INFO - Client disconnected: ppXkyrDQf8diDduRAAAT
+2024-12-03 00:27:10,571 - app_logger - INFO - Starting server...
+2024-12-03 00:27:10,571 - app_logger - INFO -  * Please set ENDPOINT to: http://192.168.68.52:5000
+2024-12-03 00:27:10,571 - app_logger - INFO - Press CTRL+C to quit
+2024-12-03 00:27:11,121 - app_logger - INFO - Client connected: igv2MjvNPtr7VmVbAAAB
+2024-12-03 00:27:12,707 - app_logger - INFO - Client connected: qnkkROdma0TMxyvNAAAD
+2024-12-03 00:27:12,709 - app_logger - INFO - Client disconnected: qnkkROdma0TMxyvNAAAD
+2024-12-03 00:27:12,739 - app_logger - INFO - Client connected: 3YnxRcBshfq-BU4SAAAF
+2024-12-03 00:27:12,840 - app_logger - INFO - Client disconnected: 3YnxRcBshfq-BU4SAAAF
+2024-12-03 00:27:13,131 - app_logger - INFO - Client connected: TTL4UAnDxdnx_tFSAAAH
+2024-12-03 00:27:15,989 - app_logger - INFO - New player Woop joined with new ID aa94db50-b49d-4cbc-b47e-4c2fff64050c
+2024-12-03 00:27:15,990 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:27:15,991 - app_logger - DEBUG - Player List: ['{"sid": "TTL4UAnDxdnx_tFSAAAH", "player_id": "aa94db50-b49d-4cbc-b47e-4c2fff64050c", "username": "Woop", "active": true, "sus": false, "alive": true, "pic": 6, "meltdown_code": null}']
+2024-12-03 00:27:23,324 - app_logger - INFO - Client connected: wgPdklHzT_btxt5cAAAJ
+2024-12-03 00:27:23,480 - app_logger - INFO - Client disconnected: wgPdklHzT_btxt5cAAAJ
+2024-12-03 00:27:23,753 - app_logger - INFO - Client connected: NQk_CtgNhtNICf9kAAAL
+2024-12-03 00:27:25,217 - app_logger - INFO - Client disconnected: NQk_CtgNhtNICf9kAAAL
+2024-12-03 00:27:25,729 - app_logger - INFO - Client connected: 6oBC3cOGcbGAP-6dAAAN
+2024-12-03 00:27:29,413 - app_logger - INFO - New player Bbbh joined with new ID 05507369-d6ab-4d15-bb24-db3cd058a2a6
+2024-12-03 00:27:29,414 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:27:29,414 - app_logger - DEBUG - Player List: ['{"sid": "TTL4UAnDxdnx_tFSAAAH", "player_id": "aa94db50-b49d-4cbc-b47e-4c2fff64050c", "username": "Woop", "active": true, "sus": false, "alive": true, "pic": 6, "meltdown_code": null}', '{"sid": "6oBC3cOGcbGAP-6dAAAN", "player_id": "05507369-d6ab-4d15-bb24-db3cd058a2a6", "username": "Bbbh", "active": true, "sus": false, "alive": true, "pic": 10, "meltdown_code": null}']
+2024-12-03 00:27:32,317 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:27:32,317 - app_logger - DEBUG - Player List: ['{"sid": "TTL4UAnDxdnx_tFSAAAH", "player_id": "aa94db50-b49d-4cbc-b47e-4c2fff64050c", "username": "Woop", "active": true, "sus": true, "alive": true, "pic": 6, "meltdown_code": null}', '{"sid": "6oBC3cOGcbGAP-6dAAAN", "player_id": "05507369-d6ab-4d15-bb24-db3cd058a2a6", "username": "Bbbh", "active": true, "sus": false, "alive": true, "pic": 10, "meltdown_code": null}']
+2024-12-03 00:27:32,317 - app_logger - INFO - Game started
+2024-12-03 00:27:32,318 - app_logger - DEBUG - Assigned task to player 05507369-d6ab-4d15-bb24-db3cd058a2a6: Neatly organize the couch and pillows by the living room TV
+2024-12-03 00:27:39,590 - app_logger - INFO - Client disconnected: igv2MjvNPtr7VmVbAAAB
+2024-12-03 00:27:39,912 - app_logger - INFO - Client connected: -WLkXgFDBPKZN2VLAAAP
+2024-12-03 00:27:48,481 - app_logger - INFO - Pin entered
+2024-12-03 00:27:48,481 - app_logger - DEBUG - Pin data: 9536
+2024-12-03 00:27:51,957 - app_logger - INFO - Pin entered
+2024-12-03 00:27:51,959 - app_logger - DEBUG - Pin data: 2883
+2024-12-03 00:27:52,596 - app_logger - WARNING - Meltdown occurred. Sus score increased to 1
+2024-12-03 00:28:10,061 - app_logger - INFO - Meeting started
+2024-12-03 00:28:13,131 - app_logger - INFO - Meeting ended
+2024-12-03 00:28:15,177 - app_logger - INFO - Player 05507369-d6ab-4d15-bb24-db3cd058a2a6 completed a task. Crew score: 1
+2024-12-03 00:28:15,177 - app_logger - DEBUG - Assigned new task to player 05507369-d6ab-4d15-bb24-db3cd058a2a6: Do 5 jumping jacks in the gym
+2024-12-03 00:28:43,562 - app_logger - INFO - Pin entered
+2024-12-03 00:28:43,565 - app_logger - DEBUG - Pin data: 5546
+2024-12-03 00:28:49,233 - app_logger - INFO - Client disconnected: TTL4UAnDxdnx_tFSAAAH
+2024-12-03 00:28:49,750 - app_logger - INFO - Client connected: 0-oe_qpoFkAzcZArAAAR
+2024-12-03 00:28:49,922 - app_logger - INFO - Existing player rejoining...
+2024-12-03 00:28:49,923 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:28:49,923 - app_logger - DEBUG - Player List: ['{"sid": "0-oe_qpoFkAzcZArAAAR", "player_id": "aa94db50-b49d-4cbc-b47e-4c2fff64050c", "username": "Woop", "active": true, "sus": true, "alive": true, "pic": 6, "meltdown_code": 7884}', '{"sid": "6oBC3cOGcbGAP-6dAAAN", "player_id": "05507369-d6ab-4d15-bb24-db3cd058a2a6", "username": "Bbbh", "active": true, "sus": false, "alive": true, "pic": 10, "meltdown_code": 9006}']
+2024-12-03 00:28:49,924 - app_logger - DEBUG - Sent meltdown code to player aa94db50-b49d-4cbc-b47e-4c2fff64050c
+2024-12-03 00:28:51,625 - app_logger - INFO - Client disconnected: 0-oe_qpoFkAzcZArAAAR
+2024-12-03 00:28:51,773 - app_logger - INFO - Client connected: 6WaW5lMTdrA9_K71AAAT
+2024-12-03 00:28:51,793 - app_logger - INFO - Existing player rejoining...
+2024-12-03 00:28:51,796 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:28:51,797 - app_logger - DEBUG - Player List: ['{"sid": "6WaW5lMTdrA9_K71AAAT", "player_id": "aa94db50-b49d-4cbc-b47e-4c2fff64050c", "username": "Woop", "active": true, "sus": true, "alive": true, "pic": 6, "meltdown_code": 7884}', '{"sid": "6oBC3cOGcbGAP-6dAAAN", "player_id": "05507369-d6ab-4d15-bb24-db3cd058a2a6", "username": "Bbbh", "active": true, "sus": false, "alive": true, "pic": 10, "meltdown_code": 9006}']
+2024-12-03 00:28:51,798 - app_logger - DEBUG - Sent meltdown code to player aa94db50-b49d-4cbc-b47e-4c2fff64050c
+2024-12-03 00:28:53,392 - app_logger - INFO - Client disconnected: 6WaW5lMTdrA9_K71AAAT
+2024-12-03 00:28:53,533 - app_logger - INFO - Client connected: qrtMaha6FtCD3NtNAAAV
+2024-12-03 00:28:53,555 - app_logger - INFO - Existing player rejoining...
+2024-12-03 00:28:53,555 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:28:53,556 - app_logger - DEBUG - Player List: ['{"sid": "qrtMaha6FtCD3NtNAAAV", "player_id": "aa94db50-b49d-4cbc-b47e-4c2fff64050c", "username": "Woop", "active": true, "sus": true, "alive": true, "pic": 6, "meltdown_code": 7884}', '{"sid": "6oBC3cOGcbGAP-6dAAAN", "player_id": "05507369-d6ab-4d15-bb24-db3cd058a2a6", "username": "Bbbh", "active": true, "sus": false, "alive": true, "pic": 10, "meltdown_code": 9006}']
+2024-12-03 00:28:53,556 - app_logger - DEBUG - Sent meltdown code to player aa94db50-b49d-4cbc-b47e-4c2fff64050c
+2024-12-03 00:28:54,107 - app_logger - INFO - Client disconnected: 6oBC3cOGcbGAP-6dAAAN
+2024-12-03 00:28:54,273 - app_logger - INFO - Client connected: CgNy23rNFR5g9AiLAAAX
+2024-12-03 00:28:58,231 - app_logger - INFO - Client disconnected: CgNy23rNFR5g9AiLAAAX
+2024-12-03 00:28:58,444 - app_logger - INFO - Client connected: FmvQJfKX3hoPoBSqAAAZ
+2024-12-03 00:28:58,473 - app_logger - INFO - Existing player rejoining...
+2024-12-03 00:28:58,474 - app_logger - INFO - Sending player list to all clients
+2024-12-03 00:28:58,476 - app_logger - DEBUG - Player List: ['{"sid": "qrtMaha6FtCD3NtNAAAV", "player_id": "aa94db50-b49d-4cbc-b47e-4c2fff64050c", "username": "Woop", "active": true, "sus": true, "alive": true, "pic": 6, "meltdown_code": 7884}', '{"sid": "FmvQJfKX3hoPoBSqAAAZ", "player_id": "05507369-d6ab-4d15-bb24-db3cd058a2a6", "username": "Bbbh", "active": true, "sus": false, "alive": true, "pic": 10, "meltdown_code": 9006}']
+2024-12-03 00:28:58,477 - app_logger - DEBUG - Sent meltdown code to player 05507369-d6ab-4d15-bb24-db3cd058a2a6
+2024-12-03 00:28:58,477 - app_logger - INFO - Sending task to player
+2024-12-03 00:29:00,712 - app_logger - WARNING - Meltdown occurred. Sus score increased to 2
+2024-12-03 00:29:13,020 - app_logger - INFO - Client disconnected: -WLkXgFDBPKZN2VLAAAP
+2024-12-03 00:29:13,021 - app_logger - INFO - Client disconnected: qrtMaha6FtCD3NtNAAAV
+2024-12-03 00:29:13,021 - app_logger - INFO - Client disconnected: FmvQJfKX3hoPoBSqAAAZ

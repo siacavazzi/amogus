@@ -24,6 +24,11 @@ function ReactorMeltdown() {
                 setPin(["", "", "", ""]);
             }, 3000);
         });
+
+        socket.on("code_correct", () => {
+            setIsIncorrect(false);
+            setPin(["", "", "", ""]);
+        })
     }, [socket]);
 
     useEffect(() => {

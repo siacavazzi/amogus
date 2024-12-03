@@ -10,7 +10,7 @@ from flask_socketio import emit
 
 class Game:
 
-    def __init__(self, socket):
+    def __init__(self, socket, speaker):
         self.players = []
         self.tasks = read_task_file()
         self.crew_score = 0
@@ -20,21 +20,33 @@ class Game:
         self.active_meltdown = None
         self.meeting = False
         self.numImposters = None
+        self.numCrew = None
         self.taskGoal = None
         self.backgrounds = list(range(0, 16 + 1))  
         self.socket = socket
+        self.end_state = None
+        self.speaker = speaker
 
         # crewmate to imposter ratio
         self.sus_ratio = 5
         # tasks per player
         self.task_ratio = 10
 
-    def start_meltdown(self, duration=60):
+    def start_meltdown(self, duration=30):
         self.active_meltdown = Meltdown(self.players, duration, self.socket)
+        self.active_meltdown.game = self
         self.active_meltdown.start_countdown()
 
     def check_pin(self, pin):
         self.active_meltdown.check_pin(pin)
+
+    def meltdown(self):
+        self.active_meltdown = None
+        self.end_state = "meltdown_fail"
+        self.socket.emit("end_game", self.end_state)
+
+        if self.speaker:
+            self.speaker.play_sound("sus_victory")
 
 
     def start_hack(self, duration):
@@ -89,6 +101,7 @@ class Game:
         # 1/5 ratio
         raw_imposters = len(self.players) / self.sus_ratio
         self.numImposters = max(1, min(math.ceil(raw_imposters), len(self.players) - 1))
+        self.numCrew = len(self.players) - self.numImposters
         random.shuffle(self.players)
         for i in range(0, self.numImposters):
             self.players[i]

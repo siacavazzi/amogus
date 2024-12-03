@@ -17,6 +17,9 @@ import ReactorMeltdown from "./pages/MeltdownPage";
 import ReactorNormal from "./pages/ReactorPage";
 import { isMobile } from "react-device-detect";
 import MeltdownInfo from "./pages/MeltdownInfo";
+import CrewVictoryScreen from "./pages/CrewVictory";
+import ImposterVictoryScreen from "./pages/ImposterVictory";
+import NuclearMeltdownScreen from "./pages/MeltdownEnd";
 
 const PageController = () => {
     const {
@@ -31,13 +34,25 @@ const PageController = () => {
         setHackTime,
         meltdownCode,
         meltdownTimer,
-    } = useContext(DataContext); // Use DataContext here
+        endState,
+    } = useContext(DataContext);
 
     const [currentPage, setCurrentPage] = useState("connecting");
 
     useEffect(() => {
+        console.log("GAME ENDED!!!!")
+        console.log(endState)
+    },[endState])
+
+    useEffect(() => {
         if (!connected) {
             setCurrentPage("connecting");
+            return;
+        }
+
+        if(endState) {
+            console.log(endState)
+            setCurrentPage(endState)
             return;
         }
 
@@ -105,6 +120,7 @@ const PageController = () => {
         meltdownCode,
         hackTime,
         meeting,
+        endState,
     ]);
 
     // Mapping of page identifiers to components
@@ -121,6 +137,9 @@ const PageController = () => {
         meeting: <EmergencyMeetingPage />,
         imposter: <ImposterPage />,
         crewmember: <CrewmemberPage />,
+        sus_victory: <ImposterVictoryScreen/>,
+        victory: <CrewVictoryScreen />,
+        meltdown_fail: <NuclearMeltdownScreen />,
         unknown: (
             <p>
                 You're really not supposed to see this... Uhhh please go talk to
@@ -143,7 +162,7 @@ const PageController = () => {
                 />
             )}
             {pages[currentPage]}
-            <div style={{ height: "70px" }}></div>
+            {/* <div style={{ height: "70px" }}></div> */}
         </div>
     );
 };

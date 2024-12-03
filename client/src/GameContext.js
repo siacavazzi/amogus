@@ -33,7 +33,8 @@ export default function GameContext({ children }) {
     const [hackTime, setHackTime] = useState(0);
     const [meltdownCode, setMeltdownCode] = useState(undefined);
     const [ meltdownTimer, setMeltdownTimer] = useState(false);
-    const [codesNeeded, setCodesNeeded] = useState(undefined)
+    const [codesNeeded, setCodesNeeded] = useState(undefined);
+    const [endState, setEndState] = useState(undefined)
 
     const resetState = () => {
         setGameState({})
@@ -53,6 +54,7 @@ export default function GameContext({ children }) {
         setCodesNeeded(undefined);
         setMeltdownTimer(undefined);
         setMeltdownCode(undefined);
+        setEndState(undefined);
     }
 
     const resetMessage = (delay) => {
@@ -94,6 +96,12 @@ export default function GameContext({ children }) {
             resetState();
         });
 
+        socketRef.current.on('end_game', (data) => {
+            console.log("GAME OVER!!!!!!!!!!!!!")
+            console.log(data)
+            setEndState(data);
+        });
+
         socketRef.current.on('code_correct', (data) => {
             console.log("CORRECT CODE")
             console.log(data)
@@ -107,6 +115,8 @@ export default function GameContext({ children }) {
             setCodesNeeded(data)
         });
 
+        // TODO: MELTDOWN ISSUES!!!!
+        // SLIDER ISSUES. GETTING STUCK
         socketRef.current.on('meltdown_end', () => {
             setCodesNeeded(undefined);
             setMeltdownTimer(undefined);
@@ -277,7 +287,8 @@ export default function GameContext({ children }) {
         meltdownCode,
         meltdownTimer,
         codesNeeded,
-    }), [meltdownCode,codesNeeded, meltdownTimer, hackTime, audio, playerState, gameState, connected, players, message, dialog, running, task, crewScore, showAnimation, meeting, taskGoal, susPoints]);
+        endState,
+    }), [endState, meltdownCode,codesNeeded, meltdownTimer, hackTime, audio, playerState, gameState, connected, players, message, dialog, running, task, crewScore, showAnimation, meeting, taskGoal, susPoints]);
 
     return (
         <DataContext.Provider value={contextValue}>
