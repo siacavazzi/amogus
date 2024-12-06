@@ -32,9 +32,9 @@ export default function GameContext({ children }) {
     const [taskGoal, setTaskGoal] = useState(1);
     const [hackTime, setHackTime] = useState(0);
     const [meltdownCode, setMeltdownCode] = useState(undefined);
-    const [ meltdownTimer, setMeltdownTimer] = useState(false);
+    const [meltdownTimer, setMeltdownTimer] = useState(false);
     const [codesNeeded, setCodesNeeded] = useState(undefined);
-    const [endState, setEndState] = useState(undefined)
+    const [endState, setEndState] = useState(undefined);
 
     const resetState = () => {
         setGameState({})
@@ -47,6 +47,7 @@ export default function GameContext({ children }) {
         setTask(undefined)
         setRunning(false)
         setCrewScore(0);
+        setSusPoints(0);
         setMeeting(false)
         setDialog(undefined);
         setHackTime(0);
@@ -68,7 +69,6 @@ export default function GameContext({ children }) {
     };
 
     useEffect(() => {
-        console.log(message)
         const reset = resetMessage(5000)
         return reset;
     }, [message])
@@ -84,7 +84,6 @@ export default function GameContext({ children }) {
         });
 
         socketRef.current.on('connect', () => {
-            console.log("WebSocket connection established");
             setConnected(true);
             socketRef.current.emit('rejoin', {
                 player_id: playerState.playerId,
@@ -92,31 +91,17 @@ export default function GameContext({ children }) {
         });
 
         socketRef.current.on('disconnect', () => {
-            console.log("WebSocket connection disconnected");
             resetState();
         });
 
         socketRef.current.on('end_game', (data) => {
-            console.log("GAME OVER!!!!!!!!!!!!!")
-            console.log(data)
             setEndState(data);
-        });
-
-        socketRef.current.on('code_correct', (data) => {
-            console.log("CORRECT CODE")
-            console.log(data)
-            if(data === 0 ) {
-                setMeltdownTimer(undefined)
-            }
-            setCodesNeeded(data)
         });
 
         socketRef.current.on('codes_needed', (data) => {
             setCodesNeeded(data)
         });
 
-        // TODO: MELTDOWN ISSUES!!!!
-        // SLIDER ISSUES. GETTING STUCK
         socketRef.current.on('meltdown_end', () => {
             setCodesNeeded(undefined);
             setMeltdownTimer(undefined);
@@ -148,22 +133,17 @@ export default function GameContext({ children }) {
         });
 
         socketRef.current.on('crew_score', (data) => {
-            console.log("# Completed tasks: ", data.score)
             setCrewScore(data.score);
         });
 
         socketRef.current.on('game_start', () => {
-            console.log("SET RUNNING TO TRUE")
             setRunning(true)
         });
 
         socketRef.current.on('meeting', () => {
-            console.log("MEEEEETING CALLLED = = = =  = = = = = = =  = = = = =")
             setAudio('meeting')
-            console.log(audioEnabled)
             setMeeting(true);
             isMobile && setDialog({ title: "Emergency Meeting Called!", body: <MeetingDisplay /> });
-
         });
 
 
@@ -177,7 +157,6 @@ export default function GameContext({ children }) {
         });
 
         socketRef.current.on('task_goal', (data) => {
-            console.log(data)
             setTaskGoal(data)
         });
 
@@ -194,7 +173,6 @@ export default function GameContext({ children }) {
             if (!playerState && data.action != "rejoin") {
                 return;
             }
-            console.log(data)
             let me;
             if (data.action === "player_list" || data.action === "start_game" || data.action === "rejoin") {
                 if (Array.isArray(data.list)) {
@@ -214,7 +192,6 @@ export default function GameContext({ children }) {
                         if (me) {
                             setPlayerState(me)
                             console.log(me)
-                            console.log("found me")
                         } else {
                             console.log("not found")
                         }
@@ -222,7 +199,7 @@ export default function GameContext({ children }) {
                         console.log("not found")
                         // setMessage({ status: "error", text: "Idk who i am :(" })
                     }
-                    if(me) {
+                    if (me) {
                         setPlayers(parsedPlayers);
                     }
                     console.log("Updated players state:", parsedPlayers);
@@ -231,12 +208,11 @@ export default function GameContext({ children }) {
                 }
 
                 if (data.action === "start_game" && me) {
-                    console.log("start game")
                     setAudio('start');
                     setRunning(true);
                     isMobile && setDialog({ title: "Game Started", body: <PlayerRole sus={me.sus} /> });
 
-                } else if(data.action === "start_game") {
+                } else if (data.action === "start_game") {
                     setRunning(true);
                 }
             }
@@ -288,7 +264,27 @@ export default function GameContext({ children }) {
         meltdownTimer,
         codesNeeded,
         endState,
-    }), [endState, meltdownCode,codesNeeded, meltdownTimer, hackTime, audio, playerState, gameState, connected, players, message, dialog, running, task, crewScore, showAnimation, meeting, taskGoal, susPoints]);
+        setCodesNeeded,
+    }), [
+        endState,
+        meltdownCode,
+        codesNeeded,
+        meltdownTimer,
+        hackTime, audio,
+        playerState,
+        gameState,
+        connected,
+        players,
+        message,
+        dialog,
+        running,
+        task,
+        crewScore,
+        showAnimation,
+        meeting,
+        taskGoal,
+        susPoints
+    ]);
 
     return (
         <DataContext.Provider value={contextValue}>

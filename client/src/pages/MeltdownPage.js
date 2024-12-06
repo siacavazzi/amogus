@@ -6,13 +6,24 @@ function ReactorMeltdown() {
         socket,
         meltdownTimer,
         codesNeeded,
+        setCodesNeeded,
     } = useContext(DataContext);
 
     const [pin, setPin] = useState(["", "", "", ""]);
     const [isIncorrect, setIsIncorrect] = useState(false);
     const [isCooldown, setIsCooldown] = useState(false);
+    const [codesNeededChanged, setCodesNeededChanged] = useState(false); // State to trigger animation
+    const [isCorrectFlash, setIsCorrectFlash] = useState(false); // State for green flash
+    const [isAllCodesEntered, setIsAllCodesEntered] = useState(false); // State for success message
 
     const inputRefs = useRef([]);
+
+    // Keep track of previous codesNeeded to detect changes
+    const prevCodesNeededRef = useRef(codesNeeded);
+
+    useEffect(() => {
+        console.log(codesNeeded);
+    }, [codesNeeded]);
 
     useEffect(() => {
         socket.on("code_incorrect", () => {
@@ -25,17 +36,66 @@ function ReactorMeltdown() {
             }, 3000);
         });
 
-        socket.on("code_correct", () => {
+        socket.on("code_correct", (data) => {
+            console.log("CODES NEEDED");
+            console.log(data);
+            setCodesNeeded(data);
             setIsIncorrect(false);
             setPin(["", "", "", ""]);
-        })
-    }, [socket]);
+
+            // Trigger green flash
+            triggerGreenFlash();
+
+            // Check if all codes have been entered
+            if (data === 0) {
+                handleAllCodesEntered();
+            }
+        });
+
+        // Cleanup listeners on unmount
+        return () => {
+            socket.off("code_incorrect");
+            socket.off("code_correct");
+        };
+    }, [socket, setCodesNeeded]);
 
     useEffect(() => {
         if (!isCooldown) {
             focusFirstEmptyInput();
         }
     }, [pin, isCooldown]);
+
+    // Detect changes in codesNeeded to trigger animation
+    useEffect(() => {
+        if (prevCodesNeededRef.current !== codesNeeded) {
+            setCodesNeededChanged(true);
+            prevCodesNeededRef.current = codesNeeded;
+
+            // Remove the animation class after animation duration (e.g., 500ms)
+            const timer = setTimeout(() => {
+                setCodesNeededChanged(false);
+            }, 500);
+
+            return () => clearTimeout(timer);
+        }
+    }, [codesNeeded]);
+
+    // Function to trigger green flash
+    const triggerGreenFlash = () => {
+        setIsCorrectFlash(true);
+        setTimeout(() => {
+            setIsCorrectFlash(false);
+        }, 500); // Flash duration: 500ms
+    };
+
+    // Function to handle all codes entered
+    const handleAllCodesEntered = () => {
+        setIsAllCodesEntered(true);
+        // Hide the message after 0.5 seconds
+        setTimeout(() => {
+            setIsAllCodesEntered(false);
+        }, 500);
+    };
 
     const focusFirstEmptyInput = () => {
         const firstEmptyIndex = pin.findIndex((digit) => digit === "");
@@ -113,20 +173,26 @@ function ReactorMeltdown() {
 
     return (
         <div
-            className={`flex flex-col items-center justify-center h-screen p-4 bg-gradient-to-b from-gray-900 to-red-900 text-white ${
-                meltdownTimer <= 10 ? "animate-pulse" : ""
-            }`}
+            className={`flex flex-col items-center justify-center min-h-screen p-4 
+                        bg-gradient-to-b from-gray-900 to-red-900 text-white 
+                        transition-colors duration-500
+                        ${isCorrectFlash ? "bg-green-500" : "bg-gradient-to-b from-gray-900 to-red-900"}`}
         >
             <div
-                className={`w-full max-w-3xl bg-gray-800 p-12 rounded-lg shadow-lg flex flex-col items-center transition-transform duration-300 ${
-                    isIncorrect ? "animate-shake" : ""
-                }`}
+                className={`w-full max-w-3xl bg-gray-800 p-12 rounded-lg shadow-lg flex flex-col items-center transition-transform duration-300 
+                            ${isIncorrect ? "animate-shake" : ""}
+                            ${isCorrectFlash ? "border-4 border-green-400" : ""}`}
             >
                 <h1 className="text-6xl font-bold mb-12 text-center text-red-500">
                     Reactor Meltdown
                 </h1>
-                <div className="w-full max-w-2xl mb-12">
-                    <div className="flex justify-center space-x-6 mb-10">
+
+                {/* Emphasized Codes Needed Section */}
+                <div className="w-full max-w-2xl mb-12 flex flex-col items-center">
+                    <div
+                        className={`flex justify-center space-x-6 mb-10 transition-all duration-500 
+                                    ${codesNeededChanged ? "animate-pulse" : ""}`}
+                    >
                         {pin.map((digit, index) => (
                             <input
                                 key={index}
@@ -139,30 +205,48 @@ function ReactorMeltdown() {
                                 onClick={() => handleInputClick(index)}
                                 onKeyDown={(e) => handleKeyDown(e, index)}
                                 disabled={isCooldown}
-                                className={`w-20 h-20 border-4 rounded text-center text-4xl bg-gray-700 focus:outline-none focus:ring-4 ${
-                                    isCooldown
-                                        ? "cursor-not-allowed opacity-50"
-                                        : isIncorrect
-                                        ? "border-red-500 focus:ring-red-400"
-                                        : "border-blue-500 focus:ring-blue-400"
-                                }`}
+                                className={`w-20 h-20 border-4 rounded text-center text-4xl bg-gray-700 focus:outline-none focus:ring-4 
+                                            ${
+                                                isCooldown
+                                                    ? "cursor-not-allowed opacity-50"
+                                                    : isIncorrect
+                                                    ? "border-red-500 focus:ring-red-400"
+                                                    : "border-blue-500 focus:ring-blue-400"
+                                            }`}
                             />
                         ))}
                     </div>
+
                     {isIncorrect && (
                         <p className="text-red-500 text-center text-2xl mb-6">
                             Incorrect PIN. Cooldown active, try again in 3 seconds.
                         </p>
                     )}
-                    {codesNeeded && (
-                        <p className="text-center text-2xl mb-6">
-                            {codesNeeded} More Pins Needed!
+
+                    {/* Emphasized Codes Needed Display */}
+                    {codesNeeded !== undefined && (
+                        <p
+                            className={`text-center text-4xl font-extrabold mb-6 transition-transform duration-500 
+                                        ${
+                                            codesNeededChanged
+                                                ? "animate-bounce text-yellow-400"
+                                                : "text-yellow-300"
+                                        }`}
+                        >
+                            {codesNeeded} More Codes Needed!
                         </p>
                     )}
+
+                    {/* Success Message When All Codes Are Entered */}
+                    {isAllCodesEntered && (
+                        <p className="text-green-500 text-center text-4xl font-bold mb-6 animate-fade-in-out">
+                            All Codes Entered! Success!
+                        </p>
+                    )}
+
                     <p
-                        className={`text-center text-4xl font-bold ${
-                            meltdownTimer <= 10 ? "text-red-500" : ""
-                        }`}
+                        className={`text-center text-4xl font-bold 
+                                    ${meltdownTimer <= 10 ? "text-red-500" : ""}`}
                     >
                         Time Remaining: {meltdownTimer}s
                     </p>

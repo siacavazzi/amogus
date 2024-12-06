@@ -10,7 +10,7 @@ from flask_socketio import emit
 
 class Game:
 
-    def __init__(self, socket, speaker):
+    def __init__(self, socket, speaker, sus_ratio, task_ratio, meltdown_time, code_percent):
         self.players = []
         self.tasks = read_task_file()
         self.crew_score = 0
@@ -28,12 +28,14 @@ class Game:
         self.speaker = speaker
 
         # crewmate to imposter ratio
-        self.sus_ratio = 5
+        self.sus_ratio = sus_ratio
         # tasks per player
-        self.task_ratio = 10
+        self.task_ratio = task_ratio
+        self.meltdown_time = meltdown_time
+        self.code_percent = code_percent
 
-    def start_meltdown(self, duration=30):
-        self.active_meltdown = Meltdown(self.players, duration, self.socket)
+    def start_meltdown(self):
+        self.active_meltdown = Meltdown(self.players, self.meltdown_time, self.socket, self.speaker, self.code_percent)
         self.active_meltdown.game = self
         self.active_meltdown.start_countdown()
 
@@ -71,7 +73,7 @@ class Game:
         random_number = 1
 
         if not self.backgrounds:
-            random_number = random.randint(1, 11)
+            random_number = random.randint(1, len(self.backgrounds) - 1)
         else:
             random_number = random.choice(self.backgrounds)
             print(random_number)

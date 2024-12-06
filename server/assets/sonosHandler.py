@@ -13,7 +13,6 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
         logging.StreamHandler()
-        # You can add FileHandler or other handlers here if needed
     ]
 )
 logger = logging.getLogger(__name__)
@@ -38,13 +37,20 @@ class SonosController:
 
         if not enabled:
             logger.info("SonosController is disabled.")
+            self.speakers = []
+            self.master_speaker = None
+            self.ready = False
+            self.stop_loop = False
+            self.loop_thread = None
+            self.lock = Lock()
             return
 
         try:
-            discovered_speakers = list(discover())
+            discovered_speakers = discover()
             if not discovered_speakers:
                 raise ValueError("No Sonos speakers found during discovery.")
 
+            discovered_speakers = list(discovered_speakers)
             logger.info(f"Discovered {len(discovered_speakers)} Sonos speaker(s).")
 
             # Filter out unreachable speakers
@@ -85,7 +91,9 @@ class SonosController:
             "start": "start.mp3",
             "meltdown": "meltdown.mp3",
             "sus_victory": "sus_victory.mp3",
-            "crew_victory": "crew_victory.mp3"
+            "crew_victory": "crew_victory.mp3",
+            "meltdown_fail": "meltdown_fail.mp3",
+            "meltdown_over": "meltdown_over.mp3"
         }
 
         if self.speakers:
@@ -134,14 +142,7 @@ class SonosController:
                 logger.info(f"Selected master speaker: {self.master_speaker.player_name}")
 
                 # Attempt to join other speakers to the master
-                join_success = True
-                for speaker in self.speakers:
-                    if speaker == self.master_speaker:
-                        continue
-                    if not self.try_join_speaker(speaker):
-                        join_success = False
-                        break  # If joining fails, try the next master
-                if join_success:
+                if self.join_all_speakers():
                     self.ready = True
                     logger.info(f"Sonos initialization successful with master speaker: {self.master_speaker.player_name}")
                     return
@@ -157,6 +158,18 @@ class SonosController:
 
         # If no master speaker could be successfully set
         logger.error("Failed to initialize SonosController: No suitable master speaker found.")
+
+    def join_all_speakers(self):
+        """
+        Attempts to join all speakers in self.speakers to the current master_speaker.
+        Returns True if successful, False otherwise.
+        """
+        for speaker in self.speakers:
+            if speaker == self.master_speaker:
+                continue
+            if not self.try_join_speaker(speaker):
+                return False
+        return True
 
     def try_join_speaker(self, speaker):
         """
@@ -183,7 +196,7 @@ class SonosController:
                 logger.warning(f"Attempt {attempt} to join speaker '{speaker.player_name}' failed: {e}")
                 if error_code == 501:
                     logger.error(f"UPnP Error 501 encountered. The master speaker '{self.master_speaker.player_name}' may not support joining.")
-                    return False  # Trigger master selection to try a different master
+                    return False
                 if attempt < self.max_retries:
                     logger.info(f"Retrying to join speaker '{speaker.player_name}' in {self.retry_delay} seconds...")
                     time.sleep(self.retry_delay)
@@ -201,7 +214,6 @@ class SonosController:
         """
         try:
             message = str(exception)
-            # Example message: "UPnP Error 501 received: Action Failed from 192.168.1.16"
             parts = message.split("UPnP Error")
             if len(parts) > 1:
                 code_part = parts[1].strip().split()[0]
@@ -246,6 +258,10 @@ class SonosController:
             logger.warning("Sonos system not ready.")
             return False
 
+        if sound not in self.audio:
+            logger.error(f"Sound '{sound}' not found in audio library.")
+            return False
+
         if interrupt:
             self.stop()  # Stop any current playback or loops
 
@@ -254,9 +270,6 @@ class SonosController:
             self.master_speaker.play_uri(play_sound_uri)
             logger.info(f"Playing sound '{sound}'...")
             return True
-        except KeyError:
-            logger.error(f"Sound '{sound}' not found in audio library.")
-            return False
         except SoCoException as e:
             logger.error(f"Failed to play sound '{sound}': {e}")
             return False
@@ -267,6 +280,7 @@ class SonosController:
     def loop_sound(self, sound, duration, interrupt=True):
         """
         Loops the specified sound for a given duration.
+        Now waits for the track to fully finish by checking transport state.
 
         :param sound: Key of the sound to loop from the audio dictionary.
         :param duration: Duration in seconds to loop the sound.
@@ -296,18 +310,13 @@ class SonosController:
                         self.master_speaker.play_uri(play_sound_uri)
                         logger.info(f"Playing '{sound}' on loop...")
 
-                        # Get the track duration
-                        track_info = self.master_speaker.get_current_track_info()
-                        track_duration_str = track_info.get('duration', '0:00')
-                        track_duration = self.parse_time_to_seconds(track_duration_str)
-
-                        if track_duration == 0:
-                            logger.warning("Could not retrieve track duration. Defaulting to 5 seconds.")
-                            track_duration = 5  # Default duration if unable to get track duration
-
-                        # Wait for the track to finish or until stop_loop is True
-                        start_time = time.time()
-                        while time.time() - start_time < track_duration and not self.stop_loop:
+                        # Wait until track finishes or until stop_loop is True
+                        while not self.stop_loop:
+                            transport_info = self.master_speaker.get_current_transport_info()
+                            current_state = transport_info.get('current_transport_state', '').lower()
+                            # Once the state is not playing or transitioning, track is done
+                            if current_state not in ('playing', 'transitioning'):
+                                break
                             time.sleep(0.5)
 
                     logger.info("Looping completed or interrupted.")
@@ -321,26 +330,12 @@ class SonosController:
         self.loop_thread.start()
         return True
 
-    @staticmethod
-    def parse_time_to_seconds(time_str):
-        """
-        Converts a time string in the format 'HH:MM:SS' to total seconds.
-
-        :param time_str: Time string to convert.
-        :return: Total seconds as an integer.
-        """
-        try:
-            h, m, s = map(int, time_str.split(':'))
-            return h * 3600 + m * 60 + s
-        except:
-            return 0
-
     def stop(self):
         """
         Stops any active playback or looping.
         """
         self.stop_loop = True
-        if self.ready:
+        if self.ready and self.master_speaker:
             try:
                 self.master_speaker.stop()
                 logger.info("Playback stopped.")
@@ -352,4 +347,4 @@ class SonosController:
             except Exception as e:
                 logger.error(f"Unexpected error when stopping playback: {e}")
         else:
-            logger.warning("SonosController is not ready. Nothing to stop.")
+            logger.warning("SonosController is not ready or no master speaker set. Nothing to stop.")

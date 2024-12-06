@@ -91,13 +91,13 @@ const Modal = () => {
           <div className="px-6 py-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
             {dialog?.title === "Click to enable audio" ?
               <button
-                className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
+                className="w-full bg-green-600 text-white py-4 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
                 onClick={() => closeModal()}
               >
                 Enable audio
               </button>
               : <button
-                className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                className="w-full bg-blue-600 text-white py-4 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
                 onClick={() => closeModal()}
               >
                 OK

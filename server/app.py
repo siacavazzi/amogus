@@ -1,3 +1,27 @@
+############################
+##### GAME VARIABLES #######
+
+# how long players have to stop a meltdown (seconds)
+meltdown_time = 60
+
+# fraction of players who need to enter a code to end meltdown (ex if 0.4 - 4 of 10 players need to enter codes)
+code_percent = 0.4
+
+# crewmate to imposter ratio (crewmates per imposter). 
+sus_ratio = 5 
+
+# number of tasks each player need to finish to win (on average)
+task_ratio = 10 
+
+# SOUND SETTINGS
+sonos_enabled = True
+speaker_volume = 30
+# dont play sounds on speakers with 'bed' in the name
+ignore_bedroom_speakers = True
+
+############################
+
+
 import eventlet
 eventlet.monkey_patch()
 from flask import Flask, request
@@ -14,9 +38,8 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": '*'}})
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-speaker = SonosController(enabled=True)
-game = Game(socketio, speaker)
-
+speaker = SonosController(enabled=sonos_enabled, default_volume=speaker_volume, ignore_bedroom_speakers=ignore_bedroom_speakers)
+game = Game(socketio, speaker, sus_ratio, task_ratio, meltdown_time)
 
 def sendPlayerList(action='player_list'):
     logger.info("Sending player list to all clients")
@@ -159,7 +182,7 @@ def handle_start(data):
         logger.warning("Start game attempted but game is already running")
         return
 
-    speaker.play_sound("start")
+    speaker.play_sound("theme")
     game.game_running = True
     game.assignRoles()
     sendPlayerList('start_game')

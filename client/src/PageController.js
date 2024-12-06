@@ -20,6 +20,7 @@ import MeltdownInfo from "./pages/MeltdownInfo";
 import CrewVictoryScreen from "./pages/CrewVictory";
 import ImposterVictoryScreen from "./pages/ImposterVictory";
 import NuclearMeltdownScreen from "./pages/MeltdownEnd";
+import ReactorWaiting from "./pages/ReactorWaiting";
 
 const PageController = () => {
     const {
@@ -40,23 +41,22 @@ const PageController = () => {
     const [currentPage, setCurrentPage] = useState("connecting");
 
     useEffect(() => {
-        console.log("GAME ENDED!!!!")
-        console.log(endState)
-    },[endState])
-
-    useEffect(() => {
         if (!connected) {
             setCurrentPage("connecting");
             return;
         }
 
         if(endState) {
-            console.log(endState)
             setCurrentPage(endState)
             return;
         }
 
         if (!isMobile) {
+            console.log(running)
+            if(!running) {
+                setCurrentPage("reactorWaiting");
+                return;
+            }
             if (meltdownTimer > 0) {
                 setCurrentPage("meltdown");
             } else {
@@ -123,7 +123,6 @@ const PageController = () => {
         endState,
     ]);
 
-    // Mapping of page identifiers to components
     const pages = {
         connecting: <ConnectingPage />,
         meltdown: <ReactorMeltdown />,
@@ -140,6 +139,7 @@ const PageController = () => {
         sus_victory: <ImposterVictoryScreen/>,
         victory: <CrewVictoryScreen />,
         meltdown_fail: <NuclearMeltdownScreen />,
+        reactorWaiting: <ReactorWaiting/>,
         unknown: (
             <p>
                 You're really not supposed to see this... Uhhh please go talk to
@@ -154,7 +154,7 @@ const PageController = () => {
                 <Alert size="lg" status={message.status} title={message.text} />
             )}
             <Modal />
-            {running && (
+            {running && isMobile && (
                 <ProgressBar
                     score={crewScore}
                     goalScore={taskGoal}
@@ -162,7 +162,6 @@ const PageController = () => {
                 />
             )}
             {pages[currentPage]}
-            {/* <div style={{ height: "70px" }}></div> */}
         </div>
     );
 };
