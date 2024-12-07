@@ -22,6 +22,8 @@ ignore_bedroom_speakers = True
 ############################
 
 
+##### WHEN MELTDOWN ENDS PLAYER CODES ARE NOT CLEARED AND IF RELOADED IT STILL SENDS A CODE
+
 import eventlet
 eventlet.monkey_patch()
 from flask import Flask, request
@@ -39,7 +41,7 @@ CORS(app, resources={r"/*": {"origins": '*'}})
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 speaker = SonosController(enabled=sonos_enabled, default_volume=speaker_volume, ignore_bedroom_speakers=ignore_bedroom_speakers)
-game = Game(socketio, speaker, sus_ratio, task_ratio, meltdown_time)
+game = Game(socketio, speaker, sus_ratio, task_ratio, meltdown_time, code_percent)
 
 def sendPlayerList(action='player_list'):
     logger.info("Sending player list to all clients")
@@ -79,7 +81,7 @@ def handleJoin(data):
         emit("task_goal", game.taskGoal)
         emit("sus_score", game.sus_score)
 
-        if player.meltdown_code:
+        if player.meltdown_code and game.active_meltdown:
             emit("meltdown_code", player.meltdown_code, to=player.sid)
             logger.debug(f"Sent meltdown code to player {player.player_id}")
 
