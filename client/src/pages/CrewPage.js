@@ -1,7 +1,6 @@
 // ./pages/CrewmemberPage.jsx
 
 import React, { useContext, useEffect } from 'react';
-import './CrewmemberPage.css'; 
 import PropTypes from 'prop-types';
 import { DataContext } from '../GameContext';
 import AnimationOverlay from '../components/AnimationOverlay';
@@ -19,8 +18,8 @@ const CrewmemberPage = () => {
   } = useContext(DataContext); // Use DataContext here
 
   useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
+    window.scrollTo(0, 0);
+  }, []);
 
   // Function to handle completing a task
   const handleCompleteTask = () => {
@@ -41,26 +40,30 @@ const CrewmemberPage = () => {
   };
 
   return (
-    <div className="crewmember-page">
-      {/* <h2>Crewmember Dashboard</h2> */}
-      <div className="crewmember-actions">
-        <button onClick={handleCallMeeting} className="action-button call-meeting">
+    <div className="flex flex-col items-center p-8 bg-gray-800 text-white min-h-screen relative">
+      {/* Crewmember Actions */}
+      <div className="mb-8">
+        <button
+          onClick={handleCallMeeting}
+          className="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg shadow-lg hover:from-orange-600 hover:to-orange-700 transition-colors duration-300"
+        >
           Call Meeting
         </button>
       </div>
-      {/* <h3>Current Task</h3> */}
-      <div className="task-section">
-        <p>Task:</p>
+
+      {/* Task Section */}
+      <div className="w-full max-w-xl bg-gray-700 p-6 rounded-lg shadow-md">
+        <p className="text-lg font-semibold mb-4">Task:</p>
         {task ? (
-          <div className="task-display">
-            <h2>{task}</h2>
+          <div className="flex flex-col items-center mb-4">
+            <h2 className="text-2xl text-blue-400">{task}</h2>
           </div>
         ) : (
-          <div className="task-display">
-            <p>No task assigned.</p>
+          <div className="flex flex-col items-center mb-4">
+            <p className="text-lg">No task assigned.</p>
           </div>
         )}
-        <MUECustomSlider text={"Slide to complete task"} onSuccess={handleCompleteTask} />
+        <MUECustomSlider text="Slide to complete task" onSuccess={handleCompleteTask} />
       </div>
 
       {/* Animation Overlay */}

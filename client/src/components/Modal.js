@@ -8,8 +8,6 @@ const Modal = () => {
 
   useEffect(() => {
     if (dialog?.title) {
-      console.log(dialog.title)
-      console.log("OPEN")
       setOpen(true);
     } else {
       setOpen(false);

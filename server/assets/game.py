@@ -132,3 +132,18 @@ class Game:
             if player.player_id == player_id:
                 return player
         return None
+    
+    def reset(self):
+        self.players = []
+        self.tasks = read_task_file()
+        self.crew_score = 0
+        self.sus_score = 0
+        self.game_running = False
+        self.active_hack = 0
+        self.active_meltdown = None
+        self.meeting = False
+        self.numImposters = None
+        self.numCrew = None
+        self.taskGoal = None
+        self.backgrounds = list(range(0, 16 + 1))  
+        self.end_state = None

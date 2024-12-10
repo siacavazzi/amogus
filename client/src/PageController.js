@@ -4,7 +4,6 @@ import { DataContext } from "./GameContext";
 import LoginPage from "./pages/Login";
 import ConnectingPage from "./pages/ConnectingPage";
 import PlayersPage from "./pages/PlayersPage";
-import Alert from "./components/Alert";
 import Modal from "./components/Modal";
 import ImposterPage from "./pages/ImposterPage";
 import CrewmemberPage from "./pages/CrewPage";
@@ -52,7 +51,6 @@ const PageController = () => {
         }
 
         if (!isMobile) {
-            console.log(running)
             if(!running) {
                 setCurrentPage("reactorWaiting");
                 return;
@@ -150,11 +148,8 @@ const PageController = () => {
 
     return (
         <div>
-            {message && (
-                <Alert size="lg" status={message.status} title={message.text} />
-            )}
             <Modal />
-            {running && isMobile && (
+            {running && isMobile && !endState && (
                 <ProgressBar
                     score={crewScore}
                     goalScore={taskGoal}

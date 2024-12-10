@@ -93,7 +93,9 @@ class SonosController:
             "sus_victory": "sus_victory.mp3",
             "crew_victory": "crew_victory.mp3",
             "meltdown_fail": "meltdown_fail.mp3",
-            "meltdown_over": "meltdown_over.mp3"
+            "meltdown_over": "meltdown_over.mp3",
+            "dead":"dead.mp3",
+            "hack":"hack.mp3"
         }
 
         if self.speakers:

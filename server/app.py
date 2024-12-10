@@ -2,7 +2,10 @@
 ##### GAME VARIABLES #######
 
 # how long players have to stop a meltdown (seconds)
-meltdown_time = 60
+meltdown_time = 60 # s
+
+# how long hacks work for
+hack_length = 30 # s
 
 # fraction of players who need to enter a code to end meltdown (ex if 0.4 - 4 of 10 players need to enter codes)
 code_percent = 0.4
@@ -15,14 +18,12 @@ task_ratio = 10
 
 # SOUND SETTINGS
 sonos_enabled = True
-speaker_volume = 30
+speaker_volume = 30 # %
 # dont play sounds on speakers with 'bed' in the name
 ignore_bedroom_speakers = True
 
 ############################
 
-
-##### WHEN MELTDOWN ENDS PLAYER CODES ARE NOT CLEARED AND IF RELOADED IT STILL SENDS A CODE
 
 import eventlet
 eventlet.monkey_patch()
@@ -110,7 +111,8 @@ def handleHack():
         game.sus_score -= 1
         emit("sus_score", game.sus_score, broadcast=True)
         logger.info(f"Hack initiated. Sus score decreased to {game.sus_score}")
-        game.start_hack(30)
+        game.start_hack(hack_length)
+        speaker.play_sound('hack')
         logger.debug("Hack started with a duration of 30 seconds")
 
 @socketio.on("meeting")
@@ -147,6 +149,7 @@ def handleDeath(data):
     player = game.getPlayerById(data.get('player_id'))
     if player:
         player.alive = False
+        speaker.play_sound('dead')
         logger.info(f"Player {player.player_id} marked as dead")
 
         if not player.sus:

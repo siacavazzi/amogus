@@ -1,47 +1,58 @@
-// ProgressBar.jsx
+// src/components/ProgressBar.jsx
+
 import React from 'react';
 import PropTypes from 'prop-types';
-import '../CSS/ProgressBar.css';
 
 const ProgressBar = ({ score, goalScore, sus }) => {
   // Calculate percentage
   let percentage = (score / goalScore) * 100;
 
-  console.log(`Score: ${score}, Goal: ${goalScore}, Percent: ${percentage}`)
+  console.log(`Score: ${score}, Goal: ${goalScore}, Percent: ${percentage}`);
 
-  // Handle edge cases
-  if (percentage < 0) percentage = 0;
-  if (percentage > 100) percentage = 100;
+  // Handle edge cases: NaN, less than 0, greater than 100
+  if (isNaN(percentage)) {
+    percentage = 0;
+  } else {
+    percentage = Math.max(0, Math.min(Math.round(percentage), 100));
+  }
 
-  // Determine progress bar color
-  const progressColor = sus ? '#ff4757' : '#2ed573'; // Red if sus, Green otherwise
+  // Determine progress bar gradient based on 'sus' status
+  const progressGradient = sus
+    ? 'from-red-500 via-pink-500 to-red-500'
+    : 'from-green-400 via-green-500 to-green-400';
 
   // Determine message based on role
   const message = sus
-    ? 'Kill all players before they complete the tasks'
-    : 'Complete the progress bar or remove the imposters before getting killed';
+    ? 'Eliminate all players before they complete the tasks.'
+    : 'Complete the progress bar or remove the imposters before getting eliminated.';
 
   return (
-    <div className="progress-bar-container">
+    <div className="w-full max-w-md mx-auto p-4 bg-gray-900 rounded-none shadow-md">
+      {/* Message */}
+      <div className="mb-2">
+        <p className="text-sm font-medium text-gray-300 dark:text-gray-400">
+          {message}
+        </p>
+      </div>
+
+      {/* Progress Bar */}
       <div
-        className="progress-bar"
+        className="w-full bg-gray-700 dark:bg-gray-800 h-4 overflow-hidden shadow-inner"
         role="progressbar"
         aria-valuenow={score}
         aria-valuemin="0"
         aria-valuemax={goalScore}
-        aria-label={`Progress: ${percentage.toFixed(1)} percent`}
+        aria-label={`Progress: ${percentage} percent`}
       >
         <div
-          className="progress-bar-fill"
-          style={{ width: `${percentage}%`, backgroundColor: progressColor }}
+          className={`h-full bg-gradient-to-r ${progressGradient} transition-all duration-500 ease-in-out`}
+          style={{ width: `${percentage}%` }}
         ></div>
       </div>
 
-      <div className="progress-bar-message">
-        {message}
-        <div className="progress-bar-text">
-        {score} / {goalScore} ({percentage.toFixed(1)}%)
-      </div>
+      {/* Percentage Display */}
+      <div className="mt-2 text-center text-sm text-gray-400 dark:text-gray-500">
+        {percentage}%
       </div>
     </div>
   );
