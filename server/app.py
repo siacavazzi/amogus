@@ -152,7 +152,7 @@ def handleEndMeeting():
 
 @socketio.on('deny_location')
 def handleDeny(data):
-    if game.sus_score >= 2:
+    if game.sus_score >= 2 and not game.denied_location:
         speaker.play_sound('sus')
         game.deny_location(data, 60)
         game.sus_score -= 1
