@@ -1,6 +1,6 @@
 import React from "react";
 
-const ProfilePicture = ({ imageCode }) => {
+export const ProfilePicture = ({ imageCode }) => {
     // Ensure the code is within the range 0–9
   
     // Dynamically create the image path

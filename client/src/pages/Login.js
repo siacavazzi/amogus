@@ -1,11 +1,15 @@
-// ./pages/LoginPage.jsx
-
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
+import { ChevronLeft } from 'lucide-react';
 import { DataContext } from '../GameContext';
 
 function LoginPage() {
     const [username, setUsername] = useState('');
-    const { setPlayerState, socket } = useContext(DataContext);
+    const { setPlayerState, socket, setTaskEntry } = useContext(DataContext);
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []);
+    
 
     const handleJoin = async (e) => {
         e.preventDefault();
@@ -13,31 +17,24 @@ function LoginPage() {
         setPlayerState(prevState => ({ ...prevState, username: username }));
         let playerId = localStorage.getItem('player_id');
 
-        // Emit 'join' event with playerId and username
         socket.emit('join', { player_id: playerId, username: username });
     };
 
+    const handleEnterTasks = () => {
+        setTaskEntry(true)
+    };
+
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-gray-800 to-gray-900 p-6">
-            
-            {/* <div className="relative bg-gray-700 bg-opacity-90 backdrop-blur-md p-8 rounded-lg shadow-lg max-w-sm w-full mx-4">
-            <h2 className="text-2xl font-bold mb-2 text-gray-100">Laptop Options: </h2>
-                                <button
-                        type="submit"
-                        className="w-full mb-4 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400 transform hover:scale-105"
-                    >
-                        Start Task Entry
-                    </button>
-
-                    <button
-                        type="submit"
-                        className="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400 transform hover:scale-105"
-                    >
-                        Use Laptop as reactor
-                    </button>
-
-                    </div> */}
-
+        <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-gray-800 to-gray-900 p-6 relative">
+            {/* Back Button Styled */}
+            <button
+                type="button"
+                onClick={handleEnterTasks}
+                className="absolute top-6 left-6 flex items-center text-gray-300 hover:text-white transition-colors"
+            >
+                <ChevronLeft className="mr-1" />
+                <span className="text-sm">Task Entry</span>
+            </button>
 
             <div className="relative bg-gray-700 bg-opacity-90 backdrop-blur-md p-8 rounded-lg shadow-lg max-w-sm w-full">
                 {/* Decorative Icon */}

@@ -4,15 +4,16 @@ import React, { useContext, useEffect } from "react";
 import { DataContext } from "../GameContext";
 import MUECustomSlider from "../components/swiper";
 import PlayerCard from "../components/PlayerCard";
+import { ChevronLeft } from 'lucide-react';
 
 export default function PlayersPage() {
-    const { players, socket, setMessage, setAudio, running } = useContext(DataContext);
+    const { players, socket, setMessage, setAudio, running, setTaskEntry } = useContext(DataContext);
 
     useEffect(() => {
         window.scrollTo(0, 0)
-      }, [])
+    }, [])
 
-      console.log(running)
+    console.log(running)
 
     if (!players || players.length === 0) {
         return (
@@ -34,6 +35,14 @@ export default function PlayersPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-tr from-gray-800 to-gray-900 p-6">
+            {!running && <button
+                type="button"
+                onClick={() => setTaskEntry(true)}
+                className="absolute top-6 left-6 flex items-center text-gray-300 hover:text-white transition-colors"
+            >
+                <ChevronLeft className="mr-1" />
+                <span className="text-sm">Task Entry</span>
+            </button>}
             <div className="max-w-6xl mx-auto">
                 <div className="flex flex-col items-center mb-6">
                     <button

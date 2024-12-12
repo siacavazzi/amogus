@@ -1,52 +1,267 @@
 [
-    "Go pet Archie",
-    "Throw out 1 piece of trash in the house",
-    "Ride the elevator one floor",
-    "Write a gratitude card",
-    "Shoot a pool ball",
-    "put 1 meme in the groupchat",
-    "clean something that is dirty",
-    "take a photo with at least 2 other people in it",
-    "Go in the sauna",
-    "Play one ball on the Big Indian",
-    "Play one life in packman",
-    "Eat any snack in the kitchen",
-    "Read any book in the sun room",
-    "go chill in the garage for 10 seconds",
-    "change archie's water",
-    "Read a book from fishy room book shelf",
-    "Neatly organize the shoes by the side door",
-    "Neatly organized the shoes by the garage entrance",
-    "Neatly organize the couch and pillows by the living room TV",
-    "Watch something on the TV in the office",
-    "Go yell something from the roof",
-    "have a sip of water",
-    "take a shot or drink water",
-    "Pet fitz",
-    "Do 5 jumping jacks in the gym",
-    "spin around in the office chair",
-    "sit on a bed in the sun room",
-    "shotgun a beer",
-    "vacuum movie room",
-    "gobble a whole fruit",
-    "pet harley",
-    "throw fitz a ball",
-    "take a picture of someone and send it in the gc",
-    "ride the elevator to the 3rd floor from any floor",
-    "send a selfie to the group chat",
-    "play 1 round of any arcade game",
-    "slide a shuffleboard",
-    "find paper and pen and write me 5 more tasks",
-    "recline in the movie room",
-    "write a post it note and stick it to someone's back",
-    "write a post it note and stick it to the fridge",
-    "wash your hands in an upstairs bathroom",
-    "Chillout on the porch and sing the ABCs",
-    "Take a photo of the poolhouse from the third floor",
-    "Checkout the fishy room to make sure Patty isn't jumping out a window",
-    "Do 5 pushups in the gym",
-    "Do a little dance outside G and Paps room",
-    "light a candle",
-    "collect 5 leaves from the yard (sorry its cold)",
-    "play an arcade game"
+    {
+        "task": "Play arcade games",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "Organize storage shelves",
+        "location": "Basement",
+        "difficulty": 3
+    },
+    {
+        "task": "Clean the basement",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "Maintain HVAC systems",
+        "location": "Basement",
+        "difficulty": 3
+    },
+    {
+        "task": "Clean air vents",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "Fix electrical outlets",
+        "location": "Basement",
+        "difficulty": 3
+    },
+    {
+        "task": "Install new lighting fixtures",
+        "location": "1st Floor",
+        "difficulty": 3
+    },
+    {
+        "task": "Mow the lawn",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Clean windows",
+        "location": "1st Floor",
+        "difficulty": 1
+    },
+    {
+        "task": "Install security cameras",
+        "location": "1st Floor",
+        "difficulty": 3
+    },
+    {
+        "task": "Replace carpet",
+        "location": "1st Floor",
+        "difficulty": 3
+    },
+    {
+        "task": "Plant new flowers",
+        "location": "1st Floor",
+        "difficulty": 1
+    },
+    {
+        "task": "Paint the living room",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Repair plumbing issues",
+        "location": "2nd Floor",
+        "difficulty": 3
+    },
+    {
+        "task": "Assemble furniture",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Decorate for holidays",
+        "location": "2nd Floor",
+        "difficulty": 1
+    },
+    {
+        "task": "Install shelving units",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Organize file cabinets",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Set up conference room",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Update signage",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Set up audiovisual equipment",
+        "location": "3rd Floor",
+        "difficulty": 3
+    },
+    {
+        "task": "Upgrade computer systems",
+        "location": "Other",
+        "difficulty": 3
+    },
+    {
+        "task": "Organize office supplies",
+        "location": "Other",
+        "difficulty": 1
+    },
+    {
+        "task": "Conduct inventory audit",
+        "location": "Other",
+        "difficulty": 3
+    },
+    {
+        "task": "Backup data",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Manage social media accounts",
+        "location": "Other",
+        "difficulty": 1
+    },
+    {
+        "task": "Conduct safety drills",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Update website content",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Arrange meeting schedules",
+        "location": "Other",
+        "difficulty": 1
+    },
+    {
+        "task": "Vacuum carpets",
+        "location": "1st Floor",
+        "difficulty": 1
+    },
+    {
+        "task": "Dust furniture",
+        "location": "2nd Floor",
+        "difficulty": 1
+    },
+    {
+        "task": "Wipe down surfaces",
+        "location": "3rd Floor",
+        "difficulty": 1
+    },
+    {
+        "task": "Organize recycling bins",
+        "location": "Basement",
+        "difficulty": 1
+    },
+    {
+        "task": "Replace light bulbs",
+        "location": "1st Floor",
+        "difficulty": 1
+    },
+    {
+        "task": "Water indoor plants",
+        "location": "Other",
+        "difficulty": 1
+    },
+    {
+        "task": "Update contact lists",
+        "location": "Other",
+        "difficulty": 1
+    },
+    {
+        "task": "Schedule maintenance checks",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Organize digital files",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Clean restroom facilities",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Inspect fire extinguishers",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Set up recycling program",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "Update employee handbook",
+        "location": "Other",
+        "difficulty": 3
+    },
+    {
+        "task": "Coordinate team meetings",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Prepare monthly reports",
+        "location": "Other",
+        "difficulty": 3
+    },
+    {
+        "task": "Arrange office supplies restock",
+        "location": "Other",
+        "difficulty": 1
+    },
+    {
+        "task": "Test emergency lighting",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "Clean kitchen area",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Organize team building activities",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Monitor security logs",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "poop",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "Eat some food",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Polar arctic thunder ",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "go into the office",
+        "location": "1st Floor",
+        "difficulty": 2
+    }
 ]

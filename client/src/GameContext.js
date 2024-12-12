@@ -35,6 +35,9 @@ export default function GameContext({ children }) {
     const [meltdownTimer, setMeltdownTimer] = useState(false);
     const [codesNeeded, setCodesNeeded] = useState(undefined);
     const [endState, setEndState] = useState(undefined);
+    const [taskEntry , setTaskEntry] = useState(false);
+    const [taskLocations, setTaskLocations] = useState([]);
+    const [deniedLocation, setDeniedLocation] = useState(undefined)
 
     const resetState = () => {
         setGameState({})
@@ -56,6 +59,8 @@ export default function GameContext({ children }) {
         setMeltdownTimer(undefined);
         setMeltdownCode(undefined);
         setEndState(undefined);
+        setDeniedLocation(undefined);
+        setTaskLocations([])
     }
 
     const resetMessage = (delay) => {
@@ -89,6 +94,11 @@ export default function GameContext({ children }) {
                 player_id: playerState.playerId,
             });
         });
+
+        socketRef.current.on('task_locations', (data) => {
+            console.log(data)
+            setTaskLocations(data)
+        })
 
         socketRef.current.on('disconnect', () => {
             resetState();
@@ -126,6 +136,7 @@ export default function GameContext({ children }) {
         });
 
         socketRef.current.on('task', (data) => {
+            console.log(data)
             if (!running) {
                 setRunning(true)
             }
@@ -145,6 +156,17 @@ export default function GameContext({ children }) {
             setMeeting(true);
             isMobile && setDialog({ title: "Emergency Meeting Called!", body: <MeetingDisplay /> });
         });
+
+        socketRef.current.on('active_denial', (location) => {
+            console.log("DENIAL")
+            console.log(location)
+            if(location === 'none') {
+              setDeniedLocation(undefined);
+              return
+            }
+
+            setDeniedLocation(location);
+          });
 
 
         socketRef.current.on('end_meeting', () => {
@@ -265,12 +287,17 @@ export default function GameContext({ children }) {
         codesNeeded,
         endState,
         setCodesNeeded,
+        taskEntry,
+        setTaskEntry,
+        taskLocations,
+        deniedLocation
     }), [
         endState,
         meltdownCode,
         codesNeeded,
         meltdownTimer,
-        hackTime, audio,
+        hackTime, 
+        audio,
         playerState,
         gameState,
         connected,
@@ -283,7 +310,9 @@ export default function GameContext({ children }) {
         showAnimation,
         meeting,
         taskGoal,
-        susPoints
+        susPoints,
+        taskEntry,
+        deniedLocation
     ]);
 
     return (

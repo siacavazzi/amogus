@@ -20,6 +20,7 @@ import CrewVictoryScreen from "./pages/CrewVictory";
 import ImposterVictoryScreen from "./pages/ImposterVictory";
 import NuclearMeltdownScreen from "./pages/MeltdownEnd";
 import ReactorWaiting from "./pages/ReactorWaiting";
+import TaskEntryPage from "./pages/TaskEntryPage";
 
 const PageController = () => {
     const {
@@ -35,6 +36,7 @@ const PageController = () => {
         meltdownCode,
         meltdownTimer,
         endState,
+        taskEntry,
     } = useContext(DataContext);
 
     const [currentPage, setCurrentPage] = useState("connecting");
@@ -50,21 +52,27 @@ const PageController = () => {
             return;
         }
 
-        if (!isMobile) {
-            if(!running) {
-                setCurrentPage("reactorWaiting");
-                return;
-            }
-            if (meltdownTimer > 0) {
-                setCurrentPage("meltdown");
-            } else {
-                setCurrentPage("reactorNormal");
-            }
-            return;
-        }
+        // if (!isMobile) {
+        //     if(!running) {
+        //         setCurrentPage("reactorWaiting");
+        //         return;
+        //     }
+        //     if (meltdownTimer > 0) {
+        //         setCurrentPage("meltdown");
+        //     } else {
+        //         setCurrentPage("reactorNormal");
+        //     }
+        //     return;
+        // }
 
         if (running && !playerState?.username) {
             setCurrentPage("gameRunning");
+            return;
+        }
+
+        if (taskEntry) {
+            console.log("task entry")
+            setCurrentPage("taskEntry")
             return;
         }
 
@@ -119,6 +127,8 @@ const PageController = () => {
         hackTime,
         meeting,
         endState,
+        taskEntry,
+        
     ]);
 
     const pages = {
@@ -138,6 +148,7 @@ const PageController = () => {
         victory: <CrewVictoryScreen />,
         meltdown_fail: <NuclearMeltdownScreen />,
         reactorWaiting: <ReactorWaiting/>,
+        taskEntry: <TaskEntryPage />,
         unknown: (
             <p>
                 You're really not supposed to see this... Uhhh please go talk to

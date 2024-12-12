@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { DataContext } from '../GameContext';
 import AnimationOverlay from '../components/AnimationOverlay';
 import MUECustomSlider from '../components/swiper';
+import { FaExclamationTriangle } from 'react-icons/fa';
 
 const CrewmemberPage = () => {
   const {
@@ -43,12 +44,14 @@ const CrewmemberPage = () => {
     <div className="flex flex-col items-center p-8 bg-gray-800 text-white min-h-screen relative">
       {/* Crewmember Actions */}
       <div className="mb-8">
-        <button
-          onClick={handleCallMeeting}
-          className="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg shadow-lg hover:from-orange-600 hover:to-orange-700 transition-colors duration-300"
-        >
-          Call Meeting
-        </button>
+        
+      <button
+      onClick={handleCallMeeting}
+      className="flex items-center px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg shadow-lg hover:from-orange-600 hover:to-orange-700 transition-colors duration-300"
+    >
+      <FaExclamationTriangle className="mr-2" />
+      Call Meeting
+    </button>
       </div>
 
       {/* Task Section */}
@@ -56,7 +59,8 @@ const CrewmemberPage = () => {
         <p className="text-lg font-semibold mb-4">Task:</p>
         {task ? (
           <div className="flex flex-col items-center mb-4">
-            <h2 className="text-2xl text-blue-400">{task}</h2>
+            <h2 className="text-2xl text-blue-400">{task.task}</h2>
+            <p className="text-lg text-gray-300 mt-2">Location: {task.location}</p>
           </div>
         ) : (
           <div className="flex flex-col items-center mb-4">
@@ -74,12 +78,15 @@ const CrewmemberPage = () => {
 
 // Define PropTypes for type checking
 CrewmemberPage.propTypes = {
-  task: PropTypes.string,
+  task: PropTypes.shape({
+    task: PropTypes.string,
+    location: PropTypes.string,
+  }),
 };
 
 // Define default props
 CrewmemberPage.defaultProps = {
-  task: '',
+  task: { task: '', location: '' },
 };
 
 export default CrewmemberPage;

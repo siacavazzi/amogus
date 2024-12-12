@@ -8,13 +8,14 @@ import time
 from threading import Thread
 from flask_socketio import emit
 
+
 class Game:
 
-    def __init__(self, socket, speaker, sus_ratio, task_ratio, meltdown_time, code_percent):
+    def __init__(self, socket, task_handler, speaker, sus_ratio, task_ratio, meltdown_time, code_percent):
         self.players = []
-        self.tasks = read_task_file()
+        self.task_handler = task_handler
         self.crew_score = 0
-        self.sus_score = 0
+        self.sus_score = 10
         self.game_running = False
         self.active_hack = 0
         self.active_meltdown = None
@@ -22,14 +23,16 @@ class Game:
         self.numImposters = None
         self.numCrew = None
         self.taskGoal = None
+        self.completed_tasks = 0
         self.backgrounds = list(range(0, 16 + 1))  
         self.socket = socket
         self.end_state = None
         self.speaker = speaker
+        self.denied_location = None
 
-        # crewmate to imposter ratio
+        # Crewmate to imposter ratio
         self.sus_ratio = sus_ratio
-        # tasks per player
+        # Tasks per player
         self.task_ratio = task_ratio
         self.meltdown_time = meltdown_time
         self.code_percent = code_percent
@@ -49,7 +52,6 @@ class Game:
 
         if self.speaker:
             self.speaker.play_sound("sus_victory")
-
 
     def start_hack(self, duration):
         if self.active_hack > 0:
@@ -85,12 +87,10 @@ class Game:
         return new_player
     
     def getTask(self):
-        if(len(self.tasks) < 1):
-            return 'No tasks remaining'
-        
-        random_index = random.randint(0, len(self.tasks) - 1)
-        task = self.tasks.pop(random_index)
-        return task
+        if self.completed_tasks >= self.taskGoal:
+            self.end_state = 'victory'
+            self.speaker.play_sound('victory')
+        return self.task_handler.get_task(self.denied_location)
 
     def resetRoles(self):
         for player in self.players:
@@ -98,28 +98,22 @@ class Game:
 
     def assignRoles(self):
         self.resetRoles()
-        print(self.players)
     
-        # 1/5 ratio
         raw_imposters = len(self.players) / self.sus_ratio
         self.numImposters = max(1, min(math.ceil(raw_imposters), len(self.players) - 1))
         self.numCrew = len(self.players) - self.numImposters
         random.shuffle(self.players)
         for i in range(0, self.numImposters):
-            self.players[i]
-            self.players[i].sus = True ## DEBUG this should be true
+            self.players[i].sus = True  # DEBUG: this should be true
         random.shuffle(self.players)
-        print("assinging roles...")
+        print("assigning roles...")
         print(self.players)
 
         numCrew = len(self.players) - self.numImposters
         
         self.taskGoal = numCrew * self.task_ratio
 
-        print(numCrew)
-        print(self.taskGoal)
-        print(self.numImposters)
-    
+        print(f"{numCrew} crew and {self.numImposters} impostors")
 
     def getPlayerBySid(self, sid):
         for player in self.players:
@@ -135,7 +129,6 @@ class Game:
     
     def reset(self):
         self.players = []
-        self.tasks = read_task_file()
         self.crew_score = 0
         self.sus_score = 0
         self.game_running = False
@@ -147,3 +140,31 @@ class Game:
         self.taskGoal = None
         self.backgrounds = list(range(0, 16 + 1))  
         self.end_state = None
+
+        self.task_handler.reset()
+
+    def deny_location(self, location: str, duration: int):
+        """
+        Deny access to a specified location for a given duration.
+
+        Args:
+            location (str): The location to be denied.
+            duration (int): Duration in seconds for which the location is denied.
+        """
+        self.denied_location = location
+        self.socket.emit('active_denial', self.denied_location)
+        print(f"Location '{location}' denied for {duration} seconds.")
+
+        Thread(target=self._reset_denied_location, args=(duration,)).start()
+
+    def _reset_denied_location(self, duration: int):
+        """
+        Helper method to reset the denied_location after a delay.
+
+        Args:
+            duration (int): Duration in seconds to wait before resetting.
+        """
+        time.sleep(duration)
+        self.denied_location = None
+        self.socket.emit('active_denial', 'none')
+        print(f"Location '{self.denied_location}' is now allowed again.")

@@ -1,18 +1,35 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { DataContext } from "../GameContext";
-import { FaRadiation } from "react-icons/fa"; // For the nuclear icon
+import { FaRadiation } from "react-icons/fa";
 
 function ReactorNormal() {
-    const { socket } = useContext(DataContext);
-    const [isSabotaging, setIsSabotaging] = useState(false); // State to track animation
+    const { socket,
+        meeting,
+        hackTime,
+        endState,
+     } = useContext(DataContext);
+    const [isSabotaging, setIsSabotaging] = useState(false);
+
+    useEffect(() => {
+        console.log("Context values:", { meeting, hackTime, endState });
+    }, [meeting, hackTime, endState]);
+    
 
     const handleSabotage = () => {
-        setIsSabotaging(true); // Trigger animation
+        setIsSabotaging(true);
         setTimeout(() => {
-            socket.emit("meltdown"); // Emit after 3 seconds
-            setIsSabotaging(false); // Reset animation state
-        }, 3000); // 3-second delay
+            socket.emit("meltdown");
+            setIsSabotaging(false);
+        }, 3000);
     };
+
+    console.log(meeting)
+
+    function isDisabled() {
+        // TODO FIX THIS WHEN THERE IS A HACK IT BREAKS AND THE BUTTON CANT BE CLICKED
+        console.log(isSabotaging || meeting || hackTime > 0 || endState)
+        return (isSabotaging || meeting || hackTime > 0 || endState)
+    }
 
     return (
         <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-b from-gray-800 to-gray-900 text-white p-4">
@@ -25,9 +42,9 @@ function ReactorNormal() {
                 </h1>
                 <button
                     onClick={handleSabotage}
-                    disabled={isSabotaging} // Disable button during animation
+                    disabled={isDisabled()}
                     className={`relative px-16 py-8 text-4xl font-bold text-white rounded-lg focus:outline-none transition-transform duration-300 bg-red-700 transform scale-95 ${
-                        isSabotaging ? "opacity-50 cursor-not-allowed" : ""
+                        isDisabled() ? "opacity-50 cursor-not-allowed" : ""
                     }`}
                 >
                     {isSabotaging ? "Sabotaging..." : "Sabotage Reactor"}

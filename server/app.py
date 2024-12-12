@@ -1,5 +1,13 @@
-############################
 ##### GAME VARIABLES #######
+
+# Task locations. This can be whatever you want as long as they correspond to real places
+locations = [
+    'Basement',
+    '1st Floor',
+    '2nd Floor',
+    '3rd Floor',
+    'Other'
+]
 
 # how long players have to stop a meltdown (seconds)
 meltdown_time = 60 # s
@@ -34,6 +42,7 @@ from uuid import uuid4
 from assets.game import Game
 from assets.sonosHandler import SonosController
 from assets.utils import *
+from assets.taskHandler import *
 
 logger = setup_logging()
 
@@ -41,8 +50,10 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": '*'}})
 socketio = SocketIO(app, cors_allowed_origins="*")
 
+# big boi objects
 speaker = SonosController(enabled=sonos_enabled, default_volume=speaker_volume, ignore_bedroom_speakers=ignore_bedroom_speakers)
-game = Game(socketio, speaker, sus_ratio, task_ratio, meltdown_time, code_percent)
+taskHandler = TaskHandler(locations)
+game = Game(socketio, taskHandler, speaker, sus_ratio, task_ratio, meltdown_time, code_percent)
 
 def sendPlayerList(action='player_list'):
     logger.info("Sending player list to all clients")
@@ -57,6 +68,8 @@ def index():
 @socketio.on('connect')
 def handle_connect():
     logger.info(f'Client connected: {request.sid}')
+    emit('task_locations', locations, json=True)
+
     if game.game_running:
         emit("game_start")
 
@@ -81,6 +94,8 @@ def handleJoin(data):
         emit("crew_score", {"score": game.crew_score})
         emit("task_goal", game.taskGoal)
         emit("sus_score", game.sus_score)
+        if game.denied_location:
+            emit('active_denial', game.denied_location)
 
         if player.meltdown_code and game.active_meltdown:
             emit("meltdown_code", player.meltdown_code, to=player.sid)
@@ -90,17 +105,22 @@ def handleJoin(data):
             logger.info("Sending task to player")
             emit("task", {"task": player.get_task()}, to=player.sid)
 
+@socketio.on('add_task')
+def addTask(data):
+    print(data)
+    taskHandler.add_task(data)
+
 @socketio.on("complete_task")
 def handleTaskComplete(data):
     player = game.getPlayerById(data.get('player_id'))
-    if player and len(game.tasks) > 0:
+    if player and len(taskHandler.tasks) > 0:
         game.crew_score += 1
         emit("crew_score", {"score": game.crew_score}, broadcast=True)
         logger.info(f"Player {player.player_id} completed a task. Crew score: {game.crew_score}")
         player.task = game.getTask()
         emit("task", {"task": player.task}, to=player.sid)
         logger.debug(f"Assigned new task to player {player.player_id}: {player.task}")
-    elif player and len(game.tasks) == 0:
+    elif player and len(taskHandler.tasks) == 0:
         player.task = None
         emit("task", {"task": "No More Tasks"}, to=player.sid)
         logger.info(f"No more tasks available. Informed player {player.player_id}")
@@ -129,6 +149,14 @@ def handleEndMeeting():
         emit("end_meeting", broadcast=True)
         game.meeting = False
         logger.info("Meeting ended")
+
+@socketio.on('deny_location')
+def handleDeny(data):
+    if game.sus_score >= 2:
+        speaker.play_sound('sus')
+        game.deny_location(data, 60)
+        game.sus_score -= 1
+        emit("sus_score", game.sus_score, broadcast=True)
 
 @socketio.on('meltdown')
 def handleMeltdown():
@@ -196,9 +224,10 @@ def handle_start(data):
 
     # Send a different task to each crewmate
     for player in game.players:
-        if not player.sus and len(game.tasks) > 0:
+        if not player.sus and len(taskHandler.tasks) > 0:
+            # gotta change this for impostor power ups 
             player.task = game.getTask()
-            emit("task", {"task": player.get_task()}, to=player.sid)
+            emit("task", {"task": player.task}, to=player.sid)
             logger.debug(f"Assigned task to player {player.player_id}: {player.task}")
 
 @socketio.on('join')
