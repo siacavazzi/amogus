@@ -96,7 +96,10 @@ class SonosController:
             "meltdown_over": "meltdown_over.mp3",
             "dead":"dead.mp3",
             "hack":"hack.mp3",
-            "sus":"sus.mp3"
+            "sus":"sus.mp3",
+            "brainrot":"brainrot.mp3",
+            "annoying_notif":"annoying_notif.mp3",
+            "meow":"meow.mp3",
         }
 
         if self.speakers:

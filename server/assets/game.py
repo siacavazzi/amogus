@@ -4,6 +4,7 @@ from uuid import uuid4
 from assets.player import Player
 from assets.taskHandler import *
 from assets.meltdown import *
+from assets.card import *
 import time
 from threading import Thread
 from flask_socketio import emit
@@ -11,7 +12,7 @@ from flask_socketio import emit
 
 class Game:
 
-    def __init__(self, socket, task_handler, speaker, sus_ratio, task_ratio, meltdown_time, code_percent):
+    def __init__(self, socket, task_handler, speaker, sus_ratio, task_ratio, meltdown_time, code_percent, locations):
         self.players = []
         self.task_handler = task_handler
         self.crew_score = 0
@@ -29,6 +30,7 @@ class Game:
         self.end_state = None
         self.speaker = speaker
         self.denied_location = None
+        self.card_deck = CardDeck(locations)
 
         # Crewmate to imposter ratio
         self.sus_ratio = sus_ratio
@@ -96,6 +98,12 @@ class Game:
         for player in self.players:
             player.sus = False
 
+    def drawCards(self):
+        for i in range(0, len(self.players)):
+            if self.players[i].sus:
+                self.players[i].cards.append(self.card_deck.draw_card())
+
+
     def assignRoles(self):
         self.resetRoles()
     
@@ -105,6 +113,11 @@ class Game:
         random.shuffle(self.players)
         for i in range(0, self.numImposters):
             self.players[i].sus = True  # DEBUG: this should be true
+            self.players[i].cards.append(self.card_deck.draw_card())
+
+            ### DEBUG
+            self.players[i].cards.append(self.card_deck.draw_card())
+
         random.shuffle(self.players)
         print("assigning roles...")
         print(self.players)

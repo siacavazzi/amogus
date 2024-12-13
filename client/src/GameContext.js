@@ -175,7 +175,6 @@ export default function GameContext({ children }) {
 
         socketRef.current.on('hack', (data) => {
             setHackTime(data);
-            setAudio('hack')
         });
 
         socketRef.current.on('task_goal', (data) => {
@@ -223,6 +222,7 @@ export default function GameContext({ children }) {
                     }
                     if (me) {
                         setPlayers(parsedPlayers);
+                        console.log(parsedPlayers)
                     }
                     console.log("Updated players state:", parsedPlayers);
                 } else {

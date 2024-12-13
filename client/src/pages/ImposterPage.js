@@ -1,23 +1,61 @@
 // src/pages/ImposterPage.jsx
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { DataContext } from '../GameContext';
 import MUECustomSlider from '../components/swiper';
-import { FaExclamationTriangle } from 'react-icons/fa';
+
+
 
 const ImposterPage = () => {
   const {
-    handleCallMeeting,
     setAudio,
-    susPoints,
-    socket,
     taskLocations,
-    deniedLocation
+    deniedLocation,
+    playerState,
+    socket
   } = useContext(DataContext);
 
-  useEffect(() => {
-    console.log(deniedLocation)
-  },[deniedLocation])
+  function playCard(id, action) {
+    console.log("play card", id)
+    if (action === 'area_denial' && deniedLocation) {
+        return
+    }
+    socket.emit('play_card', {player_id: localStorage.getItem('player_id'), card_id: id})
+  }
 
+
+// ActionCard Component to display individual game actions
+const ActionCard = ({ action, text, location, duration, id }) => (
+    <div 
+    className="bg-gray-300 text-gray-800 rounded-lg shadow-md p-6 flex flex-col hover:scale-105 transition-transform transform"
+    onClick = {() => playCard(id, action)}
+    >
+      <h3 className="text-xl font-semibold mb-2 capitalize">
+        {action.replace('_', ' ')}
+      </h3>
+      <p className="flex-grow">{text}</p>
+      {/* Conditionally render Location if it's provided */}
+      {location && (
+        <div className="mt-4">
+          <span className="block text-sm text-gray-600">Location: {location}</span>
+        </div>
+      )}
+      {/* Conditionally render Duration if it's provided */}
+      {duration && (
+        <div className="mt-2">
+          <span className="block text-sm text-gray-600">
+            Duration: {duration} seconds
+          </span>
+        </div>
+      )}
+    </div>
+  );
+  
+
+
+
+  useEffect(() => {
+    console.log('Denied Locations:', deniedLocation);
+  }, [deniedLocation]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -27,88 +65,30 @@ const ImposterPage = () => {
     setAudio('complete_task');
   };
 
-  // Conditions for sabotage buttons
-  const canHack = susPoints >= 1;
-  const canDeny = susPoints >= 2;
-
-  const handleSabotage = (type) => {
-    if (type === 'hack' && canHack) {
-      socket.emit('hack');
-    }
-    // If you have other sabotage types, handle them here
-  };
-
-  const handleDenyLocation = (location) => {
-    if (!canDeny || deniedLocation) return;
-
-    socket.emit('deny_location', location);
-    // The server should handle point deduction and broadcasting the denial
-  };
-
   return (
     <div className="flex flex-col items-center p-8 bg-gray-800 text-white min-h-screen">
-      {/* Call Meeting Button */}
-      <button
-      onClick={handleCallMeeting}
-      className="flex items-center px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg shadow-lg hover:from-orange-600 hover:to-orange-700 transition-colors duration-300"
-    >
-      <FaExclamationTriangle className="mr-2" />
-      Call Meeting
-    </button>
-
-      {/* Display Points */}
-      <div className="mb-4 pt-4 text-2xl text-yellow-500">
-        <p>Points: {susPoints}</p>
-      </div>
-
-      {/* Sabotage Actions */}
-      <div className="w-full max-w-xl bg-gray-700 p-6 rounded-lg shadow-md flex flex-col items-center space-y-4">
-        {/* Hack Players Button */}
-        <button
-          onClick={() => handleSabotage('hack')}
-          className={`w-full px-6 py-3 rounded-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-orange-300 ${
-            !canHack
-              ? 'bg-gray-500 text-gray-300 cursor-not-allowed'
-              : 'bg-orange-500 hover:bg-orange-700 text-white'
-          }`}
-          disabled={!canHack}
-          title={!canHack ? 'Not enough points to Hack Players' : 'Hack Players'}
-        >
-          Hack Players (1 Point)
-        </button>
-
-        {/* Deny a Location Button */}
-        {/* Removed the generic 'Deny a floor' button since we're adding specific location buttons */}
-      </div>
-
-      {/* Location Denial Section */}
+      
+      {/* Denied Locations Section */}
       <div className="w-full max-w-xl bg-gray-700 p-6 rounded-lg shadow-md mt-6">
-        <h2 className="text-xl mb-4">Deny a Location</h2>
+        <h2 className="text-xl mb-4">Denied Locations</h2>
         <div className="grid grid-cols-2 gap-4">
           {taskLocations.map((location) => {
-            if(location === 'Other') return
+            if (location === 'Other') return null;
             const isDenied = deniedLocation === location;
-            const isOtherDenied = deniedLocation && deniedLocation !== location;
-            const isButtonDisabled = isOtherDenied || susPoints < 2;
 
             return (
               <button
                 key={location}
-                onClick={() => handleDenyLocation(location)}
-                className={`w-full px-4 py-2 rounded-lg transition-colors duration-300 focus:outline-none focus:ring-2 ${
+                className={`w-full px-4 py-2 rounded-lg transition-colors duration-300 focus:outline-none ${
                   isDenied
                     ? 'bg-red-500 text-white cursor-not-allowed'
-                    : isButtonDisabled
-                    ? 'bg-gray-500 text-gray-300 cursor-not-allowed'
-                    : 'bg-blue-500 hover:bg-blue-700 text-white'
+                    : 'bg-blue-500 text-white cursor-not-allowed opacity-70'
                 }`}
-                disabled={isDenied || isButtonDisabled}
+                disabled
                 title={
                   isDenied
                     ? `${location} is currently denied`
-                    : susPoints < 2
-                    ? 'Not enough points to deny a location'
-                    : `Deny ${location} for 1 minute`
+                    : 'Location is denied and cannot be interacted with'
                 }
               >
                 {location}
@@ -119,11 +99,54 @@ const ImposterPage = () => {
         </div>
       </div>
 
+      {/* Game Actions Cards Section */}
+      <div className="w-full max-w-4xl bg-gray-700 p-6 rounded-lg shadow-md mt-6">
+        <h2 className="text-xl mb-4">Cards</h2>
+        {(!playerState.cards || playerState.cards.length === 0) ? (
+          <p className="text-center text-gray-300">No cards available.</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {playerState.cards.map((cardJson) => {
+              try {
+                // Parse each card JSON string into an object
+                const card = JSON.parse(cardJson);
+
+                // Destructure required fields, handling potential typos
+                const { action, text, location, duration, id } = card;
+
+                // Prepare the action object without 'id' and 'sound'
+                const actionData = {
+                  action,
+                  text,
+                  location,
+                  duration: duration !== undefined && duration !== null ? duration : null,
+                };
+
+                return (
+                  <ActionCard
+                    key={id}
+                    id={id} 
+                    action={actionData.action}
+                    text={actionData.text}
+                    location={actionData.location}
+                    duration={actionData.duration}
+                  />
+                );
+              } catch (error) {
+                console.error('Error parsing game action card:', error);
+                return null; // Skip rendering this card if JSON is invalid
+              }
+            })}
+          </div>
+        )}
+      </div>
+
       {/* Task Slider */}
       <MUECustomSlider
         sus
         onSuccess={handleSwipe}
         text="Slide to pretend to do a task"
+        className="mt-6"
       />
     </div>
   );

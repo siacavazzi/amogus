@@ -12,6 +12,7 @@ class Player:
         self.task = None
         self.fake_task = None
         self.meltdown_code = None
+        self.cards = []
         
     def disconnect(self):
         self.active = False
@@ -25,6 +26,15 @@ class Player:
         if self.fake_task is not None:
             return self.fake_task
         return self.task
+    
+    def get_card(self, id):
+        card = next((card for card in self.cards if card.id == id), None)
+        return card
+    
+    def remove_card(self, card):
+        self.cards.remove(card)
+
+
 
     def to_json(self):
         # Convert the object's attributes to a dictionary
@@ -36,7 +46,8 @@ class Player:
             "sus": self.sus,
             "alive": self.alive,
             "pic": self.pic,
-            "meltdown_code": self.meltdown_code
+            "meltdown_code": self.meltdown_code,
+            "cards": [card.export() for card in self.cards]
         })
 
     def __str__(self):

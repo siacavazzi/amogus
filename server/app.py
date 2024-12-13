@@ -6,7 +6,9 @@ locations = [
     '1st Floor',
     '2nd Floor',
     '3rd Floor',
-    'Other'
+
+    ############
+    'Other' # ALWAYS KEEP OTHER
 ]
 
 # how long players have to stop a meltdown (seconds)
@@ -53,7 +55,7 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 # big boi objects
 speaker = SonosController(enabled=sonos_enabled, default_volume=speaker_volume, ignore_bedroom_speakers=ignore_bedroom_speakers)
 taskHandler = TaskHandler(locations)
-game = Game(socketio, taskHandler, speaker, sus_ratio, task_ratio, meltdown_time, code_percent)
+game = Game(socketio, taskHandler, speaker, sus_ratio, task_ratio, meltdown_time, code_percent, locations)
 
 def sendPlayerList(action='player_list'):
     logger.info("Sending player list to all clients")
@@ -125,15 +127,30 @@ def handleTaskComplete(data):
         emit("task", {"task": "No More Tasks"}, to=player.sid)
         logger.info(f"No more tasks available. Informed player {player.player_id}")
 
-@socketio.on("hack")
-def handleHack():
-    if game.sus_score >= 1 and not game.active_hack and not game.meeting:
-        game.sus_score -= 1
-        emit("sus_score", game.sus_score, broadcast=True)
-        logger.info(f"Hack initiated. Sus score decreased to {game.sus_score}")
+def handleHack(hack_length=30):
+    if not game.active_hack and not game.meeting:
+        logger.info(f"Hack initiated. ")
         game.start_hack(hack_length)
         speaker.play_sound('hack')
         logger.debug("Hack started with a duration of 30 seconds")
+
+@socketio.on("play_card")
+def playCard(data):
+    print(data)
+    player = game.getPlayerById(data.get('player_id'))
+    card = player.get_card(data.get('card_id'))
+    print(card.action)
+    if card.action == 'hack':
+        handleHack(card.duration)
+    elif card.action == 'meeting':
+        handleMeeting()
+    elif card.action == 'taunt':
+        speaker.play_sound(card.sound)
+    elif card.action == 'area_denial':
+        handleDeny(card.location)
+    player.remove_card(card)
+    sendPlayerList()
+
 
 @socketio.on("meeting")
 def handleMeeting():
@@ -152,16 +169,15 @@ def handleEndMeeting():
 
 @socketio.on('deny_location')
 def handleDeny(data):
-    if game.sus_score >= 2 and not game.denied_location:
+    if not game.denied_location:
         speaker.play_sound('sus')
         game.deny_location(data, 60)
-        game.sus_score -= 1
-        emit("sus_score", game.sus_score, broadcast=True)
 
 @socketio.on('meltdown')
 def handleMeltdown():
     speaker.loop_sound("meltdown", 60)
     game.start_meltdown()
+    ## add card draw
     game.sus_score += 1
     emit("sus_score", game.sus_score, broadcast=True)
     logger.warning(f"Meltdown occurred. Sus score increased to {game.sus_score}")
@@ -181,15 +197,14 @@ def handleDeath(data):
         logger.info(f"Player {player.player_id} marked as dead")
 
         if not player.sus:
-            game.sus_score += 1
             game.numCrew -= 1
             print(f"CREW LEFT: {game.numCrew}")
-            if game.numCrew <= 0:
-                game.end_state = 'sus_victory'
-                speaker.play_sound('sus_victory')
-                emit("end_game", game.end_state, broadcast=True)
-                logger.info(f"Game over: {game.end_state}")
-            emit("sus_score", game.sus_score, broadcast=True)
+            # if game.numCrew <= 0:
+            #     game.end_state = 'sus_victory'
+            #     speaker.play_sound('sus_victory')
+            #     emit("end_game", game.end_state, broadcast=True)
+            #     logger.info(f"Game over: {game.end_state}")
+            game.drawCards()
             logger.debug(f"Player {player.player_id} was not suspicious. Sus score increased to {game.sus_score}")
         else:
             game.numImposters -= 1
@@ -229,6 +244,7 @@ def handle_start(data):
             player.task = game.getTask()
             emit("task", {"task": player.task}, to=player.sid)
             logger.debug(f"Assigned task to player {player.player_id}: {player.task}")
+
 
 @socketio.on('join')
 def handle_join(data):
