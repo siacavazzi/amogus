@@ -4,9 +4,10 @@ import eventlet
 class Meltdown:
     def __init__(self, players, time, socketio, speaker, code_percent):
         self.players = players
-        self.num_players = len(players)
         self.socketio = socketio
         self.time_left = time
+        self.living_players = [player for player in players if player.alive]
+        self.num_players = len(self.living_players)
         self.codes_needed = max(int(self.num_players * code_percent), 1)
         self.valid_pins = [random.randint(1000, 9999) for _ in range(self.num_players)]
         self.codes_entered = 0
@@ -33,9 +34,9 @@ class Meltdown:
 
     def distribute_codes(self):
         for i in range(0, self.num_players):
-            self.players[i - 1].meltdown_code = self.valid_pins[i - 1]
-            self.socketio.emit("meltdown_code", self.valid_pins[i - 1], to=self.players[i - 1].sid)
-            print(f"sending code {self.valid_pins[i - 1]} to {self.players[i - 1].sid}")
+            self.living_players[i - 1].meltdown_code = self.valid_pins[i - 1]
+            self.socketio.emit("meltdown_code", self.valid_pins[i - 1], to=self.living_players[i - 1].sid)
+            print(f"sending code {self.valid_pins[i - 1]} to {self.living_players[i - 1].sid}")
 
 
     def check_pin(self, input_pin):
