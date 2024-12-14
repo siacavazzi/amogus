@@ -26,7 +26,6 @@ const PageController = () => {
     const {
         playerState,
         connected,
-        message,
         running,
         crewScore,
         meeting,

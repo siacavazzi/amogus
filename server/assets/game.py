@@ -37,10 +37,12 @@ class Game:
         # Tasks per player
         self.task_ratio = task_ratio
         self.meltdown_time = meltdown_time
+        self.meltdown_time_mod = 0
         self.code_percent = code_percent
 
     def start_meltdown(self):
-        self.active_meltdown = Meltdown(self.players, self.meltdown_time, self.socket, self.speaker, self.code_percent)
+        self.active_meltdown = Meltdown(self.players, self.meltdown_time - self.meltdown_time_mod, self.socket, self.speaker, self.code_percent)
+        self.meltdown_time_mod = 0
         self.active_meltdown.game = self
         self.active_meltdown.start_countdown()
 
@@ -98,10 +100,10 @@ class Game:
         for player in self.players:
             player.sus = False
 
-    def drawCards(self):
+    def drawCards(self, probability=1):
         for i in range(0, len(self.players)):
             if self.players[i].sus:
-                self.players[i].cards.append(self.card_deck.draw_card())
+                self.players[i].cards.append(self.card_deck.draw_card(probability))
 
 
     def assignRoles(self):
@@ -116,6 +118,8 @@ class Game:
             self.players[i].cards.append(self.card_deck.draw_card())
 
             ### DEBUG
+            self.players[i].cards.append(self.card_deck.draw_card())
+            self.players[i].cards.append(self.card_deck.draw_card())
             self.players[i].cards.append(self.card_deck.draw_card())
 
         random.shuffle(self.players)
@@ -153,6 +157,8 @@ class Game:
         self.taskGoal = None
         self.backgrounds = list(range(0, 16 + 1))  
         self.end_state = None
+        self.denied_location = None
+        self.card_deck = CardDeck(self.locations)
 
         self.task_handler.reset()
 

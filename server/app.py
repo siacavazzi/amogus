@@ -6,22 +6,19 @@ locations = [
     '1st Floor',
     '2nd Floor',
     '3rd Floor',
+] # 'Other' will always be included as a location
 
-    ############
-    'Other' # ALWAYS KEEP OTHER
-]
-
-# how long players have to stop a meltdown (seconds)
+# how long players have to stop a meltdown without card modifications(seconds)
 meltdown_time = 60 # s
-
-# how long hacks work for
-hack_length = 30 # s
 
 # fraction of players who need to enter a code to end meltdown (ex if 0.4 - 4 of 10 players need to enter codes)
 code_percent = 0.4
 
 # crewmate to imposter ratio (crewmates per imposter). 
 sus_ratio = 5 
+
+# probability of imposter drawing a card out of 1 (reduce this if the imposter is OP)
+card_draw_probability = 0.5 
 
 # number of tasks each player need to finish to win (on average)
 task_ratio = 10 
@@ -52,6 +49,7 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": '*'}})
 socketio = SocketIO(app, cors_allowed_origins="*")
 
+locations.append("Other")
 # big boi objects
 speaker = SonosController(enabled=sonos_enabled, default_volume=speaker_volume, ignore_bedroom_speakers=ignore_bedroom_speakers)
 taskHandler = TaskHandler(locations)
@@ -148,6 +146,13 @@ def playCard(data):
         speaker.play_sound(card.sound)
     elif card.action == 'area_denial':
         handleDeny(card.location)
+    elif card.action == 'fake_task':
+        print("IMPLEMENT THIS ONE LOL")
+    elif card.action == 'discard_draw':
+        print("IMPLEMENT THIS ONE LOL")
+    elif card.action == 'reduce_meltdown':
+        game.meltdown_time_mod += card.duration
+
     player.remove_card(card)
     sendPlayerList()
 
@@ -204,7 +209,7 @@ def handleDeath(data):
             #     speaker.play_sound('sus_victory')
             #     emit("end_game", game.end_state, broadcast=True)
             #     logger.info(f"Game over: {game.end_state}")
-            game.drawCards()
+            game.drawCards(probability=card_draw_probability)
             logger.debug(f"Player {player.player_id} was not suspicious. Sus score increased to {game.sus_score}")
         else:
             game.numImposters -= 1

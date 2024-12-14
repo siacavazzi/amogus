@@ -34,6 +34,7 @@ class CardDeck:
             Card('meeting', 'Call a meeting'),
             Card('meeting', 'Call a meeting'),
 
+            Card('hack', 'Block all players from doing anything', duration=10),
             Card('hack', 'Block all players from doing anything', duration=15),
             Card('hack', 'Block all players from doing anything', duration=30),
             Card('hack', 'Block all players from doing anything', duration=45),
@@ -43,15 +44,25 @@ class CardDeck:
             Card('taunt', 'Make crewmates suspicious', sound='sus'),
             Card('taunt', 'M E O W', sound='meow'),
 
-            ## ADD MORE CARDS but idk which ones
+            Card('reduce_meltdown', 'Reduce the amount of time players have to stop the next meltdown **NOT IMPLEMENTED**',duration=10),
+            Card('reduce_meltdown', 'Reduce the amount of time players have to stop the next meltdown **NOT IMPLEMENTED**',duration=15),
+
+            Card('discard_draw', 'Discard a random card and draw a new card **NOT IMPLEMENTED**'),
+            Card('discard_draw', 'Discard a random card and draw a new card **NOT IMPLEMENTED**'),
+            Card('discard_draw', 'Discard a random card and draw a new card **NOT IMPLEMENTED**')
         ]
 
+        # Location based cards invoked programmatically since locations shouldn't be hardcoded
         for location in locations:
             if location != 'Other':
                 self.cards.append(Card('area_denial', 'Stop sending tasks to a specific location', duration=60, location=location))
+                self.cards.append(Card('fake_task', 'Send a fake task at a specific location to a player **NOT IMPLEMENTED**', location=location))
         print(self.cards)
 
-    def draw_card(self):
+    def draw_card(self, probability=1):
+        if random.random() > probability:
+            return None
+        
         if not self.cards:
             if not self.discard:
                 return None 
