@@ -263,5 +263,10 @@
         "task": "go into the office",
         "location": "1st Floor",
         "difficulty": 2
+    },
+    {
+        "task": "Poop",
+        "location": "Other",
+        "difficulty": 2
     }
 ]

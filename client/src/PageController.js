@@ -8,7 +8,7 @@ import Modal from "./components/Modal";
 import ImposterPage from "./pages/ImposterPage";
 import CrewmemberPage from "./pages/CrewPage";
 import ProgressBar from "./components/ProgressBar";
-import EmergencyMeetingPage from "./pages/MeetingPage";
+import MeetingWaitingPage from "./pages/MeetingWaitingPage";
 import DeadPage from "./pages/DeadPage";
 import HackedPage from "./pages/HackedPage";
 import GameRunningPage from "./pages/GameRunning";
@@ -28,7 +28,7 @@ const PageController = () => {
         connected,
         running,
         crewScore,
-        meeting,
+        meetingState,
         taskGoal,
         hackTime,
         setHackTime,
@@ -51,23 +51,23 @@ const PageController = () => {
             return;
         }
 
-        if (!isMobile) {
-            if(!running) {
-                setCurrentPage("reactorWaiting");
-                return;
-            }
-            if (meltdownTimer > 0) {
-                setCurrentPage("meltdown");
-            } else {
-                setCurrentPage("reactorNormal");
-            }
-            return;
-        }
+        // if (!isMobile) {
+        //     if(!running) {
+        //         setCurrentPage("reactorWaiting");
+        //         return;
+        //     }
+        //     if (meltdownTimer > 0) {
+        //         setCurrentPage("meltdown");
+        //     } else {
+        //         setCurrentPage("reactorNormal");
+        //     }
+        //     return;
+        // }
 
-        if (running && !playerState?.username) {
-            setCurrentPage("gameRunning");
-            return;
-        }
+        // if (running && !playerState?.username) {
+        //     setCurrentPage("gameRunning");
+        //     return;
+        // }
 
         if (taskEntry) {
             console.log("task entry")
@@ -100,9 +100,13 @@ const PageController = () => {
             return;
         }
 
-        if (meeting) {
-            setCurrentPage("meeting");
-            return;
+        if (meetingState) {
+            console.log("MEETING STATE")
+            console.log(meetingState)
+            if(meetingState.stage === 'waiting') {
+                setCurrentPage("meetingWaiting");
+                return;
+            }
         }
 
         if (running && playerState?.sus) {
@@ -124,7 +128,7 @@ const PageController = () => {
         playerState,
         meltdownCode,
         hackTime,
-        meeting,
+        meetingState,
         endState,
         taskEntry,
 
@@ -140,7 +144,7 @@ const PageController = () => {
         dead: <DeadPage />,
         meltdownCode: <MeltdownInfo/>,
         hacked: <HackedPage hackTime={hackTime} setHackTime={setHackTime} />,
-        meeting: <EmergencyMeetingPage />,
+        meetingWaiting: <MeetingWaitingPage />,
         imposter: <ImposterPage />,
         crewmember: <CrewmemberPage />,
         sus_victory: <ImposterVictoryScreen/>,

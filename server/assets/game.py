@@ -5,6 +5,7 @@ from assets.player import Player
 from assets.taskHandler import *
 from assets.meltdown import *
 from assets.card import *
+from assets.meeting import *
 import time
 from threading import Thread
 from flask_socketio import emit
@@ -12,7 +13,7 @@ from flask_socketio import emit
 
 class Game:
 
-    def __init__(self, socket, task_handler, speaker, sus_ratio, task_ratio, meltdown_time, code_percent, locations):
+    def __init__(self, socket, task_handler, speaker, sus_ratio, task_ratio, meltdown_time, code_percent, locations, vote_time):
         self.players = []
         self.task_handler = task_handler
         self.crew_score = 0
@@ -39,6 +40,7 @@ class Game:
         self.meltdown_time = meltdown_time
         self.meltdown_time_mod = 0
         self.code_percent = code_percent
+        self.vote_time = vote_time
 
     def start_meltdown(self):
         self.active_meltdown = Meltdown(self.players, self.meltdown_time - self.meltdown_time_mod, self.socket, self.speaker, self.code_percent)
@@ -187,3 +189,22 @@ class Game:
         self.denied_location = None
         self.socket.emit('active_denial', 'none')
         print(f"Location '{self.denied_location}' is now allowed again.")
+
+    def start_meeting(self, player_who_started_it):
+        self.meeting = Meeting(self.vote_time, self.socket, player_who_started_it)
+        self.socket.emit("meeting", self.meeting.to_json())
+
+
+    def try_start_voting(self):
+        if self.meeting.stage != 'waiting':
+            return 
+        
+        for player in self.players:
+            if player.alive and not player.ready:
+                return 
+            
+        self.meeting.start_voting()
+
+
+
+

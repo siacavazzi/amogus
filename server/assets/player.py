@@ -7,12 +7,19 @@ class Player:
         self.player_id = player_id
         self.pic = pic
         self.active = True
-        self.sus = False
+        
         self.alive = True
         self.task = None
         self.fake_task = None
         self.meltdown_code = None
+
+        # imposter vars
+        self.sus = False
         self.cards = []
+
+        # meeting vars
+        self.vote = None
+        self.ready = False
         
     def disconnect(self):
         self.active = False
@@ -34,8 +41,6 @@ class Player:
     def remove_card(self, card):
         self.cards.remove(card)
 
-
-
     def to_json(self):
         # Convert the object's attributes to a dictionary
         return json.dumps({
@@ -47,7 +52,9 @@ class Player:
             "alive": self.alive,
             "pic": self.pic,
             "meltdown_code": self.meltdown_code,
-            "cards": [card.export() for card in self.cards]
+            "cards": [card.export() for card in self.cards],
+            "vote": self.vote,
+            "ready":self.ready
         })
 
     def __str__(self):

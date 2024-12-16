@@ -33,23 +33,29 @@ class CardDeck:
             Card('meeting', 'Call a meeting'),
             Card('meeting', 'Call a meeting'),
             Card('meeting', 'Call a meeting'),
+            Card('meeting', 'Call a meeting'),
+            Card('meeting', 'Call a meeting'),
+            Card('meeting', 'Call a meeting'),
+            Card('meeting', 'Call a meeting'),
+            Card('meeting', 'Call a meeting'),
+            Card('meeting', 'Call a meeting'),
 
-            Card('hack', 'Block all players from doing anything', duration=10),
-            Card('hack', 'Block all players from doing anything', duration=15),
-            Card('hack', 'Block all players from doing anything', duration=30),
-            Card('hack', 'Block all players from doing anything', duration=45),
+            # Card('hack', 'Block all players from doing anything', duration=10),
+            # Card('hack', 'Block all players from doing anything', duration=15),
+            # Card('hack', 'Block all players from doing anything', duration=30),
+            # Card('hack', 'Block all players from doing anything', duration=45),
 
-            Card('taunt', 'Taunt crewmates with brainrot', sound='brainrot'),
-            Card('taunt', 'Taunt crewmates with work PTSD', sound='annoying_notif'),
-            Card('taunt', 'Make crewmates suspicious', sound='sus'),
-            Card('taunt', 'M E O W', sound='meow'),
+            # Card('taunt', 'Taunt crewmates with brainrot', sound='brainrot'),
+            # Card('taunt', 'Taunt crewmates with work PTSD', sound='annoying_notif'),
+            # Card('taunt', 'Make crewmates suspicious', sound='sus'),
+            # Card('taunt', 'M E O W', sound='meow'),
 
-            Card('reduce_meltdown', 'Reduce the amount of time players have to stop the next meltdown **NOT IMPLEMENTED**',duration=10),
-            Card('reduce_meltdown', 'Reduce the amount of time players have to stop the next meltdown **NOT IMPLEMENTED**',duration=15),
+            # Card('reduce_meltdown', 'Reduce the amount of time players have to stop the next meltdown **NOT IMPLEMENTED**',duration=10),
+            # Card('reduce_meltdown', 'Reduce the amount of time players have to stop the next meltdown **NOT IMPLEMENTED**',duration=15),
 
-            Card('discard_draw', 'Discard a random card and draw a new card **NOT IMPLEMENTED**'),
-            Card('discard_draw', 'Discard a random card and draw a new card **NOT IMPLEMENTED**'),
-            Card('discard_draw', 'Discard a random card and draw a new card **NOT IMPLEMENTED**')
+            # Card('discard_draw', 'Discard a random card and draw a new card **NOT IMPLEMENTED**'),
+            # Card('discard_draw', 'Discard a random card and draw a new card **NOT IMPLEMENTED**'),
+            # Card('discard_draw', 'Discard a random card and draw a new card **NOT IMPLEMENTED**')
         ]
 
         # Location based cards invoked programmatically since locations shouldn't be hardcoded

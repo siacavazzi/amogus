@@ -8,6 +8,9 @@ locations = [
     '3rd Floor',
 ] # 'Other' will always be included as a location
 
+
+vote_time = 60
+
 # how long players have to stop a meltdown without card modifications(seconds)
 meltdown_time = 60 # s
 
@@ -15,7 +18,7 @@ meltdown_time = 60 # s
 code_percent = 0.4
 
 # crewmate to imposter ratio (crewmates per imposter). 
-sus_ratio = 5 
+sus_ratio = 5 # This is bogus. Make it a goddamn number not a ratio
 
 # probability of imposter drawing a card out of 1 (reduce this if the imposter is OP)
 card_draw_probability = 0.5 
@@ -29,6 +32,17 @@ speaker_volume = 30 # %
 # dont play sounds on speakers with 'bed' in the name
 ignore_bedroom_speakers = True
 
+
+# Voting should be in game!!! This could hook into the ui for slecting a player to give a fake task
+# impooster cards should be on another screenn so a glance cant ruin their game
+# Kill cooldown buttin to control kills! This could be fed only
+# meeting colldown!!! AND reactor cooldown
+# extra imposter screen on a click so everyone has the same UI!!!
+# Voting knowlage. Who voted for who... not necessarily needed now but a good goal
+# dead bodies vs meetings. SO
+#                          - limited global number of meetings, including imposter card play
+#                          - dead body reports (imposters can also do this as a card) honor system but reported to all
+# OVERALL - focus more on the honor system
 ############################
 
 
@@ -53,7 +67,7 @@ locations.append("Other")
 # big boi objects
 speaker = SonosController(enabled=sonos_enabled, default_volume=speaker_volume, ignore_bedroom_speakers=ignore_bedroom_speakers)
 taskHandler = TaskHandler(locations)
-game = Game(socketio, taskHandler, speaker, sus_ratio, task_ratio, meltdown_time, code_percent, locations)
+game = Game(socketio, taskHandler, speaker, sus_ratio, task_ratio, meltdown_time, code_percent, locations, vote_time)
 
 def sendPlayerList(action='player_list'):
     logger.info("Sending player list to all clients")
@@ -81,7 +95,7 @@ def handle_connect():
             emit("hack", game.active_hack)
             logger.debug(f"Active hack: {game.active_hack}")
         if game.meeting:
-            emit("meeting")
+            emit("meeting", game.meeting.to_json())
             logger.debug("Meeting is active")
 
 @socketio.on('rejoin')
@@ -141,7 +155,7 @@ def playCard(data):
     if card.action == 'hack':
         handleHack(card.duration)
     elif card.action == 'meeting':
-        handleMeeting()
+        handleMeeting(data)
     elif card.action == 'taunt':
         speaker.play_sound(card.sound)
     elif card.action == 'area_denial':
@@ -158,12 +172,24 @@ def playCard(data):
 
 
 @socketio.on("meeting")
-def handleMeeting():
+def handleMeeting(data):
     if not game.meeting:
         speaker.play_sound("meeting")
-        emit("meeting", broadcast=True)
-        game.meeting = True
+        player = game.getPlayerById(data.get('player_id'))
+        game.start_meeting(player)
+
+        # emit("meeting", broadcast=True)
+        # game.meeting = True
         logger.info("Meeting started")
+
+@socketio.on("ready")
+def handleReady(data):
+    player = game.getPlayerById(data.get('player_id'))
+    player.ready = True
+    sendPlayerList()
+    game.try_start_voting() # only starts if all players are ready
+        
+
 
 @socketio.on('end_meeting')
 def handleEndMeeting():
@@ -200,6 +226,8 @@ def handleDeath(data):
         player.alive = False
         speaker.play_sound('dead')
         logger.info(f"Player {player.player_id} marked as dead")
+        if game.meeting:
+            game.try_start_voting()
 
         if not player.sus:
             game.numCrew -= 1
