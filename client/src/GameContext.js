@@ -28,7 +28,7 @@ export default function GameContext({ children }) {
     const [crewScore, setCrewScore] = useState(0);
     const [susPoints, setSusPoints] = useState(0);
     const [showAnimation, setShowAnimation] = useState(false);
-    const [meeting, setMeeting] = useState(false);
+    const [meetingState, setMeetingState] = useState(undefined);
     const [taskGoal, setTaskGoal] = useState(1);
     const [hackTime, setHackTime] = useState(0);
     const [meltdownCode, setMeltdownCode] = useState(undefined);
@@ -51,10 +51,9 @@ export default function GameContext({ children }) {
         setRunning(false)
         setCrewScore(0);
         setSusPoints(0);
-        setMeeting(false)
+        setMeetingState(undefined)
         setDialog(undefined);
         setHackTime(0);
-        setMeeting(false);
         setCodesNeeded(undefined);
         setMeltdownTimer(undefined);
         setMeltdownCode(undefined);
@@ -151,11 +150,26 @@ export default function GameContext({ children }) {
             setRunning(true)
         });
 
-        socketRef.current.on('meeting', () => {
-            setAudio('meeting')
-            setMeeting(true);
-            isMobile && setDialog({ title: "Emergency Meeting Called!", body: <MeetingDisplay /> });
+        socketRef.current.on('meeting', (data) => {
+            try {
+                // If data is a JSON string, parse it
+                const meetingData = typeof data === 'string' ? JSON.parse(data) : data;
+        
+                setAudio('meeting');
+                console.log(meetingData);
+                setMeetingState(meetingData);
+        
+                if (isMobile) {
+                    setDialog({ 
+                        title: "Emergency Meeting Called!", 
+                        body: <MeetingDisplay meetingData={meetingData} /> 
+                    });
+                }
+            } catch (error) {
+                console.error("Error parsing meeting data:", error);
+            }
         });
+        
 
         socketRef.current.on('active_denial', (location) => {
             console.log("DENIAL")
@@ -168,9 +182,8 @@ export default function GameContext({ children }) {
             setDeniedLocation(location);
           });
 
-
         socketRef.current.on('end_meeting', () => {
-            setMeeting(false);
+            setMeetingState(undefined);
         });
 
         socketRef.current.on('hack', (data) => {
@@ -250,7 +263,7 @@ export default function GameContext({ children }) {
     }, []);
 
     function handleCallMeeting() {
-        socketRef.current.emit("meeting");
+        socketRef.current.emit("meeting", { player_id: localStorage.getItem('player_id') });
     }
 
 
@@ -274,7 +287,7 @@ export default function GameContext({ children }) {
         showAnimation,
         setShowAnimation,
         handleCallMeeting,
-        meeting,
+        meetingState,
         taskGoal,
         setAudioEnabled,
         audioEnabled,
@@ -308,7 +321,7 @@ export default function GameContext({ children }) {
         task,
         crewScore,
         showAnimation,
-        meeting,
+        meetingState,
         taskGoal,
         susPoints,
         taskEntry,
