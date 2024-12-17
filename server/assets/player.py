@@ -41,6 +41,7 @@ class Player:
 
     def to_json(self):
         # Convert the object's attributes to a dictionary
+        print("Debug - self.cards:", self.cards)
         return json.dumps({
             "sid": self.sid,
             "player_id": self.player_id,
@@ -50,7 +51,7 @@ class Player:
             "alive": self.alive,
             "pic": self.pic,
             "meltdown_code": self.meltdown_code,
-            "cards": [card.export() for card in self.cards if card],
+            "cards": [card.export() for card in self.cards if hasattr(card, 'export')],
             "ready":self.ready
         })
 

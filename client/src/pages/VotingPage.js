@@ -6,10 +6,10 @@ export default function VotingPage() {
     const { players, socket, setMessage, meetingState, vetoVotes, votes, playerState } = useContext(DataContext);
 
     const [selectedPlayer, setSelectedPlayer] = useState(null);
-    const [timeLeft, setTimeLeft] = useState(meetingState.time_left); 
+    const [timeLeft, setTimeLeft] = useState(meetingState.time_left);
 
     useEffect(() => {
-        for(const player of players) {
+        for (const player of players) {
             player.ready = false
         }
         const timer = setInterval(() => {
@@ -21,7 +21,7 @@ export default function VotingPage() {
 
     const handleVote = () => {
         if (selectedPlayer) {
-            socket.emit("vote", {player_id: localStorage.getItem('player_id') , votedFor: selectedPlayer.player_id });
+            socket.emit("vote", { player_id: localStorage.getItem('player_id'), votedFor: selectedPlayer.player_id });
             setMessage({ text: `You voted for ${selectedPlayer.username}`, status: "success" });
         } else {
             setMessage({ text: "Please select a player to vote for.", status: "warning" });
@@ -29,7 +29,7 @@ export default function VotingPage() {
     };
 
     const handleVeto = () => {
-        socket.emit("veto", {player_id: localStorage.getItem('player_id')  });
+        socket.emit("veto", { player_id: localStorage.getItem('player_id') });
         setMessage({ text: "You voted to veto.", status: "info" });
         setSelectedPlayer(null)
     };
@@ -46,15 +46,26 @@ export default function VotingPage() {
 
                 {/* Players Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-                    {players.map((player) => (
-                        <PlayerCard
-                            key={player.player_id}
-                            player={player}
-                            selected={selectedPlayer?.player_id === player.player_id}
-                            votes={(votes?.[player?.player_id] ?? 0)} 
-                            onClick={() => setSelectedPlayer(player)}
-                        />
-                    ))}
+                    {players.map((player) => {
+                        const isMe = playerState?.player_id === player.player_id;
+                        const isDead = !player.alive;
+
+                        return (
+                            <PlayerCard
+                                key={player.player_id}
+                                player={player}
+                                selected={selectedPlayer?.player_id === player.player_id}
+                                votes={(votes?.[player?.player_id] ?? 0)}
+                                onClick={
+                                    isDead || isMe
+                                        ? null // Disable clicking if player is dead or 'me'
+                                        : () => setSelectedPlayer(player)
+                                }
+                                isMe={isMe}
+                                isClickable={!isDead && !isMe}
+                            />
+                        );
+                    })}
                 </div>
 
                 {/* Veto Option */}

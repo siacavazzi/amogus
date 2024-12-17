@@ -13,7 +13,7 @@ from flask_socketio import emit
 
 class Game:
 
-    def __init__(self, socket, task_handler, speaker, sus_ratio, task_ratio, meltdown_time, code_percent, locations, vote_time):
+    def __init__(self, socket, task_handler, speaker, sus_ratio, task_ratio, meltdown_time, code_percent, locations, vote_time, card_draw_probability):
         self.players = []
         self.task_handler = task_handler
         self.crew_score = 0
@@ -32,6 +32,7 @@ class Game:
         self.speaker = speaker
         self.denied_location = None
         self.card_deck = CardDeck(locations)
+        self.card_draw_probability = card_draw_probability
 
         # Crewmate to imposter ratio
         self.sus_ratio = sus_ratio
@@ -215,8 +216,35 @@ class Game:
         for player in self.players:
             player.ready = False
 
-    def kill_player(self, player):
+    def kill_player(self, player_id):
+        player = self.getPlayerById(player_id)
+        if not player:
+            return
+        
         player.alive = False
+        player.ready = True
+
+        if not player.sus:
+            self.numCrew -= 1
+            if self.numCrew <= 0:
+                self.end_state = 'sus_victory'
+                self.speaker.play_sound('sus_victory')
+                self.socket.emit("end_game", self.end_state)
+                return
+            
+            # i think drawing cards should notify impostors
+            self.drawCards(probability=self.card_draw_probability)
+        else:
+            self.numImposters -= 1
+            if self.numImposters <= 0:
+                self.end_state = 'victory'
+                self.speaker.play_sound('crew_victory')
+                self.socket.emit("end_game", self.end_state)
+                return
+                
+        if self.meeting:
+            self.try_start_voting()
+
         player_list = [player.to_json() for player in self.players]
         self.socket.emit('game_data', {'action': 'player_list', 'list': player_list})
         

@@ -10,9 +10,6 @@ const CrewVictoryScreen = ({ message = "Crewmates Win!" }) => {
                 <h1 className="text-5xl font-bold mb-4">
                     {message}
                 </h1>
-                <p className="text-2xl">
-                    All tasks completed successfully.
-                </p>
             </div>
         </div>
     );

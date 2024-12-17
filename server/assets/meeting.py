@@ -128,8 +128,7 @@ class Meeting:
         # Determine who was voted out (player with the most votes)
             self.voted_out = self.determine_voted_out(final_votes)
             if self.voted_out:
-                player = self.game.getPlayerById(self.voted_out)
-                self.game.kill_player(player)
+                self.game.kill_player(self.voted_out)
                 
             self.reason = 'votes'
             self.votes = self.compute_vote_counts()

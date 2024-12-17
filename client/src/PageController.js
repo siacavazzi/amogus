@@ -48,7 +48,7 @@ const PageController = () => {
             return;
         }
 
-        if(endState) {
+        if(endState && meetingState?.stage !== 'over') {
             setCurrentPage(endState)
             return;
         }

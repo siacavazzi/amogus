@@ -67,7 +67,7 @@ locations.append("Other")
 # big boi objects
 speaker = SonosController(enabled=sonos_enabled, default_volume=speaker_volume, ignore_bedroom_speakers=ignore_bedroom_speakers)
 taskHandler = TaskHandler(locations)
-game = Game(socketio, taskHandler, speaker, sus_ratio, task_ratio, meltdown_time, code_percent, locations, vote_time)
+game = Game(socketio, taskHandler, speaker, sus_ratio, task_ratio, meltdown_time, code_percent, locations, vote_time, card_draw_probability)
 
 def sendPlayerList(action='player_list'):
     logger.info("Sending player list to all clients")
@@ -235,34 +235,7 @@ def handlePinEntry(data):
 
 @socketio.on('player_dead')
 def handleDeath(data):
-    player = game.getPlayerById(data.get('player_id'))
-    if player:
-        player.alive = False
-        speaker.play_sound('dead')
-        logger.info(f"Player {player.player_id} marked as dead")
-        if game.meeting:
-            game.try_start_voting()
-
-        if not player.sus:
-            game.numCrew -= 1
-            print(f"CREW LEFT: {game.numCrew}")
-            # if game.numCrew <= 0:
-            #     game.end_state = 'sus_victory'
-            #     speaker.play_sound('sus_victory')
-            #     emit("end_game", game.end_state, broadcast=True)
-            #     logger.info(f"Game over: {game.end_state}")
-            game.drawCards(probability=card_draw_probability)
-            logger.debug(f"Player {player.player_id} was not suspicious. Sus score increased to {game.sus_score}")
-        else:
-            game.numImposters -= 1
-            print(f"IMPOSTERS LEFT: {game.numImposters}")
-            if game.numImposters <= 0:
-                game.end_state = 'victory'
-                speaker.play_sound('crew_victory')
-                emit("end_game", game.end_state, broadcast=True)
-                logger.info(f"Game over: {game.end_state}")
-                
-        sendPlayerList()
+    game.kill_player(data.get('player_id'))
 
 @socketio.on('reset')
 def reset_game():

@@ -17,13 +17,12 @@ const MeetingWaitingPage = () => {
   useEffect(() => {
     let ready = 0
     for (const player of players) {
-      if (player.ready) {
+      if (player.ready && player.alive) {
         ready = ready + 1
       }
     }
     setReadyPlayers(ready)
   }, [playerState, players])
-
 
   const [readyPlayers, setReadyPlayers] = useState(0);
 
