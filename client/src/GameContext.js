@@ -38,6 +38,9 @@ export default function GameContext({ children }) {
     const [taskEntry , setTaskEntry] = useState(false);
     const [taskLocations, setTaskLocations] = useState([]);
     const [deniedLocation, setDeniedLocation] = useState(undefined)
+    const [votes, setVotes] = useState({})
+    const [vetoVotes, setVetoVotes] = useState(0); 
+    // const [meetineTimeLeft, setMee]
 
     const resetState = () => {
         setGameState({})
@@ -60,6 +63,8 @@ export default function GameContext({ children }) {
         setEndState(undefined);
         setDeniedLocation(undefined);
         setTaskLocations([])
+        setVotes({})
+        setVetoVotes(0)
     }
 
     const resetMessage = (delay) => {
@@ -152,14 +157,13 @@ export default function GameContext({ children }) {
 
         socketRef.current.on('meeting', (data) => {
             try {
-                // If data is a JSON string, parse it
                 const meetingData = typeof data === 'string' ? JSON.parse(data) : data;
-        
+                
                 setAudio('meeting');
                 console.log(meetingData);
                 setMeetingState(meetingData);
         
-                if (isMobile) {
+                if (isMobile && meetingData.stage === 'waiting') {
                     setDialog({ 
                         title: "Emergency Meeting Called!", 
                         body: <MeetingDisplay meetingData={meetingData} /> 
@@ -169,6 +173,16 @@ export default function GameContext({ children }) {
                 console.error("Error parsing meeting data:", error);
             }
         });
+
+        socketRef.current.on("vote_update", (data) => {
+            console.log(data)
+            setVotes(data.votes || {});
+            setVetoVotes(data.vetoVotes || 0);
+        });
+
+        socketRef.current.on("meeting_ended", (data) => {
+            console.log(data)
+        })
         
 
         socketRef.current.on('active_denial', (location) => {
@@ -303,7 +317,12 @@ export default function GameContext({ children }) {
         taskEntry,
         setTaskEntry,
         taskLocations,
-        deniedLocation
+        deniedLocation,
+        votes,
+        vetoVotes,
+        setMeetingState,
+        setVotes,
+        setVetoVotes,
     }), [
         endState,
         meltdownCode,
@@ -325,7 +344,9 @@ export default function GameContext({ children }) {
         taskGoal,
         susPoints,
         taskEntry,
-        deniedLocation
+        deniedLocation,
+        votes,
+        vetoVotes
     ]);
 
     return (

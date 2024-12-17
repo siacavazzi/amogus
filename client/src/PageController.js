@@ -21,6 +21,8 @@ import ImposterVictoryScreen from "./pages/ImposterVictory";
 import NuclearMeltdownScreen from "./pages/MeltdownEnd";
 import ReactorWaiting from "./pages/ReactorWaiting";
 import TaskEntryPage from "./pages/TaskEntryPage";
+import VotingPage from "./pages/VotingPage";
+import MeetingResultPage from "./pages/MeetingResultsPage";
 
 const PageController = () => {
     const {
@@ -64,10 +66,10 @@ const PageController = () => {
         //     return;
         // }
 
-        // if (running && !playerState?.username) {
-        //     setCurrentPage("gameRunning");
-        //     return;
-        // }
+        if (running && !playerState?.username) {
+            setCurrentPage("gameRunning");
+            return;
+        }
 
         if (taskEntry) {
             console.log("task entry")
@@ -75,7 +77,7 @@ const PageController = () => {
             return;
         }
 
-        if ((!playerState || !playerState.username) && !running) {
+        if ((!playerState || !playerState?.username) && !running) {
             setCurrentPage("login");
             return;
         }
@@ -85,7 +87,7 @@ const PageController = () => {
             return;
         }
 
-        if (playerState?.alive === false) {
+        if (playerState?.alive === false && meetingState?.stage !== 'over') {
             setCurrentPage("dead");
             return;
         }
@@ -102,11 +104,19 @@ const PageController = () => {
 
         if (meetingState) {
             console.log("MEETING STATE")
-            console.log(meetingState)
+            console.log(meetingState.stage)
             if(meetingState.stage === 'waiting') {
                 setCurrentPage("meetingWaiting");
                 return;
+            } else if(meetingState.stage === 'voting') {
+                console.log("players page")
+                setCurrentPage("votingPage");
+                return;
+            } else if(meetingState.stage === 'over') {
+                setCurrentPage("resultsPage");
+                return;
             }
+            
         }
 
         if (running && playerState?.sus) {
@@ -145,6 +155,8 @@ const PageController = () => {
         meltdownCode: <MeltdownInfo/>,
         hacked: <HackedPage hackTime={hackTime} setHackTime={setHackTime} />,
         meetingWaiting: <MeetingWaitingPage />,
+        votingPage: <VotingPage />,
+        resultsPage: <MeetingResultPage />,
         imposter: <ImposterPage />,
         crewmember: <CrewmemberPage />,
         sus_victory: <ImposterVictoryScreen/>,

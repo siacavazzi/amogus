@@ -95,7 +95,11 @@ def handle_connect():
             emit("hack", game.active_hack)
             logger.debug(f"Active hack: {game.active_hack}")
         if game.meeting:
+            print("TIME LEFT== = = = = = ")
+            print(game.meeting.time_left)
             emit("meeting", game.meeting.to_json())
+            if game.meeting.stage == 'voting':
+                game.meeting.emit_vote_counts()
             logger.debug("Meeting is active")
 
 @socketio.on('rejoin')
@@ -188,8 +192,18 @@ def handleReady(data):
     player.ready = True
     sendPlayerList()
     game.try_start_voting() # only starts if all players are ready
-        
 
+@socketio.on("vote")
+def handleVote(data):
+    voting_player = game.getPlayerById(data.get('player_id'))
+    voted_for = game.getPlayerById(data.get('votedFor'))
+    game.meeting.register_vote(voting_player, voted_for)
+
+@socketio.on("veto")
+def handleVote(data):
+    voting_player = game.getPlayerById(data.get('player_id'))
+    game.meeting.register_vote(voting_player, veto=True)
+        
 
 @socketio.on('end_meeting')
 def handleEndMeeting():

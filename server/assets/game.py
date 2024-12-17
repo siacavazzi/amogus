@@ -191,8 +191,16 @@ class Game:
         print(f"Location '{self.denied_location}' is now allowed again.")
 
     def start_meeting(self, player_who_started_it):
-        self.meeting = Meeting(self.vote_time, self.socket, player_who_started_it)
+        self.meeting = Meeting(self.vote_time, self.socket, player_who_started_it, self)
         self.socket.emit("meeting", self.meeting.to_json())
+
+    def get_num_living_players(self):
+        living_players = 0
+        for player in self.players:
+            if player.alive:
+                living_players += 1
+
+        return living_players
 
 
     def try_start_voting(self):
@@ -204,7 +212,12 @@ class Game:
                 return 
             
         self.meeting.start_voting()
+        for player in self.players:
+            player.ready = False
 
-
-
+    def kill_player(self, player):
+        player.alive = False
+        player_list = [player.to_json() for player in self.players]
+        self.socket.emit('game_data', {'action': 'player_list', 'list': player_list})
+        
 

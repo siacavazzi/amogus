@@ -26,11 +26,8 @@ export default function PlayersPage() {
     }
 
     function startGame() {
-        if (players.length >= 0) {
-            socket.emit('start_game', {});
-        } else {
-            setMessage({ text: "At least 3 players are needed to start the game.", status: "warning" });
-        }
+        socket.emit('start_game', {});
+
     }
 
     return (

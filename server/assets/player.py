@@ -17,8 +17,6 @@ class Player:
         self.sus = False
         self.cards = []
 
-        # meeting vars
-        self.vote = None
         self.ready = False
         
     def disconnect(self):
@@ -52,8 +50,7 @@ class Player:
             "alive": self.alive,
             "pic": self.pic,
             "meltdown_code": self.meltdown_code,
-            "cards": [card.export() for card in self.cards],
-            "vote": self.vote,
+            "cards": [card.export() for card in self.cards if card],
             "ready":self.ready
         })
 

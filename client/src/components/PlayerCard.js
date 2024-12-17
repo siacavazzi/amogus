@@ -1,35 +1,45 @@
 import React from "react";
 
 export const ProfilePicture = ({ imageCode }) => {
-    // Ensure the code is within the range 0–9
-  
-    // Dynamically create the image path
     const imagePath = require(`../imgs/${imageCode}.gif`);
-    console.log(`../imgs/${imageCode}.gif`)
-  
+
     return (
-      <div>
-        <img 
-          src={imagePath} 
-          alt={`Profile ${imageCode}`} 
-          style={{ width: 100, height: 100, borderRadius: '50%' }} 
-        />
-      </div>
+        <div>
+            <img
+                src={imagePath}
+                alt={`Profile ${imageCode}`}
+                style={{ width: 100, height: 100, borderRadius: "50%" }}
+            />
+        </div>
     );
-  };
+};
 
-const PlayerCard = ({ player }) => {
-    console.log(player)
-
+const PlayerCard = ({ player, selected = false, votes = 0, onClick }) => {
+    console.log(votes)
     return (
-        <div className="bg-gray-800 shadow-md rounded-lg p-6 flex flex-col items-center transition-transform transform hover:scale-105">
+        <div
+            onClick={onClick}
+            className={`relative bg-gray-800 shadow-md rounded-lg p-6 flex flex-col items-center transition-transform transform hover:scale-105 cursor-pointer
+                ${selected ? "border-4 border-green-500" : "border-2 border-transparent"}`}
+        >
             <div className="mb-2">
-            <ProfilePicture imageCode={player.pic}/>
+                <ProfilePicture imageCode={player.pic} />
             </div>
             <h3 className="text-xl font-semibold text-gray-200">{player.username}</h3>
-            <p className={`mt-1 text-sm font-medium ${player.alive ? 'text-green-400' : 'text-red-500'}`}>
+            <p
+                className={`mt-1 text-sm font-medium ${
+                    player.alive ? "text-green-400" : "text-red-500"
+                }`}
+            >
                 {player.alive ? "Alive" : "Dead"}
             </p>
+
+            {/* Optional Votes Display */}
+            { (
+                <div className="absolute top-2 right-2 bg-red-600 text-white text-sm font-bold py-1 px-2 rounded-full shadow-md">
+                    {votes} {votes === 1 ? "Vote" : "Votes"}
+                </div>
+            )}
         </div>
     );
 };

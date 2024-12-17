@@ -17,7 +17,7 @@ const MeetingWaitingPage = () => {
   useEffect(() => {
     let ready = 0
     for (const player of players) {
-      if(player.ready) {
+      if (player.ready) {
         ready = ready + 1
       }
     }
@@ -26,7 +26,7 @@ const MeetingWaitingPage = () => {
 
 
   const [readyPlayers, setReadyPlayers] = useState(0);
-  const [isDead, setIsDead] = useState(false);
+
 
   const handleReadyUp = () => {
     socket.emit("ready", { player_id: localStorage.getItem('player_id') })
@@ -49,7 +49,9 @@ const MeetingWaitingPage = () => {
         </p>
         <p className="text-lg mb-4">
           Players yet to ready up:{" "}
-          <span className="font-bold">{players.length - readyPlayers}</span>
+          <span className="font-bold">
+            {players.filter(player => player.alive).length - readyPlayers}
+          </span>
         </p>
       </div>
       <div className="flex flex-col md:flex-row gap-4">
@@ -60,7 +62,7 @@ const MeetingWaitingPage = () => {
           I'm Dead
         </button>
       </div>
-      {!playerState.ready && <MUECustomSlider onSuccess={handleReadyUp}/>}
+      {!playerState.ready && <MUECustomSlider onSuccess={handleReadyUp} />}
     </div>
   );
 };
