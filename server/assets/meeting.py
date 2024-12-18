@@ -20,6 +20,10 @@ class Meeting:
 
 
     def start_voting(self):
+        if self.game.get_num_living_players() <= 1:
+            self.game.end_state = 'sus_victory'
+            self.socket.emit("end_game", self.game.end_state)
+            return
         self.stage = 'voting'
         self.socket.emit("meeting", self.to_json())
         Thread(target=self._vote_countdown).start()
@@ -81,7 +85,6 @@ class Meeting:
         """
         veto_count = len(self.veto_votes)
         player_count = len(self.game.players)
-        print("VETO DATA")
         return veto_count > (player_count / 2)
     
     def determine_voted_out(self, vote_counts):
@@ -116,8 +119,7 @@ class Meeting:
 
         if early:
             self.reason = 'veto'
-            self.votes = self.compute_vote_counts()
-        # Meeting ended due to veto threshold
+
             print("Meeting ended early due to veto threshold...")
             self.socket.emit("meeting", self.to_json())
         else:

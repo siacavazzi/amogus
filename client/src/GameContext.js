@@ -40,6 +40,9 @@ export default function GameContext({ children }) {
     const [deniedLocation, setDeniedLocation] = useState(undefined)
     const [votes, setVotes] = useState({})
     const [vetoVotes, setVetoVotes] = useState(0); 
+    const [showSusPage, setShowSusPage] = useState(false)
+    const [killCooldown, setKillCooldown] = useState(0);
+    const [activeCards, setActiveCards] = useState([])
     // const [meetineTimeLeft, setMee]
 
     const resetState = () => {
@@ -65,6 +68,8 @@ export default function GameContext({ children }) {
         setTaskLocations([])
         setVotes({})
         setVetoVotes(0)
+        setShowSusPage(false)
+        setActiveCards([])
     }
 
     const resetMessage = (delay) => {
@@ -76,6 +81,45 @@ export default function GameContext({ children }) {
             return () => clearTimeout(timer);
         }
     };
+
+    useEffect(() => {
+        // Set intervals only for cards with 'time_left'
+        const countdownIntervals = activeCards.map((card, index) => {
+            if (card.time_left && card.time_left > 0 && card.countdown) {
+                return setInterval(() => {
+                    setActiveCards((prevCards) => {
+                        const updatedCards = [...prevCards];
+                        if (updatedCards[index].time_left > 0) {
+                            updatedCards[index] = {
+                                ...updatedCards[index],
+                                time_left: updatedCards[index].time_left - 1,
+                            };
+                        }
+                        return updatedCards;
+                    });
+                }, 1000);
+            }
+            return null;
+        });
+    
+        // Cleanup intervals on unmount or activeCards change
+        return () => {
+            countdownIntervals.forEach((interval) => {
+                if (interval) clearInterval(interval);
+            });
+        };
+    }, [activeCards]);
+
+    useEffect(() => {
+        let timer;
+        if (killCooldown > 0) {
+          timer = setInterval(() => {
+            setKillCooldown((prev) => (prev > 0 ? prev - 1 : 0));
+          }, 1000); // Reduce cooldown every second
+        }
+        return () => clearInterval(timer); // Cleanup interval
+      }, [killCooldown]);
+    
 
     useEffect(() => {
         const reset = resetMessage(5000)
@@ -183,6 +227,21 @@ export default function GameContext({ children }) {
         socketRef.current.on("meeting_ended", (data) => {
             console.log(data)
         })
+        
+        socketRef.current.on('active_cards', (data) => {
+            console.log("ACTIVE CARDS:");
+            console.log(data);
+        
+            try {
+                // Parse each element of the array
+                const parsedData = data.map((item) => {
+                    return typeof item === 'string' ? JSON.parse(item) : item;
+                });
+                setActiveCards(parsedData);
+            } catch (error) {
+                console.error("Failed to parse active cards data:", error);
+            }
+        });
         
 
         socketRef.current.on('active_denial', (location) => {
@@ -323,6 +382,11 @@ export default function GameContext({ children }) {
         setMeetingState,
         setVotes,
         setVetoVotes,
+        showSusPage,
+        setShowSusPage,
+        killCooldown,
+        setKillCooldown,
+        activeCards
     }), [
         endState,
         meltdownCode,
@@ -346,7 +410,10 @@ export default function GameContext({ children }) {
         taskEntry,
         deniedLocation,
         votes,
-        vetoVotes
+        vetoVotes,
+        showSusPage,
+        killCooldown,
+        activeCards,
     ]);
 
     return (

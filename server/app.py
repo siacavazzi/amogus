@@ -33,7 +33,7 @@ speaker_volume = 30 # %
 ignore_bedroom_speakers = True
 
 
-# Voting should be in game!!! This could hook into the ui for slecting a player to give a fake task
+# Voting should be in game!!! This could hook into the ui for slecting a player to give a fake task X
 # impooster cards should be on another screenn so a glance cant ruin their game
 # Kill cooldown buttin to control kills! This could be fed only
 # meeting colldown!!! AND reactor cooldown
@@ -86,10 +86,14 @@ def handle_connect():
 
     if game.game_running:
         emit("game_start")
+        emit("crew_score", {"score": game.crew_score})
+        emit("task_goal", game.taskGoal)
 
         if game.end_state:
             logger.info(f"Game over: {game.end_state}")
             emit("end_game", game.end_state)
+        if len(game.active_cards) > 0:
+            game.emit_active_cards()
 
         if game.active_hack > 0:
             emit("hack", game.active_hack)
@@ -109,9 +113,7 @@ def handleJoin(data):
         logger.info("Existing player rejoining...")
         player.sid = request.sid
         sendPlayerList("rejoin")
-        emit("crew_score", {"score": game.crew_score})
-        emit("task_goal", game.taskGoal)
-        emit("sus_score", game.sus_score)
+
         if game.denied_location:
             emit('active_denial', game.denied_location)
 
@@ -162,16 +164,21 @@ def playCard(data):
         handleMeeting(data)
     elif card.action == 'taunt':
         speaker.play_sound(card.sound)
+    # active cards
     elif card.action == 'area_denial':
-        handleDeny(card.location)
+        if not game.denied_location:
+            speaker.play_sound('sus')
+            game.deny_location(card)
     elif card.action == 'fake_task':
         print("IMPLEMENT THIS ONE LOL")
     elif card.action == 'discard_draw':
         print("IMPLEMENT THIS ONE LOL")
     elif card.action == 'reduce_meltdown':
+        game.active_cards.append(card)
         game.meltdown_time_mod += card.duration
 
     player.remove_card(card)
+    game.emit_active_cards()
     sendPlayerList()
 
 
@@ -212,20 +219,13 @@ def handleEndMeeting():
         game.meeting = False
         logger.info("Meeting ended")
 
-@socketio.on('deny_location')
-def handleDeny(data):
-    if not game.denied_location:
-        speaker.play_sound('sus')
-        game.deny_location(data, 60)
 
 @socketio.on('meltdown')
 def handleMeltdown():
     speaker.loop_sound("meltdown", 60)
     game.start_meltdown()
     ## add card draw
-    game.sus_score += 1
-    emit("sus_score", game.sus_score, broadcast=True)
-    logger.warning(f"Meltdown occurred. Sus score increased to {game.sus_score}")
+    logger.warning(f"Meltdown occurred.")
 
 @socketio.on("pin_entry")
 def handlePinEntry(data):

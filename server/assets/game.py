@@ -17,7 +17,6 @@ class Game:
         self.players = []
         self.task_handler = task_handler
         self.crew_score = 0
-        self.sus_score = 10
         self.game_running = False
         self.active_hack = 0
         self.active_meltdown = None
@@ -32,6 +31,7 @@ class Game:
         self.speaker = speaker
         self.denied_location = None
         self.card_deck = CardDeck(locations)
+        self.active_cards = []
         self.card_draw_probability = card_draw_probability
 
         # Crewmate to imposter ratio
@@ -46,19 +46,26 @@ class Game:
     def start_meltdown(self):
         self.active_meltdown = Meltdown(self.players, self.meltdown_time - self.meltdown_time_mod, self.socket, self.speaker, self.code_percent)
         self.meltdown_time_mod = 0
+        for card in self.active_cards:
+            if card.action == 'reduce_meltdown':
+                self.active_cards.remove(card)
         self.active_meltdown.game = self
         self.active_meltdown.start_countdown()
 
     def check_pin(self, pin):
         self.active_meltdown.check_pin(pin)
 
-    def meltdown(self):
+    def meltdown(self): # call when meltdown fails
         self.active_meltdown = None
         self.end_state = "meltdown_fail"
         self.socket.emit("end_game", self.end_state)
 
         if self.speaker:
             self.speaker.play_sound("sus_victory")
+
+    def emit_player_list(self):
+        player_list = [player.to_json() for player in self.players]
+        self.socket.emit('game_data', {'action': 'player_list', 'list': player_list})
 
     def start_hack(self, duration):
         if self.active_hack > 0:
@@ -150,7 +157,6 @@ class Game:
     def reset(self):
         self.players = []
         self.crew_score = 0
-        self.sus_score = 0
         self.game_running = False
         self.active_hack = 0
         self.active_meltdown = None
@@ -165,7 +171,14 @@ class Game:
 
         self.task_handler.reset()
 
-    def deny_location(self, location: str, duration: int):
+    def emit_active_cards(self):
+        output = []
+        for card in self.active_cards:
+            output.append(card.export())
+        print(output)
+        self.socket.emit('active_cards', output)
+
+    def deny_location(self, card):
         """
         Deny access to a specified location for a given duration.
 
@@ -173,22 +186,26 @@ class Game:
             location (str): The location to be denied.
             duration (int): Duration in seconds for which the location is denied.
         """
-        self.denied_location = location
-        self.socket.emit('active_denial', self.denied_location)
-        print(f"Location '{location}' denied for {duration} seconds.")
+        self.denied_location = card.location
+        self.active_cards.append(card)
+        self.emit_active_cards()
+        print(f"Location '{card.location}' denied for {card.duration} seconds.")
 
-        Thread(target=self._reset_denied_location, args=(duration,)).start()
+        Thread(target=self._denied_location_countdown, args=(card,)).start()
 
-    def _reset_denied_location(self, duration: int):
+    def _denied_location_countdown(self, card):
         """
         Helper method to reset the denied_location after a delay.
 
         Args:
             duration (int): Duration in seconds to wait before resetting.
         """
-        time.sleep(duration)
+        while card.time_left > 0:
+            time.sleep(1)
+            card.time_left -= 1
         self.denied_location = None
-        self.socket.emit('active_denial', 'none')
+        if card in self.active_cards:
+            self.active_cards.remove(card)
         print(f"Location '{self.denied_location}' is now allowed again.")
 
     def start_meeting(self, player_who_started_it):
@@ -203,7 +220,6 @@ class Game:
 
         return living_players
 
-
     def try_start_voting(self):
         if self.meeting.stage != 'waiting':
             return 
@@ -215,6 +231,7 @@ class Game:
         self.meeting.start_voting()
         for player in self.players:
             player.ready = False
+
 
     def kill_player(self, player_id):
         player = self.getPlayerById(player_id)
@@ -245,7 +262,6 @@ class Game:
         if self.meeting:
             self.try_start_voting()
 
-        player_list = [player.to_json() for player in self.players]
-        self.socket.emit('game_data', {'action': 'player_list', 'list': player_list})
+        self.emit_player_list()
         
 

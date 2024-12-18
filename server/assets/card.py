@@ -4,10 +4,12 @@ import uuid
 
 class Card:
 
-    def __init__(self, action, text, location=None, duration=None, sound=None):
+    def __init__(self, action, text, location=None, duration=None, sound=None, countdown=False):
         self.action = action
         self.location = location
         self.duration = duration
+        self.countdown = countdown
+        self.time_left = duration
         self.sound = sound
         self.text = text
         self.id = str(uuid.uuid4())
@@ -21,7 +23,9 @@ class Card:
             "text":self.text,
             "location":self.location,
             "duration":self.duration,
-            "id":self.id
+            "time_left": self.time_left,
+            "id":self.id,
+            "countdown":self.countdown
         })
 
 class CardDeck:
@@ -29,16 +33,13 @@ class CardDeck:
     def __init__(self, locations):
         self.discard = []
 
-        self.cards = [
-            Card('meeting', 'Call a meeting'),
-            Card('meeting', 'Call a meeting'),
-            Card('meeting', 'Call a meeting'),
-            Card('meeting', 'Call a meeting'),
-            Card('meeting', 'Call a meeting'),
-            Card('meeting', 'Call a meeting'),
-            Card('meeting', 'Call a meeting'),
-            Card('meeting', 'Call a meeting'),
-            Card('meeting', 'Call a meeting'),
+        self.cards = [# CHANGE THESE THEYDONT WORK
+            # Card('meeting', 'Call a body found meeting'), 
+            # Card('meeting', 'Call a body found meeting'), 
+            # Card('meeting', 'Call a body found meeting'), 
+            # Card('meeting', 'Call a body found meeting'), 
+            # Card('meeting', 'Call a body found meeting'), 
+            # Card('meeting', 'Call a body found meeting'), 
 
             # Card('hack', 'Block all players from doing anything', duration=10),
             # Card('hack', 'Block all players from doing anything', duration=15),
@@ -50,8 +51,8 @@ class CardDeck:
             # Card('taunt', 'Make crewmates suspicious', sound='sus'),
             # Card('taunt', 'M E O W', sound='meow'),
 
-            # Card('reduce_meltdown', 'Reduce the amount of time players have to stop the next meltdown **NOT IMPLEMENTED**',duration=10),
-            # Card('reduce_meltdown', 'Reduce the amount of time players have to stop the next meltdown **NOT IMPLEMENTED**',duration=15),
+            Card('reduce_meltdown', 'Reduce the amount of time players have to stop the next meltdown **NOT IMPLEMENTED**',duration=10),
+            Card('reduce_meltdown', 'Reduce the amount of time players have to stop the next meltdown **NOT IMPLEMENTED**',duration=15),
 
             # Card('discard_draw', 'Discard a random card and draw a new card **NOT IMPLEMENTED**'),
             # Card('discard_draw', 'Discard a random card and draw a new card **NOT IMPLEMENTED**'),
@@ -61,8 +62,8 @@ class CardDeck:
         # Location based cards invoked programmatically since locations shouldn't be hardcoded
         for location in locations:
             if location != 'Other':
-                self.cards.append(Card('area_denial', 'Stop sending tasks to a specific location', duration=60, location=location))
-                self.cards.append(Card('fake_task', 'Send a fake task at a specific location to a player **NOT IMPLEMENTED**', location=location))
+                self.cards.append(Card('area_denial', 'Stop sending tasks to a specific location', duration=60, countdown=True, location=location))
+                #self.cards.append(Card('fake_task', 'Send a fake task at a specific location to a player **NOT IMPLEMENTED**', location=location))
         print(self.cards)
 
     def draw_card(self, probability=1):

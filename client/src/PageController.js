@@ -38,6 +38,8 @@ const PageController = () => {
         meltdownTimer,
         endState,
         taskEntry,
+        showSusPage,
+        setShowSusPage,
     } = useContext(DataContext);
 
     const [currentPage, setCurrentPage] = useState("connecting");
@@ -48,7 +50,7 @@ const PageController = () => {
             return;
         }
 
-        if(endState && meetingState?.stage !== 'over') {
+        if (endState && meetingState?.stage !== 'over') {
             setCurrentPage(endState)
             return;
         }
@@ -105,28 +107,29 @@ const PageController = () => {
         if (meetingState) {
             console.log("MEETING STATE")
             console.log(meetingState.stage)
-            if(meetingState.stage === 'waiting') {
+            if (meetingState.stage === 'waiting') {
                 setCurrentPage("meetingWaiting");
                 return;
-            } else if(meetingState.stage === 'voting') {
+            } else if (meetingState.stage === 'voting') {
                 console.log("players page")
                 setCurrentPage("votingPage");
                 return;
-            } else if(meetingState.stage === 'over') {
+            } else if (meetingState.stage === 'over') {
                 setCurrentPage("resultsPage");
                 return;
             }
-            
+
         }
 
-        if (running && playerState?.sus) {
-            setCurrentPage("imposter");
-            return;
-        }
-
-        if (running && !playerState?.sus) {
-            setCurrentPage("crewmember");
-            return;
+        if (running) {
+            console.log(showSusPage)
+            if (showSusPage) {
+                setCurrentPage("imposter");
+                return;
+            } else {
+                setCurrentPage("crewmember");
+                return;
+            }
         }
 
         setCurrentPage("unknown");
@@ -141,6 +144,7 @@ const PageController = () => {
         meetingState,
         endState,
         taskEntry,
+        showSusPage,
 
     ]);
 
@@ -152,17 +156,17 @@ const PageController = () => {
         login: <LoginPage />,
         players: <PlayersPage />,
         dead: <DeadPage />,
-        meltdownCode: <MeltdownInfo/>,
+        meltdownCode: <MeltdownInfo />,
         hacked: <HackedPage hackTime={hackTime} setHackTime={setHackTime} />,
         meetingWaiting: <MeetingWaitingPage />,
         votingPage: <VotingPage />,
         resultsPage: <MeetingResultPage />,
-        imposter: <ImposterPage />,
-        crewmember: <CrewmemberPage />,
-        sus_victory: <ImposterVictoryScreen/>,
+        imposter: <ImposterPage setShowSusPage={setShowSusPage}/>,
+        crewmember: <CrewmemberPage setShowSusPage={setShowSusPage} />,
+        sus_victory: <ImposterVictoryScreen />,
         victory: <CrewVictoryScreen />,
         meltdown_fail: <NuclearMeltdownScreen />,
-        reactorWaiting: <ReactorWaiting/>,
+        reactorWaiting: <ReactorWaiting />,
         taskEntry: <TaskEntryPage />,
         unknown: (
             <p>
