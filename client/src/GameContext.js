@@ -43,6 +43,7 @@ export default function GameContext({ children }) {
     const [showSusPage, setShowSusPage] = useState(false)
     const [killCooldown, setKillCooldown] = useState(0);
     const [activeCards, setActiveCards] = useState([])
+    const [modalOpen, setModalOpen] = useState(false)
     // const [meetineTimeLeft, setMee]
 
     const resetState = () => {
@@ -70,6 +71,7 @@ export default function GameContext({ children }) {
         setVetoVotes(0)
         setShowSusPage(false)
         setActiveCards([])
+        setModalOpen(false)
     }
 
     const resetMessage = (delay) => {
@@ -144,12 +146,17 @@ export default function GameContext({ children }) {
         });
 
         socketRef.current.on('task_locations', (data) => {
-            console.log(data)
             setTaskLocations(data)
         })
 
         socketRef.current.on('disconnect', () => {
             resetState();
+        });
+
+        socketRef.current.on('message', (data) => {
+            if(data.player === localStorage.getItem("player_id")) {
+                setDialog({ title: "Message", body: data.message });
+            }
         });
 
         socketRef.current.on('end_game', (data) => {
@@ -204,14 +211,16 @@ export default function GameContext({ children }) {
                 const meetingData = typeof data === 'string' ? JSON.parse(data) : data;
                 
                 setAudio('meeting');
-                console.log(meetingData);
                 setMeetingState(meetingData);
-        
-                if (isMobile && meetingData.stage === 'waiting') {
+                setShowSusPage(false)
+                
+                if (meetingData.stage === 'waiting') {
                     setDialog({ 
                         title: "Emergency Meeting Called!", 
                         body: <MeetingDisplay meetingData={meetingData} /> 
                     });
+                } else {
+                    setDialog(undefined)
                 }
             } catch (error) {
                 console.error("Error parsing meeting data:", error);
@@ -245,8 +254,6 @@ export default function GameContext({ children }) {
         
 
         socketRef.current.on('active_denial', (location) => {
-            console.log("DENIAL")
-            console.log(location)
             if(location === 'none') {
               setDeniedLocation(undefined);
               return
@@ -270,7 +277,6 @@ export default function GameContext({ children }) {
         // Handle 'player_id' event
         socketRef.current.on('player_id', (data) => {
             if (data && data.player_id) {
-                console.log("setting new id ?")
                 localStorage.setItem('player_id', data.player_id);
                 setPlayerState(prevState => ({ ...prevState, playerId: data.player_id }));
             }
@@ -386,7 +392,9 @@ export default function GameContext({ children }) {
         setShowSusPage,
         killCooldown,
         setKillCooldown,
-        activeCards
+        activeCards,
+        modalOpen,
+        setModalOpen
     }), [
         endState,
         meltdownCode,
@@ -414,6 +422,7 @@ export default function GameContext({ children }) {
         showSusPage,
         killCooldown,
         activeCards,
+        modalOpen
     ]);
 
     return (

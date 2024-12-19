@@ -5,11 +5,11 @@ import { Beforeunload } from 'react-beforeunload';
 import { FaArrowCircleRight } from "react-icons/fa";
 
 // Dimensions and styling constants
-const SLIDER_HEIGHT = '4rem';
-const SLIDER_HANDLE_SIZE = '3.5rem';
+const SLIDER_HEIGHT = '5rem';
+const SLIDER_HANDLE_SIZE = '4.5rem';
 const SLIDER_BORDER_RADIUS = '2rem';
 const SLIDER_TEXT_FONT_SIZE = '1.25rem';
-const SLIDER_ICON_SIZE = '2rem';
+const SLIDER_ICON_SIZE = '3rem';
 const SUCCESS_THRESHOLD = 0.8; // 80% threshold
 
 const MUECustomSlider = ({

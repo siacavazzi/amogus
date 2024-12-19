@@ -2,17 +2,17 @@ import React, { useState, useEffect, useContext, useRef } from "react";
 import { DataContext } from "../GameContext";
 
 const Modal = () => {
-  const { dialog, setAudio, setAudioEnabled } = useContext(DataContext);
+  const { dialog, setAudio, setAudioEnabled, meetingState } = useContext(DataContext);
   const [open, setOpen] = useState(false);
   const modalRef = useRef(null);
 
   useEffect(() => {
-    if (dialog?.title) {
+    if (dialog?.title && !(meetingState?.stage === "over" || meetingState?.stage === "voting")) {
       setOpen(true);
     } else {
       setOpen(false);
     }
-  }, [dialog]);
+  }, [dialog, meetingState]);
 
   // Close modal when Escape key is pressed
   useEffect(() => {

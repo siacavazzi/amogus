@@ -100,6 +100,8 @@ class SonosController:
             "brainrot":"brainrot.mp3",
             "annoying_notif":"annoying_notif.mp3",
             "meow":"meow.mp3",
+            "hurry":"hurry.mp3",
+            "veto":"veto.mp3"
         }
 
         if self.speakers:

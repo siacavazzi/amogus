@@ -15,13 +15,12 @@ const CrewmemberPage = ({ setShowSusPage }) => {
     setAudio,
     playerState,
     killCooldown,
-    setKillCooldown
+    setKillCooldown,
   } = useContext(DataContext);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
 
   const handleClickButton = () => {
     if (!playerState?.sus) {
@@ -31,13 +30,12 @@ const CrewmemberPage = ({ setShowSusPage }) => {
     }
   };
 
-  // Function to handle completing a task or killing a player
   const handleCompleteTask = () => {
     if (playerState?.sus) {
-      if (killCooldown > 0) return; // Prevent killing during cooldown
+      if (killCooldown > 0) return; // Prevent action during cooldown
       setAudio("kill_player");
       socket.emit("kill_player", { player_id: localStorage.getItem("player_id") });
-      setKillCooldown(60); // Set 60 seconds cooldown
+      setKillCooldown(60); // 60 second cooldown
       return;
     }
 
@@ -54,30 +52,35 @@ const CrewmemberPage = ({ setShowSusPage }) => {
     setShowAnimation(false);
   };
 
+  // Keeping the page styling consistent for both crewmates and sus players:
+  // The button, backgrounds, and layout remain the same. Only text changes slightly.
   return (
-    <div className="flex flex-col items-center p-8 bg-gray-800 text-white min-h-screen relative">
-      {/* Crewmember Actions */}
+    <div className="relative flex flex-col items-center min-h-screen p-8 pt-12 pb--16 bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white">
+      {/* Meeting / Vent Button */}
       <div className="mb-8">
         <button
           onClick={handleClickButton}
-          className="flex items-center px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg shadow-lg hover:from-orange-600 hover:to-orange-700 transition-colors duration-300"
+          className="flex items-center justify-center px-6 py-3 rounded-full shadow-lg transition-transform duration-300 focus:outline-none focus:ring-2 bg-orange-600 hover:bg-orange-700 focus:ring-orange-500 transform hover:scale-105"
         >
           <FaExclamationTriangle className="mr-2" />
           {playerState?.sus ? "Enter Vent" : "Call Meeting"}
         </button>
       </div>
 
-      {/* Task Section */}
-      <div className="w-full max-w-xl bg-gray-700 p-6 rounded-lg shadow-md">
-        <p className="text-lg font-semibold mb-4">Task:</p>
-        {task ? (
+      {/* Task / Elimination Section */}
+      <div className="w-full max-w-xl bg-gray-700/90 backdrop-blur-md p-6 rounded-xl shadow-xl">
+        <p className="text-lg font-semibold mb-4 underline underline-offset-4 decoration-blue-400">
+          {playerState?.sus ? "Current Objective:" : "Current Task:"}
+        </p>
+
+        {task && !playerState?.sus ? (
           <div className="flex flex-col items-center mb-4">
-            <h2 className="text-2xl text-blue-400">{task.task}</h2>
+            <h2 className="text-2xl text-blue-400 font-bold">{task.task}</h2>
             <p className="text-lg text-gray-300 mt-2">Location: {task.location}</p>
           </div>
         ) : (
           <div className="flex flex-col items-center mb-4">
-            <p className="text-lg">
+            <p className="text-lg text-gray-300">
               {playerState?.sus
                 ? `Eliminate all crewmates ${
                     killCooldown > 0 ? `(Cooldown: ${killCooldown}s)` : ""
@@ -87,7 +90,8 @@ const CrewmemberPage = ({ setShowSusPage }) => {
           </div>
         )}
 
-        <MUECustomSlider
+      </div>
+      <MUECustomSlider
           text={
             playerState?.sus
               ? killCooldown > 0
@@ -97,7 +101,6 @@ const CrewmemberPage = ({ setShowSusPage }) => {
           }
           onSuccess={handleCompleteTask}
         />
-      </div>
 
       {/* Animation Overlay */}
       {showAnimation && <AnimationOverlay onComplete={handleAnimationComplete} />}

@@ -12,6 +12,7 @@ class Meeting:
         self.socket = socket
         self.player_who_started_it = player_who_started_it
         self.game = game
+        self.speaker = game.speaker
         self.votes = {} 
         self.veto_votes = set()
         self.reason = None
@@ -122,6 +123,7 @@ class Meeting:
 
             print("Meeting ended early due to veto threshold...")
             self.socket.emit("meeting", self.to_json())
+            self.speaker.play_sound('veto')
         else:
         # Regular meeting ending, determine who was voted out
             print("Meeting over...")
@@ -137,6 +139,9 @@ class Meeting:
 
             self.socket.emit("meeting", self.to_json())
 
+            # draw cards for impostors
+            self.game.drawCards(probability=self.game.card_draw_probability)
+
         print(f"Final Votes: {self.votes}, Veto Votes: {len(self.veto_votes)}")
         self.game.meeting = None
 
@@ -145,6 +150,8 @@ class Meeting:
         Countdown the voting time and end the meeting.
         """
         while self.time_left > 0:
+            if self.time_left == 10 and self.stage != 'over':
+                self.speaker.play_sound('hurry')
             time.sleep(1)
             self.time_left -= 1
 

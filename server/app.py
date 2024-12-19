@@ -8,6 +8,7 @@ locations = [
     '3rd Floor',
 ] # 'Other' will always be included as a location
 
+number_of_imposters = 2
 
 vote_time = 60
 
@@ -22,6 +23,7 @@ sus_ratio = 5 # This is bogus. Make it a goddamn number not a ratio
 
 # probability of imposter drawing a card out of 1 (reduce this if the imposter is OP)
 card_draw_probability = 0.5 
+starting_cards  = 1
 
 # number of tasks each player need to finish to win (on average)
 task_ratio = 10 
@@ -67,7 +69,7 @@ locations.append("Other")
 # big boi objects
 speaker = SonosController(enabled=sonos_enabled, default_volume=speaker_volume, ignore_bedroom_speakers=ignore_bedroom_speakers)
 taskHandler = TaskHandler(locations)
-game = Game(socketio, taskHandler, speaker, sus_ratio, task_ratio, meltdown_time, code_percent, locations, vote_time, card_draw_probability)
+game = Game(socketio, taskHandler, speaker, sus_ratio, task_ratio, meltdown_time, code_percent, locations, vote_time, card_draw_probability, number_of_imposters, starting_cards)
 
 def sendPlayerList(action='player_list'):
     logger.info("Sending player list to all clients")
@@ -92,8 +94,8 @@ def handle_connect():
         if game.end_state:
             logger.info(f"Game over: {game.end_state}")
             emit("end_game", game.end_state)
-        if len(game.active_cards) > 0:
-            game.emit_active_cards()
+        if len(game.card_deck.active_cards) > 0:
+            game.card_deck.emit_active_cards()
 
         if game.active_hack > 0:
             emit("hack", game.active_hack)
@@ -157,30 +159,8 @@ def playCard(data):
     print(data)
     player = game.getPlayerById(data.get('player_id'))
     card = player.get_card(data.get('card_id'))
-    print(card.action)
-    if card.action == 'hack':
-        handleHack(card.duration)
-    elif card.action == 'meeting':
-        handleMeeting(data)
-    elif card.action == 'taunt':
-        speaker.play_sound(card.sound)
-    # active cards
-    elif card.action == 'area_denial':
-        if not game.denied_location:
-            speaker.play_sound('sus')
-            game.deny_location(card)
-    elif card.action == 'fake_task':
-        print("IMPLEMENT THIS ONE LOL")
-    elif card.action == 'discard_draw':
-        print("IMPLEMENT THIS ONE LOL")
-    elif card.action == 'reduce_meltdown':
-        game.active_cards.append(card)
-        game.meltdown_time_mod += card.duration
-
-    player.remove_card(card)
-    game.emit_active_cards()
-    sendPlayerList()
-
+    if card:
+        card.play_card(player)
 
 @socketio.on("meeting")
 def handleMeeting(data):

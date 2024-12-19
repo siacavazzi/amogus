@@ -33,6 +33,8 @@ class Player:
         return self.task
     
     def get_card(self, id):
+        print("cards = = =  = = =")
+        print(self.cards)
         card = next((card for card in self.cards if card.id == id), None)
         return card
     

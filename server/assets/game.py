@@ -9,11 +9,12 @@ from assets.meeting import *
 import time
 from threading import Thread
 from flask_socketio import emit
+from assets.utils import *
 
 
 class Game:
 
-    def __init__(self, socket, task_handler, speaker, sus_ratio, task_ratio, meltdown_time, code_percent, locations, vote_time, card_draw_probability):
+    def __init__(self, socket, task_handler, speaker, sus_ratio, task_ratio, meltdown_time, code_percent, locations, vote_time, card_draw_probability, numImposters, starting_cards):
         self.players = []
         self.task_handler = task_handler
         self.crew_score = 0
@@ -21,7 +22,8 @@ class Game:
         self.active_hack = 0
         self.active_meltdown = None
         self.meeting = False
-        self.numImposters = None
+        self.starting_cards = starting_cards
+        self.numImposters = numImposters
         self.numCrew = None
         self.taskGoal = None
         self.completed_tasks = 0
@@ -30,7 +32,7 @@ class Game:
         self.end_state = None
         self.speaker = speaker
         self.denied_location = None
-        self.card_deck = CardDeck(locations)
+        self.card_deck = CardDeck(locations, socket, self)
         self.active_cards = []
         self.card_draw_probability = card_draw_probability
 
@@ -70,6 +72,7 @@ class Game:
     def start_hack(self, duration):
         if self.active_hack > 0:
             return
+        self.speaker.play_sound('hack')
         self.active_hack = duration
         emit("hack", duration, broadcast=True)
 
@@ -80,9 +83,7 @@ class Game:
         while self.active_hack > 0:
             time.sleep(1)  # Wait 1 second
             self.active_hack -= 1
-        
-        # Hack has ended
-        emit("end_hack", broadcast=True)
+
 
     def addPlayer(self, sid, username):
         player_id = str(uuid4())
@@ -112,25 +113,28 @@ class Game:
 
     def drawCards(self, probability=1):
         for i in range(0, len(self.players)):
-            if self.players[i].sus:
-                self.players[i].cards.append(self.card_deck.draw_card(probability))
+            if self.players[i].sus and self.players[i].alive:
+                card = self.card_deck.draw_card(probability)
+                if card:
+                    self.players[i].cards.append(card)
+                    send_message_to_player(self.socket, self.players[i].player_id, f"You drew {card.action}")
+
+        self.emit_player_list()
 
 
     def assignRoles(self):
         self.resetRoles()
+
+        if self.numImposters > len(self.players):
+            self.numImposters == len(self.players)
     
-        raw_imposters = len(self.players) / self.sus_ratio
-        self.numImposters = max(1, min(math.ceil(raw_imposters), len(self.players) - 1))
         self.numCrew = len(self.players) - self.numImposters
         random.shuffle(self.players)
         for i in range(0, self.numImposters):
-            self.players[i].sus = True  # DEBUG: this should be true
-            self.players[i].cards.append(self.card_deck.draw_card())
+            self.players[i].sus = True
+            for _ in range(0, self.starting_cards):
+                self.players[i].cards.append(self.card_deck.draw_card())
 
-            ### DEBUG
-            self.players[i].cards.append(self.card_deck.draw_card())
-            self.players[i].cards.append(self.card_deck.draw_card())
-            self.players[i].cards.append(self.card_deck.draw_card())
 
         random.shuffle(self.players)
         print("assigning roles...")
@@ -168,48 +172,11 @@ class Game:
         self.end_state = None
         self.denied_location = None
         self.card_deck = CardDeck(self.locations)
-
         self.task_handler.reset()
-
-    def emit_active_cards(self):
-        output = []
-        for card in self.active_cards:
-            output.append(card.export())
-        print(output)
-        self.socket.emit('active_cards', output)
-
-    def deny_location(self, card):
-        """
-        Deny access to a specified location for a given duration.
-
-        Args:
-            location (str): The location to be denied.
-            duration (int): Duration in seconds for which the location is denied.
-        """
-        self.denied_location = card.location
-        self.active_cards.append(card)
-        self.emit_active_cards()
-        print(f"Location '{card.location}' denied for {card.duration} seconds.")
-
-        Thread(target=self._denied_location_countdown, args=(card,)).start()
-
-    def _denied_location_countdown(self, card):
-        """
-        Helper method to reset the denied_location after a delay.
-
-        Args:
-            duration (int): Duration in seconds to wait before resetting.
-        """
-        while card.time_left > 0:
-            time.sleep(1)
-            card.time_left -= 1
-        self.denied_location = None
-        if card in self.active_cards:
-            self.active_cards.remove(card)
-        print(f"Location '{self.denied_location}' is now allowed again.")
 
     def start_meeting(self, player_who_started_it):
         self.meeting = Meeting(self.vote_time, self.socket, player_who_started_it, self)
+        self.speaker.play_sound('meeting')
         self.socket.emit("meeting", self.meeting.to_json())
 
     def get_num_living_players(self):
@@ -248,9 +215,8 @@ class Game:
                 self.speaker.play_sound('sus_victory')
                 self.socket.emit("end_game", self.end_state)
                 return
+    
             
-            # i think drawing cards should notify impostors
-            self.drawCards(probability=self.card_draw_probability)
         else:
             self.numImposters -= 1
             if self.numImposters <= 0:

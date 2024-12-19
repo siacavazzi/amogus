@@ -54,3 +54,6 @@ def setup_logging():
     logger.addHandler(file_handler)
 
     return logger
+
+def send_message_to_player(socket, player_id, message):
+    socket.emit('message', {'player': player_id, 'message': message})
