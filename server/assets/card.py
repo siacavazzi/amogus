@@ -113,7 +113,9 @@ class CardDeck:
             Card('Taunt', 'Make crewmates suspicious', self,sound='sus'),
             Card('Taunt', 'M E O W', self,sound='meow'),
 
+
             Card('Shorten Meltdown', 'Reduce the amount of time players have to stop the next meltdown', self,duration=10),
+            Card('Shorten Meltdown', 'Reduce the amount of time players have to stop the next meltdown', self,duration=12),
             Card('Shorten Meltdown', 'Reduce the amount of time players have to stop the next meltdown',self,duration=15),
 
             Card('Discard and Draw', 'Discard a random card and draw a new card', self),

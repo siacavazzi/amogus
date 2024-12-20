@@ -1,4 +1,3 @@
-import math
 import random
 from uuid import uuid4
 from assets.player import Player
@@ -14,7 +13,7 @@ from assets.utils import *
 
 class Game:
 
-    def __init__(self, socket, task_handler, speaker, sus_ratio, task_ratio, meltdown_time, code_percent, locations, vote_time, card_draw_probability, numImposters, starting_cards):
+    def __init__(self, socket, task_handler, speaker, task_ratio, meltdown_time, code_percent, locations, vote_time, card_draw_probability, numImposters, starting_cards):
         self.players = []
         self.task_handler = task_handler
         self.crew_score = 0
@@ -36,8 +35,6 @@ class Game:
         self.active_cards = []
         self.card_draw_probability = card_draw_probability
 
-        # Crewmate to imposter ratio
-        self.sus_ratio = sus_ratio
         # Tasks per player
         self.task_ratio = task_ratio
         self.meltdown_time = meltdown_time
@@ -126,7 +123,7 @@ class Game:
         self.resetRoles()
 
         if self.numImposters > len(self.players):
-            self.numImposters == len(self.players)
+            self.numImposters = len(self.players)
     
         self.numCrew = len(self.players) - self.numImposters
         random.shuffle(self.players)

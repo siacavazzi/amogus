@@ -8,9 +8,9 @@ locations = [
     '3rd Floor',
 ] # 'Other' will always be included as a location
 
-number_of_imposters = 2
 
-vote_time = 60
+# length of voting during meetings
+vote_time = 60 # s
 
 # how long players have to stop a meltdown without card modifications(seconds)
 meltdown_time = 60 # s
@@ -18,12 +18,11 @@ meltdown_time = 60 # s
 # fraction of players who need to enter a code to end meltdown (ex if 0.4 - 4 of 10 players need to enter codes)
 code_percent = 0.4
 
-# crewmate to imposter ratio (crewmates per imposter). 
-sus_ratio = 5 # This is bogus. Make it a goddamn number not a ratio
-
+#Imposter stuff
+number_of_imposters = 2
 # probability of imposter drawing a card out of 1 (reduce this if the imposter is OP)
 card_draw_probability = 0.5 
-starting_cards  = 1
+starting_cards = 1
 
 # number of tasks each player need to finish to win (on average)
 task_ratio = 10 
@@ -69,7 +68,7 @@ locations.append("Other")
 # big boi objects
 speaker = SonosController(enabled=sonos_enabled, default_volume=speaker_volume, ignore_bedroom_speakers=ignore_bedroom_speakers)
 taskHandler = TaskHandler(locations)
-game = Game(socketio, taskHandler, speaker, sus_ratio, task_ratio, meltdown_time, code_percent, locations, vote_time, card_draw_probability, number_of_imposters, starting_cards)
+game = Game(socketio, taskHandler, speaker, task_ratio, meltdown_time, code_percent, locations, vote_time, card_draw_probability, number_of_imposters, starting_cards)
 
 def sendPlayerList(action='player_list'):
     logger.info("Sending player list to all clients")

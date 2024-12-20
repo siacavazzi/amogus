@@ -1,29 +1,34 @@
 import React, { useEffect } from 'react';
+import { FaSpinner } from 'react-icons/fa';
 
 function ConnectingPage() {
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            alert("This probably isn't working for 1 of 2 reasons. 1) You are not connected to WiFi. 2) Sam didn't do his job and update the endpoint and/ or start the server. Go tell him he needs to lock in.");
-        }, 6000);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      alert(
+        "Connection issue! Possible causes:\n1) No WiFi.\n2) Sam needs to start the server."
+      );
+    }, 6000);
 
-        // Cleanup the timer when the component unmounts
-        return () => clearTimeout(timer);
-    }, []);
+    return () => clearTimeout(timer);
+  }, []);
 
-    return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-            <div className="flex flex-col items-center bg-white p-8 rounded shadow-md">
-                <img
-                    src="https://media.tenor.com/gQV5VzHLWQIAAAAM/among-us-sus.gif"
-                    alt="Connecting animation"
-                />
-                <h2 className="text-2xl font-semibold text-gray-800">Connecting...</h2>
-                <p className="text-gray-600 mt-2">Please wait while we establish a connection.</p>
-            </div>
-        </div>
-    );
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 p-4">
+      <div className="flex flex-col items-center bg-gray-800/80 backdrop-blur-sm p-8 rounded-xl shadow-2xl">
+        <img
+          src="https://media.tenor.com/gQV5VzHLWQIAAAAM/among-us-sus.gif"
+          alt="Connecting animation"
+          className="w-48 h-48 mb-4 rounded-lg"
+        />
+        <h2 className="text-3xl font-bold text-white mb-2">Connecting...</h2>
+        <p className="text-gray-300 mb-6 text-center">
+          We're establishing a connection to the sussy network.
+        </p>
+        <FaSpinner className="text-white animate-spin text-3xl" />
+      </div>
+    </div>
+  );
 }
 
 export default ConnectingPage;
-

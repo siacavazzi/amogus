@@ -268,5 +268,15 @@
         "task": "Poop",
         "location": "Other",
         "difficulty": 2
+    },
+    {
+        "task": "go harass mungus",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Jork it",
+        "location": "3rd Floor",
+        "difficulty": 2
     }
 ]
