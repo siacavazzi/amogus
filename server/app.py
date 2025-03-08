@@ -16,12 +16,12 @@ vote_time = 60 # s
 meltdown_time = 60 # s
 
 # fraction of players who need to enter a code to end meltdown (ex if 0.4 - 4 of 10 players need to enter codes)
-code_percent = 0.4
+code_percent = 0.8
 
 #Imposter stuff
-number_of_imposters = 2
+number_of_imposters = 1
 # probability of imposter drawing a card out of 1 (reduce this if the imposter is OP)
-card_draw_probability = 0.5 
+card_draw_probability = 0.70 # / 1
 starting_cards = 1
 
 # number of tasks each player need to finish to win (on average)

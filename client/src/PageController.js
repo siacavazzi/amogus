@@ -55,18 +55,18 @@ const PageController = () => {
             return;
         }
 
-        // if (!isMobile) {
-        //     if(!running) {
-        //         setCurrentPage("reactorWaiting");
-        //         return;
-        //     }
-        //     if (meltdownTimer > 0) {
-        //         setCurrentPage("meltdown");
-        //     } else {
-        //         setCurrentPage("reactorNormal");
-        //     }
-        //     return;
-        // }
+        if (!isMobile) {
+            if(!running) {
+                setCurrentPage("reactorWaiting");
+                return;
+            }
+            if (meltdownTimer > 0) {
+                setCurrentPage("meltdown");
+            } else {
+                setCurrentPage("reactorNormal");
+            }
+            return;
+        }
 
         if (running && !playerState?.username) {
             setCurrentPage("gameRunning");
