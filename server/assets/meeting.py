@@ -27,6 +27,7 @@ class Meeting:
             return
         self.stage = 'voting'
         self.socket.emit("meeting", self.to_json())
+        self.speaker.play_sound('hurry')
         Thread(target=self._vote_countdown).start()
     
     def register_vote(self, voting_player, voted_for=None, veto=False):

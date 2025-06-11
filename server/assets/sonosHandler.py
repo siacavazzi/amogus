@@ -52,6 +52,7 @@ class SonosController:
 
             discovered_speakers = list(discovered_speakers)
             logger.info(f"Discovered {len(discovered_speakers)} Sonos speaker(s).")
+            logger.info(f"Listing speakers: {discovered_speakers}")
 
             # Filter out unreachable speakers
             discovered_speakers = self.filter_unreachable_speakers(discovered_speakers)
@@ -101,7 +102,8 @@ class SonosController:
             "annoying_notif":"annoying_notif.mp3",
             "meow":"meow.mp3",
             "hurry":"hurry.mp3",
-            "veto":"veto.mp3"
+            "veto":"veto.mp3",
+            "fear":"fear.mp3"
         }
 
         if self.speakers:

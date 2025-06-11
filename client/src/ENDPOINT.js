@@ -1,1 +1,1 @@
-export const ENDPOINT = '192.168.68.58:5000'
+export const ENDPOINT = '192.168.68.57:5000'

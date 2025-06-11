@@ -42,18 +42,18 @@ export const AudioHandler = () => {
   }, [setAudioEnabled, setDialog]);
 
   // Prompt user to enable audio if not already enabled
-  useEffect(() => {
-    if (!audioEnabled) {
-      setDialog({
-        title: "Enable Audio",
-        content: (
-          <button onClick={initializeAudio}>
-            Click to Enable Audio
-          </button>
-        ),
-      });
-    }
-  }, [audioEnabled, initializeAudio, setDialog]);
+  // useEffect(() => {
+  //   if (!audioEnabled) {
+  //     setDialog({
+  //       title: "Enable Audio",
+  //       content: (
+  //         <button onClick={initializeAudio}>
+  //           Click to Enable Audio
+  //         </button>
+  //       ),
+  //     });
+  //   }
+  // }, [audioEnabled, initializeAudio, setDialog]);
 
   // Play audio when `audio` changes
   useEffect(() => {

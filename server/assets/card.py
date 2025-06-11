@@ -101,14 +101,15 @@ class CardDeck:
             Card('Self Report', 'Call a body found meeting', self), 
             Card('Self Report', 'Call a body found meeting', self), 
             Card('Self Report', 'Call a body found meeting', self), 
+            Card('Self Report', 'Call a body found meeting', self), 
 
 
             Card('EMP', 'Disable all devices for the duration', self,duration=10),
             Card('EMP', 'Disable all devices for the duration', self, duration=15),
-            Card('EMP', 'Disable all devices for the duration', self,duration=30),
-            Card('EMP', 'Disable all devices for the duration', self,duration=45),
+            Card('EMP', 'Disable all devices for the duration', self,duration=25),
+            Card('EMP', 'Disable all devices for the duration', self,duration=35),
 
-            Card('Taunt', 'Taunt crewmates with brainrot', self,sound='brainrot'),
+            Card('Taunt', 'Make crewmates scared', self,sound='fear'),
             Card('Taunt', 'Taunt crewmates with work PTSD', self,sound='annoying_notif'),
             Card('Taunt', 'Make crewmates suspicious', self,sound='sus'),
             Card('Taunt', 'M E O W', self,sound='meow'),
@@ -120,8 +121,6 @@ class CardDeck:
 
             Card('Discard and Draw', 'Discard a random card and draw a new card', self),
             Card('Discard and Draw', 'Discard a random card and draw a new card', self),
-            Card('Discard and Draw', 'Discard a random card and draw a new card', self),
-
         ]
 
         # Location based cards invoked programmatically since locations shouldn't be hardcoded

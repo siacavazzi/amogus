@@ -132,7 +132,6 @@ class Game:
             for _ in range(0, self.starting_cards):
                 self.players[i].cards.append(self.card_deck.draw_card())
 
-
         random.shuffle(self.players)
         print("assigning roles...")
         print(self.players)
