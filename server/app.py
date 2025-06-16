@@ -8,42 +8,30 @@ locations = [
     '3rd Floor',
 ] # 'Other' will always be included as a location
 
-
 # length of voting during meetings
-vote_time = 60 # s
+vote_time = 180 # s
 
 # how long players have to stop a meltdown without card modifications(seconds)
 meltdown_time = 60 # s
 
 # fraction of players who need to enter a code to end meltdown (ex if 0.4 - 4 of 10 players need to enter codes)
-code_percent = 0.8
+code_percent = 0.7
 
 #Imposter stuff
-number_of_imposters = 1
+number_of_imposters = 2
 # probability of imposter drawing a card out of 1 (reduce this if the imposter is OP)
-card_draw_probability = 0.70 # / 1
-starting_cards = 1
+card_draw_probability = 0.90 # / 1
+starting_cards = 8
 
 # number of tasks each player need to finish to win (on average)
-task_ratio = 10 
+task_ratio = 12
 
 # SOUND SETTINGS
-sonos_enabled = True
-speaker_volume = 30 # %
+sonos_enabled = False
+speaker_volume = 80 # %
 # dont play sounds on speakers with 'bed' in the name
 ignore_bedroom_speakers = True
 
-
-# Voting should be in game!!! This could hook into the ui for slecting a player to give a fake task X
-# impooster cards should be on another screenn so a glance cant ruin their game
-# Kill cooldown buttin to control kills! This could be fed only
-# meeting colldown!!! AND reactor cooldown
-# extra imposter screen on a click so everyone has the same UI!!!
-# Voting knowlage. Who voted for who... not necessarily needed now but a good goal
-# dead bodies vs meetings. SO
-#                          - limited global number of meetings, including imposter card play
-#                          - dead body reports (imposters can also do this as a card) honor system but reported to all
-# OVERALL - focus more on the honor system
 ############################
 
 
@@ -52,7 +40,6 @@ eventlet.monkey_patch()
 from flask import Flask, request
 from flask_socketio import SocketIO, emit
 from flask_cors import CORS
-from uuid import uuid4
 from assets.game import Game
 from assets.sonosHandler import SonosController
 from assets.utils import *
@@ -67,6 +54,9 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 locations.append("Other")
 # big boi objects
 speaker = SonosController(enabled=sonos_enabled, default_volume=speaker_volume, ignore_bedroom_speakers=ignore_bedroom_speakers)
+if sonos_enabled:
+    speaker.play_sound("theme")
+
 taskHandler = TaskHandler(locations)
 game = Game(socketio, taskHandler, speaker, task_ratio, meltdown_time, code_percent, locations, vote_time, card_draw_probability, number_of_imposters, starting_cards)
 
@@ -100,7 +90,6 @@ def handle_connect():
             emit("hack", game.active_hack)
             logger.debug(f"Active hack: {game.active_hack}")
         if game.meeting:
-            print("TIME LEFT== = = = = = ")
             print(game.meeting.time_left)
             emit("meeting", game.meeting.to_json())
             if game.meeting.stage == 'voting':
@@ -126,7 +115,7 @@ def handleJoin(data):
             logger.info("Sending task to player")
             emit("task", {"task": player.get_task()}, to=player.sid)
 
-@socketio.on('add_task')
+@socketio.on('add_task') # this should use an api and not a socket
 def addTask(data):
     print(data)
     taskHandler.add_task(data)
@@ -201,10 +190,9 @@ def handleEndMeeting():
 
 @socketio.on('meltdown')
 def handleMeltdown():
-    speaker.loop_sound("meltdown", 60)
     game.start_meltdown()
-    ## add card draw
-    logger.warning(f"Meltdown occurred.")
+    ## add card draw?
+    logger.warning("Meltdown occurred.")
 
 @socketio.on("pin_entry")
 def handlePinEntry(data):

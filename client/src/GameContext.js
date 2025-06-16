@@ -44,6 +44,7 @@ export default function GameContext({ children }) {
     const [killCooldown, setKillCooldown] = useState(0);
     const [activeCards, setActiveCards] = useState([])
     const [modalOpen, setModalOpen] = useState(false)
+    let otherImposters = [];
     // const [meetineTimeLeft, setMee]
 
     const resetState = () => {
@@ -298,8 +299,9 @@ export default function GameContext({ children }) {
                             return null; // Handle malformed JSON
                         }
                     }).filter(player => player !== null); // Filter out any failed parses
-
+                    otherImposters = parsedPlayers.filter((player) => player.sus && player.player_id !== localStorage.getItem('player_id'))
                     console.log("Active players:", parsedPlayers);
+                    console.log({otherImposters})
                     if (playerState.playerId) {
                         me = parsedPlayers.find((player) => player.player_id === localStorage.getItem('player_id'))
                         if (me) {
@@ -324,7 +326,8 @@ export default function GameContext({ children }) {
                 if (data.action === "start_game" && me) {
                     setAudio('start');
                     setRunning(true);
-                    isMobile && setDialog({ title: "Game Started", body: <PlayerRole sus={me.sus} /> });
+                    
+                    isMobile && setDialog({ title: "Game Started", body: <PlayerRole sus={me.sus} otherImposters={otherImposters}/> });
 
                 } else if (data.action === "start_game") {
                     setRunning(true);

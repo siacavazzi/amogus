@@ -87,7 +87,7 @@ class TaskHandler:
         
         if denied_location:
             eligible_tasks = [
-                task for task in self.tasks if task['location'] != denied_location
+                task for task in self.tasks if task['location'].lower() != denied_location.lower()
             ]
 
             if not eligible_tasks:

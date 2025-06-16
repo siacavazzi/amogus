@@ -6,7 +6,7 @@ function ConnectingPage() {
   useEffect(() => {
     const timer = setTimeout(() => {
       alert(
-        "Connection issue! Possible causes:\n1) No WiFi.\n2) Sam needs to start the server."
+        "Connection issue! Possible causes:\n1) Not on WiFi.\n2) Sam needs to start the server."
       );
     }, 6000);
 

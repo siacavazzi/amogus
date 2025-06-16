@@ -1,282 +1,1147 @@
 [
     {
-        "task": "Play arcade games",
-        "location": "Basement",
-        "difficulty": 2
-    },
-    {
-        "task": "Organize storage shelves",
-        "location": "Basement",
-        "difficulty": 3
-    },
-    {
-        "task": "Clean the basement",
-        "location": "Basement",
-        "difficulty": 2
-    },
-    {
-        "task": "Maintain HVAC systems",
-        "location": "Basement",
-        "difficulty": 3
-    },
-    {
-        "task": "Clean air vents",
-        "location": "Basement",
-        "difficulty": 2
-    },
-    {
-        "task": "Fix electrical outlets",
-        "location": "Basement",
-        "difficulty": 3
-    },
-    {
-        "task": "Install new lighting fixtures",
-        "location": "1st Floor",
-        "difficulty": 3
-    },
-    {
-        "task": "Mow the lawn",
+        "task": "take a shot",
         "location": "1st Floor",
         "difficulty": 2
     },
     {
-        "task": "Clean windows",
-        "location": "1st Floor",
-        "difficulty": 1
-    },
-    {
-        "task": "Install security cameras",
-        "location": "1st Floor",
-        "difficulty": 3
-    },
-    {
-        "task": "Replace carpet",
-        "location": "1st Floor",
-        "difficulty": 3
-    },
-    {
-        "task": "Plant new flowers",
-        "location": "1st Floor",
-        "difficulty": 1
-    },
-    {
-        "task": "Paint the living room",
-        "location": "2nd Floor",
+        "task": "sit in the sauna for 5 seconds ",
+        "location": "Basement",
         "difficulty": 2
     },
     {
-        "task": "Repair plumbing issues",
-        "location": "2nd Floor",
-        "difficulty": 3
-    },
-    {
-        "task": "Assemble furniture",
-        "location": "2nd Floor",
-        "difficulty": 2
-    },
-    {
-        "task": "Decorate for holidays",
-        "location": "2nd Floor",
-        "difficulty": 1
-    },
-    {
-        "task": "Install shelving units",
-        "location": "2nd Floor",
-        "difficulty": 2
-    },
-    {
-        "task": "Organize file cabinets",
-        "location": "2nd Floor",
-        "difficulty": 2
-    },
-    {
-        "task": "Set up conference room",
+        "task": "Sit in the grandparents bathtub",
         "location": "3rd Floor",
         "difficulty": 2
     },
     {
-        "task": "Update signage",
-        "location": "3rd Floor",
-        "difficulty": 2
-    },
-    {
-        "task": "Set up audiovisual equipment",
-        "location": "3rd Floor",
-        "difficulty": 3
-    },
-    {
-        "task": "Upgrade computer systems",
-        "location": "Other",
-        "difficulty": 3
-    },
-    {
-        "task": "Organize office supplies",
-        "location": "Other",
-        "difficulty": 1
-    },
-    {
-        "task": "Conduct inventory audit",
-        "location": "Other",
-        "difficulty": 3
-    },
-    {
-        "task": "Backup data",
-        "location": "Other",
-        "difficulty": 2
-    },
-    {
-        "task": "Manage social media accounts",
-        "location": "Other",
-        "difficulty": 1
-    },
-    {
-        "task": "Conduct safety drills",
-        "location": "Other",
-        "difficulty": 2
-    },
-    {
-        "task": "Update website content",
-        "location": "Other",
-        "difficulty": 2
-    },
-    {
-        "task": "Arrange meeting schedules",
-        "location": "Other",
-        "difficulty": 1
-    },
-    {
-        "task": "Vacuum carpets",
+        "task": "Piggy back ride 1 minute ",
         "location": "1st Floor",
-        "difficulty": 1
+        "difficulty": 2
     },
     {
-        "task": "Dust furniture",
+        "task": "do a spin in the office chair",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Build up/tear down fireball tower",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Take a shot",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Drink water, stay hydrated!",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Play Pussy blaster (artic thunder)",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "stand in the shower in the grandparents room",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Play arctic thunder",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "get at least 1 point in shuffleboard",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "touch the third floor elevator",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Piggy back ride 30 seconds",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "take a mirror selfie in the grandparents room ",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Sit in sauna and think about life",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "Drink water! ",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "lay in your bed for 10 seconds ",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "write on the pig chalkboard",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "play one round of artic thunder (and dont cum)",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "Send a selfie to chat with one other person",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Crawl thru someone\u2019s legs",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "go into your own room",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "sit on the front porch for 5 seconds ",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Ride on the peloton 20 seconds",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "Go to the roof",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Clean up one item",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Throw 3 darts at the dashboard",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "Feet pic!",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "Write a gratitude card",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "write a compliment in the office",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Write one gratitude note",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Write a compliment ",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "write on the paper in the office",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "drink fireball ",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "write on the paper in the second floor hallway beds",
         "location": "2nd Floor",
-        "difficulty": 1
+        "difficulty": 2
     },
     {
-        "task": "Wipe down surfaces",
+        "task": "Wash your hands on 3rd floor",
         "location": "3rd Floor",
-        "difficulty": 1
-    },
-    {
-        "task": "Organize recycling bins",
-        "location": "Basement",
-        "difficulty": 1
-    },
-    {
-        "task": "Replace light bulbs",
-        "location": "1st Floor",
-        "difficulty": 1
-    },
-    {
-        "task": "Water indoor plants",
-        "location": "Other",
-        "difficulty": 1
-    },
-    {
-        "task": "Update contact lists",
-        "location": "Other",
-        "difficulty": 1
-    },
-    {
-        "task": "Schedule maintenance checks",
-        "location": "Other",
         "difficulty": 2
     },
     {
-        "task": "Organize digital files",
-        "location": "Other",
-        "difficulty": 2
-    },
-    {
-        "task": "Clean restroom facilities",
+        "task": "Pick up a piece of trash and throw it away in kitchen",
         "location": "1st Floor",
         "difficulty": 2
     },
     {
-        "task": "Inspect fire extinguishers",
-        "location": "Other",
-        "difficulty": 2
-    },
-    {
-        "task": "Set up recycling program",
-        "location": "Basement",
-        "difficulty": 2
-    },
-    {
-        "task": "Update employee handbook",
-        "location": "Other",
-        "difficulty": 3
-    },
-    {
-        "task": "Coordinate team meetings",
-        "location": "Other",
-        "difficulty": 2
-    },
-    {
-        "task": "Prepare monthly reports",
-        "location": "Other",
-        "difficulty": 3
-    },
-    {
-        "task": "Arrange office supplies restock",
-        "location": "Other",
-        "difficulty": 1
-    },
-    {
-        "task": "Test emergency lighting",
-        "location": "Basement",
-        "difficulty": 2
-    },
-    {
-        "task": "Clean kitchen area",
-        "location": "1st Floor",
-        "difficulty": 2
-    },
-    {
-        "task": "Organize team building activities",
-        "location": "Other",
-        "difficulty": 2
-    },
-    {
-        "task": "Monitor security logs",
-        "location": "Other",
-        "difficulty": 2
-    },
-    {
-        "task": "poop",
-        "location": "Basement",
-        "difficulty": 2
-    },
-    {
-        "task": "Eat some food",
-        "location": "1st Floor",
-        "difficulty": 2
-    },
-    {
-        "task": "Polar arctic thunder ",
-        "location": "Basement",
-        "difficulty": 2
-    },
-    {
-        "task": "go into the office",
-        "location": "1st Floor",
-        "difficulty": 2
-    },
-    {
-        "task": "Poop",
-        "location": "Other",
-        "difficulty": 2
-    },
-    {
-        "task": "go harass mungus",
-        "location": "1st Floor",
-        "difficulty": 2
-    },
-    {
-        "task": "Jork it",
+        "task": "sit on the top of the steps until someone else comes",
         "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "High five someone",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "touch the ladder in the grandparents room",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "drink some water from the water cooler",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Take a selfie in the sauna ",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "run a lap in the grandparents room",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Go to one spot where someone hid in sardines",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Get in the grandparents bathtub",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "text an emoji into the group chat",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Shoot a pool ball into a pocket ",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "Go to the bunk bed room and visualize Australia ",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Give a friend a compliment",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "sit in the theatre for 30 seconds ",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "Dap up a person",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "kiss someone somewhere",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "selfie",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Play a video on YouTube on the main tv",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "bring a friend to the third floor (kiss if ur feeling spicy)",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Take a lion king pic of mochi",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Steal a joke from one of \u201cthe roommates\u201d",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Take a selfie with at least one other person",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "go to the third floor and text someone a compliment while jorking it",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Jork it in g paps shower g pap style",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Switch an item of clothing with someone",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "sit in the sauna for 30 seconds ",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "Hop around on 1 leg for 1 min",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "lay in the little window section by the kitchen table ",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Play a round of pizza box",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Add to the back of the pizza box ",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "go take a selfie with an old photo of sam iac",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "Do ten squats in gym",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "find someone with a vape",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "change an article of clothing with someone",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Shoot one hoop",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Send Neel a text off someone else\u2019s phone",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Talk like Trump for 1 min",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Send a selfie with at least 3 people total",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "A selfie with 2 people ",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Attempt a cartwheel",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Write gratitude note",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Write gratitude note",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Take a shot!!!",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "say the time out loud",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "lay down in hallway bed",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "10 jumping jacks",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Wash hands",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "sit in sam\u2019s grandmas closet",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "sit in the desk in grandparents room",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Post banana Netanyahu photo ",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "go from the basement to the third floor or vice versa. run!!!!!!!",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Tickle Sam\u2019s feet ",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Lay down in hallway bed 30 sec ",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Take a pic of someone\u2019s feet ",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "do a lap around the kitchen",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "stand on the porch",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Take a pic of someone\u2019s feet ",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "smile at yourself in the bathroom",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "text something sappy in the chat",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Take a bump or watch someone take a bump",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Bust a move in the laundry room",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Go to the roof",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Play arctic thinder ",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "10 jumping jacks",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "watch silicon valley for 1 min",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "Add a rule to pizza box ",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "flip a coin on the pizzabox",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Do a squat in the Gym",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "Chug wine for 3 seconds",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "cocaine (optional) ",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Tell someone why jorking someone is wrong and amoral and really fucked up in 2025",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "3 push-ups",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Make a layup outside in the basket",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "touch the washer dryer",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Make a meme from one of the photos in the chat",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Tell someone about your favorite pokemon",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "put something on in the movie room",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "turn off a light (any floor)",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Take a picture in the 2nd floor shared bathroom",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Turn a light off",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Larp as mochi",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "switch clothes w someone",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "stand on the landing of the second floor steps",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Tell someone a bad joke",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "light a firework ",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "turn on/off the tv",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Recite the following: According to all known laws of aviation, there is no way a bee should be able to fly. Its wings are too small to get its fat little body off the ground. The bee, of course, flies anyway because bees don't care what humans think is impossible. Yellow, black. Yellow, black. Yellow, black. Yellow, black. Ooh, black and yellow! Let's shake it up a little. Barry! Breakfast is ready! Coming! Hang on a second. Hello? Barry? Adam? Can you believe this is happening? I can't. I'll pick you up. Looking sharp. Use the stairs, Your father paid good money for those. Sorry. I'm excited. Here's the graduate. We're very proud of you, son. A perfect report card, all B's. Very proud. Ma! I got a thing going here. You got lint on your fuzz. Ow! That's me! Wave to us! We'll be in row 118,000. Bye!",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Hit someone vape ",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Eat a chip ",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Shake ass in the movie theather ",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "go to the third floor and loiter around suspiciously ",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Do a pushup",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Lick the pigs nose in the kitchen",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "throw something in the trash or recycling",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "throw something in the trash or recycling",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "send one of ur baby pics to the group chat",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Do a push up in the office",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "call a meeting and vote out a software engineer",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "switch jewelry w someone",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "hit a pool ball",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "try out two arcade machines",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "lift a weight",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "Do a dance in front of the grill",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Go into garage",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Hit the Quan",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "Have sexual intercourse with mochi (jk just go pet her)",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Walk around on all fours",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "eat a krispee kreme donut",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Record a vid of u dancing send to chat",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "recline in the movie theatre ",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "Twerk on an elevated surface",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Go shout something from the 3rd floor",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "go to the grandparents bathroom and summon the sheetz spirit",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "ring the doorbell on the front door ",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Go on the roof and\u2026 York",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "send an accusatory text to someone ",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Bring a little paper cup from kitchen to the third floor ",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Wash ur hands in basement bathroom",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "Sniff a Sam ",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Lay on a bed ",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "shot",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "eat a chip",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Add a pizza box rule",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "shot of water",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Post mochi on your instagram story",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Walk up to someone and ask, \u201c*sniff sniff* Is that you?\u201d",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "no names for one round",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "pet mochi",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Fart on someone fr try your best ",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Give yourself a sharpie tattoo",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Wear the sunglasses ",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Widen your penis ",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "Steal Sam C\u2019s sunglasses ",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "flick the lights in your bedroom on and off",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Pet mochi",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Ask a tech bro to jork off on you",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "Reach completion with a friend (link arms) ",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "go lay down down in ur bed for 10 seconds",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Elephant walk three people around the basement ",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "Turn off one light",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "Turn off one light",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Turn off one light",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Turn off one light",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Turn on one light",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "Turn on one light",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Turn on one light",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Turn on one light",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Do a square dance in the kitchen",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Go into the garage and pretend to be a car who's jorking it lightning mcqueen style",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Smell someone and rate it",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "JORK it on the pool table ",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "Jork it jorking style",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "put something in the dishwasher",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "recline a chair in the theatre room",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "prank text your roommate",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Load a dish in the dishwasher",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Close a door ",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "drink water",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Open a drawer in the kitchen",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Take out a bag of trash or recycling",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "read a page in a book",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "flop onto juliana\u2019s bed",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Add a task ",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Clean a living room item (organize a pillow, fold a blanket, etc.)",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "wash your hands in one of the bathrooms",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Pick up a piece of trash",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Pet mochi",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Tidy smth ",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "lift a weight",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "text the groupchat your favorite american girl doll OR pokemon",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "Do 10 jumping jacks",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "open the fridge",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "shoot a ball in pool",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "Go \u201cpspspspspsps\u201d to mochi",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "score a point in shuffleboard",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "Twerk in place for 10 seconds",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "plank for 30 seconds on the second floor",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "open the dishwasher or close the dishwasher ",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Wash hands",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "open the dishwasher or close the dishwasher",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Lay down on Juliana\u2019s bed ",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "move a pillow to a different couch",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Ask someone for a picture of their mom and play \u201csmash or pass\u201d",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "move a pillow to a different couch",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "move an empty cup into the sink",
+        "location": "1st Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Send a poll in the group chat from the 3rd floor",
+        "location": "3rd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "venmo someone $1",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "Kiss someone ",
+        "location": "2nd Floor",
+        "difficulty": 2
+    },
+    {
+        "task": "steal someone\u2019s vape",
+        "location": "Other",
+        "difficulty": 2
+    },
+    {
+        "task": "start reactor meltdown as a prank",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "flicker the lights",
+        "location": "Basement",
+        "difficulty": 2
+    },
+    {
+        "task": "flicker the lightd",
+        "location": "2nd Floor",
         "difficulty": 2
     }
 ]

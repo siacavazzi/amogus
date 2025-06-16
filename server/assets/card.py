@@ -46,6 +46,8 @@ class Card:
             self.game.start_meeting(player)
         elif self.action == 'Taunt':
             self.game.speaker.play_sound(self.sound)
+        elif self.action == 'Remote Sabotage':
+            self.game.start_meltdown()
     # active cards
         elif self.action == 'Area Denial':
             if not self.game.denied_location:
@@ -104,10 +106,10 @@ class CardDeck:
             Card('Self Report', 'Call a body found meeting', self), 
 
 
-            Card('EMP', 'Disable all devices for the duration', self,duration=10),
-            Card('EMP', 'Disable all devices for the duration', self, duration=15),
-            Card('EMP', 'Disable all devices for the duration', self,duration=25),
-            Card('EMP', 'Disable all devices for the duration', self,duration=35),
+            Card('EMP', 'Disable all devices for the duration', self,duration=30),
+            Card('EMP', 'Disable all devices for the duration', self, duration=30),
+            Card('EMP', 'Disable all devices for the duration', self,duration=60),
+            Card('EMP', 'Disable all devices for the duration', self,duration=60),
 
             Card('Taunt', 'Make crewmates scared', self,sound='fear'),
             Card('Taunt', 'Taunt crewmates with work PTSD', self,sound='annoying_notif'),
@@ -121,12 +123,19 @@ class CardDeck:
 
             Card('Discard and Draw', 'Discard a random card and draw a new card', self),
             Card('Discard and Draw', 'Discard a random card and draw a new card', self),
+
+            Card('Remote Sabotage', 'Trigger a sabotage remotely', self),
+            Card('Remote Sabotage', 'Trigger a sabotage remotely', self),
+            Card('Remote Sabotage', 'Trigger a sabotage remotely', self),
         ]
 
         # Location based cards invoked programmatically since locations shouldn't be hardcoded
         for location in locations:
             if location != 'Other':
-                self.cards.append(Card('Area Denial', 'Stop sending tasks to a specific location', self,duration=60, countdown=True, location=location))
+                self.cards.append(Card('Area Denial', 'Stop sending tasks to a specific location', self,duration=120, countdown=True, location=location))
+                if random.random() > 0.4:
+                    self.cards.append(Card('Area Denial', 'Stop sending tasks to a specific location', self,duration=60, countdown=True, location=location))
+
                 #self.cards.append(Card('fake_task', 'Send a fake task at a specific location to a player **NOT IMPLEMENTED**', location=location))
         print(self.cards)
 

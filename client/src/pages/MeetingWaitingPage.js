@@ -27,6 +27,9 @@ const MeetingWaitingPage = () => {
   };
 
   const handleImDead = () => {
+    if(!window.confirm('Are you sure?')) {
+      return
+    }
     if (socket) {
       socket.emit('player_dead', { player_id: localStorage.getItem('player_id') });
     }

@@ -43,6 +43,7 @@ class Game:
         self.vote_time = vote_time
 
     def start_meltdown(self):
+        self.speaker.loop_sound("meltdown", self.meltdown_time - self.meltdown_time_mod)
         self.active_meltdown = Meltdown(self.players, self.meltdown_time - self.meltdown_time_mod, self.socket, self.speaker, self.code_percent)
         self.meltdown_time_mod = 0
         for card in self.active_cards:

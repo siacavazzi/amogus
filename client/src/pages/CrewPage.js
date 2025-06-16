@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import PropTypes from "prop-types";
 import { DataContext } from "../GameContext";
 import AnimationOverlay from "../components/AnimationOverlay";
@@ -34,8 +34,8 @@ const CrewmemberPage = ({ setShowSusPage }) => {
     if (playerState?.sus) {
       if (killCooldown > 0) return; // Prevent action during cooldown
       setAudio("kill_player");
-      socket.emit("kill_player", { player_id: localStorage.getItem("player_id") });
-      setKillCooldown(60); // 60 second cooldown
+      socket.emit("kill_player", { player_id: localStorage.getItem("player_id") }); // doesnt do anything yet...
+      setKillCooldown(15); 
       return;
     }
 
