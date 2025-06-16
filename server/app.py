@@ -32,7 +32,7 @@ speaker_volume = 80 # %
 # dont play sounds on speakers with 'bed' in the name
 ignore_bedroom_speakers = True
 
-############################
+#############################
 
 
 import eventlet
