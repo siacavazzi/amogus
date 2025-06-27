@@ -11,7 +11,7 @@ const DataContext = createContext();
 
 export default function GameContext({ children }) {
     const [playerState, setPlayerState] = useState({
-        username: '',
+        username: localStorage.getItem('username') || '',
         playerId: localStorage.getItem('player_id') || '',
     });
     const [roomCode, setRoomCode] = useState(localStorage.getItem('room_code') || '');
@@ -53,7 +53,7 @@ export default function GameContext({ children }) {
         setConnected(false)
         setPlayers([])
         setPlayerState({
-            username: '',
+            username: localStorage.getItem('username') || '',
             playerId: localStorage.getItem('player_id') || '',
         })
         setRoomCode(localStorage.getItem('room_code') || '')
@@ -313,6 +313,7 @@ export default function GameContext({ children }) {
                         me = parsedPlayers.find((player) => player.player_id === localStorage.getItem('player_id'))
                         if (me) {
                             setPlayerState(me)
+                            localStorage.setItem('username', me.username)
                             console.log(me)
                         } else {
                             console.log("not found")

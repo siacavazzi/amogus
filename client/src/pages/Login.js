@@ -3,7 +3,7 @@ import { ChevronLeft } from 'lucide-react';
 import { DataContext } from '../GameContext';
 
 function LoginPage() {
-    const [username, setUsername] = useState('');
+    const [username, setUsername] = useState(localStorage.getItem('username') || '');
     const { setPlayerState, socket, setTaskEntry, roomCode, setRoomCode } = useContext(DataContext);
     const [localRoom, setLocalRoom] = useState(roomCode);
 
@@ -16,6 +16,7 @@ function LoginPage() {
         e.preventDefault();
 
         setPlayerState(prevState => ({ ...prevState, username: username }));
+        localStorage.setItem('username', username);
         let playerId = localStorage.getItem('player_id');
 
         socket.emit('join', { player_id: playerId, username: username, room: localRoom });
