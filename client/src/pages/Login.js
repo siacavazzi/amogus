@@ -1,10 +1,11 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { ChevronLeft } from 'lucide-react';
 import { DataContext } from '../GameContext';
+import { ENDPOINT } from '../ENDPOINT';
 
 function LoginPage() {
     const [username, setUsername] = useState('');
-    const [roomCode, setRoomCode] = useState('');
+    const [roomCode, setRoomCode] = useState(undefined);
     const [errorMsg, setErrorMsg] = useState('');
     const { setPlayerState, socket, setTaskEntry, roomId, setRoomId, setCreateRoom } = useContext(DataContext);
 
@@ -16,23 +17,25 @@ function LoginPage() {
 
     const handleJoin = async (e) => {
         e.preventDefault();
-
-        setPlayerState(prevState => ({ ...prevState, username }));
+        console.log("im called")
+        
         const playerId = localStorage.getItem('player_id');
-        const room = roomCode || roomId;
-        if (!room) return;
-
+        let room = roomCode || roomId;
         try {
-            const res = await fetch(`/api/rooms/${room}`);
+            const res = await fetch(ENDPOINT+`/api/rooms/${room}`);
+            console.log(res)
             if (!res.ok) {
                 setErrorMsg('Room not found');
                 return;
             }
             setRoomId(room);
             socket.emit('join', { player_id: playerId, username, room_id: room });
-        } catch {
+        } catch(e) {
+            console.log("i failed...", e)
             setErrorMsg('Failed to reach server');
         }
+        if (!room) return;
+        setPlayerState(prevState => ({ ...prevState, username }));
     };
 
     useEffect(() => {
