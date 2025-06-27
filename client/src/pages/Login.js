@@ -5,6 +5,7 @@ import { DataContext } from '../GameContext';
 function LoginPage() {
     const [username, setUsername] = useState('');
     const [roomCode, setRoomCode] = useState('');
+    const [errorMsg, setErrorMsg] = useState('');
     const { setPlayerState, socket, setTaskEntry, roomId, setRoomId } = useContext(DataContext);
 
     useEffect(() => {
@@ -28,8 +29,21 @@ function LoginPage() {
         socket.on('room_created', (data) => {
             setRoomId(data.room_id);
             setRoomCode(data.room_id);
+            setErrorMsg('');
         });
-    }, [socket]);
+        socket.on('error', (data) => {
+            if (data.message === 'Room not found') {
+                setRoomId('');
+                localStorage.removeItem('room_id');
+                setRoomCode('');
+            }
+            setErrorMsg(data.message);
+        });
+        return () => {
+            socket.off('room_created');
+            socket.off('error');
+        };
+    }, [socket, setRoomId]);
 
     const handleCreateRoom = () => {
         socket.emit('create_room');
@@ -74,6 +88,9 @@ function LoginPage() {
                             required
                         />
                     </div>
+                    {errorMsg && (
+                        <div className="mb-2 text-red-400 text-sm">{errorMsg}</div>
+                    )}
                     <div className="mb-4">
                         <label htmlFor="room" className="block text-gray-300 mb-2">
                             Room Code

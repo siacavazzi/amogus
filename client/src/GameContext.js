@@ -82,6 +82,18 @@ export default function GameContext({ children }) {
         setModalOpen(false)
     }
 
+    const leaveRoom = () => {
+        if (socketRef.current) {
+            socketRef.current.emit('leave_room', {
+                player_id: playerState.playerId,
+                room_id: roomId,
+            });
+        }
+        setRoomId('');
+        localStorage.removeItem('room_id');
+        resetState();
+    }
+
     const resetMessage = (delay) => {
         if (message !== undefined) {
             const timer = setTimeout(() => {
@@ -407,7 +419,8 @@ export default function GameContext({ children }) {
         setKillCooldown,
         activeCards,
         modalOpen,
-        setModalOpen
+        setModalOpen,
+        leaveRoom
     }), [
         endState,
         meltdownCode,
@@ -436,7 +449,8 @@ export default function GameContext({ children }) {
         showSusPage,
         killCooldown,
         activeCards,
-        modalOpen
+        modalOpen,
+        leaveRoom
     ]);
 
     return (

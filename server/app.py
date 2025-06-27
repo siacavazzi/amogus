@@ -88,7 +88,7 @@ def handle_connect():
 
 @socketio.on('create_room')
 def handle_create_room():
-    room_id = str(uuid4())[:6]
+    room_id = str(uuid4())[:4]
     rooms[room_id] = create_game(room_id)
     emit('room_created', {'room_id': room_id}, to=request.sid)
 
@@ -333,6 +333,21 @@ def handle_join(data):
         logger.info(f"New player {username} joined with ID {player.player_id}")
 
     player_room[player.player_id] = room_id
+    sendPlayerList(game, room_id)
+
+@socketio.on('leave_room')
+def handle_leave(data):
+    room_id = data.get('room_id')
+    player_id = data.get('player_id')
+    game = rooms.get(room_id)
+    if not game:
+        return
+    player = game.getPlayerById(player_id)
+    if player:
+        game.players.remove(player)
+        player_room.pop(player_id, None)
+        if len(game.players) == 0:
+            del rooms[room_id]
     sendPlayerList(game, room_id)
 
 @socketio.on('disconnect')
