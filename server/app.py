@@ -108,6 +108,23 @@ def handleJoin(data):
         player_room[player.player_id] = room_id
         sendPlayerList(game, room_id, "rejoin")
 
+        if game.game_running:
+            emit("game_start", to=player.sid)
+            emit("crew_score", {"score": game.crew_score}, to=player.sid)
+            emit("task_goal", game.taskGoal, to=player.sid)
+
+            if game.end_state:
+                emit("end_game", game.end_state, to=player.sid)
+            if len(game.card_deck.active_cards) > 0:
+                game.card_deck.emit_active_cards()
+
+            if game.active_hack > 0:
+                emit("hack", game.active_hack, to=player.sid)
+            if game.meeting:
+                emit("meeting", game.meeting.to_json(), to=player.sid)
+                if game.meeting.stage == 'voting':
+                    game.meeting.emit_vote_counts()
+
         if game.denied_location:
             emit('active_denial', game.denied_location, room=room_id)
 
@@ -119,10 +136,11 @@ def handleJoin(data):
             logger.info("Sending task to player")
             emit("task", {"task": player.get_task()}, to=player.sid)
 
-@socketio.on('add_task') # this should use an api and not a socket
+@socketio.on('add_task')  # this should use an api and not a socket
 def addTask(data):
     print(data)
-    taskHandler.add_task(data)
+    for game in rooms.values():
+        game.task_handler.add_task(data)
 
 @socketio.on("complete_task")
 def handleTaskComplete(data):
@@ -143,12 +161,6 @@ def handleTaskComplete(data):
         emit("task", {"task": "No More Tasks"}, to=player.sid)
         logger.info(f"No more tasks available. Informed player {player.player_id}")
 
-def handleHack(hack_length=30):
-    if not game.active_hack and not game.meeting:
-        logger.info(f"Hack initiated. ")
-        game.start_hack(hack_length)
-        speaker.play_sound('hack')
-        logger.debug("Hack started with a duration of 30 seconds")
 
 @socketio.on("play_card")
 def playCard(data):
@@ -172,9 +184,9 @@ def handleMeeting(data):
     player = game.getPlayerById(player_id)
     game.start_meeting(player)
 
-        # emit("meeting", broadcast=True)
-        # game.meeting = True
-        logger.info("Meeting started")
+    # emit("meeting", broadcast=True)
+    # game.meeting = True
+    logger.info("Meeting started")
 
 @socketio.on("ready")
 def handleReady(data):
