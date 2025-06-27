@@ -37,6 +37,7 @@ export default function GameContext({ children }) {
     const [codesNeeded, setCodesNeeded] = useState(undefined);
     const [endState, setEndState] = useState(undefined);
     const [taskEntry , setTaskEntry] = useState(false);
+    const [createRoom, setCreateRoom] = useState(false);
     const [taskLocations, setTaskLocations] = useState([]);
 
     useEffect(() => {
@@ -57,6 +58,10 @@ export default function GameContext({ children }) {
     const resetState = () => {
         setGameState({})
         setConnected(false)
+        clearGameState()
+    }
+
+    const clearGameState = () => {
         setPlayers([])
         setPlayerState({
             username: '',
@@ -80,6 +85,7 @@ export default function GameContext({ children }) {
         setShowSusPage(false)
         setActiveCards([])
         setModalOpen(false)
+        setCreateRoom(false)
     }
 
     const leaveRoom = () => {
@@ -91,7 +97,7 @@ export default function GameContext({ children }) {
         }
         setRoomId('');
         localStorage.removeItem('room_id');
-        resetState();
+        clearGameState();
     }
 
     const resetMessage = (delay) => {
@@ -343,6 +349,9 @@ export default function GameContext({ children }) {
                     console.error("Unexpected data format:", data);
                 }
 
+                if (data.running) {
+                    setRunning(true);
+                }
                 if (data.action === "start_game" && me) {
                     setAudio('start');
                     setRunning(true);
@@ -406,6 +415,8 @@ export default function GameContext({ children }) {
         setCodesNeeded,
         taskEntry,
         setTaskEntry,
+        createRoom,
+        setCreateRoom,
         taskLocations,
         deniedLocation,
         votes,
@@ -450,7 +461,9 @@ export default function GameContext({ children }) {
         killCooldown,
         activeCards,
         modalOpen,
-        leaveRoom
+        leaveRoom,
+        createRoom,
+        setCreateRoom
     ]);
 
     return (

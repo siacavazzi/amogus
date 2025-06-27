@@ -18,10 +18,6 @@ export default function PlayersPage() {
     if (!players || players.length === 0) {
         return (
             <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-gray-800 to-gray-900 p-6 relative">
-                <div className="absolute top-6 right-6 text-gray-200 text-sm flex items-center space-x-4">
-                    <span>Room: {roomId}</span>
-                    <button onClick={leaveRoom} className="text-red-400 hover:text-red-500">Leave</button>
-                </div>
                 <div className="text-center text-gray-400">
                     <p className="text-lg">No players available</p>
                 </div>
@@ -44,10 +40,6 @@ export default function PlayersPage() {
                 <ChevronLeft className="mr-1" />
                 <span className="text-sm">Task Entry</span>
             </button>}
-            <div className="absolute top-6 right-6 text-gray-200 text-sm flex items-center space-x-4">
-                <span>Room: {roomId}</span>
-                <button onClick={leaveRoom} className="text-red-400 hover:text-red-500">Leave</button>
-            </div>
             <div className="max-w-6xl mx-auto">
                 <div className="flex flex-col items-center mb-6">
                     <button

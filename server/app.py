@@ -69,7 +69,7 @@ def sendPlayerList(game, room, action='player_list'):
     logger.info(f"Sending player list to room {room}")
     player_list = [player.to_json() for player in game.players]
     logger.debug(f"Player List: {player_list}")
-    emit('game_data', {'action': action, 'list': player_list}, room=room, json=True)
+    emit('game_data', {'action': action, 'list': player_list, 'running': game.game_running}, room=room, json=True)
 
 def get_game_by_player(player_id):
     room = player_room.get(player_id)
@@ -90,6 +90,7 @@ def handle_connect():
 def handle_create_room():
     room_id = str(uuid4())[:4]
     rooms[room_id] = create_game(room_id)
+    logger.info(f"Room {room_id} created")
     emit('room_created', {'room_id': room_id}, to=request.sid)
 
 @socketio.on('rejoin')
@@ -98,6 +99,7 @@ def handleJoin(data):
     player_id = data.get('player_id')
     game = rooms.get(room_id)
     if not game:
+        logger.warning(f"Rejoin failed: room {room_id} not found")
         emit('error', {'message': 'Room not found'}, to=request.sid)
         return
     player = game.getPlayerById(player_id)
@@ -304,6 +306,7 @@ def handle_join(data):
         emit('error', {'message': 'Room not found'}, to=sid)
         return
     join_room(room_id)
+    logger.info(f"Player attempting to join room {room_id}")
 
     if not username:
         emit('error', {'message': 'Username is required'}, to=sid)
@@ -333,6 +336,7 @@ def handle_join(data):
         logger.info(f"New player {username} joined with ID {player.player_id}")
 
     player_room[player.player_id] = room_id
+    logger.info(f"Player {player.username} joined room {room_id}")
     sendPlayerList(game, room_id)
 
 @socketio.on('leave_room')
@@ -344,9 +348,11 @@ def handle_leave(data):
         return
     player = game.getPlayerById(player_id)
     if player:
+        logger.info(f"Player {player.username} leaving room {room_id}")
         game.players.remove(player)
         player_room.pop(player_id, None)
         if len(game.players) == 0:
+            logger.info(f"Room {room_id} is empty and will be removed")
             del rooms[room_id]
     sendPlayerList(game, room_id)
 

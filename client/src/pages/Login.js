@@ -6,7 +6,7 @@ function LoginPage() {
     const [username, setUsername] = useState('');
     const [roomCode, setRoomCode] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
-    const { setPlayerState, socket, setTaskEntry, roomId, setRoomId } = useContext(DataContext);
+    const { setPlayerState, socket, setTaskEntry, roomId, setRoomId, setCreateRoom } = useContext(DataContext);
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -26,11 +26,6 @@ function LoginPage() {
     };
 
     useEffect(() => {
-        socket.on('room_created', (data) => {
-            setRoomId(data.room_id);
-            setRoomCode(data.room_id);
-            setErrorMsg('');
-        });
         socket.on('error', (data) => {
             if (data.message === 'Room not found') {
                 setRoomId('');
@@ -40,13 +35,12 @@ function LoginPage() {
             setErrorMsg(data.message);
         });
         return () => {
-            socket.off('room_created');
             socket.off('error');
         };
     }, [socket, setRoomId]);
 
     const handleCreateRoom = () => {
-        socket.emit('create_room');
+        setCreateRoom(true);
     };
 
     const handleEnterTasks = () => {
