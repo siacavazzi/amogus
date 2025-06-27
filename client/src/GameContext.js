@@ -14,6 +14,7 @@ export default function GameContext({ children }) {
         username: '',
         playerId: localStorage.getItem('player_id') || '',
     });
+    const [roomId, setRoomId] = useState(localStorage.getItem('room_id') || '');
 
     // united states
     const [gameState, setGameState] = useState({}); // <--- USE this PLEASE we need to refactor this shit
@@ -36,7 +37,14 @@ export default function GameContext({ children }) {
     const [codesNeeded, setCodesNeeded] = useState(undefined);
     const [endState, setEndState] = useState(undefined);
     const [taskEntry , setTaskEntry] = useState(false);
+    const [createRoom, setCreateRoom] = useState(false);
     const [taskLocations, setTaskLocations] = useState([]);
+
+    useEffect(() => {
+        if (roomId) {
+            localStorage.setItem('room_id', roomId);
+        }
+    }, [roomId]);
     const [deniedLocation, setDeniedLocation] = useState(undefined)
     const [votes, setVotes] = useState({})
     const [vetoVotes, setVetoVotes] = useState(0); 
@@ -50,6 +58,10 @@ export default function GameContext({ children }) {
     const resetState = () => {
         setGameState({})
         setConnected(false)
+        clearGameState()
+    }
+
+    const clearGameState = () => {
         setPlayers([])
         setPlayerState({
             username: '',
@@ -73,6 +85,19 @@ export default function GameContext({ children }) {
         setShowSusPage(false)
         setActiveCards([])
         setModalOpen(false)
+        setCreateRoom(false)
+    }
+
+    const leaveRoom = () => {
+        if (socketRef.current) {
+            socketRef.current.emit('leave_room', {
+                player_id: playerState.playerId,
+                room_id: roomId,
+            });
+        }
+        setRoomId('');
+        localStorage.removeItem('room_id');
+        clearGameState();
     }
 
     const resetMessage = (delay) => {
@@ -143,6 +168,7 @@ export default function GameContext({ children }) {
             setConnected(true);
             socketRef.current.emit('rejoin', {
                 player_id: playerState.playerId,
+                room_id: roomId,
             });
         });
 
@@ -323,6 +349,9 @@ export default function GameContext({ children }) {
                     console.error("Unexpected data format:", data);
                 }
 
+                if (data.running) {
+                    setRunning(true);
+                }
                 if (data.action === "start_game" && me) {
                     setAudio('start');
                     setRunning(true);
@@ -352,6 +381,8 @@ export default function GameContext({ children }) {
     const contextValue = useMemo(() => ({
         playerState,
         setPlayerState,
+        roomId,
+        setRoomId,
         gameState,
         setGameState,
         socket: socketRef.current,
@@ -384,6 +415,8 @@ export default function GameContext({ children }) {
         setCodesNeeded,
         taskEntry,
         setTaskEntry,
+        createRoom,
+        setCreateRoom,
         taskLocations,
         deniedLocation,
         votes,
@@ -397,7 +430,8 @@ export default function GameContext({ children }) {
         setKillCooldown,
         activeCards,
         modalOpen,
-        setModalOpen
+        setModalOpen,
+        leaveRoom
     }), [
         endState,
         meltdownCode,
@@ -406,6 +440,7 @@ export default function GameContext({ children }) {
         hackTime, 
         audio,
         playerState,
+        roomId,
         gameState,
         connected,
         players,
@@ -425,7 +460,10 @@ export default function GameContext({ children }) {
         showSusPage,
         killCooldown,
         activeCards,
-        modalOpen
+        modalOpen,
+        leaveRoom,
+        createRoom,
+        setCreateRoom
     ]);
 
     return (

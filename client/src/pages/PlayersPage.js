@@ -7,7 +7,7 @@ import PlayerCard from "../components/PlayerCard";
 import { ChevronLeft } from 'lucide-react';
 
 export default function PlayersPage() {
-    const { players, socket, setMessage, setAudio, running, setTaskEntry } = useContext(DataContext);
+    const { players, socket, setMessage, setAudio, running, setTaskEntry, roomId, leaveRoom } = useContext(DataContext);
 
     useEffect(() => {
         window.scrollTo(0, 0)
@@ -17,7 +17,7 @@ export default function PlayersPage() {
 
     if (!players || players.length === 0) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-gray-800 to-gray-900 p-6">
+            <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-gray-800 to-gray-900 p-6 relative">
                 <div className="text-center text-gray-400">
                     <p className="text-lg">No players available</p>
                 </div>
@@ -26,7 +26,7 @@ export default function PlayersPage() {
     }
 
     function startGame() {
-        socket.emit('start_game', {});
+        socket.emit('start_game', { room_id: roomId });
 
     }
 
