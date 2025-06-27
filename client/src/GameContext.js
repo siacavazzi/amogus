@@ -14,6 +14,7 @@ export default function GameContext({ children }) {
         username: '',
         playerId: localStorage.getItem('player_id') || '',
     });
+    const [roomCode, setRoomCode] = useState(localStorage.getItem('room_code') || '');
 
     // united states
     const [gameState, setGameState] = useState({}); // <--- USE this PLEASE we need to refactor this shit
@@ -55,6 +56,7 @@ export default function GameContext({ children }) {
             username: '',
             playerId: localStorage.getItem('player_id') || '',
         })
+        setRoomCode(localStorage.getItem('room_code') || '')
         setTask(undefined)
         setRunning(false)
         setCrewScore(0);
@@ -143,6 +145,7 @@ export default function GameContext({ children }) {
             setConnected(true);
             socketRef.current.emit('rejoin', {
                 player_id: playerState.playerId,
+                room: roomCode,
             });
         });
 
@@ -281,6 +284,10 @@ export default function GameContext({ children }) {
                 localStorage.setItem('player_id', data.player_id);
                 setPlayerState(prevState => ({ ...prevState, playerId: data.player_id }));
             }
+            if (data && data.room) {
+                localStorage.setItem('room_code', data.room);
+                setRoomCode(data.room);
+            }
         });
 
         socketRef.current.on('game_data', (data) => {
@@ -352,6 +359,8 @@ export default function GameContext({ children }) {
     const contextValue = useMemo(() => ({
         playerState,
         setPlayerState,
+        roomCode,
+        setRoomCode,
         gameState,
         setGameState,
         socket: socketRef.current,
@@ -425,7 +434,9 @@ export default function GameContext({ children }) {
         showSusPage,
         killCooldown,
         activeCards,
-        modalOpen
+        modalOpen,
+        roomCode,
+        setRoomCode
     ]);
 
     return (

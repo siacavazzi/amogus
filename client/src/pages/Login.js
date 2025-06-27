@@ -4,7 +4,8 @@ import { DataContext } from '../GameContext';
 
 function LoginPage() {
     const [username, setUsername] = useState('');
-    const { setPlayerState, socket, setTaskEntry } = useContext(DataContext);
+    const { setPlayerState, socket, setTaskEntry, roomCode, setRoomCode } = useContext(DataContext);
+    const [localRoom, setLocalRoom] = useState(roomCode);
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -17,8 +18,21 @@ function LoginPage() {
         setPlayerState(prevState => ({ ...prevState, username: username }));
         let playerId = localStorage.getItem('player_id');
 
-        socket.emit('join', { player_id: playerId, username: username });
+        socket.emit('join', { player_id: playerId, username: username, room: localRoom });
     };
+
+    const handleCreateRoom = () => {
+        socket.emit('create_room');
+    };
+
+    useEffect(() => {
+        socket.on('room_created', (data) => {
+            setRoomCode(data.room);
+            setLocalRoom(data.room);
+            localStorage.setItem('room_code', data.room);
+        });
+        return () => socket.off('room_created');
+    }, [socket]);
 
     const handleEnterTasks = () => {
         setTaskEntry(true)
@@ -59,6 +73,25 @@ function LoginPage() {
                             required
                         />
                     </div>
+                    {!localRoom && (
+                        <div className="mb-4">
+                            <label htmlFor="room" className="block text-gray-300 mb-2">
+                                Room Code
+                            </label>
+                            <input
+                                type="text"
+                                id="room"
+                                value={localRoom}
+                                onChange={(e) => setLocalRoom(e.target.value.toUpperCase())}
+                                className="w-full px-4 py-2 border border-gray-500 rounded-lg bg-gray-600 text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-colors"
+                                placeholder="XXXX"
+                            />
+                            <button type="button" onClick={handleCreateRoom} className="mt-2 w-full bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700">Create Room</button>
+                        </div>
+                    )}
+                    {localRoom && (
+                        <p className="text-center text-gray-300 mb-4">Room: {localRoom}</p>
+                    )}
                     <button
                         type="submit"
                         className="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400 transform hover:scale-105"

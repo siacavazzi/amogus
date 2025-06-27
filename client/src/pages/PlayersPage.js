@@ -7,7 +7,7 @@ import PlayerCard from "../components/PlayerCard";
 import { ChevronLeft } from 'lucide-react';
 
 export default function PlayersPage() {
-    const { players, socket, setMessage, setAudio, running, setTaskEntry } = useContext(DataContext);
+    const { players, socket, setMessage, setAudio, running, setTaskEntry, playerState } = useContext(DataContext);
 
     useEffect(() => {
         window.scrollTo(0, 0)
@@ -26,7 +26,7 @@ export default function PlayersPage() {
     }
 
     function startGame() {
-        socket.emit('start_game', {});
+        socket.emit('start_game', { player_id: playerState.playerId });
 
     }
 

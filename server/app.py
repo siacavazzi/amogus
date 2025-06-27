@@ -40,10 +40,8 @@ eventlet.monkey_patch()
 from flask import Flask
 from flask_socketio import SocketIO
 from flask_cors import CORS
-from assets.game import Game
 from assets.sonosHandler import SonosController
 from assets.utils import setup_logging, get_local_ip, write_ip_to_file
-from assets.taskHandler import TaskHandler
 from socket_handlers import register_socket_handlers
 
 logger = setup_logging()
@@ -58,14 +56,23 @@ speaker = SonosController(enabled=sonos_enabled, default_volume=speaker_volume, 
 if sonos_enabled:
     speaker.play_sound("theme")
 
-taskHandler = TaskHandler(locations)
-game = Game(socketio, taskHandler, speaker, task_ratio, meltdown_time, code_percent, locations, vote_time, card_draw_probability, number_of_imposters, starting_cards)
 
 @app.route('/')
 def index():
     return "<h1>You shouldn't see this. Please change your port from :5000 to :3000</h1>"
 
-register_socket_handlers(socketio, game, taskHandler, speaker, locations, logger)
+config = {
+    'task_ratio': task_ratio,
+    'meltdown_time': meltdown_time,
+    'code_percent': code_percent,
+    'locations': locations,
+    'vote_time': vote_time,
+    'card_draw_probability': card_draw_probability,
+    'number_of_imposters': number_of_imposters,
+    'starting_cards': starting_cards,
+}
+
+register_socket_handlers(socketio, speaker, config, logger)
 
 if __name__ == '__main__':
     local_ip = get_local_ip()
