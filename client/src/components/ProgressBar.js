@@ -18,7 +18,7 @@ const ProgressBar = ({ score, goalScore, sus }) => {
   const message = sus ? 'Eliminate Crew' : 'Complete Tasks';
 
   return (
-    <div className="fixed top-0 w-full z-50 bg-gray-900">
+    <div className="fixed top-8 w-full z-50 bg-gray-900">
       <div className="max-w-md mx-auto px-2 py-1 flex items-center space-x-2 text-xs text-gray-300">
         {/* Message */}
         <span className="whitespace-nowrap">{message}</span>

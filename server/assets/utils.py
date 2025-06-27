@@ -19,7 +19,7 @@ def get_local_ip():
 def write_ip_to_file(ip_address):
     try:
         with open("../client/src/ENDPOINT.js", 'w') as file:
-            text = f"export const ENDPOINT = '{ip_address}'"
+            text = f"export const ENDPOINT = 'http://{ip_address}'"
             file.write(text)
         print(f"IP address '{ip_address}' has been written to '../client/src/ENDPOINT.js'.")
     except Exception as e:

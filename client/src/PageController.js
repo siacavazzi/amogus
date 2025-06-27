@@ -5,6 +5,7 @@ import LoginPage from "./pages/Login";
 import ConnectingPage from "./pages/ConnectingPage";
 import PlayersPage from "./pages/PlayersPage";
 import Modal from "./components/Modal";
+import RoomBanner from "./components/RoomBanner";
 import ImposterPage from "./pages/ImposterPage";
 import CrewmemberPage from "./pages/CrewPage";
 import ProgressBar from "./components/ProgressBar";
@@ -23,6 +24,7 @@ import ReactorWaiting from "./pages/ReactorWaiting";
 import TaskEntryPage from "./pages/TaskEntryPage";
 import VotingPage from "./pages/VotingPage";
 import MeetingResultPage from "./pages/MeetingResultsPage";
+import CreateRoomPage from "./pages/CreateRoom";
 
 const PageController = () => {
     const {
@@ -40,6 +42,9 @@ const PageController = () => {
         taskEntry,
         showSusPage,
         setShowSusPage,
+        createRoom,
+        roomId,
+        leaveRoom,
     } = useContext(DataContext);
 
     const [currentPage, setCurrentPage] = useState("connecting");
@@ -76,6 +81,11 @@ const PageController = () => {
         if (taskEntry) {
             console.log("task entry")
             setCurrentPage("taskEntry")
+            return;
+        }
+
+        if (createRoom) {
+            setCurrentPage("createRoom");
             return;
         }
 
@@ -145,6 +155,7 @@ const PageController = () => {
         endState,
         taskEntry,
         showSusPage,
+        createRoom,
 
     ]);
 
@@ -168,6 +179,7 @@ const PageController = () => {
         meltdown_fail: <NuclearMeltdownScreen />,
         reactorWaiting: <ReactorWaiting />,
         taskEntry: <TaskEntryPage />,
+        createRoom: <CreateRoomPage />,
         unknown: (
             <p>
                 You're really not supposed to see this... Uhhh please go talk to
@@ -179,6 +191,7 @@ const PageController = () => {
     return (
         <div>
             <Modal />
+            <RoomBanner roomId={roomId} onLeave={leaveRoom} />
             {running && isMobile && !endState && (
                 <ProgressBar
                     score={crewScore}
