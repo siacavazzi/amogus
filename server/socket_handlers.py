@@ -35,12 +35,12 @@ def register_socket_handlers(socketio: SocketIO, speaker, config, logger):
     def send_player_list(game, room, action="player_list"):
         logger.info("Sending player list to room %s", room)
         player_list = [player.to_json() for player in game.players]
-        socketio.emit("game_data", {"action": action, "list": player_list}, room=room, json=True)
+        socketio.emit("game_data", {"action": action, "list": player_list}, room=room)
 
     @socketio.on("connect")
     def handle_connect():
         logger.info("Client connected: %s", request.sid)
-        emit("task_locations", locations, json=True)
+        emit("task_locations", locations)
 
     @socketio.on("create_room")
     def handle_create_room():
