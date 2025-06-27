@@ -55,5 +55,5 @@ def setup_logging():
 
     return logger
 
-def send_message_to_player(socket, player_id, message):
-    socket.emit('message', {'player': player_id, 'message': message})
+def send_message_to_player(socketio, player_id, message):
+    socketio.emit('message', {'player': player_id, 'message': message})

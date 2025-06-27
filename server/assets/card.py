@@ -17,7 +17,7 @@ class Card:
         self.text = text
         self.card_deck = card_deck
         self.game = card_deck.game
-        self.socket = card_deck.socket
+        self.socketio = card_deck.socketio
         self.id = str(uuid.uuid4())
     
     def __repr__(self):
@@ -35,7 +35,7 @@ class Card:
     def notify_impostors(self, player):
         for other_player in self.game.players:
             if (other_player is not player) and other_player.sus and other_player.alive:
-                send_message_to_player(self.socket, other_player.player_id, f"{player.username} played {self.action}")
+                send_message_to_player(self.socketio, other_player.player_id, f"{player.username} played {self.action}")
 
 
     def play_card(self, player):
@@ -65,7 +65,7 @@ class Card:
                 player.remove_card(self)
                 player.cards.pop(0)
                 card= self.card_deck.draw_card()
-                send_message_to_player(self.socket, player.player_id, f"You drew: {card.action}")
+                send_message_to_player(self.socketio, player.player_id, f"You drew: {card.action}")
                 player.cards.append(card)
 
         elif self.action == 'Shorten Meltdown':
@@ -93,10 +93,10 @@ class Card:
 
 class CardDeck:
 
-    def __init__(self, locations, socket, game):
+    def __init__(self, locations, socketio, game):
         self.discard = []
         self.active_cards = []
-        self.socket = socket
+        self.socketio = socketio
         self.game = game
 
         self.cards = [# CHANGE THESE THEYDONT WORK
@@ -164,7 +164,7 @@ class CardDeck:
         for card in self.active_cards:
             output.append(card.export())
         print(output)
-        self.socket.emit('active_cards', output)
+        self.socketio.emit('active_cards', output)
 
 
 
