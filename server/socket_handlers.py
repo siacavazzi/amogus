@@ -71,6 +71,7 @@ def register_socket_handlers(socketio: SocketIO, speaker, config, logger):
         player_id = data.get("player_id")
         room = data.get("room") or player_rooms.get(player_id)
         if not room or room not in rooms:
+            emit("room_missing", to=request.sid)
             return
 
         game = rooms[room]["game"]

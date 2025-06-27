@@ -149,6 +149,11 @@ export default function GameContext({ children }) {
             });
         });
 
+        socketRef.current.on('room_missing', () => {
+            localStorage.removeItem('room_code');
+            resetState();
+        });
+
         socketRef.current.on('task_locations', (data) => {
             setTaskLocations(data)
         })

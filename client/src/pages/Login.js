@@ -8,6 +8,10 @@ function LoginPage() {
     const [localRoom, setLocalRoom] = useState(roomCode);
 
     useEffect(() => {
+        setLocalRoom(roomCode);
+    }, [roomCode]);
+
+    useEffect(() => {
         window.scrollTo(0, 0);
       }, []);
     
