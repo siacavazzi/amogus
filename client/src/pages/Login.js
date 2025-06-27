@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { ChevronLeft } from 'lucide-react';
 import { DataContext } from '../GameContext';
+import { ENDPOINT } from '../ENDPOINT';
 
 function LoginPage() {
     const [username, setUsername] = useState('');
@@ -17,13 +18,13 @@ function LoginPage() {
     const handleJoin = async (e) => {
         e.preventDefault();
 
-        setPlayerState(prevState => ({ ...prevState, username }));
+        
         const playerId = localStorage.getItem('player_id');
         const room = roomCode || roomId;
         if (!room) return;
 
         try {
-            const res = await fetch(`/api/rooms/${room}`);
+            const res = await fetch(ENDPOINT+`/api/rooms/${room}`);
             if (!res.ok) {
                 setErrorMsg('Room not found');
                 return;
@@ -33,6 +34,7 @@ function LoginPage() {
         } catch {
             setErrorMsg('Failed to reach server');
         }
+        setPlayerState(prevState => ({ ...prevState, username }));
     };
 
     useEffect(() => {

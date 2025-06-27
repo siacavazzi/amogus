@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { ChevronLeft } from 'lucide-react';
 import { DataContext } from '../GameContext';
+import { ENDPOINT } from '../ENDPOINT';
 
 function CreateRoomPage() {
     const [username, setUsername] = useState('');
@@ -20,7 +21,7 @@ function CreateRoomPage() {
             setErrorMsg('Username required');
             return;
         }
-        fetch('/api/rooms', { method: 'POST' })
+        fetch(ENDPOINT+'/api/rooms', { method: 'POST' })
             .then(res => res.json())
             .then(data => {
                 setRoomId(data.room_id);

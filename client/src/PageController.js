@@ -155,6 +155,7 @@ const PageController = () => {
         endState,
         taskEntry,
         showSusPage,
+        createRoom,
 
     ]);
 
