@@ -11,9 +11,10 @@ const DataContext = createContext();
 
 export default function GameContext({ children }) {
     const [playerState, setPlayerState] = useState({
-        username: '',
+        username: localStorage.getItem('username') || '',
         playerId: localStorage.getItem('player_id') || '',
     });
+    const [roomCode, setRoomCode] = useState(localStorage.getItem('room_code') || '');
 
     // united states
     const [gameState, setGameState] = useState({}); // <--- USE this PLEASE we need to refactor this shit
@@ -52,9 +53,10 @@ export default function GameContext({ children }) {
         setConnected(false)
         setPlayers([])
         setPlayerState({
-            username: '',
+            username: localStorage.getItem('username') || '',
             playerId: localStorage.getItem('player_id') || '',
         })
+        setRoomCode(localStorage.getItem('room_code') || '')
         setTask(undefined)
         setRunning(false)
         setCrewScore(0);
@@ -143,7 +145,13 @@ export default function GameContext({ children }) {
             setConnected(true);
             socketRef.current.emit('rejoin', {
                 player_id: playerState.playerId,
+                room: roomCode,
             });
+        });
+
+        socketRef.current.on('room_missing', () => {
+            localStorage.removeItem('room_code');
+            resetState();
         });
 
         socketRef.current.on('task_locations', (data) => {
@@ -281,6 +289,10 @@ export default function GameContext({ children }) {
                 localStorage.setItem('player_id', data.player_id);
                 setPlayerState(prevState => ({ ...prevState, playerId: data.player_id }));
             }
+            if (data && data.room) {
+                localStorage.setItem('room_code', data.room);
+                setRoomCode(data.room);
+            }
         });
 
         socketRef.current.on('game_data', (data) => {
@@ -306,6 +318,7 @@ export default function GameContext({ children }) {
                         me = parsedPlayers.find((player) => player.player_id === localStorage.getItem('player_id'))
                         if (me) {
                             setPlayerState(me)
+                            localStorage.setItem('username', me.username)
                             console.log(me)
                         } else {
                             console.log("not found")
@@ -352,6 +365,8 @@ export default function GameContext({ children }) {
     const contextValue = useMemo(() => ({
         playerState,
         setPlayerState,
+        roomCode,
+        setRoomCode,
         gameState,
         setGameState,
         socket: socketRef.current,
@@ -425,7 +440,9 @@ export default function GameContext({ children }) {
         showSusPage,
         killCooldown,
         activeCards,
-        modalOpen
+        modalOpen,
+        roomCode,
+        setRoomCode
     ]);
 
     return (

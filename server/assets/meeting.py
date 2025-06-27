@@ -1,15 +1,14 @@
 import json
 from threading import Thread
-from flask_socketio import emit
 import time
 from collections import Counter
 
 class Meeting:
 
-    def __init__(self, vote_time, socket, player_who_started_it, game):
+    def __init__(self, vote_time, socketio, player_who_started_it, game):
         self.stage = 'waiting'
         self.time_left = vote_time
-        self.socket = socket
+        self.socketio = socketio
         self.player_who_started_it = player_who_started_it
         self.game = game
         self.speaker = game.speaker
@@ -23,10 +22,10 @@ class Meeting:
     def start_voting(self):
         if self.game.get_num_living_players() <= 1:
             self.game.end_state = 'sus_victory'
-            self.socket.emit("end_game", self.game.end_state)
+            self.socketio.emit("end_game", self.game.end_state, room=self.game.room)
             return
         self.stage = 'voting'
-        self.socket.emit("meeting", self.to_json())
+        self.socketio.emit("meeting", self.to_json(), room=self.game.room)
         self.speaker.play_sound('hurry')
         Thread(target=self._vote_countdown).start()
     
@@ -79,7 +78,7 @@ class Meeting:
         veto_count = len(self.veto_votes)
 
         print(f"Vote Summary: {vote_summary}, Veto Votes: {veto_count}")
-        self.socket.emit("vote_update", {"votes": vote_summary, "vetoVotes": veto_count})
+        self.socketio.emit("vote_update", {"votes": vote_summary, "vetoVotes": veto_count}, room=self.game.room)
 
     def check_veto_threshold(self):
         """
@@ -123,7 +122,7 @@ class Meeting:
             self.reason = 'veto'
 
             print("Meeting ended early due to veto threshold...")
-            self.socket.emit("meeting", self.to_json())
+            self.socketio.emit("meeting", self.to_json(), room=self.game.room)
             self.speaker.play_sound('veto')
         else:
         # Regular meeting ending, determine who was voted out
@@ -138,7 +137,7 @@ class Meeting:
             self.reason = 'votes'
             self.votes = self.compute_vote_counts()
 
-            self.socket.emit("meeting", self.to_json())
+            self.socketio.emit("meeting", self.to_json(), room=self.game.room)
 
             # draw cards for impostors
             self.game.drawCards(probability=self.game.card_draw_probability)

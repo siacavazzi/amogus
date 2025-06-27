@@ -7,13 +7,13 @@ from assets.card import *
 from assets.meeting import *
 import time
 from threading import Thread
-from flask_socketio import emit
+
 from assets.utils import *
 
 
 class Game:
 
-    def __init__(self, socket, task_handler, speaker, task_ratio, meltdown_time, code_percent, locations, vote_time, card_draw_probability, numImposters, starting_cards):
+    def __init__(self, socketio, task_handler, speaker, task_ratio, meltdown_time, code_percent, locations, vote_time, card_draw_probability, numImposters, starting_cards, room=None):
         self.players = []
         self.task_handler = task_handler
         self.crew_score = 0
@@ -27,13 +27,14 @@ class Game:
         self.taskGoal = None
         self.completed_tasks = 0
         self.backgrounds = list(range(0, 16 + 1))  
-        self.socket = socket
+        self.socketio = socketio
         self.end_state = None
         self.speaker = speaker
         self.denied_location = None
-        self.card_deck = CardDeck(locations, socket, self)
+        self.card_deck = CardDeck(locations, socketio, self)
         self.active_cards = []
         self.card_draw_probability = card_draw_probability
+        self.room = room
 
         # Tasks per player
         self.task_ratio = task_ratio
@@ -44,7 +45,7 @@ class Game:
 
     def start_meltdown(self):
         self.speaker.loop_sound("meltdown", self.meltdown_time - self.meltdown_time_mod)
-        self.active_meltdown = Meltdown(self.players, self.meltdown_time - self.meltdown_time_mod, self.socket, self.speaker, self.code_percent)
+        self.active_meltdown = Meltdown(self.players, self.meltdown_time - self.meltdown_time_mod, self.socketio, self.speaker, self.code_percent)
         self.meltdown_time_mod = 0
         for card in self.active_cards:
             if card.action == 'reduce_meltdown':
@@ -58,21 +59,21 @@ class Game:
     def meltdown(self): # call when meltdown fails
         self.active_meltdown = None
         self.end_state = "meltdown_fail"
-        self.socket.emit("end_game", self.end_state)
+        self.socketio.emit("end_game", self.end_state, room=self.room)
 
         if self.speaker:
             self.speaker.play_sound("sus_victory")
 
     def emit_player_list(self):
         player_list = [player.to_json() for player in self.players]
-        self.socket.emit('game_data', {'action': 'player_list', 'list': player_list})
+        self.socketio.emit('game_data', {'action': 'player_list', 'list': player_list}, room=self.room)
 
     def start_hack(self, duration):
         if self.active_hack > 0:
             return
         self.speaker.play_sound('hack')
         self.active_hack = duration
-        emit("hack", duration, broadcast=True)
+        self.socketio.emit("hack", duration, room=self.room)
 
         # Start a background thread to handle the countdown
         Thread(target=self._hack_countdown).start()
@@ -115,7 +116,7 @@ class Game:
                 card = self.card_deck.draw_card(probability)
                 if card:
                     self.players[i].cards.append(card)
-                    send_message_to_player(self.socket, self.players[i].player_id, f"You drew {card.action}")
+                    send_message_to_player(self.socketio, self.players[i].player_id, f"You drew {card.action}")
 
         self.emit_player_list()
 
@@ -168,13 +169,13 @@ class Game:
         self.backgrounds = list(range(0, 16 + 1))  
         self.end_state = None
         self.denied_location = None
-        self.card_deck = CardDeck(self.locations)
+        self.card_deck = CardDeck(self.locations, self.socketio, self)
         self.task_handler.reset()
 
     def start_meeting(self, player_who_started_it):
-        self.meeting = Meeting(self.vote_time, self.socket, player_who_started_it, self)
+        self.meeting = Meeting(self.vote_time, self.socketio, player_who_started_it, self)
         self.speaker.play_sound('meeting')
-        self.socket.emit("meeting", self.meeting.to_json())
+        self.socketio.emit("meeting", self.meeting.to_json(), room=self.room)
 
     def get_num_living_players(self):
         living_players = 0
@@ -210,7 +211,7 @@ class Game:
             if self.numCrew <= 0:
                 self.end_state = 'sus_victory'
                 self.speaker.play_sound('sus_victory')
-                self.socket.emit("end_game", self.end_state)
+                self.socketio.emit("end_game", self.end_state, room=self.room)
                 return
     
             
@@ -219,7 +220,7 @@ class Game:
             if self.numImposters <= 0:
                 self.end_state = 'victory'
                 self.speaker.play_sound('crew_victory')
-                self.socket.emit("end_game", self.end_state)
+                self.socketio.emit("end_game", self.end_state, room=self.room)
                 return
                 
         if self.meeting:
