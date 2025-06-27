@@ -38,12 +38,13 @@ ignore_bedroom_speakers = True
 import eventlet
 eventlet.monkey_patch()
 from flask import Flask, request
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO, emit, join_room
 from flask_cors import CORS
 from assets.game import Game
 from assets.sonosHandler import SonosController
 from assets.utils import *
 from assets.taskHandler import *
+from uuid import uuid4
 
 logger = setup_logging()
 
@@ -51,20 +52,30 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": '*'}})
 socketio = SocketIO(app, cors_allowed_origins="*")
 
+rooms = {}
+player_room = {}
+
+def create_game(room_id):
+    task_handler = TaskHandler(locations)
+    return Game(socketio, task_handler, speaker, task_ratio, meltdown_time, code_percent, locations, vote_time, card_draw_probability, number_of_imposters, starting_cards, room=room_id)
+
 locations.append("Other")
 # big boi objects
 speaker = SonosController(enabled=sonos_enabled, default_volume=speaker_volume, ignore_bedroom_speakers=ignore_bedroom_speakers)
 if sonos_enabled:
     speaker.play_sound("theme")
 
-taskHandler = TaskHandler(locations)
-game = Game(socketio, taskHandler, speaker, task_ratio, meltdown_time, code_percent, locations, vote_time, card_draw_probability, number_of_imposters, starting_cards)
-
-def sendPlayerList(action='player_list'):
-    logger.info("Sending player list to all clients")
+def sendPlayerList(game, room, action='player_list'):
+    logger.info(f"Sending player list to room {room}")
     player_list = [player.to_json() for player in game.players]
     logger.debug(f"Player List: {player_list}")
-    emit('game_data', {'action': action, 'list': player_list}, broadcast=True, json=True)
+    emit('game_data', {'action': action, 'list': player_list}, room=room, json=True)
+
+def get_game_by_player(player_id):
+    room = player_room.get(player_id)
+    if room:
+        return rooms.get(room), room
+    return None, None
 
 @app.route('/')
 def index():
@@ -75,37 +86,30 @@ def handle_connect():
     logger.info(f'Client connected: {request.sid}')
     emit('task_locations', locations, json=True)
 
-    if game.game_running:
-        emit("game_start")
-        emit("crew_score", {"score": game.crew_score})
-        emit("task_goal", game.taskGoal)
-
-        if game.end_state:
-            logger.info(f"Game over: {game.end_state}")
-            emit("end_game", game.end_state)
-        if len(game.card_deck.active_cards) > 0:
-            game.card_deck.emit_active_cards()
-
-        if game.active_hack > 0:
-            emit("hack", game.active_hack)
-            logger.debug(f"Active hack: {game.active_hack}")
-        if game.meeting:
-            print(game.meeting.time_left)
-            emit("meeting", game.meeting.to_json())
-            if game.meeting.stage == 'voting':
-                game.meeting.emit_vote_counts()
-            logger.debug("Meeting is active")
+@socketio.on('create_room')
+def handle_create_room():
+    room_id = str(uuid4())[:6]
+    rooms[room_id] = create_game(room_id)
+    emit('room_created', {'room_id': room_id}, to=request.sid)
 
 @socketio.on('rejoin')
 def handleJoin(data):
-    player = game.getPlayerById(data.get('player_id'))
+    room_id = data.get('room_id')
+    player_id = data.get('player_id')
+    game = rooms.get(room_id)
+    if not game:
+        emit('error', {'message': 'Room not found'}, to=request.sid)
+        return
+    player = game.getPlayerById(player_id)
     if player:
         logger.info("Existing player rejoining...")
         player.sid = request.sid
-        sendPlayerList("rejoin")
+        join_room(room_id)
+        player_room[player.player_id] = room_id
+        sendPlayerList(game, room_id, "rejoin")
 
         if game.denied_location:
-            emit('active_denial', game.denied_location)
+            emit('active_denial', game.denied_location, room=room_id)
 
         if player.meltdown_code and game.active_meltdown:
             emit("meltdown_code", player.meltdown_code, to=player.sid)
@@ -122,15 +126,19 @@ def addTask(data):
 
 @socketio.on("complete_task")
 def handleTaskComplete(data):
-    player = game.getPlayerById(data.get('player_id'))
-    if player and len(taskHandler.tasks) > 0:
+    player_id = data.get('player_id')
+    game, room = get_game_by_player(player_id)
+    if not game:
+        return
+    player = game.getPlayerById(player_id)
+    if player and len(game.task_handler.tasks) > 0:
         game.crew_score += 1
-        emit("crew_score", {"score": game.crew_score}, broadcast=True)
+        emit("crew_score", {"score": game.crew_score}, room=room)
         logger.info(f"Player {player.player_id} completed a task. Crew score: {game.crew_score}")
         player.task = game.getTask()
         emit("task", {"task": player.task}, to=player.sid)
         logger.debug(f"Assigned new task to player {player.player_id}: {player.task}")
-    elif player and len(taskHandler.tasks) == 0:
+    elif player and len(game.task_handler.tasks) == 0:
         player.task = None
         emit("task", {"task": "No More Tasks"}, to=player.sid)
         logger.info(f"No more tasks available. Informed player {player.player_id}")
@@ -145,17 +153,24 @@ def handleHack(hack_length=30):
 @socketio.on("play_card")
 def playCard(data):
     print(data)
-    player = game.getPlayerById(data.get('player_id'))
+    player_id = data.get('player_id')
+    game, _ = get_game_by_player(player_id)
+    if not game:
+        return
+    player = game.getPlayerById(player_id)
     card = player.get_card(data.get('card_id'))
     if card:
         card.play_card(player)
 
 @socketio.on("meeting")
 def handleMeeting(data):
-    if not game.meeting:
-        speaker.play_sound("meeting")
-        player = game.getPlayerById(data.get('player_id'))
-        game.start_meeting(player)
+    player_id = data.get('player_id')
+    game, room = get_game_by_player(player_id)
+    if not game or game.meeting:
+        return
+    speaker.play_sound("meeting")
+    player = game.getPlayerById(player_id)
+    game.start_meeting(player)
 
         # emit("meeting", broadcast=True)
         # game.meeting = True
@@ -163,56 +178,90 @@ def handleMeeting(data):
 
 @socketio.on("ready")
 def handleReady(data):
-    player = game.getPlayerById(data.get('player_id'))
+    player_id = data.get('player_id')
+    game, room = get_game_by_player(player_id)
+    if not game:
+        return
+    player = game.getPlayerById(player_id)
     player.ready = True
-    sendPlayerList()
+    sendPlayerList(game, room)
     game.try_start_voting() # only starts if all players are ready
 
 @socketio.on("vote")
 def handleVote(data):
-    voting_player = game.getPlayerById(data.get('player_id'))
-    voted_for = game.getPlayerById(data.get('votedFor'))
+    voting_player_id = data.get('player_id')
+    voted_for_id = data.get('votedFor')
+    game, _ = get_game_by_player(voting_player_id)
+    if not game:
+        return
+    voting_player = game.getPlayerById(voting_player_id)
+    voted_for = game.getPlayerById(voted_for_id)
     game.meeting.register_vote(voting_player, voted_for)
 
 @socketio.on("veto")
 def handleVote(data):
-    voting_player = game.getPlayerById(data.get('player_id'))
+    voting_player_id = data.get('player_id')
+    game, _ = get_game_by_player(voting_player_id)
+    if not game:
+        return
+    voting_player = game.getPlayerById(voting_player_id)
     game.meeting.register_vote(voting_player, veto=True)
         
 
 @socketio.on('end_meeting')
 def handleEndMeeting():
-    if game.meeting:
-        emit("end_meeting", broadcast=True)
-        game.meeting = False
-        logger.info("Meeting ended")
+    # Determine room by meeting owner's game
+    for room_id, game in rooms.items():
+        if game.meeting:
+            emit("end_meeting", room=room_id)
+            game.meeting = False
+            logger.info("Meeting ended")
 
 
 @socketio.on('meltdown')
-def handleMeltdown():
+def handleMeltdown(data):
+    player_id = data.get('player_id')
+    game, _ = get_game_by_player(player_id)
+    if not game:
+        return
     game.start_meltdown()
-    ## add card draw?
     logger.warning("Meltdown occurred.")
 
 @socketio.on("pin_entry")
 def handlePinEntry(data):
     logger.info("Pin entered")
+    player_id = data.get('player_id')
+    game, _ = get_game_by_player(player_id)
+    if not game:
+        return
     game.check_pin(data)
     logger.debug(f"Pin data: {data}")
 
 @socketio.on('player_dead')
 def handleDeath(data):
-    game.kill_player(data.get('player_id'))
+    player_id = data.get('player_id')
+    game, _ = get_game_by_player(player_id)
+    if not game:
+        return
+    game.kill_player(player_id)
 
 @socketio.on('reset')
-def reset_game():
+def reset_game(data):
+    room_id = data.get('room_id')
+    game = rooms.get(room_id)
+    if not game:
+        return
     for player in game.players:
         player.reset()
-    sendPlayerList()
+    sendPlayerList(game, room_id)
     logger.info("Game has been reset")
 
 @socketio.on('start_game')
 def handle_start(data):
+    room_id = data.get('room_id')
+    game = rooms.get(room_id)
+    if not game:
+        return
     if game.game_running:
         logger.warning("Start game attempted but game is already running")
         return
@@ -220,14 +269,12 @@ def handle_start(data):
     speaker.play_sound("theme")
     game.game_running = True
     game.assignRoles()
-    sendPlayerList('start_game')
-    emit("task_goal", game.taskGoal, broadcast=True)
+    sendPlayerList(game, room_id, 'start_game')
+    emit("task_goal", game.taskGoal, room=room_id)
     logger.info("Game started")
 
-    # Send a different task to each crewmate
     for player in game.players:
-        if not player.sus and len(taskHandler.tasks) > 0:
-            # gotta change this for impostor power ups 
+        if not player.sus and len(game.task_handler.tasks) > 0:
             player.task = game.getTask()
             emit("task", {"task": player.task}, to=player.sid)
             logger.debug(f"Assigned task to player {player.player_id}: {player.task}")
@@ -237,7 +284,14 @@ def handle_start(data):
 def handle_join(data):
     player_id = data.get('player_id')
     username = data.get('username')
+    room_id = data.get('room_id')
     sid = request.sid
+
+    game = rooms.get(room_id)
+    if not game:
+        emit('error', {'message': 'Room not found'}, to=sid)
+        return
+    join_room(room_id)
 
     if not username:
         emit('error', {'message': 'Username is required'}, to=sid)
@@ -247,12 +301,10 @@ def handle_join(data):
     if player_id:
         player = game.getPlayerById(player_id)
         if player:
-            # Player reconnected
             player.sid = sid
-            player.username = username  # Update username on reconnect
+            player.username = username
             logger.info(f"Player {player.username} (ID: {player.player_id}) reconnected with new SID: {sid}")
         else:
-            # Invalid player_id, create new player
             if game.game_running:
                 logger.warning(f"Join attempt with invalid player_id: {player_id} while game is running")
                 return
@@ -268,7 +320,8 @@ def handle_join(data):
         emit('player_id', {'player_id': player.player_id, 'pic': player.pic}, to=sid)
         logger.info(f"New player {username} joined with ID {player.player_id}")
 
-    sendPlayerList()
+    player_room[player.player_id] = room_id
+    sendPlayerList(game, room_id)
 
 @socketio.on('disconnect')
 def handle_disconnect():

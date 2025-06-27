@@ -93,11 +93,12 @@ class Card:
 
 class CardDeck:
 
-    def __init__(self, locations, socket, game):
+    def __init__(self, locations, socket, game, room):
         self.discard = []
         self.active_cards = []
         self.socket = socket
         self.game = game
+        self.room = room
 
         self.cards = [# CHANGE THESE THEYDONT WORK
             Card('Self Report', 'Call a body found meeting', self), 
@@ -164,7 +165,7 @@ class CardDeck:
         for card in self.active_cards:
             output.append(card.export())
         print(output)
-        self.socket.emit('active_cards', output)
+        self.socket.emit('active_cards', output, room=self.room)
 
 
 

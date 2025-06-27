@@ -14,6 +14,7 @@ export default function GameContext({ children }) {
         username: '',
         playerId: localStorage.getItem('player_id') || '',
     });
+    const [roomId, setRoomId] = useState(localStorage.getItem('room_id') || '');
 
     // united states
     const [gameState, setGameState] = useState({}); // <--- USE this PLEASE we need to refactor this shit
@@ -37,6 +38,12 @@ export default function GameContext({ children }) {
     const [endState, setEndState] = useState(undefined);
     const [taskEntry , setTaskEntry] = useState(false);
     const [taskLocations, setTaskLocations] = useState([]);
+
+    useEffect(() => {
+        if (roomId) {
+            localStorage.setItem('room_id', roomId);
+        }
+    }, [roomId]);
     const [deniedLocation, setDeniedLocation] = useState(undefined)
     const [votes, setVotes] = useState({})
     const [vetoVotes, setVetoVotes] = useState(0); 
@@ -143,6 +150,7 @@ export default function GameContext({ children }) {
             setConnected(true);
             socketRef.current.emit('rejoin', {
                 player_id: playerState.playerId,
+                room_id: roomId,
             });
         });
 
@@ -352,6 +360,8 @@ export default function GameContext({ children }) {
     const contextValue = useMemo(() => ({
         playerState,
         setPlayerState,
+        roomId,
+        setRoomId,
         gameState,
         setGameState,
         socket: socketRef.current,
@@ -406,6 +416,7 @@ export default function GameContext({ children }) {
         hackTime, 
         audio,
         playerState,
+        roomId,
         gameState,
         connected,
         players,
