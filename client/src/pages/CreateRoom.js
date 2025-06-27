@@ -8,19 +8,11 @@ function CreateRoomPage() {
     const { socket, setPlayerState, setRoomId, setCreateRoom } = useContext(DataContext);
 
     useEffect(() => {
-        socket.on('room_created', (data) => {
-            setRoomId(data.room_id);
-            const playerId = localStorage.getItem('player_id');
-            setPlayerState(prev => ({ ...prev, username }));
-            socket.emit('join', { player_id: playerId, username, room_id: data.room_id });
-            setCreateRoom(false);
-        });
         socket.on('error', (data) => setErrorMsg(data.message));
         return () => {
-            socket.off('room_created');
             socket.off('error');
         };
-    }, [socket, username, setRoomId, setPlayerState, setCreateRoom]);
+    }, [socket]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -28,7 +20,16 @@ function CreateRoomPage() {
             setErrorMsg('Username required');
             return;
         }
-        socket.emit('create_room');
+        fetch('/api/rooms', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                setRoomId(data.room_id);
+                const playerId = localStorage.getItem('player_id');
+                setPlayerState(prev => ({ ...prev, username }));
+                socket.emit('join', { player_id: playerId, username, room_id: data.room_id });
+                setCreateRoom(false);
+            })
+            .catch(() => setErrorMsg('Failed to create room'));
     };
 
     return (

@@ -38,7 +38,7 @@ ignore_bedroom_speakers = True
 import eventlet
 eventlet.monkey_patch()
 from flask import Flask, request
-from flask_socketio import SocketIO, emit, join_room
+from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask_cors import CORS
 from assets.game import Game
 from assets.sonosHandler import SonosController
@@ -76,6 +76,23 @@ def get_game_by_player(player_id):
     if room:
         return rooms.get(room), room
     return None, None
+
+@app.route('/api/rooms/<room_id>', methods=['GET'])
+def api_check_room(room_id):
+    """Return 200 if the room exists so the client can verify rooms via HTTP."""
+    if room_id in rooms:
+        logger.debug(f"API check: room {room_id} exists")
+        return {'exists': True}, 200
+    logger.warning(f"API check failed: room {room_id} not found")
+    return {'error': 'Room not found'}, 404
+
+@app.route('/api/rooms', methods=['POST'])
+def api_create_room():
+    """Create a new room and return the room id."""
+    room_id = str(uuid4())[:4]
+    rooms[room_id] = create_game(room_id)
+    logger.info(f"Room {room_id} created via HTTP API")
+    return {'room_id': room_id}, 201
 
 @app.route('/')
 def index():
@@ -351,6 +368,7 @@ def handle_leave(data):
         logger.info(f"Player {player.username} leaving room {room_id}")
         game.players.remove(player)
         player_room.pop(player_id, None)
+        leave_room(room_id, sid=player.sid)
         if len(game.players) == 0:
             logger.info(f"Room {room_id} is empty and will be removed")
             del rooms[room_id]

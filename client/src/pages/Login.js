@@ -17,12 +17,22 @@ function LoginPage() {
     const handleJoin = async (e) => {
         e.preventDefault();
 
-        setPlayerState(prevState => ({ ...prevState, username: username }));
-        let playerId = localStorage.getItem('player_id');
+        setPlayerState(prevState => ({ ...prevState, username }));
+        const playerId = localStorage.getItem('player_id');
         const room = roomCode || roomId;
         if (!room) return;
-        setRoomId(room);
-        socket.emit('join', { player_id: playerId, username: username, room_id: room });
+
+        try {
+            const res = await fetch(`/api/rooms/${room}`);
+            if (!res.ok) {
+                setErrorMsg('Room not found');
+                return;
+            }
+            setRoomId(room);
+            socket.emit('join', { player_id: playerId, username, room_id: room });
+        } catch {
+            setErrorMsg('Failed to reach server');
+        }
     };
 
     useEffect(() => {
