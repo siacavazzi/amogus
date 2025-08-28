@@ -245,6 +245,22 @@ class Game:
             self.meeting.veto_votes.discard(player_id)
 
         if player in self.players:
-            self.players.remove(player)
+            # mutate list in-place so references like meltdown.players stay valid
+            self.players[:] = [p for p in self.players if p is not player]
+
+        # Adjust role counts if the game has already started
+        if self.game_running:
+            if player.sus:
+                self.numImposters -= 1
+                if self.numImposters <= 0:
+                    self.end_state = 'victory'
+                    self.speaker.play_sound('crew_victory')
+                    self.socket.emit("end_game", self.end_state, room=self.room)
+            else:
+                self.numCrew -= 1
+                if self.numCrew <= 0:
+                    self.end_state = 'sus_victory'
+                    self.speaker.play_sound('sus_victory')
+                    self.socket.emit("end_game", self.end_state, room=self.room)
         
 
