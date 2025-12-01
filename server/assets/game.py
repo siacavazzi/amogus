@@ -13,7 +13,7 @@ from assets.utils import *
 
 class Game:
 
-    def __init__(self, socket, task_handler, speaker, task_ratio, meltdown_time, code_percent, locations, vote_time, card_draw_probability, numImposters, starting_cards):
+    def __init__(self, socket, task_handler, speaker, task_ratio, meltdown_time, code_percent, locations, vote_time, card_draw_probability, numImposters, starting_cards, vote_threshold):
         self.players = []
         self.task_handler = task_handler
         self.crew_score = 0
@@ -41,6 +41,7 @@ class Game:
         self.meltdown_time_mod = 0
         self.code_percent = code_percent
         self.vote_time = vote_time
+        self.vote_threshold = vote_threshold
 
     def start_meltdown(self):
         self.speaker.loop_sound("meltdown", self.meltdown_time - self.meltdown_time_mod)

@@ -63,7 +63,7 @@ class SonosController:
             if self.ignore_bedroom_speakers:
                 filtered_speakers = [
                     speaker for speaker in discovered_speakers
-                    if 'bed' not in speaker.player_name.lower()
+                    if 'Suite' not in speaker.player_name.lower()
                 ]
                 ignored_count = len(discovered_speakers) - len(filtered_speakers)
                 self.speakers = filtered_speakers

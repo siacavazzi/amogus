@@ -1,4 +1,5 @@
 import json
+import math
 from threading import Thread
 from flask_socketio import emit
 import time
@@ -83,30 +84,49 @@ class Meeting:
 
     def check_veto_threshold(self):
         """
-        Check if the number of veto votes exceeds half the players.
+        Check if the number of veto votes exceeds half the living players.
         """
         veto_count = len(self.veto_votes)
-        player_count = len(self.game.players)
-        return veto_count > (player_count / 2)
+        living_player_count = self.game.get_num_living_players()
+        return veto_count > (living_player_count / 2)
     
     def determine_voted_out(self, vote_counts):
         """
         Determine the player with the most votes.
+        Requires a configurable fraction of living players to vote for someone to eject them.
+        Returns None if there's a tie, no votes, or threshold not met.
         """
         if not vote_counts:
             return None  # No votes cast
 
-    # Sort players by vote count in descending order
-        sorted_votes = sorted(vote_counts.items(), key=lambda item: item[1], reverse=True)
+        # Filter out players with 0 votes
+        players_with_votes = {k: v for k, v in vote_counts.items() if v > 0}
+        
+        if not players_with_votes:
+            print("No votes cast for any player.")
+            return None
 
-    # Check for a tie
+        # Sort players by vote count in descending order
+        sorted_votes = sorted(players_with_votes.items(), key=lambda item: item[1], reverse=True)
+
+        # Check for a tie at the top
         if len(sorted_votes) > 1 and sorted_votes[0][1] == sorted_votes[1][1]:
             print("Tie detected. No one is voted out.")
             return None
 
-    # Return the player with the most votes
+        # Get the player with the most votes
         voted_out_player = sorted_votes[0][0]
-        print(f"Player voted out: {voted_out_player}")
+        votes_received = sorted_votes[0][1]
+
+        # Calculate required votes based on living player count and threshold
+        living_player_count = self.game.get_num_living_players()
+        required_votes = math.ceil(living_player_count * self.game.vote_threshold)
+
+        if votes_received < required_votes:
+            print(f"Not enough votes. Got {votes_received}, need {required_votes} ({self.game.vote_threshold * 100:.0f}% of {living_player_count} living players).")
+            return None
+
+        print(f"Player voted out: {voted_out_player} with {votes_received} votes (needed {required_votes})")
         return voted_out_player
 
     

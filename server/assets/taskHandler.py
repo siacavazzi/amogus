@@ -79,11 +79,13 @@ class TaskHandler:
             f"Successfully added the task: {task_obj}, there are now {len(self.tasks)} tasks"
         )
 
+    def reset(self):
+        self._load_tasks()
+        print("Tasks have been reset to the file contents.")
 
     def get_task(self, denied_location=None):
         if not self.tasks:
-            print("No tasks available.")
-            return None
+            self.reset()
         
         if denied_location:
             eligible_tasks = [
@@ -101,10 +103,6 @@ class TaskHandler:
         self.tasks.remove(task)
 
         return task
-
-    def reset(self):
-        self._load_tasks()
-        print("Tasks have been reset to the file contents.")
 
     def _validate_difficulty(self, difficulty):
         if not isinstance(difficulty, int) or not (1 <= difficulty <= 3):

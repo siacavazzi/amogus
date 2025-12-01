@@ -11,24 +11,27 @@ locations = [
 # length of voting during meetings
 vote_time = 180 # s
 
+# fraction of living players needed to vote for someone to eject them (e.g., 0.66 = 2/3 majority)
+vote_threshold = 0.66
+
 # how long players have to stop a meltdown without card modifications(seconds)
 meltdown_time = 60 # s
 
 # fraction of players who need to enter a code to end meltdown (ex if 0.4 - 4 of 10 players need to enter codes)
-code_percent = 0.7
+code_percent = 0.6
 
 #Imposter stuff
 number_of_imposters = 2
 # probability of imposter drawing a card out of 1 (reduce this if the imposter is OP)
 card_draw_probability = 0.90 # / 1
-starting_cards = 8
+starting_cards = 2
 
 # number of tasks each player need to finish to win (on average)
 task_ratio = 12
 
 # SOUND SETTINGS
 sonos_enabled = False
-speaker_volume = 80 # %
+speaker_volume = 50 # %
 # dont play sounds on speakers with 'bed' in the name
 ignore_bedroom_speakers = True
 
@@ -58,7 +61,7 @@ if sonos_enabled:
     speaker.play_sound("theme")
 
 taskHandler = TaskHandler(locations)
-game = Game(socketio, taskHandler, speaker, task_ratio, meltdown_time, code_percent, locations, vote_time, card_draw_probability, number_of_imposters, starting_cards)
+game = Game(socketio, taskHandler, speaker, task_ratio, meltdown_time, code_percent, locations, vote_time, card_draw_probability, number_of_imposters, starting_cards, vote_threshold)
 
 def sendPlayerList(action='player_list'):
     logger.info("Sending player list to all clients")
@@ -68,7 +71,7 @@ def sendPlayerList(action='player_list'):
 
 @app.route('/')
 def index():
-    return "<h1>You shouldn't see this. Please change your port from :5000 to :3000</h1>"
+    return "<h1>You shouldn't see this. Please change your port from :5001 to :3000</h1>"
 
 @socketio.on('connect')
 def handle_connect():
@@ -280,8 +283,8 @@ def handle_disconnect():
 
 if __name__ == '__main__':
     local_ip = get_local_ip()
-    write_ip_to_file(f"{local_ip}:5000")
+    write_ip_to_file(f"{local_ip}:5001")
     logger.info("Starting server...")
-    logger.info(f" * Please set ENDPOINT to: http://{local_ip}:5000")
+    logger.info(f" * Please set ENDPOINT to: http://{local_ip}:5001")
     logger.info("Press CTRL+C to quit")
-    socketio.run(app, host='0.0.0.0', port=5000, debug=False)
+    socketio.run(app, host='0.0.0.0', port=5001, debug=False)
