@@ -168,7 +168,10 @@ function ReactorMeltdown() {
 
     const handleSubmit = (enteredPin) => {
         console.log("Entered PIN:", enteredPin.join(""));
-        socket.emit("pin_entry", enteredPin.join(""));
+        socket.emit("pin_entry", { 
+            player_id: localStorage.getItem('player_id'),
+            pin: enteredPin.join("") 
+        });
     };
 
     return (

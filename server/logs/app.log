@@ -1447,3 +1447,98 @@
 2025-11-30 00:52:53,560 - app_logger - INFO - Client disconnected: EeUSHbcFdTjT1hbkAAAX
 2025-11-30 00:52:56,502 - app_logger - INFO - Client connected: TT4RPx2J7des9WiQAAAZ
 2025-11-30 00:53:32,634 - app_logger - INFO - Client disconnected: TT4RPx2J7des9WiQAAAZ
+2025-12-04 14:28:36,573 - app_logger - INFO - Starting server...
+2025-12-04 14:28:36,573 - app_logger - INFO -  * Please set ENDPOINT to: http://192.168.68.63:5001
+2025-12-04 14:28:36,574 - app_logger - INFO - Press CTRL+C to quit
+2025-12-04 14:35:35,164 - app_logger - INFO - Starting server...
+2025-12-04 14:35:35,165 - app_logger - INFO -  * Please set ENDPOINT to: http://192.168.68.63:5001
+2025-12-04 14:35:35,165 - app_logger - INFO - Press CTRL+C to quit
+2025-12-04 14:35:56,451 - app_logger - INFO - Client connected: ydL8bdoMzBUjveaVAAAC
+2025-12-04 14:36:13,073 - app_logger - INFO - Game created with room code: RTLX
+2025-12-04 14:39:43,478 - app_logger - INFO - Client disconnected: ydL8bdoMzBUjveaVAAAC
+2025-12-04 14:39:43,790 - app_logger - INFO - Client connected: XY34QG4I46gqbq6FAAAF
+2025-12-04 14:40:05,835 - app_logger - INFO - Client connected: iSWb5P-K8UNXtQPXAAAH
+2025-12-04 14:40:17,709 - app_logger - WARNING - Join attempt for non-existent room: RTLK
+2025-12-04 14:40:24,445 - app_logger - INFO - Client disconnected: iSWb5P-K8UNXtQPXAAAH
+2025-12-04 14:40:24,534 - app_logger - INFO - Client connected: 6WUTCZdzfEK4BH_sAAAJ
+2025-12-04 14:40:27,752 - app_logger - INFO - Client 6WUTCZdzfEK4BH_sAAAJ joined room RTLX
+2025-12-04 14:40:32,973 - app_logger - INFO - New player Sam joined room RTLX with ID 402aa410-770d-46a9-ab6f-9997d7fa6cd2
+2025-12-04 14:40:32,974 - app_logger - INFO - Sending player list to room RTLX
+2025-12-04 14:40:32,974 - app_logger - DEBUG - Player List: ['{"sid": "6WUTCZdzfEK4BH_sAAAJ", "player_id": "402aa410-770d-46a9-ab6f-9997d7fa6cd2", "username": "Sam", "active": true, "sus": false, "alive": true, "pic": 10, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-04 14:40:35,661 - app_logger - INFO - Client disconnected: 6WUTCZdzfEK4BH_sAAAJ
+2025-12-04 14:40:35,745 - app_logger - INFO - Client connected: GO1oKkfBYQ9Qp-oHAAAL
+2025-12-04 14:40:35,756 - app_logger - INFO - Player 402aa410-770d-46a9-ab6f-9997d7fa6cd2 rejoining room RTLX
+2025-12-04 14:40:35,756 - app_logger - INFO - Sending player list to room RTLX
+2025-12-04 14:40:35,756 - app_logger - DEBUG - Player List: ['{"sid": "GO1oKkfBYQ9Qp-oHAAAL", "player_id": "402aa410-770d-46a9-ab6f-9997d7fa6cd2", "username": "Sam", "active": true, "sus": false, "alive": true, "pic": 10, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-04 14:40:38,488 - app_logger - INFO - Sending player list to room RTLX
+2025-12-04 14:40:38,491 - app_logger - DEBUG - Player List: ['{"sid": "GO1oKkfBYQ9Qp-oHAAAL", "player_id": "402aa410-770d-46a9-ab6f-9997d7fa6cd2", "username": "Sam", "active": true, "sus": true, "alive": true, "pic": 10, "meltdown_code": null, "cards": ["{\\"action\\": \\"Taunt\\", \\"text\\": \\"Taunt crewmates with work PTSD\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"a85b930a-b4a6-4d4d-92de-23f188ce31a0\\", \\"countdown\\": false}", "{\\"action\\": \\"Shorten Meltdown\\", \\"text\\": \\"Reduce the amount of time players have to stop the next meltdown\\", \\"location\\": null, \\"duration\\": 12, \\"time_left\\": 12, \\"id\\": \\"f16982b2-a778-4a93-a23e-5ecb401c88eb\\", \\"countdown\\": false}"], "ready": false}']
+2025-12-04 14:40:38,491 - app_logger - INFO - Game started in room RTLX
+2025-12-04 14:41:35,571 - app_logger - INFO - Client disconnected: GO1oKkfBYQ9Qp-oHAAAL
+2025-12-04 14:43:48,182 - app_logger - INFO - Client connected: LnINS0SjqnSLHYnGAAAN
+2025-12-04 14:43:48,195 - app_logger - INFO - Player 402aa410-770d-46a9-ab6f-9997d7fa6cd2 rejoining room RTLX
+2025-12-04 14:43:48,196 - app_logger - INFO - Sending player list to room RTLX
+2025-12-04 14:43:48,196 - app_logger - DEBUG - Player List: ['{"sid": "LnINS0SjqnSLHYnGAAAN", "player_id": "402aa410-770d-46a9-ab6f-9997d7fa6cd2", "username": "Sam", "active": true, "sus": true, "alive": true, "pic": 10, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-04 14:44:05,294 - app_logger - INFO - Client disconnected: LnINS0SjqnSLHYnGAAAN
+2025-12-04 14:46:02,853 - app_logger - INFO - Client disconnected: XY34QG4I46gqbq6FAAAF
+2025-12-04 14:46:12,124 - app_logger - INFO - Starting server...
+2025-12-04 14:46:12,125 - app_logger - INFO -  * Please set ENDPOINT to: http://192.168.68.63:5001
+2025-12-04 14:46:12,125 - app_logger - INFO - Press CTRL+C to quit
+2025-12-04 14:46:12,658 - app_logger - INFO - Client connected: znpHjB0INPvfwwZCAAAC
+2025-12-04 14:46:27,996 - app_logger - INFO - Game created with room code: QPFJ
+2025-12-04 14:46:49,561 - app_logger - INFO - Client connected: QDRgZ74oJSzwCgLeAAAE
+2025-12-04 14:46:56,110 - app_logger - INFO - Client QDRgZ74oJSzwCgLeAAAE joined room QPFJ
+2025-12-04 14:46:58,978 - app_logger - INFO - New player Sam joined room QPFJ with ID 2728a524-bf14-45d0-8aba-aefe8566971a
+2025-12-04 14:46:58,979 - app_logger - INFO - Sending player list to room QPFJ
+2025-12-04 14:46:58,981 - app_logger - DEBUG - Player List: ['{"sid": "QDRgZ74oJSzwCgLeAAAE", "player_id": "2728a524-bf14-45d0-8aba-aefe8566971a", "username": "Sam", "active": true, "sus": false, "alive": true, "pic": 1, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-04 14:47:43,503 - app_logger - INFO - Client disconnected: QDRgZ74oJSzwCgLeAAAE
+2025-12-04 14:47:43,601 - app_logger - INFO - Client connected: e1xKb4g7HMS3--DKAAAG
+2025-12-04 14:47:43,616 - app_logger - INFO - Player 2728a524-bf14-45d0-8aba-aefe8566971a rejoining room QPFJ
+2025-12-04 14:47:43,618 - app_logger - INFO - Sending player list to room QPFJ
+2025-12-04 14:47:43,618 - app_logger - DEBUG - Player List: ['{"sid": "e1xKb4g7HMS3--DKAAAG", "player_id": "2728a524-bf14-45d0-8aba-aefe8566971a", "username": "Sam", "active": true, "sus": false, "alive": true, "pic": 1, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-04 14:47:48,994 - app_logger - INFO - Sending player list to room QPFJ
+2025-12-04 14:47:48,994 - app_logger - DEBUG - Player List: ['{"sid": "e1xKb4g7HMS3--DKAAAG", "player_id": "2728a524-bf14-45d0-8aba-aefe8566971a", "username": "Sam", "active": true, "sus": true, "alive": true, "pic": 1, "meltdown_code": null, "cards": ["{\\"action\\": \\"Area Denial\\", \\"text\\": \\"Stop sending tasks to a specific location\\", \\"location\\": \\"3rd Floor\\", \\"duration\\": 120, \\"time_left\\": 120, \\"id\\": \\"6d48b222-5fa3-4761-970c-b8c637eec4c1\\", \\"countdown\\": true}", "{\\"action\\": \\"Area Denial\\", \\"text\\": \\"Stop sending tasks to a specific location\\", \\"location\\": \\"2nd Floor\\", \\"duration\\": 120, \\"time_left\\": 120, \\"id\\": \\"00253783-d1d3-43cc-86d6-2d25ac3d2aaf\\", \\"countdown\\": true}"], "ready": false}']
+2025-12-04 14:47:48,995 - app_logger - INFO - Game started in room QPFJ
+2025-12-04 14:51:12,368 - app_logger - INFO - Client disconnected: e1xKb4g7HMS3--DKAAAG
+2025-12-04 14:52:58,836 - app_logger - INFO - Client disconnected: znpHjB0INPvfwwZCAAAC
+2025-12-04 14:52:58,843 - app_logger - INFO - Client connected: Y4tBpxK6HENVXxysAAAI
+2025-12-04 14:53:15,328 - app_logger - INFO - Client disconnected: Y4tBpxK6HENVXxysAAAI
+2025-12-04 14:53:15,332 - app_logger - INFO - Client connected: 84rM0VlUfE2qP0tnAAAK
+2025-12-04 15:00:00,319 - app_logger - INFO - Client disconnected: 84rM0VlUfE2qP0tnAAAK
+2025-12-04 15:00:00,344 - app_logger - INFO - Client connected: eDvoJsPdLoz8hn-cAAAN
+2025-12-04 15:00:12,656 - app_logger - INFO - Client disconnected: eDvoJsPdLoz8hn-cAAAN
+2025-12-04 15:00:12,666 - app_logger - INFO - Client connected: yv_TavPwNvA79D9uAAAP
+2025-12-04 15:00:27,222 - app_logger - INFO - Client disconnected: yv_TavPwNvA79D9uAAAP
+2025-12-04 15:00:27,227 - app_logger - INFO - Client connected: fUtihXBNEsHE25fvAAAR
+2025-12-04 15:00:46,723 - app_logger - INFO - Client disconnected: fUtihXBNEsHE25fvAAAR
+2025-12-04 15:00:46,745 - app_logger - INFO - Client connected: Y4fH7mL58OagrUBsAAAT
+2025-12-04 15:02:16,843 - app_logger - INFO - Client disconnected: Y4fH7mL58OagrUBsAAAT
+2025-12-04 15:02:17,876 - app_logger - INFO - Starting server...
+2025-12-04 15:02:17,876 - app_logger - INFO -  * Please set ENDPOINT to: http://192.168.68.63:5001
+2025-12-04 15:02:17,876 - app_logger - INFO - Press CTRL+C to quit
+2025-12-04 15:02:19,014 - app_logger - INFO - Client connected: 1nTCqLkuZOP5Q1EJAAAB
+2025-12-04 15:02:21,112 - app_logger - INFO - Client disconnected: 1nTCqLkuZOP5Q1EJAAAB
+2025-12-04 15:02:21,741 - app_logger - INFO - Client connected: j6vvAofYfNHte5QjAAAE
+2025-12-04 15:02:25,374 - app_logger - INFO - Client disconnected: j6vvAofYfNHte5QjAAAE
+2025-12-04 15:02:25,525 - app_logger - INFO - Client connected: -sghL95srGbSyF5iAAAH
+2025-12-04 15:03:07,464 - app_logger - INFO - Client connected: REIcJqF_kYoxJ8YjAAAJ
+2025-12-04 15:03:22,996 - app_logger - INFO - Client disconnected: REIcJqF_kYoxJ8YjAAAJ
+2025-12-04 15:04:10,347 - app_logger - INFO - Client disconnected: -sghL95srGbSyF5iAAAH
+2025-12-04 15:04:12,431 - app_logger - INFO - Starting server...
+2025-12-04 15:04:12,431 - app_logger - INFO -  * Please set ENDPOINT to: http://192.168.68.63:5001
+2025-12-04 15:04:12,431 - app_logger - INFO - Press CTRL+C to quit
+2025-12-04 15:04:16,469 - app_logger - INFO - Client connected: QGglC7o78vUjJyayAAAC
+2025-12-04 15:04:17,602 - app_logger - INFO - Game created with room code: QFCO
+2025-12-04 15:04:17,621 - app_logger - INFO - Reactor registered for room QFCO (sid: QGglC7o78vUjJyayAAAC)
+2025-12-04 15:05:00,115 - app_logger - INFO - Game QFCO config updated: {'locations': ['2nd Floor', '3rd Floor', 'a'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 3, 'card_draw_probability': 0.85, 'starting_cards': 4, 'task_ratio': 12}
+2025-12-04 15:05:00,125 - app_logger - INFO - Room QFCO is now open for players
+2025-12-04 15:48:46,213 - app_logger - INFO - Client disconnected: QGglC7o78vUjJyayAAAC
+2025-12-04 15:48:46,234 - app_logger - INFO - Client connected: jWMWBfbOkrwhMEmVAAAE
+2025-12-04 15:50:42,874 - app_logger - INFO - Client disconnected: jWMWBfbOkrwhMEmVAAAE
+2025-12-04 15:50:43,965 - app_logger - INFO - Starting server...
+2025-12-04 15:50:43,966 - app_logger - INFO -  * Please set ENDPOINT to: http://192.168.68.63:5001
+2025-12-04 15:50:43,966 - app_logger - INFO - Press CTRL+C to quit
+2025-12-04 15:50:45,213 - app_logger - INFO - Client connected: a8eDb2DMHNYM1auzAAAB
+2025-12-04 15:50:46,890 - app_logger - INFO - Game created with room code: RGDA
+2025-12-04 15:50:46,893 - app_logger - INFO - Reactor registered for room RGDA (sid: a8eDb2DMHNYM1auzAAAB)
+2025-12-04 15:51:24,705 - app_logger - INFO - Game RGDA config updated: {'locations': ['Basement', '1st Floor', '2nd Floor', '3rd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.75, 'num_imposters': 2, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-04 15:51:24,708 - app_logger - INFO - Room RGDA is now open for players

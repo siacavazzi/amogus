@@ -18,7 +18,7 @@ function ReactorNormal() {
     const handleSabotage = () => {
         setIsSabotaging(true);
         setTimeout(() => {
-            socket.emit("meltdown");
+            socket.emit("meltdown", { player_id: localStorage.getItem('player_id') });
             setIsSabotaging(false);
         }, 3000);
     };

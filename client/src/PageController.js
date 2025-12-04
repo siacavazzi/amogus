@@ -1,6 +1,7 @@
 // PageController.jsx
 import React, { useContext, useEffect, useState, memo } from "react";
 import { DataContext } from "./GameContext";
+import LobbyPage from "./pages/LobbyPage";
 import LoginPage from "./pages/Login";
 import ConnectingPage from "./pages/ConnectingPage";
 import PlayersPage from "./pages/PlayersPage";
@@ -23,6 +24,7 @@ import ReactorWaiting from "./pages/ReactorWaiting";
 import TaskEntryPage from "./pages/TaskEntryPage";
 import VotingPage from "./pages/VotingPage";
 import MeetingResultPage from "./pages/MeetingResultsPage";
+import GameConfigPage from "./pages/GameConfigPage";
 
 const PageController = () => {
     const {
@@ -40,6 +42,10 @@ const PageController = () => {
         taskEntry,
         showSusPage,
         setShowSusPage,
+        inRoom,
+        roomCode,
+        isRoomCreator,
+        roomOpen,
     } = useContext(DataContext);
 
     const [currentPage, setCurrentPage] = useState("connecting");
@@ -47,6 +53,18 @@ const PageController = () => {
     useEffect(() => {
         if (!connected) {
             setCurrentPage("connecting");
+            return;
+        }
+
+        // Show lobby if not in a room yet
+        if (!inRoom && !roomCode) {
+            setCurrentPage("lobby");
+            return;
+        }
+
+        // Show config page for room creator before room is opened
+        if (inRoom && isRoomCreator && !roomOpen && !running) {
+            setCurrentPage("gameConfig");
             return;
         }
 
@@ -145,11 +163,16 @@ const PageController = () => {
         endState,
         taskEntry,
         showSusPage,
-
+        inRoom,
+        roomCode,
+        isRoomCreator,
+        roomOpen,
     ]);
 
     const pages = {
         connecting: <ConnectingPage />,
+        lobby: <LobbyPage />,
+        gameConfig: <GameConfigPage />,
         meltdown: <ReactorMeltdown />,
         reactorNormal: <ReactorNormal />,
         gameRunning: <GameRunningPage />,

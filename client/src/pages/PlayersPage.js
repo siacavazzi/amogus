@@ -1,17 +1,38 @@
 // ./pages/PlayersPage.jsx
 
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { DataContext } from "../GameContext";
 import MUECustomSlider from "../components/swiper";
 import PlayerCard from "../components/PlayerCard";
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Copy, Check } from 'lucide-react';
 
 export default function PlayersPage() {
-    const { players, socket, setMessage, setAudio, running, setTaskEntry } = useContext(DataContext);
+    const { players, socket, setMessage, setAudio, running, setTaskEntry, roomCode } = useContext(DataContext);
+    const [copied, setCopied] = useState(false);
 
     useEffect(() => {
         window.scrollTo(0, 0)
     }, [])
+
+    const copyRoomCode = async () => {
+        try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                await navigator.clipboard.writeText(roomCode);
+            } else {
+                // Fallback for older browsers/non-HTTPS
+                const textArea = document.createElement('textarea');
+                textArea.value = roomCode;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+            }
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch (err) {
+            console.error('Failed to copy:', err);
+        }
+    };
 
     console.log(running)
 
@@ -26,8 +47,7 @@ export default function PlayersPage() {
     }
 
     function startGame() {
-        socket.emit('start_game', {});
-
+        socket.emit('start_game', { player_id: localStorage.getItem('player_id') });
     }
 
     return (
@@ -41,6 +61,28 @@ export default function PlayersPage() {
                 <span className="text-sm">Task Entry</span>
             </button>}
             <div className="max-w-6xl mx-auto">
+                {/* Room Code Display */}
+                {roomCode && !running && (
+                    <div className="flex items-center justify-center mb-6">
+                        <div className="bg-gray-800 bg-opacity-80 px-6 py-3 rounded-lg flex items-center gap-3">
+                            <span className="text-gray-400 text-sm">Room:</span>
+                            <span className="text-2xl font-mono font-bold text-indigo-400 tracking-widest">
+                                {roomCode}
+                            </span>
+                            <button
+                                onClick={copyRoomCode}
+                                className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+                                title="Copy room code"
+                            >
+                                {copied ? (
+                                    <Check className="text-green-400" size={18} />
+                                ) : (
+                                    <Copy className="text-gray-400" size={18} />
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                )}
                 <div className="flex flex-col items-center mb-6">
                     <button
                         className="mb-4 bg-indigo-600 text-white py-2 px-6 rounded-full shadow-lg hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400"

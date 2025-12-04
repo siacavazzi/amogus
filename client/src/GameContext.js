@@ -15,6 +15,12 @@ export default function GameContext({ children }) {
         playerId: localStorage.getItem('player_id') || '',
     });
 
+    // Room/lobby state
+    const [roomCode, setRoomCode] = useState(localStorage.getItem('room_code') || '');
+    const [inRoom, setInRoom] = useState(false);
+    const [isRoomCreator, setIsRoomCreator] = useState(false);
+    const [roomOpen, setRoomOpen] = useState(false);
+
     // united states
     const [gameState, setGameState] = useState({}); // <--- USE this PLEASE we need to refactor this shit
     const [connected, setConnected] = useState(false);
@@ -55,6 +61,11 @@ export default function GameContext({ children }) {
             username: '',
             playerId: localStorage.getItem('player_id') || '',
         })
+        setRoomCode('')
+        setInRoom(false)
+        setIsRoomCreator(false)
+        setRoomOpen(false)
+        localStorage.removeItem('room_code')
         setTask(undefined)
         setRunning(false)
         setCrewScore(0);
@@ -141,9 +152,66 @@ export default function GameContext({ children }) {
 
         socketRef.current.on('connect', () => {
             setConnected(true);
-            socketRef.current.emit('rejoin', {
-                player_id: playerState.playerId,
-            });
+            // Try to rejoin existing game if we have a player_id
+            const playerId = localStorage.getItem('player_id');
+            if (playerId) {
+                socketRef.current.emit('rejoin', {
+                    player_id: playerId,
+                });
+            }
+        });
+
+        // Room management events
+        socketRef.current.on('game_created', (data) => {
+            console.log('Game created:', data);
+            setRoomCode(data.room_code);
+            setInRoom(true);
+            setIsRoomCreator(data.is_creator || false);
+            setRoomOpen(false);  // Room not open until creator opens it
+            localStorage.setItem('room_code', data.room_code);
+            
+            // Desktop clients register as reactor
+            if (!isMobile) {
+                socketRef.current.emit('register_reactor', { room_code: data.room_code });
+            }
+        });
+
+        socketRef.current.on('room_opened', (data) => {
+            console.log('Room opened:', data);
+            setRoomOpen(true);
+        });
+
+        socketRef.current.on('game_joined', (data) => {
+            console.log('Joined game:', data);
+            setRoomCode(data.room_code);
+            setInRoom(true);
+            setIsRoomCreator(false);
+            setRoomOpen(true);  // If we joined, the room must be open
+            localStorage.setItem('room_code', data.room_code);
+            
+            // Desktop clients register as reactor
+            if (!isMobile) {
+                socketRef.current.emit('register_reactor', { room_code: data.room_code });
+            }
+        });
+
+        socketRef.current.on('reactor_registered', (data) => {
+            console.log('Reactor registered:', data);
+        });
+
+        socketRef.current.on('rejoin_failed', (data) => {
+            console.log('Rejoin failed:', data);
+            // Clear stale session data
+            localStorage.removeItem('player_id');
+            localStorage.removeItem('room_code');
+            setPlayerState({ username: '', playerId: '' });
+            setRoomCode('');
+            setInRoom(false);
+        });
+
+        socketRef.current.on('error', (data) => {
+            console.error('Socket error:', data);
+            setDialog({ title: "Error", body: data.message });
         });
 
         socketRef.current.on('task_locations', (data) => {
@@ -177,6 +245,53 @@ export default function GameContext({ children }) {
 
         socketRef.current.on('reset', () => {
             resetState();
+        });
+
+        // Game reset - back to players page, same room
+        socketRef.current.on('game_reset', (data) => {
+            console.log('Game reset:', data);
+            setRunning(false);
+            setEndState(undefined);
+            setTask(undefined);
+            setCrewScore(0);
+            setMeetingState(undefined);
+            setMeltdownCode(undefined);
+            setMeltdownTimer(undefined);
+            setCodesNeeded(undefined);
+            setHackTime(0);
+            setActiveCards([]);
+            setShowSusPage(false);
+            setDeniedLocation(undefined);
+        });
+
+        // Room disbanded - go back to lobby
+        socketRef.current.on('room_disbanded', (data) => {
+            console.log('Room disbanded:', data);
+            localStorage.removeItem('player_id');
+            localStorage.removeItem('room_code');
+            setPlayerState({ username: '', playerId: '' });
+            setRoomCode('');
+            setInRoom(false);
+            setIsRoomCreator(false);
+            setRoomOpen(false);
+            setRunning(false);
+            setEndState(undefined);
+            setPlayers([]);
+        });
+
+        // Left room voluntarily
+        socketRef.current.on('left_room', () => {
+            console.log('Left room');
+            localStorage.removeItem('player_id');
+            localStorage.removeItem('room_code');
+            setPlayerState({ username: '', playerId: '' });
+            setRoomCode('');
+            setInRoom(false);
+            setIsRoomCreator(false);
+            setRoomOpen(false);
+            setRunning(false);
+            setEndState(undefined);
+            setPlayers([]);
         });
 
         socketRef.current.on('meltdown_code', (data) => {
@@ -397,7 +512,17 @@ export default function GameContext({ children }) {
         setKillCooldown,
         activeCards,
         modalOpen,
-        setModalOpen
+        setModalOpen,
+        // Room management
+        roomCode,
+        setRoomCode,
+        inRoom,
+        setInRoom,
+        isRoomCreator,
+        setIsRoomCreator,
+        roomOpen,
+        setRoomOpen,
+        resetState,
     }), [
         endState,
         meltdownCode,
@@ -425,7 +550,11 @@ export default function GameContext({ children }) {
         showSusPage,
         killCooldown,
         activeCards,
-        modalOpen
+        modalOpen,
+        roomCode,
+        inRoom,
+        isRoomCreator,
+        roomOpen,
     ]);
 
     return (

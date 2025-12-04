@@ -12,13 +12,26 @@ class Meltdown:
         self.valid_pins = [random.randint(1000, 9999) for _ in range(self.num_players)]
         self.codes_entered = 0
         self.meltdown_active = True
-        self.game = None
+        self.game = None  # Set after creation
         self.speaker = speaker
+
+    def emit_to_room(self, event, data=None):
+        """Emit to the game's room if available, otherwise broadcast."""
+        if self.game and self.game.room_code:
+            if data is not None:
+                self.socketio.emit(event, data, room=self.game.room_code)
+            else:
+                self.socketio.emit(event, room=self.game.room_code)
+        else:
+            if data is not None:
+                self.socketio.emit(event, data)
+            else:
+                self.socketio.emit(event)
 
     def start_countdown(self):
         """Starts the countdown timer."""
         print(f"Meltdown initiated! {self.time_left} seconds remaining.")
-        self.socketio.emit("codes_needed", self.codes_needed)
+        self.emit_to_room("codes_needed", self.codes_needed)
         self.distribute_codes()
         while self.time_left > 0:
             if self.codes_entered >= self.codes_needed:
@@ -26,7 +39,7 @@ class Meltdown:
                 return
             eventlet.sleep(1)  # Asynchronous delay
             self.time_left -= 1
-            self.socketio.emit('meltdown_update', self.time_left)
+            self.emit_to_room('meltdown_update', self.time_left)
 
         # If the countdown reaches 0 and the meltdown is still active
         if self.meltdown_active:
@@ -50,18 +63,18 @@ class Meltdown:
         except ValueError:
             # Handle the case where conversion fails
             print("Invalid PIN format. PIN should be a number.")
-            self.socketio.emit("code_incorrect")
+            self.emit_to_room("code_incorrect")
             return False
     
         if input_pin in self.valid_pins:
             print("Valid PIN entered!")
             self.valid_pins.remove(input_pin)
             self.codes_entered += 1
-            self.socketio.emit("code_correct", self.codes_needed - self.codes_entered)
+            self.emit_to_room("code_correct", self.codes_needed - self.codes_entered)
             return True
     
         print("Invalid PIN")
-        self.socketio.emit("code_incorrect")
+        self.emit_to_room("code_incorrect")
         return False
 
 
@@ -72,7 +85,7 @@ class Meltdown:
             if self.game:
                 self.game.active_meltdown = None
             self.speaker.play_sound("meltdown_over")
-            self.socketio.emit('meltdown_end')
+            self.emit_to_room('meltdown_end')
         else:
             print("Meltdown failed!")
             self.speaker.play_sound("meltdown_fail")
