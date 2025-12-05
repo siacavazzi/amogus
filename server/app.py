@@ -204,6 +204,31 @@ def handle_join_game(data):
     logger.info(f"Client {sid} joined room {room_code}")
 
 
+# ============ SONOS CONNECTOR ============
+
+@socketio.on('sonos_join')
+def handle_sonos_join(data):
+    """Handle a Sonos connector joining a game room."""
+    sid = request.sid
+    room_code = data.get('room_code', '').upper() if data else None
+    
+    if not room_code:
+        emit('sonos_error', {'message': 'Room code is required'})
+        return
+    
+    game = game_manager.get_game(room_code)
+    if not game:
+        emit('sonos_error', {'message': f'Game room {room_code} not found'})
+        return
+    
+    # Join the special Sonos room for this game
+    sonos_room = f"sonos_{room_code}"
+    join_room(sonos_room)
+    
+    logger.info(f"Sonos connector {sid} joined room {room_code}")
+    emit('sonos_joined', {'room_code': room_code, 'message': f'Connected to game {room_code}'})
+
+
 @socketio.on('register_reactor')
 def handle_register_reactor(data):
     """Register a desktop client as the reactor for a game room."""

@@ -1,0 +1,4 @@
+# Sonos Connector Dependencies
+python-socketio[client]>=5.0.0
+soco>=0.29.0
+requests>=2.25.0

@@ -4,6 +4,7 @@ import time
 from threading import Thread, Lock
 from assets.game import Game
 from assets.taskHandler import TaskHandler
+from assets.sonosHandler import GameSpeaker
 
 
 class GameManager:
@@ -45,11 +46,14 @@ class GameManager:
             # Clear default tasks - players must load a task list or create tasks collaboratively
             task_handler.tasks = []
             
+            # Create a per-game speaker for Sonos connectors
+            game_speaker = GameSpeaker(self.socketio, room_code)
+            
             # Create the game instance
             game = Game(
                 socket=self.socketio,
                 task_handler=task_handler,
-                speaker=self.speaker,
+                speaker=game_speaker,
                 task_ratio=self.config['TASK_RATIO'],
                 meltdown_time=self.config['MELTDOWN_TIME'],
                 code_percent=self.config['CODE_PERCENT'],

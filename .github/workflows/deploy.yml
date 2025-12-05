@@ -61,6 +61,8 @@ jobs:
       - name: Restart application
         run: |
           ssh root@${{ secrets.DROPLET_IP }} << 'EOF'
+            # Ensure all Python dependencies are installed
+            /opt/amogus/venv/bin/pip install -q flask flask-socketio flask-cors eventlet gunicorn soco
             systemctl restart amogus
             sleep 3
             systemctl status amogus --no-pager || true
@@ -69,4 +71,4 @@ jobs:
       - name: Health check
         run: |
           sleep 5
-          curl -f http://${{ secrets.DROPLET_IP }}/health || echo "Health check failed but deployment completed"
+          curl -f https://amogus-party.duckdns.org/health || echo "Health check failed but deployment completed"
