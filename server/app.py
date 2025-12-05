@@ -1,12 +1,15 @@
 import eventlet
 eventlet.monkey_patch()
-from flask import Flask, request
+import os
+import base64
+from flask import Flask, request, send_from_directory
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask_cors import CORS
 from assets.game_manager import GameManager
 from assets.sonosHandler import SonosController
 from assets.utils import *
 from assets.taskHandler import *
+from assets.task_list_manager import TaskListManager
 from config import (
     LOCATIONS, VOTE_TIME, VOTE_THRESHOLD, MELTDOWN_TIME, CODE_PERCENT,
     NUMBER_OF_IMPOSTERS, CARD_DRAW_PROBABILITY, STARTING_CARDS, TASK_RATIO,
@@ -38,6 +41,20 @@ speaker = SonosController(enabled=SONOS_ENABLED, default_volume=SPEAKER_VOLUME, 
 # Game manager handles multiple concurrent games
 game_manager = GameManager(socketio, speaker, game_config)
 
+# Task list manager for persistent task lists
+task_list_manager = TaskListManager()
+
+# Directory for storing selfie images
+SELFIES_DIR = os.path.join(os.path.dirname(__file__), 'selfies')
+os.makedirs(SELFIES_DIR, exist_ok=True)
+
+
+# Flask route to serve selfie images
+@app.route('/selfies/<filename>')
+def serve_selfie(filename):
+    """Serve selfie images from the selfies directory."""
+    return send_from_directory(SELFIES_DIR, filename)
+
 
 def get_game_and_player(player_id):
     """Helper to get game and player from player_id."""
@@ -56,9 +73,16 @@ def sendPlayerList(game, room_code, action='player_list'):
     socketio.emit('game_data', {'action': action, 'list': player_list}, room=room_code)
 
 
-@app.route('/')
-def index():
-    return "<h1>Among Us IRL Server</h1><p>Connect via the client application.</p>"
+# Serve React build files
+CLIENT_BUILD_DIR = os.path.join(os.path.dirname(__file__), '..', 'client', 'build')
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_client(path):
+    """Serve the React client application."""
+    if path and os.path.exists(os.path.join(CLIENT_BUILD_DIR, path)):
+        return send_from_directory(CLIENT_BUILD_DIR, path)
+    return send_from_directory(CLIENT_BUILD_DIR, 'index.html')
 
 
 @app.route('/api/games')
@@ -190,15 +214,30 @@ def handle_register_reactor(data):
         emit('error', {'message': 'Game not found'})
         return
     
-    if game.game_running:
+    # Allow re-registration if already the reactor (e.g., after reconnect)
+    # Only block new reactors from registering while game is running
+    if game.game_running and game.reactor_sid != sid and game.reactor_sid is not None:
         emit('error', {'message': 'Cannot register reactor after game has started'})
         return
     
     # Register this client as the reactor
     game.has_reactor = True
     game.reactor_sid = sid
+    
+    # Join the Socket.IO room so reactor receives room-wide events
+    join_room(room_code)
+    game_manager.sid_to_game[sid] = room_code
+    
     logger.info(f"Reactor registered for room {room_code} (sid: {sid})")
     emit('reactor_registered', {'room_code': room_code})
+    
+    # If game is running, send current game state to reactor
+    if game.game_running:
+        emit("game_start")
+        emit("crew_score", {"score": game.crew_score})
+        emit("task_goal", game.taskGoal)
+        if game.active_meltdown:
+            emit("meltdown_update", game.active_meltdown.time_left)
 
 
 # ============ CONNECTION HANDLING ============
@@ -280,6 +319,7 @@ def handle_join(data):
     player_id = data.get('player_id')
     username = data.get('username')
     room_code = data.get('room_code', '').upper()
+    selfie_data = data.get('selfie')  # Base64 encoded image data
     sid = request.sid
 
     if not username:
@@ -310,14 +350,41 @@ def handle_join(data):
         logger.warning(f"Join attempt while game running: {username}")
         return
 
-    player = game.addPlayer(sid, username)
+    # Save selfie if provided
+    selfie_filename = None
+    if selfie_data:
+        try:
+            # Remove data URL prefix if present (e.g., "data:image/jpeg;base64,")
+            if ',' in selfie_data:
+                selfie_data = selfie_data.split(',')[1]
+            
+            # Generate unique filename
+            import uuid
+            selfie_filename = f"{uuid.uuid4().hex}.jpg"
+            selfie_path = os.path.join(SELFIES_DIR, selfie_filename)
+            
+            # Decode and save
+            with open(selfie_path, 'wb') as f:
+                f.write(base64.b64decode(selfie_data))
+            
+            logger.info(f"Saved selfie for {username}: {selfie_filename}")
+        except Exception as e:
+            logger.error(f"Failed to save selfie for {username}: {e}")
+            selfie_filename = None
+
+    player = game.addPlayer(sid, username, selfie_filename)
     game_manager.register_player(player.player_id, room_code, sid)
     join_room(room_code)
     
     emit('player_id', {'player_id': player.player_id, 'pic': player.pic}, to=sid)
     logger.info(f"New player {username} joined room {room_code} with ID {player.player_id}")
     
+    # Send player list to all players in the room
     sendPlayerList(game, room_code)
+    
+    # Also send directly to the joining player to avoid race condition
+    player_list = [p.to_json() for p in game.players]
+    emit('game_data', {'action': 'player_list', 'list': player_list}, to=sid)
 
 
 # ============ GAME FLOW ============
@@ -336,10 +403,34 @@ def handle_start(data):
         logger.warning("Start game attempted but game is already running")
         return
 
+    # Calculate minimum tasks needed
+    min_tasks = max(len(game.players) * 3, 10)
+    
+    # Log current state for debugging
+    logger.info(f"Start game check - task_list_applied={game.task_list_applied}, task_handler.tasks={len(game.task_handler.tasks)}, min_tasks={min_tasks}")
+    
+    # Enter collaborative task creation mode if:
+    # 1. No task list was explicitly applied, OR
+    # 2. There aren't enough tasks in the task handler
+    if not game.task_list_applied or len(game.task_handler.tasks) < min_tasks:
+        game.task_creation_mode = True
+        socketio.emit('enter_task_creation', {
+            'min_tasks': min_tasks,
+            'current_tasks': len(game.collaborative_tasks),
+            'tasks': game.collaborative_tasks,
+            'locations': game.locations,
+            'task_list_code': game.collaborative_task_list_code
+        }, room=room_code)
+        logger.info(f"Game {room_code} entering collaborative task creation mode (task_list_applied={game.task_list_applied}, need {min_tasks} tasks, have {len(game.task_handler.tasks)})")
+        return
+
+    # We have enough tasks - start the game
+    logger.info(f"Starting game {room_code} with {len(game.task_handler.tasks)} tasks from applied task list")
     speaker.play_sound("theme")
     game.game_running = True
     game.assignRoles()
     sendPlayerList(game, room_code, 'start_game')
+    socketio.emit("game_start", room=room_code)
     socketio.emit("task_goal", game.taskGoal, room=room_code)
     logger.info(f"Game started in room {room_code}")
 
@@ -347,7 +438,7 @@ def handle_start(data):
     for p in game.players:
         if not p.sus and len(game.task_handler.tasks) > 0:
             p.task = game.getTask()
-            emit("task", {"task": p.task}, to=p.sid)
+            socketio.emit("task", {"task": p.task}, to=p.sid)
             logger.debug(f"Assigned task to player {p.player_id}: {p.task}")
 
 
@@ -418,9 +509,14 @@ def leave_room_handler(data):
     # Notify the leaving player
     emit('left_room')
     
-    # Notify remaining players
-    sendPlayerList(game, room_code)
-    logger.info(f"Player {player.username} left room {room_code}")
+    # If no players left, delete the room
+    if len(game.players) == 0:
+        game_manager.remove_game(room_code)
+        logger.info(f"Room {room_code} deleted (no players remaining)")
+    else:
+        # Notify remaining players
+        sendPlayerList(game, room_code)
+        logger.info(f"Player {player.username} left room {room_code}")
 
 
 # ============ TASK HANDLING ============
@@ -552,15 +648,33 @@ def handleEndMeeting(data=None):
 @socketio.on('meltdown')
 def handleMeltdown(data=None):
     """Start a meltdown event."""
-    if data:
+    sid = request.sid
+    game = None
+    room_code = None
+    
+    # First try to find game by player_id (mobile player triggering)
+    if data and data.get('player_id'):
         player_id = data.get('player_id')
         game, player, room_code = get_game_and_player(player_id)
-    else:
-        return
+    
+    # If not found, try by room_code (reactor triggering)
+    if not game and data and data.get('room_code'):
+        room_code = data.get('room_code', '').upper()
+        game = game_manager.get_game(room_code)
+    
+    # Finally, try by SID (reactor registered to a room)
+    if not game:
+        game, room_code = game_manager.get_game_by_sid(sid)
     
     if game:
-        game.start_meltdown()
-        logger.warning(f"Meltdown started in room {room_code}")
+        # Verify this is either a reactor or a player in the game
+        if game.reactor_sid == sid or (data and data.get('player_id')):
+            game.start_meltdown()
+            logger.warning(f"Meltdown started in room {room_code} (triggered by sid: {sid})")
+        else:
+            logger.warning(f"Meltdown rejected - unauthorized sid: {sid}")
+    else:
+        logger.warning(f"Meltdown failed - game not found for sid: {sid}")
 
 
 @socketio.on("pin_entry")
@@ -568,12 +682,36 @@ def handlePinEntry(data):
     """Handle meltdown PIN entry."""
     player_id = data.get('player_id')
     pin = data.get('pin')
-    game, player, room_code = get_game_and_player(player_id)
+    room_code = data.get('room_code', '').upper() if data.get('room_code') else None
+    sid = request.sid
     
-    if game and game.active_meltdown:
-        logger.info("Pin entered")
-        game.check_pin(pin)
-        logger.debug(f"Pin data: {pin}")
+    logger.info(f"PIN entry attempt: player_id={player_id}, room_code={room_code}, pin={pin}")
+    
+    game = None
+    
+    # Try to find game by player_id first
+    if player_id:
+        game, player, room_code = get_game_and_player(player_id)
+    
+    # If not found, try by room_code
+    if not game and room_code:
+        game = game_manager.get_game(room_code)
+    
+    # Finally try by SID (for reactor)
+    if not game:
+        game, room_code = game_manager.get_game_by_sid(sid)
+    
+    if not game:
+        logger.warning(f"PIN entry failed: game not found")
+        return
+    
+    if not game.active_meltdown:
+        logger.warning(f"PIN entry failed: no active meltdown in room {room_code}")
+        return
+    
+    logger.info(f"Checking PIN {pin} in room {room_code}")
+    game.check_pin(pin)
+    logger.debug(f"PIN check complete")
 
 
 # ============ PLAYER STATUS ============
@@ -588,12 +726,472 @@ def handleDeath(data):
         game.kill_player(player_id)
 
 
+# ============ TASK LIST MANAGEMENT ============
+
+@socketio.on('get_my_task_lists')
+def handle_get_my_task_lists(data):
+    """Get all task lists created by the current player."""
+    player_id = data.get('player_id')
+    if not player_id:
+        emit('error', {'message': 'Player ID required'})
+        return
+    
+    lists = task_list_manager.get_player_task_lists(player_id)
+    emit('my_task_lists', {'lists': lists})
+
+
+@socketio.on('load_task_list')
+def handle_load_task_list(data):
+    """Load a task list by its code."""
+    code = data.get('code', '').upper()
+    if not code:
+        emit('error', {'message': 'Task list code required'})
+        return
+    
+    task_list = task_list_manager.get_task_list(code)
+    if not task_list:
+        emit('error', {'message': f'Task list not found: {code}'})
+        return
+    
+    emit('task_list_loaded', {'task_list': task_list})
+
+
+@socketio.on('create_task_list')
+def handle_create_task_list(data):
+    """Create a new task list."""
+    player_id = data.get('player_id')
+    name = data.get('name', 'My Task List')
+    tasks = data.get('tasks', [])
+    locations = data.get('locations')
+    from_default = data.get('from_default', False)
+    
+    if not player_id:
+        emit('error', {'message': 'Player ID required'})
+        return
+    
+    if from_default:
+        code = task_list_manager.import_from_default(player_id, name)
+    else:
+        code = task_list_manager.create_task_list(player_id, name, tasks, locations)
+    
+    if code:
+        task_list = task_list_manager.get_task_list(code)
+        emit('task_list_created', {'task_list': task_list})
+        logger.info(f"Task list created: {code} by player {player_id}")
+    else:
+        emit('error', {'message': 'Failed to create task list'})
+
+
+@socketio.on('update_task_list')
+def handle_update_task_list(data):
+    """Update a task list (name, tasks, or locations)."""
+    player_id = data.get('player_id')
+    code = data.get('code', '').upper()
+    updates = data.get('updates', {})
+    
+    if not code:
+        emit('error', {'message': 'Task list code required'})
+        return
+    
+    success = task_list_manager.update_task_list(code, updates, player_id)
+    if success:
+        task_list = task_list_manager.get_task_list(code)
+        emit('task_list_updated', {'task_list': task_list})
+    else:
+        emit('error', {'message': 'Failed to update task list. You may not be the owner.'})
+
+
+@socketio.on('add_task_to_list')
+def handle_add_task_to_list(data):
+    """Add a single task to a task list."""
+    player_id = data.get('player_id')
+    code = data.get('code', '').upper()
+    task_obj = data.get('task')
+    
+    if not code or not task_obj:
+        emit('error', {'message': 'Code and task required'})
+        return
+    
+    success = task_list_manager.add_task(code, task_obj, player_id)
+    if success:
+        task_list = task_list_manager.get_task_list(code)
+        emit('task_list_updated', {'task_list': task_list})
+    else:
+        emit('error', {'message': 'Failed to add task'})
+
+
+@socketio.on('remove_task_from_list')
+def handle_remove_task_from_list(data):
+    """Remove a task from a task list by index."""
+    player_id = data.get('player_id')
+    code = data.get('code', '').upper()
+    task_index = data.get('task_index')
+    
+    if not code or task_index is None:
+        emit('error', {'message': 'Code and task index required'})
+        return
+    
+    success = task_list_manager.remove_task(code, task_index, player_id)
+    if success:
+        task_list = task_list_manager.get_task_list(code)
+        emit('task_list_updated', {'task_list': task_list})
+    else:
+        emit('error', {'message': 'Failed to remove task'})
+
+
+@socketio.on('delete_task_list')
+def handle_delete_task_list(data):
+    """Delete a task list."""
+    player_id = data.get('player_id')
+    code = data.get('code', '').upper()
+    
+    if not player_id or not code:
+        emit('error', {'message': 'Player ID and code required'})
+        return
+    
+    success = task_list_manager.delete_task_list(code, player_id)
+    if success:
+        emit('task_list_deleted', {'code': code})
+        logger.info(f"Task list deleted: {code} by player {player_id}")
+    else:
+        emit('error', {'message': 'Failed to delete task list. You may not be the owner.'})
+
+
+@socketio.on('duplicate_task_list')
+def handle_duplicate_task_list(data):
+    """Duplicate a task list (for sharing/copying)."""
+    player_id = data.get('player_id')
+    code = data.get('code', '').upper()
+    new_name = data.get('new_name')
+    
+    if not player_id or not code:
+        emit('error', {'message': 'Player ID and code required'})
+        return
+    
+    new_code = task_list_manager.duplicate_task_list(code, player_id, new_name)
+    if new_code:
+        task_list = task_list_manager.get_task_list(new_code)
+        emit('task_list_created', {'task_list': task_list})
+        logger.info(f"Task list duplicated: {code} -> {new_code} by player {player_id}")
+    else:
+        emit('error', {'message': 'Failed to duplicate task list'})
+
+
+@socketio.on('apply_task_list_to_game')
+def handle_apply_task_list_to_game(data):
+    """Apply a saved task list to the current game."""
+    room_code = data.get('room_code', '').upper()
+    task_list_code = data.get('task_list_code', '').upper()
+    sid = request.sid
+    
+    game = game_manager.get_game(room_code)
+    if not game:
+        emit('error', {'message': 'Game not found'})
+        return
+    
+    if game.creator_sid != sid:
+        emit('error', {'message': 'Only the room creator can change task settings'})
+        return
+    
+    if game.game_running:
+        emit('error', {'message': 'Cannot change tasks while game is running'})
+        return
+    
+    task_list = task_list_manager.get_task_list(task_list_code)
+    if not task_list:
+        emit('error', {'message': f'Task list not found: {task_list_code}'})
+        return
+    
+    # Update game locations and reload task handler with the task list's tasks
+    game.locations = task_list['locations'].copy()
+    if 'Other' not in game.locations:
+        game.locations.append('Other')
+    
+    # Override the task handler with the loaded tasks
+    game.task_handler.locations = game.locations
+    game.task_handler.tasks = [task.copy() for task in task_list['tasks']]
+    game.task_list_applied = True  # Mark that a task list was explicitly applied
+    
+    # Also populate collaborative tasks so they show in the task editor
+    game.collaborative_tasks = [task.copy() for task in task_list['tasks']]
+    game.collaborative_task_list_code = task_list_code  # Track the code
+    
+    # Rebuild card deck with new locations
+    from assets.card import CardDeck
+    game.card_deck = CardDeck(game.locations, game.socket, game)
+    
+    logger.info(f"Applied task list {task_list_code} to game {room_code}: {len(task_list['tasks'])} tasks loaded, task_list_applied={game.task_list_applied}")
+    logger.info(f"Task handler now has {len(game.task_handler.tasks)} tasks")
+    emit('task_list_applied', {
+        'task_list_code': task_list_code,
+        'task_list_name': task_list['name'],
+        'task_count': len(task_list['tasks']),
+        'locations': game.locations
+    })
+    # Also send updated config
+    emit('game_config', game.get_config())
+
+
+# ============ COLLABORATIVE TASK CREATION ============
+
+@socketio.on('toggle_task_creation_mode')
+def handle_toggle_task_creation_mode(data):
+    """Toggle task creation mode on/off from the lobby - only affects requesting client."""
+    room_code = data.get('room_code', '').upper()
+    enable = data.get('enable', True)
+    
+    game = game_manager.get_game(room_code)
+    if not game:
+        emit('error', {'message': 'Game not found'})
+        return
+    
+    if game.game_running:
+        emit('error', {'message': 'Cannot toggle task creation during game'})
+        return
+    
+    # Set task creation mode on the game (needed for task operations to work)
+    game.task_creation_mode = enable
+    
+    if enable:
+        # Only send to the requesting client, not the whole room
+        min_tasks = max(len(game.players) * 3, 10)
+        emit('enter_task_creation', {
+            'min_tasks': min_tasks,
+            'current_tasks': len(game.collaborative_tasks),
+            'tasks': game.collaborative_tasks,
+            'locations': game.locations,
+            'task_list_code': game.collaborative_task_list_code
+        })
+        logger.info(f"Task creation mode enabled for client in room {room_code}")
+    else:
+        emit('exit_task_creation')
+        logger.info(f"Task creation mode disabled for client in room {room_code}")
+
+
+@socketio.on('get_collaborative_tasks')
+def handle_get_collaborative_tasks(data):
+    """Get current collaborative tasks for a room."""
+    room_code = data.get('room_code', '').upper()
+    
+    game = game_manager.get_game(room_code)
+    if not game:
+        emit('error', {'message': 'Game not found'})
+        return
+    
+    min_tasks = max(len(game.players) * 3, 10)
+    emit('collaborative_tasks', {
+        'tasks': game.collaborative_tasks,
+        'min_tasks': min_tasks,
+        'task_list_code': game.collaborative_task_list_code
+    })
+
+
+@socketio.on('add_collaborative_task')
+def handle_add_collaborative_task(data):
+    """Add a task during collaborative creation phase."""
+    room_code = data.get('room_code', '').upper()
+    task = data.get('task', {})
+    
+    game = game_manager.get_game(room_code)
+    if not game:
+        emit('error', {'message': 'Game not found'})
+        return
+    
+    if not game.task_creation_mode:
+        emit('error', {'message': 'Not in task creation mode'})
+        return
+    
+    # Validate task
+    if not task.get('task'):
+        emit('error', {'message': 'Task description required'})
+        return
+    
+    # Set defaults
+    task.setdefault('location', 'Other')
+    task.setdefault('difficulty', 2)
+    
+    # Add to collaborative tasks
+    game.collaborative_tasks.append(task)
+    
+    # Broadcast to all players in the room
+    min_tasks = len(game.players) * 3
+    socketio.emit('collaborative_task_added', {
+        'task': task,
+        'total_tasks': len(game.collaborative_tasks),
+        'min_tasks': min_tasks
+    }, room=room_code)
+    
+    logger.info(f"Collaborative task added in room {room_code}: {task.get('task')[:50]}")
+
+
+@socketio.on('remove_collaborative_task')
+def handle_remove_collaborative_task(data):
+    """Remove a task during collaborative creation phase."""
+    room_code = data.get('room_code', '').upper()
+    task_index = data.get('task_index')
+    
+    game = game_manager.get_game(room_code)
+    if not game:
+        emit('error', {'message': 'Game not found'})
+        return
+    
+    if not game.task_creation_mode:
+        emit('error', {'message': 'Not in task creation mode'})
+        return
+    
+    if task_index is None or task_index < 0 or task_index >= len(game.collaborative_tasks):
+        emit('error', {'message': 'Invalid task index'})
+        return
+    
+    removed_task = game.collaborative_tasks.pop(task_index)
+    
+    # Broadcast to all players in the room
+    socketio.emit('collaborative_task_removed', {
+        'index': task_index,
+        'total_tasks': len(game.collaborative_tasks)
+    }, room=room_code)
+    
+    logger.info(f"Collaborative task removed in room {room_code}: {removed_task.get('task', '')[:50]}")
+
+
+@socketio.on('finalize_collaborative_tasks')
+def handle_finalize_collaborative_tasks(data):
+    """Finalize collaborative tasks and start the game."""
+    room_code = data.get('room_code', '').upper()
+    player_id = data.get('player_id')
+    
+    game = game_manager.get_game(room_code)
+    if not game:
+        emit('error', {'message': 'Game not found'})
+        return
+    
+    if not game.task_creation_mode:
+        emit('error', {'message': 'Not in task creation mode'})
+        return
+    
+    min_tasks = len(game.players) * 3
+    if len(game.collaborative_tasks) < min_tasks:
+        emit('error', {'message': f'Need at least {min_tasks} tasks to start'})
+        return
+    
+    # Apply the collaborative tasks to the task handler
+    game.task_handler.tasks = [task.copy() for task in game.collaborative_tasks]
+    game.task_creation_mode = False
+    
+    # Now actually start the game
+    speaker.play_sound("theme")
+    game.game_running = True
+    game.assignRoles()
+    sendPlayerList(game, room_code, 'start_game')
+    socketio.emit("game_start", room=room_code)  # Signal clients to exit task creation mode
+    socketio.emit("task_goal", game.taskGoal, room=room_code)
+    logger.info(f"Game started in room {room_code} with {len(game.task_handler.tasks)} collaborative tasks")
+
+    # Send a different task to each crewmate
+    for p in game.players:
+        if not p.sus and len(game.task_handler.tasks) > 0:
+            p.task = game.getTask()
+            socketio.emit("task", {"task": p.task}, to=p.sid)
+            logger.debug(f"Assigned task to player {p.player_id}: {p.task}")
+
+
+@socketio.on('save_collaborative_tasks')
+def handle_save_collaborative_tasks(data):
+    """Save the current collaborative tasks as a new or updated task list."""
+    room_code = data.get('room_code', '').upper()
+    name = data.get('name', 'Collaborative Task List')
+    device_id = data.get('device_id')  # Use device_id for ownership
+    
+    game = game_manager.get_game(room_code)
+    if not game:
+        emit('error', {'message': 'Game not found'})
+        return
+    
+    if len(game.collaborative_tasks) == 0:
+        emit('error', {'message': 'No tasks to save'})
+        return
+    
+    if not device_id:
+        emit('error', {'message': 'Device ID required to save task list'})
+        return
+    
+    # If we already have a code for this session, update that task list
+    if game.collaborative_task_list_code:
+        # Update existing task list
+        success = task_list_manager.update_task_list(
+            game.collaborative_task_list_code,
+            {
+                'name': name,
+                'tasks': game.collaborative_tasks,
+                'locations': game.locations
+            },
+            device_id
+        )
+        if success:
+            task_list = task_list_manager.get_task_list(game.collaborative_task_list_code)
+            socketio.emit('collaborative_tasks_saved', {
+                'code': game.collaborative_task_list_code,
+                'name': name,
+                'task_count': len(game.collaborative_tasks),
+                'updated': True
+            }, room=room_code)
+            logger.info(f"Updated collaborative task list {game.collaborative_task_list_code} in room {room_code}")
+        else:
+            # Ownership issue - create a new one instead
+            code = task_list_manager.create_task_list(
+                device_id, 
+                name, 
+                game.collaborative_tasks, 
+                game.locations
+            )
+            if code:
+                game.collaborative_task_list_code = code
+                socketio.emit('collaborative_tasks_saved', {
+                    'code': code,
+                    'name': name,
+                    'task_count': len(game.collaborative_tasks),
+                    'updated': False
+                }, room=room_code)
+                logger.info(f"Created new collaborative task list {code} in room {room_code}")
+    else:
+        # Create new task list
+        code = task_list_manager.create_task_list(
+            device_id, 
+            name, 
+            game.collaborative_tasks, 
+            game.locations
+        )
+        if code:
+            game.collaborative_task_list_code = code
+            socketio.emit('collaborative_tasks_saved', {
+                'code': code,
+                'name': name,
+                'task_count': len(game.collaborative_tasks),
+                'updated': False
+            }, room=room_code)
+            logger.info(f"Created collaborative task list {code} in room {room_code}")
+        else:
+            emit('error', {'message': 'Failed to save task list'})
+
+
 # ============ STARTUP ============
 
 if __name__ == '__main__':
     local_ip = get_local_ip()
     write_ip_to_file(f"{local_ip}:5001")
     logger.info("Starting server...")
-    logger.info(f" * Please set ENDPOINT to: http://{local_ip}:5001")
-    logger.info("Press CTRL+C to quit")
-    socketio.run(app, host='0.0.0.0', port=5001, debug=False)
+    
+    # Check if SSL certificates exist
+    cert_file = os.path.join(os.path.dirname(__file__), 'cert.pem')
+    key_file = os.path.join(os.path.dirname(__file__), 'key.pem')
+    
+    if os.path.exists(cert_file) and os.path.exists(key_file):
+        logger.info(f" * Running with HTTPS at: https://{local_ip}:5001")
+        logger.info(" * Note: You may need to accept the self-signed certificate in your browser")
+        socketio.run(app, host='0.0.0.0', port=5001, debug=False, 
+                     certfile=cert_file, keyfile=key_file)
+    else:
+        logger.info(f" * Running with HTTP at: http://{local_ip}:5001")
+        logger.info(" * For HTTPS, generate certificates with:")
+        logger.info("   openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365")
+        socketio.run(app, host='0.0.0.0', port=5001, debug=False)

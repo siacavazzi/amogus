@@ -29,7 +29,12 @@ class Meltdown:
                 self.socketio.emit(event)
 
     def start_countdown(self):
-        """Starts the countdown timer."""
+        """Starts the countdown timer in a background greenlet."""
+        # Spawn the actual countdown in a background greenlet so it doesn't block
+        eventlet.spawn(self._countdown_loop)
+    
+    def _countdown_loop(self):
+        """The actual countdown logic running in a background greenlet."""
         print(f"Meltdown initiated! {self.time_left} seconds remaining.")
         self.emit_to_room("codes_needed", self.codes_needed)
         self.distribute_codes()

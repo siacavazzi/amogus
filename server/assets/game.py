@@ -23,6 +23,7 @@ class Game:
         self.meeting = False
         self.starting_cards = starting_cards
         self.numImposters = numImposters
+        self.initial_numImposters = numImposters  # Store initial value for reset
         self.numCrew = None
         self.taskGoal = None
         self.completed_tasks = 0
@@ -55,6 +56,12 @@ class Game:
         self.has_reactor = False
         self.reactor_sid = None
         
+        # Collaborative task creation (Jackbox-style)
+        self.collaborative_tasks = []
+        self.task_creation_mode = False
+        self.task_list_applied = False  # Track if a task list was explicitly applied
+        self.collaborative_task_list_code = None  # Code if collaborative tasks have been saved
+        
         # Create card deck after has_reactor is set
         self.card_deck = CardDeck(locations, socket, self)
 
@@ -79,6 +86,10 @@ class Game:
             if 'Other' not in self.locations:
                 self.locations.append('Other')
             self.task_handler.locations = self.locations
+            # Only reset task handler if no task list was explicitly applied
+            # Otherwise we'd lose the loaded task list!
+            if not self.task_list_applied:
+                self.task_handler.reset()  # Reload tasks with new locations
             # Rebuild card deck with new locations
             self.card_deck = CardDeck(self.locations, self.socket, self)
         
@@ -92,6 +103,7 @@ class Game:
             self.code_percent = float(config['code_percent'])
         if 'num_imposters' in config:
             self.numImposters = int(config['num_imposters'])
+            self.initial_numImposters = self.numImposters
         if 'card_draw_probability' in config:
             self.card_draw_probability = float(config['card_draw_probability'])
         if 'starting_cards' in config:
@@ -156,7 +168,7 @@ class Game:
             self.active_hack -= 1
 
 
-    def addPlayer(self, sid, username):
+    def addPlayer(self, sid, username, selfie_filename=None):
         player_id = str(uuid4())
         random_number = 1
 
@@ -167,7 +179,7 @@ class Game:
             print(random_number)
             self.backgrounds.remove(random_number)
 
-        new_player = Player(sid=sid, player_id=player_id, username=username, pic=random_number)
+        new_player = Player(sid=sid, player_id=player_id, username=username, pic=random_number, selfie=selfie_filename)
         self.players.append(new_player)
 
         return new_player
@@ -239,13 +251,16 @@ class Game:
         self.active_hack = 0
         self.active_meltdown = None
         self.meeting = False
-        self.numImposters = None
+        self.numImposters = self.initial_numImposters  # Restore to config value
         self.numCrew = None
         self.taskGoal = None
+        self.completed_tasks = 0
         self.backgrounds = list(range(0, 16 + 1))  
         self.end_state = None
         self.end_time = None
         self.denied_location = None
+        self.meltdown_time_mod = 0
+        self.active_cards = []
         self.card_deck = CardDeck(self.locations, self.socket, self)
         self.task_handler.reset()
         self.last_activity = time.time()
@@ -263,9 +278,26 @@ class Game:
         self.end_time = None
         self.denied_location = None
         self.meltdown_time_mod = 0
+        self.active_cards = []  # Clear active cards (Area Denial, etc.)
+        self.numImposters = self.initial_numImposters  # Restore initial imposter count
+        self.numCrew = None  # Will be recalculated on game start
         self.card_deck = CardDeck(self.locations, self.socket, self)
-        self.task_handler.reset()
+        
+        # Only reset task handler if no task list was applied
+        # Otherwise preserve the loaded tasks for replaying
+        if not self.task_list_applied:
+            self.task_handler.reset()
+            # Also reset collaborative task state
+            self.collaborative_tasks = []
+            self.collaborative_task_list_code = None
+        else:
+            # Restore tasks from collaborative_tasks (which has the full set)
+            if self.collaborative_tasks:
+                self.task_handler.tasks = [task.copy() for task in self.collaborative_tasks]
+        
+        self.task_creation_mode = False
         self.last_activity = time.time()
+        
         # Reset backgrounds for new profile pics
         self.backgrounds = list(range(0, 16 + 1))
         # Remove used backgrounds from available pool

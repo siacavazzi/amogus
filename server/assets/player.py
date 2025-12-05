@@ -1,11 +1,12 @@
 import json
 
 class Player:
-    def __init__(self, sid, player_id, username, pic):
+    def __init__(self, sid, player_id, username, pic, selfie=None):
         self.sid = sid
         self.username = username
         self.player_id = player_id
         self.pic = pic
+        self.selfie = selfie  # Filename of selfie image (e.g., "abc123.jpg")
         self.active = True
         
         self.alive = True
@@ -23,9 +24,15 @@ class Player:
         self.active = False
 
     def reset(self):
+        """Reset player state for a new game (keeps identity)."""
         self.active = True
         self.sus = False
         self.alive = True
+        self.task = None
+        self.fake_task = None
+        self.meltdown_code = None
+        self.cards = []
+        self.ready = False
 
     def get_task(self):
         if self.fake_task is not None:
@@ -52,6 +59,7 @@ class Player:
             "sus": self.sus,
             "alive": self.alive,
             "pic": self.pic,
+            "selfie": self.selfie,
             "meltdown_code": self.meltdown_code,
             "cards": [card.export() for card in self.cards if hasattr(card, 'export')],
             "ready":self.ready

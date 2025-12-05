@@ -1,2 +1,29 @@
 [
+    {"task": "Do 10 jumping jacks", "location": "Basement", "difficulty": 1},
+    {"task": "Find a red object and bring it back", "location": "Basement", "difficulty": 2},
+    {"task": "Count all the chairs", "location": "Basement", "difficulty": 1},
+    
+    {"task": "Turn a light off and on 3 times", "location": "1st Floor", "difficulty": 1},
+    {"task": "Find something that starts with the letter B", "location": "1st Floor", "difficulty": 2},
+    {"task": "Do a silly dance for 10 seconds", "location": "1st Floor", "difficulty": 1},
+    {"task": "Take a photo of something blue", "location": "1st Floor", "difficulty": 2},
+    
+    {"task": "Find and touch 3 different doors", "location": "2nd Floor", "difficulty": 1},
+    {"task": "Do 5 squats", "location": "2nd Floor", "difficulty": 1},
+    {"task": "Find the tallest person and high-five them", "location": "2nd Floor", "difficulty": 2},
+    {"task": "Stand on one foot for 15 seconds", "location": "2nd Floor", "difficulty": 1},
+    
+    {"task": "Find a book and read the first sentence aloud", "location": "3rd Floor", "difficulty": 2},
+    {"task": "Touch your toes 5 times", "location": "3rd Floor", "difficulty": 1},
+    {"task": "Find something metal and knock on it", "location": "3rd Floor", "difficulty": 1},
+    {"task": "Walk backwards for 10 steps", "location": "3rd Floor", "difficulty": 1},
+    
+    {"task": "Tell a joke to someone", "location": "Other", "difficulty": 2},
+    {"task": "Compliment someone in the room", "location": "Other", "difficulty": 1},
+    {"task": "Do your best impression of an animal", "location": "Other", "difficulty": 2},
+    {"task": "Spin around 3 times", "location": "Other", "difficulty": 1},
+    {"task": "Pretend to be a robot for 10 seconds", "location": "Other", "difficulty": 2},
+    {"task": "Find someone and tell them a fun fact", "location": "Other", "difficulty": 2},
+    {"task": "Clap your hands 10 times", "location": "Other", "difficulty": 1},
+    {"task": "Make a funny face at someone", "location": "Other", "difficulty": 1}
 ]

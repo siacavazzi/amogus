@@ -5,7 +5,12 @@ import { AudioHandler } from './AudioHandler';
 import PlayerRole from './components/PlayerRole';
 import MeetingDisplay from './components/MeetingDisplay';
 import MeltdownAvertedDisplay from './components/MeltdownAverted';
-import { isMobile } from 'react-device-detect';
+import { isMobile as isMobileDevice } from 'react-device-detect';
+
+// Allow URL param override for testing: ?mobile=true or ?mobile=false
+const urlParams = new URLSearchParams(window.location.search);
+const mobileOverride = urlParams.get('mobile');
+const isMobile = mobileOverride !== null ? mobileOverride === 'true' : isMobileDevice;
 
 const DataContext = createContext();
 
@@ -50,6 +55,7 @@ export default function GameContext({ children }) {
     const [killCooldown, setKillCooldown] = useState(0);
     const [activeCards, setActiveCards] = useState([])
     const [modalOpen, setModalOpen] = useState(false)
+    const [taskCreationMode, setTaskCreationMode] = useState(false)
     let otherImposters = [];
     // const [meetineTimeLeft, setMee]
 
@@ -84,6 +90,7 @@ export default function GameContext({ children }) {
         setShowSusPage(false)
         setActiveCards([])
         setModalOpen(false)
+        setTaskCreationMode(false)
     }
 
     const resetMessage = (delay) => {
@@ -154,10 +161,14 @@ export default function GameContext({ children }) {
             setConnected(true);
             // Try to rejoin existing game if we have a player_id
             const playerId = localStorage.getItem('player_id');
+            const roomCode = localStorage.getItem('room_code');
             if (playerId) {
                 socketRef.current.emit('rejoin', {
                     player_id: playerId,
                 });
+            } else if (!isMobile && roomCode) {
+                // Reactor reconnecting - re-register as reactor
+                socketRef.current.emit('register_reactor', { room_code: roomCode });
             }
         });
 
@@ -211,7 +222,7 @@ export default function GameContext({ children }) {
 
         socketRef.current.on('error', (data) => {
             console.error('Socket error:', data);
-            setDialog({ title: "Error", body: data.message });
+            isMobile && setDialog({ title: "Error", body: data.message });
         });
 
         socketRef.current.on('task_locations', (data) => {
@@ -224,7 +235,7 @@ export default function GameContext({ children }) {
 
         socketRef.current.on('message', (data) => {
             if(data.player === localStorage.getItem("player_id")) {
-                setDialog({ title: "Message", body: data.message });
+                isMobile && setDialog({ title: "Message", body: data.message });
             }
         });
 
@@ -320,6 +331,19 @@ export default function GameContext({ children }) {
 
         socketRef.current.on('game_start', () => {
             setRunning(true)
+            setTaskCreationMode(false)  // Exit task creation mode when game starts
+        });
+
+        // Collaborative task creation mode
+        socketRef.current.on('enter_task_creation', (data) => {
+            console.log('Entering task creation mode:', data);
+            setTaskCreationMode(true);
+            setTaskLocations(data.locations || []);
+        });
+
+        socketRef.current.on('exit_task_creation', () => {
+            console.log('Exiting task creation mode');
+            setTaskCreationMode(false);
         });
 
         socketRef.current.on('meeting', (data) => {
@@ -331,7 +355,7 @@ export default function GameContext({ children }) {
                 setShowSusPage(false)
                 
                 if (meetingData.stage === 'waiting') {
-                    setDialog({ 
+                    isMobile && setDialog({ 
                         title: "Emergency Meeting Called!", 
                         body: <MeetingDisplay meetingData={meetingData} /> 
                     });
@@ -441,11 +465,13 @@ export default function GameContext({ children }) {
                 if (data.action === "start_game" && me) {
                     setAudio('start');
                     setRunning(true);
+                    setTaskCreationMode(false);  // Exit task creation mode
                     
                     isMobile && setDialog({ title: "Game Started", body: <PlayerRole sus={me.sus} otherImposters={otherImposters}/> });
 
                 } else if (data.action === "start_game") {
                     setRunning(true);
+                    setTaskCreationMode(false);  // Exit task creation mode
                 }
             }
         });
@@ -513,6 +539,9 @@ export default function GameContext({ children }) {
         activeCards,
         modalOpen,
         setModalOpen,
+        // Task creation mode
+        taskCreationMode,
+        setTaskCreationMode,
         // Room management
         roomCode,
         setRoomCode,
@@ -555,6 +584,7 @@ export default function GameContext({ children }) {
         inRoom,
         isRoomCreator,
         roomOpen,
+        taskCreationMode,
     ]);
 
     return (

@@ -1,0 +1,76 @@
+{
+  "code": "VZED7K",
+  "name": "Copy of spring lake test 1",
+  "creator_id": "device_16lt0kc8cmis5xqt0",
+  "created_at": 1764897467.956935,
+  "updated_at": 1764897467.956935,
+  "locations": [
+    "Basement",
+    "1st Floor",
+    "2nd Floor",
+    "3rd Floor",
+    "Other"
+  ],
+  "tasks": [
+    {
+      "task": "test",
+      "location": "Basement",
+      "difficulty": 2,
+      "added_by": "poop"
+    },
+    {
+      "task": "jork",
+      "location": "1st Floor",
+      "difficulty": 2,
+      "added_by": "poop"
+    },
+    {
+      "task": "shit on floor",
+      "location": "3rd Floor",
+      "difficulty": 2,
+      "added_by": "poop"
+    },
+    {
+      "task": "eat beans",
+      "location": "2nd Floor",
+      "difficulty": 2,
+      "added_by": "poop"
+    },
+    {
+      "task": "cream",
+      "location": "2nd Floor",
+      "difficulty": 2,
+      "added_by": "poop"
+    },
+    {
+      "task": "idk man just do something",
+      "location": "2nd Floor",
+      "difficulty": 2,
+      "added_by": "poop"
+    },
+    {
+      "task": "WAHHHHHHHH",
+      "location": "2nd Floor",
+      "difficulty": 2,
+      "added_by": "poop"
+    },
+    {
+      "task": "RF",
+      "location": "2nd Floor",
+      "difficulty": 2,
+      "added_by": "poop"
+    },
+    {
+      "task": "EWFWE",
+      "location": "2nd Floor",
+      "difficulty": 2,
+      "added_by": "poop"
+    },
+    {
+      "task": "peenar",
+      "location": "Other",
+      "difficulty": 2,
+      "added_by": "poop"
+    }
+  ]
+}

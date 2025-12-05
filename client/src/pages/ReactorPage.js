@@ -7,6 +7,7 @@ function ReactorNormal() {
         meeting,
         hackTime,
         endState,
+        roomCode,
      } = useContext(DataContext);
     const [isSabotaging, setIsSabotaging] = useState(false);
 
@@ -18,7 +19,11 @@ function ReactorNormal() {
     const handleSabotage = () => {
         setIsSabotaging(true);
         setTimeout(() => {
-            socket.emit("meltdown", { player_id: localStorage.getItem('player_id') });
+            // Send both player_id and room_code for maximum compatibility
+            socket.emit("meltdown", { 
+                player_id: localStorage.getItem('player_id'),
+                room_code: roomCode 
+            });
             setIsSabotaging(false);
         }, 3000);
     };

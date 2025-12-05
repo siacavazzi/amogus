@@ -42,6 +42,8 @@ class GameManager:
             
             # Create a task handler for this game
             task_handler = TaskHandler(locations)
+            # Clear default tasks - players must load a task list or create tasks collaboratively
+            task_handler.tasks = []
             
             # Create the game instance
             game = Game(
@@ -175,9 +177,16 @@ class GameManager:
                 
                 # Also remove games that ended more than 30 minutes ago
                 if game.end_state and hasattr(game, 'end_time'):
-                    if current_time - game.end_time > 1800:  # 30 minutes
-                        games_to_remove.append(room_code)
+                    if game.end_time and current_time - game.end_time > 1800:  # 30 minutes
+                        if room_code not in games_to_remove:
+                            games_to_remove.append(room_code)
         
         for room_code in games_to_remove:
+            # Notify clients before removing
+            game = self.games.get(room_code)
+            if game:
+                self.socketio.emit('room_disbanded', {
+                    'message': 'Room closed due to inactivity'
+                }, room=room_code)
             self.delete_game(room_code)
             print(f"Cleaned up inactive game: {room_code}")

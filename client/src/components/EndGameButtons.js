@@ -3,14 +3,26 @@ import { DataContext } from '../GameContext';
 import { RotateCcw, LogOut } from 'lucide-react';
 
 function EndGameButtons() {
-    const { socket, playerState } = useContext(DataContext);
+    const { socket } = useContext(DataContext);
 
     const handlePlayAgain = () => {
-        socket.emit('reset', { player_id: playerState.playerId });
+        const playerId = localStorage.getItem('player_id');
+        if (playerId && socket) {
+            console.log('Emitting reset with player_id:', playerId);
+            socket.emit('reset', { player_id: playerId });
+        } else {
+            console.error('Cannot reset: missing player_id or socket');
+        }
     };
 
     const handleLeaveRoom = () => {
-        socket.emit('leave_room', { player_id: playerState.playerId });
+        const playerId = localStorage.getItem('player_id');
+        if (playerId && socket) {
+            console.log('Emitting leave_room with player_id:', playerId);
+            socket.emit('leave_room', { player_id: playerId });
+        } else {
+            console.error('Cannot leave room: missing player_id or socket');
+        }
     };
 
     return (

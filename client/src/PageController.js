@@ -15,7 +15,7 @@ import HackedPage from "./pages/HackedPage";
 import GameRunningPage from "./pages/GameRunning";
 import ReactorMeltdown from "./pages/MeltdownPage";
 import ReactorNormal from "./pages/ReactorPage";
-import { isMobile } from "react-device-detect";
+import { isMobile as isMobileDevice } from "react-device-detect";
 import MeltdownInfo from "./pages/MeltdownInfo";
 import CrewVictoryScreen from "./pages/CrewVictory";
 import ImposterVictoryScreen from "./pages/ImposterVictory";
@@ -25,6 +25,11 @@ import TaskEntryPage from "./pages/TaskEntryPage";
 import VotingPage from "./pages/VotingPage";
 import MeetingResultPage from "./pages/MeetingResultsPage";
 import GameConfigPage from "./pages/GameConfigPage";
+
+// Allow URL param override for testing: ?mobile=true or ?mobile=false
+const urlParams = new URLSearchParams(window.location.search);
+const mobileOverride = urlParams.get('mobile');
+const isMobile = mobileOverride !== null ? mobileOverride === 'true' : isMobileDevice;
 
 const PageController = () => {
     const {
