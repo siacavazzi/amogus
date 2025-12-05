@@ -24,10 +24,10 @@ class Meeting:
     def start_voting(self):
         if self.game.get_num_living_players() <= 1:
             self.game.end_state = 'sus_victory'
-            self.socket.emit("end_game", self.game.end_state)
+            self.game.emit_to_room("end_game", self.game.end_state)
             return
         self.stage = 'voting'
-        self.socket.emit("meeting", self.to_json())
+        self.game.emit_to_room("meeting", self.to_json())
         self.speaker.play_sound('hurry')
         Thread(target=self._vote_countdown).start()
     
@@ -80,7 +80,7 @@ class Meeting:
         veto_count = len(self.veto_votes)
 
         print(f"Vote Summary: {vote_summary}, Veto Votes: {veto_count}")
-        self.socket.emit("vote_update", {"votes": vote_summary, "vetoVotes": veto_count})
+        self.game.emit_to_room("vote_update", {"votes": vote_summary, "vetoVotes": veto_count})
 
     def check_veto_threshold(self):
         """
@@ -143,7 +143,7 @@ class Meeting:
             self.reason = 'veto'
 
             print("Meeting ended early due to veto threshold...")
-            self.socket.emit("meeting", self.to_json())
+            self.game.emit_to_room("meeting", self.to_json())
             self.speaker.play_sound('veto')
         else:
         # Regular meeting ending, determine who was voted out
@@ -158,7 +158,7 @@ class Meeting:
             self.reason = 'votes'
             self.votes = self.compute_vote_counts()
 
-            self.socket.emit("meeting", self.to_json())
+            self.game.emit_to_room("meeting", self.to_json())
 
             # draw cards for impostors
             self.game.drawCards(probability=self.game.card_draw_probability)

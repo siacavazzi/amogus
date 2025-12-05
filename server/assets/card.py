@@ -93,51 +93,61 @@ class Card:
 
 class CardDeck:
 
+    # Cards that require a reactor (desktop) to be present
+    REACTOR_CARDS = ['Remote Sabotage', 'Shorten Meltdown']
+
     def __init__(self, locations, socket, game):
         self.discard = []
         self.active_cards = []
         self.socket = socket
         self.game = game
+        self.locations = locations
+        self._build_deck()
 
-        self.cards = [# CHANGE THESE THEYDONT WORK
+    def _build_deck(self):
+        """Build the card deck, optionally excluding reactor cards."""
+        has_reactor = self.game.has_reactor if self.game else True
+        
+        self.cards = [
             Card('Self Report', 'Call a body found meeting', self), 
             Card('Self Report', 'Call a body found meeting', self), 
             Card('Self Report', 'Call a body found meeting', self), 
             Card('Self Report', 'Call a body found meeting', self), 
 
-
-            Card('EMP', 'Disable all devices for the duration', self,duration=30),
             Card('EMP', 'Disable all devices for the duration', self, duration=30),
-            Card('EMP', 'Disable all devices for the duration', self,duration=60),
-            Card('EMP', 'Disable all devices for the duration', self,duration=60),
+            Card('EMP', 'Disable all devices for the duration', self, duration=30),
+            Card('EMP', 'Disable all devices for the duration', self, duration=60),
+            Card('EMP', 'Disable all devices for the duration', self, duration=60),
 
-            Card('Taunt', 'Make crewmates scared', self,sound='fear'),
-            Card('Taunt', 'Taunt crewmates with work PTSD', self,sound='annoying_notif'),
-            Card('Taunt', 'Make crewmates suspicious', self,sound='sus'),
-            Card('Taunt', 'M E O W', self,sound='meow'),
-
-
-            Card('Shorten Meltdown', 'Reduce the amount of time players have to stop the next meltdown', self,duration=10),
-            Card('Shorten Meltdown', 'Reduce the amount of time players have to stop the next meltdown', self,duration=12),
-            Card('Shorten Meltdown', 'Reduce the amount of time players have to stop the next meltdown',self,duration=15),
+            Card('Taunt', 'Make crewmates scared', self, sound='fear'),
+            Card('Taunt', 'Taunt crewmates with work PTSD', self, sound='annoying_notif'),
+            Card('Taunt', 'Make crewmates suspicious', self, sound='sus'),
+            Card('Taunt', 'M E O W', self, sound='meow'),
 
             Card('Discard and Draw', 'Discard a random card and draw a new card', self),
             Card('Discard and Draw', 'Discard a random card and draw a new card', self),
-
-            Card('Remote Sabotage', 'Trigger a sabotage remotely', self),
-            Card('Remote Sabotage', 'Trigger a sabotage remotely', self),
-            Card('Remote Sabotage', 'Trigger a sabotage remotely', self),
         ]
 
-        # Location based cards invoked programmatically since locations shouldn't be hardcoded
-        for location in locations:
-            if location != 'Other':
-                self.cards.append(Card('Area Denial', 'Stop sending tasks to a specific location', self,duration=120, countdown=True, location=location))
-                if random.random() > 0.4:
-                    self.cards.append(Card('Area Denial', 'Stop sending tasks to a specific location', self,duration=60, countdown=True, location=location))
+        # Only add reactor-dependent cards if a reactor is present
+        if has_reactor:
+            self.cards.extend([
+                Card('Shorten Meltdown', 'Reduce the amount of time players have to stop the next meltdown', self, duration=10),
+                Card('Shorten Meltdown', 'Reduce the amount of time players have to stop the next meltdown', self, duration=12),
+                Card('Shorten Meltdown', 'Reduce the amount of time players have to stop the next meltdown', self, duration=15),
 
-                #self.cards.append(Card('fake_task', 'Send a fake task at a specific location to a player **NOT IMPLEMENTED**', location=location))
-        print(self.cards)
+                Card('Remote Sabotage', 'Trigger a sabotage remotely', self),
+                Card('Remote Sabotage', 'Trigger a sabotage remotely', self),
+                Card('Remote Sabotage', 'Trigger a sabotage remotely', self),
+            ])
+
+        # Location based cards invoked programmatically since locations shouldn't be hardcoded
+        for location in self.locations:
+            if location != 'Other':
+                self.cards.append(Card('Area Denial', 'Stop sending tasks to a specific location', self, duration=120, countdown=True, location=location))
+                if random.random() > 0.4:
+                    self.cards.append(Card('Area Denial', 'Stop sending tasks to a specific location', self, duration=60, countdown=True, location=location))
+
+        print(f"Card deck built with {len(self.cards)} cards (reactor: {has_reactor})")
 
     def draw_card(self, probability=1):
         if random.random() > probability:
@@ -164,7 +174,7 @@ class CardDeck:
         for card in self.active_cards:
             output.append(card.export())
         print(output)
-        self.socket.emit('active_cards', output)
+        self.game.emit_to_room('active_cards', output)
 
 
 

@@ -1,6 +1,7 @@
 // PageController.jsx
 import React, { useContext, useEffect, useState, memo } from "react";
 import { DataContext } from "./GameContext";
+import LobbyPage from "./pages/LobbyPage";
 import LoginPage from "./pages/Login";
 import ConnectingPage from "./pages/ConnectingPage";
 import PlayersPage from "./pages/PlayersPage";
@@ -14,7 +15,7 @@ import HackedPage from "./pages/HackedPage";
 import GameRunningPage from "./pages/GameRunning";
 import ReactorMeltdown from "./pages/MeltdownPage";
 import ReactorNormal from "./pages/ReactorPage";
-import { isMobile } from "react-device-detect";
+import { isMobile as isMobileDevice } from "react-device-detect";
 import MeltdownInfo from "./pages/MeltdownInfo";
 import CrewVictoryScreen from "./pages/CrewVictory";
 import ImposterVictoryScreen from "./pages/ImposterVictory";
@@ -23,6 +24,12 @@ import ReactorWaiting from "./pages/ReactorWaiting";
 import TaskEntryPage from "./pages/TaskEntryPage";
 import VotingPage from "./pages/VotingPage";
 import MeetingResultPage from "./pages/MeetingResultsPage";
+import GameConfigPage from "./pages/GameConfigPage";
+
+// Allow URL param override for testing: ?mobile=true or ?mobile=false
+const urlParams = new URLSearchParams(window.location.search);
+const mobileOverride = urlParams.get('mobile');
+const isMobile = mobileOverride !== null ? mobileOverride === 'true' : isMobileDevice;
 
 const PageController = () => {
     const {
@@ -40,6 +47,10 @@ const PageController = () => {
         taskEntry,
         showSusPage,
         setShowSusPage,
+        inRoom,
+        roomCode,
+        isRoomCreator,
+        roomOpen,
     } = useContext(DataContext);
 
     const [currentPage, setCurrentPage] = useState("connecting");
@@ -47,6 +58,18 @@ const PageController = () => {
     useEffect(() => {
         if (!connected) {
             setCurrentPage("connecting");
+            return;
+        }
+
+        // Show lobby if not in a room yet
+        if (!inRoom && !roomCode) {
+            setCurrentPage("lobby");
+            return;
+        }
+
+        // Show config page for room creator before room is opened
+        if (inRoom && isRoomCreator && !roomOpen && !running) {
+            setCurrentPage("gameConfig");
             return;
         }
 
@@ -145,11 +168,16 @@ const PageController = () => {
         endState,
         taskEntry,
         showSusPage,
-
+        inRoom,
+        roomCode,
+        isRoomCreator,
+        roomOpen,
     ]);
 
     const pages = {
         connecting: <ConnectingPage />,
+        lobby: <LobbyPage />,
+        gameConfig: <GameConfigPage />,
         meltdown: <ReactorMeltdown />,
         reactorNormal: <ReactorNormal />,
         gameRunning: <GameRunningPage />,

@@ -1,0 +1,72 @@
+name: Deploy to DigitalOcean
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./client
+        run: npm ci --legacy-peer-deps
+
+      - name: Build React app
+        working-directory: ./client
+        run: npm run build
+        env:
+          CI: false  # Don't treat warnings as errors
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DROPLET_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.DROPLET_IP }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to Droplet
+        run: |
+          # Upload server files
+          rsync -avz --delete \
+            --exclude '__pycache__' \
+            --exclude '*.pyc' \
+            --exclude 'selfies/*' \
+            --exclude 'task_lists/*' \
+            --exclude 'logs/*' \
+            --exclude 'cert.pem' \
+            --exclude 'key.pem' \
+            ./server/ root@${{ secrets.DROPLET_IP }}:/opt/amogus/server/
+
+          # Upload built React app
+          rsync -avz --delete \
+            ./client/build/ root@${{ secrets.DROPLET_IP }}:/opt/amogus/client/build/
+
+          # Upload deploy scripts (in case they changed)
+          rsync -avz \
+            ./deploy/ root@${{ secrets.DROPLET_IP }}:/opt/amogus/deploy/
+
+      - name: Restart application
+        run: |
+          ssh root@${{ secrets.DROPLET_IP }} << 'EOF'
+            systemctl restart amogus
+            sleep 3
+            systemctl status amogus --no-pager || true
+          EOF
+
+      - name: Health check
+        run: |
+          sleep 5
+          curl -f http://${{ secrets.DROPLET_IP }}/health || echo "Health check failed but deployment completed"

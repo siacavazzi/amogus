@@ -7,6 +7,7 @@ function ReactorMeltdown() {
         meltdownTimer,
         codesNeeded,
         setCodesNeeded,
+        roomCode,
     } = useContext(DataContext);
 
     const [pin, setPin] = useState(["", "", "", ""]);
@@ -168,7 +169,11 @@ function ReactorMeltdown() {
 
     const handleSubmit = (enteredPin) => {
         console.log("Entered PIN:", enteredPin.join(""));
-        socket.emit("pin_entry", enteredPin.join(""));
+        socket.emit("pin_entry", { 
+            player_id: localStorage.getItem('player_id'),
+            room_code: roomCode,
+            pin: enteredPin.join("") 
+        });
     };
 
     return (

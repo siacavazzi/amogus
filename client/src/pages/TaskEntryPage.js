@@ -11,7 +11,7 @@ function TaskEntryPage() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        socket.emit('add_task', { task, location });
+        socket.emit('add_task', { task, location, player_id: localStorage.getItem('player_id') });
         setTask('');
         setLocation('');
         setConfirmationMessage(true);
