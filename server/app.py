@@ -18,7 +18,10 @@ from config import (
 
 logger = setup_logging()
 
-app = Flask(__name__)
+# Serve React build files
+CLIENT_BUILD_DIR = os.path.join(os.path.dirname(__file__), '..', 'client', 'build')
+
+app = Flask(__name__, static_folder=CLIENT_BUILD_DIR, static_url_path='')
 CORS(app, resources={r"/*": {"origins": '*'}})
 socketio = SocketIO(app, cors_allowed_origins="*")
 
@@ -73,22 +76,28 @@ def sendPlayerList(game, room_code, action='player_list'):
     socketio.emit('game_data', {'action': action, 'list': player_list}, room=room_code)
 
 
-# Serve React build files
-CLIENT_BUILD_DIR = os.path.join(os.path.dirname(__file__), '..', 'client', 'build')
-
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def serve_client(path):
-    """Serve the React client application."""
-    if path and os.path.exists(os.path.join(CLIENT_BUILD_DIR, path)):
-        return send_from_directory(CLIENT_BUILD_DIR, path)
-    return send_from_directory(CLIENT_BUILD_DIR, 'index.html')
-
-
 @app.route('/api/games')
 def list_games():
     """API endpoint to list all active games (for debugging/admin)."""
     return game_manager.get_all_games()
+
+
+@app.route('/health')
+def health_check():
+    """Health check endpoint for load balancers and monitoring."""
+    return {'status': 'healthy', 'games': len(game_manager.games)}, 200
+
+
+# Catch-all route for React client - serves index.html for client-side routing
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_client(path):
+    """Serve the React client application."""
+    # If file exists, Flask's static_folder will serve it
+    # Otherwise serve index.html for React routing
+    if path and os.path.isfile(os.path.join(CLIENT_BUILD_DIR, path)):
+        return app.send_static_file(path)
+    return app.send_static_file('index.html')
 
 
 # ============ ROOM MANAGEMENT ============

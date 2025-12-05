@@ -2674,3 +2674,39 @@
 2025-12-04 22:37:05,642 - app_logger - INFO - Starting server...
 2025-12-04 22:37:05,642 - app_logger - INFO -  * Running with HTTPS at: https://192.168.68.63:5001
 2025-12-04 22:37:05,642 - app_logger - INFO -  * Note: You may need to accept the self-signed certificate in your browser
+2025-12-04 22:39:17,197 - app_logger - INFO - Starting server...
+2025-12-04 22:39:17,198 - app_logger - INFO -  * Running with HTTPS at: https://192.168.68.63:5001
+2025-12-04 22:39:17,198 - app_logger - INFO -  * Note: You may need to accept the self-signed certificate in your browser
+2025-12-04 22:41:26,210 - app_logger - INFO - Starting server...
+2025-12-04 22:41:26,210 - app_logger - INFO -  * Running with HTTPS at: https://192.168.68.63:5001
+2025-12-04 22:41:26,210 - app_logger - INFO -  * Note: You may need to accept the self-signed certificate in your browser
+2025-12-04 22:41:35,852 - app_logger - INFO - Client connected: PI6PpRDg6LLl_tkeAAAB
+2025-12-04 22:42:10,178 - app_logger - INFO - Client disconnected: PI6PpRDg6LLl_tkeAAAB
+2025-12-04 22:42:10,494 - app_logger - INFO - Client connected: vNWx_DkoG1YFd9hNAAAD
+2025-12-04 22:42:12,351 - app_logger - INFO - Client disconnected: vNWx_DkoG1YFd9hNAAAD
+2025-12-04 22:42:12,855 - app_logger - INFO - Client connected: 11pqOb4_ASIQRaY8AAAF
+2025-12-04 22:42:50,782 - app_logger - INFO - Client connected: tU0Cq3Xe86JQZD9HAAAH
+2025-12-04 22:42:55,307 - app_logger - INFO - Game created with room code: YQJE
+2025-12-04 22:43:04,737 - app_logger - INFO - Game YQJE config updated: {'locations': ['Basement', '1st Floor', '2nd Floor', '3rd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 2, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-04 22:43:04,738 - app_logger - INFO - Room YQJE is now open for players
+2025-12-04 22:43:20,066 - app_logger - INFO - Saved selfie for Samm: 0ff31ab11a894f9abd65214428742003.jpg
+2025-12-04 22:43:20,066 - app_logger - INFO - New player Samm joined room YQJE with ID b19a2c27-8805-4490-8265-b31f579783eb
+2025-12-04 22:43:20,066 - app_logger - INFO - Sending player list to room YQJE
+2025-12-04 22:43:20,067 - app_logger - DEBUG - Player List: ['{"sid": "tU0Cq3Xe86JQZD9HAAAH", "player_id": "b19a2c27-8805-4490-8265-b31f579783eb", "username": "Samm", "active": true, "sus": false, "alive": true, "pic": 6, "selfie": "0ff31ab11a894f9abd65214428742003.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-04 22:43:22,294 - app_logger - INFO - Client disconnected: tU0Cq3Xe86JQZD9HAAAH
+2025-12-04 22:43:22,435 - app_logger - INFO - Client connected: _KRNglhWB5Jv6UQVAAAJ
+2025-12-04 22:43:22,444 - app_logger - INFO - Player b19a2c27-8805-4490-8265-b31f579783eb rejoining room YQJE
+2025-12-04 22:43:22,444 - app_logger - INFO - Sending player list to room YQJE
+2025-12-04 22:43:22,445 - app_logger - DEBUG - Player List: ['{"sid": "_KRNglhWB5Jv6UQVAAAJ", "player_id": "b19a2c27-8805-4490-8265-b31f579783eb", "username": "Samm", "active": true, "sus": false, "alive": true, "pic": 6, "selfie": "0ff31ab11a894f9abd65214428742003.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-04 22:43:47,985 - app_logger - INFO - Task creation mode enabled for client in room YQJE
+2025-12-04 22:43:57,844 - app_logger - INFO - Collaborative task added in room YQJE: Pooop
+2025-12-04 22:44:03,479 - app_logger - INFO - Collaborative task removed in room YQJE: Pooop
+2025-12-04 22:44:19,351 - app_logger - INFO - Client disconnected: _KRNglhWB5Jv6UQVAAAJ
+2025-12-04 23:03:04,030 - app_logger - INFO - Client connected: j0QZsDxFFn8l3FDJAAAL
+2025-12-04 23:03:04,048 - app_logger - INFO - Player b19a2c27-8805-4490-8265-b31f579783eb rejoining room YQJE
+2025-12-04 23:03:04,050 - app_logger - INFO - Sending player list to room YQJE
+2025-12-04 23:03:04,050 - app_logger - DEBUG - Player List: ['{"sid": "j0QZsDxFFn8l3FDJAAAL", "player_id": "b19a2c27-8805-4490-8265-b31f579783eb", "username": "Samm", "active": true, "sus": false, "alive": true, "pic": 6, "selfie": "0ff31ab11a894f9abd65214428742003.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-04 23:03:05,744 - app_logger - INFO - Client disconnected: j0QZsDxFFn8l3FDJAAAL
+2025-12-04 23:26:24,779 - app_logger - INFO - Client disconnected: 11pqOb4_ASIQRaY8AAAF
+2025-12-04 23:26:27,658 - app_logger - INFO - Client connected: VNZpNS9xOAuaBXZOAAAN
+2025-12-04 23:27:10,708 - app_logger - INFO - Client disconnected: VNZpNS9xOAuaBXZOAAAN
