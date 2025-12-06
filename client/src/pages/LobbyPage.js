@@ -56,7 +56,12 @@ function LobbyPage() {
         }
         setIsJoining(true);
         setError('');
-        socket.emit('join_game', { room_code: inputRoomCode.toUpperCase() });
+        // Include player_id for reconnection (to restore host status)
+        const playerId = localStorage.getItem('player_id');
+        socket.emit('join_game', { 
+            room_code: inputRoomCode.toUpperCase(),
+            player_id: playerId || undefined
+        });
         
         // Timeout fallback in case server doesn't respond
         setTimeout(() => {

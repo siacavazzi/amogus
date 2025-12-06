@@ -179,6 +179,7 @@ def handle_join_game(data):
     """Join an existing game room by room code."""
     sid = request.sid
     room_code = data.get('room_code', '').upper()
+    player_id = data.get('player_id')  # Optional: for reconnecting players
     
     game = game_manager.get_game(room_code)
     if not game:
@@ -199,9 +200,16 @@ def handle_join_game(data):
     join_room(room_code)
     game_manager.sid_to_game[sid] = room_code
     
-    emit('game_joined', {'room_code': room_code})
+    # Check if this player is the creator (for reconnecting players)
+    is_creator = False
+    if player_id and game.creator_player_id == player_id:
+        is_creator = True
+        game.creator_sid = sid  # Update the socket ID
+        logger.info(f"Creator {player_id} reconnected to room {room_code}")
+    
+    emit('game_joined', {'room_code': room_code, 'is_creator': is_creator})
     emit('task_locations', game.locations)
-    logger.info(f"Client {sid} joined room {room_code}")
+    logger.info(f"Client {sid} joined room {room_code}, is_creator={is_creator}")
 
 
 # ============ SONOS CONNECTOR ============
@@ -299,8 +307,14 @@ def handleRejoin(data):
     game_manager.update_sid(player_id, request.sid)
     join_room(room_code)
     
+    # Check if this player is the creator
+    is_creator = (player_id == game.creator_player_id)
+    if is_creator:
+        game.creator_sid = request.sid  # Update the socket ID
+        logger.info(f"Creator {player_id} reconnected to room {room_code}")
+    
     # Send current game state
-    emit('game_joined', {'room_code': room_code})
+    emit('game_joined', {'room_code': room_code, 'is_creator': is_creator})
     emit('task_locations', game.locations)
     sendPlayerList(game, room_code, "rejoin")
     
@@ -369,7 +383,15 @@ def handle_join(data):
             player.username = username
             game_manager.update_sid(player_id, sid)
             join_room(existing_room)
-            logger.info(f"Player {player.username} (ID: {player.player_id}) reconnected")
+            
+            # Update creator_sid if this player is the creator
+            is_creator = (player.player_id == game.creator_player_id)
+            if is_creator:
+                game.creator_sid = sid
+                logger.info(f"Updated creator_sid to {sid} for room {existing_room}")
+            
+            logger.info(f"Player {player.username} (ID: {player.player_id}) reconnected, is_creator={is_creator}")
+            emit('player_id', {'player_id': player.player_id, 'pic': player.pic, 'is_creator': is_creator}, to=sid)
             sendPlayerList(game, existing_room)
             return
 
@@ -410,7 +432,15 @@ def handle_join(data):
     game_manager.register_player(player.player_id, room_code, sid)
     join_room(room_code)
     
-    emit('player_id', {'player_id': player.player_id, 'pic': player.pic}, to=sid)
+    # If this player's socket matches the creator socket, set creator_player_id
+    if game.creator_sid == sid and game.creator_player_id is None:
+        game.creator_player_id = player.player_id
+        logger.info(f"Set creator_player_id to {player.player_id} for room {room_code}")
+    
+    # Check if this player is the creator
+    is_creator = (player.player_id == game.creator_player_id)
+    
+    emit('player_id', {'player_id': player.player_id, 'pic': player.pic, 'is_creator': is_creator}, to=sid)
     logger.info(f"New player {username} joined room {room_code} with ID {player.player_id}")
     
     # Send player list to all players in the room
@@ -441,13 +471,22 @@ def handle_start(data):
     min_tasks = max(len(game.players) * 3, 10)
     
     # Log current state for debugging
-    logger.info(f"Start game check - task_list_applied={game.task_list_applied}, task_handler.tasks={len(game.task_handler.tasks)}, min_tasks={min_tasks}")
+    logger.info(f"Start game check - task_list_applied={game.task_list_applied}, task_handler.tasks={len(game.task_handler.tasks)}, collaborative_tasks={len(game.collaborative_tasks)}, min_tasks={min_tasks}")
     
-    # Enter collaborative task creation mode if:
-    # 1. No task list was explicitly applied, OR
-    # 2. There aren't enough tasks in the task handler
-    if not game.task_list_applied or len(game.task_handler.tasks) < min_tasks:
-        game.task_creation_mode = True
+    # Check if we have collaborative tasks that can be used
+    if len(game.collaborative_tasks) > 0:
+        # Apply collaborative tasks to the task handler
+        game.task_handler.tasks = [task.copy() for task in game.collaborative_tasks]
+        logger.info(f"Applied {len(game.collaborative_tasks)} collaborative tasks to game {room_code}")
+    
+    # Now check if we have enough tasks to start
+    if len(game.task_handler.tasks) < min_tasks:
+        # Not enough tasks - need more
+        if not game.task_list_applied and len(game.collaborative_tasks) == 0:
+            # No task list and no collaborative tasks - reset locations
+            game.locations = ['Other']
+            game.task_handler.locations = ['Other']
+        
         socketio.emit('enter_task_creation', {
             'min_tasks': min_tasks,
             'current_tasks': len(game.collaborative_tasks),
@@ -455,11 +494,17 @@ def handle_start(data):
             'locations': game.locations,
             'task_list_code': game.collaborative_task_list_code
         }, room=room_code)
-        logger.info(f"Game {room_code} entering collaborative task creation mode (task_list_applied={game.task_list_applied}, need {min_tasks} tasks, have {len(game.task_handler.tasks)})")
+        logger.info(f"Game {room_code} needs more tasks (have {len(game.task_handler.tasks)}, need {min_tasks})")
         return
 
     # We have enough tasks - start the game
-    logger.info(f"Starting game {room_code} with {len(game.task_handler.tasks)} tasks from applied task list")
+    logger.info(f"Starting game {room_code} with {len(game.task_handler.tasks)} tasks")
+    
+    # Rebuild card deck with current locations to ensure location-based cards are correct
+    from assets.card import CardDeck
+    game.card_deck = CardDeck(game.locations, game.socket, game)
+    logger.info(f"Card deck rebuilt with locations: {game.locations}")
+    
     speaker.play_sound("theme")
     game.game_running = True
     game.assignRoles()
@@ -790,6 +835,29 @@ def handle_load_task_list(data):
     emit('task_list_loaded', {'task_list': task_list})
 
 
+@socketio.on('save_task_list_to_user')
+def handle_save_task_list_to_user(data):
+    """Save an external task list to the user's saved lists (without duplicating)."""
+    player_id = data.get('player_id')
+    code = data.get('code', '').upper()
+    
+    if not player_id:
+        emit('error', {'message': 'Player ID required'})
+        return
+    
+    if not code:
+        emit('error', {'message': 'Task list code required'})
+        return
+    
+    success = task_list_manager.save_to_player_list(code, player_id)
+    if success:
+        lists = task_list_manager.get_player_task_lists(player_id)
+        emit('my_task_lists', {'lists': lists})
+        logger.info(f"Task list {code} saved to player {player_id}'s list")
+    else:
+        emit('error', {'message': f'Task list not found: {code}'})
+
+
 @socketio.on('create_task_list')
 def handle_create_task_list(data):
     """Create a new task list."""
@@ -806,6 +874,10 @@ def handle_create_task_list(data):
     if from_default:
         code = task_list_manager.import_from_default(player_id, name)
     else:
+        # Validate locations before creating
+        if not locations or len(locations) < 2:
+            emit('error', {'message': 'At least 2 locations are required to create a task list'})
+            return
         code = task_list_manager.create_task_list(player_id, name, tasks, locations)
     
     if code:
@@ -875,7 +947,7 @@ def handle_remove_task_from_list(data):
 
 @socketio.on('delete_task_list')
 def handle_delete_task_list(data):
-    """Delete a task list."""
+    """Remove a task list from the player's saved lists (does not delete the file)."""
     player_id = data.get('player_id')
     code = data.get('code', '').upper()
     
@@ -883,12 +955,13 @@ def handle_delete_task_list(data):
         emit('error', {'message': 'Player ID and code required'})
         return
     
-    success = task_list_manager.delete_task_list(code, player_id)
+    # Only remove from player's list, don't delete the actual file
+    success = task_list_manager.remove_from_player_list(code, player_id)
     if success:
         emit('task_list_deleted', {'code': code})
-        logger.info(f"Task list deleted: {code} by player {player_id}")
+        logger.info(f"Task list {code} removed from player {player_id}'s saved lists")
     else:
-        emit('error', {'message': 'Failed to delete task list. You may not be the owner.'})
+        emit('error', {'message': 'Task list not in your saved lists.'})
 
 
 @socketio.on('duplicate_task_list')
@@ -949,6 +1022,7 @@ def handle_apply_task_list_to_game(data):
     # Also populate collaborative tasks so they show in the task editor
     game.collaborative_tasks = [task.copy() for task in task_list['tasks']]
     game.collaborative_task_list_code = task_list_code  # Track the code
+    game.collaborative_task_list_name = task_list['name']  # Track the name
     
     # Rebuild card deck with new locations
     from assets.card import CardDeck
@@ -1016,8 +1090,37 @@ def handle_get_collaborative_tasks(data):
     emit('collaborative_tasks', {
         'tasks': game.collaborative_tasks,
         'min_tasks': min_tasks,
-        'task_list_code': game.collaborative_task_list_code
+        'task_list_code': game.collaborative_task_list_code,
+        'task_list_name': game.collaborative_task_list_name,
+        'collaborative_mode': game.collaborative_mode
     })
+
+
+@socketio.on('toggle_collaborative_mode')
+def handle_toggle_collaborative_mode(data):
+    """Toggle whether all players can add tasks or just the host."""
+    room_code = data.get('room_code', '').upper()
+    enabled = data.get('enabled', False)
+    sid = request.sid
+    
+    game = game_manager.get_game(room_code)
+    if not game:
+        emit('error', {'message': 'Game not found'})
+        return
+    
+    # Only host can toggle collaborative mode
+    if game.creator_sid != sid:
+        emit('error', {'message': 'Only the host can change this setting'})
+        return
+    
+    game.collaborative_mode = enabled
+    
+    # Broadcast the change to all players
+    socketio.emit('collaborative_mode_changed', {
+        'enabled': enabled
+    }, room=room_code)
+    
+    logger.info(f"Collaborative mode {'enabled' if enabled else 'disabled'} in room {room_code}")
 
 
 @socketio.on('add_collaborative_task')
@@ -1025,14 +1128,26 @@ def handle_add_collaborative_task(data):
     """Add a task during collaborative creation phase."""
     room_code = data.get('room_code', '').upper()
     task = data.get('task', {})
+    sid = request.sid
     
     game = game_manager.get_game(room_code)
     if not game:
         emit('error', {'message': 'Game not found'})
         return
     
-    if not game.task_creation_mode:
-        emit('error', {'message': 'Not in task creation mode'})
+    # Allow task addition when room is open and game hasn't started
+    if game.game_running:
+        emit('error', {'message': 'Cannot add tasks while game is running'})
+        return
+    
+    if not game.is_open:
+        emit('error', {'message': 'Room is not open yet'})
+        return
+    
+    # Check permissions: only host can add tasks unless collaborative_mode is enabled
+    is_host = (game.creator_sid == sid)
+    if not is_host and not game.collaborative_mode:
+        emit('error', {'message': 'Only the host can add tasks. Ask them to enable collaborative mode.'})
         return
     
     # Validate task
@@ -1069,8 +1184,13 @@ def handle_remove_collaborative_task(data):
         emit('error', {'message': 'Game not found'})
         return
     
-    if not game.task_creation_mode:
-        emit('error', {'message': 'Not in task creation mode'})
+    # Allow task removal when room is open and game hasn't started
+    if game.game_running:
+        emit('error', {'message': 'Cannot remove tasks while game is running'})
+        return
+    
+    if not game.is_open:
+        emit('error', {'message': 'Room is not open yet'})
         return
     
     if task_index is None or task_index < 0 or task_index >= len(game.collaborative_tasks):
@@ -1088,6 +1208,43 @@ def handle_remove_collaborative_task(data):
     logger.info(f"Collaborative task removed in room {room_code}: {removed_task.get('task', '')[:50]}")
 
 
+@socketio.on('update_game_locations')
+def handle_update_game_locations(data):
+    """Update game locations during task creation mode. Only the host can do this."""
+    room_code = data.get('room_code', '').upper()
+    locations = data.get('locations', [])
+    sid = request.sid
+    
+    game = game_manager.get_game(room_code)
+    if not game:
+        emit('error', {'message': 'Game not found'})
+        return
+    
+    # Only host can edit locations
+    if game.creator_sid != sid:
+        emit('error', {'message': 'Only the host can edit locations'})
+        return
+    
+    if game.game_running:
+        emit('error', {'message': 'Cannot change locations while game is running'})
+        return
+    
+    # Ensure 'Other' is always included
+    if 'Other' not in locations:
+        locations.append('Other')
+    
+    game.locations = locations
+    game.task_handler.locations = locations
+    
+    # Rebuild card deck with new locations
+    from assets.card import CardDeck
+    game.card_deck = CardDeck(game.locations, game.socket, game)
+    
+    # Broadcast updated locations to all players in the room
+    socketio.emit('task_locations', locations, room=room_code)
+    logger.info(f"Updated locations in room {room_code}: {locations}")
+
+
 @socketio.on('finalize_collaborative_tasks')
 def handle_finalize_collaborative_tasks(data):
     """Finalize collaborative tasks and start the game."""
@@ -1099,18 +1256,27 @@ def handle_finalize_collaborative_tasks(data):
         emit('error', {'message': 'Game not found'})
         return
     
-    if not game.task_creation_mode:
-        emit('error', {'message': 'Not in task creation mode'})
+    # Allow finalization when room is open and game hasn't started
+    if game.game_running:
+        emit('error', {'message': 'Game already running'})
         return
     
-    min_tasks = len(game.players) * 3
-    if len(game.collaborative_tasks) < min_tasks:
-        emit('error', {'message': f'Need at least {min_tasks} tasks to start'})
+    if not game.is_open:
+        emit('error', {'message': 'Room is not open yet'})
+        return
+    
+    if len(game.collaborative_tasks) == 0:
+        emit('error', {'message': 'No tasks to start with'})
         return
     
     # Apply the collaborative tasks to the task handler
     game.task_handler.tasks = [task.copy() for task in game.collaborative_tasks]
     game.task_creation_mode = False
+    
+    # Rebuild card deck with current locations to ensure location-based cards are correct
+    from assets.card import CardDeck
+    game.card_deck = CardDeck(game.locations, game.socket, game)
+    logger.info(f"Card deck rebuilt with locations: {game.locations}")
     
     # Now actually start the game
     speaker.play_sound("theme")
@@ -1162,6 +1328,7 @@ def handle_save_collaborative_tasks(data):
             device_id
         )
         if success:
+            game.collaborative_task_list_name = name  # Update stored name
             task_list = task_list_manager.get_task_list(game.collaborative_task_list_code)
             socketio.emit('collaborative_tasks_saved', {
                 'code': game.collaborative_task_list_code,
@@ -1180,6 +1347,7 @@ def handle_save_collaborative_tasks(data):
             )
             if code:
                 game.collaborative_task_list_code = code
+                game.collaborative_task_list_name = name  # Store the name
                 socketio.emit('collaborative_tasks_saved', {
                     'code': code,
                     'name': name,
@@ -1197,6 +1365,7 @@ def handle_save_collaborative_tasks(data):
         )
         if code:
             game.collaborative_task_list_code = code
+            game.collaborative_task_list_name = name  # Store the name
             socketio.emit('collaborative_tasks_saved', {
                 'code': code,
                 'name': name,
@@ -1212,20 +1381,28 @@ def handle_save_collaborative_tasks(data):
 
 if __name__ == '__main__':
     local_ip = get_local_ip()
-    write_ip_to_file(f"{local_ip}:5001")
     logger.info("Starting server...")
+    
+    # Check for development mode (disable SSL)
+    dev_mode = os.environ.get('DEV', '').lower() in ('1', 'true', 'yes')
     
     # Check if SSL certificates exist
     cert_file = os.path.join(os.path.dirname(__file__), 'cert.pem')
     key_file = os.path.join(os.path.dirname(__file__), 'key.pem')
     
-    if os.path.exists(cert_file) and os.path.exists(key_file):
+    use_ssl = os.path.exists(cert_file) and os.path.exists(key_file) and not dev_mode
+    
+    if dev_mode:
+        logger.info(" * DEV MODE: SSL disabled")
+    
+    if use_ssl:
         logger.info(f" * Running with HTTPS at: https://{local_ip}:5001")
         logger.info(" * Note: You may need to accept the self-signed certificate in your browser")
         socketio.run(app, host='0.0.0.0', port=5001, debug=False, 
                      certfile=cert_file, keyfile=key_file)
     else:
         logger.info(f" * Running with HTTP at: http://{local_ip}:5001")
-        logger.info(" * For HTTPS, generate certificates with:")
-        logger.info("   openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365")
+        if not dev_mode:
+            logger.info(" * For HTTPS, generate certificates with:")
+            logger.info("   openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365")
         socketio.run(app, host='0.0.0.0', port=5001, debug=False)

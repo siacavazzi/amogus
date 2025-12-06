@@ -196,7 +196,7 @@ export default function GameContext({ children }) {
             console.log('Joined game:', data);
             setRoomCode(data.room_code);
             setInRoom(true);
-            setIsRoomCreator(false);
+            setIsRoomCreator(data.is_creator || false);
             setRoomOpen(true);  // If we joined, the room must be open
             localStorage.setItem('room_code', data.room_code);
             
@@ -419,6 +419,10 @@ export default function GameContext({ children }) {
             if (data && data.player_id) {
                 localStorage.setItem('player_id', data.player_id);
                 setPlayerState(prevState => ({ ...prevState, playerId: data.player_id }));
+                // Update creator status if provided (for reconnection)
+                if (data.is_creator !== undefined) {
+                    setIsRoomCreator(data.is_creator);
+                }
             }
         });
 
@@ -438,25 +442,28 @@ export default function GameContext({ children }) {
                             return null; // Handle malformed JSON
                         }
                     }).filter(player => player !== null); // Filter out any failed parses
-                    otherImposters = parsedPlayers.filter((player) => player.sus && player.player_id !== localStorage.getItem('player_id'))
+                    
+                    // Always use localStorage for player_id to avoid race conditions
+                    const myPlayerId = localStorage.getItem('player_id');
+                    otherImposters = parsedPlayers.filter((player) => player.sus && player.player_id !== myPlayerId)
                     console.log("Active players:", parsedPlayers);
                     console.log({otherImposters})
-                    if (playerState.playerId) {
-                        me = parsedPlayers.find((player) => player.player_id === localStorage.getItem('player_id'))
+                    
+                    if (myPlayerId) {
+                        me = parsedPlayers.find((player) => player.player_id === myPlayerId)
                         if (me) {
                             setPlayerState(me)
                             console.log(me)
                         } else {
-                            console.log("not found")
+                            console.log("Player not found in list")
                         }
                     } else {
-                        console.log("not found")
-                        // setMessage({ status: "error", text: "Idk who i am :(" })
+                        console.log("No player_id in localStorage yet")
                     }
-                    if (me) {
-                        setPlayers(parsedPlayers);
-                        console.log(parsedPlayers)
-                    }
+                    
+                    // Always update players list - don't gate on finding ourselves
+                    // This fixes the race condition where player_list arrives before player_id is set
+                    setPlayers(parsedPlayers);
                     console.log("Updated players state:", parsedPlayers);
                 } else {
                     console.error("Unexpected data format:", data);

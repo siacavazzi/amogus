@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import { DataContext } from '../GameContext';
-import { Settings, Users, Clock, Target, Zap, Play, ChevronDown, ChevronUp, MapPin, Plus, X, List, Download, Copy, Trash2, Save, FileText, LogOut } from 'lucide-react';
+import { Users, Play, ChevronDown, ChevronUp, List, Download, Trash2, Check, LogOut, MapPin, Settings, ArrowRight, ArrowLeft, X } from 'lucide-react';
 
 // Get or create a persistent device ID for task list ownership
 function getDeviceId() {
@@ -15,6 +15,9 @@ function getDeviceId() {
 function GameConfigPage() {
     const { socket, roomCode } = useContext(DataContext);
     
+    // Two-step wizard: 'tasklist' or 'settings'
+    const [step, setStep] = useState('tasklist');
+    
     const [config, setConfig] = useState({
         locations: ['Basement', '1st Floor', '2nd Floor', '3rd Floor'],
         vote_time: 180,
@@ -27,22 +30,20 @@ function GameConfigPage() {
         task_ratio: 12,
     });
     
-    const [expandedSection, setExpandedSection] = useState('locations');
-    const [newLocation, setNewLocation] = useState('');
+    const [showAdvanced, setShowAdvanced] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     
     // Task list state
     const [myTaskLists, setMyTaskLists] = useState([]);
     const [loadTaskListCode, setLoadTaskListCode] = useState('');
     const [currentTaskList, setCurrentTaskList] = useState(null);
-    const [newTaskListName, setNewTaskListName] = useState('');
-    const [newTask, setNewTask] = useState({ task: '', location: 'Other', difficulty: 2 });
     const [taskListLoading, setTaskListLoading] = useState(false);
+    const [taskListApplied, setTaskListApplied] = useState(false);
     
     // Use device ID instead of player ID for task list ownership
     const deviceId = useRef(getDeviceId()).current;
 
-    // Request current config when component mounts (only once)
+    // Request current config when component mounts
     useEffect(() => {
         if (socket && roomCode) {
             socket.emit('get_game_config', { room_code: roomCode });
@@ -68,7 +69,7 @@ function GameConfigPage() {
         };
     }, [socket]);
 
-    // Listen for task list events - stable handlers
+    // Listen for task list events
     useEffect(() => {
         if (!socket) return;
 
@@ -100,6 +101,7 @@ function GameConfigPage() {
         const handleTaskListApplied = (data) => {
             console.log('Task list applied to game:', data);
             setTaskListLoading(false);
+            setTaskListApplied(true);
         };
 
         const handleTaskListDeleted = (data) => {
@@ -136,65 +138,15 @@ function GameConfigPage() {
         setConfig(prev => ({ ...prev, [key]: value }));
     };
 
-    const addLocation = () => {
-        if (newLocation.trim() && !config.locations.includes(newLocation.trim())) {
-            updateConfig('locations', [...config.locations, newLocation.trim()]);
-            setNewLocation('');
-        }
-    };
-
-    const removeLocation = (location) => {
-        updateConfig('locations', config.locations.filter(l => l !== location));
-    };
-
     // Task list handlers
     const loadTaskListByCode = () => {
         if (!loadTaskListCode.trim()) return;
         setTaskListLoading(true);
-        socket.emit('load_task_list', { code: loadTaskListCode.trim().toUpperCase() });
+        const code = loadTaskListCode.trim().toUpperCase();
+        socket.emit('load_task_list', { code });
+        // Auto-save to user's list when loading by code
+        socket.emit('save_task_list_to_user', { player_id: deviceId, code });
         setLoadTaskListCode('');
-    };
-
-    const createTaskListFromDefaults = () => {
-        const name = newTaskListName.trim() || 'My Task List';
-        setTaskListLoading(true);
-        socket.emit('create_task_list', { 
-            player_id: deviceId, 
-            name: name,
-            from_default: true 
-        });
-        setNewTaskListName('');
-    };
-
-    const createEmptyTaskList = () => {
-        const name = newTaskListName.trim() || 'New Task List';
-        setTaskListLoading(true);
-        socket.emit('create_task_list', { 
-            player_id: deviceId, 
-            name: name,
-            tasks: [],
-            locations: config.locations 
-        });
-        setNewTaskListName('');
-    };
-
-    const addTaskToList = () => {
-        if (!currentTaskList || !newTask.task.trim()) return;
-        socket.emit('add_task_to_list', {
-            player_id: deviceId,
-            code: currentTaskList.code,
-            task: { ...newTask, task: newTask.task.trim() }
-        });
-        setNewTask({ task: '', location: 'Other', difficulty: 2 });
-    };
-
-    const removeTaskFromList = (index) => {
-        if (!currentTaskList) return;
-        socket.emit('remove_task_from_list', {
-            player_id: deviceId,
-            code: currentTaskList.code,
-            task_index: index
-        });
     };
 
     const applyTaskListToGame = () => {
@@ -206,18 +158,15 @@ function GameConfigPage() {
         });
     };
 
+    const clearTaskListSelection = () => {
+        setCurrentTaskList(null);
+        setTaskListApplied(false);
+    };
+
     const deleteTaskList = (code) => {
         if (window.confirm('Are you sure you want to delete this task list?')) {
             socket.emit('delete_task_list', { player_id: deviceId, code });
         }
-    };
-
-    const duplicateTaskList = (code) => {
-        socket.emit('duplicate_task_list', { 
-            player_id: deviceId, 
-            code,
-            new_name: null 
-        });
     };
 
     const handleOpenRoom = () => {
@@ -236,33 +185,13 @@ function GameConfigPage() {
         }
     };
 
-    const toggleSection = (section) => {
-        setExpandedSection(expandedSection === section ? null : section);
+    const proceedToSettings = () => {
+        // Apply task list if one is loaded but not yet applied
+        if (currentTaskList && !taskListApplied) {
+            applyTaskListToGame();
+        }
+        setStep('settings');
     };
-
-    const Section = ({ id, icon: Icon, title, children }) => (
-        <div className="bg-gray-700 rounded-lg overflow-hidden mb-3">
-            <button
-                onClick={() => toggleSection(id)}
-                className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-600 transition-colors"
-            >
-                <div className="flex items-center gap-3">
-                    <Icon size={20} className="text-indigo-400" />
-                    <span className="font-medium text-gray-100">{title}</span>
-                </div>
-                {expandedSection === id ? (
-                    <ChevronUp size={20} className="text-gray-400" />
-                ) : (
-                    <ChevronDown size={20} className="text-gray-400" />
-                )}
-            </button>
-            {expandedSection === id && (
-                <div className="px-4 pb-4 pt-2 border-t border-gray-600">
-                    {children}
-                </div>
-            )}
-        </div>
-    );
 
     const SliderInput = ({ label, value, onChange, min, max, step = 1, unit = '', description }) => (
         <div className="mb-4">
@@ -289,18 +218,366 @@ function GameConfigPage() {
         </div>
     );
 
+    // Step 1: Task List Selection
+    const renderTaskListStep = () => (
+        <>
+            <div className="text-center mb-6">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                    <List size={28} className="text-indigo-400" />
+                    <h1 className="text-2xl font-bold text-gray-100">Task List</h1>
+                </div>
+                <p className="text-gray-400 text-sm">
+                    Load a saved task list, or skip to create tasks with your group
+                </p>
+            </div>
+
+            <div className="bg-gray-700 rounded-lg p-4 mb-4">
+                {/* Load by code */}
+                <div className="mb-4">
+                    <label className="text-gray-300 text-sm block mb-2">Load by Code</label>
+                    <div className="flex gap-2">
+                        <input
+                            type="text"
+                            value={loadTaskListCode}
+                            onChange={(e) => setLoadTaskListCode(e.target.value.toUpperCase())}
+                            onKeyPress={(e) => e.key === 'Enter' && loadTaskListByCode()}
+                            placeholder="Enter 6-letter code..."
+                            maxLength={6}
+                            className="flex-1 px-4 py-3 bg-gray-600 border border-gray-500 rounded-lg text-gray-100 text-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 font-mono uppercase text-center tracking-widest"
+                        />
+                        <button
+                            onClick={loadTaskListByCode}
+                            disabled={taskListLoading || loadTaskListCode.length < 6}
+                            className="px-4 py-3 bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
+                        >
+                            <Download size={20} />
+                        </button>
+                    </div>
+                </div>
+
+                {/* My saved task lists */}
+                {myTaskLists.length > 0 && (
+                    <div className="mb-4">
+                        <label className="text-gray-300 text-sm block mb-2">Your Saved Lists</label>
+                        <div className="space-y-2 max-h-48 overflow-y-auto">
+                            {myTaskLists.map((list) => (
+                                <div 
+                                    key={list.code} 
+                                    className={`flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer transition-colors ${
+                                        currentTaskList?.code === list.code 
+                                            ? 'bg-indigo-600 bg-opacity-30 border border-indigo-500' 
+                                            : 'bg-gray-600 hover:bg-gray-550'
+                                    }`}
+                                    onClick={() => {
+                                        setTaskListLoading(true);
+                                        setTaskListApplied(false);
+                                        socket.emit('load_task_list', { code: list.code });
+                                    }}
+                                >
+                                    <div className="flex-1 min-w-0">
+                                        <span className="text-gray-200 text-sm block truncate">{list.name}</span>
+                                        <span className="text-gray-400 text-xs">
+                                            {list.task_count} tasks • <span className="font-mono">{list.code}</span>
+                                        </span>
+                                    </div>
+                                    <div className="flex gap-1 ml-2">
+                                        {currentTaskList?.code === list.code && (
+                                            <Check size={18} className="text-green-400 mr-1" />
+                                        )}
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                deleteTaskList(list.code);
+                                            }}
+                                            className="p-1 text-red-400 hover:text-red-300"
+                                            title="Delete"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Currently loaded task list preview */}
+                {currentTaskList && (
+                    <div className="border-t border-gray-600 pt-4 mt-4">
+                        <div className="flex items-center justify-between mb-2">
+                            <span className="text-gray-200 font-medium">{currentTaskList.name}</span>
+                            <div className="flex items-center gap-2">
+                                {taskListApplied && (
+                                    <span className="flex items-center gap-1 text-green-400 text-sm">
+                                        <Check size={16} /> Applied
+                                    </span>
+                                )}
+                                <button
+                                    onClick={clearTaskListSelection}
+                                    className="p-1 text-gray-400 hover:text-gray-200 hover:bg-gray-600 rounded transition-colors"
+                                    title="Clear selection"
+                                >
+                                    <X size={18} />
+                                </button>
+                            </div>
+                        </div>
+                        <p className="text-gray-400 text-sm mb-3">
+                            {currentTaskList.tasks.length} tasks • 
+                            {(currentTaskList.locations || []).filter(l => l !== 'Other').length} locations
+                        </p>
+                        
+                        {/* Locations preview */}
+                        {currentTaskList.locations && currentTaskList.locations.filter(l => l !== 'Other').length > 0 && (
+                            <div className="flex flex-wrap gap-2 mb-3">
+                                {currentTaskList.locations.filter(l => l !== 'Other').map((loc) => (
+                                    <span
+                                        key={loc}
+                                        className="bg-gray-600 px-2 py-1 rounded-full text-gray-300 text-xs flex items-center gap-1"
+                                    >
+                                        <MapPin size={10} />
+                                        {loc}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Task preview */}
+                        <div className="max-h-32 overflow-y-auto space-y-1 text-sm">
+                            {currentTaskList.tasks.slice(0, 5).map((task, index) => (
+                                <div 
+                                    key={index}
+                                    className="bg-gray-600 px-3 py-2 rounded text-gray-300 truncate"
+                                >
+                                    {task.task}
+                                </div>
+                            ))}
+                            {currentTaskList.tasks.length > 5 && (
+                                <p className="text-gray-500 text-xs text-center py-1">
+                                    + {currentTaskList.tasks.length - 5} more
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* Action buttons */}
+            <div className="space-y-3">
+                <button
+                    onClick={proceedToSettings}
+                    className="w-full bg-indigo-600 text-white py-4 px-6 rounded-lg hover:bg-indigo-700 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-400 flex items-center justify-center gap-3 font-bold text-lg"
+                >
+                    {currentTaskList ? (
+                        <>
+                            <span>Use This Task List</span>
+                            <ArrowRight size={20} />
+                        </>
+                    ) : (
+                        <>
+                            <span>Create Tasks with Group</span>
+                            <ArrowRight size={20} />
+                        </>
+                    )}
+                </button>
+                
+                <p className="text-center text-gray-500 text-xs">
+                    {currentTaskList 
+                        ? "You can still add more tasks after opening the room"
+                        : "All players can add tasks together after joining"
+                    }
+                </p>
+            </div>
+        </>
+    );
+
+    // Step 2: Game Settings (Imposters + Advanced)
+    const renderSettingsStep = () => (
+        <>
+            <div className="text-center mb-6">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                    <Users size={28} className="text-indigo-400" />
+                    <h1 className="text-2xl font-bold text-gray-100">Game Settings</h1>
+                </div>
+                {currentTaskList && taskListApplied && (
+                    <p className="text-green-400 text-sm flex items-center justify-center gap-1">
+                        <Check size={16} />
+                        Using task list: {currentTaskList.name}
+                    </p>
+                )}
+            </div>
+
+            {/* Number of Imposters - Primary Setting */}
+            <div className="bg-gray-700 rounded-lg p-6 mb-4">
+                <div className="text-center mb-4">
+                    <h2 className="text-lg font-bold text-gray-100 mb-1">Number of Imposters</h2>
+                    <p className="text-gray-400 text-sm">Choose based on group size</p>
+                </div>
+                
+                <div className="flex justify-center gap-3 mb-4">
+                    {[1, 2, 3, 4].map((num) => (
+                        <button
+                            key={num}
+                            onClick={() => updateConfig('num_imposters', num)}
+                            className={`w-16 h-16 rounded-xl text-2xl font-bold transition-all ${
+                                config.num_imposters === num
+                                    ? 'bg-red-600 text-white scale-110 shadow-lg'
+                                    : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                            }`}
+                        >
+                            {num}
+                        </button>
+                    ))}
+                </div>
+                
+                <p className="text-center text-gray-500 text-xs">
+                    {config.num_imposters === 1 && "Best for 4-6 players"}
+                    {config.num_imposters === 2 && "Best for 6-10 players"}
+                    {config.num_imposters === 3 && "Best for 10-15 players"}
+                    {config.num_imposters === 4 && "Best for 15+ players (chaos mode!)"}
+                </p>
+            </div>
+
+            {/* Advanced Settings (collapsed by default) */}
+            <div className="bg-gray-700 rounded-lg overflow-hidden mb-6">
+                <button
+                    onClick={() => setShowAdvanced(!showAdvanced)}
+                    className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-600 transition-colors"
+                >
+                    <div className="flex items-center gap-3">
+                        <Settings size={20} className="text-gray-400" />
+                        <span className="text-gray-300">Advanced Settings</span>
+                    </div>
+                    {showAdvanced ? (
+                        <ChevronUp size={20} className="text-gray-400" />
+                    ) : (
+                        <ChevronDown size={20} className="text-gray-400" />
+                    )}
+                </button>
+                
+                {showAdvanced && (
+                    <div className="px-4 pb-4 pt-2 border-t border-gray-600 space-y-6">
+                        {/* Imposter Cards */}
+                        <div>
+                            <h3 className="text-gray-200 font-medium mb-3">Imposter Cards</h3>
+                            <SliderInput
+                                label="Starting Cards"
+                                value={config.starting_cards}
+                                onChange={(v) => updateConfig('starting_cards', v)}
+                                min={0}
+                                max={5}
+                                description="Cards each imposter starts with"
+                            />
+                            <SliderInput
+                                label="Card Draw Chance"
+                                value={config.card_draw_probability}
+                                onChange={(v) => updateConfig('card_draw_probability', v)}
+                                min={0}
+                                max={1}
+                                step={0.05}
+                                description="Chance to draw a card after task completion"
+                            />
+                        </div>
+
+                        {/* Meetings */}
+                        <div>
+                            <h3 className="text-gray-200 font-medium mb-3">Meetings & Voting</h3>
+                            <SliderInput
+                                label="Voting Time"
+                                value={config.vote_time}
+                                onChange={(v) => updateConfig('vote_time', v)}
+                                min={60}
+                                max={300}
+                                step={15}
+                                unit="s"
+                                description="Time allowed for voting"
+                            />
+                            <SliderInput
+                                label="Vote Threshold"
+                                value={config.vote_threshold}
+                                onChange={(v) => updateConfig('vote_threshold', v)}
+                                min={0.5}
+                                max={1}
+                                step={0.05}
+                                description="Votes needed to eject"
+                            />
+                        </div>
+
+                        {/* Meltdown */}
+                        <div>
+                            <h3 className="text-gray-200 font-medium mb-3">Meltdown Sabotage</h3>
+                            <SliderInput
+                                label="Meltdown Time"
+                                value={config.meltdown_time}
+                                onChange={(v) => updateConfig('meltdown_time', v)}
+                                min={30}
+                                max={120}
+                                step={5}
+                                unit="s"
+                                description="Time to stop meltdown"
+                            />
+                            <SliderInput
+                                label="Codes Required"
+                                value={config.code_percent}
+                                onChange={(v) => updateConfig('code_percent', v)}
+                                min={0.3}
+                                max={1}
+                                step={0.05}
+                                description="% of players needed"
+                            />
+                        </div>
+
+                        {/* Tasks */}
+                        <div>
+                            <h3 className="text-gray-200 font-medium mb-3">Tasks</h3>
+                            <SliderInput
+                                label="Tasks Per Player"
+                                value={config.task_ratio}
+                                onChange={(v) => updateConfig('task_ratio', v)}
+                                min={5}
+                                max={25}
+                                description="Tasks to complete for crew victory"
+                            />
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* Action buttons */}
+            <div className="space-y-3">
+                <button
+                    onClick={handleOpenRoom}
+                    disabled={isSaving}
+                    className="w-full bg-green-600 text-white py-4 px-6 rounded-lg hover:bg-green-700 transition-all focus:outline-none focus:ring-2 focus:ring-green-400 transform hover:scale-105 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-lg"
+                >
+                    {isSaving ? (
+                        <span className="animate-pulse">Opening Room...</span>
+                    ) : (
+                        <>
+                            <Play size={24} />
+                            <span>Open Room</span>
+                        </>
+                    )}
+                </button>
+
+                <button
+                    onClick={() => setStep('tasklist')}
+                    className="w-full py-3 text-gray-400 hover:text-gray-200 transition-colors flex items-center justify-center gap-2"
+                >
+                    <ArrowLeft size={18} />
+                    <span>Back to Task List</span>
+                </button>
+            </div>
+        </>
+    );
+
     return (
         <div className="min-h-screen bg-gradient-to-tr from-gray-800 to-gray-900 p-4">
             <div className="max-w-lg mx-auto">
-                {/* Header */}
-                <div className="text-center mb-6">
-                    <div className="flex items-center justify-center gap-2 mb-2">
-                        <Settings size={28} className="text-indigo-400" />
-                        <h1 className="text-2xl font-bold text-gray-100">Game Settings</h1>
-                    </div>
+                {/* Room code header */}
+                <div className="flex items-center justify-center mb-6">
                     <div className="bg-gray-700 px-4 py-2 rounded-lg inline-flex items-center gap-3">
-                        <span className="text-gray-400 text-sm">Room Code: </span>
-                        <span className="text-indigo-400 font-mono font-bold text-xl">{roomCode}</span>
+                        <span className="text-gray-400 text-sm">Room:</span>
+                        <span className="text-indigo-400 font-mono font-bold text-xl tracking-widest">{roomCode}</span>
                         <div className="w-px h-5 bg-gray-500"></div>
                         <button
                             onClick={handleLeaveRoom}
@@ -312,354 +589,18 @@ function GameConfigPage() {
                     </div>
                 </div>
 
-                {/* Configuration Sections */}
-                <div className="mb-6">
-                    {/* Locations */}
-                    <Section id="locations" icon={MapPin} title="Locations">
-                        <p className="text-gray-400 text-sm mb-3">
-                            Add the locations in your venue where tasks can be assigned.
-                        </p>
-                        <div className="flex flex-wrap gap-2 mb-3">
-                            {config.locations.map((location) => (
-                                <div
-                                    key={location}
-                                    className="flex items-center gap-1 bg-gray-600 px-3 py-1 rounded-full"
-                                >
-                                    <span className="text-gray-200 text-sm">{location}</span>
-                                    <button
-                                        onClick={() => removeLocation(location)}
-                                        className="text-gray-400 hover:text-red-400 transition-colors"
-                                    >
-                                        <X size={14} />
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
-                        <div className="flex gap-2">
-                            <input
-                                type="text"
-                                value={newLocation}
-                                onChange={(e) => setNewLocation(e.target.value)}
-                                onKeyPress={(e) => e.key === 'Enter' && addLocation()}
-                                placeholder="Add location..."
-                                className="flex-1 px-3 py-2 bg-gray-600 border border-gray-500 rounded-lg text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                            />
-                            <button
-                                onClick={addLocation}
-                                className="px-3 py-2 bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
-                            >
-                                <Plus size={20} className="text-white" />
-                            </button>
-                        </div>
-                    </Section>
-
-                    {/* Imposters */}
-                    <Section id="imposters" icon={Users} title="Imposters">
-                        <SliderInput
-                            label="Number of Imposters"
-                            value={config.num_imposters}
-                            onChange={(v) => updateConfig('num_imposters', v)}
-                            min={1}
-                            max={5}
-                            description="Adjust based on group size. 1-2 for small groups, 2-3 for larger."
-                        />
-                        <SliderInput
-                            label="Starting Cards"
-                            value={config.starting_cards}
-                            onChange={(v) => updateConfig('starting_cards', v)}
-                            min={0}
-                            max={5}
-                            description="Cards each imposter starts with."
-                        />
-                        <SliderInput
-                            label="Card Draw Chance"
-                            value={config.card_draw_probability}
-                            onChange={(v) => updateConfig('card_draw_probability', v)}
-                            min={0}
-                            max={1}
-                            step={0.05}
-                            description="Probability of drawing a card after task completion."
-                        />
-                    </Section>
-
-                    {/* Meetings & Voting */}
-                    <Section id="meetings" icon={Clock} title="Meetings & Voting">
-                        <SliderInput
-                            label="Voting Time"
-                            value={config.vote_time}
-                            onChange={(v) => updateConfig('vote_time', v)}
-                            min={60}
-                            max={300}
-                            step={15}
-                            unit="s"
-                            description="Time allowed for voting during meetings."
-                        />
-                        <SliderInput
-                            label="Vote Threshold"
-                            value={config.vote_threshold}
-                            onChange={(v) => updateConfig('vote_threshold', v)}
-                            min={0.5}
-                            max={1}
-                            step={0.05}
-                            description="Fraction of votes needed to eject someone."
-                        />
-                    </Section>
-
-                    {/* Meltdown */}
-                    <Section id="meltdown" icon={Zap} title="Meltdown">
-                        <SliderInput
-                            label="Meltdown Time"
-                            value={config.meltdown_time}
-                            onChange={(v) => updateConfig('meltdown_time', v)}
-                            min={30}
-                            max={120}
-                            step={5}
-                            unit="s"
-                            description="Time to stop a meltdown before imposters win."
-                        />
-                        <SliderInput
-                            label="Codes Required"
-                            value={config.code_percent}
-                            onChange={(v) => updateConfig('code_percent', v)}
-                            min={0.3}
-                            max={1}
-                            step={0.05}
-                            description="Fraction of players who must enter codes to stop meltdown."
-                        />
-                    </Section>
-
-                    {/* Tasks */}
-                    <Section id="tasks" icon={Target} title="Tasks">
-                        <SliderInput
-                            label="Tasks Per Player"
-                            value={config.task_ratio}
-                            onChange={(v) => updateConfig('task_ratio', v)}
-                            min={5}
-                            max={25}
-                            description="Average tasks each crewmate needs to complete for crew to win."
-                        />
-                    </Section>
-
-                    {/* Task Lists */}
-                    <Section id="tasklists" icon={List} title="Task Lists">
-                        <p className="text-gray-400 text-sm mb-3">
-                            Load or create custom task lists. Task lists are saved and can be reused.
-                        </p>
-
-                        {/* Load by code */}
-                        <div className="mb-4">
-                            <label className="text-gray-300 text-sm block mb-2">Load Task List by Code</label>
-                            <div className="flex gap-2">
-                                <input
-                                    type="text"
-                                    value={loadTaskListCode}
-                                    onChange={(e) => setLoadTaskListCode(e.target.value.toUpperCase())}
-                                    onKeyPress={(e) => e.key === 'Enter' && loadTaskListByCode()}
-                                    placeholder="Enter code..."
-                                    maxLength={6}
-                                    className="flex-1 px-3 py-2 bg-gray-600 border border-gray-500 rounded-lg text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 font-mono uppercase"
-                                />
-                                <button
-                                    onClick={loadTaskListByCode}
-                                    disabled={taskListLoading}
-                                    className="px-4 py-2 bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors text-sm disabled:opacity-50"
-                                >
-                                    <Download size={18} />
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* My saved task lists */}
-                        {myTaskLists.length > 0 && (
-                            <div className="mb-4">
-                                <label className="text-gray-300 text-sm block mb-2">Your Saved Task Lists</label>
-                                <div className="space-y-2 max-h-40 overflow-y-auto">
-                                    {myTaskLists.map((list) => (
-                                        <div 
-                                            key={list.code} 
-                                            className="flex items-center justify-between bg-gray-600 px-3 py-2 rounded-lg"
-                                        >
-                                            <div className="flex-1 min-w-0">
-                                                <span className="text-gray-200 text-sm block truncate">{list.name}</span>
-                                                <span className="text-gray-400 text-xs">{list.task_count} tasks • <span className="font-mono">{list.code}</span></span>
-                                            </div>
-                                            <div className="flex gap-1 ml-2">
-                                                <button
-                                                    onClick={() => {
-                                                        setTaskListLoading(true);
-                                                        socket.emit('load_task_list', { code: list.code });
-                                                    }}
-                                                    className="p-1 text-indigo-400 hover:text-indigo-300"
-                                                    title="Load"
-                                                >
-                                                    <Download size={16} />
-                                                </button>
-                                                <button
-                                                    onClick={() => deleteTaskList(list.code)}
-                                                    className="p-1 text-red-400 hover:text-red-300"
-                                                    title="Delete"
-                                                >
-                                                    <Trash2 size={16} />
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Create new task list */}
-                        <div className="mb-4 border-t border-gray-600 pt-4">
-                            <label className="text-gray-300 text-sm block mb-2">Create New Task List</label>
-                            <input
-                                type="text"
-                                value={newTaskListName}
-                                onChange={(e) => setNewTaskListName(e.target.value)}
-                                placeholder="Task list name..."
-                                className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-lg text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 mb-2"
-                            />
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={createTaskListFromDefaults}
-                                    disabled={taskListLoading}
-                                    className="flex-1 px-3 py-2 bg-green-600 rounded-lg hover:bg-green-700 transition-colors text-sm disabled:opacity-50 flex items-center justify-center gap-2"
-                                >
-                                    <FileText size={16} />
-                                    From Defaults
-                                </button>
-                                <button
-                                    onClick={createEmptyTaskList}
-                                    disabled={taskListLoading}
-                                    className="flex-1 px-3 py-2 bg-gray-500 rounded-lg hover:bg-gray-400 transition-colors text-sm disabled:opacity-50 flex items-center justify-center gap-2"
-                                >
-                                    <Plus size={16} />
-                                    Empty List
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Currently loaded task list */}
-                        {currentTaskList && (
-                            <div className="border-t border-gray-600 pt-4">
-                                <div className="flex items-center justify-between mb-3">
-                                    <div>
-                                        <span className="text-gray-200 font-medium">{currentTaskList.name}</span>
-                                        <span className="text-gray-400 text-xs block">
-                                            Code: <span className="font-mono text-indigo-400">{currentTaskList.code}</span>
-                                            {' • '}{currentTaskList.tasks.length} tasks
-                                        </span>
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <button
-                                            onClick={() => duplicateTaskList(currentTaskList.code)}
-                                            className="p-2 bg-gray-600 rounded-lg hover:bg-gray-500 transition-colors"
-                                            title="Duplicate"
-                                        >
-                                            <Copy size={16} />
-                                        </button>
-                                        <button
-                                            onClick={applyTaskListToGame}
-                                            disabled={taskListLoading}
-                                            className="px-3 py-2 bg-green-600 rounded-lg hover:bg-green-700 transition-colors text-sm disabled:opacity-50 flex items-center gap-2"
-                                        >
-                                            <Save size={16} />
-                                            Apply to Game
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {/* Add new task */}
-                                {currentTaskList.creator_id === deviceId && (
-                                    <div className="mb-3 bg-gray-600 p-3 rounded-lg">
-                                        <label className="text-gray-300 text-xs block mb-2">Add Task</label>
-                                        <input
-                                            type="text"
-                                            value={newTask.task}
-                                            onChange={(e) => setNewTask({ ...newTask, task: e.target.value })}
-                                            onKeyPress={(e) => e.key === 'Enter' && addTaskToList()}
-                                            placeholder="Task description..."
-                                            className="w-full px-3 py-2 bg-gray-700 border border-gray-500 rounded-lg text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 mb-2"
-                                        />
-                                        <div className="flex gap-2">
-                                            <select
-                                                value={newTask.location}
-                                                onChange={(e) => setNewTask({ ...newTask, location: e.target.value })}
-                                                className="flex-1 px-3 py-2 bg-gray-700 border border-gray-500 rounded-lg text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                                            >
-                                                {(currentTaskList.locations || config.locations).map(loc => (
-                                                    <option key={loc} value={loc}>{loc}</option>
-                                                ))}
-                                            </select>
-                                            <select
-                                                value={newTask.difficulty}
-                                                onChange={(e) => setNewTask({ ...newTask, difficulty: parseInt(e.target.value) })}
-                                                className="w-20 px-3 py-2 bg-gray-700 border border-gray-500 rounded-lg text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                                            >
-                                                <option value={1}>Easy</option>
-                                                <option value={2}>Med</option>
-                                                <option value={3}>Hard</option>
-                                            </select>
-                                            <button
-                                                onClick={addTaskToList}
-                                                className="px-3 py-2 bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
-                                            >
-                                                <Plus size={18} />
-                                            </button>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Task list */}
-                                <div className="max-h-60 overflow-y-auto space-y-1">
-                                    {currentTaskList.tasks.map((task, index) => (
-                                        <div 
-                                            key={index}
-                                            className="flex items-center justify-between bg-gray-600 px-3 py-2 rounded text-sm"
-                                        >
-                                            <div className="flex-1 min-w-0">
-                                                <span className="text-gray-200 block truncate">{task.task}</span>
-                                                <span className="text-gray-400 text-xs">
-                                                    {task.location}
-                                                    {task.difficulty && ` • ${'⭐'.repeat(task.difficulty)}`}
-                                                </span>
-                                            </div>
-                                            {currentTaskList.creator_id === deviceId && (
-                                                <button
-                                                    onClick={() => removeTaskFromList(index)}
-                                                    className="p-1 text-red-400 hover:text-red-300 ml-2"
-                                                >
-                                                    <X size={14} />
-                                                </button>
-                                            )}
-                                        </div>
-                                    ))}
-                                    {currentTaskList.tasks.length === 0 && (
-                                        <p className="text-gray-500 text-sm text-center py-4">No tasks yet. Add some above!</p>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-                    </Section>
+                {/* Step indicator */}
+                <div className="flex items-center justify-center gap-2 mb-6">
+                    <div className={`w-3 h-3 rounded-full ${step === 'tasklist' ? 'bg-indigo-500' : 'bg-gray-600'}`}></div>
+                    <div className="w-8 h-0.5 bg-gray-600"></div>
+                    <div className={`w-3 h-3 rounded-full ${step === 'settings' ? 'bg-indigo-500' : 'bg-gray-600'}`}></div>
                 </div>
 
-                {/* Open Room Button */}
-                <button
-                    onClick={handleOpenRoom}
-                    disabled={isSaving || config.locations.length === 0}
-                    className="w-full bg-green-600 text-white py-4 px-6 rounded-lg hover:bg-green-700 transition-all focus:outline-none focus:ring-2 focus:ring-green-400 transform hover:scale-105 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-lg"
-                >
-                    {isSaving ? (
-                        <span className="animate-pulse">Opening Room...</span>
-                    ) : (
-                        <>
-                            <Play size={24} />
-                            <span>Open Room for Players</span>
-                        </>
-                    )}
-                </button>
+                {/* Render current step */}
+                {step === 'tasklist' ? renderTaskListStep() : renderSettingsStep()}
 
-                <p className="text-center text-gray-500 text-sm mt-4">
-                    Once opened, other players can join with code <span className="text-indigo-400 font-mono">{roomCode}</span>
+                <p className="text-center text-gray-500 text-sm mt-6">
+                    Share code <span className="text-indigo-400 font-mono">{roomCode}</span> to invite players
                 </p>
             </div>
         </div>

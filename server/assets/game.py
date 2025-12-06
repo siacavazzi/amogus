@@ -50,7 +50,8 @@ class Game:
         self.last_activity = time.time()
         self.end_time = None
         self.is_open = False  # Room not open until creator configures it
-        self.creator_sid = None  # Track who created the room
+        self.creator_sid = None  # Track who created the room (socket id, can change on reconnect)
+        self.creator_player_id = None  # Track who created the room (player id, persistent)
         
         # Reactor (desktop) support - must be set before CardDeck is created
         self.has_reactor = False
@@ -61,6 +62,8 @@ class Game:
         self.task_creation_mode = False
         self.task_list_applied = False  # Track if a task list was explicitly applied
         self.collaborative_task_list_code = None  # Code if collaborative tasks have been saved
+        self.collaborative_task_list_name = None  # Name of the task list
+        self.collaborative_mode = False  # If True, all players can add tasks; if False, only host
         
         # Create card deck after has_reactor is set
         self.card_deck = CardDeck(locations, socket, self)

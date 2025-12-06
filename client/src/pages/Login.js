@@ -42,7 +42,7 @@ function LoginPage() {
     return (
         <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-gray-800 to-gray-900 p-6 relative">
             {/* Back Button Styled */}
-            {step === 'username' && (
+            {/* {step === 'username' && (
                 <button
                     type="button"
                     onClick={handleEnterTasks}
@@ -51,7 +51,7 @@ function LoginPage() {
                     <ChevronLeft className="mr-1" />
                     <span className="text-sm">Task Entry</span>
                 </button>
-            )}
+            )} */}
             {step === 'camera' && (
                 <button
                     type="button"

@@ -2710,3 +2710,1092 @@
 2025-12-04 23:26:24,779 - app_logger - INFO - Client disconnected: 11pqOb4_ASIQRaY8AAAF
 2025-12-04 23:26:27,658 - app_logger - INFO - Client connected: VNZpNS9xOAuaBXZOAAAN
 2025-12-04 23:27:10,708 - app_logger - INFO - Client disconnected: VNZpNS9xOAuaBXZOAAAN
+2025-12-06 15:43:16,064 - app_logger - INFO - Starting server...
+2025-12-06 15:43:16,064 - app_logger - INFO -  * Running with HTTPS at: https://192.168.68.63:5001
+2025-12-06 15:43:16,064 - app_logger - INFO -  * Note: You may need to accept the self-signed certificate in your browser
+2025-12-06 15:46:02,506 - app_logger - INFO - Starting server...
+2025-12-06 15:46:02,506 - app_logger - INFO -  * DEV MODE: SSL disabled
+2025-12-06 15:46:02,506 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.63:5001
+2025-12-06 15:46:11,281 - app_logger - INFO - Client connected: AXaZq1paRLNnqLjHAAAB
+2025-12-06 15:46:12,475 - app_logger - INFO - Client disconnected: AXaZq1paRLNnqLjHAAAB
+2025-12-06 15:46:12,792 - app_logger - INFO - Client connected: 2iVEhYAyKNURQS3KAAAE
+2025-12-06 15:46:19,435 - app_logger - INFO - Game created with room code: KARW
+2025-12-06 15:46:19,440 - app_logger - INFO - Reactor registered for room KARW (sid: 2iVEhYAyKNURQS3KAAAE)
+2025-12-06 15:54:19,112 - app_logger - INFO - Client disconnected: 2iVEhYAyKNURQS3KAAAE
+2025-12-06 15:54:20,194 - app_logger - INFO - Starting server...
+2025-12-06 15:54:20,194 - app_logger - INFO -  * DEV MODE: SSL disabled
+2025-12-06 15:54:20,194 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.63:5001
+2025-12-06 15:54:21,104 - app_logger - INFO - Client connected: s0XNehOCcITZsAyJAAAB
+2025-12-06 15:54:37,790 - app_logger - INFO - Game created with room code: PVSB
+2025-12-06 15:54:37,795 - app_logger - INFO - Reactor registered for room PVSB (sid: s0XNehOCcITZsAyJAAAB)
+2025-12-06 15:54:43,627 - app_logger - INFO - Game PVSB config updated: {'locations': ['Basement', '1st Floor', '2nd Floor', '3rd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 2, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 15:54:43,635 - app_logger - INFO - Room PVSB is now open for players
+2025-12-06 15:54:48,289 - app_logger - INFO - Client disconnected: s0XNehOCcITZsAyJAAAB
+2025-12-06 15:54:48,590 - app_logger - INFO - Client connected: lExl92KhWAADzHY1AAAE
+2025-12-06 15:54:53,777 - app_logger - INFO - Saved selfie for sam: 34dbcb17abf74091b61280d238fd81dc.jpg
+2025-12-06 15:54:53,781 - app_logger - INFO - New player sam joined room PVSB with ID 8e8bcbee-f6da-4753-aa78-49d8688cbc4c
+2025-12-06 15:54:53,781 - app_logger - INFO - Sending player list to room PVSB
+2025-12-06 15:54:53,781 - app_logger - DEBUG - Player List: ['{"sid": "lExl92KhWAADzHY1AAAE", "player_id": "8e8bcbee-f6da-4753-aa78-49d8688cbc4c", "username": "sam", "active": true, "sus": false, "alive": true, "pic": 12, "selfie": "34dbcb17abf74091b61280d238fd81dc.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 15:54:55,682 - app_logger - INFO - Client disconnected: lExl92KhWAADzHY1AAAE
+2025-12-06 15:54:55,843 - app_logger - INFO - Client connected: T0LQSDI8kyiHPImnAAAH
+2025-12-06 15:54:55,846 - app_logger - INFO - Player 8e8bcbee-f6da-4753-aa78-49d8688cbc4c rejoining room PVSB
+2025-12-06 15:54:55,847 - app_logger - INFO - Sending player list to room PVSB
+2025-12-06 15:54:55,847 - app_logger - DEBUG - Player List: ['{"sid": "T0LQSDI8kyiHPImnAAAH", "player_id": "8e8bcbee-f6da-4753-aa78-49d8688cbc4c", "username": "sam", "active": true, "sus": false, "alive": true, "pic": 12, "selfie": "34dbcb17abf74091b61280d238fd81dc.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 15:54:57,165 - app_logger - INFO - Task creation mode enabled for client in room PVSB
+2025-12-06 15:55:02,909 - app_logger - INFO - Room PVSB deleted (no players remaining)
+2025-12-06 15:55:05,301 - app_logger - INFO - Client disconnected: T0LQSDI8kyiHPImnAAAH
+2025-12-06 15:55:05,408 - app_logger - INFO - Client connected: voyQVyu-dNl-zIEIAAAK
+2025-12-06 15:55:06,074 - app_logger - INFO - Game created with room code: DGYV
+2025-12-06 15:55:31,425 - app_logger - INFO - Game DGYV config updated: {'locations': ['p'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 2, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 15:55:31,429 - app_logger - INFO - Room DGYV is now open for players
+2025-12-06 15:55:34,674 - app_logger - INFO - Saved selfie for sa : bc238db8533e423da1ef4e1cc6e60ffb.jpg
+2025-12-06 15:55:34,676 - app_logger - INFO - New player sa  joined room DGYV with ID a83b077f-3ea9-43f0-b3ce-54254ab30fe0
+2025-12-06 15:55:34,677 - app_logger - INFO - Sending player list to room DGYV
+2025-12-06 15:55:34,677 - app_logger - DEBUG - Player List: ['{"sid": "voyQVyu-dNl-zIEIAAAK", "player_id": "a83b077f-3ea9-43f0-b3ce-54254ab30fe0", "username": "sa ", "active": true, "sus": false, "alive": true, "pic": 10, "selfie": "bc238db8533e423da1ef4e1cc6e60ffb.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 15:55:36,137 - app_logger - INFO - Client disconnected: voyQVyu-dNl-zIEIAAAK
+2025-12-06 15:55:36,275 - app_logger - INFO - Client connected: hCd5TCWymcpo-IO3AAAM
+2025-12-06 15:55:36,283 - app_logger - INFO - Player a83b077f-3ea9-43f0-b3ce-54254ab30fe0 rejoining room DGYV
+2025-12-06 15:55:36,289 - app_logger - INFO - Sending player list to room DGYV
+2025-12-06 15:55:36,290 - app_logger - DEBUG - Player List: ['{"sid": "hCd5TCWymcpo-IO3AAAM", "player_id": "a83b077f-3ea9-43f0-b3ce-54254ab30fe0", "username": "sa ", "active": true, "sus": false, "alive": true, "pic": 10, "selfie": "bc238db8533e423da1ef4e1cc6e60ffb.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 15:55:37,332 - app_logger - INFO - Task creation mode enabled for client in room DGYV
+2025-12-06 15:55:41,851 - app_logger - INFO - Room DGYV deleted (no players remaining)
+2025-12-06 15:55:43,256 - app_logger - INFO - Game created with room code: ONLC
+2025-12-06 15:55:47,672 - app_logger - INFO - Applied task list VZED7K to game ONLC: 10 tasks loaded, task_list_applied=True
+2025-12-06 15:55:47,672 - app_logger - INFO - Task handler now has 10 tasks
+2025-12-06 15:55:53,356 - app_logger - INFO - Applied task list VZED7K to game ONLC: 10 tasks loaded, task_list_applied=True
+2025-12-06 15:55:53,357 - app_logger - INFO - Task handler now has 10 tasks
+2025-12-06 15:57:02,492 - app_logger - INFO - Game ONLC config updated: {'locations': ['Basement', '1st Floor', '2nd Floor', '3rd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 2, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 15:57:02,495 - app_logger - INFO - Room ONLC is now open for players
+2025-12-06 15:57:06,840 - app_logger - INFO - Saved selfie for ppp: bd6cf0ad2c2a4cfdb3215d465c03aa2c.jpg
+2025-12-06 15:57:06,847 - app_logger - INFO - New player ppp joined room ONLC with ID 030691d1-5c0f-46b7-98d3-2071cf4abb5b
+2025-12-06 15:57:06,847 - app_logger - INFO - Sending player list to room ONLC
+2025-12-06 15:57:06,847 - app_logger - DEBUG - Player List: ['{"sid": "hCd5TCWymcpo-IO3AAAM", "player_id": "030691d1-5c0f-46b7-98d3-2071cf4abb5b", "username": "ppp", "active": true, "sus": false, "alive": true, "pic": 7, "selfie": "bd6cf0ad2c2a4cfdb3215d465c03aa2c.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 16:00:18,827 - app_logger - INFO - Client disconnected: hCd5TCWymcpo-IO3AAAM
+2025-12-06 16:00:19,903 - app_logger - INFO - Starting server...
+2025-12-06 16:00:19,903 - app_logger - INFO -  * DEV MODE: SSL disabled
+2025-12-06 16:00:19,904 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.63:5001
+2025-12-06 16:00:21,615 - app_logger - INFO - Client connected: gdtS6CtLcYqfoEQ2AAAB
+2025-12-06 16:00:24,276 - app_logger - INFO - Client disconnected: gdtS6CtLcYqfoEQ2AAAB
+2025-12-06 16:00:24,711 - app_logger - INFO - Client connected: iGkQdwowfI5GqDaVAAAE
+2025-12-06 16:00:25,659 - app_logger - INFO - Game created with room code: FRNT
+2025-12-06 16:00:38,496 - app_logger - INFO - Game FRNT config updated: {'locations': ['Basement', '1st Floor', '2nd Floor', '3rd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 2, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 16:00:38,499 - app_logger - INFO - Room FRNT is now open for players
+2025-12-06 16:00:43,921 - app_logger - INFO - Saved selfie for sam: b12e3c84617d4ec2b9f148725130a9b5.jpg
+2025-12-06 16:00:43,923 - app_logger - INFO - New player sam joined room FRNT with ID 15d136cb-df1c-44b8-a10c-b9e099ae6e74
+2025-12-06 16:00:43,924 - app_logger - INFO - Sending player list to room FRNT
+2025-12-06 16:00:43,924 - app_logger - DEBUG - Player List: ['{"sid": "iGkQdwowfI5GqDaVAAAE", "player_id": "15d136cb-df1c-44b8-a10c-b9e099ae6e74", "username": "sam", "active": true, "sus": false, "alive": true, "pic": 12, "selfie": "b12e3c84617d4ec2b9f148725130a9b5.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 16:00:45,325 - app_logger - INFO - Client disconnected: iGkQdwowfI5GqDaVAAAE
+2025-12-06 16:00:45,508 - app_logger - INFO - Client connected: d28CQHznKTMr6oP4AAAH
+2025-12-06 16:00:45,516 - app_logger - INFO - Player 15d136cb-df1c-44b8-a10c-b9e099ae6e74 rejoining room FRNT
+2025-12-06 16:00:45,520 - app_logger - INFO - Sending player list to room FRNT
+2025-12-06 16:00:45,520 - app_logger - DEBUG - Player List: ['{"sid": "d28CQHznKTMr6oP4AAAH", "player_id": "15d136cb-df1c-44b8-a10c-b9e099ae6e74", "username": "sam", "active": true, "sus": false, "alive": true, "pic": 12, "selfie": "b12e3c84617d4ec2b9f148725130a9b5.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 16:00:46,936 - app_logger - INFO - Task creation mode enabled for client in room FRNT
+2025-12-06 16:00:54,176 - app_logger - INFO - Room FRNT deleted (no players remaining)
+2025-12-06 16:00:55,468 - app_logger - INFO - Game created with room code: GBFK
+2025-12-06 16:01:05,733 - app_logger - INFO - Game GBFK config updated: {'locations': ['Basement', '1st Floor', '2nd Floor', '3rd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 2, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 16:01:05,736 - app_logger - INFO - Room GBFK is now open for players
+2025-12-06 16:01:10,739 - app_logger - INFO - New player sam joined room GBFK with ID ee8de6c7-6e7f-406e-9774-6247a8a11f06
+2025-12-06 16:01:10,740 - app_logger - INFO - Sending player list to room GBFK
+2025-12-06 16:01:10,740 - app_logger - DEBUG - Player List: ['{"sid": "d28CQHznKTMr6oP4AAAH", "player_id": "ee8de6c7-6e7f-406e-9774-6247a8a11f06", "username": "sam", "active": true, "sus": false, "alive": true, "pic": 0, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 16:01:22,129 - app_logger - INFO - Room GBFK deleted (no players remaining)
+2025-12-06 16:01:23,234 - app_logger - INFO - Game created with room code: UUFQ
+2025-12-06 16:06:46,716 - app_logger - INFO - Client disconnected: d28CQHznKTMr6oP4AAAH
+2025-12-06 16:06:47,843 - app_logger - INFO - Starting server...
+2025-12-06 16:06:47,844 - app_logger - INFO -  * DEV MODE: SSL disabled
+2025-12-06 16:06:47,844 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.63:5001
+2025-12-06 16:06:49,708 - app_logger - INFO - Client connected: jnFtQtcOsEZITj8xAAAB
+2025-12-06 16:06:56,162 - app_logger - INFO - Game created with room code: DZPY
+2025-12-06 16:07:03,561 - app_logger - INFO - Game DZPY config updated: {'locations': ['Basement', '1st Floor', '2nd Floor', '3rd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 2, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 16:07:03,562 - app_logger - INFO - Room DZPY is now open for players
+2025-12-06 16:07:09,632 - app_logger - INFO - Saved selfie for sam: 9fefaea224be4a57bf4a818b159ee26e.jpg
+2025-12-06 16:07:09,633 - app_logger - INFO - New player sam joined room DZPY with ID 523778b7-40dc-4f99-a003-04bf3c128d65
+2025-12-06 16:07:09,634 - app_logger - INFO - Sending player list to room DZPY
+2025-12-06 16:07:09,634 - app_logger - DEBUG - Player List: ['{"sid": "jnFtQtcOsEZITj8xAAAB", "player_id": "523778b7-40dc-4f99-a003-04bf3c128d65", "username": "sam", "active": true, "sus": false, "alive": true, "pic": 3, "selfie": "9fefaea224be4a57bf4a818b159ee26e.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 16:07:13,096 - app_logger - INFO - Task creation mode enabled for client in room DZPY
+2025-12-06 16:10:45,304 - app_logger - INFO - Client disconnected: jnFtQtcOsEZITj8xAAAB
+2025-12-06 16:10:46,532 - app_logger - INFO - Starting server...
+2025-12-06 16:10:46,533 - app_logger - INFO -  * DEV MODE: SSL disabled
+2025-12-06 16:10:46,533 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.63:5001
+2025-12-06 16:10:47,226 - app_logger - INFO - Client connected: Uez0ViIITDGEMtckAAAB
+2025-12-06 16:10:56,554 - app_logger - INFO - Client disconnected: Uez0ViIITDGEMtckAAAB
+2025-12-06 16:10:57,083 - app_logger - INFO - Client connected: JdEQTEG5e8uywKxtAAAE
+2025-12-06 16:10:58,558 - app_logger - INFO - Game created with room code: SNKP
+2025-12-06 16:11:07,283 - app_logger - INFO - Game SNKP config updated: {'locations': ['Basement', '1st Floor', '2nd Floor', '3rd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 2, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 16:11:07,288 - app_logger - INFO - Room SNKP is now open for players
+2025-12-06 16:11:16,247 - app_logger - INFO - Saved selfie for sam: f266652298e648d394ede22183badc67.jpg
+2025-12-06 16:11:16,252 - app_logger - INFO - New player sam joined room SNKP with ID d3580ed4-b458-4c16-823c-9f15446ac053
+2025-12-06 16:11:16,253 - app_logger - INFO - Sending player list to room SNKP
+2025-12-06 16:11:16,254 - app_logger - DEBUG - Player List: ['{"sid": "JdEQTEG5e8uywKxtAAAE", "player_id": "d3580ed4-b458-4c16-823c-9f15446ac053", "username": "sam", "active": true, "sus": false, "alive": true, "pic": 8, "selfie": "f266652298e648d394ede22183badc67.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 16:11:18,034 - app_logger - INFO - Client disconnected: JdEQTEG5e8uywKxtAAAE
+2025-12-06 16:11:18,223 - app_logger - INFO - Client connected: yRKUYmLcmJbgS7q1AAAH
+2025-12-06 16:11:18,230 - app_logger - INFO - Player d3580ed4-b458-4c16-823c-9f15446ac053 rejoining room SNKP
+2025-12-06 16:11:18,232 - app_logger - INFO - Sending player list to room SNKP
+2025-12-06 16:11:18,233 - app_logger - DEBUG - Player List: ['{"sid": "yRKUYmLcmJbgS7q1AAAH", "player_id": "d3580ed4-b458-4c16-823c-9f15446ac053", "username": "sam", "active": true, "sus": false, "alive": true, "pic": 8, "selfie": "f266652298e648d394ede22183badc67.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 16:11:22,396 - app_logger - INFO - Task creation mode enabled for client in room SNKP
+2025-12-06 16:11:27,866 - app_logger - INFO - Client disconnected: yRKUYmLcmJbgS7q1AAAH
+2025-12-06 16:11:27,968 - app_logger - INFO - Client connected: YjqplmdrFtbRUfh9AAAJ
+2025-12-06 16:11:27,973 - app_logger - INFO - Player d3580ed4-b458-4c16-823c-9f15446ac053 rejoining room SNKP
+2025-12-06 16:11:27,974 - app_logger - INFO - Sending player list to room SNKP
+2025-12-06 16:11:27,975 - app_logger - DEBUG - Player List: ['{"sid": "YjqplmdrFtbRUfh9AAAJ", "player_id": "d3580ed4-b458-4c16-823c-9f15446ac053", "username": "sam", "active": true, "sus": false, "alive": true, "pic": 8, "selfie": "f266652298e648d394ede22183badc67.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 16:11:31,520 - app_logger - INFO - Client disconnected: YjqplmdrFtbRUfh9AAAJ
+2025-12-06 16:11:32,586 - app_logger - INFO - Starting server...
+2025-12-06 16:11:32,587 - app_logger - INFO -  * DEV MODE: SSL disabled
+2025-12-06 16:11:32,587 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.63:5001
+2025-12-06 16:11:33,892 - app_logger - INFO - Client connected: XS1nAKhLDPiTQQ4PAAAB
+2025-12-06 16:11:41,250 - app_logger - INFO - Client disconnected: XS1nAKhLDPiTQQ4PAAAB
+2025-12-06 16:11:41,538 - app_logger - INFO - Client connected: GmM3sDChABA3xFlMAAAE
+2025-12-06 16:11:42,757 - app_logger - INFO - Game created with room code: QCLE
+2025-12-06 16:11:47,117 - app_logger - INFO - Game QCLE config updated: {'locations': ['Basement', '1st Floor', '2nd Floor', '3rd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 2, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 16:11:47,122 - app_logger - INFO - Room QCLE is now open for players
+2025-12-06 16:11:50,724 - app_logger - INFO - New player sa  joined room QCLE with ID 160c501d-2808-49c7-a496-b4ffdd4b810b
+2025-12-06 16:11:50,725 - app_logger - INFO - Sending player list to room QCLE
+2025-12-06 16:11:50,725 - app_logger - DEBUG - Player List: ['{"sid": "GmM3sDChABA3xFlMAAAE", "player_id": "160c501d-2808-49c7-a496-b4ffdd4b810b", "username": "sa ", "active": true, "sus": false, "alive": true, "pic": 7, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 16:11:52,095 - app_logger - INFO - Client disconnected: GmM3sDChABA3xFlMAAAE
+2025-12-06 16:11:52,270 - app_logger - INFO - Client connected: mEnjt0cHkF7Jw3rDAAAH
+2025-12-06 16:11:52,280 - app_logger - INFO - Player 160c501d-2808-49c7-a496-b4ffdd4b810b rejoining room QCLE
+2025-12-06 16:11:52,281 - app_logger - INFO - Sending player list to room QCLE
+2025-12-06 16:11:52,281 - app_logger - DEBUG - Player List: ['{"sid": "mEnjt0cHkF7Jw3rDAAAH", "player_id": "160c501d-2808-49c7-a496-b4ffdd4b810b", "username": "sa ", "active": true, "sus": false, "alive": true, "pic": 7, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 16:11:53,979 - app_logger - INFO - Task creation mode enabled for client in room QCLE
+2025-12-06 16:15:17,282 - app_logger - INFO - Updated locations in room QCLE: ['1st Floor', '2nd Floor', '3rd Floor', 'Other']
+2025-12-06 16:15:17,962 - app_logger - INFO - Updated locations in room QCLE: ['1st Floor', '2nd Floor', '3rd Floor', 'Other']
+2025-12-06 16:15:18,553 - app_logger - INFO - Updated locations in room QCLE: ['2nd Floor', '3rd Floor', 'Other']
+2025-12-06 16:15:27,407 - app_logger - INFO - Client disconnected: mEnjt0cHkF7Jw3rDAAAH
+2025-12-06 16:15:28,540 - app_logger - INFO - Starting server...
+2025-12-06 16:15:28,540 - app_logger - INFO -  * DEV MODE: SSL disabled
+2025-12-06 16:15:28,540 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.63:5001
+2025-12-06 16:15:29,767 - app_logger - INFO - Client connected: YA7Iw6L6u-kKyvuKAAAB
+2025-12-06 16:15:32,416 - app_logger - INFO - Game created with room code: HWZT
+2025-12-06 16:15:34,520 - app_logger - INFO - Game HWZT config updated: {'locations': ['Basement', '1st Floor', '2nd Floor', '3rd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 2, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 16:15:34,527 - app_logger - INFO - Room HWZT is now open for players
+2025-12-06 16:15:39,783 - app_logger - INFO - Saved selfie for sam: 66fa239b3de3481297e8c9581d7e4458.jpg
+2025-12-06 16:15:39,786 - app_logger - INFO - New player sam joined room HWZT with ID 252d6e3c-b36b-431f-ace2-04fe92493e70
+2025-12-06 16:15:39,787 - app_logger - INFO - Sending player list to room HWZT
+2025-12-06 16:15:39,788 - app_logger - DEBUG - Player List: ['{"sid": "YA7Iw6L6u-kKyvuKAAAB", "player_id": "252d6e3c-b36b-431f-ace2-04fe92493e70", "username": "sam", "active": true, "sus": false, "alive": true, "pic": 7, "selfie": "66fa239b3de3481297e8c9581d7e4458.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 16:15:43,604 - app_logger - INFO - Task creation mode enabled for client in room HWZT
+2025-12-06 16:15:47,111 - app_logger - INFO - Updated locations in room HWZT: ['1st Floor', '2nd Floor', '3rd Floor', 'Other']
+2025-12-06 16:15:47,238 - app_logger - INFO - Updated locations in room HWZT: ['2nd Floor', '3rd Floor', 'Other']
+2025-12-06 16:15:50,509 - app_logger - INFO - Updated locations in room HWZT: ['2nd Floor', '3rd Floor', 'Test', 'Other']
+2025-12-06 16:15:56,349 - app_logger - INFO - Updated locations in room HWZT: ['2nd Floor', '3rd Floor', 'Test', 'Poopoo', 'Other']
+2025-12-06 16:15:57,349 - app_logger - INFO - Updated locations in room HWZT: ['2nd Floor', '3rd Floor', 'Test', 'Poopoo', 'Other']
+2025-12-06 16:16:07,262 - app_logger - INFO - Collaborative task added in room HWZT: jork it
+2025-12-06 16:16:16,600 - app_logger - INFO - Updated locations in room HWZT: ['2nd Floor', '3rd Floor', 'Test', 'Poopoo', 'Other']
+2025-12-06 16:16:19,834 - app_logger - INFO - Updated locations in room HWZT: ['2nd Floor', '3rd Floor', 'Test', 'Poopoo', 'hiii', 'Other']
+2025-12-06 16:16:20,566 - app_logger - INFO - Updated locations in room HWZT: ['2nd Floor', '3rd Floor', 'Test', 'Poopoo', 'hiii', 'Other']
+2025-12-06 16:16:28,043 - app_logger - INFO - Collaborative task added in room HWZT: yooo
+2025-12-06 16:16:29,254 - app_logger - INFO - Collaborative task added in room HWZT: ewf
+2025-12-06 16:16:30,042 - app_logger - INFO - Collaborative task added in room HWZT: ef
+2025-12-06 16:16:31,350 - app_logger - INFO - Collaborative task added in room HWZT: efew
+2025-12-06 16:16:32,416 - app_logger - INFO - Collaborative task added in room HWZT: efwef
+2025-12-06 16:16:33,329 - app_logger - INFO - Collaborative task added in room HWZT: efewf
+2025-12-06 16:16:34,102 - app_logger - INFO - Collaborative task added in room HWZT: wefewf
+2025-12-06 16:16:34,960 - app_logger - INFO - Collaborative task added in room HWZT: efewf
+2025-12-06 16:16:36,179 - app_logger - INFO - Collaborative task added in room HWZT: ewfewf
+2025-12-06 16:21:51,586 - app_logger - INFO - Room HWZT deleted (no players remaining)
+2025-12-06 16:22:45,016 - app_logger - INFO - Client disconnected: YA7Iw6L6u-kKyvuKAAAB
+2025-12-06 16:22:46,062 - app_logger - INFO - Starting server...
+2025-12-06 16:22:46,062 - app_logger - INFO -  * DEV MODE: SSL disabled
+2025-12-06 16:22:46,062 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.63:5001
+2025-12-06 16:22:46,144 - app_logger - INFO - Client connected: B8PzqjfU-kiwTQgdAAAB
+2025-12-06 16:22:47,519 - app_logger - INFO - Game created with room code: MMBS
+2025-12-06 16:22:49,586 - app_logger - INFO - Game MMBS config updated: {'locations': ['Basement', '1st Floor', '2nd Floor', '3rd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 2, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 16:22:49,590 - app_logger - INFO - Room MMBS is now open for players
+2025-12-06 16:22:54,473 - app_logger - INFO - Saved selfie for sam: aba665c6bd2a434ca699456c075b9862.jpg
+2025-12-06 16:22:54,474 - app_logger - INFO - New player sam joined room MMBS with ID a1d93afa-df4f-4ee0-8849-bba7535c2917
+2025-12-06 16:22:54,474 - app_logger - INFO - Sending player list to room MMBS
+2025-12-06 16:22:54,477 - app_logger - DEBUG - Player List: ['{"sid": "B8PzqjfU-kiwTQgdAAAB", "player_id": "a1d93afa-df4f-4ee0-8849-bba7535c2917", "username": "sam", "active": true, "sus": false, "alive": true, "pic": 14, "selfie": "aba665c6bd2a434ca699456c075b9862.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 16:23:08,418 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, min_tasks=10
+2025-12-06 16:23:08,420 - app_logger - INFO - Game MMBS entering collaborative task creation mode (task_list_applied=False, need 10 tasks, have 23, locations=['Other'])
+2025-12-06 16:23:18,444 - app_logger - INFO - Updated locations in room MMBS: ['kitchen', 'Other']
+2025-12-06 16:23:22,011 - app_logger - INFO - Updated locations in room MMBS: ['kitchen', 'basement', 'Other']
+2025-12-06 16:23:23,062 - app_logger - INFO - Updated locations in room MMBS: ['kitchen', 'basement', 'Other']
+2025-12-06 16:23:36,567 - app_logger - INFO - Collaborative task added in room MMBS: what
+2025-12-06 16:23:45,649 - app_logger - INFO - Updated locations in room MMBS: ['kitchen', 'basement', 'hmmm', 'Other']
+2025-12-06 16:23:47,381 - app_logger - INFO - Updated locations in room MMBS: ['kitchen', 'hmmm', 'Other']
+2025-12-06 16:23:49,730 - app_logger - INFO - Updated locations in room MMBS: ['kitchen', 'hmmm', 'Other']
+2025-12-06 16:23:55,247 - app_logger - INFO - Collaborative task removed in room MMBS: what
+2025-12-06 16:23:59,785 - app_logger - INFO - Collaborative task added in room MMBS: test
+2025-12-06 16:24:05,819 - app_logger - INFO - Created collaborative task list ARYYVR in room MMBS
+2025-12-06 16:24:09,615 - app_logger - INFO - Room MMBS deleted (no players remaining)
+2025-12-06 16:24:10,979 - app_logger - INFO - Game created with room code: LWVL
+2025-12-06 16:24:18,907 - app_logger - INFO - Applied task list ARYYVR to game LWVL: 1 tasks loaded, task_list_applied=True
+2025-12-06 16:24:18,907 - app_logger - INFO - Task handler now has 1 tasks
+2025-12-06 16:24:23,297 - app_logger - INFO - Game LWVL config updated: {'locations': ['kitchen', 'hmmm'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 2, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 16:24:23,300 - app_logger - INFO - Room LWVL is now open for players
+2025-12-06 16:24:25,755 - app_logger - INFO - Updated locations in room LWVL: ['kitchen', 'hmmm', 'Other']
+2025-12-06 16:29:59,888 - app_logger - INFO - Client disconnected: B8PzqjfU-kiwTQgdAAAB
+2025-12-06 16:30:00,930 - app_logger - INFO - Starting server...
+2025-12-06 16:30:00,930 - app_logger - INFO -  * DEV MODE: SSL disabled
+2025-12-06 16:30:00,930 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.63:5001
+2025-12-06 16:30:02,266 - app_logger - INFO - Client connected: hFiPJ1avKUnn4PY_AAAB
+2025-12-06 16:30:03,257 - app_logger - INFO - Game created with room code: ZVNC
+2025-12-06 16:30:05,601 - app_logger - INFO - Game ZVNC config updated: {'locations': ['Basement', '1st Floor', '2nd Floor', '3rd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 2, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 16:30:05,609 - app_logger - INFO - Room ZVNC is now open for players
+2025-12-06 16:30:30,947 - app_logger - INFO - Saved selfie for sam: cf81f2b9fcb54258b8204859969b1ca6.jpg
+2025-12-06 16:30:30,977 - app_logger - INFO - New player sam joined room ZVNC with ID 14e48007-c2ee-4d3a-bd6b-c08bf7371b1f
+2025-12-06 16:30:30,977 - app_logger - INFO - Sending player list to room ZVNC
+2025-12-06 16:30:30,978 - app_logger - DEBUG - Player List: ['{"sid": "hFiPJ1avKUnn4PY_AAAB", "player_id": "14e48007-c2ee-4d3a-bd6b-c08bf7371b1f", "username": "sam", "active": true, "sus": false, "alive": true, "pic": 9, "selfie": "cf81f2b9fcb54258b8204859969b1ca6.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 16:30:42,213 - app_logger - INFO - Updated locations in room ZVNC: ['1st Floor', '2nd Floor', '3rd Floor', 'Other']
+2025-12-06 16:30:42,883 - app_logger - INFO - Updated locations in room ZVNC: ['2nd Floor', '3rd Floor', 'Other']
+2025-12-06 16:30:47,979 - app_logger - INFO - Updated locations in room ZVNC: ['2nd Floor', '3rd Floor', 'Other']
+2025-12-06 16:30:50,150 - app_logger - INFO - Updated locations in room ZVNC: ['2nd Floor', '3rd Floor', 'Other']
+2025-12-06 16:32:18,676 - app_logger - INFO - Room ZVNC deleted (no players remaining)
+2025-12-06 16:32:20,695 - app_logger - INFO - Game created with room code: JNYE
+2025-12-06 16:32:23,356 - app_logger - INFO - Game JNYE config updated: {'locations': ['Basement', '1st Floor', '2nd Floor', '3rd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 2, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 16:32:23,358 - app_logger - INFO - Room JNYE is now open for players
+2025-12-06 16:32:26,609 - app_logger - INFO - New player sam joined room JNYE with ID 41c96258-09d9-49aa-8a49-f2c232bb99c0
+2025-12-06 16:32:26,610 - app_logger - INFO - Sending player list to room JNYE
+2025-12-06 16:32:26,611 - app_logger - DEBUG - Player List: ['{"sid": "hFiPJ1avKUnn4PY_AAAB", "player_id": "41c96258-09d9-49aa-8a49-f2c232bb99c0", "username": "sam", "active": true, "sus": false, "alive": true, "pic": 15, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 16:32:38,810 - app_logger - INFO - Updated locations in room JNYE: ['Basement', '1st Floor', '2nd Floor', 'Other']
+2025-12-06 16:32:41,496 - app_logger - INFO - Updated locations in room JNYE: ['Basement', '1st Floor', '2nd Floor', 'Other']
+2025-12-06 16:33:13,850 - app_logger - INFO - Updated locations in room JNYE: ['Basement', '1st Floor', '2nd Floor', '3rd Floor', 'Other']
+2025-12-06 16:33:15,388 - app_logger - INFO - Updated locations in room JNYE: ['Basement', '1st Floor', '2nd Floor', '3rd Floor', 'Other']
+2025-12-06 16:35:46,600 - app_logger - INFO - Client disconnected: hFiPJ1avKUnn4PY_AAAB
+2025-12-06 16:35:46,633 - app_logger - INFO - Client connected: YrGp1SD6MQhT30k2AAAD
+2025-12-06 16:35:46,635 - app_logger - INFO - Player 41c96258-09d9-49aa-8a49-f2c232bb99c0 rejoining room JNYE
+2025-12-06 16:35:46,635 - app_logger - INFO - Sending player list to room JNYE
+2025-12-06 16:35:46,636 - app_logger - DEBUG - Player List: ['{"sid": "YrGp1SD6MQhT30k2AAAD", "player_id": "41c96258-09d9-49aa-8a49-f2c232bb99c0", "username": "sam", "active": true, "sus": false, "alive": true, "pic": 15, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 16:36:59,077 - app_logger - INFO - Client disconnected: YrGp1SD6MQhT30k2AAAD
+2025-12-06 16:36:59,087 - app_logger - INFO - Client connected: Mi6BCM9cRYQ1yStpAAAF
+2025-12-06 16:36:59,088 - app_logger - INFO - Player 41c96258-09d9-49aa-8a49-f2c232bb99c0 rejoining room JNYE
+2025-12-06 16:36:59,089 - app_logger - INFO - Sending player list to room JNYE
+2025-12-06 16:36:59,089 - app_logger - DEBUG - Player List: ['{"sid": "Mi6BCM9cRYQ1yStpAAAF", "player_id": "41c96258-09d9-49aa-8a49-f2c232bb99c0", "username": "sam", "active": true, "sus": false, "alive": true, "pic": 15, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 16:38:10,488 - app_logger - INFO - Client disconnected: Mi6BCM9cRYQ1yStpAAAF
+2025-12-06 16:38:11,392 - app_logger - INFO - Starting server...
+2025-12-06 16:38:11,392 - app_logger - INFO -  * DEV MODE: SSL disabled
+2025-12-06 16:38:11,392 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.63:5001
+2025-12-06 16:38:12,083 - app_logger - INFO - Client connected: T-oSJMxtwJ0qIwkuAAAB
+2025-12-06 16:38:44,023 - app_logger - INFO - Client disconnected: T-oSJMxtwJ0qIwkuAAAB
+2025-12-06 16:38:44,373 - app_logger - INFO - Client connected: MJozVIzNC7z1aHSfAAAE
+2025-12-06 16:38:44,869 - app_logger - INFO - Game created with room code: XDTB
+2025-12-06 16:38:46,521 - app_logger - INFO - Game XDTB config updated: {'locations': ['Basement', '1st Floor', '2nd Floor', '3rd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 2, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 16:38:46,527 - app_logger - INFO - Room XDTB is now open for players
+2025-12-06 16:38:51,895 - app_logger - INFO - Saved selfie for sam: b4518fddfe2a4907b799669dc1aeb864.jpg
+2025-12-06 16:38:51,896 - app_logger - INFO - New player sam joined room XDTB with ID eef6241c-a073-41d2-a4e3-d5df0fec7cf3
+2025-12-06 16:38:51,896 - app_logger - INFO - Sending player list to room XDTB
+2025-12-06 16:38:51,897 - app_logger - DEBUG - Player List: ['{"sid": "MJozVIzNC7z1aHSfAAAE", "player_id": "eef6241c-a073-41d2-a4e3-d5df0fec7cf3", "username": "sam", "active": true, "sus": false, "alive": true, "pic": 6, "selfie": "b4518fddfe2a4907b799669dc1aeb864.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 16:39:05,917 - app_logger - INFO - Updated locations in room XDTB: ['Basement', '1st Floor', '2nd Floor', 'Other']
+2025-12-06 16:39:11,118 - app_logger - INFO - Updated locations in room XDTB: ['Basement', '1st Floor', '2nd Floor', 'Attic', 'Other']
+2025-12-06 16:39:12,338 - app_logger - INFO - Updated locations in room XDTB: ['Basement', '2nd Floor', 'Attic', 'Other']
+2025-12-06 16:39:13,170 - app_logger - INFO - Updated locations in room XDTB: ['Basement', 'Attic', 'Other']
+2025-12-06 16:39:18,647 - app_logger - INFO - Updated locations in room XDTB: ['Basement', 'Attic', 'Pool area', 'Other']
+2025-12-06 16:39:21,038 - app_logger - INFO - Updated locations in room XDTB: ['Attic', 'Pool area', 'Other']
+2025-12-06 16:39:31,943 - app_logger - INFO - Updated locations in room XDTB: ['Attic', 'Pool area', 'Kitchen / living room', 'Other']
+2025-12-06 16:39:34,416 - app_logger - INFO - Updated locations in room XDTB: ['Pool area', 'Kitchen / living room', 'Other']
+2025-12-06 16:39:38,351 - app_logger - INFO - Updated locations in room XDTB: ['Pool area', 'Kitchen / living room', 'Beach', 'Other']
+2025-12-06 16:39:41,107 - app_logger - INFO - Updated locations in room XDTB: ['Pool area', 'Kitchen / living room', 'Beach', 'Other']
+2025-12-06 16:39:49,009 - app_logger - INFO - Collaborative task added in room XDTB: Take a shot
+2025-12-06 16:39:56,178 - app_logger - INFO - Created collaborative task list J6996W in room XDTB
+2025-12-06 16:40:10,758 - app_logger - INFO - Updated locations in room XDTB: ['Pool area', 'Beach', 'Other']
+2025-12-06 16:40:11,561 - app_logger - INFO - Updated locations in room XDTB: ['Pool area', 'Beach', 'Other']
+2025-12-06 16:40:26,157 - app_logger - INFO - Client connected: N3UIrVptIISdAt9zAAAH
+2025-12-06 16:40:29,470 - app_logger - INFO - Client disconnected: N3UIrVptIISdAt9zAAAH
+2025-12-06 16:40:29,529 - app_logger - INFO - Client connected: fgQi0IZchtbvHvalAAAJ
+2025-12-06 16:40:37,365 - app_logger - INFO - Client fgQi0IZchtbvHvalAAAJ joined room XDTB
+2025-12-06 16:40:44,856 - app_logger - INFO - Saved selfie for opp: f08bbde039364ab98bd7ad75505917a9.jpg
+2025-12-06 16:40:44,857 - app_logger - INFO - New player opp joined room XDTB with ID 181e792b-98d3-41b8-a60b-5f28aaf36256
+2025-12-06 16:40:44,857 - app_logger - INFO - Sending player list to room XDTB
+2025-12-06 16:40:44,857 - app_logger - DEBUG - Player List: ['{"sid": "MJozVIzNC7z1aHSfAAAE", "player_id": "eef6241c-a073-41d2-a4e3-d5df0fec7cf3", "username": "sam", "active": true, "sus": false, "alive": true, "pic": 6, "selfie": "b4518fddfe2a4907b799669dc1aeb864.jpg", "meltdown_code": null, "cards": [], "ready": false}', '{"sid": "fgQi0IZchtbvHvalAAAJ", "player_id": "181e792b-98d3-41b8-a60b-5f28aaf36256", "username": "opp", "active": true, "sus": false, "alive": true, "pic": 5, "selfie": "f08bbde039364ab98bd7ad75505917a9.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 16:41:01,764 - app_logger - INFO - Collaborative task added in room XDTB: test123
+2025-12-06 16:41:05,645 - app_logger - INFO - Created new collaborative task list NH66ZJ in room XDTB
+2025-12-06 16:41:11,934 - app_logger - INFO - Updated collaborative task list NH66ZJ in room XDTB
+2025-12-06 16:41:29,945 - app_logger - INFO - Updated locations in room XDTB: ['Pool area', 'Beach', 'Kitchen / living room', 'Other']
+2025-12-06 16:41:31,364 - app_logger - INFO - Updated locations in room XDTB: ['Pool area', 'Beach', 'Kitchen / living room', 'Other']
+2025-12-06 16:41:41,458 - app_logger - INFO - Collaborative task added in room XDTB: ???
+2025-12-06 16:41:51,041 - app_logger - INFO - Client disconnected: MJozVIzNC7z1aHSfAAAE
+2025-12-06 16:41:51,389 - app_logger - INFO - Client connected: kl9H2PqceLsdlPR4AAAM
+2025-12-06 16:41:51,393 - app_logger - INFO - Player eef6241c-a073-41d2-a4e3-d5df0fec7cf3 rejoining room XDTB
+2025-12-06 16:41:51,396 - app_logger - INFO - Sending player list to room XDTB
+2025-12-06 16:41:51,398 - app_logger - DEBUG - Player List: ['{"sid": "kl9H2PqceLsdlPR4AAAM", "player_id": "eef6241c-a073-41d2-a4e3-d5df0fec7cf3", "username": "sam", "active": true, "sus": false, "alive": true, "pic": 6, "selfie": "b4518fddfe2a4907b799669dc1aeb864.jpg", "meltdown_code": null, "cards": [], "ready": false}', '{"sid": "fgQi0IZchtbvHvalAAAJ", "player_id": "181e792b-98d3-41b8-a60b-5f28aaf36256", "username": "opp", "active": true, "sus": false, "alive": true, "pic": 5, "selfie": "f08bbde039364ab98bd7ad75505917a9.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 16:42:55,043 - app_logger - INFO - Updated locations in room XDTB: ['Pool area', 'Beach', 'Other']
+2025-12-06 16:42:56,665 - app_logger - INFO - Updated locations in room XDTB: ['Pool area', 'Beach', 'Other']
+2025-12-06 16:42:58,356 - app_logger - INFO - Collaborative task removed in room XDTB: Take a shot
+2025-12-06 16:43:52,932 - app_logger - INFO - Collaborative task added in room XDTB: ergerg
+2025-12-06 16:43:54,923 - app_logger - INFO - Created new collaborative task list NX43TF in room XDTB
+2025-12-06 16:45:48,207 - app_logger - INFO - Client disconnected: fgQi0IZchtbvHvalAAAJ
+2025-12-06 16:45:48,209 - app_logger - INFO - Client disconnected: kl9H2PqceLsdlPR4AAAM
+2025-12-06 16:45:49,288 - app_logger - INFO - Starting server...
+2025-12-06 16:45:49,289 - app_logger - INFO -  * DEV MODE: SSL disabled
+2025-12-06 16:45:49,289 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.63:5001
+2025-12-06 16:45:49,401 - app_logger - INFO - Client connected: HFTz86IrtmGA46uYAAAB
+2025-12-06 16:45:50,738 - app_logger - INFO - Client connected: 35NWBOa7-bvg07QSAAAD
+2025-12-06 16:45:56,860 - app_logger - INFO - Game created with room code: DDMT
+2025-12-06 16:45:58,728 - app_logger - INFO - Game DDMT config updated: {'locations': ['Basement', '1st Floor', '2nd Floor', '3rd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 2, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 16:45:58,733 - app_logger - INFO - Room DDMT is now open for players
+2025-12-06 16:46:04,340 - app_logger - INFO - Saved selfie for sam: 2ab91599558e4b76b23eef1118d7fce5.jpg
+2025-12-06 16:46:04,341 - app_logger - INFO - New player sam joined room DDMT with ID b2bc1397-3e82-48c1-a451-4dc171fc87c0
+2025-12-06 16:46:04,341 - app_logger - INFO - Sending player list to room DDMT
+2025-12-06 16:46:04,341 - app_logger - DEBUG - Player List: ['{"sid": "HFTz86IrtmGA46uYAAAB", "player_id": "b2bc1397-3e82-48c1-a451-4dc171fc87c0", "username": "sam", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": "2ab91599558e4b76b23eef1118d7fce5.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 16:46:17,576 - app_logger - INFO - Client 35NWBOa7-bvg07QSAAAD joined room DDMT
+2025-12-06 16:46:22,557 - app_logger - INFO - Saved selfie for poop: 05fb6b3847bd47e1a3fdd7874b0229ae.jpg
+2025-12-06 16:46:22,559 - app_logger - INFO - New player poop joined room DDMT with ID 63c92f4d-cc62-4d9d-bb4b-5c58b9f6b186
+2025-12-06 16:46:22,559 - app_logger - INFO - Sending player list to room DDMT
+2025-12-06 16:46:22,560 - app_logger - DEBUG - Player List: ['{"sid": "HFTz86IrtmGA46uYAAAB", "player_id": "b2bc1397-3e82-48c1-a451-4dc171fc87c0", "username": "sam", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": "2ab91599558e4b76b23eef1118d7fce5.jpg", "meltdown_code": null, "cards": [], "ready": false}', '{"sid": "35NWBOa7-bvg07QSAAAD", "player_id": "63c92f4d-cc62-4d9d-bb4b-5c58b9f6b186", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 2, "selfie": "05fb6b3847bd47e1a3fdd7874b0229ae.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 16:46:31,818 - app_logger - INFO - Updated locations in room DDMT: ['Basement', '1st Floor', '2nd Floor', 'Other']
+2025-12-06 16:46:35,024 - app_logger - INFO - Updated locations in room DDMT: ['Basement', '1st Floor', '2nd Floor', 'Other']
+2025-12-06 16:46:41,952 - app_logger - INFO - Collaborative task added in room DDMT: kill me
+2025-12-06 16:46:54,084 - app_logger - INFO - Updated locations in room DDMT: ['Basement', '1st Floor', '2nd Floor', 'Other']
+2025-12-06 16:46:55,534 - app_logger - INFO - Collaborative task removed in room DDMT: kill me
+2025-12-06 16:46:57,230 - app_logger - INFO - Updated locations in room DDMT: ['Basement', '1st Floor', 'Other']
+2025-12-06 16:47:00,874 - app_logger - INFO - Updated locations in room DDMT: ['Basement', '1st Floor', 'ayyy', 'Other']
+2025-12-06 16:47:03,832 - app_logger - INFO - Updated locations in room DDMT: ['Basement', '1st Floor', 'ayyy', 'cool', 'Other']
+2025-12-06 16:47:05,525 - app_logger - INFO - Updated locations in room DDMT: ['Basement', '1st Floor', 'ayyy', 'cool', 'Other']
+2025-12-06 16:47:07,796 - app_logger - INFO - Collaborative task added in room DDMT: 1
+2025-12-06 16:47:09,433 - app_logger - INFO - Collaborative task added in room DDMT: 2
+2025-12-06 16:47:10,549 - app_logger - INFO - Collaborative task added in room DDMT: 3
+2025-12-06 16:47:11,373 - app_logger - INFO - Collaborative task added in room DDMT: 4
+2025-12-06 16:47:12,899 - app_logger - INFO - Collaborative task added in room DDMT: 5
+2025-12-06 16:47:32,001 - app_logger - INFO - Client disconnected: 35NWBOa7-bvg07QSAAAD
+2025-12-06 16:47:32,217 - app_logger - INFO - Client connected: nnSwadV4YtOJl7WWAAAG
+2025-12-06 16:47:32,219 - app_logger - INFO - Player 63c92f4d-cc62-4d9d-bb4b-5c58b9f6b186 rejoining room DDMT
+2025-12-06 16:47:32,219 - app_logger - INFO - Sending player list to room DDMT
+2025-12-06 16:47:32,219 - app_logger - DEBUG - Player List: ['{"sid": "HFTz86IrtmGA46uYAAAB", "player_id": "b2bc1397-3e82-48c1-a451-4dc171fc87c0", "username": "sam", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": "2ab91599558e4b76b23eef1118d7fce5.jpg", "meltdown_code": null, "cards": [], "ready": false}', '{"sid": "nnSwadV4YtOJl7WWAAAG", "player_id": "63c92f4d-cc62-4d9d-bb4b-5c58b9f6b186", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 2, "selfie": "05fb6b3847bd47e1a3fdd7874b0229ae.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 16:47:35,660 - app_logger - INFO - Collaborative task removed in room DDMT: 1
+2025-12-06 16:47:36,805 - app_logger - INFO - Collaborative task removed in room DDMT: 5
+2025-12-06 16:47:37,000 - app_logger - INFO - Collaborative task removed in room DDMT: 4
+2025-12-06 16:47:38,240 - app_logger - INFO - Collaborative task removed in room DDMT: 3
+2025-12-06 16:47:38,983 - app_logger - INFO - Collaborative task removed in room DDMT: 2
+2025-12-06 16:47:44,163 - app_logger - INFO - Collaborative task added in room DDMT: poop
+2025-12-06 16:47:53,799 - app_logger - INFO - Updated locations in room DDMT: ['Basement', '1st Floor', 'ayyy', 'cool', 'Other']
+2025-12-06 16:48:15,967 - app_logger - INFO - Collaborative task added in room DDMT: 1
+2025-12-06 16:48:16,827 - app_logger - INFO - Collaborative task added in room DDMT: 2
+2025-12-06 16:48:17,633 - app_logger - INFO - Collaborative task added in room DDMT: 3
+2025-12-06 16:48:18,359 - app_logger - INFO - Collaborative task added in room DDMT: 4
+2025-12-06 16:48:22,609 - app_logger - INFO - Collaborative task added in room DDMT: 1
+2025-12-06 16:48:23,669 - app_logger - INFO - Collaborative task added in room DDMT: 2
+2025-12-06 16:48:24,580 - app_logger - INFO - Collaborative task added in room DDMT: 3
+2025-12-06 16:48:25,296 - app_logger - INFO - Collaborative task added in room DDMT: 4
+2025-12-06 16:48:26,372 - app_logger - INFO - Collaborative task added in room DDMT: 5
+2025-12-06 16:48:34,597 - app_logger - INFO - Collaborative task added in room DDMT: efewfewfewffewfefwfwef
+2025-12-06 16:48:38,890 - app_logger - INFO - Collaborative task added in room DDMT: 1
+2025-12-06 16:48:39,715 - app_logger - INFO - Collaborative task added in room DDMT: 2
+2025-12-06 16:48:40,396 - app_logger - INFO - Collaborative task added in room DDMT: 3
+2025-12-06 16:48:40,968 - app_logger - INFO - Collaborative task added in room DDMT: 4
+2025-12-06 16:48:41,701 - app_logger - INFO - Collaborative task added in room DDMT: 5
+2025-12-06 16:48:48,051 - app_logger - INFO - Collaborative task added in room DDMT: 1
+2025-12-06 16:48:48,840 - app_logger - INFO - Collaborative task added in room DDMT: 2
+2025-12-06 16:48:49,566 - app_logger - INFO - Collaborative task added in room DDMT: 3
+2025-12-06 16:48:50,264 - app_logger - INFO - Collaborative task added in room DDMT: 4
+2025-12-06 16:48:51,326 - app_logger - INFO - Collaborative task added in room DDMT: 5
+2025-12-06 16:48:52,602 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, min_tasks=10
+2025-12-06 16:48:52,604 - app_logger - INFO - Game DDMT entering collaborative task creation mode (task_list_applied=False, need 10 tasks, have 23, locations=['Basement', '1st Floor', 'ayyy', 'cool', 'Other'])
+2025-12-06 16:48:55,078 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, min_tasks=10
+2025-12-06 16:48:55,083 - app_logger - INFO - Game DDMT entering collaborative task creation mode (task_list_applied=False, need 10 tasks, have 23, locations=['Basement', '1st Floor', 'ayyy', 'cool', 'Other'])
+2025-12-06 16:48:55,244 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, min_tasks=10
+2025-12-06 16:48:55,245 - app_logger - INFO - Game DDMT entering collaborative task creation mode (task_list_applied=False, need 10 tasks, have 23, locations=['Basement', '1st Floor', 'ayyy', 'cool', 'Other'])
+2025-12-06 16:48:56,003 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, min_tasks=10
+2025-12-06 16:48:56,005 - app_logger - INFO - Game DDMT entering collaborative task creation mode (task_list_applied=False, need 10 tasks, have 23, locations=['Basement', '1st Floor', 'ayyy', 'cool', 'Other'])
+2025-12-06 16:48:56,087 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, min_tasks=10
+2025-12-06 16:48:56,088 - app_logger - INFO - Game DDMT entering collaborative task creation mode (task_list_applied=False, need 10 tasks, have 23, locations=['Basement', '1st Floor', 'ayyy', 'cool', 'Other'])
+2025-12-06 16:48:56,494 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, min_tasks=10
+2025-12-06 16:48:56,495 - app_logger - INFO - Game DDMT entering collaborative task creation mode (task_list_applied=False, need 10 tasks, have 23, locations=['Basement', '1st Floor', 'ayyy', 'cool', 'Other'])
+2025-12-06 16:48:56,637 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, min_tasks=10
+2025-12-06 16:48:56,640 - app_logger - INFO - Game DDMT entering collaborative task creation mode (task_list_applied=False, need 10 tasks, have 23, locations=['Basement', '1st Floor', 'ayyy', 'cool', 'Other'])
+2025-12-06 16:49:03,057 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, min_tasks=10
+2025-12-06 16:49:03,061 - app_logger - INFO - Game DDMT entering collaborative task creation mode (task_list_applied=False, need 10 tasks, have 23, locations=['Basement', '1st Floor', 'ayyy', 'cool', 'Other'])
+2025-12-06 16:49:03,227 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, min_tasks=10
+2025-12-06 16:49:03,233 - app_logger - INFO - Game DDMT entering collaborative task creation mode (task_list_applied=False, need 10 tasks, have 23, locations=['Basement', '1st Floor', 'ayyy', 'cool', 'Other'])
+2025-12-06 16:49:03,368 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, min_tasks=10
+2025-12-06 16:49:03,369 - app_logger - INFO - Game DDMT entering collaborative task creation mode (task_list_applied=False, need 10 tasks, have 23, locations=['Basement', '1st Floor', 'ayyy', 'cool', 'Other'])
+2025-12-06 16:49:04,654 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, min_tasks=10
+2025-12-06 16:49:04,655 - app_logger - INFO - Game DDMT entering collaborative task creation mode (task_list_applied=False, need 10 tasks, have 23, locations=['Basement', '1st Floor', 'ayyy', 'cool', 'Other'])
+2025-12-06 16:49:04,836 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, min_tasks=10
+2025-12-06 16:49:04,838 - app_logger - INFO - Game DDMT entering collaborative task creation mode (task_list_applied=False, need 10 tasks, have 23, locations=['Basement', '1st Floor', 'ayyy', 'cool', 'Other'])
+2025-12-06 16:49:05,735 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, min_tasks=10
+2025-12-06 16:49:05,736 - app_logger - INFO - Game DDMT entering collaborative task creation mode (task_list_applied=False, need 10 tasks, have 23, locations=['Basement', '1st Floor', 'ayyy', 'cool', 'Other'])
+2025-12-06 16:49:05,995 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, min_tasks=10
+2025-12-06 16:49:05,997 - app_logger - INFO - Game DDMT entering collaborative task creation mode (task_list_applied=False, need 10 tasks, have 23, locations=['Basement', '1st Floor', 'ayyy', 'cool', 'Other'])
+2025-12-06 16:49:45,918 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, min_tasks=10
+2025-12-06 16:49:45,921 - app_logger - INFO - Game DDMT entering collaborative task creation mode (task_list_applied=False, need 10 tasks, have 23, locations=['Basement', '1st Floor', 'ayyy', 'cool', 'Other'])
+2025-12-06 16:49:46,074 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, min_tasks=10
+2025-12-06 16:49:46,074 - app_logger - INFO - Game DDMT entering collaborative task creation mode (task_list_applied=False, need 10 tasks, have 23, locations=['Basement', '1st Floor', 'ayyy', 'cool', 'Other'])
+2025-12-06 16:49:46,247 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, min_tasks=10
+2025-12-06 16:49:46,248 - app_logger - INFO - Game DDMT entering collaborative task creation mode (task_list_applied=False, need 10 tasks, have 23, locations=['Basement', '1st Floor', 'ayyy', 'cool', 'Other'])
+2025-12-06 16:49:46,434 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, min_tasks=10
+2025-12-06 16:49:46,435 - app_logger - INFO - Game DDMT entering collaborative task creation mode (task_list_applied=False, need 10 tasks, have 23, locations=['Basement', '1st Floor', 'ayyy', 'cool', 'Other'])
+2025-12-06 16:49:46,594 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, min_tasks=10
+2025-12-06 16:49:46,596 - app_logger - INFO - Game DDMT entering collaborative task creation mode (task_list_applied=False, need 10 tasks, have 23, locations=['Basement', '1st Floor', 'ayyy', 'cool', 'Other'])
+2025-12-06 16:49:46,760 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, min_tasks=10
+2025-12-06 16:49:46,761 - app_logger - INFO - Game DDMT entering collaborative task creation mode (task_list_applied=False, need 10 tasks, have 23, locations=['Basement', '1st Floor', 'ayyy', 'cool', 'Other'])
+2025-12-06 16:49:46,929 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, min_tasks=10
+2025-12-06 16:49:46,932 - app_logger - INFO - Game DDMT entering collaborative task creation mode (task_list_applied=False, need 10 tasks, have 23, locations=['Basement', '1st Floor', 'ayyy', 'cool', 'Other'])
+2025-12-06 16:49:53,452 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, min_tasks=10
+2025-12-06 16:49:53,453 - app_logger - INFO - Game DDMT entering collaborative task creation mode (task_list_applied=False, need 10 tasks, have 23, locations=['Basement', '1st Floor', 'ayyy', 'cool', 'Other'])
+2025-12-06 16:49:53,653 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, min_tasks=10
+2025-12-06 16:49:53,657 - app_logger - INFO - Game DDMT entering collaborative task creation mode (task_list_applied=False, need 10 tasks, have 23, locations=['Basement', '1st Floor', 'ayyy', 'cool', 'Other'])
+2025-12-06 16:49:53,825 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, min_tasks=10
+2025-12-06 16:49:53,827 - app_logger - INFO - Game DDMT entering collaborative task creation mode (task_list_applied=False, need 10 tasks, have 23, locations=['Basement', '1st Floor', 'ayyy', 'cool', 'Other'])
+2025-12-06 16:49:53,994 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, min_tasks=10
+2025-12-06 16:49:53,996 - app_logger - INFO - Game DDMT entering collaborative task creation mode (task_list_applied=False, need 10 tasks, have 23, locations=['Basement', '1st Floor', 'ayyy', 'cool', 'Other'])
+2025-12-06 16:49:54,749 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, min_tasks=10
+2025-12-06 16:49:54,766 - app_logger - INFO - Game DDMT entering collaborative task creation mode (task_list_applied=False, need 10 tasks, have 23, locations=['Basement', '1st Floor', 'ayyy', 'cool', 'Other'])
+2025-12-06 16:49:54,919 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, min_tasks=10
+2025-12-06 16:49:54,919 - app_logger - INFO - Game DDMT entering collaborative task creation mode (task_list_applied=False, need 10 tasks, have 23, locations=['Basement', '1st Floor', 'ayyy', 'cool', 'Other'])
+2025-12-06 16:52:15,742 - app_logger - INFO - Client disconnected: HFTz86IrtmGA46uYAAAB
+2025-12-06 16:52:15,745 - app_logger - INFO - Client disconnected: nnSwadV4YtOJl7WWAAAG
+2025-12-06 16:52:16,758 - app_logger - INFO - Starting server...
+2025-12-06 16:52:16,758 - app_logger - INFO -  * DEV MODE: SSL disabled
+2025-12-06 16:52:16,758 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.63:5001
+2025-12-06 16:52:17,491 - app_logger - INFO - Client connected: 23SRi4SqV3fqI1oXAAAB
+2025-12-06 16:52:17,536 - app_logger - INFO - Client connected: W4yORLVFFgGLOX7XAAAD
+2025-12-06 16:52:22,532 - app_logger - INFO - Game created with room code: ETEV
+2025-12-06 16:52:38,329 - app_logger - INFO - Game ETEV config updated: {'locations': ['Basement', '1st Floor', '2nd Floor', '3rd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 2, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 16:52:38,333 - app_logger - INFO - Room ETEV is now open for players
+2025-12-06 16:52:43,236 - app_logger - INFO - Saved selfie for sam: 4c010553df764636806fbc3cfc37b137.jpg
+2025-12-06 16:52:43,237 - app_logger - INFO - New player sam joined room ETEV with ID 3cba94c7-b6cc-4fd5-9def-67b7f8082a76
+2025-12-06 16:52:43,237 - app_logger - INFO - Sending player list to room ETEV
+2025-12-06 16:52:43,238 - app_logger - DEBUG - Player List: ['{"sid": "23SRi4SqV3fqI1oXAAAB", "player_id": "3cba94c7-b6cc-4fd5-9def-67b7f8082a76", "username": "sam", "active": true, "sus": false, "alive": true, "pic": 15, "selfie": "4c010553df764636806fbc3cfc37b137.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 16:52:49,380 - app_logger - INFO - Client W4yORLVFFgGLOX7XAAAD joined room ETEV
+2025-12-06 16:52:53,927 - app_logger - INFO - Saved selfie for pooppp: 80b0649653344557806c1b332997bd3d.jpg
+2025-12-06 16:52:53,930 - app_logger - INFO - New player pooppp joined room ETEV with ID 56cfb541-bab7-423c-8fa0-3c692f3226db
+2025-12-06 16:52:53,930 - app_logger - INFO - Sending player list to room ETEV
+2025-12-06 16:52:53,932 - app_logger - DEBUG - Player List: ['{"sid": "23SRi4SqV3fqI1oXAAAB", "player_id": "3cba94c7-b6cc-4fd5-9def-67b7f8082a76", "username": "sam", "active": true, "sus": false, "alive": true, "pic": 15, "selfie": "4c010553df764636806fbc3cfc37b137.jpg", "meltdown_code": null, "cards": [], "ready": false}', '{"sid": "W4yORLVFFgGLOX7XAAAD", "player_id": "56cfb541-bab7-423c-8fa0-3c692f3226db", "username": "pooppp", "active": true, "sus": false, "alive": true, "pic": 10, "selfie": "80b0649653344557806c1b332997bd3d.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 16:53:02,741 - app_logger - INFO - Updated locations in room ETEV: ['Basement', '1st Floor', '2nd Floor', 'Other']
+2025-12-06 16:53:03,472 - app_logger - INFO - Updated locations in room ETEV: ['Basement', '1st Floor', 'Other']
+2025-12-06 16:53:05,659 - app_logger - INFO - Updated locations in room ETEV: ['Basement', '1st Floor', 'Other']
+2025-12-06 16:53:11,391 - app_logger - INFO - Collaborative task added in room ETEV: 1
+2025-12-06 16:53:13,386 - app_logger - INFO - Collaborative task added in room ETEV: 2
+2025-12-06 16:53:14,095 - app_logger - INFO - Collaborative task added in room ETEV: 3
+2025-12-06 16:53:14,655 - app_logger - INFO - Collaborative task added in room ETEV: 4
+2025-12-06 16:53:15,775 - app_logger - INFO - Collaborative task added in room ETEV: 5
+2025-12-06 16:53:21,422 - app_logger - INFO - Collaborative task added in room ETEV: 1
+2025-12-06 16:53:22,121 - app_logger - INFO - Collaborative task added in room ETEV: 2
+2025-12-06 16:53:22,855 - app_logger - INFO - Collaborative task added in room ETEV: 3
+2025-12-06 16:53:23,497 - app_logger - INFO - Collaborative task added in room ETEV: 4
+2025-12-06 16:53:24,649 - app_logger - INFO - Collaborative task added in room ETEV: 5
+2025-12-06 16:53:26,680 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, collaborative_tasks=10, min_tasks=10
+2025-12-06 16:53:26,684 - app_logger - INFO - Applied 10 collaborative tasks to game ETEV
+2025-12-06 16:53:26,684 - app_logger - INFO - Starting game ETEV with 10 tasks
+2025-12-06 16:53:26,686 - app_logger - INFO - Sending player list to room ETEV
+2025-12-06 16:53:26,688 - app_logger - DEBUG - Player List: ['{"sid": "23SRi4SqV3fqI1oXAAAB", "player_id": "3cba94c7-b6cc-4fd5-9def-67b7f8082a76", "username": "sam", "active": true, "sus": true, "alive": true, "pic": 15, "selfie": "4c010553df764636806fbc3cfc37b137.jpg", "meltdown_code": null, "cards": ["{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"80957af9-302f-46da-8ac0-9a85d5df4a03\\", \\"countdown\\": false}", "{\\"action\\": \\"Discard and Draw\\", \\"text\\": \\"Discard a random card and draw a new card\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"11f8da40-f9b1-4f4e-ab2d-bbfbf5ecf6e5\\", \\"countdown\\": false}"], "ready": false}', '{"sid": "W4yORLVFFgGLOX7XAAAD", "player_id": "56cfb541-bab7-423c-8fa0-3c692f3226db", "username": "pooppp", "active": true, "sus": true, "alive": true, "pic": 10, "selfie": "80b0649653344557806c1b332997bd3d.jpg", "meltdown_code": null, "cards": ["{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 30, \\"time_left\\": 30, \\"id\\": \\"99a9c5e8-5a5a-4692-9d78-535d7b176561\\", \\"countdown\\": false}", "{\\"action\\": \\"Self Report\\", \\"text\\": \\"Call a body found meeting\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"5cc64f55-434c-408b-a978-91460a6be2e1\\", \\"countdown\\": false}"], "ready": false}']
+2025-12-06 16:53:26,689 - app_logger - INFO - Game started in room ETEV
+2025-12-06 16:53:26,690 - app_logger - INFO - Game started in room ETEV
+2025-12-06 16:53:34,651 - app_logger - INFO - Client disconnected: 23SRi4SqV3fqI1oXAAAB
+2025-12-06 16:53:34,653 - app_logger - INFO - Client disconnected: W4yORLVFFgGLOX7XAAAD
+2025-12-06 16:53:37,858 - app_logger - INFO - Starting server...
+2025-12-06 16:53:37,859 - app_logger - INFO -  * DEV MODE: SSL disabled
+2025-12-06 16:53:37,859 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.63:5001
+2025-12-06 16:53:40,254 - app_logger - INFO - Client connected: 96pXWMOp-LAXlS1jAAAB
+2025-12-06 16:53:41,444 - app_logger - INFO - Client connected: TQzk96RuFHSvQotkAAAD
+2025-12-06 16:53:42,491 - app_logger - INFO - Game created with room code: KPCI
+2025-12-06 16:53:55,476 - app_logger - INFO - Task list deleted: NX43TF by player device_16lt0kc8cmis5xqt0
+2025-12-06 16:54:00,289 - app_logger - INFO - Task list deleted: J6996W by player device_16lt0kc8cmis5xqt0
+2025-12-06 16:54:03,232 - app_logger - INFO - Task list deleted: ARYYVR by player device_16lt0kc8cmis5xqt0
+2025-12-06 16:54:05,045 - app_logger - INFO - Game KPCI config updated: {'locations': ['Basement', '1st Floor', '2nd Floor', '3rd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 2, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 16:54:05,047 - app_logger - INFO - Room KPCI is now open for players
+2025-12-06 16:54:10,583 - app_logger - INFO - Client disconnected: 96pXWMOp-LAXlS1jAAAB
+2025-12-06 16:54:10,942 - app_logger - INFO - Client connected: u8DOGZ4isjFLJShtAAAG
+2025-12-06 16:54:15,159 - app_logger - INFO - New player qwdwqd joined room KPCI with ID 48389cc8-61a3-4556-bb2d-4f4590ed6ca3
+2025-12-06 16:54:15,160 - app_logger - INFO - Sending player list to room KPCI
+2025-12-06 16:54:15,161 - app_logger - DEBUG - Player List: ['{"sid": "u8DOGZ4isjFLJShtAAAG", "player_id": "48389cc8-61a3-4556-bb2d-4f4590ed6ca3", "username": "qwdwqd", "active": true, "sus": false, "alive": true, "pic": 9, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 16:54:17,179 - app_logger - INFO - Room KPCI deleted (no players remaining)
+2025-12-06 16:54:18,534 - app_logger - INFO - Game created with room code: NZCT
+2025-12-06 16:54:25,367 - app_logger - INFO - Game NZCT config updated: {'locations': ['Basement', '1st Floor', '2nd Floor', '3rd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 1, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 16:54:25,371 - app_logger - INFO - Room NZCT is now open for players
+2025-12-06 16:54:29,470 - app_logger - INFO - Saved selfie for samm: dfb5d74253a54e809a609b96c1edc3ae.jpg
+2025-12-06 16:54:29,473 - app_logger - INFO - New player samm joined room NZCT with ID 1f1d7bae-f06a-4e39-b97d-dc5333d4f26f
+2025-12-06 16:54:29,473 - app_logger - INFO - Sending player list to room NZCT
+2025-12-06 16:54:29,473 - app_logger - DEBUG - Player List: ['{"sid": "u8DOGZ4isjFLJShtAAAG", "player_id": "1f1d7bae-f06a-4e39-b97d-dc5333d4f26f", "username": "samm", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": "dfb5d74253a54e809a609b96c1edc3ae.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 16:54:32,867 - app_logger - INFO - Updated locations in room NZCT: ['Basement', '1st Floor', '2nd Floor', 'Other']
+2025-12-06 16:54:33,564 - app_logger - INFO - Updated locations in room NZCT: ['Basement', '1st Floor', 'Other']
+2025-12-06 16:54:35,417 - app_logger - INFO - Updated locations in room NZCT: ['Basement', '1st Floor', 'Other']
+2025-12-06 16:54:41,046 - app_logger - INFO - Client TQzk96RuFHSvQotkAAAD joined room NZCT
+2025-12-06 16:54:43,312 - app_logger - INFO - New player sdqdqd joined room NZCT with ID d7e22133-2faa-46ff-b3a6-7971a3f86d87
+2025-12-06 16:54:43,312 - app_logger - INFO - Sending player list to room NZCT
+2025-12-06 16:54:43,313 - app_logger - DEBUG - Player List: ['{"sid": "u8DOGZ4isjFLJShtAAAG", "player_id": "1f1d7bae-f06a-4e39-b97d-dc5333d4f26f", "username": "samm", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": "dfb5d74253a54e809a609b96c1edc3ae.jpg", "meltdown_code": null, "cards": [], "ready": false}', '{"sid": "TQzk96RuFHSvQotkAAAD", "player_id": "d7e22133-2faa-46ff-b3a6-7971a3f86d87", "username": "sdqdqd", "active": true, "sus": false, "alive": true, "pic": 10, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 16:54:46,605 - app_logger - INFO - Collaborative task added in room NZCT: 1
+2025-12-06 16:54:48,251 - app_logger - INFO - Collaborative task added in room NZCT: 2
+2025-12-06 16:54:49,164 - app_logger - INFO - Collaborative task added in room NZCT: 3
+2025-12-06 16:54:50,256 - app_logger - INFO - Collaborative task added in room NZCT: 4
+2025-12-06 16:54:51,742 - app_logger - INFO - Collaborative task added in room NZCT: 5
+2025-12-06 16:54:58,282 - app_logger - INFO - Collaborative task removed in room NZCT: 1
+2025-12-06 16:54:59,441 - app_logger - INFO - Collaborative task removed in room NZCT: 5
+2025-12-06 16:54:59,616 - app_logger - INFO - Collaborative task removed in room NZCT: 4
+2025-12-06 16:55:00,333 - app_logger - INFO - Collaborative task removed in room NZCT: 3
+2025-12-06 16:55:00,883 - app_logger - INFO - Collaborative task removed in room NZCT: 2
+2025-12-06 16:55:04,014 - app_logger - INFO - Collaborative task added in room NZCT: 1
+2025-12-06 16:55:06,386 - app_logger - INFO - Collaborative task added in room NZCT: 2
+2025-12-06 16:55:07,061 - app_logger - INFO - Collaborative task added in room NZCT: 3
+2025-12-06 16:55:07,935 - app_logger - INFO - Collaborative task added in room NZCT: 4
+2025-12-06 16:55:08,917 - app_logger - INFO - Collaborative task added in room NZCT: 5
+2025-12-06 16:55:14,792 - app_logger - INFO - Collaborative task added in room NZCT: 32
+2025-12-06 16:55:18,716 - app_logger - INFO - Collaborative task added in room NZCT: 1
+2025-12-06 16:55:19,673 - app_logger - INFO - Collaborative task added in room NZCT: 2
+2025-12-06 16:55:20,347 - app_logger - INFO - Collaborative task added in room NZCT: 3
+2025-12-06 16:55:21,615 - app_logger - INFO - Collaborative task added in room NZCT: 4
+2025-12-06 16:55:22,799 - app_logger - INFO - Collaborative task added in room NZCT: 5
+2025-12-06 16:55:24,768 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, collaborative_tasks=11, min_tasks=10
+2025-12-06 16:55:24,769 - app_logger - INFO - Applied 11 collaborative tasks to game NZCT
+2025-12-06 16:55:24,772 - app_logger - INFO - Starting game NZCT with 11 tasks
+2025-12-06 16:55:24,774 - app_logger - INFO - Sending player list to room NZCT
+2025-12-06 16:55:24,775 - app_logger - DEBUG - Player List: ['{"sid": "u8DOGZ4isjFLJShtAAAG", "player_id": "1f1d7bae-f06a-4e39-b97d-dc5333d4f26f", "username": "samm", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": "dfb5d74253a54e809a609b96c1edc3ae.jpg", "meltdown_code": null, "cards": [], "ready": false}', '{"sid": "TQzk96RuFHSvQotkAAAD", "player_id": "d7e22133-2faa-46ff-b3a6-7971a3f86d87", "username": "sdqdqd", "active": true, "sus": true, "alive": true, "pic": 10, "selfie": null, "meltdown_code": null, "cards": ["{\\"action\\": \\"Discard and Draw\\", \\"text\\": \\"Discard a random card and draw a new card\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"ea7abc76-50fd-4184-8b7a-abbded418879\\", \\"countdown\\": false}", "{\\"action\\": \\"Taunt\\", \\"text\\": \\"Make crewmates suspicious\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"e6b9add0-cb93-46d2-8b2b-af6e2e00d6f7\\", \\"countdown\\": false}"], "ready": false}']
+2025-12-06 16:55:24,776 - app_logger - INFO - Game started in room NZCT
+2025-12-06 16:55:24,776 - app_logger - INFO - Game started in room NZCT
+2025-12-06 16:55:24,777 - app_logger - DEBUG - Assigned task to player 1f1d7bae-f06a-4e39-b97d-dc5333d4f26f: {'task': '4', 'location': 'Basement', 'difficulty': 2, 'added_by': 'sdqdqd'}
+2025-12-06 16:55:30,523 - app_logger - INFO - Player 1f1d7bae-f06a-4e39-b97d-dc5333d4f26f completed a task. Crew score: 1
+2025-12-06 16:55:30,526 - app_logger - DEBUG - Assigned new task to player 1f1d7bae-f06a-4e39-b97d-dc5333d4f26f: {'task': '32', 'location': 'Basement', 'difficulty': 2, 'added_by': 'sdqdqd'}
+2025-12-06 16:55:33,078 - app_logger - INFO - Player 1f1d7bae-f06a-4e39-b97d-dc5333d4f26f completed a task. Crew score: 2
+2025-12-06 16:55:33,078 - app_logger - DEBUG - Assigned new task to player 1f1d7bae-f06a-4e39-b97d-dc5333d4f26f: {'task': '1', 'location': 'Basement', 'difficulty': 2, 'added_by': 'sdqdqd'}
+2025-12-06 16:55:34,991 - app_logger - INFO - Player 1f1d7bae-f06a-4e39-b97d-dc5333d4f26f completed a task. Crew score: 3
+2025-12-06 16:55:34,992 - app_logger - DEBUG - Assigned new task to player 1f1d7bae-f06a-4e39-b97d-dc5333d4f26f: {'task': '3', 'location': '1st Floor', 'difficulty': 2, 'added_by': 'sdqdqd'}
+2025-12-06 16:55:43,459 - app_logger - INFO - Meeting started in room NZCT
+2025-12-06 16:55:47,531 - app_logger - INFO - Sending player list to room NZCT
+2025-12-06 16:55:47,535 - app_logger - DEBUG - Player List: ['{"sid": "u8DOGZ4isjFLJShtAAAG", "player_id": "1f1d7bae-f06a-4e39-b97d-dc5333d4f26f", "username": "samm", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": "dfb5d74253a54e809a609b96c1edc3ae.jpg", "meltdown_code": null, "cards": [], "ready": false}', '{"sid": "TQzk96RuFHSvQotkAAAD", "player_id": "d7e22133-2faa-46ff-b3a6-7971a3f86d87", "username": "sdqdqd", "active": true, "sus": true, "alive": true, "pic": 10, "selfie": null, "meltdown_code": null, "cards": ["{\\"action\\": \\"Self Report\\", \\"text\\": \\"Call a body found meeting\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"435277d7-a63f-4fbc-80ea-13e4dc822ccf\\", \\"countdown\\": false}"], "ready": true}']
+2025-12-06 16:55:49,103 - app_logger - INFO - Sending player list to room NZCT
+2025-12-06 16:55:49,104 - app_logger - DEBUG - Player List: ['{"sid": "u8DOGZ4isjFLJShtAAAG", "player_id": "1f1d7bae-f06a-4e39-b97d-dc5333d4f26f", "username": "samm", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": "dfb5d74253a54e809a609b96c1edc3ae.jpg", "meltdown_code": null, "cards": [], "ready": true}', '{"sid": "TQzk96RuFHSvQotkAAAD", "player_id": "d7e22133-2faa-46ff-b3a6-7971a3f86d87", "username": "sdqdqd", "active": true, "sus": true, "alive": true, "pic": 10, "selfie": null, "meltdown_code": null, "cards": ["{\\"action\\": \\"Self Report\\", \\"text\\": \\"Call a body found meeting\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"435277d7-a63f-4fbc-80ea-13e4dc822ccf\\", \\"countdown\\": false}"], "ready": true}']
+2025-12-06 16:55:57,978 - app_logger - INFO - Meeting started in room NZCT
+2025-12-06 16:56:01,869 - app_logger - INFO - Sending player list to room NZCT
+2025-12-06 16:56:01,870 - app_logger - DEBUG - Player List: ['{"sid": "u8DOGZ4isjFLJShtAAAG", "player_id": "1f1d7bae-f06a-4e39-b97d-dc5333d4f26f", "username": "samm", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": "dfb5d74253a54e809a609b96c1edc3ae.jpg", "meltdown_code": null, "cards": [], "ready": true}', '{"sid": "TQzk96RuFHSvQotkAAAD", "player_id": "d7e22133-2faa-46ff-b3a6-7971a3f86d87", "username": "sdqdqd", "active": true, "sus": true, "alive": true, "pic": 10, "selfie": null, "meltdown_code": null, "cards": ["{\\"action\\": \\"Self Report\\", \\"text\\": \\"Call a body found meeting\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"435277d7-a63f-4fbc-80ea-13e4dc822ccf\\", \\"countdown\\": false}", "{\\"action\\": \\"Taunt\\", \\"text\\": \\"Taunt crewmates with work PTSD\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"d594050c-af40-40f9-9e18-5c94e2597252\\", \\"countdown\\": false}"], "ready": false}']
+2025-12-06 16:56:02,978 - app_logger - INFO - Sending player list to room NZCT
+2025-12-06 16:56:02,979 - app_logger - DEBUG - Player List: ['{"sid": "u8DOGZ4isjFLJShtAAAG", "player_id": "1f1d7bae-f06a-4e39-b97d-dc5333d4f26f", "username": "samm", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": "dfb5d74253a54e809a609b96c1edc3ae.jpg", "meltdown_code": null, "cards": [], "ready": true}', '{"sid": "TQzk96RuFHSvQotkAAAD", "player_id": "d7e22133-2faa-46ff-b3a6-7971a3f86d87", "username": "sdqdqd", "active": true, "sus": true, "alive": true, "pic": 10, "selfie": null, "meltdown_code": null, "cards": ["{\\"action\\": \\"Self Report\\", \\"text\\": \\"Call a body found meeting\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"435277d7-a63f-4fbc-80ea-13e4dc822ccf\\", \\"countdown\\": false}", "{\\"action\\": \\"Taunt\\", \\"text\\": \\"Taunt crewmates with work PTSD\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"d594050c-af40-40f9-9e18-5c94e2597252\\", \\"countdown\\": false}"], "ready": true}']
+2025-12-06 16:56:13,625 - app_logger - INFO - Sending player list to room NZCT
+2025-12-06 16:56:13,626 - app_logger - DEBUG - Player List: ['{"sid": "u8DOGZ4isjFLJShtAAAG", "player_id": "1f1d7bae-f06a-4e39-b97d-dc5333d4f26f", "username": "samm", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": "dfb5d74253a54e809a609b96c1edc3ae.jpg", "meltdown_code": null, "cards": [], "ready": true}', '{"sid": "TQzk96RuFHSvQotkAAAD", "player_id": "d7e22133-2faa-46ff-b3a6-7971a3f86d87", "username": "sdqdqd", "active": true, "sus": true, "alive": true, "pic": 10, "selfie": null, "meltdown_code": null, "cards": ["{\\"action\\": \\"Taunt\\", \\"text\\": \\"Taunt crewmates with work PTSD\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"d594050c-af40-40f9-9e18-5c94e2597252\\", \\"countdown\\": false}", "{\\"action\\": \\"Self Report\\", \\"text\\": \\"Call a body found meeting\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"de280801-6ef5-4c79-90cd-857c7a907546\\", \\"countdown\\": false}"], "ready": false}']
+2025-12-06 16:56:14,861 - app_logger - INFO - Sending player list to room NZCT
+2025-12-06 16:56:14,862 - app_logger - DEBUG - Player List: ['{"sid": "u8DOGZ4isjFLJShtAAAG", "player_id": "1f1d7bae-f06a-4e39-b97d-dc5333d4f26f", "username": "samm", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": "dfb5d74253a54e809a609b96c1edc3ae.jpg", "meltdown_code": null, "cards": [], "ready": true}', '{"sid": "TQzk96RuFHSvQotkAAAD", "player_id": "d7e22133-2faa-46ff-b3a6-7971a3f86d87", "username": "sdqdqd", "active": true, "sus": true, "alive": true, "pic": 10, "selfie": null, "meltdown_code": null, "cards": ["{\\"action\\": \\"Taunt\\", \\"text\\": \\"Taunt crewmates with work PTSD\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"d594050c-af40-40f9-9e18-5c94e2597252\\", \\"countdown\\": false}", "{\\"action\\": \\"Self Report\\", \\"text\\": \\"Call a body found meeting\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"de280801-6ef5-4c79-90cd-857c7a907546\\", \\"countdown\\": false}"], "ready": true}']
+2025-12-06 16:56:27,425 - app_logger - INFO - Sending player list to room NZCT
+2025-12-06 16:56:27,427 - app_logger - DEBUG - Player List: ['{"sid": "u8DOGZ4isjFLJShtAAAG", "player_id": "1f1d7bae-f06a-4e39-b97d-dc5333d4f26f", "username": "samm", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": "dfb5d74253a54e809a609b96c1edc3ae.jpg", "meltdown_code": null, "cards": [], "ready": true}', '{"sid": "TQzk96RuFHSvQotkAAAD", "player_id": "d7e22133-2faa-46ff-b3a6-7971a3f86d87", "username": "sdqdqd", "active": true, "sus": true, "alive": true, "pic": 10, "selfie": null, "meltdown_code": null, "cards": ["{\\"action\\": \\"Taunt\\", \\"text\\": \\"Taunt crewmates with work PTSD\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"d594050c-af40-40f9-9e18-5c94e2597252\\", \\"countdown\\": false}", "{\\"action\\": \\"Taunt\\", \\"text\\": \\"Make crewmates scared\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"5c6e4097-5c47-4620-830a-dab222c3e553\\", \\"countdown\\": false}"], "ready": false}']
+2025-12-06 16:56:29,257 - app_logger - INFO - Sending player list to room NZCT
+2025-12-06 16:56:29,259 - app_logger - DEBUG - Player List: ['{"sid": "u8DOGZ4isjFLJShtAAAG", "player_id": "1f1d7bae-f06a-4e39-b97d-dc5333d4f26f", "username": "samm", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": "dfb5d74253a54e809a609b96c1edc3ae.jpg", "meltdown_code": null, "cards": [], "ready": true}', '{"sid": "TQzk96RuFHSvQotkAAAD", "player_id": "d7e22133-2faa-46ff-b3a6-7971a3f86d87", "username": "sdqdqd", "active": true, "sus": true, "alive": true, "pic": 10, "selfie": null, "meltdown_code": null, "cards": ["{\\"action\\": \\"Taunt\\", \\"text\\": \\"Taunt crewmates with work PTSD\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"d594050c-af40-40f9-9e18-5c94e2597252\\", \\"countdown\\": false}", "{\\"action\\": \\"Taunt\\", \\"text\\": \\"Make crewmates scared\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"5c6e4097-5c47-4620-830a-dab222c3e553\\", \\"countdown\\": false}"], "ready": true}']
+2025-12-06 16:56:42,336 - app_logger - INFO - Sending player list to room NZCT
+2025-12-06 16:56:42,338 - app_logger - DEBUG - Player List: ['{"sid": "u8DOGZ4isjFLJShtAAAG", "player_id": "1f1d7bae-f06a-4e39-b97d-dc5333d4f26f", "username": "samm", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": "dfb5d74253a54e809a609b96c1edc3ae.jpg", "meltdown_code": null, "cards": [], "ready": true}', '{"sid": "TQzk96RuFHSvQotkAAAD", "player_id": "d7e22133-2faa-46ff-b3a6-7971a3f86d87", "username": "sdqdqd", "active": true, "sus": true, "alive": true, "pic": 10, "selfie": null, "meltdown_code": null, "cards": ["{\\"action\\": \\"Taunt\\", \\"text\\": \\"Make crewmates scared\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"5c6e4097-5c47-4620-830a-dab222c3e553\\", \\"countdown\\": false}"], "ready": false}']
+2025-12-06 16:56:43,770 - app_logger - INFO - Sending player list to room NZCT
+2025-12-06 16:56:43,771 - app_logger - DEBUG - Player List: ['{"sid": "u8DOGZ4isjFLJShtAAAG", "player_id": "1f1d7bae-f06a-4e39-b97d-dc5333d4f26f", "username": "samm", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": "dfb5d74253a54e809a609b96c1edc3ae.jpg", "meltdown_code": null, "cards": [], "ready": true}', '{"sid": "TQzk96RuFHSvQotkAAAD", "player_id": "d7e22133-2faa-46ff-b3a6-7971a3f86d87", "username": "sdqdqd", "active": true, "sus": true, "alive": true, "pic": 10, "selfie": null, "meltdown_code": null, "cards": ["{\\"action\\": \\"Taunt\\", \\"text\\": \\"Make crewmates scared\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"5c6e4097-5c47-4620-830a-dab222c3e553\\", \\"countdown\\": false}"], "ready": true}']
+2025-12-06 16:56:52,703 - app_logger - INFO - Meeting started in room NZCT
+2025-12-06 16:56:55,237 - app_logger - INFO - Sending player list to room NZCT
+2025-12-06 16:56:55,238 - app_logger - DEBUG - Player List: ['{"sid": "u8DOGZ4isjFLJShtAAAG", "player_id": "1f1d7bae-f06a-4e39-b97d-dc5333d4f26f", "username": "samm", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": "dfb5d74253a54e809a609b96c1edc3ae.jpg", "meltdown_code": null, "cards": [], "ready": false}', '{"sid": "TQzk96RuFHSvQotkAAAD", "player_id": "d7e22133-2faa-46ff-b3a6-7971a3f86d87", "username": "sdqdqd", "active": true, "sus": true, "alive": true, "pic": 10, "selfie": null, "meltdown_code": null, "cards": ["{\\"action\\": \\"Taunt\\", \\"text\\": \\"Make crewmates scared\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"5c6e4097-5c47-4620-830a-dab222c3e553\\", \\"countdown\\": false}", "{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 30, \\"time_left\\": 30, \\"id\\": \\"6fa355f4-2d85-4326-923d-bd66c84edaef\\", \\"countdown\\": false}"], "ready": true}']
+2025-12-06 16:56:56,636 - app_logger - INFO - Sending player list to room NZCT
+2025-12-06 16:56:56,637 - app_logger - DEBUG - Player List: ['{"sid": "u8DOGZ4isjFLJShtAAAG", "player_id": "1f1d7bae-f06a-4e39-b97d-dc5333d4f26f", "username": "samm", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": "dfb5d74253a54e809a609b96c1edc3ae.jpg", "meltdown_code": null, "cards": [], "ready": true}', '{"sid": "TQzk96RuFHSvQotkAAAD", "player_id": "d7e22133-2faa-46ff-b3a6-7971a3f86d87", "username": "sdqdqd", "active": true, "sus": true, "alive": true, "pic": 10, "selfie": null, "meltdown_code": null, "cards": ["{\\"action\\": \\"Taunt\\", \\"text\\": \\"Make crewmates scared\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"5c6e4097-5c47-4620-830a-dab222c3e553\\", \\"countdown\\": false}", "{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 30, \\"time_left\\": 30, \\"id\\": \\"6fa355f4-2d85-4326-923d-bd66c84edaef\\", \\"countdown\\": false}"], "ready": true}']
+2025-12-06 16:57:07,871 - app_logger - INFO - Meeting started in room NZCT
+2025-12-06 16:57:10,928 - app_logger - INFO - Sending player list to room NZCT
+2025-12-06 16:57:10,929 - app_logger - DEBUG - Player List: ['{"sid": "u8DOGZ4isjFLJShtAAAG", "player_id": "1f1d7bae-f06a-4e39-b97d-dc5333d4f26f", "username": "samm", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": "dfb5d74253a54e809a609b96c1edc3ae.jpg", "meltdown_code": null, "cards": [], "ready": false}', '{"sid": "TQzk96RuFHSvQotkAAAD", "player_id": "d7e22133-2faa-46ff-b3a6-7971a3f86d87", "username": "sdqdqd", "active": true, "sus": true, "alive": true, "pic": 10, "selfie": null, "meltdown_code": null, "cards": ["{\\"action\\": \\"Taunt\\", \\"text\\": \\"Make crewmates scared\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"5c6e4097-5c47-4620-830a-dab222c3e553\\", \\"countdown\\": false}", "{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 30, \\"time_left\\": 30, \\"id\\": \\"6fa355f4-2d85-4326-923d-bd66c84edaef\\", \\"countdown\\": false}", "{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 30, \\"time_left\\": 30, \\"id\\": \\"9e0c0917-0e11-4ffa-9405-799aaf74258b\\", \\"countdown\\": false}"], "ready": true}']
+2025-12-06 16:57:12,415 - app_logger - INFO - Sending player list to room NZCT
+2025-12-06 16:57:12,417 - app_logger - DEBUG - Player List: ['{"sid": "u8DOGZ4isjFLJShtAAAG", "player_id": "1f1d7bae-f06a-4e39-b97d-dc5333d4f26f", "username": "samm", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": "dfb5d74253a54e809a609b96c1edc3ae.jpg", "meltdown_code": null, "cards": [], "ready": true}', '{"sid": "TQzk96RuFHSvQotkAAAD", "player_id": "d7e22133-2faa-46ff-b3a6-7971a3f86d87", "username": "sdqdqd", "active": true, "sus": true, "alive": true, "pic": 10, "selfie": null, "meltdown_code": null, "cards": ["{\\"action\\": \\"Taunt\\", \\"text\\": \\"Make crewmates scared\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"5c6e4097-5c47-4620-830a-dab222c3e553\\", \\"countdown\\": false}", "{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 30, \\"time_left\\": 30, \\"id\\": \\"6fa355f4-2d85-4326-923d-bd66c84edaef\\", \\"countdown\\": false}", "{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 30, \\"time_left\\": 30, \\"id\\": \\"9e0c0917-0e11-4ffa-9405-799aaf74258b\\", \\"countdown\\": false}"], "ready": true}']
+2025-12-06 16:57:25,158 - app_logger - INFO - Player 1f1d7bae-f06a-4e39-b97d-dc5333d4f26f completed a task. Crew score: 4
+2025-12-06 16:57:25,159 - app_logger - DEBUG - Assigned new task to player 1f1d7bae-f06a-4e39-b97d-dc5333d4f26f: {'task': '2', 'location': 'Basement', 'difficulty': 2, 'added_by': 'sdqdqd'}
+2025-12-06 16:57:26,432 - app_logger - INFO - Meeting started in room NZCT
+2025-12-06 16:57:29,261 - app_logger - INFO - Sending player list to room NZCT
+2025-12-06 16:57:29,262 - app_logger - DEBUG - Player List: ['{"sid": "u8DOGZ4isjFLJShtAAAG", "player_id": "1f1d7bae-f06a-4e39-b97d-dc5333d4f26f", "username": "samm", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": "dfb5d74253a54e809a609b96c1edc3ae.jpg", "meltdown_code": null, "cards": [], "ready": false}', '{"sid": "TQzk96RuFHSvQotkAAAD", "player_id": "d7e22133-2faa-46ff-b3a6-7971a3f86d87", "username": "sdqdqd", "active": true, "sus": true, "alive": true, "pic": 10, "selfie": null, "meltdown_code": null, "cards": ["{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 30, \\"time_left\\": 30, \\"id\\": \\"6fa355f4-2d85-4326-923d-bd66c84edaef\\", \\"countdown\\": false}", "{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 30, \\"time_left\\": 30, \\"id\\": \\"9e0c0917-0e11-4ffa-9405-799aaf74258b\\", \\"countdown\\": false}", "{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"618e4c1e-3013-431c-8c20-8f3c8896f788\\", \\"countdown\\": false}"], "ready": true}']
+2025-12-06 16:57:30,911 - app_logger - INFO - Sending player list to room NZCT
+2025-12-06 16:57:30,911 - app_logger - DEBUG - Player List: ['{"sid": "u8DOGZ4isjFLJShtAAAG", "player_id": "1f1d7bae-f06a-4e39-b97d-dc5333d4f26f", "username": "samm", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": "dfb5d74253a54e809a609b96c1edc3ae.jpg", "meltdown_code": null, "cards": [], "ready": true}', '{"sid": "TQzk96RuFHSvQotkAAAD", "player_id": "d7e22133-2faa-46ff-b3a6-7971a3f86d87", "username": "sdqdqd", "active": true, "sus": true, "alive": true, "pic": 10, "selfie": null, "meltdown_code": null, "cards": ["{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 30, \\"time_left\\": 30, \\"id\\": \\"6fa355f4-2d85-4326-923d-bd66c84edaef\\", \\"countdown\\": false}", "{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 30, \\"time_left\\": 30, \\"id\\": \\"9e0c0917-0e11-4ffa-9405-799aaf74258b\\", \\"countdown\\": false}", "{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"618e4c1e-3013-431c-8c20-8f3c8896f788\\", \\"countdown\\": false}"], "ready": true}']
+2025-12-06 17:00:48,682 - app_logger - INFO - Client disconnected: TQzk96RuFHSvQotkAAAD
+2025-12-06 17:00:48,686 - app_logger - INFO - Client disconnected: u8DOGZ4isjFLJShtAAAG
+2025-12-06 17:00:50,181 - app_logger - INFO - Starting server...
+2025-12-06 17:00:50,181 - app_logger - INFO -  * DEV MODE: SSL disabled
+2025-12-06 17:00:50,181 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.63:5001
+2025-12-06 17:00:50,259 - app_logger - INFO - Client connected: V32tFvK4dg4bMaA3AAAB
+2025-12-06 17:00:52,596 - app_logger - INFO - Client connected: 4E4ojUcGXI2bCJ5iAAAD
+2025-12-06 17:00:56,027 - app_logger - INFO - Game created with room code: JMGM
+2025-12-06 17:00:59,693 - app_logger - INFO - Game JMGM config updated: {'locations': ['Basement', '1st Floor', '2nd Floor', '3rd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 2, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 17:00:59,696 - app_logger - INFO - Room JMGM is now open for players
+2025-12-06 17:01:02,684 - app_logger - INFO - New player sasa joined room JMGM with ID dce84c48-58e2-43ac-8df0-89c7b93d60cd
+2025-12-06 17:01:02,685 - app_logger - INFO - Sending player list to room JMGM
+2025-12-06 17:01:02,685 - app_logger - DEBUG - Player List: ['{"sid": "4E4ojUcGXI2bCJ5iAAAD", "player_id": "dce84c48-58e2-43ac-8df0-89c7b93d60cd", "username": "sasa", "active": true, "sus": false, "alive": true, "pic": 5, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 17:01:06,458 - app_logger - INFO - Client V32tFvK4dg4bMaA3AAAB joined room JMGM
+2025-12-06 17:01:09,991 - app_logger - INFO - New player dqwdwq joined room JMGM with ID 7e18f493-fc01-4cab-9cee-a7009ebdd93f
+2025-12-06 17:01:09,992 - app_logger - INFO - Sending player list to room JMGM
+2025-12-06 17:01:09,992 - app_logger - DEBUG - Player List: ['{"sid": "4E4ojUcGXI2bCJ5iAAAD", "player_id": "dce84c48-58e2-43ac-8df0-89c7b93d60cd", "username": "sasa", "active": true, "sus": false, "alive": true, "pic": 5, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}', '{"sid": "V32tFvK4dg4bMaA3AAAB", "player_id": "7e18f493-fc01-4cab-9cee-a7009ebdd93f", "username": "dqwdwq", "active": true, "sus": false, "alive": true, "pic": 12, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 17:01:16,517 - app_logger - INFO - Updated locations in room JMGM: ['Basement', '1st Floor', '2nd Floor', 'Other']
+2025-12-06 17:01:17,200 - app_logger - INFO - Updated locations in room JMGM: ['Basement', '1st Floor', 'Other']
+2025-12-06 17:01:18,816 - app_logger - INFO - Updated locations in room JMGM: ['Basement', '1st Floor', 'Other']
+2025-12-06 17:01:26,851 - app_logger - INFO - Collaborative task added in room JMGM: 1
+2025-12-06 17:01:28,521 - app_logger - INFO - Collaborative task added in room JMGM: 2
+2025-12-06 17:01:29,155 - app_logger - INFO - Collaborative task added in room JMGM: 3
+2025-12-06 17:01:30,154 - app_logger - INFO - Collaborative task added in room JMGM: 4
+2025-12-06 17:01:31,208 - app_logger - INFO - Collaborative task added in room JMGM: 5
+2025-12-06 17:01:34,668 - app_logger - INFO - Collaborative task added in room JMGM: 1
+2025-12-06 17:01:35,446 - app_logger - INFO - Collaborative task added in room JMGM: 2
+2025-12-06 17:01:36,168 - app_logger - INFO - Collaborative task added in room JMGM: 3
+2025-12-06 17:01:36,873 - app_logger - INFO - Collaborative task added in room JMGM: 4
+2025-12-06 17:01:37,818 - app_logger - INFO - Collaborative task added in room JMGM: 5
+2025-12-06 17:01:45,322 - app_logger - INFO - Sending player list to room JMGM
+2025-12-06 17:01:45,325 - app_logger - DEBUG - Player List: ['{"sid": "V32tFvK4dg4bMaA3AAAB", "player_id": "7e18f493-fc01-4cab-9cee-a7009ebdd93f", "username": "dqwdwq", "active": true, "sus": false, "alive": true, "pic": 12, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 17:01:45,326 - app_logger - INFO - Player sasa left room JMGM
+2025-12-06 17:01:53,132 - app_logger - INFO - Created collaborative task list XWBTDQ in room JMGM
+2025-12-06 17:01:57,050 - app_logger - INFO - Room JMGM deleted (no players remaining)
+2025-12-06 17:01:58,715 - app_logger - INFO - Game created with room code: PAMQ
+2025-12-06 17:02:03,208 - app_logger - INFO - Applied task list XWBTDQ to game PAMQ: 10 tasks loaded, task_list_applied=True
+2025-12-06 17:02:03,208 - app_logger - INFO - Task handler now has 10 tasks
+2025-12-06 17:02:07,967 - app_logger - INFO - Game PAMQ config updated: {'locations': ['Basement', '1st Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 1, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 17:02:07,971 - app_logger - INFO - Room PAMQ is now open for players
+2025-12-06 17:02:11,259 - app_logger - INFO - New player dwwd joined room PAMQ with ID 791c6b2a-7b72-423e-8bba-54a13b97639a
+2025-12-06 17:02:11,260 - app_logger - INFO - Sending player list to room PAMQ
+2025-12-06 17:02:11,261 - app_logger - DEBUG - Player List: ['{"sid": "4E4ojUcGXI2bCJ5iAAAD", "player_id": "791c6b2a-7b72-423e-8bba-54a13b97639a", "username": "dwwd", "active": true, "sus": false, "alive": true, "pic": 2, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 17:02:14,092 - app_logger - INFO - Client V32tFvK4dg4bMaA3AAAB joined room PAMQ
+2025-12-06 17:02:16,400 - app_logger - INFO - New player wdfeewf joined room PAMQ with ID c66f6d30-103c-4f18-ad98-e0045d671ec4
+2025-12-06 17:02:16,401 - app_logger - INFO - Sending player list to room PAMQ
+2025-12-06 17:02:16,404 - app_logger - DEBUG - Player List: ['{"sid": "4E4ojUcGXI2bCJ5iAAAD", "player_id": "791c6b2a-7b72-423e-8bba-54a13b97639a", "username": "dwwd", "active": true, "sus": false, "alive": true, "pic": 2, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}', '{"sid": "V32tFvK4dg4bMaA3AAAB", "player_id": "c66f6d30-103c-4f18-ad98-e0045d671ec4", "username": "wdfeewf", "active": true, "sus": false, "alive": true, "pic": 9, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 17:02:19,482 - app_logger - INFO - Start game check - task_list_applied=True, task_handler.tasks=10, collaborative_tasks=10, min_tasks=10
+2025-12-06 17:02:19,483 - app_logger - INFO - Applied 10 collaborative tasks to game PAMQ
+2025-12-06 17:02:19,483 - app_logger - INFO - Starting game PAMQ with 10 tasks
+2025-12-06 17:02:19,483 - app_logger - INFO - Card deck rebuilt with locations: ['Basement', '1st Floor', 'Other']
+2025-12-06 17:02:19,484 - app_logger - INFO - Sending player list to room PAMQ
+2025-12-06 17:02:19,484 - app_logger - DEBUG - Player List: ['{"sid": "4E4ojUcGXI2bCJ5iAAAD", "player_id": "791c6b2a-7b72-423e-8bba-54a13b97639a", "username": "dwwd", "active": true, "sus": false, "alive": true, "pic": 2, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}', '{"sid": "V32tFvK4dg4bMaA3AAAB", "player_id": "c66f6d30-103c-4f18-ad98-e0045d671ec4", "username": "wdfeewf", "active": true, "sus": true, "alive": true, "pic": 9, "selfie": null, "meltdown_code": null, "cards": ["{\\"action\\": \\"Discard and Draw\\", \\"text\\": \\"Discard a random card and draw a new card\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"5cca0bef-a98d-4787-bde4-ba07475b311d\\", \\"countdown\\": false}", "{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 30, \\"time_left\\": 30, \\"id\\": \\"9525ff80-45e5-4219-9d67-e00fe3624068\\", \\"countdown\\": false}"], "ready": false}']
+2025-12-06 17:02:19,485 - app_logger - INFO - Game started in room PAMQ
+2025-12-06 17:02:19,485 - app_logger - DEBUG - Assigned task to player 791c6b2a-7b72-423e-8bba-54a13b97639a: {'task': '1', 'location': 'Basement', 'difficulty': 2, 'added_by': 'dqwdwq'}
+2025-12-06 17:02:28,274 - app_logger - INFO - Player 791c6b2a-7b72-423e-8bba-54a13b97639a completed a task. Crew score: 1
+2025-12-06 17:02:28,276 - app_logger - DEBUG - Assigned new task to player 791c6b2a-7b72-423e-8bba-54a13b97639a: {'task': '5', 'location': '1st Floor', 'difficulty': 2, 'added_by': 'dqwdwq'}
+2025-12-06 17:02:30,483 - app_logger - INFO - Meeting started in room PAMQ
+2025-12-06 17:02:34,028 - app_logger - INFO - Sending player list to room PAMQ
+2025-12-06 17:02:34,029 - app_logger - DEBUG - Player List: ['{"sid": "4E4ojUcGXI2bCJ5iAAAD", "player_id": "791c6b2a-7b72-423e-8bba-54a13b97639a", "username": "dwwd", "active": true, "sus": false, "alive": true, "pic": 2, "selfie": null, "meltdown_code": null, "cards": [], "ready": true}', '{"sid": "V32tFvK4dg4bMaA3AAAB", "player_id": "c66f6d30-103c-4f18-ad98-e0045d671ec4", "username": "wdfeewf", "active": true, "sus": true, "alive": true, "pic": 9, "selfie": null, "meltdown_code": null, "cards": ["{\\"action\\": \\"Area Denial\\", \\"text\\": \\"Stop sending tasks to a specific location\\", \\"location\\": \\"Basement\\", \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"aee2adf8-a373-4ffd-8cf0-08e760bc7283\\", \\"countdown\\": true}"], "ready": false}']
+2025-12-06 17:02:35,740 - app_logger - INFO - Sending player list to room PAMQ
+2025-12-06 17:02:35,742 - app_logger - DEBUG - Player List: ['{"sid": "4E4ojUcGXI2bCJ5iAAAD", "player_id": "791c6b2a-7b72-423e-8bba-54a13b97639a", "username": "dwwd", "active": true, "sus": false, "alive": true, "pic": 2, "selfie": null, "meltdown_code": null, "cards": [], "ready": true}', '{"sid": "V32tFvK4dg4bMaA3AAAB", "player_id": "c66f6d30-103c-4f18-ad98-e0045d671ec4", "username": "wdfeewf", "active": true, "sus": true, "alive": true, "pic": 9, "selfie": null, "meltdown_code": null, "cards": ["{\\"action\\": \\"Area Denial\\", \\"text\\": \\"Stop sending tasks to a specific location\\", \\"location\\": \\"Basement\\", \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"aee2adf8-a373-4ffd-8cf0-08e760bc7283\\", \\"countdown\\": true}"], "ready": true}']
+2025-12-06 17:02:47,383 - app_logger - INFO - Player 791c6b2a-7b72-423e-8bba-54a13b97639a completed a task. Crew score: 2
+2025-12-06 17:02:47,385 - app_logger - DEBUG - Assigned new task to player 791c6b2a-7b72-423e-8bba-54a13b97639a: {'task': '2', 'location': '1st Floor', 'difficulty': 2, 'added_by': 'dqwdwq'}
+2025-12-06 17:02:49,157 - app_logger - INFO - Player 791c6b2a-7b72-423e-8bba-54a13b97639a completed a task. Crew score: 3
+2025-12-06 17:02:49,158 - app_logger - DEBUG - Assigned new task to player 791c6b2a-7b72-423e-8bba-54a13b97639a: {'task': '1', 'location': '1st Floor', 'difficulty': 2, 'added_by': 'dqwdwq'}
+2025-12-06 17:02:51,141 - app_logger - INFO - Player 791c6b2a-7b72-423e-8bba-54a13b97639a completed a task. Crew score: 4
+2025-12-06 17:02:51,144 - app_logger - DEBUG - Assigned new task to player 791c6b2a-7b72-423e-8bba-54a13b97639a: {'task': '3', 'location': '1st Floor', 'difficulty': 2, 'added_by': 'dqwdwq'}
+2025-12-06 17:02:53,165 - app_logger - INFO - Player 791c6b2a-7b72-423e-8bba-54a13b97639a completed a task. Crew score: 5
+2025-12-06 17:02:53,166 - app_logger - DEBUG - Assigned new task to player 791c6b2a-7b72-423e-8bba-54a13b97639a: {'task': '4', 'location': '1st Floor', 'difficulty': 2, 'added_by': 'dqwdwq'}
+2025-12-06 17:02:55,091 - app_logger - INFO - Player 791c6b2a-7b72-423e-8bba-54a13b97639a completed a task. Crew score: 6
+2025-12-06 17:02:55,092 - app_logger - DEBUG - Assigned new task to player 791c6b2a-7b72-423e-8bba-54a13b97639a: {'task': '5', 'location': 'Basement', 'difficulty': 2, 'added_by': 'dqwdwq'}
+2025-12-06 17:03:38,037 - app_logger - INFO - Meeting started in room PAMQ
+2025-12-06 17:03:46,061 - app_logger - INFO - Sending player list to room PAMQ
+2025-12-06 17:03:46,063 - app_logger - DEBUG - Player List: ['{"sid": "V32tFvK4dg4bMaA3AAAB", "player_id": "c66f6d30-103c-4f18-ad98-e0045d671ec4", "username": "wdfeewf", "active": true, "sus": true, "alive": true, "pic": 9, "selfie": null, "meltdown_code": null, "cards": ["{\\"action\\": \\"Self Report\\", \\"text\\": \\"Call a body found meeting\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"382c4787-0da7-4a03-acae-85c2103f650a\\", \\"countdown\\": false}"], "ready": false}']
+2025-12-06 17:03:46,064 - app_logger - INFO - Player dwwd left room PAMQ
+2025-12-06 17:03:47,062 - app_logger - INFO - Room PAMQ deleted (no players remaining)
+2025-12-06 17:04:26,076 - app_logger - INFO - Game created with room code: QJXI
+2025-12-06 17:07:08,854 - app_logger - INFO - Client disconnected: 4E4ojUcGXI2bCJ5iAAAD
+2025-12-06 17:07:09,204 - app_logger - INFO - Client connected: 5-SD3lSXtbj6JU7IAAAG
+2025-12-06 17:07:12,596 - app_logger - INFO - New player fwefew joined room QJXI with ID 92fb70e6-7775-4a9c-bdcd-ded6a4fc8dc0
+2025-12-06 17:07:12,596 - app_logger - INFO - Sending player list to room QJXI
+2025-12-06 17:07:12,597 - app_logger - DEBUG - Player List: ['{"sid": "5-SD3lSXtbj6JU7IAAAG", "player_id": "92fb70e6-7775-4a9c-bdcd-ded6a4fc8dc0", "username": "fwefew", "active": true, "sus": false, "alive": true, "pic": 3, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 17:07:14,295 - app_logger - INFO - Room QJXI deleted (no players remaining)
+2025-12-06 17:07:15,914 - app_logger - INFO - Game created with room code: RMCV
+2025-12-06 17:14:22,676 - app_logger - INFO - Client disconnected: 5-SD3lSXtbj6JU7IAAAG
+2025-12-06 17:14:23,083 - app_logger - INFO - Client connected: bEtgsg3PLwsoXfwwAAAJ
+2025-12-06 17:14:24,094 - app_logger - INFO - Game created with room code: ATFM
+2025-12-06 17:15:08,317 - app_logger - INFO - Applied task list XG8W6C to game ATFM: 10 tasks loaded, task_list_applied=True
+2025-12-06 17:15:08,319 - app_logger - INFO - Task handler now has 10 tasks
+2025-12-06 17:15:09,724 - app_logger - INFO - Game ATFM config updated: {'locations': ['Basement', '1st Floor', '2nd Floor', '3rd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 2, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 17:15:09,727 - app_logger - INFO - Room ATFM is now open for players
+2025-12-06 17:15:12,309 - app_logger - INFO - New player dqd joined room ATFM with ID 38bb5ae9-4536-4893-9e67-4e9324f88609
+2025-12-06 17:15:12,309 - app_logger - INFO - Sending player list to room ATFM
+2025-12-06 17:15:12,310 - app_logger - DEBUG - Player List: ['{"sid": "bEtgsg3PLwsoXfwwAAAJ", "player_id": "38bb5ae9-4536-4893-9e67-4e9324f88609", "username": "dqd", "active": true, "sus": false, "alive": true, "pic": 14, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 17:15:15,746 - app_logger - INFO - Room ATFM deleted (no players remaining)
+2025-12-06 17:15:17,098 - app_logger - INFO - Game created with room code: ZRDR
+2025-12-06 17:15:41,475 - app_logger - INFO - Game ZRDR config updated: {'locations': ['Basement', '1st Floor', '2nd Floor', '3rd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 2, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 17:15:41,480 - app_logger - INFO - Room ZRDR is now open for players
+2025-12-06 17:15:43,642 - app_logger - INFO - New player ewewf joined room ZRDR with ID 2c7cb62b-2492-4f1d-a5cd-57330bf3e0e1
+2025-12-06 17:15:43,643 - app_logger - INFO - Sending player list to room ZRDR
+2025-12-06 17:15:43,643 - app_logger - DEBUG - Player List: ['{"sid": "bEtgsg3PLwsoXfwwAAAJ", "player_id": "2c7cb62b-2492-4f1d-a5cd-57330bf3e0e1", "username": "ewewf", "active": true, "sus": false, "alive": true, "pic": 13, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 17:15:46,651 - app_logger - INFO - Updated locations in room ZRDR: ['Basement', '1st Floor', '2nd Floor', 'Other']
+2025-12-06 17:15:47,247 - app_logger - INFO - Updated locations in room ZRDR: ['Basement', '1st Floor', 'Other']
+2025-12-06 17:15:48,489 - app_logger - INFO - Updated locations in room ZRDR: ['Basement', '1st Floor', '1', 'Other']
+2025-12-06 17:15:49,431 - app_logger - INFO - Updated locations in room ZRDR: ['Basement', '1st Floor', '1', '2', 'Other']
+2025-12-06 17:15:50,132 - app_logger - INFO - Updated locations in room ZRDR: ['Basement', '1st Floor', '1', '2', '3', 'Other']
+2025-12-06 17:15:50,861 - app_logger - INFO - Updated locations in room ZRDR: ['Basement', '1st Floor', '1', '2', '3', '4', 'Other']
+2025-12-06 17:15:53,025 - app_logger - INFO - Updated locations in room ZRDR: ['Basement', '1st Floor', '2', '3', '4', 'Other']
+2025-12-06 17:15:53,346 - app_logger - INFO - Updated locations in room ZRDR: ['Basement', '1st Floor', '3', '4', 'Other']
+2025-12-06 17:15:53,697 - app_logger - INFO - Updated locations in room ZRDR: ['Basement', '1st Floor', '4', 'Other']
+2025-12-06 17:15:54,038 - app_logger - INFO - Updated locations in room ZRDR: ['Basement', '1st Floor', 'Other']
+2025-12-06 17:15:54,705 - app_logger - INFO - Updated locations in room ZRDR: ['Basement', '1st Floor', 'Other']
+2025-12-06 17:15:57,989 - app_logger - INFO - Collaborative task added in room ZRDR: 1
+2025-12-06 17:15:59,672 - app_logger - INFO - Collaborative task added in room ZRDR: 2
+2025-12-06 17:16:00,597 - app_logger - INFO - Collaborative task added in room ZRDR: 3
+2025-12-06 17:16:01,149 - app_logger - INFO - Collaborative task added in room ZRDR: 4
+2025-12-06 17:16:01,726 - app_logger - INFO - Collaborative task added in room ZRDR: 5
+2025-12-06 17:16:05,007 - app_logger - INFO - Collaborative task added in room ZRDR: 1
+2025-12-06 17:16:05,685 - app_logger - INFO - Collaborative task added in room ZRDR: 2
+2025-12-06 17:16:06,197 - app_logger - INFO - Collaborative task added in room ZRDR: 3
+2025-12-06 17:16:06,759 - app_logger - INFO - Collaborative task added in room ZRDR: 4
+2025-12-06 17:16:07,884 - app_logger - INFO - Collaborative task added in room ZRDR: 5
+2025-12-06 17:16:12,357 - app_logger - INFO - Created collaborative task list SZ89F7 in room ZRDR
+2025-12-06 17:16:22,768 - app_logger - INFO - Room ZRDR deleted (no players remaining)
+2025-12-06 17:16:24,668 - app_logger - INFO - Game created with room code: QOKV
+2025-12-06 17:17:53,850 - app_logger - INFO - Applied task list SZ89F7 to game QOKV: 10 tasks loaded, task_list_applied=True
+2025-12-06 17:17:53,853 - app_logger - INFO - Task handler now has 10 tasks
+2025-12-06 17:18:23,787 - app_logger - INFO - Game QOKV config updated: {'locations': ['Basement', '1st Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 2, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 17:18:23,789 - app_logger - INFO - Room QOKV is now open for players
+2025-12-06 17:21:22,410 - app_logger - INFO - Client disconnected: V32tFvK4dg4bMaA3AAAB
+2025-12-06 17:21:22,415 - app_logger - INFO - Client disconnected: bEtgsg3PLwsoXfwwAAAJ
+2025-12-06 17:21:23,440 - app_logger - INFO - Starting server...
+2025-12-06 17:21:23,440 - app_logger - INFO -  * DEV MODE: SSL disabled
+2025-12-06 17:21:23,440 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.63:5001
+2025-12-06 17:21:23,801 - app_logger - INFO - Client connected: a9ymtviU1a4G685MAAAB
+2025-12-06 17:21:24,758 - app_logger - INFO - Client connected: qAKMEF_XZ2nNqUsZAAAD
+2025-12-06 17:21:27,303 - app_logger - INFO - Game created with room code: JPXT
+2025-12-06 17:21:42,117 - app_logger - INFO - Task list XG8W6C saved to player device_b32ocpi2jmiuupois's list
+2025-12-06 17:21:53,020 - app_logger - INFO - Applied task list SZ89F7 to game JPXT: 10 tasks loaded, task_list_applied=True
+2025-12-06 17:21:53,021 - app_logger - INFO - Task handler now has 10 tasks
+2025-12-06 17:21:54,225 - app_logger - INFO - Game JPXT config updated: {'locations': ['Basement', '1st Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 2, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 17:21:54,229 - app_logger - INFO - Room JPXT is now open for players
+2025-12-06 17:21:58,742 - app_logger - INFO - New player vfvfd joined room JPXT with ID 66db761b-169f-4ebe-a158-a40b21b72646
+2025-12-06 17:21:58,742 - app_logger - INFO - Sending player list to room JPXT
+2025-12-06 17:21:58,744 - app_logger - DEBUG - Player List: ['{"sid": "a9ymtviU1a4G685MAAAB", "player_id": "66db761b-169f-4ebe-a158-a40b21b72646", "username": "vfvfd", "active": true, "sus": false, "alive": true, "pic": 14, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 17:22:11,967 - app_logger - INFO - Collaborative task added in room JPXT: jork peenar
+2025-12-06 17:22:23,220 - app_logger - INFO - Room JPXT deleted (no players remaining)
+2025-12-06 17:22:24,865 - app_logger - INFO - Game created with room code: NGRH
+2025-12-06 17:25:27,576 - app_logger - INFO - Client disconnected: qAKMEF_XZ2nNqUsZAAAD
+2025-12-06 17:25:27,583 - app_logger - INFO - Client disconnected: a9ymtviU1a4G685MAAAB
+2025-12-06 17:25:27,609 - app_logger - INFO - Client connected: LbnytRqiHtzD0M4YAAAG
+2025-12-06 17:25:27,612 - app_logger - INFO - Client connected: esBOH3dXgjdPceIVAAAH
+2025-12-06 17:25:30,997 - app_logger - INFO - Client disconnected: LbnytRqiHtzD0M4YAAAG
+2025-12-06 17:25:31,450 - app_logger - INFO - Client connected: jAWNI5IsPmYMPlgNAAAK
+2025-12-06 17:25:32,479 - app_logger - INFO - Game created with room code: YVQT
+2025-12-06 17:25:34,845 - app_logger - INFO - Applied task list SZ89F7 to game YVQT: 10 tasks loaded, task_list_applied=True
+2025-12-06 17:25:34,846 - app_logger - INFO - Task handler now has 10 tasks
+2025-12-06 17:25:35,875 - app_logger - INFO - Game YVQT config updated: {'locations': ['Basement', '1st Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 2, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 17:25:35,878 - app_logger - INFO - Room YVQT is now open for players
+2025-12-06 17:25:42,162 - app_logger - INFO - Saved selfie for sam: 488a480a27ef45dbb775c3ed91ba2225.jpg
+2025-12-06 17:25:42,164 - app_logger - INFO - New player sam joined room YVQT with ID 0370e94c-0485-4939-b2a7-209a9d634afe
+2025-12-06 17:25:42,164 - app_logger - INFO - Sending player list to room YVQT
+2025-12-06 17:25:42,164 - app_logger - DEBUG - Player List: ['{"sid": "jAWNI5IsPmYMPlgNAAAK", "player_id": "0370e94c-0485-4939-b2a7-209a9d634afe", "username": "sam", "active": true, "sus": false, "alive": true, "pic": 12, "selfie": "488a480a27ef45dbb775c3ed91ba2225.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 17:26:47,220 - app_logger - INFO - Updated collaborative task list SZ89F7 in room YVQT
+2025-12-06 17:26:59,795 - app_logger - INFO - Updated collaborative task list SZ89F7 in room YVQT
+2025-12-06 17:27:02,724 - app_logger - INFO - Updated collaborative task list SZ89F7 in room YVQT
+2025-12-06 17:27:27,598 - app_logger - INFO - Updated collaborative task list SZ89F7 in room YVQT
+2025-12-06 17:27:59,276 - app_logger - INFO - Updated collaborative task list SZ89F7 in room YVQT
+2025-12-06 17:28:42,034 - app_logger - INFO - Client disconnected: esBOH3dXgjdPceIVAAAH
+2025-12-06 17:28:42,035 - app_logger - INFO - Client disconnected: jAWNI5IsPmYMPlgNAAAK
+2025-12-06 17:28:43,018 - app_logger - INFO - Starting server...
+2025-12-06 17:28:43,018 - app_logger - INFO -  * DEV MODE: SSL disabled
+2025-12-06 17:28:43,018 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.63:5001
+2025-12-06 17:28:43,177 - app_logger - INFO - Client connected: zB0l2sFVYkpSYu0GAAAB
+2025-12-06 17:28:43,400 - app_logger - INFO - Client connected: EusUMgEd9QEmg96HAAAD
+2025-12-06 17:28:43,400 - app_logger - INFO - Client disconnected: zB0l2sFVYkpSYu0GAAAB
+2025-12-06 17:28:43,404 - app_logger - INFO - Client connected: 3jw2vBco0PtDaRydAAAF
+2025-12-06 17:28:46,714 - app_logger - INFO - Game created with room code: AVWL
+2025-12-06 17:28:52,112 - app_logger - INFO - Applied task list SZ89F7 to game AVWL: 10 tasks loaded, task_list_applied=True
+2025-12-06 17:28:52,112 - app_logger - INFO - Task handler now has 10 tasks
+2025-12-06 17:28:53,031 - app_logger - INFO - Game AVWL config updated: {'locations': ['Basement', '1st Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 2, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 17:28:53,034 - app_logger - INFO - Room AVWL is now open for players
+2025-12-06 17:28:57,199 - app_logger - INFO - Saved selfie for grb: f2856be353c94d51bc409887c0a38def.jpg
+2025-12-06 17:28:57,201 - app_logger - INFO - New player grb joined room AVWL with ID c5e0d20f-131e-4d5c-8f7c-ea8976c861f4
+2025-12-06 17:28:57,201 - app_logger - INFO - Sending player list to room AVWL
+2025-12-06 17:28:57,201 - app_logger - DEBUG - Player List: ['{"sid": "EusUMgEd9QEmg96HAAAD", "player_id": "c5e0d20f-131e-4d5c-8f7c-ea8976c861f4", "username": "grb", "active": true, "sus": false, "alive": true, "pic": 10, "selfie": "f2856be353c94d51bc409887c0a38def.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 17:28:59,210 - app_logger - INFO - Updated collaborative task list SZ89F7 in room AVWL
+2025-12-06 17:29:09,173 - app_logger - INFO - Client disconnected: EusUMgEd9QEmg96HAAAD
+2025-12-06 17:29:09,190 - app_logger - INFO - Client disconnected: 3jw2vBco0PtDaRydAAAF
+2025-12-06 17:29:09,225 - app_logger - INFO - Client connected: bUcb0uHYa_4PAe2HAAAI
+2025-12-06 17:29:09,226 - app_logger - INFO - Client connected: Vl2R1q3vl_brJfvdAAAJ
+2025-12-06 17:29:09,229 - app_logger - INFO - Player c5e0d20f-131e-4d5c-8f7c-ea8976c861f4 rejoining room AVWL
+2025-12-06 17:29:09,232 - app_logger - INFO - Sending player list to room AVWL
+2025-12-06 17:29:09,233 - app_logger - DEBUG - Player List: ['{"sid": "bUcb0uHYa_4PAe2HAAAI", "player_id": "c5e0d20f-131e-4d5c-8f7c-ea8976c861f4", "username": "grb", "active": true, "sus": false, "alive": true, "pic": 10, "selfie": "f2856be353c94d51bc409887c0a38def.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 17:29:11,301 - app_logger - INFO - Updated collaborative task list SZ89F7 in room AVWL
+2025-12-06 17:29:28,957 - app_logger - INFO - Collaborative task added in room AVWL: test
+2025-12-06 17:29:30,969 - app_logger - INFO - Updated collaborative task list SZ89F7 in room AVWL
+2025-12-06 17:29:33,835 - app_logger - INFO - Updated collaborative task list SZ89F7 in room AVWL
+2025-12-06 17:29:37,740 - app_logger - INFO - Collaborative task added in room AVWL: rgergrege
+2025-12-06 17:29:39,760 - app_logger - INFO - Updated collaborative task list SZ89F7 in room AVWL
+2025-12-06 17:29:43,930 - app_logger - INFO - Room AVWL deleted (no players remaining)
+2025-12-06 17:29:45,750 - app_logger - INFO - Game created with room code: CNVL
+2025-12-06 17:29:57,812 - app_logger - INFO - Task list deleted: SZ89F7 by player device_b32ocpi2jmiuupois
+2025-12-06 17:32:17,696 - app_logger - INFO - Game CNVL config updated: {'locations': ['Basement', '1st Floor', '2nd Floor', '3rd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 2, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 17:32:17,699 - app_logger - INFO - Room CNVL is now open for players
+2025-12-06 17:32:20,329 - app_logger - INFO - New player hthtrh joined room CNVL with ID c1ec0cb8-a5ce-45de-b29d-1ad89e2c3437
+2025-12-06 17:32:20,331 - app_logger - INFO - Sending player list to room CNVL
+2025-12-06 17:32:20,332 - app_logger - DEBUG - Player List: ['{"sid": "bUcb0uHYa_4PAe2HAAAI", "player_id": "c1ec0cb8-a5ce-45de-b29d-1ad89e2c3437", "username": "hthtrh", "active": true, "sus": false, "alive": true, "pic": 7, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 17:32:41,065 - app_logger - INFO - Updated locations in room CNVL: ['Basement', '1st Floor', '2nd Floor', 'Other']
+2025-12-06 17:32:41,781 - app_logger - INFO - Updated locations in room CNVL: ['Basement', '1st Floor', 'Other']
+2025-12-06 17:32:42,521 - app_logger - INFO - Updated locations in room CNVL: ['Basement', '1st Floor', 'Other']
+2025-12-06 17:32:46,392 - app_logger - INFO - Collaborative task added in room CNVL: test
+2025-12-06 17:32:48,409 - app_logger - INFO - Created collaborative task list 987647 in room CNVL
+2025-12-06 17:32:50,423 - app_logger - INFO - Updated collaborative task list 987647 in room CNVL
+2025-12-06 17:32:53,483 - app_logger - INFO - Collaborative task added in room CNVL: 123
+2025-12-06 17:32:55,495 - app_logger - INFO - Updated collaborative task list 987647 in room CNVL
+2025-12-06 17:37:43,817 - app_logger - INFO - Updated collaborative task list 987647 in room CNVL
+2025-12-06 17:37:58,884 - app_logger - INFO - Updated collaborative task list 987647 in room CNVL
+2025-12-06 17:38:16,660 - app_logger - INFO - Updated collaborative task list 987647 in room CNVL
+2025-12-06 17:38:34,948 - app_logger - INFO - Updated collaborative task list 987647 in room CNVL
+2025-12-06 17:38:46,917 - app_logger - INFO - Updated collaborative task list 987647 in room CNVL
+2025-12-06 17:38:58,748 - app_logger - INFO - Updated collaborative task list 987647 in room CNVL
+2025-12-06 17:40:22,068 - app_logger - INFO - Updated collaborative task list 987647 in room CNVL
+2025-12-06 17:40:34,067 - app_logger - INFO - Updated collaborative task list 987647 in room CNVL
+2025-12-06 17:40:39,065 - app_logger - INFO - Updated collaborative task list 987647 in room CNVL
+2025-12-06 17:40:43,063 - app_logger - INFO - Updated collaborative task list 987647 in room CNVL
+2025-12-06 17:40:52,067 - app_logger - INFO - Updated collaborative task list 987647 in room CNVL
+2025-12-06 17:41:16,068 - app_logger - INFO - Updated collaborative task list 987647 in room CNVL
+2025-12-06 17:41:41,078 - app_logger - INFO - Updated collaborative task list 987647 in room CNVL
+2025-12-06 17:41:53,069 - app_logger - INFO - Updated collaborative task list 987647 in room CNVL
+2025-12-06 17:42:03,064 - app_logger - INFO - Updated collaborative task list 987647 in room CNVL
+2025-12-06 17:42:17,067 - app_logger - INFO - Updated collaborative task list 987647 in room CNVL
+2025-12-06 17:42:32,127 - app_logger - INFO - Client disconnected: bUcb0uHYa_4PAe2HAAAI
+2025-12-06 17:42:32,130 - app_logger - INFO - Client disconnected: Vl2R1q3vl_brJfvdAAAJ
+2025-12-06 17:42:33,287 - app_logger - INFO - Starting server...
+2025-12-06 17:42:33,287 - app_logger - INFO -  * DEV MODE: SSL disabled
+2025-12-06 17:42:33,287 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.63:5001
+2025-12-06 17:42:33,637 - app_logger - INFO - Client connected: JFA4XVkC7IDEJBxCAAAB
+2025-12-06 17:42:34,069 - app_logger - INFO - Client connected: to7hSFB_tGMM1ANWAAAE
+2025-12-06 17:42:47,652 - app_logger - INFO - Game created with room code: VVLB
+2025-12-06 17:42:56,392 - app_logger - INFO - Game VVLB config updated: {'locations': ['Basement', '1st Floor', '2nd Floor', '3rd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 2, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 17:42:56,396 - app_logger - INFO - Room VVLB is now open for players
+2025-12-06 17:43:03,728 - app_logger - INFO - Saved selfie for sam: 406a3130873942cda7634ea94d2a4fa2.jpg
+2025-12-06 17:43:03,729 - app_logger - INFO - New player sam joined room VVLB with ID 088b0a2f-6890-42a7-b943-6beb0cd1ff9f
+2025-12-06 17:43:03,729 - app_logger - INFO - Sending player list to room VVLB
+2025-12-06 17:43:03,729 - app_logger - DEBUG - Player List: ['{"sid": "to7hSFB_tGMM1ANWAAAE", "player_id": "088b0a2f-6890-42a7-b943-6beb0cd1ff9f", "username": "sam", "active": true, "sus": false, "alive": true, "pic": 16, "selfie": "406a3130873942cda7634ea94d2a4fa2.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 17:43:20,253 - app_logger - INFO - Client disconnected: JFA4XVkC7IDEJBxCAAAB
+2025-12-06 17:43:20,266 - app_logger - INFO - Client disconnected: to7hSFB_tGMM1ANWAAAE
+2025-12-06 17:43:20,327 - app_logger - INFO - Client connected: h_6v9xEOUvHEQ8ohAAAH
+2025-12-06 17:43:20,329 - app_logger - INFO - Client connected: tFdhcwSzT3t0yykzAAAI
+2025-12-06 17:43:20,336 - app_logger - INFO - Player 088b0a2f-6890-42a7-b943-6beb0cd1ff9f rejoining room VVLB
+2025-12-06 17:43:20,338 - app_logger - INFO - Sending player list to room VVLB
+2025-12-06 17:43:20,338 - app_logger - DEBUG - Player List: ['{"sid": "tFdhcwSzT3t0yykzAAAI", "player_id": "088b0a2f-6890-42a7-b943-6beb0cd1ff9f", "username": "sam", "active": true, "sus": false, "alive": true, "pic": 16, "selfie": "406a3130873942cda7634ea94d2a4fa2.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 17:43:32,578 - app_logger - INFO - Room VVLB deleted (no players remaining)
+2025-12-06 17:43:34,493 - app_logger - INFO - Game created with room code: EQKY
+2025-12-06 17:43:40,471 - app_logger - INFO - Game EQKY config updated: {'locations': ['Basement', '1st Floor', '2nd Floor', '3rd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 1, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 17:43:40,477 - app_logger - INFO - Room EQKY is now open for players
+2025-12-06 17:43:45,603 - app_logger - INFO - Saved selfie for poop: a21671cccb1d41a2ae19845b044ea20c.jpg
+2025-12-06 17:43:45,604 - app_logger - INFO - New player poop joined room EQKY with ID 71ef4492-9af0-4af3-9591-54cc756d0df3
+2025-12-06 17:43:45,604 - app_logger - INFO - Sending player list to room EQKY
+2025-12-06 17:43:45,604 - app_logger - DEBUG - Player List: ['{"sid": "tFdhcwSzT3t0yykzAAAI", "player_id": "71ef4492-9af0-4af3-9591-54cc756d0df3", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 11, "selfie": "a21671cccb1d41a2ae19845b044ea20c.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 17:44:03,093 - app_logger - INFO - Client h_6v9xEOUvHEQ8ohAAAH joined room EQKY
+2025-12-06 17:44:07,070 - app_logger - INFO - Saved selfie for test: 2d0c9c2947ac40439b3bd5f5cba5d4b0.jpg
+2025-12-06 17:44:07,071 - app_logger - INFO - New player test joined room EQKY with ID 407db53a-c0da-4364-a418-17f525d080c2
+2025-12-06 17:44:07,071 - app_logger - INFO - Sending player list to room EQKY
+2025-12-06 17:44:07,072 - app_logger - DEBUG - Player List: ['{"sid": "tFdhcwSzT3t0yykzAAAI", "player_id": "71ef4492-9af0-4af3-9591-54cc756d0df3", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 11, "selfie": "a21671cccb1d41a2ae19845b044ea20c.jpg", "meltdown_code": null, "cards": [], "ready": false}', '{"sid": "h_6v9xEOUvHEQ8ohAAAH", "player_id": "407db53a-c0da-4364-a418-17f525d080c2", "username": "test", "active": true, "sus": false, "alive": true, "pic": 0, "selfie": "2d0c9c2947ac40439b3bd5f5cba5d4b0.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 17:44:20,710 - app_logger - INFO - Collaborative task added in room EQKY: test
+2025-12-06 17:44:22,582 - app_logger - INFO - Collaborative mode enabled in room EQKY
+2025-12-06 17:44:26,664 - app_logger - INFO - Collaborative mode disabled in room EQKY
+2025-12-06 17:44:27,756 - app_logger - INFO - Collaborative mode enabled in room EQKY
+2025-12-06 17:44:29,200 - app_logger - INFO - Collaborative mode disabled in room EQKY
+2025-12-06 17:44:32,008 - app_logger - INFO - Collaborative mode enabled in room EQKY
+2025-12-06 17:44:37,956 - app_logger - INFO - Collaborative mode disabled in room EQKY
+2025-12-06 17:44:38,358 - app_logger - INFO - Collaborative mode enabled in room EQKY
+2025-12-06 17:44:59,534 - app_logger - INFO - Updated locations in room EQKY: ['Basement', '1st Floor', '2nd Floor', 'Other']
+2025-12-06 17:45:00,295 - app_logger - INFO - Updated locations in room EQKY: ['Basement', '1st Floor', 'Other']
+2025-12-06 17:45:01,980 - app_logger - INFO - Updated locations in room EQKY: ['Basement', '1st Floor', 'Other']
+2025-12-06 17:45:04,574 - app_logger - INFO - Collaborative mode disabled in room EQKY
+2025-12-06 17:45:11,739 - app_logger - INFO - Collaborative task added in room EQKY: 1
+2025-12-06 17:45:13,030 - app_logger - INFO - Collaborative task added in room EQKY: 2
+2025-12-06 17:45:13,672 - app_logger - INFO - Collaborative task added in room EQKY: 3
+2025-12-06 17:45:14,201 - app_logger - INFO - Collaborative task added in room EQKY: 4
+2025-12-06 17:45:14,956 - app_logger - INFO - Collaborative task added in room EQKY: 5
+2025-12-06 17:45:18,102 - app_logger - INFO - Collaborative task added in room EQKY: 1
+2025-12-06 17:45:18,817 - app_logger - INFO - Collaborative task added in room EQKY: 2
+2025-12-06 17:45:19,357 - app_logger - INFO - Collaborative task added in room EQKY: 3
+2025-12-06 17:45:19,988 - app_logger - INFO - Collaborative task added in room EQKY: 4
+2025-12-06 17:45:20,840 - app_logger - INFO - Collaborative task added in room EQKY: 5
+2025-12-06 17:45:29,999 - app_logger - INFO - Start game check - task_list_applied=False, task_handler.tasks=23, collaborative_tasks=11, min_tasks=10
+2025-12-06 17:45:30,002 - app_logger - INFO - Applied 11 collaborative tasks to game EQKY
+2025-12-06 17:45:30,003 - app_logger - INFO - Starting game EQKY with 11 tasks
+2025-12-06 17:45:30,004 - app_logger - INFO - Card deck rebuilt with locations: ['Basement', '1st Floor', 'Other']
+2025-12-06 17:45:30,006 - app_logger - INFO - Sending player list to room EQKY
+2025-12-06 17:45:30,007 - app_logger - DEBUG - Player List: ['{"sid": "tFdhcwSzT3t0yykzAAAI", "player_id": "71ef4492-9af0-4af3-9591-54cc756d0df3", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 11, "selfie": "a21671cccb1d41a2ae19845b044ea20c.jpg", "meltdown_code": null, "cards": [], "ready": false}', '{"sid": "h_6v9xEOUvHEQ8ohAAAH", "player_id": "407db53a-c0da-4364-a418-17f525d080c2", "username": "test", "active": true, "sus": true, "alive": true, "pic": 0, "selfie": "2d0c9c2947ac40439b3bd5f5cba5d4b0.jpg", "meltdown_code": null, "cards": ["{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 30, \\"time_left\\": 30, \\"id\\": \\"a67f04e2-edb5-411e-8109-3782105356e8\\", \\"countdown\\": false}", "{\\"action\\": \\"Taunt\\", \\"text\\": \\"Make crewmates suspicious\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"403a4f61-b32d-4cf4-bfa2-e8a78f19a572\\", \\"countdown\\": false}"], "ready": false}']
+2025-12-06 17:45:30,007 - app_logger - INFO - Game started in room EQKY
+2025-12-06 17:45:30,008 - app_logger - DEBUG - Assigned task to player 71ef4492-9af0-4af3-9591-54cc756d0df3: {'task': 'test', 'location': 'Other', 'difficulty': 2, 'added_by': 'poop'}
+2025-12-06 17:45:33,881 - app_logger - INFO - Player 71ef4492-9af0-4af3-9591-54cc756d0df3 completed a task. Crew score: 1
+2025-12-06 17:45:33,882 - app_logger - DEBUG - Assigned new task to player 71ef4492-9af0-4af3-9591-54cc756d0df3: {'task': '2', 'location': 'Basement', 'difficulty': 2, 'added_by': 'poop'}
+2025-12-06 17:46:01,819 - app_logger - INFO - Client disconnected: tFdhcwSzT3t0yykzAAAI
+2025-12-06 17:46:02,205 - app_logger - INFO - Client connected: IVh35qMq9dFo0IqVAAAL
+2025-12-06 17:46:02,209 - app_logger - INFO - Player 71ef4492-9af0-4af3-9591-54cc756d0df3 rejoining room EQKY
+2025-12-06 17:46:02,210 - app_logger - INFO - Sending player list to room EQKY
+2025-12-06 17:46:02,210 - app_logger - DEBUG - Player List: ['{"sid": "IVh35qMq9dFo0IqVAAAL", "player_id": "71ef4492-9af0-4af3-9591-54cc756d0df3", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 11, "selfie": "a21671cccb1d41a2ae19845b044ea20c.jpg", "meltdown_code": null, "cards": [], "ready": false}', '{"sid": "h_6v9xEOUvHEQ8ohAAAH", "player_id": "407db53a-c0da-4364-a418-17f525d080c2", "username": "test", "active": true, "sus": true, "alive": true, "pic": 0, "selfie": "2d0c9c2947ac40439b3bd5f5cba5d4b0.jpg", "meltdown_code": null, "cards": ["{\\"action\\": \\"Taunt\\", \\"text\\": \\"Make crewmates suspicious\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"403a4f61-b32d-4cf4-bfa2-e8a78f19a572\\", \\"countdown\\": false}"], "ready": false}']
+2025-12-06 17:46:02,211 - app_logger - DEBUG - Active hack: 5
+2025-12-06 17:46:02,211 - app_logger - INFO - Sending task to player
+2025-12-06 17:46:12,536 - app_logger - INFO - Meeting started in room EQKY
+2025-12-06 17:46:15,689 - app_logger - INFO - Sending player list to room EQKY
+2025-12-06 17:46:15,689 - app_logger - DEBUG - Player List: ['{"sid": "h_6v9xEOUvHEQ8ohAAAH", "player_id": "407db53a-c0da-4364-a418-17f525d080c2", "username": "test", "active": true, "sus": true, "alive": true, "pic": 0, "selfie": "2d0c9c2947ac40439b3bd5f5cba5d4b0.jpg", "meltdown_code": null, "cards": ["{\\"action\\": \\"Taunt\\", \\"text\\": \\"Make crewmates suspicious\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"403a4f61-b32d-4cf4-bfa2-e8a78f19a572\\", \\"countdown\\": false}"], "ready": false}']
+2025-12-06 17:46:15,689 - app_logger - INFO - Player poop left room EQKY
+2025-12-06 17:46:17,451 - app_logger - INFO - Room EQKY deleted (no players remaining)
+2025-12-06 17:46:23,307 - app_logger - INFO - Game created with room code: ASHU
+2025-12-06 17:46:34,786 - app_logger - INFO - Applied task list XG8W6C to game ASHU: 10 tasks loaded, task_list_applied=True
+2025-12-06 17:46:34,787 - app_logger - INFO - Task handler now has 10 tasks
+2025-12-06 17:46:37,302 - app_logger - INFO - Game ASHU config updated: {'locations': ['Basement', '1st Floor', '2nd Floor', '3rd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 1, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 17:46:37,303 - app_logger - INFO - Room ASHU is now open for players
+2025-12-06 17:46:43,098 - app_logger - INFO - Saved selfie for poop: dbbdf2d4a92d40109c29d879929f6d22.jpg
+2025-12-06 17:46:43,100 - app_logger - INFO - New player poop joined room ASHU with ID 90e7e97b-f205-4634-ad7d-cf932bfdbfd3
+2025-12-06 17:46:43,100 - app_logger - INFO - Sending player list to room ASHU
+2025-12-06 17:46:43,100 - app_logger - DEBUG - Player List: ['{"sid": "IVh35qMq9dFo0IqVAAAL", "player_id": "90e7e97b-f205-4634-ad7d-cf932bfdbfd3", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 13, "selfie": "dbbdf2d4a92d40109c29d879929f6d22.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 17:46:45,120 - app_logger - INFO - Created new collaborative task list LQAD7H in room ASHU
+2025-12-06 17:46:47,131 - app_logger - INFO - Updated collaborative task list LQAD7H in room ASHU
+2025-12-06 17:46:56,189 - app_logger - INFO - Collaborative task added in room ASHU: jork peenar
+2025-12-06 17:46:58,207 - app_logger - INFO - Updated collaborative task list LQAD7H in room ASHU
+2025-12-06 17:47:00,981 - app_logger - INFO - Collaborative task added in room ASHU: sauna
+2025-12-06 17:47:03,002 - app_logger - INFO - Updated collaborative task list LQAD7H in room ASHU
+2025-12-06 17:49:12,309 - app_logger - INFO - Collaborative mode enabled in room ASHU
+2025-12-06 17:49:12,932 - app_logger - INFO - Collaborative mode disabled in room ASHU
+2025-12-06 17:49:13,573 - app_logger - INFO - Collaborative mode enabled in room ASHU
+2025-12-06 17:49:13,720 - app_logger - INFO - Collaborative mode disabled in room ASHU
+2025-12-06 17:50:08,638 - app_logger - INFO - Updated collaborative task list LQAD7H in room ASHU
+2025-12-06 17:50:14,064 - app_logger - INFO - Updated collaborative task list LQAD7H in room ASHU
+2025-12-06 17:50:21,074 - app_logger - INFO - Updated collaborative task list LQAD7H in room ASHU
+2025-12-06 17:50:28,932 - app_logger - INFO - Updated collaborative task list LQAD7H in room ASHU
+2025-12-06 17:50:39,382 - app_logger - INFO - Updated collaborative task list LQAD7H in room ASHU
+2025-12-06 17:51:23,417 - app_logger - INFO - Client disconnected: IVh35qMq9dFo0IqVAAAL
+2025-12-06 17:51:23,722 - app_logger - INFO - Client connected: Byj5--Kj5tLNU92KAAAO
+2025-12-06 17:51:23,724 - app_logger - INFO - Player 90e7e97b-f205-4634-ad7d-cf932bfdbfd3 rejoining room ASHU
+2025-12-06 17:51:23,724 - app_logger - INFO - Sending player list to room ASHU
+2025-12-06 17:51:23,724 - app_logger - DEBUG - Player List: ['{"sid": "Byj5--Kj5tLNU92KAAAO", "player_id": "90e7e97b-f205-4634-ad7d-cf932bfdbfd3", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 13, "selfie": "dbbdf2d4a92d40109c29d879929f6d22.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 17:51:25,758 - app_logger - INFO - Updated collaborative task list LQAD7H in room ASHU
+2025-12-06 17:51:30,252 - app_logger - INFO - Client disconnected: h_6v9xEOUvHEQ8ohAAAH
+2025-12-06 17:51:30,254 - app_logger - INFO - Client disconnected: Byj5--Kj5tLNU92KAAAO
+2025-12-06 17:51:31,220 - app_logger - INFO - Starting server...
+2025-12-06 17:51:31,220 - app_logger - INFO -  * DEV MODE: SSL disabled
+2025-12-06 17:51:31,220 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.63:5001
+2025-12-06 17:51:31,572 - app_logger - INFO - Client connected: hEyN4RLnQ61xR3c-AAAC
+2025-12-06 17:51:31,572 - app_logger - INFO - Client connected: u95pYt_-ggndss1CAAAD
+2025-12-06 17:51:32,593 - app_logger - INFO - Game created with room code: MEVG
+2025-12-06 17:51:37,536 - app_logger - INFO - Game MEVG config updated: {'locations': ['Basement', '1st Floor', '2nd Floor', '3rd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 1, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 17:51:37,540 - app_logger - INFO - Room MEVG is now open for players
+2025-12-06 17:51:42,686 - app_logger - INFO - Saved selfie for poop: d7e490013d3c4e93bc1d30df92ecd427.jpg
+2025-12-06 17:51:42,687 - app_logger - INFO - New player poop joined room MEVG with ID 51f4791f-007b-4f91-8dfd-9e747eac1398
+2025-12-06 17:51:42,687 - app_logger - INFO - Sending player list to room MEVG
+2025-12-06 17:51:42,688 - app_logger - DEBUG - Player List: ['{"sid": "u95pYt_-ggndss1CAAAD", "player_id": "51f4791f-007b-4f91-8dfd-9e747eac1398", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 4, "selfie": "d7e490013d3c4e93bc1d30df92ecd427.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 17:52:19,823 - app_logger - INFO - Client disconnected: hEyN4RLnQ61xR3c-AAAC
+2025-12-06 17:52:19,855 - app_logger - INFO - Client disconnected: u95pYt_-ggndss1CAAAD
+2025-12-06 17:52:19,898 - app_logger - INFO - Client connected: WifGj1h6ueYh_27iAAAG
+2025-12-06 17:52:19,904 - app_logger - INFO - Client connected: VtNo1whsyDijzU2HAAAH
+2025-12-06 17:52:19,912 - app_logger - INFO - Player 51f4791f-007b-4f91-8dfd-9e747eac1398 rejoining room MEVG
+2025-12-06 17:52:19,914 - app_logger - INFO - Sending player list to room MEVG
+2025-12-06 17:52:19,915 - app_logger - DEBUG - Player List: ['{"sid": "VtNo1whsyDijzU2HAAAH", "player_id": "51f4791f-007b-4f91-8dfd-9e747eac1398", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 4, "selfie": "d7e490013d3c4e93bc1d30df92ecd427.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 17:52:32,982 - app_logger - INFO - Client WifGj1h6ueYh_27iAAAG joined room MEVG
+2025-12-06 17:52:35,827 - app_logger - INFO - New player efwefwef joined room MEVG with ID e682968a-67b4-434c-92cf-44de15d574c1
+2025-12-06 17:52:35,828 - app_logger - INFO - Sending player list to room MEVG
+2025-12-06 17:52:35,832 - app_logger - DEBUG - Player List: ['{"sid": "VtNo1whsyDijzU2HAAAH", "player_id": "51f4791f-007b-4f91-8dfd-9e747eac1398", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 4, "selfie": "d7e490013d3c4e93bc1d30df92ecd427.jpg", "meltdown_code": null, "cards": [], "ready": false}', '{"sid": "WifGj1h6ueYh_27iAAAG", "player_id": "e682968a-67b4-434c-92cf-44de15d574c1", "username": "efwefwef", "active": true, "sus": false, "alive": true, "pic": 7, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 17:52:41,015 - app_logger - INFO - Client disconnected: VtNo1whsyDijzU2HAAAH
+2025-12-06 17:52:41,269 - app_logger - INFO - Client connected: abjVKvZLfyH-NYj_AAAK
+2025-12-06 17:52:41,274 - app_logger - INFO - Player 51f4791f-007b-4f91-8dfd-9e747eac1398 rejoining room MEVG
+2025-12-06 17:52:41,274 - app_logger - INFO - Sending player list to room MEVG
+2025-12-06 17:52:41,274 - app_logger - DEBUG - Player List: ['{"sid": "abjVKvZLfyH-NYj_AAAK", "player_id": "51f4791f-007b-4f91-8dfd-9e747eac1398", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 4, "selfie": "d7e490013d3c4e93bc1d30df92ecd427.jpg", "meltdown_code": null, "cards": [], "ready": false}', '{"sid": "WifGj1h6ueYh_27iAAAG", "player_id": "e682968a-67b4-434c-92cf-44de15d574c1", "username": "efwefwef", "active": true, "sus": false, "alive": true, "pic": 7, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 17:52:44,850 - app_logger - INFO - Client disconnected: WifGj1h6ueYh_27iAAAG
+2025-12-06 17:52:44,851 - app_logger - INFO - Client disconnected: abjVKvZLfyH-NYj_AAAK
+2025-12-06 17:52:45,776 - app_logger - INFO - Starting server...
+2025-12-06 17:52:45,776 - app_logger - INFO -  * DEV MODE: SSL disabled
+2025-12-06 17:52:45,776 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.63:5001
+2025-12-06 17:52:46,282 - app_logger - INFO - Client connected: U2ytLM-wXXrJyiW2AAAB
+2025-12-06 17:52:46,285 - app_logger - INFO - Client connected: MHymxj2hZBQl_TT5AAAD
+2025-12-06 17:52:47,690 - app_logger - INFO - Game created with room code: DCRN
+2025-12-06 17:52:51,981 - app_logger - INFO - Game DCRN config updated: {'locations': ['Basement', '1st Floor', '2nd Floor', '3rd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 1, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 17:52:51,983 - app_logger - INFO - Room DCRN is now open for players
+2025-12-06 17:52:54,122 - app_logger - INFO - New player feewf joined room DCRN with ID 48ffac7f-bf10-4842-98d0-234e467b33d8
+2025-12-06 17:52:54,123 - app_logger - INFO - Sending player list to room DCRN
+2025-12-06 17:52:54,124 - app_logger - DEBUG - Player List: ['{"sid": "MHymxj2hZBQl_TT5AAAD", "player_id": "48ffac7f-bf10-4842-98d0-234e467b33d8", "username": "feewf", "active": true, "sus": false, "alive": true, "pic": 10, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 17:52:56,286 - app_logger - INFO - Client disconnected: MHymxj2hZBQl_TT5AAAD
+2025-12-06 17:52:56,499 - app_logger - INFO - Client connected: hfdOhaaPyqjRexUNAAAG
+2025-12-06 17:52:56,501 - app_logger - INFO - Player 48ffac7f-bf10-4842-98d0-234e467b33d8 rejoining room DCRN
+2025-12-06 17:52:56,502 - app_logger - INFO - Sending player list to room DCRN
+2025-12-06 17:52:56,502 - app_logger - DEBUG - Player List: ['{"sid": "hfdOhaaPyqjRexUNAAAG", "player_id": "48ffac7f-bf10-4842-98d0-234e467b33d8", "username": "feewf", "active": true, "sus": false, "alive": true, "pic": 10, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 17:56:14,856 - app_logger - INFO - Client disconnected: U2ytLM-wXXrJyiW2AAAB
+2025-12-06 17:56:14,859 - app_logger - INFO - Client disconnected: hfdOhaaPyqjRexUNAAAG
+2025-12-06 17:56:14,866 - app_logger - INFO - Client connected: n1DDzYEmejg8IaP5AAAJ
+2025-12-06 17:56:14,867 - app_logger - INFO - Client connected: j2A4GUkcZggEFlKJAAAK
+2025-12-06 17:56:14,871 - app_logger - INFO - Player 48ffac7f-bf10-4842-98d0-234e467b33d8 rejoining room DCRN
+2025-12-06 17:56:14,873 - app_logger - INFO - Sending player list to room DCRN
+2025-12-06 17:56:14,874 - app_logger - DEBUG - Player List: ['{"sid": "j2A4GUkcZggEFlKJAAAK", "player_id": "48ffac7f-bf10-4842-98d0-234e467b33d8", "username": "feewf", "active": true, "sus": false, "alive": true, "pic": 10, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 17:56:41,793 - app_logger - INFO - Client disconnected: n1DDzYEmejg8IaP5AAAJ
+2025-12-06 17:56:41,804 - app_logger - INFO - Client disconnected: j2A4GUkcZggEFlKJAAAK
+2025-12-06 17:56:41,808 - app_logger - INFO - Client connected: E0jG6OMnK5IdtmcpAAAN
+2025-12-06 17:56:41,820 - app_logger - INFO - Client connected: iuVKnFgDpPXymJMdAAAO
+2025-12-06 17:56:41,823 - app_logger - INFO - Player 48ffac7f-bf10-4842-98d0-234e467b33d8 rejoining room DCRN
+2025-12-06 17:56:41,824 - app_logger - INFO - Sending player list to room DCRN
+2025-12-06 17:56:41,826 - app_logger - DEBUG - Player List: ['{"sid": "iuVKnFgDpPXymJMdAAAO", "player_id": "48ffac7f-bf10-4842-98d0-234e467b33d8", "username": "feewf", "active": true, "sus": false, "alive": true, "pic": 10, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 17:59:14,785 - app_logger - INFO - Client disconnected: E0jG6OMnK5IdtmcpAAAN
+2025-12-06 17:59:14,805 - app_logger - INFO - Client disconnected: iuVKnFgDpPXymJMdAAAO
+2025-12-06 17:59:14,834 - app_logger - INFO - Client connected: ryg-vb5tV-jhH8OEAAAR
+2025-12-06 17:59:14,836 - app_logger - INFO - Client connected: n36UcI79X-nCkMAcAAAS
+2025-12-06 17:59:14,846 - app_logger - INFO - Player 48ffac7f-bf10-4842-98d0-234e467b33d8 rejoining room DCRN
+2025-12-06 17:59:14,847 - app_logger - INFO - Sending player list to room DCRN
+2025-12-06 17:59:14,847 - app_logger - DEBUG - Player List: ['{"sid": "n36UcI79X-nCkMAcAAAS", "player_id": "48ffac7f-bf10-4842-98d0-234e467b33d8", "username": "feewf", "active": true, "sus": false, "alive": true, "pic": 10, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 17:59:22,908 - app_logger - INFO - Client disconnected: ryg-vb5tV-jhH8OEAAAR
+2025-12-06 17:59:22,909 - app_logger - INFO - Client disconnected: n36UcI79X-nCkMAcAAAS
+2025-12-06 17:59:23,875 - app_logger - INFO - Starting server...
+2025-12-06 17:59:23,875 - app_logger - INFO -  * DEV MODE: SSL disabled
+2025-12-06 17:59:23,875 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.63:5001
+2025-12-06 17:59:24,229 - app_logger - INFO - Client connected: 8AoOyp9J6wsfwqTkAAAC
+2025-12-06 17:59:24,229 - app_logger - INFO - Client connected: 48C12O_5nVSqqu6sAAAD
+2025-12-06 17:59:28,206 - app_logger - INFO - Game created with room code: AWEV
+2025-12-06 17:59:34,451 - app_logger - INFO - Applied task list LQAD7H to game AWEV: 12 tasks loaded, task_list_applied=True
+2025-12-06 17:59:34,452 - app_logger - INFO - Task handler now has 12 tasks
+2025-12-06 17:59:36,681 - app_logger - INFO - Game AWEV config updated: {'locations': ['Basement', '1st Floor', '2nd Floor', '3rd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 1, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 17:59:36,685 - app_logger - INFO - Room AWEV is now open for players
+2025-12-06 17:59:41,947 - app_logger - INFO - Saved selfie for poop: 4cb296604a904349a020df1f0e881a00.jpg
+2025-12-06 17:59:41,949 - app_logger - INFO - Set creator_player_id to 47936b72-ae81-4676-b703-5b48bc26a860 for room AWEV
+2025-12-06 17:59:41,949 - app_logger - INFO - New player poop joined room AWEV with ID 47936b72-ae81-4676-b703-5b48bc26a860
+2025-12-06 17:59:41,950 - app_logger - INFO - Sending player list to room AWEV
+2025-12-06 17:59:41,950 - app_logger - DEBUG - Player List: ['{"sid": "8AoOyp9J6wsfwqTkAAAC", "player_id": "47936b72-ae81-4676-b703-5b48bc26a860", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 16, "selfie": "4cb296604a904349a020df1f0e881a00.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 17:59:43,965 - app_logger - INFO - Updated collaborative task list LQAD7H in room AWEV
+2025-12-06 17:59:53,397 - app_logger - INFO - Client disconnected: 8AoOyp9J6wsfwqTkAAAC
+2025-12-06 17:59:53,409 - app_logger - INFO - Client disconnected: 48C12O_5nVSqqu6sAAAD
+2025-12-06 17:59:53,416 - app_logger - INFO - Client connected: 7r1f44zFVGdaaTjsAAAG
+2025-12-06 17:59:53,419 - app_logger - INFO - Client connected: diXBpHtMG2u0EzCbAAAH
+2025-12-06 17:59:53,422 - app_logger - INFO - Player 47936b72-ae81-4676-b703-5b48bc26a860 rejoining room AWEV
+2025-12-06 17:59:53,422 - app_logger - INFO - Sending player list to room AWEV
+2025-12-06 17:59:53,422 - app_logger - DEBUG - Player List: ['{"sid": "7r1f44zFVGdaaTjsAAAG", "player_id": "47936b72-ae81-4676-b703-5b48bc26a860", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 16, "selfie": "4cb296604a904349a020df1f0e881a00.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 17:59:55,480 - app_logger - INFO - Updated collaborative task list LQAD7H in room AWEV
+2025-12-06 18:00:04,945 - app_logger - INFO - Client disconnected: 7r1f44zFVGdaaTjsAAAG
+2025-12-06 18:00:05,188 - app_logger - INFO - Client connected: 1t9EsS5n5HCVEEUYAAAK
+2025-12-06 18:00:05,190 - app_logger - INFO - Player 47936b72-ae81-4676-b703-5b48bc26a860 rejoining room AWEV
+2025-12-06 18:00:05,191 - app_logger - INFO - Sending player list to room AWEV
+2025-12-06 18:00:05,191 - app_logger - DEBUG - Player List: ['{"sid": "1t9EsS5n5HCVEEUYAAAK", "player_id": "47936b72-ae81-4676-b703-5b48bc26a860", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 16, "selfie": "4cb296604a904349a020df1f0e881a00.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 18:00:07,231 - app_logger - INFO - Updated collaborative task list LQAD7H in room AWEV
+2025-12-06 18:02:29,399 - app_logger - INFO - Client disconnected: diXBpHtMG2u0EzCbAAAH
+2025-12-06 18:02:29,402 - app_logger - INFO - Client disconnected: 1t9EsS5n5HCVEEUYAAAK
+2025-12-06 18:02:31,121 - app_logger - INFO - Starting server...
+2025-12-06 18:02:31,121 - app_logger - INFO -  * DEV MODE: SSL disabled
+2025-12-06 18:02:31,121 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.63:5001
+2025-12-06 18:02:31,527 - app_logger - INFO - Client connected: 6_1aXxvQ36okH3keAAAB
+2025-12-06 18:02:31,611 - app_logger - INFO - Client connected: 0hvEsbyGhgeEOFskAAAD
+2025-12-06 18:02:31,611 - app_logger - INFO - Client disconnected: 6_1aXxvQ36okH3keAAAB
+2025-12-06 18:02:31,616 - app_logger - INFO - Client connected: vnqyi2G4pZ6S-DNxAAAF
+2025-12-06 18:02:36,388 - app_logger - INFO - Client disconnected: 0hvEsbyGhgeEOFskAAAD
+2025-12-06 18:02:36,389 - app_logger - INFO - Client disconnected: vnqyi2G4pZ6S-DNxAAAF
+2025-12-06 18:02:36,396 - app_logger - INFO - Client connected: nOUWYWNPuFO6FB_WAAAI
+2025-12-06 18:02:36,397 - app_logger - INFO - Client connected: vCqw9kwV9IWrZnx3AAAJ
+2025-12-06 18:03:32,982 - app_logger - INFO - Game created with room code: VNMH
+2025-12-06 18:03:37,560 - app_logger - INFO - Applied task list LQAD7H to game VNMH: 12 tasks loaded, task_list_applied=True
+2025-12-06 18:03:37,564 - app_logger - INFO - Task handler now has 12 tasks
+2025-12-06 18:03:39,507 - app_logger - INFO - Game VNMH config updated: {'locations': ['Basement', '1st Floor', '2nd Floor', '3rd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 1, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 18:03:39,509 - app_logger - INFO - Room VNMH is now open for players
+2025-12-06 18:03:44,292 - app_logger - INFO - Saved selfie for poop: 47777efd7b234c8baef6e4a1a2b75f77.jpg
+2025-12-06 18:03:44,294 - app_logger - INFO - Set creator_player_id to 5ab36765-69d7-464a-a9f2-a912f835796e for room VNMH
+2025-12-06 18:03:44,294 - app_logger - INFO - New player poop joined room VNMH with ID 5ab36765-69d7-464a-a9f2-a912f835796e
+2025-12-06 18:03:44,294 - app_logger - INFO - Sending player list to room VNMH
+2025-12-06 18:03:44,295 - app_logger - DEBUG - Player List: ['{"sid": "vCqw9kwV9IWrZnx3AAAJ", "player_id": "5ab36765-69d7-464a-a9f2-a912f835796e", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 15, "selfie": "47777efd7b234c8baef6e4a1a2b75f77.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 18:03:46,312 - app_logger - INFO - Updated collaborative task list LQAD7H in room VNMH
+2025-12-06 18:03:52,765 - app_logger - INFO - Updated collaborative task list LQAD7H in room VNMH
+2025-12-06 18:04:03,311 - app_logger - INFO - Updated collaborative task list LQAD7H in room VNMH
+2025-12-06 18:04:10,284 - app_logger - INFO - Updated locations in room VNMH: ['Basement', '1st Floor', '2nd Floor', '3rd Floor', 'Other']
+2025-12-06 18:04:12,298 - app_logger - INFO - Updated collaborative task list LQAD7H in room VNMH
+2025-12-06 18:04:19,027 - app_logger - INFO - Updated collaborative task list LQAD7H in room VNMH
+2025-12-06 18:04:28,405 - app_logger - INFO - Room VNMH deleted (no players remaining)
+2025-12-06 18:04:29,831 - app_logger - INFO - Game created with room code: LDKL
+2025-12-06 18:04:32,096 - app_logger - INFO - Applied task list LQAD7H to game LDKL: 12 tasks loaded, task_list_applied=True
+2025-12-06 18:04:32,097 - app_logger - INFO - Task handler now has 12 tasks
+2025-12-06 18:04:33,691 - app_logger - INFO - Game LDKL config updated: {'locations': ['Basement', '1st Floor', '2nd Floor', '3rd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 1, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 18:04:33,693 - app_logger - INFO - Room LDKL is now open for players
+2025-12-06 18:04:37,083 - app_logger - INFO - Set creator_player_id to 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 for room LDKL
+2025-12-06 18:04:37,084 - app_logger - INFO - New player poop joined room LDKL with ID 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5
+2025-12-06 18:04:37,085 - app_logger - INFO - Sending player list to room LDKL
+2025-12-06 18:04:37,085 - app_logger - DEBUG - Player List: ['{"sid": "vCqw9kwV9IWrZnx3AAAJ", "player_id": "46b57f12-85da-4e05-a4db-c2b5ffbbbdd5", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 5, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 18:04:39,100 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:04:39,496 - app_logger - INFO - Collaborative mode enabled in room LDKL
+2025-12-06 18:04:40,154 - app_logger - INFO - Collaborative mode disabled in room LDKL
+2025-12-06 18:04:40,580 - app_logger - INFO - Collaborative mode enabled in room LDKL
+2025-12-06 18:04:41,021 - app_logger - INFO - Collaborative mode disabled in room LDKL
+2025-12-06 18:04:41,429 - app_logger - INFO - Collaborative mode enabled in room LDKL
+2025-12-06 18:04:41,856 - app_logger - INFO - Collaborative mode disabled in room LDKL
+2025-12-06 18:04:42,307 - app_logger - INFO - Collaborative mode enabled in room LDKL
+2025-12-06 18:04:42,654 - app_logger - INFO - Collaborative mode disabled in room LDKL
+2025-12-06 18:04:44,071 - app_logger - INFO - Client disconnected: vCqw9kwV9IWrZnx3AAAJ
+2025-12-06 18:04:44,415 - app_logger - INFO - Client connected: eM3CRMiOzU_tiVD2AAAM
+2025-12-06 18:04:44,420 - app_logger - INFO - Player 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 rejoining room LDKL
+2025-12-06 18:04:44,421 - app_logger - INFO - Creator 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 reconnected to room LDKL
+2025-12-06 18:04:44,422 - app_logger - INFO - Sending player list to room LDKL
+2025-12-06 18:04:44,422 - app_logger - DEBUG - Player List: ['{"sid": "eM3CRMiOzU_tiVD2AAAM", "player_id": "46b57f12-85da-4e05-a4db-c2b5ffbbbdd5", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 5, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 18:04:46,454 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:07:58,341 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:08:10,819 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:08:19,635 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:08:28,758 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:09:02,417 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:09:19,887 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:09:47,564 - app_logger - INFO - Updated locations in room LDKL: ['Basement', '1st Floor', '2nd Floor', '3rd Floor', 'Other']
+2025-12-06 18:09:49,591 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:09:52,801 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:10:03,972 - app_logger - INFO - Collaborative task added in room LDKL: 1
+2025-12-06 18:10:05,239 - app_logger - INFO - Collaborative task added in room LDKL: 2
+2025-12-06 18:10:07,255 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:10:11,806 - app_logger - INFO - Collaborative task added in room LDKL: shot
+2025-12-06 18:10:13,725 - app_logger - INFO - Collaborative task added in room LDKL: poop
+2025-12-06 18:10:15,013 - app_logger - INFO - Collaborative task added in room LDKL: idk
+2025-12-06 18:10:17,034 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:10:18,968 - app_logger - INFO - Collaborative task added in room LDKL: jork
+2025-12-06 18:10:20,981 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:10:27,206 - app_logger - INFO - Updated locations in room LDKL: ['Basement', '1st Floor', '2nd Floor', '3rd Floor', 'Other']
+2025-12-06 18:10:29,220 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:10:30,789 - app_logger - INFO - Collaborative task removed in room LDKL: shit on floor
+2025-12-06 18:10:32,806 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:10:34,711 - app_logger - INFO - Updated locations in room LDKL: ['Basement', '1st Floor', '2nd Floor', 'Other']
+2025-12-06 18:10:35,399 - app_logger - INFO - Updated locations in room LDKL: ['Basement', '1st Floor', '2nd Floor', 'Other']
+2025-12-06 18:10:37,418 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:11:55,969 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL

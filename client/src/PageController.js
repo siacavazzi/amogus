@@ -4,7 +4,7 @@ import { DataContext } from "./GameContext";
 import LobbyPage from "./pages/LobbyPage";
 import LoginPage from "./pages/Login";
 import ConnectingPage from "./pages/ConnectingPage";
-import PlayersPage from "./pages/PlayersPage";
+import PreGamePage from "./pages/PreGamePage";
 import Modal from "./components/Modal";
 import ImposterPage from "./pages/ImposterPage";
 import CrewmemberPage from "./pages/CrewPage";
@@ -51,6 +51,7 @@ const PageController = () => {
         roomCode,
         isRoomCreator,
         roomOpen,
+        taskCreationMode,
     } = useContext(DataContext);
 
     const [currentPage, setCurrentPage] = useState("connecting");
@@ -96,11 +97,11 @@ const PageController = () => {
             return;
         }
 
-        if (taskEntry) {
-            console.log("task entry")
-            setCurrentPage("taskEntry")
-            return;
-        }
+        // if (taskEntry) {
+        //     console.log("task entry")
+        //     setCurrentPage("taskEntry")
+        //     return;
+        // }
 
         if ((!playerState || !playerState?.username) && !running) {
             setCurrentPage("login");
@@ -182,7 +183,7 @@ const PageController = () => {
         reactorNormal: <ReactorNormal />,
         gameRunning: <GameRunningPage />,
         login: <LoginPage />,
-        players: <PlayersPage />,
+        players: <PreGamePage />,
         dead: <DeadPage />,
         meltdownCode: <MeltdownInfo />,
         hacked: <HackedPage hackTime={hackTime} setHackTime={setHackTime} />,

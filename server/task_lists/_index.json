@@ -5,10 +5,23 @@
     ],
     "device_16lt0kc8cmis5xqt0": [
       "VZED7K"
+    ],
+    "device_kq4edzez9miutiegb": [
+      "NH66ZJ",
+      "XWBTDQ"
+    ],
+    "device_b32ocpi2jmiuupois": [
+      "XG8W6C",
+      "987647",
+      "LQAD7H"
     ]
   },
   "code_to_name": {
     "XG8W6C": "spring lake test 1",
-    "VZED7K": "Copy of spring lake test 1"
+    "VZED7K": "Copy of spring lake test 1",
+    "NH66ZJ": "Collaborative Task List",
+    "XWBTDQ": "test list 1",
+    "987647": "Task List",
+    "LQAD7H": "Test list 123"
   }
 }

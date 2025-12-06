@@ -63,13 +63,23 @@ class TaskListManager:
             player_id: The ID of the player creating the list
             name: A human-readable name for the list
             tasks: Optional list of task objects to initialize with
-            locations: Optional list of location names for this list
+            locations: List of location names for this list (minimum 2 required)
         
         Returns:
             The task list code, or None on failure
         """
+        # Validate locations - require at least 2
+        if not locations or len(locations) < 2:
+            print(f"Cannot create task list: need at least 2 locations, got {len(locations) if locations else 0}")
+            return None
+        
         with self.lock:
             code = self._generate_code()
+            
+            # Ensure 'Other' is always included as a catch-all location
+            final_locations = list(locations)
+            if 'Other' not in final_locations:
+                final_locations.append('Other')
             
             task_list = {
                 "code": code,
@@ -77,7 +87,7 @@ class TaskListManager:
                 "creator_id": player_id,
                 "created_at": time.time(),
                 "updated_at": time.time(),
-                "locations": locations or ["Basement", "1st Floor", "2nd Floor", "3rd Floor", "Other"],
+                "locations": final_locations,
                 "tasks": tasks or []
             }
             
@@ -97,7 +107,7 @@ class TaskListManager:
             self.index["code_to_name"][code] = name
             self._save_index()
             
-            print(f"Created task list '{name}' with code {code} for player {player_id}")
+            print(f"Created task list '{name}' with code {code} for player {player_id} (locations: {final_locations})")
             return code
 
     def get_task_list(self, code):
@@ -254,6 +264,32 @@ class TaskListManager:
         result.sort(key=lambda x: x["updated_at"], reverse=True)
         return result
 
+    def remove_from_player_list(self, code, player_id):
+        """
+        Remove a task list from a player's saved lists (without deleting the actual file).
+        This allows the task list to still be accessed via its code.
+        
+        Args:
+            code: The task list code to remove
+            player_id: The player who wants to remove it from their list
+        
+        Returns:
+            True on success, False if not in player's list
+        """
+        with self.lock:
+            player_lists = self.index["player_lists"].get(player_id, [])
+            if code not in player_lists:
+                return False
+            
+            # Remove from player's saved lists
+            self.index["player_lists"][player_id] = [
+                c for c in player_lists if c != code
+            ]
+            self._save_index()
+            
+            print(f"Removed task list {code} from player {player_id}'s list")
+            return True
+
     def delete_task_list(self, code, player_id):
         """
         Delete a task list. Only the creator can delete it.
@@ -287,6 +323,37 @@ class TaskListManager:
             self._save_index()
             
             print(f"Deleted task list {code}")
+            return True
+
+    def save_to_player_list(self, code, player_id):
+        """
+        Add an existing task list to a player's saved lists (without duplicating).
+        This allows users to save task lists they loaded by code.
+        
+        Args:
+            code: The task list code to save
+            player_id: The player who wants to save it
+        
+        Returns:
+            True on success, False if list doesn't exist or already saved
+        """
+        with self.lock:
+            task_list = self.get_task_list(code)
+            if not task_list:
+                return False
+            
+            # Check if already in player's list
+            player_lists = self.index["player_lists"].get(player_id, [])
+            if code in player_lists:
+                return True  # Already saved, that's fine
+            
+            # Add to player's saved lists
+            if player_id not in self.index["player_lists"]:
+                self.index["player_lists"][player_id] = []
+            self.index["player_lists"][player_id].append(code)
+            self._save_index()
+            
+            print(f"Saved task list {code} to player {player_id}'s list")
             return True
 
     def duplicate_task_list(self, code, player_id, new_name=None):
