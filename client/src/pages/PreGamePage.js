@@ -20,6 +20,11 @@ function PreGamePage() {
     const { socket, roomCode, players, taskLocations, running, setTaskEntry, setAudio, isRoomCreator } = useContext(DataContext);
     const [activeTab, setActiveTab] = useState('players'); // 'players' or 'tasks'
     
+    // Debug logging for host status
+    useEffect(() => {
+        console.log('PreGamePage: isRoomCreator =', isRoomCreator);
+    }, [isRoomCreator]);
+    
     // Task creation state
     const [tasks, setTasks] = useState([]);
     const [newTaskText, setNewTaskText] = useState('');
@@ -41,6 +46,7 @@ function PreGamePage() {
     const [isSaving, setIsSaving] = useState(false);
     const [codeCopied, setCodeCopied] = useState(false);
     const [roomCodeCopied, setRoomCodeCopied] = useState(false);
+    const [isTaskListOwner, setIsTaskListOwner] = useState(true); // Track if user owns the loaded task list
     const deviceId = useRef(getDeviceId()).current;
     const autoSaveTimeoutRef = useRef(null);
     const pendingSaveRef = useRef(false);
@@ -71,10 +77,11 @@ function PreGamePage() {
     }, []);
 
     // Auto-save function with debounce - only auto-saves AFTER initial save with a name
-    const triggerAutoSave = (currentTasks, currentLocations, currentTaskListCode) => {
+    // AND only if the current user owns the task list
+    const triggerAutoSave = (currentTasks, currentLocations, currentTaskListCode, ownsTaskList) => {
         // Only auto-save if we already have a task list code (i.e., it was saved with a name)
-        // This prevents auto-saving before the user has named the list
-        if (!currentTaskListCode || isSaving) return;
+        // AND the current user is the owner of the task list
+        if (!currentTaskListCode || isSaving || !ownsTaskList) return;
         
         // Mark that we have a pending save
         pendingSaveRef.current = true;
@@ -113,24 +120,24 @@ function PreGamePage() {
     useEffect(() => {
         if (tasks.length > 0) {
             if (tasksInitializedRef.current) {
-                triggerAutoSave(tasks, localLocations, taskListCode);
+                triggerAutoSave(tasks, localLocations, taskListCode, isTaskListOwner);
             } else {
                 tasksInitializedRef.current = true;
             }
         }
-    }, [tasks, localLocations, taskListCode]);
+    }, [tasks, localLocations, taskListCode, isTaskListOwner]);
 
     // Auto-save when locations change (after initial setup)
     const locationsAutoSaveRef = useRef(false);
     useEffect(() => {
         if (locationsInitialized && localLocations.length > 0) {
             if (locationsAutoSaveRef.current) {
-                triggerAutoSave(tasks, localLocations, taskListCode);
+                triggerAutoSave(tasks, localLocations, taskListCode, isTaskListOwner);
             } else {
                 locationsAutoSaveRef.current = true;
             }
         }
-    }, [localLocations, locationsInitialized, tasks, taskListCode]);
+    }, [localLocations, locationsInitialized, tasks, taskListCode, isTaskListOwner]);
     
     // Show location setup if needed and no tasks yet (only for host)
     useEffect(() => {
@@ -194,6 +201,10 @@ function PreGamePage() {
             if (data.collaborative_mode !== undefined) {
                 setCollaborativeMode(data.collaborative_mode);
             }
+            // Track ownership
+            if (data.is_owner !== undefined) {
+                setIsTaskListOwner(data.is_owner);
+            }
         };
 
         const handleTaskAdded = (data) => {
@@ -213,6 +224,13 @@ function PreGamePage() {
             if (data.name) {
                 setTaskListName(data.name);
             }
+            // Track ownership - if is_owner is provided, use it; for new saves, we are the owner
+            if (data.is_owner !== undefined) {
+                setIsTaskListOwner(data.is_owner);
+            } else if (!data.updated) {
+                // New list created means we are the owner
+                setIsTaskListOwner(true);
+            }
             setIsSaving(false);
         };
 
@@ -227,8 +245,8 @@ function PreGamePage() {
         socket.on('collaborative_tasks_saved', handleTasksSaved);
         socket.on('collaborative_mode_changed', handleCollaborativeModeChanged);
 
-        // Request current tasks
-        socket.emit('get_collaborative_tasks', { room_code: roomCode });
+        // Request current tasks (include device_id for ownership check)
+        socket.emit('get_collaborative_tasks', { room_code: roomCode, device_id: deviceId });
 
         return () => {
             socket.off('collaborative_tasks', handleTasksUpdate);
@@ -334,6 +352,21 @@ function PreGamePage() {
             room_code: roomCode,
             device_id: deviceId,
             name: taskListName.trim() || undefined
+        });
+    };
+
+    // Save as new copy (for when user doesn't own the current list)
+    const handleSaveAsNew = () => {
+        if (tasks.length === 0) return;
+        const newName = prompt('Enter a name for your copy of this task list:', taskListName ? `${taskListName} (Copy)` : 'My Task List');
+        if (!newName || !newName.trim()) return;
+        
+        setIsSaving(true);
+        socket.emit('save_collaborative_tasks', {
+            room_code: roomCode,
+            device_id: deviceId,
+            name: newName.trim(),
+            force_new: true  // Force creating a new list
         });
     };
 
@@ -598,7 +631,8 @@ function PreGamePage() {
                         {/* Save/Share Task List Section - Host only */}
                         {tasks.length > 0 && !showLocationSetup && canSaveTaskList && (
                             <div className="bg-gray-700 rounded-lg p-3 mb-4">
-                                {taskListCode ? (
+                                {taskListCode && isTaskListOwner ? (
+                                    // User owns this task list - show Update button
                                     <div className="flex items-center justify-center gap-3 flex-wrap">
                                         <span className="text-gray-300 text-sm">Task List Code:</span>
                                         <div className="flex items-center gap-2 bg-gray-800 px-3 py-1 rounded-lg">
@@ -624,7 +658,24 @@ function PreGamePage() {
                                             <span>{isSaving ? '...' : 'Update'}</span>
                                         </button>
                                     </div>
+                                ) : taskListCode && !isTaskListOwner ? (
+                                    // User doesn't own this task list - show Save As New
+                                    <div className="flex flex-col items-center gap-2">
+                                        <div className="flex items-center gap-2 text-sm text-gray-400">
+                                            <span>Loaded: {taskListName || taskListCode}</span>
+                                            <span className="text-xs text-gray-500">(not your list)</span>
+                                        </div>
+                                        <button
+                                            onClick={handleSaveAsNew}
+                                            disabled={isSaving}
+                                            className="flex items-center gap-1 px-3 py-1 bg-green-600 rounded-lg hover:bg-green-700 transition-colors text-sm disabled:opacity-50"
+                                        >
+                                            <Save size={14} />
+                                            <span>{isSaving ? '...' : 'Save As Your Own Copy'}</span>
+                                        </button>
+                                    </div>
                                 ) : (
+                                    // No task list yet - show name input and Save button
                                     <div className="flex items-center justify-center gap-2 flex-wrap">
                                         <input
                                             type="text"

@@ -23,7 +23,10 @@ export default function GameContext({ children }) {
     // Room/lobby state
     const [roomCode, setRoomCode] = useState(localStorage.getItem('room_code') || '');
     const [inRoom, setInRoom] = useState(false);
-    const [isRoomCreator, setIsRoomCreator] = useState(false);
+    const [isRoomCreator, setIsRoomCreator] = useState(() => {
+        // Initialize from sessionStorage for persistence across page reloads (within same session)
+        return sessionStorage.getItem('is_room_creator') === 'true';
+    });
     const [roomOpen, setRoomOpen] = useState(false);
 
     // united states
@@ -70,6 +73,7 @@ export default function GameContext({ children }) {
         setRoomCode('')
         setInRoom(false)
         setIsRoomCreator(false)
+        sessionStorage.removeItem('is_room_creator')
         setRoomOpen(false)
         localStorage.removeItem('room_code')
         setTask(undefined)
@@ -177,7 +181,9 @@ export default function GameContext({ children }) {
             console.log('Game created:', data);
             setRoomCode(data.room_code);
             setInRoom(true);
-            setIsRoomCreator(data.is_creator || false);
+            const isCreator = data.is_creator || false;
+            setIsRoomCreator(isCreator);
+            sessionStorage.setItem('is_room_creator', isCreator.toString());
             setRoomOpen(false);  // Room not open until creator opens it
             localStorage.setItem('room_code', data.room_code);
             
@@ -193,10 +199,13 @@ export default function GameContext({ children }) {
         });
 
         socketRef.current.on('game_joined', (data) => {
-            console.log('Joined game:', data);
+            console.log('Joined game:', data, 'is_creator:', data.is_creator);
             setRoomCode(data.room_code);
             setInRoom(true);
-            setIsRoomCreator(data.is_creator || false);
+            const isCreator = data.is_creator || false;
+            setIsRoomCreator(isCreator);
+            sessionStorage.setItem('is_room_creator', isCreator.toString());
+            console.log('Setting isRoomCreator to:', isCreator);
             setRoomOpen(true);  // If we joined, the room must be open
             localStorage.setItem('room_code', data.room_code);
             
@@ -215,9 +224,11 @@ export default function GameContext({ children }) {
             // Clear stale session data
             localStorage.removeItem('player_id');
             localStorage.removeItem('room_code');
+            sessionStorage.removeItem('is_room_creator');
             setPlayerState({ username: '', playerId: '' });
             setRoomCode('');
             setInRoom(false);
+            setIsRoomCreator(false);
         });
 
         socketRef.current.on('error', (data) => {
@@ -280,6 +291,7 @@ export default function GameContext({ children }) {
             console.log('Room disbanded:', data);
             localStorage.removeItem('player_id');
             localStorage.removeItem('room_code');
+            sessionStorage.removeItem('is_room_creator');
             setPlayerState({ username: '', playerId: '' });
             setRoomCode('');
             setInRoom(false);
@@ -295,6 +307,7 @@ export default function GameContext({ children }) {
             console.log('Left room');
             localStorage.removeItem('player_id');
             localStorage.removeItem('room_code');
+            sessionStorage.removeItem('is_room_creator');
             setPlayerState({ username: '', playerId: '' });
             setRoomCode('');
             setInRoom(false);
@@ -416,12 +429,15 @@ export default function GameContext({ children }) {
 
         // Handle 'player_id' event
         socketRef.current.on('player_id', (data) => {
+            console.log('Received player_id:', data);
             if (data && data.player_id) {
                 localStorage.setItem('player_id', data.player_id);
                 setPlayerState(prevState => ({ ...prevState, playerId: data.player_id }));
                 // Update creator status if provided (for reconnection)
                 if (data.is_creator !== undefined) {
+                    console.log('Setting isRoomCreator from player_id event:', data.is_creator);
                     setIsRoomCreator(data.is_creator);
+                    sessionStorage.setItem('is_room_creator', data.is_creator.toString());
                 }
             }
         });

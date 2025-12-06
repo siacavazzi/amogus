@@ -3799,3 +3799,231 @@
 2025-12-06 18:10:35,399 - app_logger - INFO - Updated locations in room LDKL: ['Basement', '1st Floor', '2nd Floor', 'Other']
 2025-12-06 18:10:37,418 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
 2025-12-06 18:11:55,969 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:18:15,114 - app_logger - INFO - Client disconnected: nOUWYWNPuFO6FB_WAAAI
+2025-12-06 18:18:15,136 - app_logger - INFO - Client connected: qsFeJOkhdILZS_1FAAAO
+2025-12-06 18:18:16,096 - app_logger - INFO - Client disconnected: eM3CRMiOzU_tiVD2AAAM
+2025-12-06 18:18:16,114 - app_logger - INFO - Client connected: k9pDPBFYadIKnALSAAAQ
+2025-12-06 18:18:16,121 - app_logger - INFO - Player 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 rejoining room LDKL
+2025-12-06 18:18:16,121 - app_logger - INFO - Creator 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 reconnected to room LDKL
+2025-12-06 18:18:16,122 - app_logger - INFO - Sending player list to room LDKL
+2025-12-06 18:18:16,122 - app_logger - DEBUG - Player List: ['{"sid": "k9pDPBFYadIKnALSAAAQ", "player_id": "46b57f12-85da-4e05-a4db-c2b5ffbbbdd5", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 5, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 18:18:19,096 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:18:26,885 - app_logger - INFO - Client disconnected: qsFeJOkhdILZS_1FAAAO
+2025-12-06 18:18:26,895 - app_logger - INFO - Client connected: u1LN1sMybGwRGX9yAAAS
+2025-12-06 18:18:27,083 - app_logger - INFO - Client disconnected: k9pDPBFYadIKnALSAAAQ
+2025-12-06 18:18:27,087 - app_logger - INFO - Client connected: M9thchLTlUiLDpouAAAU
+2025-12-06 18:18:27,089 - app_logger - INFO - Player 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 rejoining room LDKL
+2025-12-06 18:18:27,090 - app_logger - INFO - Creator 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 reconnected to room LDKL
+2025-12-06 18:18:27,090 - app_logger - INFO - Sending player list to room LDKL
+2025-12-06 18:18:27,091 - app_logger - DEBUG - Player List: ['{"sid": "M9thchLTlUiLDpouAAAU", "player_id": "46b57f12-85da-4e05-a4db-c2b5ffbbbdd5", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 5, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 18:18:30,094 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:18:43,087 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:19:25,978 - app_logger - INFO - Client disconnected: u1LN1sMybGwRGX9yAAAS
+2025-12-06 18:19:25,995 - app_logger - INFO - Client connected: sO1wDlOeNTsDAMruAAAX
+2025-12-06 18:19:26,082 - app_logger - INFO - Client disconnected: M9thchLTlUiLDpouAAAU
+2025-12-06 18:19:26,086 - app_logger - INFO - Client connected: WpdU7pJIyESadfw0AAAZ
+2025-12-06 18:19:26,087 - app_logger - INFO - Player 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 rejoining room LDKL
+2025-12-06 18:19:26,088 - app_logger - INFO - Creator 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 reconnected to room LDKL
+2025-12-06 18:19:26,088 - app_logger - INFO - Sending player list to room LDKL
+2025-12-06 18:19:26,088 - app_logger - DEBUG - Player List: ['{"sid": "WpdU7pJIyESadfw0AAAZ", "player_id": "46b57f12-85da-4e05-a4db-c2b5ffbbbdd5", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 5, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 18:19:29,082 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:19:43,864 - app_logger - INFO - Client disconnected: sO1wDlOeNTsDAMruAAAX
+2025-12-06 18:19:43,868 - app_logger - INFO - Client connected: JtG_BoCPB0LQcsNmAAAb
+2025-12-06 18:19:44,090 - app_logger - INFO - Client disconnected: WpdU7pJIyESadfw0AAAZ
+2025-12-06 18:19:44,094 - app_logger - INFO - Client connected: mbnZtC78cIz9NS8cAAAd
+2025-12-06 18:19:44,098 - app_logger - INFO - Player 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 rejoining room LDKL
+2025-12-06 18:19:44,099 - app_logger - INFO - Creator 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 reconnected to room LDKL
+2025-12-06 18:19:44,100 - app_logger - INFO - Sending player list to room LDKL
+2025-12-06 18:19:44,100 - app_logger - DEBUG - Player List: ['{"sid": "mbnZtC78cIz9NS8cAAAd", "player_id": "46b57f12-85da-4e05-a4db-c2b5ffbbbdd5", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 5, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 18:19:47,086 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:19:53,688 - app_logger - INFO - Client disconnected: JtG_BoCPB0LQcsNmAAAb
+2025-12-06 18:19:53,695 - app_logger - INFO - Client connected: wFE2bJkIwEnrm0yXAAAf
+2025-12-06 18:19:54,091 - app_logger - INFO - Client disconnected: mbnZtC78cIz9NS8cAAAd
+2025-12-06 18:19:54,097 - app_logger - INFO - Client connected: MorRwrOwgIW2U8xEAAAh
+2025-12-06 18:19:54,099 - app_logger - INFO - Player 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 rejoining room LDKL
+2025-12-06 18:19:54,100 - app_logger - INFO - Creator 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 reconnected to room LDKL
+2025-12-06 18:19:54,101 - app_logger - INFO - Sending player list to room LDKL
+2025-12-06 18:19:54,103 - app_logger - DEBUG - Player List: ['{"sid": "MorRwrOwgIW2U8xEAAAh", "player_id": "46b57f12-85da-4e05-a4db-c2b5ffbbbdd5", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 5, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 18:19:57,088 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:20:04,705 - app_logger - INFO - Client disconnected: wFE2bJkIwEnrm0yXAAAf
+2025-12-06 18:20:04,711 - app_logger - INFO - Client connected: GIogo7VAfA14wMKAAAAj
+2025-12-06 18:20:05,090 - app_logger - INFO - Client disconnected: MorRwrOwgIW2U8xEAAAh
+2025-12-06 18:20:05,097 - app_logger - INFO - Client connected: PHYIEtu3V61CutYSAAAl
+2025-12-06 18:20:05,100 - app_logger - INFO - Player 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 rejoining room LDKL
+2025-12-06 18:20:05,100 - app_logger - INFO - Creator 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 reconnected to room LDKL
+2025-12-06 18:20:05,101 - app_logger - INFO - Sending player list to room LDKL
+2025-12-06 18:20:05,101 - app_logger - DEBUG - Player List: ['{"sid": "PHYIEtu3V61CutYSAAAl", "player_id": "46b57f12-85da-4e05-a4db-c2b5ffbbbdd5", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 5, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 18:20:08,088 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:21:07,514 - app_logger - INFO - Client disconnected: GIogo7VAfA14wMKAAAAj
+2025-12-06 18:21:07,525 - app_logger - INFO - Client connected: Psjjz5awhjulaHBFAAAn
+2025-12-06 18:21:08,102 - app_logger - INFO - Client disconnected: PHYIEtu3V61CutYSAAAl
+2025-12-06 18:21:08,112 - app_logger - INFO - Client connected: yZrLqtp-JHvzB0vTAAAp
+2025-12-06 18:21:08,117 - app_logger - INFO - Player 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 rejoining room LDKL
+2025-12-06 18:21:08,117 - app_logger - INFO - Creator 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 reconnected to room LDKL
+2025-12-06 18:21:08,118 - app_logger - INFO - Sending player list to room LDKL
+2025-12-06 18:21:08,118 - app_logger - DEBUG - Player List: ['{"sid": "yZrLqtp-JHvzB0vTAAAp", "player_id": "46b57f12-85da-4e05-a4db-c2b5ffbbbdd5", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 5, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 18:21:11,096 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:21:24,294 - app_logger - INFO - Client disconnected: Psjjz5awhjulaHBFAAAn
+2025-12-06 18:21:24,297 - app_logger - INFO - Client connected: cFK_Nu4OznUUzVCEAAAr
+2025-12-06 18:21:25,095 - app_logger - INFO - Client disconnected: yZrLqtp-JHvzB0vTAAAp
+2025-12-06 18:21:25,100 - app_logger - INFO - Client connected: J03MmCIcocos87EdAAAt
+2025-12-06 18:21:25,102 - app_logger - INFO - Player 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 rejoining room LDKL
+2025-12-06 18:21:25,103 - app_logger - INFO - Creator 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 reconnected to room LDKL
+2025-12-06 18:21:25,103 - app_logger - INFO - Sending player list to room LDKL
+2025-12-06 18:21:25,103 - app_logger - DEBUG - Player List: ['{"sid": "J03MmCIcocos87EdAAAt", "player_id": "46b57f12-85da-4e05-a4db-c2b5ffbbbdd5", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 5, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 18:21:28,092 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:21:36,887 - app_logger - INFO - Client disconnected: cFK_Nu4OznUUzVCEAAAr
+2025-12-06 18:21:36,891 - app_logger - INFO - Client connected: gxl8l6KyQkB63eG0AAAv
+2025-12-06 18:21:37,088 - app_logger - INFO - Client disconnected: J03MmCIcocos87EdAAAt
+2025-12-06 18:21:37,096 - app_logger - INFO - Client connected: vfmZ_XItMdR-4qIoAAAx
+2025-12-06 18:21:37,104 - app_logger - INFO - Player 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 rejoining room LDKL
+2025-12-06 18:21:37,105 - app_logger - INFO - Creator 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 reconnected to room LDKL
+2025-12-06 18:21:37,105 - app_logger - INFO - Sending player list to room LDKL
+2025-12-06 18:21:37,105 - app_logger - DEBUG - Player List: ['{"sid": "vfmZ_XItMdR-4qIoAAAx", "player_id": "46b57f12-85da-4e05-a4db-c2b5ffbbbdd5", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 5, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 18:21:40,124 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:23:29,663 - app_logger - INFO - Client disconnected: gxl8l6KyQkB63eG0AAAv
+2025-12-06 18:23:29,682 - app_logger - INFO - Client connected: RQigVCLVoM24ss-lAAA0
+2025-12-06 18:23:30,092 - app_logger - INFO - Client disconnected: vfmZ_XItMdR-4qIoAAAx
+2025-12-06 18:23:30,097 - app_logger - INFO - Client connected: RCMqoAP_tEnPAHP6AAA2
+2025-12-06 18:23:30,100 - app_logger - INFO - Player 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 rejoining room LDKL
+2025-12-06 18:23:30,101 - app_logger - INFO - Creator 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 reconnected to room LDKL
+2025-12-06 18:23:30,104 - app_logger - INFO - Sending player list to room LDKL
+2025-12-06 18:23:30,104 - app_logger - DEBUG - Player List: ['{"sid": "RCMqoAP_tEnPAHP6AAA2", "player_id": "46b57f12-85da-4e05-a4db-c2b5ffbbbdd5", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 5, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 18:23:33,092 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:23:40,234 - app_logger - INFO - Client disconnected: RQigVCLVoM24ss-lAAA0
+2025-12-06 18:23:40,240 - app_logger - INFO - Client connected: 1Rj48GPMuCY16yQVAAA4
+2025-12-06 18:23:41,099 - app_logger - INFO - Client disconnected: RCMqoAP_tEnPAHP6AAA2
+2025-12-06 18:23:41,104 - app_logger - INFO - Client connected: xkfjR1J8Ing-DWeJAAA6
+2025-12-06 18:23:41,108 - app_logger - INFO - Player 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 rejoining room LDKL
+2025-12-06 18:23:41,108 - app_logger - INFO - Creator 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 reconnected to room LDKL
+2025-12-06 18:23:41,109 - app_logger - INFO - Sending player list to room LDKL
+2025-12-06 18:23:41,109 - app_logger - DEBUG - Player List: ['{"sid": "xkfjR1J8Ing-DWeJAAA6", "player_id": "46b57f12-85da-4e05-a4db-c2b5ffbbbdd5", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 5, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 18:23:44,083 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:23:50,634 - app_logger - INFO - Client disconnected: 1Rj48GPMuCY16yQVAAA4
+2025-12-06 18:23:50,662 - app_logger - INFO - Client connected: Ajr-b_csLU57GQ8EAAA8
+2025-12-06 18:23:51,098 - app_logger - INFO - Client disconnected: xkfjR1J8Ing-DWeJAAA6
+2025-12-06 18:23:51,104 - app_logger - INFO - Client connected: rCzrdyJGbPBV3hBaAAA-
+2025-12-06 18:23:51,106 - app_logger - INFO - Player 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 rejoining room LDKL
+2025-12-06 18:23:51,107 - app_logger - INFO - Creator 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 reconnected to room LDKL
+2025-12-06 18:23:51,107 - app_logger - INFO - Sending player list to room LDKL
+2025-12-06 18:23:51,107 - app_logger - DEBUG - Player List: ['{"sid": "rCzrdyJGbPBV3hBaAAA-", "player_id": "46b57f12-85da-4e05-a4db-c2b5ffbbbdd5", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 5, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 18:23:54,089 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:24:01,124 - app_logger - INFO - Client disconnected: Ajr-b_csLU57GQ8EAAA8
+2025-12-06 18:24:01,128 - app_logger - INFO - Client connected: pR_8KUWMUfDHe3O7AABA
+2025-12-06 18:24:02,089 - app_logger - INFO - Client disconnected: rCzrdyJGbPBV3hBaAAA-
+2025-12-06 18:24:02,097 - app_logger - INFO - Client connected: NHXqI1UKE51ZQ2jKAABC
+2025-12-06 18:24:02,100 - app_logger - INFO - Player 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 rejoining room LDKL
+2025-12-06 18:24:02,100 - app_logger - INFO - Creator 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 reconnected to room LDKL
+2025-12-06 18:24:02,100 - app_logger - INFO - Sending player list to room LDKL
+2025-12-06 18:24:02,101 - app_logger - DEBUG - Player List: ['{"sid": "NHXqI1UKE51ZQ2jKAABC", "player_id": "46b57f12-85da-4e05-a4db-c2b5ffbbbdd5", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 5, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 18:24:05,089 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:24:10,585 - app_logger - INFO - Client disconnected: pR_8KUWMUfDHe3O7AABA
+2025-12-06 18:24:10,590 - app_logger - INFO - Client connected: zN9Kdhozn465qdXpAABE
+2025-12-06 18:24:11,103 - app_logger - INFO - Client disconnected: NHXqI1UKE51ZQ2jKAABC
+2025-12-06 18:24:11,117 - app_logger - INFO - Client connected: u6aL4xJrj28bFa5wAABG
+2025-12-06 18:24:11,120 - app_logger - INFO - Player 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 rejoining room LDKL
+2025-12-06 18:24:11,120 - app_logger - INFO - Creator 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 reconnected to room LDKL
+2025-12-06 18:24:11,120 - app_logger - INFO - Sending player list to room LDKL
+2025-12-06 18:24:11,121 - app_logger - DEBUG - Player List: ['{"sid": "u6aL4xJrj28bFa5wAABG", "player_id": "46b57f12-85da-4e05-a4db-c2b5ffbbbdd5", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 5, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 18:24:14,091 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:24:23,985 - app_logger - INFO - Client disconnected: zN9Kdhozn465qdXpAABE
+2025-12-06 18:24:23,993 - app_logger - INFO - Client connected: SmEcfmha6c26zPH_AABI
+2025-12-06 18:24:24,088 - app_logger - INFO - Client disconnected: u6aL4xJrj28bFa5wAABG
+2025-12-06 18:24:24,094 - app_logger - INFO - Client connected: BGBSTkMCRyeEDKmrAABK
+2025-12-06 18:24:24,095 - app_logger - INFO - Player 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 rejoining room LDKL
+2025-12-06 18:24:24,096 - app_logger - INFO - Creator 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 reconnected to room LDKL
+2025-12-06 18:24:24,096 - app_logger - INFO - Sending player list to room LDKL
+2025-12-06 18:24:24,096 - app_logger - DEBUG - Player List: ['{"sid": "BGBSTkMCRyeEDKmrAABK", "player_id": "46b57f12-85da-4e05-a4db-c2b5ffbbbdd5", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 5, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 18:24:27,087 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:24:34,822 - app_logger - INFO - Client disconnected: SmEcfmha6c26zPH_AABI
+2025-12-06 18:24:34,830 - app_logger - INFO - Client connected: k4oUPIqok6C_cPzEAABM
+2025-12-06 18:24:35,087 - app_logger - INFO - Client disconnected: BGBSTkMCRyeEDKmrAABK
+2025-12-06 18:24:35,093 - app_logger - INFO - Client connected: xBuKPQdaI4Xpth5oAABO
+2025-12-06 18:24:35,096 - app_logger - INFO - Player 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 rejoining room LDKL
+2025-12-06 18:24:35,097 - app_logger - INFO - Creator 46b57f12-85da-4e05-a4db-c2b5ffbbbdd5 reconnected to room LDKL
+2025-12-06 18:24:35,097 - app_logger - INFO - Sending player list to room LDKL
+2025-12-06 18:24:35,098 - app_logger - DEBUG - Player List: ['{"sid": "xBuKPQdaI4Xpth5oAABO", "player_id": "46b57f12-85da-4e05-a4db-c2b5ffbbbdd5", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 5, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 18:24:38,087 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:26:45,092 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:27:14,085 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:27:26,089 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:28:37,092 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:28:44,106 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:29:42,085 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:30:11,092 - app_logger - INFO - Updated collaborative task list LQAD7H in room LDKL
+2025-12-06 18:31:58,817 - app_logger - INFO - Client disconnected: k4oUPIqok6C_cPzEAABM
+2025-12-06 18:31:58,819 - app_logger - INFO - Client disconnected: xBuKPQdaI4Xpth5oAABO
+2025-12-06 18:31:59,691 - app_logger - INFO - Starting server...
+2025-12-06 18:31:59,692 - app_logger - INFO -  * DEV MODE: SSL disabled
+2025-12-06 18:31:59,692 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.63:5001
+2025-12-06 18:32:00,589 - app_logger - INFO - Client connected: GWmsTPBRm0RGlnpSAAAB
+2025-12-06 18:32:01,089 - app_logger - INFO - Client connected: 05ZxPRxooBWkrDskAAAD
+2025-12-06 18:32:06,795 - app_logger - INFO - Client connected: KaPNXtPg0TH7fcqVAAAG
+2025-12-06 18:32:33,039 - app_logger - INFO - Game created with room code: XNSB
+2025-12-06 18:32:33,044 - app_logger - INFO - Reactor registered for room XNSB (sid: KaPNXtPg0TH7fcqVAAAG)
+2025-12-06 18:32:37,903 - app_logger - INFO - Applied task list LQAD7H to game XNSB: 17 tasks loaded, task_list_applied=True
+2025-12-06 18:32:37,903 - app_logger - INFO - Task handler now has 17 tasks
+2025-12-06 18:32:39,720 - app_logger - INFO - Game XNSB config updated: {'locations': ['Basement', '1st Floor', '2nd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 1, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 18:32:39,722 - app_logger - INFO - Room XNSB is now open for players
+2025-12-06 18:32:54,375 - app_logger - INFO - Client disconnected: KaPNXtPg0TH7fcqVAAAG
+2025-12-06 18:32:54,584 - app_logger - INFO - Client connected: r6Yi7t7JW0GCnsELAAAJ
+2025-12-06 18:32:59,072 - app_logger - INFO - Saved selfie for dqsd: a2568b0a08c24d5888f5b2d99aba55cc.jpg
+2025-12-06 18:32:59,079 - app_logger - INFO - Set creator_player_id to c2356c14-9b87-4496-ba77-a75a1f7665e4 for room XNSB (first player)
+2025-12-06 18:32:59,080 - app_logger - INFO - New player dqsd joined room XNSB with ID c2356c14-9b87-4496-ba77-a75a1f7665e4, is_creator=True
+2025-12-06 18:32:59,080 - app_logger - INFO - Sending player list to room XNSB
+2025-12-06 18:32:59,081 - app_logger - DEBUG - Player List: ['{"sid": "r6Yi7t7JW0GCnsELAAAJ", "player_id": "c2356c14-9b87-4496-ba77-a75a1f7665e4", "username": "dqsd", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": "a2568b0a08c24d5888f5b2d99aba55cc.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 18:33:02,014 - app_logger - INFO - Collaborative mode enabled in room XNSB
+2025-12-06 18:33:02,764 - app_logger - INFO - Collaborative mode disabled in room XNSB
+2025-12-06 18:33:03,489 - app_logger - INFO - Collaborative mode enabled in room XNSB
+2025-12-06 18:33:03,655 - app_logger - INFO - Collaborative mode disabled in room XNSB
+2025-12-06 18:33:15,330 - app_logger - INFO - Client disconnected: r6Yi7t7JW0GCnsELAAAJ
+2025-12-06 18:33:15,503 - app_logger - INFO - Client connected: Qc_eziIdMue35Cj7AAAL
+2025-12-06 18:33:15,509 - app_logger - INFO - Player c2356c14-9b87-4496-ba77-a75a1f7665e4 rejoining room XNSB, creator_player_id=c2356c14-9b87-4496-ba77-a75a1f7665e4
+2025-12-06 18:33:15,510 - app_logger - INFO - Creator c2356c14-9b87-4496-ba77-a75a1f7665e4 reconnected to room XNSB
+2025-12-06 18:33:15,511 - app_logger - INFO - Sending player list to room XNSB
+2025-12-06 18:33:15,512 - app_logger - DEBUG - Player List: ['{"sid": "Qc_eziIdMue35Cj7AAAL", "player_id": "c2356c14-9b87-4496-ba77-a75a1f7665e4", "username": "dqsd", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": "a2568b0a08c24d5888f5b2d99aba55cc.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 18:33:17,551 - app_logger - INFO - Updated collaborative task list LQAD7H in room XNSB
+2025-12-06 18:33:20,308 - app_logger - INFO - Client disconnected: Qc_eziIdMue35Cj7AAAL
+2025-12-06 18:33:20,414 - app_logger - INFO - Client connected: 6M0SRZauJsRRMklnAAAN
+2025-12-06 18:33:20,422 - app_logger - INFO - Player c2356c14-9b87-4496-ba77-a75a1f7665e4 rejoining room XNSB, creator_player_id=c2356c14-9b87-4496-ba77-a75a1f7665e4
+2025-12-06 18:33:20,423 - app_logger - INFO - Creator c2356c14-9b87-4496-ba77-a75a1f7665e4 reconnected to room XNSB
+2025-12-06 18:33:20,423 - app_logger - INFO - Sending player list to room XNSB
+2025-12-06 18:33:20,423 - app_logger - DEBUG - Player List: ['{"sid": "6M0SRZauJsRRMklnAAAN", "player_id": "c2356c14-9b87-4496-ba77-a75a1f7665e4", "username": "dqsd", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": "a2568b0a08c24d5888f5b2d99aba55cc.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 18:33:22,453 - app_logger - INFO - Updated collaborative task list LQAD7H in room XNSB
+2025-12-06 18:33:24,867 - app_logger - INFO - Room XNSB deleted (no players remaining)
+2025-12-06 18:33:26,338 - app_logger - INFO - Game created with room code: EQXV
+2025-12-06 18:33:28,077 - app_logger - INFO - Applied task list LQAD7H to game EQXV: 17 tasks loaded, task_list_applied=True
+2025-12-06 18:33:28,077 - app_logger - INFO - Task handler now has 17 tasks
+2025-12-06 18:33:30,338 - app_logger - INFO - Game EQXV config updated: {'locations': ['Basement', '1st Floor', '2nd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 1, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-06 18:33:30,340 - app_logger - INFO - Room EQXV is now open for players
+2025-12-06 18:33:33,027 - app_logger - INFO - Saved selfie for dqdqd: 34780830f1a54b169fd427a8fd553312.jpg
+2025-12-06 18:33:33,028 - app_logger - INFO - Set creator_player_id to 6af8ef1c-f82b-4c87-881d-8801b284f105 for room EQXV (first player)
+2025-12-06 18:33:33,031 - app_logger - INFO - New player dqdqd joined room EQXV with ID 6af8ef1c-f82b-4c87-881d-8801b284f105, is_creator=True
+2025-12-06 18:33:33,038 - app_logger - INFO - Sending player list to room EQXV
+2025-12-06 18:33:33,039 - app_logger - DEBUG - Player List: ['{"sid": "6M0SRZauJsRRMklnAAAN", "player_id": "6af8ef1c-f82b-4c87-881d-8801b284f105", "username": "dqdqd", "active": true, "sus": false, "alive": true, "pic": 13, "selfie": "34780830f1a54b169fd427a8fd553312.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-06 18:33:35,059 - app_logger - INFO - Updated collaborative task list LQAD7H in room EQXV
+2025-12-06 18:33:40,907 - app_logger - INFO - Collaborative mode enabled in room EQXV
+2025-12-06 18:33:41,349 - app_logger - INFO - Collaborative mode disabled in room EQXV
+2025-12-06 18:33:41,772 - app_logger - INFO - Collaborative mode enabled in room EQXV
+2025-12-06 18:33:42,164 - app_logger - INFO - Collaborative mode disabled in room EQXV
+2025-12-06 18:33:42,555 - app_logger - INFO - Collaborative mode enabled in room EQXV
+2025-12-06 18:33:42,780 - app_logger - INFO - Collaborative mode disabled in room EQXV
+2025-12-06 18:33:43,030 - app_logger - INFO - Collaborative mode enabled in room EQXV
+2025-12-06 18:33:43,255 - app_logger - INFO - Collaborative mode disabled in room EQXV
+2025-12-06 18:33:43,482 - app_logger - INFO - Collaborative mode enabled in room EQXV
+2025-12-06 18:33:43,683 - app_logger - INFO - Collaborative mode disabled in room EQXV
+2025-12-06 18:33:43,881 - app_logger - INFO - Collaborative mode enabled in room EQXV
+2025-12-06 18:33:44,088 - app_logger - INFO - Collaborative mode disabled in room EQXV
+2025-12-06 18:33:44,407 - app_logger - INFO - Collaborative mode enabled in room EQXV
+2025-12-06 18:33:44,608 - app_logger - INFO - Collaborative mode disabled in room EQXV
+2025-12-06 18:33:44,798 - app_logger - INFO - Collaborative mode enabled in room EQXV
+2025-12-06 18:33:44,989 - app_logger - INFO - Collaborative mode disabled in room EQXV
+2025-12-06 18:33:45,180 - app_logger - INFO - Collaborative mode enabled in room EQXV
+2025-12-06 18:33:45,364 - app_logger - INFO - Collaborative mode disabled in room EQXV
+2025-12-06 18:33:45,555 - app_logger - INFO - Collaborative mode enabled in room EQXV
+2025-12-06 18:33:45,749 - app_logger - INFO - Collaborative mode disabled in room EQXV
+2025-12-06 18:33:45,947 - app_logger - INFO - Collaborative mode enabled in room EQXV
+2025-12-06 18:33:46,140 - app_logger - INFO - Collaborative mode disabled in room EQXV
+2025-12-06 18:33:46,489 - app_logger - INFO - Collaborative mode enabled in room EQXV
+2025-12-06 18:33:46,698 - app_logger - INFO - Collaborative mode disabled in room EQXV
+2025-12-06 18:34:06,187 - app_logger - INFO - Room EQXV deleted (no players remaining)
