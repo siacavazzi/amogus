@@ -17,7 +17,7 @@ function getDeviceId() {
  * Pre-game page with tabs for Players and Task Creation
  */
 function PreGamePage() {
-    const { socket, roomCode, players, taskLocations, running, setTaskEntry, setAudio, isRoomCreator } = useContext(DataContext);
+    const { socket, roomCode, players, taskLocations, running, setTaskEntry, isRoomCreator } = useContext(DataContext);
     const [activeTab, setActiveTab] = useState('players'); // 'players' or 'tasks'
     
     // Debug logging for host status
@@ -191,6 +191,7 @@ function PreGamePage() {
 
         const handleTasksUpdate = (data) => {
             console.log('Collaborative tasks updated:', data);
+            console.log('My device_id:', deviceId, 'is_owner from server:', data.is_owner);
             setTasks(data.tasks || []);
             if (data.task_list_code) {
                 setTaskListCode(data.task_list_code);
@@ -246,6 +247,7 @@ function PreGamePage() {
         socket.on('collaborative_mode_changed', handleCollaborativeModeChanged);
 
         // Request current tasks (include device_id for ownership check)
+        console.log('Requesting collaborative tasks with device_id:', deviceId);
         socket.emit('get_collaborative_tasks', { room_code: roomCode, device_id: deviceId });
 
         return () => {
@@ -507,15 +509,8 @@ function PreGamePage() {
                 {/* ========== PLAYERS TAB ========== */}
                 {activeTab === 'players' && (
                     <>
-                        <div className="flex flex-col items-center mb-4">
-                            <button
-                                className="bg-indigo-600 text-white py-2 px-6 rounded-full shadow-lg hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                                onClick={() => setAudio('test')}
-                            >
-                                Test Sound
-                            </button>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        {/* Players Grid - 2 columns on mobile */}
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
                             {players.map((player) => (
                                 <PlayerCard key={player.id} player={player} />
                             ))}
@@ -628,11 +623,11 @@ function PreGamePage() {
                             )}
                         </div>
 
-                        {/* Save/Share Task List Section - Host only */}
-                        {tasks.length > 0 && !showLocationSetup && canSaveTaskList && (
+                        {/* Save/Share Task List Section */}
+                        {tasks.length > 0 && !showLocationSetup && (
                             <div className="bg-gray-700 rounded-lg p-3 mb-4">
-                                {taskListCode && isTaskListOwner ? (
-                                    // User owns this task list - show Update button
+                                {/* Host who owns the task list - show Update button */}
+                                {canSaveTaskList && taskListCode && isTaskListOwner && (
                                     <div className="flex items-center justify-center gap-3 flex-wrap">
                                         <span className="text-gray-300 text-sm">Task List Code:</span>
                                         <div className="flex items-center gap-2 bg-gray-800 px-3 py-1 rounded-lg">
@@ -658,8 +653,10 @@ function PreGamePage() {
                                             <span>{isSaving ? '...' : 'Update'}</span>
                                         </button>
                                     </div>
-                                ) : taskListCode && !isTaskListOwner ? (
-                                    // User doesn't own this task list - show Save As New
+                                )}
+                                
+                                {/* Host who doesn't own the task list (loaded someone else's) - show Save As New */}
+                                {canSaveTaskList && taskListCode && !isTaskListOwner && (
                                     <div className="flex flex-col items-center gap-2">
                                         <div className="flex items-center gap-2 text-sm text-gray-400">
                                             <span>Loaded: {taskListName || taskListCode}</span>
@@ -674,8 +671,10 @@ function PreGamePage() {
                                             <span>{isSaving ? '...' : 'Save As Your Own Copy'}</span>
                                         </button>
                                     </div>
-                                ) : (
-                                    // No task list yet - show name input and Save button
+                                )}
+                                
+                                {/* Host with no task list yet - show name input and Save button */}
+                                {canSaveTaskList && !taskListCode && (
                                     <div className="flex items-center justify-center gap-2 flex-wrap">
                                         <input
                                             type="text"
@@ -691,6 +690,25 @@ function PreGamePage() {
                                         >
                                             <Save size={14} />
                                             <span>{isSaving ? '...' : 'Save & Get Code'}</span>
+                                        </button>
+                                    </div>
+                                )}
+                                
+                                {/* Non-host player - show Save As Your Own Copy button */}
+                                {!canSaveTaskList && (
+                                    <div className="flex flex-col items-center gap-2">
+                                        {taskListCode && (
+                                            <div className="flex items-center gap-2 text-sm text-gray-400">
+                                                <span>Current list: {taskListName || taskListCode}</span>
+                                            </div>
+                                        )}
+                                        <button
+                                            onClick={handleSaveAsNew}
+                                            disabled={isSaving}
+                                            className="flex items-center gap-1 px-3 py-1 bg-green-600 rounded-lg hover:bg-green-700 transition-colors text-sm disabled:opacity-50"
+                                        >
+                                            <Save size={14} />
+                                            <span>{isSaving ? '...' : 'Save To My Lists'}</span>
                                         </button>
                                     </div>
                                 )}

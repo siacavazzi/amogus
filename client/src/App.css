@@ -2,13 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-
-html, body {
-  margin: 0;
-  padding: 0;
-  overflow: auto; /* or remove overflow if unnecessary */
-  height: auto; /* Avoid forcing height: 100% unless necessary */
-}
+/* Legacy container styles - can be removed if unused */
 .container {
   float: left;
   position: fixed;

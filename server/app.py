@@ -1097,7 +1097,13 @@ def handle_get_collaborative_tasks(data):
     if game.collaborative_task_list_code and device_id:
         task_list = task_list_manager.get_task_list(game.collaborative_task_list_code)
         if task_list:
-            is_owner = (task_list.get('creator_id') == device_id)
+            stored_creator = task_list.get('creator_id')
+            is_owner = (stored_creator == device_id)
+            logger.info(f"Ownership check for {game.collaborative_task_list_code}: stored_creator={stored_creator}, device_id={device_id}, is_owner={is_owner}")
+    elif game.collaborative_task_list_code and not device_id:
+        # No device_id provided - can't determine ownership
+        is_owner = False
+        logger.warning(f"No device_id provided for ownership check of {game.collaborative_task_list_code}")
     
     min_tasks = max(len(game.players) * 3, 10)
     emit('collaborative_tasks', {
@@ -1317,10 +1323,14 @@ def handle_save_collaborative_tasks(data):
     device_id = data.get('device_id')  # Use device_id for ownership
     force_new = data.get('force_new', False)  # Explicitly create a new list
     
+    logger.info(f"save_collaborative_tasks called: room={room_code}, device_id={device_id}, force_new={force_new}")
+    
     game = game_manager.get_game(room_code)
     if not game:
         emit('error', {'message': 'Game not found'})
         return
+    
+    logger.info(f"Game found, collaborative_task_list_code={game.collaborative_task_list_code}, num_tasks={len(game.collaborative_tasks)}")
     
     if len(game.collaborative_tasks) == 0:
         emit('error', {'message': 'No tasks to save'})
@@ -1334,28 +1344,32 @@ def handle_save_collaborative_tasks(data):
     if game.collaborative_task_list_code and not force_new:
         # Check ownership first before attempting update
         existing_list = task_list_manager.get_task_list(game.collaborative_task_list_code)
-        if existing_list and existing_list.get('creator_id') == device_id:
-            # We own it - update it
-            success = task_list_manager.update_task_list(
-                game.collaborative_task_list_code,
-                {
-                    'name': name,
-                    'tasks': game.collaborative_tasks,
-                    'locations': game.locations
-                },
-                device_id
-            )
-            if success:
-                game.collaborative_task_list_name = name  # Update stored name
-                socketio.emit('collaborative_tasks_saved', {
-                    'code': game.collaborative_task_list_code,
-                    'name': name,
-                    'task_count': len(game.collaborative_tasks),
-                    'updated': True,
-                    'is_owner': True
-                }, room=room_code)
-                logger.info(f"Updated collaborative task list {game.collaborative_task_list_code} in room {room_code}")
-                return
+        if existing_list:
+            stored_creator = existing_list.get('creator_id')
+            logger.info(f"Existing list found: stored_creator={stored_creator}, device_id={device_id}, match={stored_creator == device_id}")
+            
+            if stored_creator == device_id:
+                # We own it - update it
+                success = task_list_manager.update_task_list(
+                    game.collaborative_task_list_code,
+                    {
+                        'name': name,
+                        'tasks': game.collaborative_tasks,
+                        'locations': game.locations
+                    },
+                    device_id
+                )
+                if success:
+                    game.collaborative_task_list_name = name  # Update stored name
+                    socketio.emit('collaborative_tasks_saved', {
+                        'code': game.collaborative_task_list_code,
+                        'name': name,
+                        'task_count': len(game.collaborative_tasks),
+                        'updated': True,
+                        'is_owner': True
+                    }, room=room_code)
+                    logger.info(f"Updated collaborative task list {game.collaborative_task_list_code} in room {room_code}")
+                    return
         
         # We don't own this list - notify client but don't auto-create a copy
         # Client must explicitly request a new list with force_new=True

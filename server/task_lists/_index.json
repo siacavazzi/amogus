@@ -14,6 +14,15 @@
       "XG8W6C",
       "987647",
       "LQAD7H"
+    ],
+    "device_acq9w93zomizdwses": [
+      "N6NZ9W"
+    ],
+    "device_wkwfki6uamizdsh5u": [
+      "LQAD7H"
+    ],
+    "device_b2nahin7smizkkcmr": [
+      "LQAD7H"
     ]
   },
   "code_to_name": {
@@ -22,6 +31,7 @@
     "NH66ZJ": "Collaborative Task List",
     "XWBTDQ": "test list 1",
     "987647": "Task List",
-    "LQAD7H": "Test list 123"
+    "LQAD7H": "Test list 123",
+    "N6NZ9W": "Test list 123 (Copy)"
   }
 }

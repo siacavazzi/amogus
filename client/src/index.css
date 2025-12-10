@@ -2,17 +2,100 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Fix for mobile viewport height - accounts for browser chrome */
+:root {
+  --vh: 1vh;
+}
 
-html, body {
+html {
+  background-color: #1f2937; /* gray-800 - matches most page backgrounds */
+}
+
+html, body, #root {
   margin: 0;
   padding: 0;
-  overflow: auto; /* or remove overflow if unnecessary */
-  height: auto; /* Avoid forcing height: 100% unless necessary */
+  overflow-x: hidden;
+  min-height: 100dvh; /* Dynamic viewport height for mobile */
+  min-height: -webkit-fill-available; /* Safari fallback */
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Ensure backgrounds extend into safe areas */
+  background-color: #111827; /* gray-900 */
+}
+
+/* Safe area padding for notched devices */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Override Tailwind's min-h-screen to use dynamic viewport height */
+@layer utilities {
+  .min-h-screen {
+    min-height: 100dvh;
+    min-height: -webkit-fill-available;
+  }
+  .h-screen {
+    height: 100dvh;
+    height: -webkit-fill-available;
+  }
+  
+  /* Desktop-specific height fix - ensures full viewport on desktop browsers */
+  @media (min-width: 768px) {
+    .min-h-screen {
+      min-height: 100vh;
+    }
+    .h-screen {
+      height: 100vh;
+    }
+  }
+  
+  /* Fade in animation for popups */
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Coolant wave animation for meltdown progress */
+  @keyframes coolantWave {
+    0%, 100% {
+      transform: translateX(-50%) translateY(0);
+    }
+    50% {
+      transform: translateX(-50%) translateY(-10px);
+    }
+  }
+  
+  .animate-coolant-wave {
+    animation: coolantWave 2s ease-in-out infinite;
+  }
+  
+  @keyframes coolantWave2 {
+    0%, 100% {
+      transform: translateX(-50%) translateY(-5px);
+    }
+    50% {
+      transform: translateX(-50%) translateY(5px);
+    }
+  }
+  
+  .animate-coolant-wave-2 {
+    animation: coolantWave2 2.5s ease-in-out infinite;
+  }
 }
 
 code {

@@ -3,7 +3,6 @@ import GameContext from './GameContext';
 import PageController from './PageController';
 
 function App() {
-
   return (
       <GameContext>
         <PageController />

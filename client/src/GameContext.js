@@ -363,11 +363,11 @@ export default function GameContext({ children }) {
             try {
                 const meetingData = typeof data === 'string' ? JSON.parse(data) : data;
                 
-                setAudio('meeting');
                 setMeetingState(meetingData);
                 setShowSusPage(false)
                 
                 if (meetingData.stage === 'waiting') {
+                    setAudio('meeting');
                     isMobile && setDialog({ 
                         title: "Emergency Meeting Called!", 
                         body: <MeetingDisplay meetingData={meetingData} /> 

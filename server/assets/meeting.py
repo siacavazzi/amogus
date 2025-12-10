@@ -141,16 +141,15 @@ class Meeting:
 
         if early:
             self.reason = 'veto'
-
             print("Meeting ended early due to veto threshold...")
             self.game.emit_to_room("meeting", self.to_json())
             self.speaker.play_sound('veto')
         else:
-        # Regular meeting ending, determine who was voted out
+            # Regular meeting ending, determine who was voted out
             print("Meeting over...")
             final_votes = self.compute_vote_counts()
         
-        # Determine who was voted out (player with the most votes)
+            # Determine who was voted out (player with the most votes)
             self.voted_out = self.determine_voted_out(final_votes)
             if self.voted_out:
                 self.game.kill_player(self.voted_out)
@@ -160,8 +159,8 @@ class Meeting:
 
             self.game.emit_to_room("meeting", self.to_json())
 
-            # draw cards for impostors
-            self.game.drawCards(probability=self.game.card_draw_probability)
+        # Draw cards for impostors (after any meeting, including veto)
+        self.game.drawCards(probability=self.game.card_draw_probability)
 
         print(f"Final Votes: {self.votes}, Veto Votes: {len(self.veto_votes)}")
         self.game.meeting = None

@@ -1,21 +1,28 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { DataContext } from '../GameContext';
-import PlayerCard from '../components/PlayerCard';
 import MUECustomSlider from '../components/swiper';
+import { AlertCircle } from 'lucide-react';
 
 const MeetingWaitingPage = () => {
   const { playerState, players, meetingState, socket } = useContext(DataContext);
 
   const [readyPlayers, setReadyPlayers] = useState(0);
+  const [waitingPlayers, setWaitingPlayers] = useState([]);
 
   useEffect(() => {
     let ready = 0;
+    const waiting = [];
     for (const player of players) {
-      if (player.ready && player.alive) {
-        ready++;
+      if (player.alive) {
+        if (player.ready) {
+          ready++;
+        } else {
+          waiting.push(player);
+        }
       }
     }
     setReadyPlayers(ready);
+    setWaitingPlayers(waiting);
   }, [playerState, players]);
 
   const totalAlive = players.filter((player) => player.alive).length;
@@ -63,6 +70,26 @@ const MeetingWaitingPage = () => {
             ></div>
           </div>
         </div>
+
+        {/* List of players who haven't responded */}
+        {waitingPlayers.length > 0 && (
+          <div className="mb-8 bg-gray-800 bg-opacity-50 rounded-lg p-4 border border-gray-700">
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <AlertCircle className="text-yellow-400" size={20} />
+              <h3 className="text-lg font-semibold text-yellow-400">Waiting for:</h3>
+            </div>
+            <div className="flex flex-wrap justify-center gap-2">
+              {waitingPlayers.map((player) => (
+                <span
+                  key={player.id || player.player_id}
+                  className="px-3 py-1 bg-red-600 bg-opacity-30 border border-red-500 rounded-full text-red-300 text-sm font-medium"
+                >
+                  {player.username}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="flex flex-col md:flex-row gap-4 items-center justify-center mb-8">
           <button

@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { DataContext } from '../GameContext';
-import { Users, Plus, ArrowRight } from 'lucide-react';
+import { Users, Plus, ArrowRight, HelpCircle } from 'lucide-react';
 
 function LobbyPage() {
     const [inputRoomCode, setInputRoomCode] = useState('');
@@ -148,6 +148,13 @@ function LobbyPage() {
                 {/* Footer */}
                 <div className="mt-8 text-center text-gray-500 text-sm">
                     <p>Get everyone on the same WiFi network</p>
+                    <a 
+                        href="/how-to-play.html" 
+                        className="inline-flex items-center gap-2 mt-3 text-indigo-400 hover:text-indigo-300 transition-colors"
+                    >
+                        <HelpCircle size={16} />
+                        <span>How to Play</span>
+                    </a>
                 </div>
             </div>
         </div>
