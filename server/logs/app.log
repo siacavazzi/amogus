@@ -6614,3 +6614,5 @@
 2025-12-10 21:41:48,346 - app_logger - INFO - Sending player list to room QFJQ
 2025-12-10 21:41:48,351 - app_logger - DEBUG - Player List: ['{"sid": "JCu29MdRJh_r1J_nAAAB", "player_id": "11d17cf3-afaf-4b17-89a8-3fafa4bf501a", "username": "23f23f", "active": true, "sus": true, "alive": true, "pic": 8, "selfie": null, "meltdown_code": null, "cards": ["{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 30, \\"time_left\\": 30, \\"id\\": \\"ea65465b-4ef7-4fda-afb8-8f2089d1b411\\", \\"countdown\\": false}", "{\\"action\\": \\"Area Denial\\", \\"text\\": \\"Stop sending tasks to a specific location\\", \\"location\\": \\"2nd Floor\\", \\"duration\\": 120, \\"time_left\\": 120, \\"id\\": \\"dda53b5c-c36f-4538-a7f4-4a34b8b22b51\\", \\"countdown\\": true}"], "ready": true}']
 2025-12-10 21:41:52,369 - app_logger - INFO - Room QFJQ deleted (no players remaining)
+2025-12-10 21:52:25,229 - app_logger - INFO - Client disconnected: jYRkygR09sufG6tEAAAD
+2025-12-10 21:52:25,928 - app_logger - INFO - Client disconnected: JCu29MdRJh_r1J_nAAAB
