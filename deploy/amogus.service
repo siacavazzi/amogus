@@ -1,5 +1,5 @@
 [Unit]
-Description=Among Us Party Game Server
+Description=Sus Party Game Server
 After=network.target
 
 [Service]

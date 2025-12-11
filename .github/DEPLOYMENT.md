@@ -55,7 +55,7 @@ python3 -m venv venv
 # Setup systemd service
 cat > /etc/systemd/system/amogus.service << 'EOF'
 [Unit]
-Description=Among Us Party Game Server
+Description=Sus Party Game Server
 After=network.target
 
 [Service]

@@ -76,10 +76,10 @@ function LobbyPage() {
                 <div className="flex flex-col items-center mb-8">
                     <img 
                         src="https://i1.sndcdn.com/artworks-Uii8SMJvNPxy8ePA-romBoQ-t1080x1080.jpg" 
-                        alt="Among Us"
+                        alt="Sus Party"
                         className="w-32 h-32 rounded-full mb-4"
                     />
-                    <h1 className="text-3xl font-bold text-gray-100">Among Us IRL</h1>
+                    <h1 className="text-3xl font-bold text-gray-100">Sus Party</h1>
                     <p className="text-gray-400 mt-2">Create or join a game room</p>
                 </div>
 

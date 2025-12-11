@@ -54,8 +54,8 @@ export default function MeetingResultPage() {
             }`}
           >
             {votedOutPlayer.sus
-              ? "They were an Impostor!"
-              : "They were not an Impostor."}
+              ? "They were an Intruder!"
+              : "They were not an Intruder."}
           </div>
         )}
       </>

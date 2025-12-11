@@ -1,5 +1,5 @@
 #!/bin/bash
-# Quick update script for Among Us game
+# Quick update script for Sus Party game
 # Run this after pushing code changes
 
 set -e
@@ -7,7 +7,7 @@ set -e
 APP_DIR="/opt/amogus"
 APP_USER="amogus"
 
-echo "🎮 Updating Among Us Party Game..."
+echo "🎉 Updating Sus Party Game..."
 
 cd $APP_DIR
 

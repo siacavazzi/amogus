@@ -73,7 +73,12 @@ class GameSpeaker:
             "meow": "meow.mp3",
             "hurry": "hurry.mp3",
             "veto": "veto.mp3",
-            "fear": "fear.mp3"
+            "fear": "fear.mp3",
+
+            "20_percent_tasks": "20_percent_tasks.mp3",
+            "50_percent_tasks": "50_percent_tasks.mp3",
+            "80_percent_tasks": "80_percent_tasks.mp3",
+            "95_percent_tasks": "95_percent_tasks.mp3",
         }
 
     def _emit_to_sonos_connectors(self, event, data):
@@ -83,12 +88,21 @@ class GameSpeaker:
             self.socketio.emit(event, data, room=sonos_room)
             logger.debug(f"Emitted {event} to {sonos_room}")
 
+    def _emit_to_players(self, event, data):
+        """Emit an event to all players in the room for device speaker playback."""
+        if self.socketio and self.room_code:
+            self.socketio.emit(event, data, room=self.room_code)
+            logger.debug(f"Emitted {event} to players in {self.room_code}")
+
     def play_sound(self, sound, interrupt=True):
-        """Play a sound on connected Sonos systems."""
+        """Play a sound on connected Sonos systems and player devices."""
         if sound not in self.audio:
             logger.warning(f"Unknown sound: {sound}")
             return False
+        # Emit to Sonos connectors
         self._emit_to_sonos_connectors('play_sound', {'sound': sound})
+        # Also emit to all players for device speaker playback
+        self._emit_to_players('play_sound', {'sound': sound})
         logger.info(f"Emitting play_sound: {sound} to room {self.room_code}")
         return True
 
@@ -97,8 +111,10 @@ class GameSpeaker:
         if sound not in self.audio:
             return False
         self._emit_to_sonos_connectors('loop_sound', {'sound': sound, 'duration': duration})
+        self._emit_to_players('loop_sound', {'sound': sound, 'duration': duration})
         return True
 
     def stop(self):
         """Stop all playback."""
         self._emit_to_sonos_connectors('stop_sound', {})
+        self._emit_to_players('stop_sound', {})

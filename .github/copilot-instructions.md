@@ -1,8 +1,8 @@
-# Copilot Agent Instructions for Among Us IRL
+# Copilot Agent Instructions for Sus Party
 
 ## Repository Overview
 
-This is a real-life party game implementation of Among Us. Players use their phones as controllers while completing physical tasks. The project consists of a React frontend (client), a Flask/SocketIO backend (server), and optional Sonos speaker integration.
+This is a real-life social deduction party game loosely inspired by Among Us. Players use their phones as controllers while completing physical tasks. The project consists of a React frontend (client), a Flask/SocketIO backend (server), and optional Sonos speaker integration.
 
 **Languages & Frameworks:**
 - **Client**: React 18 with Tailwind CSS, socket.io-client for real-time communication
@@ -35,7 +35,7 @@ amogus/
 │   │   ├── player.py          # Player data model
 │   │   ├── meeting.py         # Voting/meeting logic
 │   │   ├── meltdown.py        # Reactor meltdown logic
-│   │   ├── card.py            # Imposter ability cards
+│   │   ├── card.py            # Intruder ability cards
 │   │   ├── taskHandler.py     # Task distribution
 │   │   └── sonosHandler.py    # Sonos speaker integration
 │   ├── tasks.json             # Default task list
@@ -143,7 +143,7 @@ The GitHub Actions workflow (`.github/workflows/deploy.yml`) runs on push to `ma
 - `LOCATIONS` - Physical locations for tasks
 - `VOTE_TIME`, `VOTE_THRESHOLD` - Meeting/voting parameters
 - `MELTDOWN_TIME`, `CODE_PERCENT` - Reactor meltdown settings
-- `NUMBER_OF_IMPOSTERS`, `CARD_DRAW_PROBABILITY`, `STARTING_CARDS` - Imposter settings
+- `NUMBER_OF_INTRUDERS`, `CARD_DRAW_PROBABILITY`, `STARTING_CARDS` - Intruder settings
 
 ### Client Endpoint (`client/src/ENDPOINT.js`)
 - Auto-detects development vs production

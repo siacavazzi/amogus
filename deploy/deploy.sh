@@ -1,6 +1,6 @@
 #!/bin/bash
 # ============================================
-# Among Us Party Game - DigitalOcean Deployment Script
+# Sus Party - DigitalOcean Deployment Script
 # ============================================
 # 
 # Prerequisites:

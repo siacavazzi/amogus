@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Among Us Sonos Connector
-========================
-A lightweight client that connects to the hosted Among Us game server
+Sus Party Sonos Connector
+=========================
+A lightweight client that connects to the hosted Sus Party game server
 and plays sounds on your local Sonos speakers.
 
 Usage:
@@ -316,7 +316,7 @@ def print_banner():
     print("""
 ╔═══════════════════════════════════════════════════════════╗
 ║                                                           ║
-║     🎮 AMONG US - SONOS CONNECTOR 🔊                      ║
+║     🎉 SUS PARTY - SONOS CONNECTOR 🔊                     ║
 ║                                                           ║
 ║     Connect your Sonos speakers to the game!              ║
 ║                                                           ║
@@ -327,7 +327,7 @@ def print_banner():
 def main():
     print_banner()
     
-    parser = argparse.ArgumentParser(description='Connect Sonos speakers to Among Us game')
+    parser = argparse.ArgumentParser(description='Connect Sonos speakers to Sus Party game')
     parser.add_argument('room_code', nargs='?', help='Game room code to join')
     parser.add_argument('--server', default=DEFAULT_SERVER, help='Game server URL')
     parser.add_argument('--volume', type=int, default=30, help='Speaker volume (0-100)')

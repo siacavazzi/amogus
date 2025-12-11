@@ -59,7 +59,7 @@ export default function GameContext({ children }) {
     const [activeCards, setActiveCards] = useState([])
     const [modalOpen, setModalOpen] = useState(false)
     const [taskCreationMode, setTaskCreationMode] = useState(false)
-    let otherImposters = [];
+    let otherIntruders = [];
     // const [meetineTimeLeft, setMee]
 
     const resetState = () => {
@@ -461,9 +461,9 @@ export default function GameContext({ children }) {
                     
                     // Always use localStorage for player_id to avoid race conditions
                     const myPlayerId = localStorage.getItem('player_id');
-                    otherImposters = parsedPlayers.filter((player) => player.sus && player.player_id !== myPlayerId)
+                    otherIntruders = parsedPlayers.filter((player) => player.sus && player.player_id !== myPlayerId)
                     console.log("Active players:", parsedPlayers);
-                    console.log({otherImposters})
+                    console.log({otherIntruders})
                     
                     if (myPlayerId) {
                         me = parsedPlayers.find((player) => player.player_id === myPlayerId)
@@ -490,7 +490,7 @@ export default function GameContext({ children }) {
                     setRunning(true);
                     setTaskCreationMode(false);  // Exit task creation mode
                     
-                    isMobile && setDialog({ title: "Game Started", body: <PlayerRole sus={me.sus} otherImposters={otherImposters}/> });
+                    isMobile && setDialog({ title: "Game Started", body: <PlayerRole sus={me.sus} otherIntruders={otherIntruders}/> });
 
                 } else if (data.action === "start_game") {
                     setRunning(true);

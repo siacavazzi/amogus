@@ -38,7 +38,7 @@ const NuclearMeltdownScreen = ({ message = "Meltdown Occurred!" }) => {
                     {message}
                 </h1>
                 <p className="text-xl md:text-2xl mb-10 text-orange-200">
-                    The imposters caused a catastrophic reactor meltdown.
+                    The intruders caused a catastrophic core meltdown.
                 </p>
                 
                 <div className="bg-gray-900/60 backdrop-blur-sm p-6 rounded-2xl border border-red-500/30">

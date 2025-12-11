@@ -127,7 +127,7 @@ function ReactorNormal() {
                 <h1 className={`text-5xl font-bold mb-4 tracking-wider transition-colors duration-300 ${
                     isSabotaging ? 'text-red-400' : 'text-cyan-400'
                 }`}>
-                    REACTOR CORE
+                    CORE
                 </h1>
                 <p className="text-gray-400 text-lg mb-10">Nuclear Fusion Control System</p>
 
@@ -155,7 +155,7 @@ function ReactorNormal() {
                         ) : (
                             <>
                                 <FaRadiation size={28} />
-                                <span>SABOTAGE REACTOR</span>
+                                <span>SABOTAGE CORE</span>
                             </>
                         )}
                     </div>
@@ -165,7 +165,7 @@ function ReactorNormal() {
                 {isSabotaging && (
                     <div className="mt-8 flex items-center gap-3 text-red-400 animate-pulse">
                         <AlertTriangle size={24} />
-                        <span className="text-xl font-medium">Overloading reactor core...</span>
+                        <span className="text-xl font-medium">Overloading core...</span>
                     </div>
                 )}
 

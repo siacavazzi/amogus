@@ -256,7 +256,7 @@ function ReactorMeltdown() {
                             ${isIncorrect ? "animate-shake border-red-500" : isCorrectFlash ? "border-green-400 border-4" : "border-red-500/30"}`}
             >
                 <h1 className="text-4xl md:text-5xl font-bold mb-8 text-center text-red-400 drop-shadow-[0_0_10px_rgba(239,68,68,0.5)]">
-                    REACTOR MELTDOWN
+                    CORE MELTDOWN
                 </h1>
 
                 {/* PIN Entry Section */}

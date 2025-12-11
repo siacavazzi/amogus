@@ -1,6 +1,6 @@
-# Among Us IRL 🚀
+# Sus Party 🎉
 
-A real-life implementation of the popular game Among Us! Play with friends in person using your phones as controllers while completing tasks around your physical location.
+A real-life social deduction party game loosely inspired by Among Us! Play with friends in person using your phones as controllers while completing tasks around your physical location.
 
 ## Features
 
@@ -9,7 +9,7 @@ A real-life implementation of the popular game Among Us! Play with friends in pe
 - 🗳️ Voting system during meetings
 - ⚠️ Meltdown events with code entry mechanics
 - 🔊 Optional Sonos speaker integration for sound effects
-- 🃏 Card system for imposters
+- 🃏 Card system for intruders
 
 ## Prerequisites
 
@@ -121,13 +121,13 @@ All game settings are stored in `server/config.py`. Edit this file to customize 
 | `MELTDOWN_TIME` | `60` | Time (in seconds) players have to stop a meltdown before it ends the game |
 | `CODE_PERCENT` | `0.6` | Fraction of players who must enter their code to stop a meltdown. `0.6` = 60% of players |
 
-### Imposter Settings
+### Intruder Settings
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `NUMBER_OF_IMPOSTERS` | `2` | Number of imposters assigned each game. Adjust based on group size |
-| `CARD_DRAW_PROBABILITY` | `0.90` | Chance (0.0-1.0) an imposter draws a card. Lower this if imposters are too powerful |
-| `STARTING_CARDS` | `2` | Number of ability cards imposters start with |
+| `NUMBER_OF_INTRUDERS` | `2` | Number of intruders assigned each game. Adjust based on group size |
+| `CARD_DRAW_PROBABILITY` | `0.90` | Chance (0.0-1.0) an intruder draws a card. Lower this if intruders are too powerful |
+| `STARTING_CARDS` | `2` | Number of ability cards intruders start with |
 
 ### Task Settings
 
@@ -159,7 +159,7 @@ LOCATIONS = [
 ]
 
 VOTE_TIME = 120           # Shorter voting time
-NUMBER_OF_IMPOSTERS = 3   # More imposters for larger group
+NUMBER_OF_INTRUDERS = 3   # More intruders for larger group
 TASK_RATIO = 15           # More tasks to complete
 MELTDOWN_TIME = 45        # Less time for meltdowns
 ```
@@ -175,7 +175,7 @@ Tasks can be added via the `server/tasks.json` file or through the socket interf
 3. **Connect players** - Have all players open the frontend URL on their phones
 4. **Enter usernames** - Each player enters their name
 5. **Start the game** - Once all players have joined, start the game
-6. **Play!** - Complete tasks, call meetings, and find the imposters!
+6. **Play!** - Complete tasks, call meetings, and find the intruders!
 
 ## Playing on Local Network
 
@@ -226,4 +226,4 @@ This creates an optimized build in `client/build/` that can be served by any sta
 
 ## License
 
-This project is for educational and entertainment purposes only. Among Us is a trademark of Innersloth LLC.
+This project is for educational and entertainment purposes. Loosely inspired by social deduction games like Among Us.

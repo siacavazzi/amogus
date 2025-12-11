@@ -43,7 +43,7 @@ function MeltdownInfo() {
 
             <div className="relative z-10 w-full max-w-lg bg-gray-800/80 backdrop-blur-sm p-8 rounded-2xl shadow-2xl flex flex-col items-center border border-red-500/30">
                 <h1 className="text-3xl md:text-4xl font-bold mb-6 text-center text-red-400 drop-shadow-[0_0_10px_rgba(239,68,68,0.5)]">
-                    REACTOR MELTDOWN
+                    CORE MELTDOWN
                 </h1>
                 
                 {/* Your Code Section */}
@@ -68,7 +68,7 @@ function MeltdownInfo() {
                     </div>
                     
                     <p className="text-gray-400 text-sm mt-4">
-                        Enter this code at the reactor terminal
+                        Enter this code at the core terminal
                     </p>
                 </div>
 

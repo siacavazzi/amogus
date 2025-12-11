@@ -33,16 +33,16 @@ MELTDOWN_TIME = 60
 # Example: 0.6 = 60% of players (6 out of 10) need to enter codes
 CODE_PERCENT = 0.6
 
-##### IMPOSTER SETTINGS #######
+##### INTRUDER SETTINGS #######
 
-# Number of imposters per game
-NUMBER_OF_IMPOSTERS = 2
+# Number of intruders per game
+NUMBER_OF_INTRUDERS = 2
 
-# Probability of imposter drawing a card (0.0 to 1.0)
-# Reduce this if imposters are too powerful
+# Probability of intruder drawing a card (0.0 to 1.0)
+# Reduce this if intruders are too powerful
 CARD_DRAW_PROBABILITY = 0.90
 
-# Number of cards imposters start with
+# Number of cards intruders start with
 STARTING_CARDS = 2
 
 ##### TASK SETTINGS #######

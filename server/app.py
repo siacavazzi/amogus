@@ -12,7 +12,7 @@ from assets.taskHandler import *
 from assets.task_list_manager import TaskListManager
 from config import (
     LOCATIONS, VOTE_TIME, VOTE_THRESHOLD, MELTDOWN_TIME, CODE_PERCENT,
-    NUMBER_OF_IMPOSTERS, CARD_DRAW_PROBABILITY, STARTING_CARDS, TASK_RATIO,
+    NUMBER_OF_INTRUDERS, CARD_DRAW_PROBABILITY, STARTING_CARDS, TASK_RATIO,
     SONOS_ENABLED, SPEAKER_VOLUME, IGNORE_BEDROOM_SPEAKERS
 )
 
@@ -32,7 +32,7 @@ game_config = {
     'VOTE_THRESHOLD': VOTE_THRESHOLD,
     'MELTDOWN_TIME': MELTDOWN_TIME,
     'CODE_PERCENT': CODE_PERCENT,
-    'NUMBER_OF_IMPOSTERS': NUMBER_OF_IMPOSTERS,
+    'NUMBER_OF_INTRUDERS': NUMBER_OF_INTRUDERS,
     'CARD_DRAW_PROBABILITY': CARD_DRAW_PROBABILITY,
     'STARTING_CARDS': STARTING_CARDS,
     'TASK_RATIO': TASK_RATIO,
@@ -625,17 +625,48 @@ def handleTaskComplete(data):
     if not game or not player:
         return
     
+    # If task pool is empty, rebuild it from the original collaborative tasks
+    if len(game.task_handler.tasks) == 0:
+        if len(game.collaborative_tasks) > 0:
+            # Rebuild from collaborative tasks and shuffle
+            import random
+            game.task_handler.tasks = [task.copy() for task in game.collaborative_tasks]
+            random.shuffle(game.task_handler.tasks)
+            logger.info(f"Task pool rebuilt and reshuffled in room {room_code}: {len(game.task_handler.tasks)} tasks")
+        else:
+            # Fallback to reloading from tasks.json
+            game.task_handler.reset()
+            logger.info(f"Task pool reset from tasks.json in room {room_code}")
+    
     if len(game.task_handler.tasks) > 0:
+        # Track previous percentage before incrementing
+        prev_percentage = (game.crew_score / game.taskGoal * 100) if game.taskGoal else 0
+        
         game.crew_score += 1
         socketio.emit("crew_score", {"score": game.crew_score}, room=room_code)
         logger.info(f"Player {player.player_id} completed a task. Crew score: {game.crew_score}")
+        
+        # Calculate new percentage and play milestone sounds
+        if game.taskGoal:
+            new_percentage = game.crew_score / game.taskGoal * 100
+            
+            # Play sound when crossing milestone thresholds
+            if prev_percentage < 20 <= new_percentage:
+                game.speaker.play_sound("20_percent_tasks")
+                logger.info(f"Milestone reached: 20% tasks complete in room {room_code}")
+            elif prev_percentage < 50 <= new_percentage:
+                game.speaker.play_sound("50_percent_tasks")
+                logger.info(f"Milestone reached: 50% tasks complete in room {room_code}")
+            elif prev_percentage < 80 <= new_percentage:
+                game.speaker.play_sound("80_percent_tasks")
+                logger.info(f"Milestone reached: 80% tasks complete in room {room_code}")
+            elif prev_percentage < 95 <= new_percentage:
+                game.speaker.play_sound("95_percent_tasks")
+                logger.info(f"Milestone reached: 95% tasks complete in room {room_code}")
+        
         player.task = game.getTask()
         emit("task", {"task": player.task}, to=player.sid)
         logger.debug(f"Assigned new task to player {player.player_id}: {player.task}")
-    else:
-        player.task = None
-        emit("task", {"task": "No More Tasks"}, to=player.sid)
-        logger.info(f"No more tasks available. Informed player {player.player_id}")
 
 
 # ============ CARD HANDLING ============

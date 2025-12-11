@@ -6,7 +6,7 @@ import LoginPage from "./pages/Login";
 import ConnectingPage from "./pages/ConnectingPage";
 import PreGamePage from "./pages/PreGamePage";
 import Modal from "./components/Modal";
-import ImposterPage from "./pages/ImposterPage";
+import IntruderPage from "./pages/IntruderPage";
 import CrewmemberPage from "./pages/CrewPage";
 import ProgressBar from "./components/ProgressBar";
 import MeetingWaitingPage from "./pages/MeetingWaitingPage";
@@ -18,7 +18,7 @@ import ReactorNormal from "./pages/ReactorPage";
 import { isMobile as isMobileDevice } from "react-device-detect";
 import MeltdownInfo from "./pages/MeltdownInfo";
 import CrewVictoryScreen from "./pages/CrewVictory";
-import ImposterVictoryScreen from "./pages/ImposterVictory";
+import IntruderVictoryScreen from "./pages/IntruderVictory";
 import NuclearMeltdownScreen from "./pages/MeltdownEnd";
 import ReactorWaiting from "./pages/ReactorWaiting";
 import TaskEntryPage from "./pages/TaskEntryPage";
@@ -148,7 +148,7 @@ const PageController = () => {
         if (running) {
             console.log(showSusPage)
             if (showSusPage) {
-                setCurrentPage("imposter");
+                setCurrentPage("intruder");
                 return;
             } else {
                 setCurrentPage("crewmember");
@@ -190,9 +190,9 @@ const PageController = () => {
         meetingWaiting: <MeetingWaitingPage />,
         votingPage: <VotingPage />,
         resultsPage: <MeetingResultPage />,
-        imposter: <ImposterPage setShowSusPage={setShowSusPage}/>,
+        intruder: <IntruderPage setShowSusPage={setShowSusPage}/>,
         crewmember: <CrewmemberPage setShowSusPage={setShowSusPage} />,
-        sus_victory: <ImposterVictoryScreen />,
+        sus_victory: <IntruderVictoryScreen />,
         victory: <CrewVictoryScreen />,
         meltdown_fail: <NuclearMeltdownScreen />,
         reactorWaiting: <ReactorWaiting />,

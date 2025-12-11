@@ -159,7 +159,7 @@ class Meeting:
 
             self.game.emit_to_room("meeting", self.to_json())
 
-        # Draw cards for impostors (after any meeting, including veto)
+        # Draw cards for intruders (after any meeting, including veto)
         self.game.drawCards(probability=self.game.card_draw_probability)
 
         print(f"Final Votes: {self.votes}, Veto Votes: {len(self.veto_votes)}")

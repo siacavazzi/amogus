@@ -1,4 +1,4 @@
-// src/pages/ImposterPage.jsx
+// src/pages/IntruderPage.jsx
 import React, { useContext, useEffect } from 'react';
 import { DataContext } from '../GameContext';
 import { LogOut, Zap, Clock, MapPin, AlertTriangle, Eye } from 'lucide-react';
@@ -69,7 +69,7 @@ function ActionCard({ action, text, location, duration, id, time_left, active = 
   );
 }
 
-const ImposterPage = ({ setShowSusPage }) => {
+const IntruderPage = ({ setShowSusPage }) => {
   const {
     playerState,
     socket,
@@ -204,4 +204,4 @@ const ImposterPage = ({ setShowSusPage }) => {
   );
 };
 
-export default ImposterPage;
+export default IntruderPage;

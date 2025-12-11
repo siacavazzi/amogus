@@ -24,7 +24,7 @@ function GameConfigPage() {
         vote_threshold: 0.66,
         meltdown_time: 60,
         code_percent: 0.6,
-        num_imposters: 2,
+        num_intruders: 2,
         card_draw_probability: 0.9,
         starting_cards: 2,
         task_ratio: 12,
@@ -390,7 +390,7 @@ function GameConfigPage() {
         </>
     );
 
-    // Step 2: Game Settings (Imposters + Advanced)
+    // Step 2: Game Settings (Intruders + Advanced)
     const renderSettingsStep = () => (
         <>
             <div className="text-center mb-6">
@@ -406,10 +406,10 @@ function GameConfigPage() {
                 )}
             </div>
 
-            {/* Number of Imposters - Primary Setting */}
+            {/* Number of Intruders - Primary Setting */}
             <div className="bg-gray-700 rounded-lg p-6 mb-4">
                 <div className="text-center mb-4">
-                    <h2 className="text-lg font-bold text-gray-100 mb-1">Number of Imposters</h2>
+                    <h2 className="text-lg font-bold text-gray-100 mb-1">Number of Intruders</h2>
                     <p className="text-gray-400 text-sm">Choose based on group size</p>
                 </div>
                 
@@ -417,9 +417,9 @@ function GameConfigPage() {
                     {[1, 2, 3, 4].map((num) => (
                         <button
                             key={num}
-                            onClick={() => updateConfig('num_imposters', num)}
+                            onClick={() => updateConfig('num_intruders', num)}
                             className={`w-16 h-16 rounded-xl text-2xl font-bold transition-all ${
-                                config.num_imposters === num
+                                config.num_intruders === num
                                     ? 'bg-red-600 text-white scale-110 shadow-lg'
                                     : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
                             }`}
@@ -430,10 +430,10 @@ function GameConfigPage() {
                 </div>
                 
                 <p className="text-center text-gray-500 text-xs">
-                    {config.num_imposters === 1 && "Best for 4-6 players"}
-                    {config.num_imposters === 2 && "Best for 6-10 players"}
-                    {config.num_imposters === 3 && "Best for 10-15 players"}
-                    {config.num_imposters === 4 && "Best for 15+ players (chaos mode!)"}
+                    {config.num_intruders === 1 && "Best for 4-6 players"}
+                    {config.num_intruders === 2 && "Best for 6-10 players"}
+                    {config.num_intruders === 3 && "Best for 10-15 players"}
+                    {config.num_intruders === 4 && "Best for 15+ players (chaos mode!)"}
                 </p>
             </div>
 
@@ -456,16 +456,16 @@ function GameConfigPage() {
                 
                 {showAdvanced && (
                     <div className="px-4 pb-4 pt-2 border-t border-gray-600 space-y-6">
-                        {/* Imposter Cards */}
+                        {/* Intruder Cards */}
                         <div>
-                            <h3 className="text-gray-200 font-medium mb-3">Imposter Cards</h3>
+                            <h3 className="text-gray-200 font-medium mb-3">Intruder Cards</h3>
                             <SliderInput
                                 label="Starting Cards"
                                 value={config.starting_cards}
                                 onChange={(v) => updateConfig('starting_cards', v)}
                                 min={0}
                                 max={5}
-                                description="Cards each imposter starts with"
+                                description="Cards each intruder starts with"
                             />
                             <SliderInput
                                 label="Card Draw Chance"

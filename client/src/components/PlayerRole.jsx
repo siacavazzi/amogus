@@ -3,9 +3,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const PlayerRole = ({ sus, otherImposters }) => {
+const PlayerRole = ({ sus, otherIntruders }) => {
   const isCrewmate = !sus;
-  const displayText = isCrewmate ? 'Crewmate' : 'Impostor';
+  const displayText = isCrewmate ? 'Crewmate' : 'Intruder';
   const roleIcon = isCrewmate ? '👩‍🚀' : '🕵️‍♂️';
 
   // Define gradient colors based on role
@@ -25,13 +25,13 @@ const PlayerRole = ({ sus, otherImposters }) => {
           {displayText}
         </div>
       </div>
-      {!isCrewmate && Array.isArray(otherImposters) && otherImposters.length > 0 && (
+      {!isCrewmate && Array.isArray(otherIntruders) && otherIntruders.length > 0 && (
         <div className="mt-2 text-base">
-          <span className="font-semibold">Other Impostors:</span>{' '}
-          {otherImposters.map((player, idx) => (
+          <span className="font-semibold">Other Intruders:</span>{' '}
+          {otherIntruders.map((player, idx) => (
             <span key={player.username}>
               {player.username}
-              {idx < otherImposters.length - 1 ? ', ' : ''}
+              {idx < otherIntruders.length - 1 ? ', ' : ''}
             </span>
           ))}
         </div>
@@ -42,7 +42,7 @@ const PlayerRole = ({ sus, otherImposters }) => {
 
 PlayerRole.propTypes = {
   sus: PropTypes.bool.isRequired,
-  otherImposters: PropTypes.arrayOf(
+  otherIntruders: PropTypes.arrayOf(
     PropTypes.shape({
       username: PropTypes.string.isRequired,
     })

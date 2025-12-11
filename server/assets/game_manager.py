@@ -60,7 +60,7 @@ class GameManager:
                 locations=locations,
                 vote_time=self.config['VOTE_TIME'],
                 card_draw_probability=self.config['CARD_DRAW_PROBABILITY'],
-                numImposters=self.config['NUMBER_OF_IMPOSTERS'],
+                numIntruders=self.config['NUMBER_OF_INTRUDERS'],
                 starting_cards=self.config['STARTING_CARDS'],
                 vote_threshold=self.config['VOTE_THRESHOLD'],
                 room_code=room_code  # Pass room code for scoped emissions

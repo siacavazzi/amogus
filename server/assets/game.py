@@ -13,7 +13,7 @@ from assets.utils import *
 
 class Game:
 
-    def __init__(self, socket, task_handler, speaker, task_ratio, meltdown_time, code_percent, locations, vote_time, card_draw_probability, numImposters, starting_cards, vote_threshold, room_code=None):
+    def __init__(self, socket, task_handler, speaker, task_ratio, meltdown_time, code_percent, locations, vote_time, card_draw_probability, numIntruders, starting_cards, vote_threshold, room_code=None):
         self.players = []
         self.task_handler = task_handler
         self.crew_score = 0
@@ -22,8 +22,8 @@ class Game:
         self.active_meltdown = None
         self.meeting = False
         self.starting_cards = starting_cards
-        self.numImposters = numImposters
-        self.initial_numImposters = numImposters  # Store initial value for reset
+        self.numIntruders = numIntruders
+        self.initial_numIntruders = numIntruders  # Store initial value for reset
         self.numCrew = None
         self.taskGoal = None
         self.completed_tasks = 0
@@ -76,7 +76,7 @@ class Game:
             'vote_threshold': self.vote_threshold,
             'meltdown_time': self.meltdown_time,
             'code_percent': self.code_percent,
-            'num_imposters': self.numImposters,
+            'num_intruders': self.numIntruders,
             'card_draw_probability': self.card_draw_probability,
             'starting_cards': self.starting_cards,
             'task_ratio': self.task_ratio,
@@ -104,9 +104,9 @@ class Game:
             self.meltdown_time = int(config['meltdown_time'])
         if 'code_percent' in config:
             self.code_percent = float(config['code_percent'])
-        if 'num_imposters' in config:
-            self.numImposters = int(config['num_imposters'])
-            self.initial_numImposters = self.numImposters
+        if 'num_intruders' in config:
+            self.numIntruders = int(config['num_intruders'])
+            self.initial_numIntruders = self.numIntruders
         if 'card_draw_probability' in config:
             self.card_draw_probability = float(config['card_draw_probability'])
         if 'starting_cards' in config:
@@ -214,12 +214,12 @@ class Game:
         # Rebuild the card deck now that we know if there's a reactor
         self.card_deck._build_deck()
 
-        if self.numImposters > len(self.players):
-            self.numImposters = len(self.players)
+        if self.numIntruders > len(self.players):
+            self.numIntruders = len(self.players)
     
-        self.numCrew = len(self.players) - self.numImposters
+        self.numCrew = len(self.players) - self.numIntruders
         random.shuffle(self.players)
-        for i in range(0, self.numImposters):
+        for i in range(0, self.numIntruders):
             self.players[i].sus = True
             for _ in range(0, self.starting_cards):
                 self.players[i].cards.append(self.card_deck.draw_card())
@@ -228,11 +228,11 @@ class Game:
         print("assigning roles...")
         print(self.players)
 
-        numCrew = len(self.players) - self.numImposters
+        numCrew = len(self.players) - self.numIntruders
         
         self.taskGoal = numCrew * self.task_ratio
 
-        print(f"{numCrew} crew and {self.numImposters} impostors (reactor: {self.has_reactor})")
+        print(f"{numCrew} crew and {self.numIntruders} intruders (reactor: {self.has_reactor})")
 
     def getPlayerBySid(self, sid):
         for player in self.players:
@@ -254,7 +254,7 @@ class Game:
         self.active_hack = 0
         self.active_meltdown = None
         self.meeting = False
-        self.numImposters = self.initial_numImposters  # Restore to config value
+        self.numIntruders = self.initial_numIntruders  # Restore to config value
         self.numCrew = None
         self.taskGoal = None
         self.completed_tasks = 0
@@ -282,7 +282,7 @@ class Game:
         self.denied_location = None
         self.meltdown_time_mod = 0
         self.active_cards = []  # Clear active cards (Area Denial, etc.)
-        self.numImposters = self.initial_numImposters  # Restore initial imposter count
+        self.numIntruders = self.initial_numIntruders  # Restore initial intruder count
         self.numCrew = None  # Will be recalculated on game start
         self.card_deck = CardDeck(self.locations, self.socket, self)
         
@@ -353,8 +353,8 @@ class Game:
     
             
         else:
-            self.numImposters -= 1
-            if self.numImposters <= 0:
+            self.numIntruders -= 1
+            if self.numIntruders <= 0:
                 self.end_state = 'victory'
                 self.end_time = time.time()
                 self.speaker.play_sound('crew_victory')

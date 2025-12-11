@@ -32,7 +32,7 @@ class Card:
         if self in self.card_deck.active_cards:
             self.card_deck.active_cards.remove(self)
     
-    def notify_impostors(self, player):
+    def notify_intruders(self, player):
         for other_player in self.game.players:
             if (other_player is not player) and other_player.sus and other_player.alive:
                 send_message_to_player(self.socket, other_player.player_id, f"{player.username} played {self.action}")
@@ -54,7 +54,7 @@ class Card:
                 self.game.speaker.play_sound('sus')
                 self.game.denied_location = self.location
                 self.card_deck.active_cards.append(self)
-                self.notify_impostors(player)
+                self.notify_intruders(player)
             else:
                 remove_card = False
         elif self.action == 'fake_task':
@@ -70,7 +70,7 @@ class Card:
 
         elif self.action == 'Shorten Meltdown':
             self.card_deck.active_cards.append(self)
-            self.notify_impostors(player)
+            self.notify_intruders(player)
             self.game.meltdown_time_mod += self.duration
         
         if self.countdown:

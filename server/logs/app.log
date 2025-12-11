@@ -6116,3 +6116,349 @@
 2025-12-10 13:23:58,185 - app_logger - INFO - Client connected: Q3mDpxErgPMjhoL7AAFk
 2025-12-10 13:24:03,867 - app_logger - INFO - Client disconnected: Q3mDpxErgPMjhoL7AAFk
 2025-12-10 13:24:30,441 - app_logger - INFO - Client connected: zPIypFZy3E0KHBznAAFn
+2025-12-10 14:01:22,880 - app_logger - INFO - Client disconnected: zPIypFZy3E0KHBznAAFn
+2025-12-10 14:01:24,449 - app_logger - INFO - Client connected: 8TYcXDdnLGyjj-HIAAFp
+2025-12-10 14:43:16,298 - app_logger - INFO - Client disconnected: 8TYcXDdnLGyjj-HIAAFp
+2025-12-10 14:43:18,964 - app_logger - INFO - Client connected: JCsgRPjyI4t4NR6jAAFr
+2025-12-10 16:08:40,726 - app_logger - INFO - Client disconnected: JCsgRPjyI4t4NR6jAAFr
+2025-12-10 16:08:41,417 - app_logger - INFO - Client connected: ZtNT5_zk0G5NqZA-AAFu
+2025-12-10 16:13:16,671 - app_logger - INFO - Client disconnected: ZtNT5_zk0G5NqZA-AAFu
+2025-12-10 16:13:17,190 - app_logger - INFO - Client connected: yAgZH7-NH1rU0M5RAAFx
+2025-12-10 16:13:17,548 - app_logger - INFO - Client disconnected: yAgZH7-NH1rU0M5RAAFx
+2025-12-10 16:13:17,715 - app_logger - INFO - Client connected: TZjO6v_fAprWErmGAAFz
+2025-12-10 16:13:18,551 - app_logger - INFO - Client disconnected: TZjO6v_fAprWErmGAAFz
+2025-12-10 16:13:18,720 - app_logger - INFO - Client connected: z0Xi0TQnfLP2GZnMAAF1
+2025-12-10 16:13:43,586 - app_logger - INFO - Client disconnected: z0Xi0TQnfLP2GZnMAAF1
+2025-12-10 16:13:44,243 - app_logger - INFO - Client connected: 7RtZfkS1ZfKvM4yeAAF4
+2025-12-10 16:17:04,820 - app_logger - INFO - Client disconnected: 7RtZfkS1ZfKvM4yeAAF4
+2025-12-10 16:17:05,226 - app_logger - INFO - Client connected: x8S4ZmdrxUTiDTxEAAF7
+2025-12-10 16:25:17,088 - app_logger - INFO - Client disconnected: x8S4ZmdrxUTiDTxEAAF7
+2025-12-10 16:25:17,589 - app_logger - INFO - Client connected: xC1g-IZggNY7B0-9AAF-
+2025-12-10 16:25:24,926 - app_logger - INFO - Client disconnected: xC1g-IZggNY7B0-9AAF-
+2025-12-10 16:25:25,089 - app_logger - INFO - Client connected: z4l63dASJ1t_wGNtAAGB
+2025-12-10 16:25:26,191 - app_logger - INFO - Game created with room code: PJIW
+2025-12-10 16:25:41,791 - app_logger - INFO - Client disconnected: z4l63dASJ1t_wGNtAAGB
+2025-12-10 16:25:43,787 - app_logger - INFO - Starting server...
+2025-12-10 16:25:43,788 - app_logger - INFO -  * DEV MODE: SSL disabled
+2025-12-10 16:25:43,788 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.62:5001
+2025-12-10 16:25:44,570 - app_logger - INFO - Client connected: oTHcpVSYRrr0Qa4GAAAB
+2025-12-10 16:25:51,779 - app_logger - INFO - Game created with room code: KWMZ
+2025-12-10 16:25:53,429 - app_logger - INFO - Applied task list LQAD7H to game KWMZ: 17 tasks loaded, task_list_applied=True
+2025-12-10 16:25:53,431 - app_logger - INFO - Task handler now has 17 tasks
+2025-12-10 16:26:03,946 - app_logger - INFO - Game KWMZ config updated: {'locations': ['Basement', '1st Floor', '2nd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 1, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-10 16:26:03,951 - app_logger - INFO - Room KWMZ is now open for players
+2025-12-10 16:26:06,294 - app_logger - INFO - Set creator_player_id to 107cf1fb-6a6c-45f5-8e2e-94be73ca6223 for room KWMZ (first player)
+2025-12-10 16:26:06,294 - app_logger - INFO - New player wfwfw joined room KWMZ with ID 107cf1fb-6a6c-45f5-8e2e-94be73ca6223, is_creator=True
+2025-12-10 16:26:06,295 - app_logger - INFO - Sending player list to room KWMZ
+2025-12-10 16:26:06,295 - app_logger - DEBUG - Player List: ['{"sid": "oTHcpVSYRrr0Qa4GAAAB", "player_id": "107cf1fb-6a6c-45f5-8e2e-94be73ca6223", "username": "wfwfw", "active": true, "sus": false, "alive": true, "pic": 16, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-10 16:26:06,304 - app_logger - INFO - Ownership check for LQAD7H: stored_creator=device_b32ocpi2jmiuupois, device_id=device_b2nahin7smizkkcmr, is_owner=False
+2025-12-10 16:26:06,307 - app_logger - INFO - Ownership check for LQAD7H: stored_creator=device_b32ocpi2jmiuupois, device_id=device_b2nahin7smizkkcmr, is_owner=False
+2025-12-10 16:26:10,630 - app_logger - INFO - Client connected: AZ7WwpLdFa4d-IQ2AAAD
+2025-12-10 16:26:17,917 - app_logger - INFO - Client AZ7WwpLdFa4d-IQ2AAAD joined room KWMZ, is_creator=False
+2025-12-10 16:26:21,399 - app_logger - INFO - Saved selfie for feerf: 2cd7c720bd59415786857f693c888101.jpg
+2025-12-10 16:26:21,400 - app_logger - INFO - New player feerf joined room KWMZ with ID 8114aec8-1135-4b76-8450-d79681423bec, is_creator=False
+2025-12-10 16:26:21,401 - app_logger - INFO - Sending player list to room KWMZ
+2025-12-10 16:26:21,401 - app_logger - DEBUG - Player List: ['{"sid": "oTHcpVSYRrr0Qa4GAAAB", "player_id": "107cf1fb-6a6c-45f5-8e2e-94be73ca6223", "username": "wfwfw", "active": true, "sus": false, "alive": true, "pic": 16, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}', '{"sid": "AZ7WwpLdFa4d-IQ2AAAD", "player_id": "8114aec8-1135-4b76-8450-d79681423bec", "username": "feerf", "active": true, "sus": false, "alive": true, "pic": 7, "selfie": "2cd7c720bd59415786857f693c888101.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-10 16:26:21,402 - app_logger - INFO - Ownership check for LQAD7H: stored_creator=device_b32ocpi2jmiuupois, device_id=device_kq4edzez9miutiegb, is_owner=False
+2025-12-10 16:26:21,404 - app_logger - INFO - Ownership check for LQAD7H: stored_creator=device_b32ocpi2jmiuupois, device_id=device_kq4edzez9miutiegb, is_owner=False
+2025-12-10 16:26:33,369 - app_logger - INFO - Start game check - task_list_applied=True, task_handler.tasks=17, collaborative_tasks=17, min_tasks=10
+2025-12-10 16:26:33,370 - app_logger - INFO - Applied 17 collaborative tasks to game KWMZ
+2025-12-10 16:26:33,370 - app_logger - INFO - Starting game KWMZ with 17 tasks
+2025-12-10 16:26:33,371 - app_logger - INFO - Card deck rebuilt with locations: ['Basement', '1st Floor', '2nd Floor', 'Other']
+2025-12-10 16:26:33,371 - app_logger - INFO - Sending player list to room KWMZ
+2025-12-10 16:26:33,371 - app_logger - DEBUG - Player List: ['{"sid": "oTHcpVSYRrr0Qa4GAAAB", "player_id": "107cf1fb-6a6c-45f5-8e2e-94be73ca6223", "username": "wfwfw", "active": true, "sus": false, "alive": true, "pic": 16, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}', '{"sid": "AZ7WwpLdFa4d-IQ2AAAD", "player_id": "8114aec8-1135-4b76-8450-d79681423bec", "username": "feerf", "active": true, "sus": true, "alive": true, "pic": 7, "selfie": "2cd7c720bd59415786857f693c888101.jpg", "meltdown_code": null, "cards": ["{\\"action\\": \\"Discard and Draw\\", \\"text\\": \\"Discard a random card and draw a new card\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"9500f7d7-1e62-497b-a187-895aa74c8a4c\\", \\"countdown\\": false}", "{\\"action\\": \\"Area Denial\\", \\"text\\": \\"Stop sending tasks to a specific location\\", \\"location\\": \\"Basement\\", \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"d2f03652-b66a-448b-aef8-22dc223fa2aa\\", \\"countdown\\": true}"], "ready": false}']
+2025-12-10 16:26:33,374 - app_logger - INFO - Game started in room KWMZ
+2025-12-10 16:26:33,375 - app_logger - DEBUG - Assigned task to player 107cf1fb-6a6c-45f5-8e2e-94be73ca6223: {'task': 'eat beans', 'location': '2nd Floor', 'difficulty': 2, 'added_by': 'poop'}
+2025-12-10 16:26:49,914 - app_logger - INFO - Player 107cf1fb-6a6c-45f5-8e2e-94be73ca6223 completed a task. Crew score: 1
+2025-12-10 16:26:49,917 - app_logger - DEBUG - Assigned new task to player 107cf1fb-6a6c-45f5-8e2e-94be73ca6223: {'task': 'shot', 'location': '1st Floor', 'difficulty': 2, 'added_by': 'poop'}
+2025-12-10 16:26:52,078 - app_logger - INFO - Player 107cf1fb-6a6c-45f5-8e2e-94be73ca6223 completed a task. Crew score: 2
+2025-12-10 16:26:52,079 - app_logger - DEBUG - Assigned new task to player 107cf1fb-6a6c-45f5-8e2e-94be73ca6223: {'task': 'RF', 'location': '2nd Floor', 'difficulty': 2, 'added_by': 'poop'}
+2025-12-10 16:26:53,920 - app_logger - INFO - Player 107cf1fb-6a6c-45f5-8e2e-94be73ca6223 completed a task. Crew score: 3
+2025-12-10 16:26:53,920 - app_logger - DEBUG - Assigned new task to player 107cf1fb-6a6c-45f5-8e2e-94be73ca6223: {'task': 'jork', 'location': '1st Floor', 'difficulty': 2, 'added_by': 'poop'}
+2025-12-10 16:26:56,452 - app_logger - INFO - Meeting started in room KWMZ
+2025-12-10 16:26:59,975 - app_logger - INFO - Sending player list to room KWMZ
+2025-12-10 16:26:59,983 - app_logger - DEBUG - Player List: ['{"sid": "oTHcpVSYRrr0Qa4GAAAB", "player_id": "107cf1fb-6a6c-45f5-8e2e-94be73ca6223", "username": "wfwfw", "active": true, "sus": false, "alive": true, "pic": 16, "selfie": null, "meltdown_code": null, "cards": [], "ready": true}', '{"sid": "AZ7WwpLdFa4d-IQ2AAAD", "player_id": "8114aec8-1135-4b76-8450-d79681423bec", "username": "feerf", "active": true, "sus": true, "alive": true, "pic": 7, "selfie": "2cd7c720bd59415786857f693c888101.jpg", "meltdown_code": null, "cards": ["{\\"action\\": \\"Discard and Draw\\", \\"text\\": \\"Discard a random card and draw a new card\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"9500f7d7-1e62-497b-a187-895aa74c8a4c\\", \\"countdown\\": false}"], "ready": false}']
+2025-12-10 16:27:04,715 - app_logger - INFO - Sending player list to room KWMZ
+2025-12-10 16:27:04,717 - app_logger - DEBUG - Player List: ['{"sid": "oTHcpVSYRrr0Qa4GAAAB", "player_id": "107cf1fb-6a6c-45f5-8e2e-94be73ca6223", "username": "wfwfw", "active": true, "sus": false, "alive": true, "pic": 16, "selfie": null, "meltdown_code": null, "cards": [], "ready": true}', '{"sid": "AZ7WwpLdFa4d-IQ2AAAD", "player_id": "8114aec8-1135-4b76-8450-d79681423bec", "username": "feerf", "active": true, "sus": true, "alive": true, "pic": 7, "selfie": "2cd7c720bd59415786857f693c888101.jpg", "meltdown_code": null, "cards": ["{\\"action\\": \\"Discard and Draw\\", \\"text\\": \\"Discard a random card and draw a new card\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"9500f7d7-1e62-497b-a187-895aa74c8a4c\\", \\"countdown\\": false}"], "ready": true}']
+2025-12-10 16:28:33,293 - app_logger - INFO - Player 107cf1fb-6a6c-45f5-8e2e-94be73ca6223 completed a task. Crew score: 4
+2025-12-10 16:28:33,295 - app_logger - DEBUG - Assigned new task to player 107cf1fb-6a6c-45f5-8e2e-94be73ca6223: {'task': 'jork', 'location': '1st Floor', 'difficulty': 2, 'added_by': 'poop'}
+2025-12-10 16:28:35,899 - app_logger - INFO - Player 107cf1fb-6a6c-45f5-8e2e-94be73ca6223 completed a task. Crew score: 5
+2025-12-10 16:28:35,900 - app_logger - DEBUG - Assigned new task to player 107cf1fb-6a6c-45f5-8e2e-94be73ca6223: {'task': 'WAHHHHHHHH', 'location': '2nd Floor', 'difficulty': 2, 'added_by': 'poop'}
+2025-12-10 16:28:39,731 - app_logger - INFO - Meeting started in room KWMZ
+2025-12-10 16:28:42,621 - app_logger - INFO - Sending player list to room KWMZ
+2025-12-10 16:28:42,621 - app_logger - DEBUG - Player List: ['{"sid": "oTHcpVSYRrr0Qa4GAAAB", "player_id": "107cf1fb-6a6c-45f5-8e2e-94be73ca6223", "username": "wfwfw", "active": true, "sus": false, "alive": true, "pic": 16, "selfie": null, "meltdown_code": null, "cards": [], "ready": true}', '{"sid": "AZ7WwpLdFa4d-IQ2AAAD", "player_id": "8114aec8-1135-4b76-8450-d79681423bec", "username": "feerf", "active": true, "sus": true, "alive": true, "pic": 7, "selfie": "2cd7c720bd59415786857f693c888101.jpg", "meltdown_code": null, "cards": ["{\\"action\\": \\"Area Denial\\", \\"text\\": \\"Stop sending tasks to a specific location\\", \\"location\\": \\"2nd Floor\\", \\"duration\\": 120, \\"time_left\\": 120, \\"id\\": \\"49fd8001-62b2-450e-b985-e12f04b5b5ca\\", \\"countdown\\": true}"], "ready": false}']
+2025-12-10 16:28:46,759 - app_logger - INFO - Sending player list to room KWMZ
+2025-12-10 16:28:46,768 - app_logger - DEBUG - Player List: ['{"sid": "oTHcpVSYRrr0Qa4GAAAB", "player_id": "107cf1fb-6a6c-45f5-8e2e-94be73ca6223", "username": "wfwfw", "active": true, "sus": false, "alive": true, "pic": 16, "selfie": null, "meltdown_code": null, "cards": [], "ready": true}', '{"sid": "AZ7WwpLdFa4d-IQ2AAAD", "player_id": "8114aec8-1135-4b76-8450-d79681423bec", "username": "feerf", "active": true, "sus": true, "alive": true, "pic": 7, "selfie": "2cd7c720bd59415786857f693c888101.jpg", "meltdown_code": null, "cards": ["{\\"action\\": \\"Area Denial\\", \\"text\\": \\"Stop sending tasks to a specific location\\", \\"location\\": \\"2nd Floor\\", \\"duration\\": 120, \\"time_left\\": 120, \\"id\\": \\"49fd8001-62b2-450e-b985-e12f04b5b5ca\\", \\"countdown\\": true}"], "ready": true}']
+2025-12-10 16:29:13,910 - app_logger - INFO - Client disconnected: oTHcpVSYRrr0Qa4GAAAB
+2025-12-10 16:29:14,153 - app_logger - INFO - Client connected: UfLMjivxSGSTt7BCAAAG
+2025-12-10 16:29:14,158 - app_logger - INFO - Player 107cf1fb-6a6c-45f5-8e2e-94be73ca6223 rejoining room KWMZ, creator_player_id=107cf1fb-6a6c-45f5-8e2e-94be73ca6223
+2025-12-10 16:29:14,160 - app_logger - INFO - Creator 107cf1fb-6a6c-45f5-8e2e-94be73ca6223 reconnected to room KWMZ
+2025-12-10 16:29:14,161 - app_logger - INFO - Sending player list to room KWMZ
+2025-12-10 16:29:14,161 - app_logger - DEBUG - Player List: ['{"sid": "UfLMjivxSGSTt7BCAAAG", "player_id": "107cf1fb-6a6c-45f5-8e2e-94be73ca6223", "username": "wfwfw", "active": true, "sus": false, "alive": true, "pic": 16, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}', '{"sid": "AZ7WwpLdFa4d-IQ2AAAD", "player_id": "8114aec8-1135-4b76-8450-d79681423bec", "username": "feerf", "active": true, "sus": true, "alive": true, "pic": 7, "selfie": "2cd7c720bd59415786857f693c888101.jpg", "meltdown_code": null, "cards": ["{\\"action\\": \\"Area Denial\\", \\"text\\": \\"Stop sending tasks to a specific location\\", \\"location\\": \\"2nd Floor\\", \\"duration\\": 120, \\"time_left\\": 120, \\"id\\": \\"49fd8001-62b2-450e-b985-e12f04b5b5ca\\", \\"countdown\\": true}"], "ready": false}']
+2025-12-10 16:29:14,163 - app_logger - DEBUG - Meeting is active
+2025-12-10 16:29:14,164 - app_logger - INFO - Sending task to player
+2025-12-10 16:29:14,169 - app_logger - INFO - Reactor registered for room KWMZ (sid: UfLMjivxSGSTt7BCAAAG)
+2025-12-10 16:29:16,407 - app_logger - INFO - Client disconnected: UfLMjivxSGSTt7BCAAAG
+2025-12-10 16:29:16,464 - app_logger - INFO - Client connected: LJL_TLIF523HKuqcAAAI
+2025-12-10 16:29:16,474 - app_logger - INFO - Player 107cf1fb-6a6c-45f5-8e2e-94be73ca6223 rejoining room KWMZ, creator_player_id=107cf1fb-6a6c-45f5-8e2e-94be73ca6223
+2025-12-10 16:29:16,475 - app_logger - INFO - Creator 107cf1fb-6a6c-45f5-8e2e-94be73ca6223 reconnected to room KWMZ
+2025-12-10 16:29:16,476 - app_logger - INFO - Sending player list to room KWMZ
+2025-12-10 16:29:16,476 - app_logger - DEBUG - Player List: ['{"sid": "LJL_TLIF523HKuqcAAAI", "player_id": "107cf1fb-6a6c-45f5-8e2e-94be73ca6223", "username": "wfwfw", "active": true, "sus": false, "alive": true, "pic": 16, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}', '{"sid": "AZ7WwpLdFa4d-IQ2AAAD", "player_id": "8114aec8-1135-4b76-8450-d79681423bec", "username": "feerf", "active": true, "sus": true, "alive": true, "pic": 7, "selfie": "2cd7c720bd59415786857f693c888101.jpg", "meltdown_code": null, "cards": ["{\\"action\\": \\"Area Denial\\", \\"text\\": \\"Stop sending tasks to a specific location\\", \\"location\\": \\"2nd Floor\\", \\"duration\\": 120, \\"time_left\\": 120, \\"id\\": \\"49fd8001-62b2-450e-b985-e12f04b5b5ca\\", \\"countdown\\": true}"], "ready": false}']
+2025-12-10 16:29:16,477 - app_logger - DEBUG - Meeting is active
+2025-12-10 16:29:16,477 - app_logger - INFO - Sending task to player
+2025-12-10 16:29:46,401 - app_logger - INFO - Meeting started in room KWMZ
+2025-12-10 16:29:49,072 - app_logger - INFO - Sending player list to room KWMZ
+2025-12-10 16:29:49,073 - app_logger - DEBUG - Player List: ['{"sid": "LJL_TLIF523HKuqcAAAI", "player_id": "107cf1fb-6a6c-45f5-8e2e-94be73ca6223", "username": "wfwfw", "active": true, "sus": false, "alive": true, "pic": 16, "selfie": null, "meltdown_code": null, "cards": [], "ready": true}', '{"sid": "AZ7WwpLdFa4d-IQ2AAAD", "player_id": "8114aec8-1135-4b76-8450-d79681423bec", "username": "feerf", "active": true, "sus": true, "alive": true, "pic": 7, "selfie": "2cd7c720bd59415786857f693c888101.jpg", "meltdown_code": null, "cards": ["{\\"action\\": \\"Area Denial\\", \\"text\\": \\"Stop sending tasks to a specific location\\", \\"location\\": \\"2nd Floor\\", \\"duration\\": 120, \\"time_left\\": 120, \\"id\\": \\"49fd8001-62b2-450e-b985-e12f04b5b5ca\\", \\"countdown\\": true}", "{\\"action\\": \\"Discard and Draw\\", \\"text\\": \\"Discard a random card and draw a new card\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"6f762e28-2210-45e4-afb9-dad4f6330efa\\", \\"countdown\\": false}", "{\\"action\\": \\"Self Report\\", \\"text\\": \\"Call a body found meeting\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"8c08f038-4b89-4ee8-ac35-0c1bb7742508\\", \\"countdown\\": false}"], "ready": false}']
+2025-12-10 16:29:53,061 - app_logger - INFO - Sending player list to room KWMZ
+2025-12-10 16:29:53,066 - app_logger - DEBUG - Player List: ['{"sid": "LJL_TLIF523HKuqcAAAI", "player_id": "107cf1fb-6a6c-45f5-8e2e-94be73ca6223", "username": "wfwfw", "active": true, "sus": false, "alive": true, "pic": 16, "selfie": null, "meltdown_code": null, "cards": [], "ready": true}', '{"sid": "AZ7WwpLdFa4d-IQ2AAAD", "player_id": "8114aec8-1135-4b76-8450-d79681423bec", "username": "feerf", "active": true, "sus": true, "alive": true, "pic": 7, "selfie": "2cd7c720bd59415786857f693c888101.jpg", "meltdown_code": null, "cards": ["{\\"action\\": \\"Area Denial\\", \\"text\\": \\"Stop sending tasks to a specific location\\", \\"location\\": \\"2nd Floor\\", \\"duration\\": 120, \\"time_left\\": 120, \\"id\\": \\"49fd8001-62b2-450e-b985-e12f04b5b5ca\\", \\"countdown\\": true}", "{\\"action\\": \\"Discard and Draw\\", \\"text\\": \\"Discard a random card and draw a new card\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"6f762e28-2210-45e4-afb9-dad4f6330efa\\", \\"countdown\\": false}", "{\\"action\\": \\"Self Report\\", \\"text\\": \\"Call a body found meeting\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"8c08f038-4b89-4ee8-ac35-0c1bb7742508\\", \\"countdown\\": false}"], "ready": true}']
+2025-12-10 16:33:40,503 - app_logger - INFO - Player 107cf1fb-6a6c-45f5-8e2e-94be73ca6223 completed a task. Crew score: 6
+2025-12-10 16:33:40,504 - app_logger - DEBUG - Assigned new task to player 107cf1fb-6a6c-45f5-8e2e-94be73ca6223: {'task': '2', 'location': 'Basement', 'difficulty': 2, 'added_by': 'poop'}
+2025-12-10 16:46:33,499 - app_logger - INFO - Client disconnected: AZ7WwpLdFa4d-IQ2AAAD
+2025-12-10 16:46:33,502 - app_logger - INFO - Client disconnected: LJL_TLIF523HKuqcAAAI
+2025-12-10 16:46:34,544 - app_logger - INFO - Starting server...
+2025-12-10 16:46:34,544 - app_logger - INFO -  * DEV MODE: SSL disabled
+2025-12-10 16:46:34,544 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.62:5001
+2025-12-10 16:46:35,668 - app_logger - INFO - Client connected: ZKL47CHd-vRcmE76AAAB
+2025-12-10 16:46:35,907 - app_logger - INFO - Client connected: vQDSFgu3Xgku-OH8AAAD
+2025-12-10 16:46:37,053 - app_logger - INFO - Game created with room code: FMIW
+2025-12-10 16:46:41,798 - app_logger - INFO - Applied task list XWBTDQ to game FMIW: 10 tasks loaded, task_list_applied=True
+2025-12-10 16:46:41,799 - app_logger - INFO - Task handler now has 10 tasks
+2025-12-10 16:46:43,682 - app_logger - INFO - Game FMIW config updated: {'locations': ['Basement', '1st Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 1, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-10 16:46:43,683 - app_logger - INFO - Room FMIW is now open for players
+2025-12-10 16:46:46,214 - app_logger - INFO - Set creator_player_id to fe6733c3-ec25-4385-80ef-4b70e95d6778 for room FMIW (first player)
+2025-12-10 16:46:46,216 - app_logger - INFO - New player wfwefew joined room FMIW with ID fe6733c3-ec25-4385-80ef-4b70e95d6778, is_creator=True
+2025-12-10 16:46:46,216 - app_logger - INFO - Sending player list to room FMIW
+2025-12-10 16:46:46,217 - app_logger - DEBUG - Player List: ['{"sid": "vQDSFgu3Xgku-OH8AAAD", "player_id": "fe6733c3-ec25-4385-80ef-4b70e95d6778", "username": "wfwefew", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-10 16:46:46,221 - app_logger - INFO - Ownership check for XWBTDQ: stored_creator=device_kq4edzez9miutiegb, device_id=device_kq4edzez9miutiegb, is_owner=True
+2025-12-10 16:46:46,225 - app_logger - INFO - Ownership check for XWBTDQ: stored_creator=device_kq4edzez9miutiegb, device_id=device_kq4edzez9miutiegb, is_owner=True
+2025-12-10 16:46:48,245 - app_logger - INFO - save_collaborative_tasks called: room=FMIW, device_id=device_kq4edzez9miutiegb, force_new=False
+2025-12-10 16:46:48,246 - app_logger - INFO - Game found, collaborative_task_list_code=XWBTDQ, num_tasks=10
+2025-12-10 16:46:48,248 - app_logger - INFO - Existing list found: stored_creator=device_kq4edzez9miutiegb, device_id=device_kq4edzez9miutiegb, match=True
+2025-12-10 16:46:48,251 - app_logger - INFO - Updated collaborative task list XWBTDQ in room FMIW
+2025-12-10 16:47:13,424 - app_logger - INFO - Client disconnected: ZKL47CHd-vRcmE76AAAB
+2025-12-10 16:47:13,876 - app_logger - INFO - Client connected: GET_mo4lzx632XpFAAAG
+2025-12-10 16:47:18,801 - app_logger - INFO - Client GET_mo4lzx632XpFAAAG joined room FMIW, is_creator=False
+2025-12-10 16:47:21,653 - app_logger - INFO - Saved selfie for efwefwe: 3547fceb56a44e64bef647d167bbb069.jpg
+2025-12-10 16:47:21,657 - app_logger - INFO - New player efwefwe joined room FMIW with ID 097a0d11-7131-44be-a0c1-6fea3ddde9b1, is_creator=False
+2025-12-10 16:47:21,657 - app_logger - INFO - Sending player list to room FMIW
+2025-12-10 16:47:21,658 - app_logger - DEBUG - Player List: ['{"sid": "vQDSFgu3Xgku-OH8AAAD", "player_id": "fe6733c3-ec25-4385-80ef-4b70e95d6778", "username": "wfwefew", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}', '{"sid": "GET_mo4lzx632XpFAAAG", "player_id": "097a0d11-7131-44be-a0c1-6fea3ddde9b1", "username": "efwefwe", "active": true, "sus": false, "alive": true, "pic": 10, "selfie": "3547fceb56a44e64bef647d167bbb069.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-10 16:47:21,660 - app_logger - INFO - Ownership check for XWBTDQ: stored_creator=device_kq4edzez9miutiegb, device_id=device_b2nahin7smizkkcmr, is_owner=False
+2025-12-10 16:47:21,662 - app_logger - INFO - Ownership check for XWBTDQ: stored_creator=device_kq4edzez9miutiegb, device_id=device_b2nahin7smizkkcmr, is_owner=False
+2025-12-10 16:47:30,816 - app_logger - INFO - Start game check - task_list_applied=True, task_handler.tasks=10, collaborative_tasks=10, min_tasks=10
+2025-12-10 16:47:30,827 - app_logger - INFO - Applied 10 collaborative tasks to game FMIW
+2025-12-10 16:47:30,827 - app_logger - INFO - Starting game FMIW with 10 tasks
+2025-12-10 16:47:30,828 - app_logger - INFO - Card deck rebuilt with locations: ['Basement', '1st Floor', 'Other']
+2025-12-10 16:47:30,829 - app_logger - INFO - Sending player list to room FMIW
+2025-12-10 16:47:30,829 - app_logger - DEBUG - Player List: ['{"sid": "vQDSFgu3Xgku-OH8AAAD", "player_id": "fe6733c3-ec25-4385-80ef-4b70e95d6778", "username": "wfwefew", "active": true, "sus": true, "alive": true, "pic": 1, "selfie": null, "meltdown_code": null, "cards": ["{\\"action\\": \\"Taunt\\", \\"text\\": \\"Make crewmates suspicious\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"384f934a-2aed-4e53-9193-061a84d237a4\\", \\"countdown\\": false}", "{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 30, \\"time_left\\": 30, \\"id\\": \\"7bef9a55-9cdb-4252-8062-88e84953f240\\", \\"countdown\\": false}"], "ready": false}', '{"sid": "GET_mo4lzx632XpFAAAG", "player_id": "097a0d11-7131-44be-a0c1-6fea3ddde9b1", "username": "efwefwe", "active": true, "sus": false, "alive": true, "pic": 10, "selfie": "3547fceb56a44e64bef647d167bbb069.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-10 16:47:30,830 - app_logger - INFO - Game started in room FMIW
+2025-12-10 16:47:30,830 - app_logger - DEBUG - Assigned task to player 097a0d11-7131-44be-a0c1-6fea3ddde9b1: {'task': '3', 'location': 'Basement', 'difficulty': 2, 'added_by': 'dqwdwq'}
+2025-12-10 16:47:36,221 - app_logger - INFO - Player 097a0d11-7131-44be-a0c1-6fea3ddde9b1 completed a task. Crew score: 1
+2025-12-10 16:47:36,222 - app_logger - DEBUG - Assigned new task to player 097a0d11-7131-44be-a0c1-6fea3ddde9b1: {'task': '3', 'location': '1st Floor', 'difficulty': 2, 'added_by': 'dqwdwq'}
+2025-12-10 16:47:38,191 - app_logger - INFO - Player 097a0d11-7131-44be-a0c1-6fea3ddde9b1 completed a task. Crew score: 2
+2025-12-10 16:47:38,192 - app_logger - DEBUG - Assigned new task to player 097a0d11-7131-44be-a0c1-6fea3ddde9b1: {'task': '1', 'location': '1st Floor', 'difficulty': 2, 'added_by': 'dqwdwq'}
+2025-12-10 16:47:40,031 - app_logger - INFO - Player 097a0d11-7131-44be-a0c1-6fea3ddde9b1 completed a task. Crew score: 3
+2025-12-10 16:47:40,036 - app_logger - INFO - Milestone reached: 20% tasks complete in room FMIW
+2025-12-10 16:47:40,038 - app_logger - DEBUG - Assigned new task to player 097a0d11-7131-44be-a0c1-6fea3ddde9b1: {'task': '5', 'location': 'Basement', 'difficulty': 2, 'added_by': 'dqwdwq'}
+2025-12-10 16:47:46,233 - app_logger - INFO - Player 097a0d11-7131-44be-a0c1-6fea3ddde9b1 completed a task. Crew score: 4
+2025-12-10 16:47:46,234 - app_logger - DEBUG - Assigned new task to player 097a0d11-7131-44be-a0c1-6fea3ddde9b1: {'task': '2', 'location': '1st Floor', 'difficulty': 2, 'added_by': 'dqwdwq'}
+2025-12-10 16:47:48,206 - app_logger - INFO - Player 097a0d11-7131-44be-a0c1-6fea3ddde9b1 completed a task. Crew score: 5
+2025-12-10 16:47:48,208 - app_logger - DEBUG - Assigned new task to player 097a0d11-7131-44be-a0c1-6fea3ddde9b1: {'task': '4', 'location': 'Basement', 'difficulty': 2, 'added_by': 'dqwdwq'}
+2025-12-10 16:47:49,918 - app_logger - INFO - Player 097a0d11-7131-44be-a0c1-6fea3ddde9b1 completed a task. Crew score: 6
+2025-12-10 16:47:49,918 - app_logger - INFO - Milestone reached: 50% tasks complete in room FMIW
+2025-12-10 16:47:49,919 - app_logger - DEBUG - Assigned new task to player 097a0d11-7131-44be-a0c1-6fea3ddde9b1: {'task': '2', 'location': 'Basement', 'difficulty': 2, 'added_by': 'dqwdwq'}
+2025-12-10 16:47:55,874 - app_logger - INFO - Player 097a0d11-7131-44be-a0c1-6fea3ddde9b1 completed a task. Crew score: 7
+2025-12-10 16:47:55,877 - app_logger - DEBUG - Assigned new task to player 097a0d11-7131-44be-a0c1-6fea3ddde9b1: {'task': '1', 'location': 'Basement', 'difficulty': 2, 'added_by': 'dqwdwq'}
+2025-12-10 16:47:57,840 - app_logger - INFO - Player 097a0d11-7131-44be-a0c1-6fea3ddde9b1 completed a task. Crew score: 8
+2025-12-10 16:47:57,840 - app_logger - DEBUG - Assigned new task to player 097a0d11-7131-44be-a0c1-6fea3ddde9b1: {'task': '4', 'location': '1st Floor', 'difficulty': 2, 'added_by': 'dqwdwq'}
+2025-12-10 16:47:59,691 - app_logger - INFO - Player 097a0d11-7131-44be-a0c1-6fea3ddde9b1 completed a task. Crew score: 9
+2025-12-10 16:47:59,692 - app_logger - DEBUG - Assigned new task to player 097a0d11-7131-44be-a0c1-6fea3ddde9b1: {'task': '5', 'location': '1st Floor', 'difficulty': 2, 'added_by': 'dqwdwq'}
+2025-12-10 16:48:02,027 - app_logger - INFO - No more tasks available. Informed player 097a0d11-7131-44be-a0c1-6fea3ddde9b1
+2025-12-10 16:48:05,724 - app_logger - INFO - No more tasks available. Informed player 097a0d11-7131-44be-a0c1-6fea3ddde9b1
+2025-12-10 16:48:07,182 - app_logger - INFO - No more tasks available. Informed player 097a0d11-7131-44be-a0c1-6fea3ddde9b1
+2025-12-10 16:55:34,446 - app_logger - INFO - Client disconnected: vQDSFgu3Xgku-OH8AAAD
+2025-12-10 16:55:34,448 - app_logger - INFO - Client disconnected: GET_mo4lzx632XpFAAAG
+2025-12-10 16:55:35,394 - app_logger - INFO - Starting server...
+2025-12-10 16:55:35,394 - app_logger - INFO -  * DEV MODE: SSL disabled
+2025-12-10 16:55:35,394 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.62:5001
+2025-12-10 16:55:35,669 - app_logger - INFO - Client connected: j_juNgiiZTvlzai5AAAB
+2025-12-10 16:55:35,813 - app_logger - INFO - Client connected: qZ5h23_nrEE6_zi6AAAD
+2025-12-10 16:55:37,115 - app_logger - INFO - Game created with room code: FNFL
+2025-12-10 16:55:41,049 - app_logger - INFO - Applied task list LQAD7H to game FNFL: 17 tasks loaded, task_list_applied=True
+2025-12-10 16:55:41,050 - app_logger - INFO - Task handler now has 17 tasks
+2025-12-10 16:55:42,998 - app_logger - INFO - Game FNFL config updated: {'locations': ['Basement', '1st Floor', '2nd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_imposters': 1, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-10 16:55:43,001 - app_logger - INFO - Room FNFL is now open for players
+2025-12-10 16:55:45,273 - app_logger - INFO - Set creator_player_id to 2a22bea1-e1dc-4b98-850b-bbaf5978f98c for room FNFL (first player)
+2025-12-10 16:55:45,274 - app_logger - INFO - New player wefewfew joined room FNFL with ID 2a22bea1-e1dc-4b98-850b-bbaf5978f98c, is_creator=True
+2025-12-10 16:55:45,274 - app_logger - INFO - Sending player list to room FNFL
+2025-12-10 16:55:45,275 - app_logger - DEBUG - Player List: ['{"sid": "qZ5h23_nrEE6_zi6AAAD", "player_id": "2a22bea1-e1dc-4b98-850b-bbaf5978f98c", "username": "wefewfew", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-10 16:55:45,279 - app_logger - INFO - Ownership check for LQAD7H: stored_creator=device_b32ocpi2jmiuupois, device_id=device_b2nahin7smizkkcmr, is_owner=False
+2025-12-10 16:55:45,280 - app_logger - INFO - Ownership check for LQAD7H: stored_creator=device_b32ocpi2jmiuupois, device_id=device_b2nahin7smizkkcmr, is_owner=False
+2025-12-10 16:55:48,815 - app_logger - INFO - Client j_juNgiiZTvlzai5AAAB joined room FNFL, is_creator=False
+2025-12-10 16:55:51,932 - app_logger - INFO - Saved selfie for efwwefew: 8794034532f64103af4f04a33b41c76e.jpg
+2025-12-10 16:55:51,935 - app_logger - INFO - New player efwwefew joined room FNFL with ID 6c68b35f-48b2-42cc-926e-802f02197361, is_creator=False
+2025-12-10 16:55:51,935 - app_logger - INFO - Sending player list to room FNFL
+2025-12-10 16:55:51,935 - app_logger - DEBUG - Player List: ['{"sid": "qZ5h23_nrEE6_zi6AAAD", "player_id": "2a22bea1-e1dc-4b98-850b-bbaf5978f98c", "username": "wefewfew", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}', '{"sid": "j_juNgiiZTvlzai5AAAB", "player_id": "6c68b35f-48b2-42cc-926e-802f02197361", "username": "efwwefew", "active": true, "sus": false, "alive": true, "pic": 5, "selfie": "8794034532f64103af4f04a33b41c76e.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-10 16:55:51,936 - app_logger - INFO - Ownership check for LQAD7H: stored_creator=device_b32ocpi2jmiuupois, device_id=device_kq4edzez9miutiegb, is_owner=False
+2025-12-10 16:55:51,937 - app_logger - INFO - Ownership check for LQAD7H: stored_creator=device_b32ocpi2jmiuupois, device_id=device_kq4edzez9miutiegb, is_owner=False
+2025-12-10 16:55:58,300 - app_logger - INFO - Start game check - task_list_applied=True, task_handler.tasks=17, collaborative_tasks=17, min_tasks=10
+2025-12-10 16:55:58,301 - app_logger - INFO - Applied 17 collaborative tasks to game FNFL
+2025-12-10 16:55:58,301 - app_logger - INFO - Starting game FNFL with 17 tasks
+2025-12-10 16:55:58,302 - app_logger - INFO - Card deck rebuilt with locations: ['Basement', '1st Floor', '2nd Floor', 'Other']
+2025-12-10 16:55:58,303 - app_logger - INFO - Sending player list to room FNFL
+2025-12-10 16:55:58,303 - app_logger - DEBUG - Player List: ['{"sid": "j_juNgiiZTvlzai5AAAB", "player_id": "6c68b35f-48b2-42cc-926e-802f02197361", "username": "efwwefew", "active": true, "sus": true, "alive": true, "pic": 5, "selfie": "8794034532f64103af4f04a33b41c76e.jpg", "meltdown_code": null, "cards": ["{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"dc95d98a-0d28-45df-a191-148054c8e0db\\", \\"countdown\\": false}", "{\\"action\\": \\"Area Denial\\", \\"text\\": \\"Stop sending tasks to a specific location\\", \\"location\\": \\"Basement\\", \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"00de2238-5e39-4e94-ba60-f81e90ab6019\\", \\"countdown\\": true}"], "ready": false}', '{"sid": "qZ5h23_nrEE6_zi6AAAD", "player_id": "2a22bea1-e1dc-4b98-850b-bbaf5978f98c", "username": "wefewfew", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-10 16:55:58,304 - app_logger - INFO - Game started in room FNFL
+2025-12-10 16:55:58,304 - app_logger - DEBUG - Assigned task to player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c: {'task': 'eat beans', 'location': '2nd Floor', 'difficulty': 2, 'added_by': 'poop'}
+2025-12-10 16:56:01,542 - app_logger - INFO - Player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c completed a task. Crew score: 1
+2025-12-10 16:56:01,543 - app_logger - DEBUG - Assigned new task to player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c: {'task': 'jork', 'location': '1st Floor', 'difficulty': 2, 'added_by': 'poop'}
+2025-12-10 16:56:03,247 - app_logger - INFO - Player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c completed a task. Crew score: 2
+2025-12-10 16:56:03,248 - app_logger - DEBUG - Assigned new task to player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c: {'task': 'RF', 'location': '2nd Floor', 'difficulty': 2, 'added_by': 'poop'}
+2025-12-10 16:56:04,865 - app_logger - INFO - Player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c completed a task. Crew score: 3
+2025-12-10 16:56:04,866 - app_logger - INFO - Milestone reached: 20% tasks complete in room FNFL
+2025-12-10 16:56:04,866 - app_logger - DEBUG - Assigned new task to player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c: {'task': 'cream', 'location': '2nd Floor', 'difficulty': 2, 'added_by': 'poop'}
+2025-12-10 16:56:08,149 - app_logger - INFO - Player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c completed a task. Crew score: 4
+2025-12-10 16:56:08,149 - app_logger - DEBUG - Assigned new task to player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c: {'task': '2', 'location': 'Basement', 'difficulty': 2, 'added_by': 'poop'}
+2025-12-10 16:56:10,565 - app_logger - INFO - Player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c completed a task. Crew score: 5
+2025-12-10 16:56:10,566 - app_logger - DEBUG - Assigned new task to player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c: {'task': 'WAHHHHHHHH', 'location': '2nd Floor', 'difficulty': 2, 'added_by': 'poop'}
+2025-12-10 16:56:12,214 - app_logger - INFO - Player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c completed a task. Crew score: 6
+2025-12-10 16:56:12,214 - app_logger - INFO - Milestone reached: 50% tasks complete in room FNFL
+2025-12-10 16:56:12,215 - app_logger - DEBUG - Assigned new task to player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c: {'task': 'sauna', 'location': 'Basement', 'difficulty': 2, 'added_by': 'poop'}
+2025-12-10 16:56:17,622 - app_logger - INFO - Player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c completed a task. Crew score: 7
+2025-12-10 16:56:17,637 - app_logger - DEBUG - Assigned new task to player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c: {'task': 'idk', 'location': '1st Floor', 'difficulty': 2, 'added_by': 'poop'}
+2025-12-10 16:56:19,148 - app_logger - INFO - Player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c completed a task. Crew score: 8
+2025-12-10 16:56:19,149 - app_logger - DEBUG - Assigned new task to player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c: {'task': 'poop', 'location': '1st Floor', 'difficulty': 2, 'added_by': 'poop'}
+2025-12-10 16:56:20,650 - app_logger - INFO - Player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c completed a task. Crew score: 9
+2025-12-10 16:56:20,651 - app_logger - DEBUG - Assigned new task to player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c: {'task': 'jork', 'location': '1st Floor', 'difficulty': 2, 'added_by': 'poop'}
+2025-12-10 16:56:22,298 - app_logger - INFO - Player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c completed a task. Crew score: 10
+2025-12-10 16:56:22,299 - app_logger - INFO - Milestone reached: 80% tasks complete in room FNFL
+2025-12-10 16:56:22,302 - app_logger - DEBUG - Assigned new task to player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c: {'task': '1', 'location': 'Basement', 'difficulty': 2, 'added_by': 'poop'}
+2025-12-10 16:56:28,984 - app_logger - INFO - Player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c completed a task. Crew score: 11
+2025-12-10 16:56:28,986 - app_logger - DEBUG - Assigned new task to player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c: {'task': 'idk man just do something', 'location': '2nd Floor', 'difficulty': 2, 'added_by': 'poop'}
+2025-12-10 16:56:31,032 - app_logger - INFO - Player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c completed a task. Crew score: 12
+2025-12-10 16:56:31,033 - app_logger - INFO - Milestone reached: 95% tasks complete in room FNFL
+2025-12-10 16:56:31,035 - app_logger - DEBUG - Assigned new task to player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c: {'task': 'shot', 'location': '1st Floor', 'difficulty': 2, 'added_by': 'poop'}
+2025-12-10 17:01:20,316 - app_logger - INFO - Client disconnected: qZ5h23_nrEE6_zi6AAAD
+2025-12-10 17:01:20,335 - app_logger - INFO - Client connected: DtFvus_f0NtbxzkBAAAF
+2025-12-10 17:01:20,338 - app_logger - INFO - Player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c rejoining room FNFL, creator_player_id=2a22bea1-e1dc-4b98-850b-bbaf5978f98c
+2025-12-10 17:01:20,338 - app_logger - INFO - Creator 2a22bea1-e1dc-4b98-850b-bbaf5978f98c reconnected to room FNFL
+2025-12-10 17:01:20,338 - app_logger - INFO - Sending player list to room FNFL
+2025-12-10 17:01:20,339 - app_logger - DEBUG - Player List: ['{"sid": "j_juNgiiZTvlzai5AAAB", "player_id": "6c68b35f-48b2-42cc-926e-802f02197361", "username": "efwwefew", "active": true, "sus": true, "alive": true, "pic": 5, "selfie": "8794034532f64103af4f04a33b41c76e.jpg", "meltdown_code": null, "cards": ["{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"dc95d98a-0d28-45df-a191-148054c8e0db\\", \\"countdown\\": false}", "{\\"action\\": \\"Area Denial\\", \\"text\\": \\"Stop sending tasks to a specific location\\", \\"location\\": \\"Basement\\", \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"00de2238-5e39-4e94-ba60-f81e90ab6019\\", \\"countdown\\": true}"], "ready": false}', '{"sid": "DtFvus_f0NtbxzkBAAAF", "player_id": "2a22bea1-e1dc-4b98-850b-bbaf5978f98c", "username": "wefewfew", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-10 17:01:20,339 - app_logger - INFO - Sending task to player
+2025-12-10 17:01:20,678 - app_logger - INFO - Client disconnected: j_juNgiiZTvlzai5AAAB
+2025-12-10 17:01:20,691 - app_logger - INFO - Client connected: URENYBaECmOag4AHAAAH
+2025-12-10 17:01:20,694 - app_logger - INFO - Player 6c68b35f-48b2-42cc-926e-802f02197361 rejoining room FNFL, creator_player_id=2a22bea1-e1dc-4b98-850b-bbaf5978f98c
+2025-12-10 17:01:20,695 - app_logger - INFO - Non-creator 6c68b35f-48b2-42cc-926e-802f02197361 rejoined room FNFL
+2025-12-10 17:01:20,695 - app_logger - INFO - Sending player list to room FNFL
+2025-12-10 17:01:20,695 - app_logger - DEBUG - Player List: ['{"sid": "URENYBaECmOag4AHAAAH", "player_id": "6c68b35f-48b2-42cc-926e-802f02197361", "username": "efwwefew", "active": true, "sus": true, "alive": true, "pic": 5, "selfie": "8794034532f64103af4f04a33b41c76e.jpg", "meltdown_code": null, "cards": ["{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"dc95d98a-0d28-45df-a191-148054c8e0db\\", \\"countdown\\": false}", "{\\"action\\": \\"Area Denial\\", \\"text\\": \\"Stop sending tasks to a specific location\\", \\"location\\": \\"Basement\\", \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"00de2238-5e39-4e94-ba60-f81e90ab6019\\", \\"countdown\\": true}"], "ready": false}', '{"sid": "DtFvus_f0NtbxzkBAAAF", "player_id": "2a22bea1-e1dc-4b98-850b-bbaf5978f98c", "username": "wefewfew", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-10 17:07:30,523 - app_logger - INFO - Client disconnected: DtFvus_f0NtbxzkBAAAF
+2025-12-10 17:07:30,745 - app_logger - INFO - Client disconnected: URENYBaECmOag4AHAAAH
+2025-12-10 17:07:42,729 - app_logger - INFO - Client connected: tH-QVmLqrltUGpS5AAAK
+2025-12-10 17:07:42,742 - app_logger - INFO - Player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c rejoining room FNFL, creator_player_id=2a22bea1-e1dc-4b98-850b-bbaf5978f98c
+2025-12-10 17:07:42,742 - app_logger - INFO - Creator 2a22bea1-e1dc-4b98-850b-bbaf5978f98c reconnected to room FNFL
+2025-12-10 17:07:42,743 - app_logger - INFO - Sending player list to room FNFL
+2025-12-10 17:07:42,743 - app_logger - DEBUG - Player List: ['{"sid": "URENYBaECmOag4AHAAAH", "player_id": "6c68b35f-48b2-42cc-926e-802f02197361", "username": "efwwefew", "active": true, "sus": true, "alive": true, "pic": 5, "selfie": "8794034532f64103af4f04a33b41c76e.jpg", "meltdown_code": null, "cards": ["{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"dc95d98a-0d28-45df-a191-148054c8e0db\\", \\"countdown\\": false}", "{\\"action\\": \\"Area Denial\\", \\"text\\": \\"Stop sending tasks to a specific location\\", \\"location\\": \\"Basement\\", \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"00de2238-5e39-4e94-ba60-f81e90ab6019\\", \\"countdown\\": true}"], "ready": false}', '{"sid": "tH-QVmLqrltUGpS5AAAK", "player_id": "2a22bea1-e1dc-4b98-850b-bbaf5978f98c", "username": "wefewfew", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-10 17:07:42,743 - app_logger - INFO - Sending task to player
+2025-12-10 17:07:43,084 - app_logger - INFO - Client connected: 17Fp32AK4xzdEPsSAAAN
+2025-12-10 17:07:43,086 - app_logger - INFO - Player 6c68b35f-48b2-42cc-926e-802f02197361 rejoining room FNFL, creator_player_id=2a22bea1-e1dc-4b98-850b-bbaf5978f98c
+2025-12-10 17:07:43,086 - app_logger - INFO - Non-creator 6c68b35f-48b2-42cc-926e-802f02197361 rejoined room FNFL
+2025-12-10 17:07:43,086 - app_logger - INFO - Sending player list to room FNFL
+2025-12-10 17:07:43,086 - app_logger - DEBUG - Player List: ['{"sid": "17Fp32AK4xzdEPsSAAAN", "player_id": "6c68b35f-48b2-42cc-926e-802f02197361", "username": "efwwefew", "active": true, "sus": true, "alive": true, "pic": 5, "selfie": "8794034532f64103af4f04a33b41c76e.jpg", "meltdown_code": null, "cards": ["{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"dc95d98a-0d28-45df-a191-148054c8e0db\\", \\"countdown\\": false}", "{\\"action\\": \\"Area Denial\\", \\"text\\": \\"Stop sending tasks to a specific location\\", \\"location\\": \\"Basement\\", \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"00de2238-5e39-4e94-ba60-f81e90ab6019\\", \\"countdown\\": true}"], "ready": false}', '{"sid": "tH-QVmLqrltUGpS5AAAK", "player_id": "2a22bea1-e1dc-4b98-850b-bbaf5978f98c", "username": "wefewfew", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-10 17:07:45,910 - app_logger - INFO - Player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c completed a task. Crew score: 13
+2025-12-10 17:07:45,913 - app_logger - DEBUG - Assigned new task to player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c: {'task': 'EWFWE', 'location': '2nd Floor', 'difficulty': 2, 'added_by': 'poop'}
+2025-12-10 17:07:51,861 - app_logger - INFO - Client disconnected: tH-QVmLqrltUGpS5AAAK
+2025-12-10 17:07:52,191 - app_logger - INFO - Client connected: H2k2bndL0FFOGW6HAAAQ
+2025-12-10 17:07:52,202 - app_logger - INFO - Player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c rejoining room FNFL, creator_player_id=2a22bea1-e1dc-4b98-850b-bbaf5978f98c
+2025-12-10 17:07:52,203 - app_logger - INFO - Creator 2a22bea1-e1dc-4b98-850b-bbaf5978f98c reconnected to room FNFL
+2025-12-10 17:07:52,206 - app_logger - INFO - Sending player list to room FNFL
+2025-12-10 17:07:52,207 - app_logger - DEBUG - Player List: ['{"sid": "17Fp32AK4xzdEPsSAAAN", "player_id": "6c68b35f-48b2-42cc-926e-802f02197361", "username": "efwwefew", "active": true, "sus": true, "alive": true, "pic": 5, "selfie": "8794034532f64103af4f04a33b41c76e.jpg", "meltdown_code": null, "cards": ["{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"dc95d98a-0d28-45df-a191-148054c8e0db\\", \\"countdown\\": false}", "{\\"action\\": \\"Area Denial\\", \\"text\\": \\"Stop sending tasks to a specific location\\", \\"location\\": \\"Basement\\", \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"00de2238-5e39-4e94-ba60-f81e90ab6019\\", \\"countdown\\": true}"], "ready": false}', '{"sid": "H2k2bndL0FFOGW6HAAAQ", "player_id": "2a22bea1-e1dc-4b98-850b-bbaf5978f98c", "username": "wefewfew", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-10 17:07:52,210 - app_logger - INFO - Sending task to player
+2025-12-10 17:08:17,908 - app_logger - INFO - Client disconnected: H2k2bndL0FFOGW6HAAAQ
+2025-12-10 17:08:18,132 - app_logger - INFO - Client connected: DNJEHPETgvy9pt9zAAAS
+2025-12-10 17:08:18,144 - app_logger - INFO - Player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c rejoining room FNFL, creator_player_id=2a22bea1-e1dc-4b98-850b-bbaf5978f98c
+2025-12-10 17:08:18,144 - app_logger - INFO - Creator 2a22bea1-e1dc-4b98-850b-bbaf5978f98c reconnected to room FNFL
+2025-12-10 17:08:18,145 - app_logger - INFO - Sending player list to room FNFL
+2025-12-10 17:08:18,146 - app_logger - DEBUG - Player List: ['{"sid": "17Fp32AK4xzdEPsSAAAN", "player_id": "6c68b35f-48b2-42cc-926e-802f02197361", "username": "efwwefew", "active": true, "sus": true, "alive": true, "pic": 5, "selfie": "8794034532f64103af4f04a33b41c76e.jpg", "meltdown_code": null, "cards": ["{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"dc95d98a-0d28-45df-a191-148054c8e0db\\", \\"countdown\\": false}", "{\\"action\\": \\"Area Denial\\", \\"text\\": \\"Stop sending tasks to a specific location\\", \\"location\\": \\"Basement\\", \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"00de2238-5e39-4e94-ba60-f81e90ab6019\\", \\"countdown\\": true}"], "ready": false}', '{"sid": "DNJEHPETgvy9pt9zAAAS", "player_id": "2a22bea1-e1dc-4b98-850b-bbaf5978f98c", "username": "wefewfew", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-10 17:08:18,148 - app_logger - INFO - Sending task to player
+2025-12-10 17:08:18,487 - app_logger - INFO - Client disconnected: 17Fp32AK4xzdEPsSAAAN
+2025-12-10 17:08:18,597 - app_logger - INFO - Client connected: 3GEJDpyV4iq42sfxAAAV
+2025-12-10 17:08:18,604 - app_logger - INFO - Player 6c68b35f-48b2-42cc-926e-802f02197361 rejoining room FNFL, creator_player_id=2a22bea1-e1dc-4b98-850b-bbaf5978f98c
+2025-12-10 17:08:18,607 - app_logger - INFO - Non-creator 6c68b35f-48b2-42cc-926e-802f02197361 rejoined room FNFL
+2025-12-10 17:08:18,608 - app_logger - INFO - Sending player list to room FNFL
+2025-12-10 17:08:18,608 - app_logger - DEBUG - Player List: ['{"sid": "3GEJDpyV4iq42sfxAAAV", "player_id": "6c68b35f-48b2-42cc-926e-802f02197361", "username": "efwwefew", "active": true, "sus": true, "alive": true, "pic": 5, "selfie": "8794034532f64103af4f04a33b41c76e.jpg", "meltdown_code": null, "cards": ["{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"dc95d98a-0d28-45df-a191-148054c8e0db\\", \\"countdown\\": false}", "{\\"action\\": \\"Area Denial\\", \\"text\\": \\"Stop sending tasks to a specific location\\", \\"location\\": \\"Basement\\", \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"00de2238-5e39-4e94-ba60-f81e90ab6019\\", \\"countdown\\": true}"], "ready": false}', '{"sid": "DNJEHPETgvy9pt9zAAAS", "player_id": "2a22bea1-e1dc-4b98-850b-bbaf5978f98c", "username": "wefewfew", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-10 17:09:03,151 - app_logger - INFO - Client disconnected: DNJEHPETgvy9pt9zAAAS
+2025-12-10 17:09:03,611 - app_logger - INFO - Client disconnected: 3GEJDpyV4iq42sfxAAAV
+2025-12-10 17:10:47,628 - app_logger - INFO - Client connected: rneXCxkXA94wO5SqAAAX
+2025-12-10 17:10:47,635 - app_logger - INFO - Player 6c68b35f-48b2-42cc-926e-802f02197361 rejoining room FNFL, creator_player_id=2a22bea1-e1dc-4b98-850b-bbaf5978f98c
+2025-12-10 17:10:47,637 - app_logger - INFO - Non-creator 6c68b35f-48b2-42cc-926e-802f02197361 rejoined room FNFL
+2025-12-10 17:10:47,640 - app_logger - INFO - Sending player list to room FNFL
+2025-12-10 17:10:47,640 - app_logger - DEBUG - Player List: ['{"sid": "rneXCxkXA94wO5SqAAAX", "player_id": "6c68b35f-48b2-42cc-926e-802f02197361", "username": "efwwefew", "active": true, "sus": true, "alive": true, "pic": 5, "selfie": "8794034532f64103af4f04a33b41c76e.jpg", "meltdown_code": null, "cards": ["{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"dc95d98a-0d28-45df-a191-148054c8e0db\\", \\"countdown\\": false}", "{\\"action\\": \\"Area Denial\\", \\"text\\": \\"Stop sending tasks to a specific location\\", \\"location\\": \\"Basement\\", \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"00de2238-5e39-4e94-ba60-f81e90ab6019\\", \\"countdown\\": true}"], "ready": false}', '{"sid": "DNJEHPETgvy9pt9zAAAS", "player_id": "2a22bea1-e1dc-4b98-850b-bbaf5978f98c", "username": "wefewfew", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-10 17:10:47,950 - app_logger - INFO - Client connected: tIQWeXVoKqHGgOnGAAAa
+2025-12-10 17:10:47,954 - app_logger - INFO - Player 2a22bea1-e1dc-4b98-850b-bbaf5978f98c rejoining room FNFL, creator_player_id=2a22bea1-e1dc-4b98-850b-bbaf5978f98c
+2025-12-10 17:10:47,955 - app_logger - INFO - Creator 2a22bea1-e1dc-4b98-850b-bbaf5978f98c reconnected to room FNFL
+2025-12-10 17:10:47,955 - app_logger - INFO - Sending player list to room FNFL
+2025-12-10 17:10:47,955 - app_logger - DEBUG - Player List: ['{"sid": "rneXCxkXA94wO5SqAAAX", "player_id": "6c68b35f-48b2-42cc-926e-802f02197361", "username": "efwwefew", "active": true, "sus": true, "alive": true, "pic": 5, "selfie": "8794034532f64103af4f04a33b41c76e.jpg", "meltdown_code": null, "cards": ["{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"dc95d98a-0d28-45df-a191-148054c8e0db\\", \\"countdown\\": false}", "{\\"action\\": \\"Area Denial\\", \\"text\\": \\"Stop sending tasks to a specific location\\", \\"location\\": \\"Basement\\", \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"00de2238-5e39-4e94-ba60-f81e90ab6019\\", \\"countdown\\": true}"], "ready": false}', '{"sid": "tIQWeXVoKqHGgOnGAAAa", "player_id": "2a22bea1-e1dc-4b98-850b-bbaf5978f98c", "username": "wefewfew", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-10 17:10:47,955 - app_logger - INFO - Sending task to player
+2025-12-10 17:21:32,754 - app_logger - INFO - Client disconnected: tIQWeXVoKqHGgOnGAAAa
+2025-12-10 17:30:56,663 - app_logger - INFO - Client disconnected: rneXCxkXA94wO5SqAAAX
+2025-12-10 17:30:59,695 - app_logger - INFO - Client connected: Gn-hAsS5sTHvmjdkAAAc
+2025-12-10 17:30:59,700 - app_logger - INFO - Player 6c68b35f-48b2-42cc-926e-802f02197361 rejoining room FNFL, creator_player_id=2a22bea1-e1dc-4b98-850b-bbaf5978f98c
+2025-12-10 17:30:59,700 - app_logger - INFO - Non-creator 6c68b35f-48b2-42cc-926e-802f02197361 rejoined room FNFL
+2025-12-10 17:30:59,703 - app_logger - INFO - Sending player list to room FNFL
+2025-12-10 17:30:59,703 - app_logger - DEBUG - Player List: ['{"sid": "Gn-hAsS5sTHvmjdkAAAc", "player_id": "6c68b35f-48b2-42cc-926e-802f02197361", "username": "efwwefew", "active": true, "sus": true, "alive": true, "pic": 5, "selfie": "8794034532f64103af4f04a33b41c76e.jpg", "meltdown_code": null, "cards": ["{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"dc95d98a-0d28-45df-a191-148054c8e0db\\", \\"countdown\\": false}", "{\\"action\\": \\"Area Denial\\", \\"text\\": \\"Stop sending tasks to a specific location\\", \\"location\\": \\"Basement\\", \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"00de2238-5e39-4e94-ba60-f81e90ab6019\\", \\"countdown\\": true}"], "ready": false}', '{"sid": "tIQWeXVoKqHGgOnGAAAa", "player_id": "2a22bea1-e1dc-4b98-850b-bbaf5978f98c", "username": "wefewfew", "active": true, "sus": false, "alive": true, "pic": 1, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-10 17:33:07,094 - app_logger - INFO - Client disconnected: Gn-hAsS5sTHvmjdkAAAc
+2025-12-10 17:37:03,103 - app_logger - INFO - Starting server...
+2025-12-10 17:37:03,103 - app_logger - INFO -  * DEV MODE: SSL disabled
+2025-12-10 17:37:03,103 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.62:5001
+2025-12-10 17:37:04,460 - app_logger - INFO - Client connected: pJShCX3SpNfDBwn_AAAB
+2025-12-10 17:37:19,385 - app_logger - INFO - Client connected: LUpZHc8FSL83MKyFAAAE
+2025-12-10 17:37:20,615 - app_logger - INFO - Client disconnected: LUpZHc8FSL83MKyFAAAE
+2025-12-10 17:37:41,396 - app_logger - INFO - Client connected: HwAYr2yIvaaBrp6PAAAG
+2025-12-10 17:37:43,060 - app_logger - INFO - Game created with room code: EQCR
+2025-12-10 17:37:43,072 - app_logger - INFO - Reactor registered for room EQCR (sid: HwAYr2yIvaaBrp6PAAAG)
+2025-12-10 17:37:44,772 - app_logger - INFO - Applied task list LQAD7H to game EQCR: 17 tasks loaded, task_list_applied=True
+2025-12-10 17:37:44,773 - app_logger - INFO - Task handler now has 17 tasks
+2025-12-10 17:37:50,822 - app_logger - INFO - Game EQCR config updated: {'locations': ['Basement', '1st Floor', '2nd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_intruders': 1, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-10 17:37:50,825 - app_logger - INFO - Room EQCR is now open for players
+2025-12-10 17:41:09,157 - app_logger - INFO - Client disconnected: pJShCX3SpNfDBwn_AAAB
+2025-12-10 17:41:09,164 - app_logger - INFO - Client disconnected: HwAYr2yIvaaBrp6PAAAG
+2025-12-10 17:41:09,563 - app_logger - INFO - Client connected: 5p1FbEBuwY0YXUQoAAAK
+2025-12-10 17:41:09,606 - app_logger - INFO - Client connected: yaN2aY-KQq6-GDjvAAAL
+2025-12-10 17:41:09,614 - app_logger - INFO - Reactor registered for room EQCR (sid: yaN2aY-KQq6-GDjvAAAL)
+2025-12-10 17:42:47,404 - app_logger - INFO - Client disconnected: 5p1FbEBuwY0YXUQoAAAK
+2025-12-10 17:42:47,412 - app_logger - INFO - Client disconnected: yaN2aY-KQq6-GDjvAAAL
+2025-12-10 17:42:47,816 - app_logger - INFO - Client connected: uTQOzYqOmVDg2JHhAAAO
+2025-12-10 17:42:47,826 - app_logger - INFO - Reactor registered for room EQCR (sid: uTQOzYqOmVDg2JHhAAAO)
+2025-12-10 17:42:47,828 - app_logger - INFO - Client connected: 779Jd1Ura35N7W0JAAAQ
+2025-12-10 17:42:59,638 - app_logger - INFO - Client disconnected: uTQOzYqOmVDg2JHhAAAO
+2025-12-10 17:42:59,654 - app_logger - INFO - Client disconnected: 779Jd1Ura35N7W0JAAAQ
+2025-12-10 17:42:59,969 - app_logger - INFO - Client connected: UIEInqfqOmXp5HWRAAAS
+2025-12-10 17:42:59,975 - app_logger - INFO - Reactor registered for room EQCR (sid: UIEInqfqOmXp5HWRAAAS)
+2025-12-10 17:43:00,008 - app_logger - INFO - Client connected: LoddlFGDMgLZ82MKAAAU
+2025-12-10 17:43:11,597 - app_logger - INFO - Client disconnected: LoddlFGDMgLZ82MKAAAU
+2025-12-10 17:43:11,602 - app_logger - INFO - Client disconnected: UIEInqfqOmXp5HWRAAAS
+2025-12-10 17:43:11,734 - app_logger - INFO - Client connected: kDH5eJiuLryo5vRcAAAY
+2025-12-10 17:43:11,739 - app_logger - INFO - Client connected: 8HNuzbDMw19VIJJ5AAAZ
+2025-12-10 17:43:11,751 - app_logger - INFO - Reactor registered for room EQCR (sid: 8HNuzbDMw19VIJJ5AAAZ)
+2025-12-10 17:43:23,992 - app_logger - INFO - Client disconnected: 8HNuzbDMw19VIJJ5AAAZ
+2025-12-10 17:43:24,000 - app_logger - INFO - Client disconnected: kDH5eJiuLryo5vRcAAAY
+2025-12-10 17:43:24,107 - app_logger - INFO - Client connected: 8NRao0g6MUQRlkP4AAAc
+2025-12-10 17:43:24,125 - app_logger - INFO - Client connected: Z2KrfU2R77OVdVyUAAAd
+2025-12-10 17:43:24,128 - app_logger - INFO - Reactor registered for room EQCR (sid: Z2KrfU2R77OVdVyUAAAd)
+2025-12-10 17:43:33,555 - app_logger - INFO - Client disconnected: Z2KrfU2R77OVdVyUAAAd
+2025-12-10 17:43:33,562 - app_logger - INFO - Client disconnected: 8NRao0g6MUQRlkP4AAAc
+2025-12-10 17:43:33,699 - app_logger - INFO - Client connected: xVizCwBGWuuaQN8-AAAg
+2025-12-10 17:43:33,728 - app_logger - INFO - Reactor registered for room EQCR (sid: xVizCwBGWuuaQN8-AAAg)
+2025-12-10 17:43:33,774 - app_logger - INFO - Client connected: 1ssPgWBbkmfwsim8AAAi
+2025-12-10 17:43:43,265 - app_logger - INFO - Client disconnected: xVizCwBGWuuaQN8-AAAg
+2025-12-10 17:43:43,268 - app_logger - INFO - Client disconnected: 1ssPgWBbkmfwsim8AAAi
+2025-12-10 17:43:43,379 - app_logger - INFO - Client connected: 9-j0fMKF4xtLrbhoAAAl
+2025-12-10 17:43:43,434 - app_logger - INFO - Client connected: V-kEdapTgnyAwL6EAAAm
+2025-12-10 17:43:43,436 - app_logger - INFO - Reactor registered for room EQCR (sid: V-kEdapTgnyAwL6EAAAm)
+2025-12-10 17:44:58,337 - app_logger - INFO - Client disconnected: V-kEdapTgnyAwL6EAAAm
+2025-12-10 17:44:58,341 - app_logger - INFO - Client disconnected: 9-j0fMKF4xtLrbhoAAAl
+2025-12-10 17:44:58,596 - app_logger - INFO - Client connected: VoA9TeSiJg9Xvcq9AAAp
+2025-12-10 17:44:58,619 - app_logger - INFO - Reactor registered for room EQCR (sid: VoA9TeSiJg9Xvcq9AAAp)
+2025-12-10 17:44:58,621 - app_logger - INFO - Client connected: Ug4A8lGfoW8EFDBHAAAr
+2025-12-10 17:54:24,083 - app_logger - INFO - Client disconnected: VoA9TeSiJg9Xvcq9AAAp
+2025-12-10 17:54:24,142 - app_logger - INFO - Client disconnected: Ug4A8lGfoW8EFDBHAAAr
+2025-12-10 17:54:25,379 - app_logger - INFO - Client connected: QMTVGtSymXXpqTQAAAAt
+2025-12-10 17:54:26,375 - app_logger - INFO - Client connected: 6cwo0ptE7YB-9vp3AAAv

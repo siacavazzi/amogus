@@ -1,12 +1,12 @@
-# 🔊 Among Us Party Game - Sonos Connector
+# 🔊 Sus Party - Sonos Connector
 
-A lightweight, open-source client that connects your local Sonos speakers to the [Among Us Party Game](https://amogus-party.duckdns.org).
+A lightweight, open-source client that connects your local Sonos speakers to the [Sus Party Game](https://amogus-party.duckdns.org).
 
 > **🔒 Privacy & Security**: This code is 100% open source. You can review every line before running it. The connector only communicates with the game server to receive sound events - it doesn't collect any personal data or access anything else on your network.
 
 ## What It Does
 
-When you're playing the Among Us party game, this connector:
+When you're playing Sus Party, this connector:
 1. Discovers Sonos speakers on your local WiFi network
 2. Connects to the game server (via secure WebSocket)
 3. Plays game sounds (meeting alerts, victory music, etc.) through your Sonos speakers

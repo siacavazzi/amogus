@@ -64,7 +64,7 @@ function ReactorWaiting() {
           <div className="bg-gray-800/80 backdrop-blur-sm p-8 rounded-2xl shadow-2xl mb-8 text-center border border-cyan-500/30">
             <div className="flex items-center justify-center gap-2 mb-4">
               <Monitor size={24} className="text-cyan-400" />
-              <p className="text-cyan-300 text-lg font-medium">Reactor Control Station</p>
+              <p className="text-cyan-300 text-lg font-medium">Core Control Station</p>
             </div>
             
             <p className="text-gray-400 text-sm mb-2">Room Code</p>
@@ -118,11 +118,11 @@ function ReactorWaiting() {
           <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-red-500/30">
             <div className="flex items-center gap-2 mb-3">
               <FaRadiation className="text-red-400 text-xl" />
-              <h3 className="text-lg font-semibold text-red-400">Reactor Control</h3>
+              <h3 className="text-lg font-semibold text-red-400">Core Control</h3>
             </div>
             <p className="text-gray-400 text-sm">
               Once the game starts, this screen becomes the <span className="text-red-400 font-medium">Sabotage Panel</span>. 
-              Imposters can trigger reactor meltdowns that crewmates must stop!
+              Intruders can trigger core meltdowns that crewmates must stop!
             </p>
           </div>
 

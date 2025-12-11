@@ -68,7 +68,7 @@ function LoginPage() {
                 {step === 'username' && (
                     <>
                         <div className="flex flex-col items-center mb-6">
-                            <img src="https://i1.sndcdn.com/artworks-Uii8SMJvNPxy8ePA-romBoQ-t1080x1080.jpg" alt="Among Us" className="w-32 h-32 rounded-full mb-4"/>
+                            <img src="https://i1.sndcdn.com/artworks-Uii8SMJvNPxy8ePA-romBoQ-t1080x1080.jpg" alt="Sus Party" className="w-32 h-32 rounded-full mb-4"/>
                             <h2 className="text-2xl font-bold mb-2 text-gray-100">Join the Game</h2>
                             <p className="text-sm text-gray-300">Enter your username to start playing</p>
                         </div>
