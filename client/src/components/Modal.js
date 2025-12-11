@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import { DataContext } from "../GameContext";
+import { X, Volume2 } from "lucide-react";
 
 const Modal = () => {
   const { dialog, setAudio, setAudioEnabled, meetingState } = useContext(DataContext);
@@ -40,17 +41,20 @@ const Modal = () => {
 
   if (!open) return null;
 
+  const isAudioModal = dialog?.title === "Click to enable audio";
+
   return (
     <>
-      {/* Backdrop */}
+      {/* Backdrop with blur */}
       <div
-        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+        onClick={() => !isAudioModal && setOpen(false)}
         aria-hidden="true"
-      ></div>
+      />
 
       {/* Modal */}
       <div
-        className="fixed inset-0 flex items-center justify-center z-50 px-4"
+        className="fixed inset-0 flex items-center justify-center z-50 px-4 pointer-events-none"
         aria-modal="true"
         role="dialog"
         aria-labelledby="modal-title"
@@ -59,49 +63,59 @@ const Modal = () => {
         <div
           ref={modalRef}
           tabIndex="-1"
-          className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-md mx-auto overflow-hidden focus:outline-none"
+          className="pointer-events-auto w-full max-w-md mx-auto overflow-hidden focus:outline-none rounded-2xl border border-gray-700/50 bg-gray-900/95 shadow-2xl"
+          style={{
+            boxShadow: '0 0 40px rgba(0, 0, 0, 0.5), 0 0 80px rgba(34, 211, 238, 0.1)',
+          }}
         >
           {/* Header */}
-          <div className="px-6 py-4 border-b dark:border-gray-700">
+          <div className="relative px-6 py-4 border-b border-gray-700/50 bg-gray-800/50">
             <h2
               id="modal-title"
-              className="text-xl font-semibold text-gray-800 dark:text-white"
+              className="text-lg font-bold text-white"
             >
-              {dialog?.title || "Default Title"}
+              {dialog?.title || "Notification"}
             </h2>
+            {!isAudioModal && (
+              <button
+                onClick={() => setOpen(false)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700/50 transition-colors"
+              >
+                <X size={20} />
+              </button>
+            )}
           </div>
 
           {/* Body */}
           <div
             id="modal-description"
-            className="px-6 py-4 overflow-y-auto max-h-80"
+            className="px-6 py-5 text-gray-300"
           >
             {typeof dialog?.body === "string" ? (
-              <p className="text-gray-700 dark:text-gray-300">{dialog.body}</p>
+              <p>{dialog.body}</p>
             ) : (
-              dialog?.body || (
-                null
-              )
+              dialog?.body || null
             )}
           </div>
 
           {/* Footer */}
-          <div className="px-6 py-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-            {dialog?.title === "Click to enable audio" ?
+          <div className="px-6 py-4 border-t border-gray-700/50 bg-gray-800/30">
+            {isAudioModal ? (
               <button
-                className="w-full bg-green-600 text-white py-4 rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
+                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white py-3 rounded-xl font-semibold hover:from-cyan-500 hover:to-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all"
                 onClick={() => closeModal()}
               >
-                Enable audio
+                <Volume2 size={20} />
+                Enable Audio
               </button>
-              : <button
-                className="w-full bg-blue-600 text-white py-4 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+            ) : (
+              <button
+                className="w-full bg-gray-700 text-white py-3 rounded-xl font-semibold hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all"
                 onClick={() => closeModal()}
               >
                 OK
               </button>
-
-            }
+            )}
           </div>
         </div>
       </div>

@@ -6462,3 +6462,155 @@
 2025-12-10 17:54:24,142 - app_logger - INFO - Client disconnected: Ug4A8lGfoW8EFDBHAAAr
 2025-12-10 17:54:25,379 - app_logger - INFO - Client connected: QMTVGtSymXXpqTQAAAAt
 2025-12-10 17:54:26,375 - app_logger - INFO - Client connected: 6cwo0ptE7YB-9vp3AAAv
+2025-12-10 21:30:23,924 - app_logger - INFO - Client disconnected: 6cwo0ptE7YB-9vp3AAAv
+2025-12-10 21:30:24,390 - app_logger - INFO - Client connected: Bwbz5cFe4fuao70LAAAy
+2025-12-10 21:30:28,952 - app_logger - INFO - Game created with room code: HEKH
+2025-12-10 21:30:28,955 - app_logger - INFO - Reactor registered for room HEKH (sid: Bwbz5cFe4fuao70LAAAy)
+2025-12-10 21:30:31,028 - app_logger - INFO - Applied task list LQAD7H to game HEKH: 17 tasks loaded, task_list_applied=True
+2025-12-10 21:30:31,029 - app_logger - INFO - Task handler now has 17 tasks
+2025-12-10 21:30:33,004 - app_logger - INFO - Game HEKH config updated: {'locations': ['Basement', '1st Floor', '2nd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_intruders': 1, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-10 21:30:33,006 - app_logger - INFO - Room HEKH is now open for players
+2025-12-10 21:30:37,960 - app_logger - INFO - Client disconnected: Bwbz5cFe4fuao70LAAAy
+2025-12-10 21:30:38,123 - app_logger - INFO - Client connected: KHTVi0GHN5WxEtpOAAA1
+2025-12-10 21:30:44,741 - app_logger - INFO - Saved selfie for sam: 0e16ff26d2dd4cdca414e03b84698e88.jpg
+2025-12-10 21:30:44,743 - app_logger - INFO - Set creator_player_id to db13c9da-82d4-468f-9aca-a54a8633781f for room HEKH (first player)
+2025-12-10 21:30:44,743 - app_logger - INFO - New player sam joined room HEKH with ID db13c9da-82d4-468f-9aca-a54a8633781f, is_creator=True
+2025-12-10 21:30:44,744 - app_logger - INFO - Sending player list to room HEKH
+2025-12-10 21:30:44,745 - app_logger - DEBUG - Player List: ['{"sid": "KHTVi0GHN5WxEtpOAAA1", "player_id": "db13c9da-82d4-468f-9aca-a54a8633781f", "username": "sam", "active": true, "sus": false, "alive": true, "pic": 5, "selfie": "0e16ff26d2dd4cdca414e03b84698e88.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-10 21:30:44,746 - app_logger - INFO - Ownership check for LQAD7H: stored_creator=device_b32ocpi2jmiuupois, device_id=device_b2nahin7smizkkcmr, is_owner=False
+2025-12-10 21:30:44,746 - app_logger - INFO - Ownership check for LQAD7H: stored_creator=device_b32ocpi2jmiuupois, device_id=device_b2nahin7smizkkcmr, is_owner=False
+2025-12-10 21:30:52,218 - app_logger - INFO - Client disconnected: KHTVi0GHN5WxEtpOAAA1
+2025-12-10 21:30:52,383 - app_logger - INFO - Client connected: f7CSax9kiBz2kObkAAA4
+2025-12-10 21:30:52,390 - app_logger - INFO - Player db13c9da-82d4-468f-9aca-a54a8633781f rejoining room HEKH, creator_player_id=db13c9da-82d4-468f-9aca-a54a8633781f
+2025-12-10 21:30:52,391 - app_logger - INFO - Creator db13c9da-82d4-468f-9aca-a54a8633781f reconnected to room HEKH
+2025-12-10 21:30:52,391 - app_logger - INFO - Sending player list to room HEKH
+2025-12-10 21:30:52,391 - app_logger - DEBUG - Player List: ['{"sid": "f7CSax9kiBz2kObkAAA4", "player_id": "db13c9da-82d4-468f-9aca-a54a8633781f", "username": "sam", "active": true, "sus": false, "alive": true, "pic": 5, "selfie": "0e16ff26d2dd4cdca414e03b84698e88.jpg", "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-10 21:30:52,401 - app_logger - INFO - Ownership check for LQAD7H: stored_creator=device_b32ocpi2jmiuupois, device_id=device_b2nahin7smizkkcmr, is_owner=False
+2025-12-10 21:30:52,402 - app_logger - INFO - Ownership check for LQAD7H: stored_creator=device_b32ocpi2jmiuupois, device_id=device_b2nahin7smizkkcmr, is_owner=False
+2025-12-10 21:31:00,507 - app_logger - INFO - Start game check - task_list_applied=True, task_handler.tasks=17, collaborative_tasks=17, min_tasks=10
+2025-12-10 21:31:00,509 - app_logger - INFO - Applied 17 collaborative tasks to game HEKH
+2025-12-10 21:31:00,509 - app_logger - INFO - Starting game HEKH with 17 tasks
+2025-12-10 21:31:00,510 - app_logger - INFO - Card deck rebuilt with locations: ['Basement', '1st Floor', '2nd Floor', 'Other']
+2025-12-10 21:31:00,511 - app_logger - INFO - Sending player list to room HEKH
+2025-12-10 21:31:00,512 - app_logger - DEBUG - Player List: ['{"sid": "f7CSax9kiBz2kObkAAA4", "player_id": "db13c9da-82d4-468f-9aca-a54a8633781f", "username": "sam", "active": true, "sus": true, "alive": true, "pic": 5, "selfie": "0e16ff26d2dd4cdca414e03b84698e88.jpg", "meltdown_code": null, "cards": ["{\\"action\\": \\"Taunt\\", \\"text\\": \\"M E O W\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"7c3a4b94-2e2d-44a3-a17a-4a26ad7710ee\\", \\"countdown\\": false}", "{\\"action\\": \\"Self Report\\", \\"text\\": \\"Call a body found meeting\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"48d15f21-af77-4119-8830-2039d0ce3857\\", \\"countdown\\": false}"], "ready": false}']
+2025-12-10 21:31:00,514 - app_logger - INFO - Game started in room HEKH
+2025-12-10 21:31:22,506 - app_logger - INFO - Sending player list to room HEKH
+2025-12-10 21:31:22,508 - app_logger - DEBUG - Player List: ['{"sid": "f7CSax9kiBz2kObkAAA4", "player_id": "db13c9da-82d4-468f-9aca-a54a8633781f", "username": "sam", "active": true, "sus": true, "alive": true, "pic": 5, "selfie": "0e16ff26d2dd4cdca414e03b84698e88.jpg", "meltdown_code": null, "cards": ["{\\"action\\": \\"Taunt\\", \\"text\\": \\"M E O W\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"7c3a4b94-2e2d-44a3-a17a-4a26ad7710ee\\", \\"countdown\\": false}"], "ready": true}']
+2025-12-10 21:31:26,454 - app_logger - INFO - Room HEKH deleted (no players remaining)
+2025-12-10 21:31:34,300 - app_logger - INFO - Client disconnected: QMTVGtSymXXpqTQAAAAt
+2025-12-10 21:31:34,304 - app_logger - INFO - Client disconnected: f7CSax9kiBz2kObkAAA4
+2025-12-10 21:31:35,309 - app_logger - INFO - Starting server...
+2025-12-10 21:31:35,309 - app_logger - INFO -  * DEV MODE: SSL disabled
+2025-12-10 21:31:35,309 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.62:5001
+2025-12-10 21:31:36,021 - app_logger - INFO - Client connected: SbqDegRGyopBu8QnAAAB
+2025-12-10 21:31:37,233 - app_logger - INFO - Client connected: OFEU0uZf9fxS_9jVAAAD
+2025-12-10 21:32:04,130 - app_logger - INFO - Client disconnected: OFEU0uZf9fxS_9jVAAAD
+2025-12-10 21:32:13,912 - app_logger - INFO - Client connected: KoZv4jRIHCqC7N6hAAAG
+2025-12-10 21:32:24,841 - app_logger - INFO - Game created with room code: MOSM
+2025-12-10 21:32:27,039 - app_logger - INFO - Applied task list LQAD7H to game MOSM: 17 tasks loaded, task_list_applied=True
+2025-12-10 21:32:27,044 - app_logger - INFO - Task handler now has 17 tasks
+2025-12-10 21:32:28,779 - app_logger - INFO - Game MOSM config updated: {'locations': ['Basement', '1st Floor', '2nd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_intruders': 1, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-10 21:32:28,780 - app_logger - INFO - Room MOSM is now open for players
+2025-12-10 21:32:31,589 - app_logger - INFO - Set creator_player_id to 1940a35b-5d31-4fb5-94b5-2f8c01370893 for room MOSM (first player)
+2025-12-10 21:32:31,594 - app_logger - INFO - New player erefwf joined room MOSM with ID 1940a35b-5d31-4fb5-94b5-2f8c01370893, is_creator=True
+2025-12-10 21:32:31,597 - app_logger - INFO - Sending player list to room MOSM
+2025-12-10 21:32:31,597 - app_logger - DEBUG - Player List: ['{"sid": "KoZv4jRIHCqC7N6hAAAG", "player_id": "1940a35b-5d31-4fb5-94b5-2f8c01370893", "username": "erefwf", "active": true, "sus": false, "alive": true, "pic": 11, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-10 21:32:31,599 - app_logger - INFO - Ownership check for LQAD7H: stored_creator=device_b32ocpi2jmiuupois, device_id=device_b2nahin7smizkkcmr, is_owner=False
+2025-12-10 21:32:31,601 - app_logger - INFO - Ownership check for LQAD7H: stored_creator=device_b32ocpi2jmiuupois, device_id=device_b2nahin7smizkkcmr, is_owner=False
+2025-12-10 21:32:38,187 - app_logger - INFO - Collaborative mode enabled in room MOSM
+2025-12-10 21:32:38,637 - app_logger - INFO - Collaborative mode disabled in room MOSM
+2025-12-10 21:32:43,702 - app_logger - INFO - Client disconnected: KoZv4jRIHCqC7N6hAAAG
+2025-12-10 21:32:44,011 - app_logger - INFO - Client connected: e0U_OQ4XwNlmpGrHAAAJ
+2025-12-10 21:32:44,015 - app_logger - INFO - Player 1940a35b-5d31-4fb5-94b5-2f8c01370893 rejoining room MOSM, creator_player_id=1940a35b-5d31-4fb5-94b5-2f8c01370893
+2025-12-10 21:32:44,017 - app_logger - INFO - Creator 1940a35b-5d31-4fb5-94b5-2f8c01370893 reconnected to room MOSM
+2025-12-10 21:32:44,018 - app_logger - INFO - Sending player list to room MOSM
+2025-12-10 21:32:44,018 - app_logger - DEBUG - Player List: ['{"sid": "e0U_OQ4XwNlmpGrHAAAJ", "player_id": "1940a35b-5d31-4fb5-94b5-2f8c01370893", "username": "erefwf", "active": true, "sus": false, "alive": true, "pic": 11, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-10 21:32:44,038 - app_logger - INFO - Ownership check for LQAD7H: stored_creator=device_b32ocpi2jmiuupois, device_id=device_b2nahin7smizkkcmr, is_owner=False
+2025-12-10 21:32:44,039 - app_logger - INFO - Ownership check for LQAD7H: stored_creator=device_b32ocpi2jmiuupois, device_id=device_b2nahin7smizkkcmr, is_owner=False
+2025-12-10 21:32:47,437 - app_logger - INFO - Collaborative mode enabled in room MOSM
+2025-12-10 21:32:48,007 - app_logger - INFO - Collaborative mode disabled in room MOSM
+2025-12-10 21:32:48,538 - app_logger - INFO - Collaborative mode enabled in room MOSM
+2025-12-10 21:32:48,946 - app_logger - INFO - Collaborative mode disabled in room MOSM
+2025-12-10 21:32:49,923 - app_logger - INFO - Collaborative mode enabled in room MOSM
+2025-12-10 21:32:50,311 - app_logger - INFO - Collaborative mode disabled in room MOSM
+2025-12-10 21:32:50,873 - app_logger - INFO - Collaborative mode enabled in room MOSM
+2025-12-10 21:32:51,441 - app_logger - INFO - Collaborative mode disabled in room MOSM
+2025-12-10 21:32:51,954 - app_logger - INFO - Collaborative mode enabled in room MOSM
+2025-12-10 21:32:52,623 - app_logger - INFO - Collaborative mode disabled in room MOSM
+2025-12-10 21:32:52,941 - app_logger - INFO - Collaborative mode enabled in room MOSM
+2025-12-10 21:32:53,581 - app_logger - INFO - Collaborative mode disabled in room MOSM
+2025-12-10 21:33:21,821 - app_logger - INFO - Room MOSM deleted (no players remaining)
+2025-12-10 21:36:35,875 - app_logger - INFO - Client disconnected: e0U_OQ4XwNlmpGrHAAAJ
+2025-12-10 21:36:36,315 - app_logger - INFO - Client connected: QlaGW5EAw0rzc_p1AAAM
+2025-12-10 21:36:37,039 - app_logger - INFO - Game created with room code: FKKQ
+2025-12-10 21:36:38,603 - app_logger - INFO - Applied task list LQAD7H to game FKKQ: 17 tasks loaded, task_list_applied=True
+2025-12-10 21:36:38,604 - app_logger - INFO - Task handler now has 17 tasks
+2025-12-10 21:36:40,114 - app_logger - INFO - Game FKKQ config updated: {'locations': ['Basement', '1st Floor', '2nd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_intruders': 1, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-10 21:36:40,116 - app_logger - INFO - Room FKKQ is now open for players
+2025-12-10 21:36:42,665 - app_logger - INFO - Set creator_player_id to e3da0615-8378-4bc0-ba71-bf861a4c0dad for room FKKQ (first player)
+2025-12-10 21:36:42,667 - app_logger - INFO - New player fwefewf joined room FKKQ with ID e3da0615-8378-4bc0-ba71-bf861a4c0dad, is_creator=True
+2025-12-10 21:36:42,667 - app_logger - INFO - Sending player list to room FKKQ
+2025-12-10 21:36:42,668 - app_logger - DEBUG - Player List: ['{"sid": "QlaGW5EAw0rzc_p1AAAM", "player_id": "e3da0615-8378-4bc0-ba71-bf861a4c0dad", "username": "fwefewf", "active": true, "sus": false, "alive": true, "pic": 14, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-10 21:36:42,680 - app_logger - INFO - Ownership check for LQAD7H: stored_creator=device_b32ocpi2jmiuupois, device_id=device_b2nahin7smizkkcmr, is_owner=False
+2025-12-10 21:36:42,682 - app_logger - INFO - Ownership check for LQAD7H: stored_creator=device_b32ocpi2jmiuupois, device_id=device_b2nahin7smizkkcmr, is_owner=False
+2025-12-10 21:36:44,755 - app_logger - INFO - Start game check - task_list_applied=True, task_handler.tasks=17, collaborative_tasks=17, min_tasks=10
+2025-12-10 21:36:44,755 - app_logger - INFO - Applied 17 collaborative tasks to game FKKQ
+2025-12-10 21:36:44,755 - app_logger - INFO - Starting game FKKQ with 17 tasks
+2025-12-10 21:36:44,756 - app_logger - INFO - Card deck rebuilt with locations: ['Basement', '1st Floor', '2nd Floor', 'Other']
+2025-12-10 21:36:44,756 - app_logger - INFO - Sending player list to room FKKQ
+2025-12-10 21:36:44,757 - app_logger - DEBUG - Player List: ['{"sid": "QlaGW5EAw0rzc_p1AAAM", "player_id": "e3da0615-8378-4bc0-ba71-bf861a4c0dad", "username": "fwefewf", "active": true, "sus": true, "alive": true, "pic": 14, "selfie": null, "meltdown_code": null, "cards": ["{\\"action\\": \\"Self Report\\", \\"text\\": \\"Call a body found meeting\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"d62610b4-aa40-4808-9540-5bd478765e65\\", \\"countdown\\": false}", "{\\"action\\": \\"Area Denial\\", \\"text\\": \\"Stop sending tasks to a specific location\\", \\"location\\": \\"2nd Floor\\", \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"2f1467a5-6d4e-40e4-a1c4-9988f7407fe7\\", \\"countdown\\": true}"], "ready": false}']
+2025-12-10 21:36:44,757 - app_logger - INFO - Game started in room FKKQ
+2025-12-10 21:39:40,065 - app_logger - INFO - Room FKKQ deleted (no players remaining)
+2025-12-10 21:39:47,537 - app_logger - INFO - Client disconnected: SbqDegRGyopBu8QnAAAB
+2025-12-10 21:39:47,538 - app_logger - INFO - Client disconnected: QlaGW5EAw0rzc_p1AAAM
+2025-12-10 21:39:48,431 - app_logger - INFO - Starting server...
+2025-12-10 21:39:48,431 - app_logger - INFO -  * DEV MODE: SSL disabled
+2025-12-10 21:39:48,431 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.62:5001
+2025-12-10 21:39:48,663 - app_logger - INFO - Client connected: nmTFAW9BRM0VuV-vAAAB
+2025-12-10 21:39:49,467 - app_logger - INFO - Game created with room code: FWQS
+2025-12-10 21:39:50,828 - app_logger - INFO - Applied task list LQAD7H to game FWQS: 17 tasks loaded, task_list_applied=True
+2025-12-10 21:39:50,828 - app_logger - INFO - Task handler now has 17 tasks
+2025-12-10 21:39:51,019 - app_logger - INFO - Client connected: 1uJPH4837-ZUinc7AAAD
+2025-12-10 21:39:52,401 - app_logger - INFO - Game FWQS config updated: {'locations': ['Basement', '1st Floor', '2nd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_intruders': 1, 'card_draw_probability': 0.9, 'starting_cards': 2, 'task_ratio': 12}
+2025-12-10 21:39:52,403 - app_logger - INFO - Room FWQS is now open for players
+2025-12-10 21:39:54,859 - app_logger - INFO - Set creator_player_id to 44418052-fc79-4523-a833-090e58d980ef for room FWQS (first player)
+2025-12-10 21:39:54,860 - app_logger - INFO - New player wdwqdqw joined room FWQS with ID 44418052-fc79-4523-a833-090e58d980ef, is_creator=True
+2025-12-10 21:39:54,860 - app_logger - INFO - Sending player list to room FWQS
+2025-12-10 21:39:54,861 - app_logger - DEBUG - Player List: ['{"sid": "nmTFAW9BRM0VuV-vAAAB", "player_id": "44418052-fc79-4523-a833-090e58d980ef", "username": "wdwqdqw", "active": true, "sus": false, "alive": true, "pic": 14, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-10 21:39:54,870 - app_logger - INFO - Ownership check for LQAD7H: stored_creator=device_b32ocpi2jmiuupois, device_id=device_b2nahin7smizkkcmr, is_owner=False
+2025-12-10 21:39:54,872 - app_logger - INFO - Ownership check for LQAD7H: stored_creator=device_b32ocpi2jmiuupois, device_id=device_b2nahin7smizkkcmr, is_owner=False
+2025-12-10 21:39:56,610 - app_logger - INFO - Start game check - task_list_applied=True, task_handler.tasks=17, collaborative_tasks=17, min_tasks=10
+2025-12-10 21:39:56,610 - app_logger - INFO - Applied 17 collaborative tasks to game FWQS
+2025-12-10 21:39:56,610 - app_logger - INFO - Starting game FWQS with 17 tasks
+2025-12-10 21:39:56,611 - app_logger - INFO - Card deck rebuilt with locations: ['Basement', '1st Floor', '2nd Floor', 'Other']
+2025-12-10 21:39:56,612 - app_logger - INFO - Sending player list to room FWQS
+2025-12-10 21:39:56,613 - app_logger - DEBUG - Player List: ['{"sid": "nmTFAW9BRM0VuV-vAAAB", "player_id": "44418052-fc79-4523-a833-090e58d980ef", "username": "wdwqdqw", "active": true, "sus": true, "alive": true, "pic": 14, "selfie": null, "meltdown_code": null, "cards": ["{\\"action\\": \\"Area Denial\\", \\"text\\": \\"Stop sending tasks to a specific location\\", \\"location\\": \\"Basement\\", \\"duration\\": 120, \\"time_left\\": 120, \\"id\\": \\"13f21344-9324-4019-9f04-f60ba835c8ee\\", \\"countdown\\": true}", "{\\"action\\": \\"Taunt\\", \\"text\\": \\"Make crewmates suspicious\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"5e08fd3e-839a-49d2-b2de-0d9c2c9bd507\\", \\"countdown\\": false}"], "ready": false}']
+2025-12-10 21:39:56,614 - app_logger - INFO - Game started in room FWQS
+2025-12-10 21:40:45,684 - app_logger - INFO - Client disconnected: nmTFAW9BRM0VuV-vAAAB
+2025-12-10 21:40:45,685 - app_logger - INFO - Client disconnected: 1uJPH4837-ZUinc7AAAD
+2025-12-10 21:40:46,639 - app_logger - INFO - Starting server...
+2025-12-10 21:40:46,640 - app_logger - INFO -  * DEV MODE: SSL disabled
+2025-12-10 21:40:46,640 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.62:5001
+2025-12-10 21:40:46,818 - app_logger - INFO - Client connected: JCu29MdRJh_r1J_nAAAB
+2025-12-10 21:40:49,021 - app_logger - INFO - Client connected: jYRkygR09sufG6tEAAAD
+2025-12-10 21:40:49,328 - app_logger - INFO - Game created with room code: QFJQ
+2025-12-10 21:40:50,819 - app_logger - INFO - Applied task list LQAD7H to game QFJQ: 17 tasks loaded, task_list_applied=True
+2025-12-10 21:40:50,820 - app_logger - INFO - Task handler now has 17 tasks
+2025-12-10 21:40:56,203 - app_logger - INFO - Game QFJQ config updated: {'locations': ['Basement', '1st Floor', '2nd Floor'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_intruders': 1, 'card_draw_probability': 0.9, 'starting_cards': 5, 'task_ratio': 12}
+2025-12-10 21:40:56,205 - app_logger - INFO - Room QFJQ is now open for players
+2025-12-10 21:40:58,210 - app_logger - INFO - Set creator_player_id to 11d17cf3-afaf-4b17-89a8-3fafa4bf501a for room QFJQ (first player)
+2025-12-10 21:40:58,211 - app_logger - INFO - New player 23f23f joined room QFJQ with ID 11d17cf3-afaf-4b17-89a8-3fafa4bf501a, is_creator=True
+2025-12-10 21:40:58,211 - app_logger - INFO - Sending player list to room QFJQ
+2025-12-10 21:40:58,212 - app_logger - DEBUG - Player List: ['{"sid": "JCu29MdRJh_r1J_nAAAB", "player_id": "11d17cf3-afaf-4b17-89a8-3fafa4bf501a", "username": "23f23f", "active": true, "sus": false, "alive": true, "pic": 8, "selfie": null, "meltdown_code": null, "cards": [], "ready": false}']
+2025-12-10 21:40:58,215 - app_logger - INFO - Ownership check for LQAD7H: stored_creator=device_b32ocpi2jmiuupois, device_id=device_b2nahin7smizkkcmr, is_owner=False
+2025-12-10 21:40:58,216 - app_logger - INFO - Ownership check for LQAD7H: stored_creator=device_b32ocpi2jmiuupois, device_id=device_b2nahin7smizkkcmr, is_owner=False
+2025-12-10 21:40:59,968 - app_logger - INFO - Start game check - task_list_applied=True, task_handler.tasks=17, collaborative_tasks=17, min_tasks=10
+2025-12-10 21:40:59,968 - app_logger - INFO - Applied 17 collaborative tasks to game QFJQ
+2025-12-10 21:40:59,969 - app_logger - INFO - Starting game QFJQ with 17 tasks
+2025-12-10 21:40:59,969 - app_logger - INFO - Card deck rebuilt with locations: ['Basement', '1st Floor', '2nd Floor', 'Other']
+2025-12-10 21:40:59,971 - app_logger - INFO - Sending player list to room QFJQ
+2025-12-10 21:40:59,971 - app_logger - DEBUG - Player List: ['{"sid": "JCu29MdRJh_r1J_nAAAB", "player_id": "11d17cf3-afaf-4b17-89a8-3fafa4bf501a", "username": "23f23f", "active": true, "sus": true, "alive": true, "pic": 8, "selfie": null, "meltdown_code": null, "cards": ["{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 30, \\"time_left\\": 30, \\"id\\": \\"64e42c35-0434-487e-9a43-5e53c7109497\\", \\"countdown\\": false}", "{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"d6fa1aee-936d-4178-948c-9cd4431ce57f\\", \\"countdown\\": false}", "{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 30, \\"time_left\\": 30, \\"id\\": \\"ea65465b-4ef7-4fda-afb8-8f2089d1b411\\", \\"countdown\\": false}", "{\\"action\\": \\"Discard and Draw\\", \\"text\\": \\"Discard a random card and draw a new card\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"e13f24e9-1051-443f-9959-1c14f6cd0d8b\\", \\"countdown\\": false}", "{\\"action\\": \\"Discard and Draw\\", \\"text\\": \\"Discard a random card and draw a new card\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"69d2d604-92f3-43d5-9c67-81dc9cf423cb\\", \\"countdown\\": false}"], "ready": false}']
+2025-12-10 21:40:59,972 - app_logger - INFO - Game started in room QFJQ
+2025-12-10 21:41:48,346 - app_logger - INFO - Sending player list to room QFJQ
+2025-12-10 21:41:48,351 - app_logger - DEBUG - Player List: ['{"sid": "JCu29MdRJh_r1J_nAAAB", "player_id": "11d17cf3-afaf-4b17-89a8-3fafa4bf501a", "username": "23f23f", "active": true, "sus": true, "alive": true, "pic": 8, "selfie": null, "meltdown_code": null, "cards": ["{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 30, \\"time_left\\": 30, \\"id\\": \\"ea65465b-4ef7-4fda-afb8-8f2089d1b411\\", \\"countdown\\": false}", "{\\"action\\": \\"Area Denial\\", \\"text\\": \\"Stop sending tasks to a specific location\\", \\"location\\": \\"2nd Floor\\", \\"duration\\": 120, \\"time_left\\": 120, \\"id\\": \\"dda53b5c-c36f-4538-a7f4-4a34b8b22b51\\", \\"countdown\\": true}"], "ready": true}']
+2025-12-10 21:41:52,369 - app_logger - INFO - Room QFJQ deleted (no players remaining)

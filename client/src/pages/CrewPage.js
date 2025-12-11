@@ -62,9 +62,6 @@ const CrewmemberPage = ({ setShowSusPage }) => {
     setShowAnimation(false);
   };
 
-  // Dynamic glow based on state
-  const accentColor = killCooldown > 0 ? 'orange' : 'cyan';
-
   return (
     <div className="relative flex flex-col items-center min-h-screen h-full p-6 pt-12 pb-32 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white overflow-hidden">
       {/* Animated Background Effects */}

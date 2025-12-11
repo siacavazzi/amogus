@@ -147,7 +147,6 @@ function LobbyPage() {
 
                 {/* Footer */}
                 <div className="mt-8 text-center text-gray-500 text-sm">
-                    <p>Get everyone on the same WiFi network</p>
                     <a 
                         href="/how-to-play.html" 
                         className="inline-flex items-center gap-2 mt-3 text-indigo-400 hover:text-indigo-300 transition-colors"

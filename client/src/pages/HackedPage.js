@@ -165,9 +165,11 @@ const HackedPage = ({ hackTime, setHackTime }) => {
 
   // Generate matrix rain columns - more columns for intense Matrix effect
   // maxChars decreases as timer approaches 0
+  // Update every 10 seconds for smooth transition
+  const hackTimeBucket = Math.floor(hackTime / 10);
   const matrixColumns = useMemo(() => {
     // Calculate max chars based on time remaining (more time = more chars)
-    const baseMaxChars = Math.max(3, Math.floor((hackTime / 60) * 25));
+    const baseMaxChars = Math.max(3, Math.floor((hackTimeBucket * 10 / 60) * 25));
     
     return Array.from({ length: 25 }, (_, i) => ({
       id: i,
@@ -176,7 +178,7 @@ const HackedPage = ({ hackTime, setHackTime }) => {
       duration: 3 + Math.random() * 2,
       maxChars: Math.max(3, baseMaxChars + Math.floor(Math.random() * 8) - 4) // Vary by ±4
     }));
-  }, [Math.floor(hackTime / 10)]); // Update every 10 seconds for smooth transition
+  }, [hackTimeBucket]);
 
   // Generate hex symbols
   const hexSymbols = useMemo(() => [
