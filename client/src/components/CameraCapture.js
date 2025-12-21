@@ -4,6 +4,7 @@ import { Camera, RotateCcw, Check, X } from 'lucide-react';
 function CameraCapture({ onCapture, onCancel }) {
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
+    const streamRef = useRef(null);
     const [stream, setStream] = useState(null);
     const [capturedImage, setCapturedImage] = useState(null);
     const [error, setError] = useState(null);
@@ -18,8 +19,8 @@ function CameraCapture({ onCapture, onCancel }) {
             }
 
             // Stop any existing stream
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
+            if (streamRef.current) {
+                streamRef.current.getTracks().forEach(track => track.stop());
             }
 
             const mediaStream = await navigator.mediaDevices.getUserMedia({
@@ -31,6 +32,7 @@ function CameraCapture({ onCapture, onCancel }) {
                 audio: false
             });
             
+            streamRef.current = mediaStream;
             setStream(mediaStream);
             if (videoRef.current) {
                 videoRef.current.srcObject = mediaStream;
@@ -52,25 +54,26 @@ function CameraCapture({ onCapture, onCancel }) {
                 setError(`Could not access camera: ${err.message || err.name || 'Unknown error'}`);
             }
         }
-    }, [facingMode, stream]);
+    }, [facingMode]);
 
     useEffect(() => {
         startCamera();
         
         return () => {
             // Cleanup: stop all tracks when component unmounts
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
+            if (streamRef.current) {
+                streamRef.current.getTracks().forEach(track => track.stop());
+                streamRef.current = null;
             }
         };
-    }, []);
+    }, [startCamera]);
 
     // Restart camera when facing mode changes
     useEffect(() => {
         if (!capturedImage) {
             startCamera();
         }
-    }, [facingMode]);
+    }, [facingMode, capturedImage, startCamera]);
 
     const capturePhoto = () => {
         if (!videoRef.current || !canvasRef.current) return;
@@ -100,8 +103,10 @@ function CameraCapture({ onCapture, onCancel }) {
         setCapturedImage(imageData);
 
         // Stop the camera stream
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
+        if (streamRef.current) {
+            streamRef.current.getTracks().forEach(track => track.stop());
+            streamRef.current = null;
+            setStream(null);
         }
     };
 
@@ -112,6 +117,12 @@ function CameraCapture({ onCapture, onCancel }) {
 
     const confirmPhoto = () => {
         if (capturedImage) {
+            // Ensure stream is stopped
+            if (streamRef.current) {
+                streamRef.current.getTracks().forEach(track => track.stop());
+                streamRef.current = null;
+                setStream(null);
+            }
             onCapture(capturedImage);
         }
     };
@@ -121,8 +132,10 @@ function CameraCapture({ onCapture, onCancel }) {
     };
 
     const skipPhoto = () => {
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
+        if (streamRef.current) {
+            streamRef.current.getTracks().forEach(track => track.stop());
+            streamRef.current = null;
+            setStream(null);
         }
         onCancel();
     };
