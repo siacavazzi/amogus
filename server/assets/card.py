@@ -7,7 +7,7 @@ from assets.utils import *
 
 class Card:
 
-    def __init__(self, action, text, card_deck, location=None, duration=None, sound=None, countdown=False):
+    def __init__(self, action, text, card_deck, location=None, duration=None, sound=None, countdown=False, requires_input=False):
         self.action = action
         self.location = location
         self.duration = duration
@@ -19,6 +19,7 @@ class Card:
         self.game = card_deck.game
         self.socket = card_deck.socket
         self.id = str(uuid.uuid4())
+        self.requires_input = requires_input  # Whether this card needs additional player input
     
     def __repr__(self):
         return f"{self.id}, {self.action}, {self.location}, {self.sound}, {self.duration}"
@@ -38,7 +39,11 @@ class Card:
                 send_message_to_player(self.socket, other_player.player_id, f"{player.username} played {self.action}")
 
 
-    def play_card(self, player):
+    def play_card(self, player, extra_data=None):
+        """
+        Play the card. 
+        extra_data: Optional dict with additional data for cards that require input (e.g., fake task details)
+        """
         remove_card = True
         if self.action == 'EMP':
             self.game.start_hack(self.duration)
@@ -57,8 +62,40 @@ class Card:
                 self.notify_intruders(player)
             else:
                 remove_card = False
-        elif self.action == 'fake_task':
-            print("IMPLEMENT THIS ONE LOL")
+        elif self.action == 'Fake Task':
+            # Requires extra_data with: target_player_id, task_text, task_location
+            if not extra_data:
+                print("Fake Task card requires extra_data")
+                remove_card = False
+            else:
+                target_player_id = extra_data.get('target_player_id')
+                task_text = extra_data.get('task_text', 'Do something suspicious')
+                task_location = extra_data.get('task_location', 'Other')
+                
+                # Find the target player
+                target_player = None
+                for p in self.game.players:
+                    if p.player_id == target_player_id:
+                        target_player = p
+                        break
+                
+                if target_player and not target_player.sus and target_player.alive:
+                    # Set the fake task - will be shown after current task is completed
+                    target_player.fake_task = {
+                        'task': task_text,
+                        'location': task_location,
+                        'difficulty': 2,
+                        'is_fake': True  # Mark as fake for potential future use
+                    }
+                    # Play the 'sus' sound
+                    self.game.speaker.play_sound('sus')
+                    # Notify other intruders
+                    self.notify_intruders(player)
+                    send_message_to_player(self.socket, player.player_id, f"Fake task sent to {target_player.username}")
+                    print(f"Fake task '{task_text}' at '{task_location}' queued for {target_player.username}")
+                else:
+                    send_message_to_player(self.socket, player.player_id, "Invalid target - must be alive crewmate")
+                    remove_card = False
         elif self.action == 'Discard and Draw':
             remove_card = False
             if len(player.cards) > 1:
@@ -88,7 +125,8 @@ class Card:
             "duration":self.duration,
             "time_left": self.time_left,
             "id":self.id,
-            "countdown":self.countdown
+            "countdown":self.countdown,
+            "requires_input": self.requires_input
         })
 
 class CardDeck:
@@ -124,8 +162,12 @@ class CardDeck:
             Card('Taunt', 'Make crewmates suspicious', self, sound='sus'),
             Card('Taunt', 'M E O W', self, sound='meow'),
 
-            Card('Discard and Draw', 'Discard a random card and draw a new card', self),
-            Card('Discard and Draw', 'Discard a random card and draw a new card', self),
+            Card('Fake Task', 'Send a fake task to a crewmate of your choice', self, requires_input=True),
+            Card('Fake Task', 'Send a fake task to a crewmate of your choice', self, requires_input=True),
+            Card('Fake Task', 'Send a fake task to a crewmate of your choice', self, requires_input=True),
+            Card('Fake Task', 'Send a fake task to a crewmate of your choice', self, requires_input=True),
+            Card('Fake Task', 'Send a fake task to a crewmate of your choice', self, requires_input=True),
+            
         ]
 
         # Only add reactor-dependent cards if a reactor is present

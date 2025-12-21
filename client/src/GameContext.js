@@ -59,23 +59,22 @@ export default function GameContext({ children }) {
     const [activeCards, setActiveCards] = useState([])
     const [modalOpen, setModalOpen] = useState(false)
     const [taskCreationMode, setTaskCreationMode] = useState(false)
+    const [resetVotes, setResetVotes] = useState({ current: 0, needed: 0, voters: [] })
     let otherIntruders = [];
     // const [meetineTimeLeft, setMee]
 
-    const resetState = () => {
+    // Reset all state to initial values (keeps connection)
+    const resetGameState = () => {
         setGameState({})
-        setConnected(false)
         setPlayers([])
         setPlayerState({
             username: '',
-            playerId: localStorage.getItem('player_id') || '',
+            playerId: '',
         })
         setRoomCode('')
         setInRoom(false)
         setIsRoomCreator(false)
-        sessionStorage.removeItem('is_room_creator')
         setRoomOpen(false)
-        localStorage.removeItem('room_code')
         setTask(undefined)
         setRunning(false)
         setCrewScore(0);
@@ -95,6 +94,15 @@ export default function GameContext({ children }) {
         setActiveCards([])
         setModalOpen(false)
         setTaskCreationMode(false)
+        setKillCooldown(0)
+        setResetVotes({ current: 0, needed: 0, voters: [] })
+    }
+
+    const resetState = () => {
+        setConnected(false)
+        resetGameState()
+        sessionStorage.removeItem('is_room_creator')
+        localStorage.removeItem('room_code')
     }
 
     const resetMessage = (delay) => {
@@ -217,6 +225,8 @@ export default function GameContext({ children }) {
 
         socketRef.current.on('reactor_registered', (data) => {
             console.log('Reactor registered:', data);
+            setRoomCode(data.room_code);
+            setInRoom(true);
         });
 
         socketRef.current.on('rejoin_failed', (data) => {
@@ -225,14 +235,19 @@ export default function GameContext({ children }) {
             localStorage.removeItem('player_id');
             localStorage.removeItem('room_code');
             sessionStorage.removeItem('is_room_creator');
-            setPlayerState({ username: '', playerId: '' });
-            setRoomCode('');
-            setInRoom(false);
-            setIsRoomCreator(false);
+            resetGameState();
         });
 
         socketRef.current.on('error', (data) => {
             console.error('Socket error:', data);
+            // Check if this is a "game/room not found" error - clear stale data
+            const msg = (data.message || '').toLowerCase();
+            if (msg.includes('game not found') || msg.includes('not in a game room')) {
+                localStorage.removeItem('player_id');
+                localStorage.removeItem('room_code');
+                sessionStorage.removeItem('is_room_creator');
+                resetGameState();
+            }
             isMobile && setDialog({ title: "Error", body: data.message });
         });
 
@@ -276,6 +291,7 @@ export default function GameContext({ children }) {
             setEndState(undefined);
             setTask(undefined);
             setCrewScore(0);
+            setTaskGoal(1);
             setMeetingState(undefined);
             setMeltdownCode(undefined);
             setMeltdownTimer(undefined);
@@ -284,6 +300,26 @@ export default function GameContext({ children }) {
             setActiveCards([]);
             setShowSusPage(false);
             setDeniedLocation(undefined);
+            setVotes({});
+            setVetoVotes(0);
+            setSusPoints(0);
+            setKillCooldown(0);
+            setTaskCreationMode(false);
+            setResetVotes({ current: 0, needed: 0, voters: [] });
+            // Clear any open modals/dialogs
+            setModalOpen(false);
+            setDialog(undefined);
+            setMessage(undefined);
+        });
+
+        // Reset vote update - track who wants to play again
+        socketRef.current.on('reset_vote_update', (data) => {
+            console.log('Reset vote update:', data);
+            setResetVotes({
+                current: data.current_votes,
+                needed: data.votes_needed,
+                voters: data.voters || []
+            });
         });
 
         // Room disbanded - go back to lobby
@@ -292,14 +328,7 @@ export default function GameContext({ children }) {
             localStorage.removeItem('player_id');
             localStorage.removeItem('room_code');
             sessionStorage.removeItem('is_room_creator');
-            setPlayerState({ username: '', playerId: '' });
-            setRoomCode('');
-            setInRoom(false);
-            setIsRoomCreator(false);
-            setRoomOpen(false);
-            setRunning(false);
-            setEndState(undefined);
-            setPlayers([]);
+            resetGameState();
         });
 
         // Left room voluntarily
@@ -308,14 +337,7 @@ export default function GameContext({ children }) {
             localStorage.removeItem('player_id');
             localStorage.removeItem('room_code');
             sessionStorage.removeItem('is_room_creator');
-            setPlayerState({ username: '', playerId: '' });
-            setRoomCode('');
-            setInRoom(false);
-            setIsRoomCreator(false);
-            setRoomOpen(false);
-            setRunning(false);
-            setEndState(undefined);
-            setPlayers([]);
+            resetGameState();
         });
 
         socketRef.current.on('meltdown_code', (data) => {
@@ -575,6 +597,8 @@ export default function GameContext({ children }) {
         roomOpen,
         setRoomOpen,
         resetState,
+        // Reset votes for play again
+        resetVotes,
     }), [
         endState,
         meltdownCode,
@@ -608,6 +632,7 @@ export default function GameContext({ children }) {
         isRoomCreator,
         roomOpen,
         taskCreationMode,
+        resetVotes,
     ]);
 
     return (

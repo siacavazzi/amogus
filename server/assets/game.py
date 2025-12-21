@@ -65,6 +65,9 @@ class Game:
         self.collaborative_task_list_name = None  # Name of the task list
         self.collaborative_mode = False  # If True, all players can add tasks; if False, only host
         
+        # Reset voting system
+        self.reset_votes = set()  # Player IDs who want to play again
+        
         # Create card deck after has_reactor is set
         self.card_deck = CardDeck(locations, socket, self)
 
@@ -144,8 +147,16 @@ class Game:
 
     def meltdown(self): # call when meltdown fails
         self.active_meltdown = None
+        
+        # Kill all crew members (intruders survive the meltdown because they're built different)
+        for player in self.players:
+            if player.alive and not player.sus:
+                player.set_death('meltdown')
+        
         self.end_state = "meltdown_fail"
         self.end_time = time.time()
+        # Emit player list BEFORE end_game so clients have updated death info
+        self.emit_player_list()
         self.emit_to_room("end_game", self.end_state)
 
         if self.speaker:
@@ -285,6 +296,7 @@ class Game:
         self.numIntruders = self.initial_numIntruders  # Restore initial intruder count
         self.numCrew = None  # Will be recalculated on game start
         self.card_deck = CardDeck(self.locations, self.socket, self)
+        self.reset_votes = set()  # Clear reset votes
         
         # Only reset task handler if no task list was applied
         # Otherwise preserve the loaded tasks for replaying
@@ -334,13 +346,22 @@ class Game:
             player.ready = False
 
 
-    def kill_player(self, player_id):
+    def kill_player(self, player_id, death_cause='unknown', task_name=None):
+        """
+        Kill a player and set their death cause.
+        
+        Args:
+            player_id: The ID of the player to kill
+            death_cause: The cause of death (e.g., 'voted_out', 'murdered', 'meltdown', etc.)
+            task_name: Optional task name if they died during a task
+        """
         player = self.getPlayerById(player_id)
         if not player:
             return
         
-        player.alive = False
-        player.ready = True
+        # Set death cause and message using the player's method
+        death_message = player.set_death(death_cause, task_name)
+        print(f"Player {player.username} died: {death_cause} - {death_message}")
 
         if not player.sus:
             self.numCrew -= 1
@@ -348,6 +369,8 @@ class Game:
                 self.end_state = 'sus_victory'
                 self.end_time = time.time()
                 self.speaker.play_sound('sus_victory')
+                # Emit player list BEFORE end_game so clients have updated death info
+                self.emit_player_list()
                 self.emit_to_room("end_game", self.end_state)
                 return
     
@@ -358,6 +381,8 @@ class Game:
                 self.end_state = 'victory'
                 self.end_time = time.time()
                 self.speaker.play_sound('crew_victory')
+                # Emit player list BEFORE end_game so clients have updated death info
+                self.emit_player_list()
                 self.emit_to_room("end_game", self.end_state)
                 return
                 

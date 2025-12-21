@@ -180,8 +180,12 @@ function GameConfigPage() {
 
     const handleLeaveRoom = () => {
         if (window.confirm('Are you sure you want to leave this room? The room will be deleted.')) {
-            const playerId = localStorage.getItem('player_id');
-            socket.emit('leave_room', { player_id: playerId });
+            // Clear local storage first
+            localStorage.removeItem('player_id');
+            localStorage.removeItem('room_code');
+            sessionStorage.removeItem('is_room_creator');
+            // Send leave_room with room_code (during setup, player_id may not exist yet)
+            socket.emit('leave_room', { room_code: roomCode });
         }
     };
 

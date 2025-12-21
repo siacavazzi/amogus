@@ -51,8 +51,11 @@ function ReactorNormal() {
     }
 
     const handleLeaveRoom = () => {
+        // Clear local storage first
+        localStorage.removeItem('room_code');
+        sessionStorage.removeItem('is_room_creator');
+        // Send leave_room with room_code (reactor doesn't have player_id)
         socket.emit('leave_room', { room_code: roomCode });
-        window.location.reload();
     };
 
     return (

@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { DataContext } from "../GameContext";
 import AnimationOverlay from "../components/AnimationOverlay";
 import MUECustomSlider from "../components/swiper";
+import LeaveGameButton from "../components/LeaveGameButton";
 import { AlertTriangle, MapPin, Target, Clock, Crosshair, Radio } from "lucide-react";
 
 const CrewmemberPage = ({ setShowSusPage }) => {
@@ -64,6 +65,9 @@ const CrewmemberPage = ({ setShowSusPage }) => {
 
   return (
     <div className="relative flex flex-col items-center min-h-screen h-full p-6 pt-12 pb-32 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white overflow-hidden">
+      {/* Leave Game Button - Fixed Position */}
+      <LeaveGameButton className="fixed top-4 right-4 z-50" />
+
       {/* Animated Background Effects */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         {/* Core glow */}

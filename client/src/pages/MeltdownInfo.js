@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { DataContext } from "../GameContext";
 import { FaRadiation } from "react-icons/fa";
+import LeaveGameButton from "../components/LeaveGameButton";
 import { AlertTriangle, Key } from "lucide-react";
 
 function MeltdownInfo() {
@@ -13,6 +14,9 @@ function MeltdownInfo() {
                         bg-gradient-to-b from-gray-900 via-red-950 to-gray-900
                         ${meltdownTimer <= 10 ? "" : ""}`}
         >
+            {/* Leave Game Button */}
+            <LeaveGameButton className="fixed top-4 right-4 z-50" />
+
             {/* Animated Background Effects */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none">
                 {/* Warning glow */}

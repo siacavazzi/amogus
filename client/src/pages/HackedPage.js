@@ -1,6 +1,7 @@
 // src/pages/HackedPage.jsx
 import React, { useEffect, useState, useMemo } from "react";
 import { Zap, Skull, AlertTriangle, Radio, Wifi, WifiOff } from "lucide-react";
+import LeaveGameButton from "../components/LeaveGameButton";
 
 // Matrix rain character component with typing effect that falls down the screen
 const MatrixColumn = ({ delay, duration, left, maxChars = 20 }) => {
@@ -204,6 +205,9 @@ const HackedPage = ({ hackTime, setHackTime }) => {
 
   return (
     <div className="relative flex items-center justify-center min-h-screen h-full bg-black overflow-hidden">
+      {/* Leave Game Button */}
+      <LeaveGameButton className="fixed top-4 right-4 z-50" />
+
       {/* Base gradient background */}
       <div className="absolute inset-0 bg-gradient-to-b from-gray-950 via-cyan-950/30 to-gray-950" />
       

@@ -1,10 +1,11 @@
 // src/pages/IntruderPage.jsx
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { DataContext } from '../GameContext';
-import { LogOut, Zap, Clock, MapPin, AlertTriangle, Eye } from 'lucide-react';
+import LeaveGameButton from '../components/LeaveGameButton';
+import { LogOut, Zap, Clock, MapPin, AlertTriangle, Eye, X, Send, Users, FileText } from 'lucide-react';
 
 // ActionCard component defined OUTSIDE to prevent re-creation on every render
-function ActionCard({ action, text, location, duration, id, time_left, active = false, countdown, onPlay }) {
+function ActionCard({ action, text, location, duration, id, time_left, active = false, countdown, requires_input, onPlay }) {
   if (time_left <= 0) {
     return null;
   }
@@ -13,7 +14,7 @@ function ActionCard({ action, text, location, duration, id, time_left, active = 
 
   return (
     <button 
-      onClick={() => onPlay(id)}
+      onClick={() => onPlay(id, requires_input, action)}
       type="button"
       className={`relative w-full text-left rounded-2xl p-6 flex flex-col border-2 ${
         active 
@@ -73,11 +74,55 @@ const IntruderPage = ({ setShowSusPage }) => {
   const {
     playerState,
     socket,
-    activeCards
+    activeCards,
+    players,
+    taskLocations
   } = useContext(DataContext);
 
-  function playCard(id) {
-    socket.emit('play_card', { player_id: localStorage.getItem('player_id'), card_id: id });
+  // Fake Task modal state
+  const [showFakeTaskModal, setShowFakeTaskModal] = useState(false);
+  const [selectedCardId, setSelectedCardId] = useState(null);
+  const [targetPlayerId, setTargetPlayerId] = useState('');
+  const [fakeTaskText, setFakeTaskText] = useState('');
+  const [fakeTaskLocation, setFakeTaskLocation] = useState('');
+
+  // Get list of alive crewmates (non-intruders)
+  const aliveCrewmates = players.filter(p => p.alive && !p.sus);
+  
+  // Get available locations
+  const availableLocations = taskLocations.length > 0 ? taskLocations : ['Other'];
+
+  function playCard(id, requires_input, action) {
+    if (requires_input && action === 'Fake Task') {
+      // Show modal for Fake Task
+      setSelectedCardId(id);
+      setTargetPlayerId('');
+      setFakeTaskText('');
+      setFakeTaskLocation(availableLocations[0] || 'Other');
+      setShowFakeTaskModal(true);
+    } else {
+      // Normal card play
+      socket.emit('play_card', { player_id: localStorage.getItem('player_id'), card_id: id });
+    }
+  }
+
+  function sendFakeTask() {
+    if (!targetPlayerId || !fakeTaskText.trim()) {
+      return;
+    }
+    
+    socket.emit('play_card', {
+      player_id: localStorage.getItem('player_id'),
+      card_id: selectedCardId,
+      extra_data: {
+        target_player_id: targetPlayerId,
+        task_text: fakeTaskText.trim(),
+        task_location: fakeTaskLocation
+      }
+    });
+    
+    setShowFakeTaskModal(false);
+    setSelectedCardId(null);
   }
 
   useEffect(() => {
@@ -88,6 +133,110 @@ const IntruderPage = ({ setShowSusPage }) => {
 
   return (
     <div className="relative flex flex-col items-center min-h-screen h-full p-4 pt-10 pb-32 bg-gradient-to-b from-red-950 via-red-900/90 to-gray-900 text-white overflow-y-auto">
+      {/* Leave Game Button - Fixed Position */}
+      <LeaveGameButton className="fixed top-4 right-4 z-50" />
+
+      {/* Fake Task Modal */}
+      {showFakeTaskModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80">
+          <div className="w-full max-w-md bg-gray-800 rounded-2xl border-2 border-red-500 overflow-hidden">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 bg-red-900/50 border-b border-red-500/50">
+              <div className="flex items-center gap-2">
+                <FileText size={20} className="text-red-300" />
+                <h3 className="text-lg font-bold text-white">Send Fake Task</h3>
+              </div>
+              <button
+                onClick={() => setShowFakeTaskModal(false)}
+                className="p-2 rounded-lg hover:bg-red-800/50 transition-colors"
+              >
+                <X size={20} className="text-gray-400" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-4 space-y-4">
+              {/* Target Selection */}
+              <div>
+                <label className="flex items-center gap-2 text-sm text-gray-300 mb-2">
+                  <Users size={16} />
+                  Select Target Crewmate
+                </label>
+                <select
+                  value={targetPlayerId}
+                  onChange={(e) => setTargetPlayerId(e.target.value)}
+                  className="w-full p-3 bg-gray-700 border border-gray-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+                >
+                  <option value="">Choose a crewmate...</option>
+                  {aliveCrewmates.map((player) => (
+                    <option key={player.player_id} value={player.player_id}>
+                      {player.username}
+                    </option>
+                  ))}
+                </select>
+                {aliveCrewmates.length === 0 && (
+                  <p className="text-red-400 text-sm mt-1">No alive crewmates to target!</p>
+                )}
+              </div>
+
+              {/* Task Text Input */}
+              <div>
+                <label className="flex items-center gap-2 text-sm text-gray-300 mb-2">
+                  <FileText size={16} />
+                  Fake Task Description
+                </label>
+                <textarea
+                  value={fakeTaskText}
+                  onChange={(e) => setFakeTaskText(e.target.value)}
+                  placeholder="e.g., Go stand in the corner and count to 100..."
+                  className="w-full p-3 bg-gray-700 border border-gray-600 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+                  rows={3}
+                  maxLength={200}
+                />
+                <p className="text-gray-500 text-xs mt-1 text-right">{fakeTaskText.length}/200</p>
+              </div>
+
+              {/* Location Selection */}
+              <div>
+                <label className="flex items-center gap-2 text-sm text-gray-300 mb-2">
+                  <MapPin size={16} />
+                  Location
+                </label>
+                <select
+                  value={fakeTaskLocation}
+                  onChange={(e) => setFakeTaskLocation(e.target.value)}
+                  className="w-full p-3 bg-gray-700 border border-gray-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+                >
+                  {availableLocations.map((loc) => (
+                    <option key={loc} value={loc}>
+                      {loc}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 bg-gray-900/50 border-t border-gray-700 flex gap-3">
+              <button
+                onClick={() => setShowFakeTaskModal(false)}
+                className="flex-1 py-3 px-4 bg-gray-700 text-white rounded-xl font-medium hover:bg-gray-600 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={sendFakeTask}
+                disabled={!targetPlayerId || !fakeTaskText.trim()}
+                className="flex-1 py-3 px-4 bg-red-600 text-white rounded-xl font-bold hover:bg-red-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                <Send size={18} />
+                Send Task
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* DANGER Background Effects - Very visible from distance */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         {/* Pulsing red glow */}
@@ -128,7 +277,7 @@ const IntruderPage = ({ setShowSusPage }) => {
           </div>
           <div className="grid gap-4">
             {activeCardsList.map((card) => {
-              const { action, text, location, duration, id, time_left, countdown } = card;
+              const { action, text, location, duration, id, time_left, countdown, requires_input } = card;
               return (
                 <ActionCard
                   key={id}
@@ -139,6 +288,7 @@ const IntruderPage = ({ setShowSusPage }) => {
                   duration={duration}
                   time_left={time_left}
                   countdown={countdown}
+                  requires_input={requires_input}
                   active
                   onPlay={playCard}
                 />
@@ -167,7 +317,7 @@ const IntruderPage = ({ setShowSusPage }) => {
             {playerState.cards.map((cardJson) => {
               try {
                 const card = JSON.parse(cardJson);
-                const { action, text, location, duration, id } = card;
+                const { action, text, location, duration, id, requires_input } = card;
                 return (
                   <ActionCard
                     key={id}
@@ -177,6 +327,7 @@ const IntruderPage = ({ setShowSusPage }) => {
                     location={location}
                     duration={duration}
                     time_left={999}
+                    requires_input={requires_input}
                     onPlay={playCard}
                   />
                 );

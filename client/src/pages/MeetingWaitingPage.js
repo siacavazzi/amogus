@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { DataContext } from '../GameContext';
 import MUECustomSlider from '../components/swiper';
+import LeaveGameButton from '../components/LeaveGameButton';
 import { AlertTriangle, Users, CheckCircle2, Clock, Skull } from 'lucide-react';
 
 const MeetingWaitingPage = () => {
@@ -54,6 +55,9 @@ const MeetingWaitingPage = () => {
 
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white p-6 pb-32 overflow-hidden">
+      {/* Leave Game Button */}
+      <LeaveGameButton className="fixed top-4 right-4 z-50" />
+
       {/* Animated Background Effects */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         {/* Central glow */}

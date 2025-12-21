@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import { DataContext } from "../GameContext";
+import LeaveGameButton from "../components/LeaveGameButton";
 
 export default function MeetingResultPage() {
   const { meetingState, players, setMeetingState, setVotes, setVetoVotes } = useContext(DataContext);
@@ -58,12 +59,20 @@ export default function MeetingResultPage() {
               : "They were not an Intruder."}
           </div>
         )}
+        {votedOutPlayer?.death_message && (
+          <div className="mt-4 text-lg text-gray-400 italic max-w-sm">
+            "{votedOutPlayer.death_message}"
+          </div>
+        )}
       </>
     );
   };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 via-black to-gray-800 p-6">
+      {/* Leave Game Button */}
+      <LeaveGameButton className="fixed top-4 right-4 z-50" />
+
       <div
         className={`transition-opacity duration-1000 transform ${
           fadeIn ? "opacity-100 scale-100" : "opacity-0 scale-95"

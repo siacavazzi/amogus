@@ -86,6 +86,8 @@ class Meltdown:
     def end_meltdown(self, success):
         """Ends the meltdown and emits the result."""
         self.meltdown_active = False
+        # Stop the looping meltdown alarm first
+        self.speaker.stop()
         if success:
             if self.game:
                 self.game.active_meltdown = None

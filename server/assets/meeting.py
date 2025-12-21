@@ -24,6 +24,8 @@ class Meeting:
     def start_voting(self):
         if self.game.get_num_living_players() <= 1:
             self.game.end_state = 'sus_victory'
+            # Emit player list BEFORE end_game so clients have updated death info
+            self.game.emit_player_list()
             self.game.emit_to_room("end_game", self.game.end_state)
             return
         self.stage = 'voting'
@@ -152,7 +154,16 @@ class Meeting:
             # Determine who was voted out (player with the most votes)
             self.voted_out = self.determine_voted_out(final_votes)
             if self.voted_out:
-                self.game.kill_player(self.voted_out)
+                # Determine if they were actually an intruder
+                voted_player = self.game.getPlayerById(self.voted_out)
+                if voted_player:
+                    if voted_player.sus:
+                        death_cause = 'voted_out_intruder'
+                    else:
+                        death_cause = 'voted_out_innocent'
+                else:
+                    death_cause = 'voted_out'
+                self.game.kill_player(self.voted_out, death_cause=death_cause)
                 
             self.reason = 'votes'
             self.votes = self.compute_vote_counts()

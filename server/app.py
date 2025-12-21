@@ -528,38 +528,90 @@ def handle_start(data):
 
 @socketio.on('reset')
 def reset_game(data):
-    """Reset a game to lobby state - keeps players but restarts game."""
+    """Vote to reset a game - when all players vote, game resets to lobby."""
+    sid = request.sid
     player_id = data.get('player_id') if isinstance(data, dict) else None
+    room_code = data.get('room_code', '').upper() if isinstance(data, dict) else None
+    force = data.get('force', False) if isinstance(data, dict) else False
     
+    game = None
+    player = None
+    
+    # Try to find game by player_id first
     if player_id:
         game, player, room_code = get_game_and_player(player_id)
-    else:
-        return
+    
+    # If no game found, try by room_code (for reactor)
+    if not game and room_code:
+        game = game_manager.get_game(room_code)
+    
+    # If still no game, try by sid
+    if not game:
+        game, room_code = game_manager.get_game_by_sid(sid)
     
     if not game:
+        emit('error', {'message': 'Game not found'})
         return
     
-    # Reset all players but keep them in the game
-    for p in game.players:
-        p.reset()
+    # If force reset (from reactor/host), reset immediately
+    if force:
+        for p in game.players:
+            p.reset()
+        game.reset_game_state()
+        socketio.emit('game_reset', {'room_code': room_code}, room=room_code)
+        sendPlayerList(game, room_code)
+        logger.info(f"Game {room_code} has been force reset to lobby")
+        return
     
-    game.reset_game_state()
+    # Add this player's vote
+    if player_id:
+        game.reset_votes.add(player_id)
     
-    # Notify all clients to go back to players page
-    socketio.emit('game_reset', {'room_code': room_code}, room=room_code)
-    sendPlayerList(game, room_code)
-    logger.info(f"Game {room_code} has been reset to lobby")
+    # Count how many players are in the game (excluding those who left)
+    total_players = len([p for p in game.players if p.sid])
+    votes_needed = total_players
+    current_votes = len(game.reset_votes)
+    
+    # Broadcast the vote update to all players
+    socketio.emit('reset_vote_update', {
+        'room_code': room_code,
+        'current_votes': current_votes,
+        'votes_needed': votes_needed,
+        'voters': list(game.reset_votes)
+    }, room=room_code)
+    
+    logger.info(f"Game {room_code}: Reset vote from {player_id}. {current_votes}/{votes_needed} votes.")
+    
+    # If all players have voted, reset the game
+    if current_votes >= votes_needed:
+        for p in game.players:
+            p.reset()
+        game.reset_game_state()
+        socketio.emit('game_reset', {'room_code': room_code}, room=room_code)
+        sendPlayerList(game, room_code)
+        logger.info(f"Game {room_code} has been reset to lobby (all players voted)")
 
 
 @socketio.on('disband_room')
 def disband_room(data):
     """Disband a room completely - all players return to main lobby."""
+    sid = request.sid
     player_id = data.get('player_id') if isinstance(data, dict) else None
+    room_code = data.get('room_code', '').upper() if isinstance(data, dict) else None
     
-    if not player_id:
-        return
+    game = None
     
-    game, player, room_code = get_game_and_player(player_id)
+    # Try to find game by player_id first
+    if player_id:
+        game, player, room_code = get_game_and_player(player_id)
+    
+    # If no game found, try by room_code (for reactor)
+    if not game and room_code:
+        game = game_manager.get_game(room_code)
+    
+    # If still no game, try by sid
+    if not game:
+        game, room_code = game_manager.get_game_by_sid(sid)
     
     if not game:
         return
@@ -574,33 +626,77 @@ def disband_room(data):
 
 @socketio.on('leave_room')
 def leave_room_handler(data):
-    """Handle a player leaving the room."""
+    """Handle a player or reactor leaving the room."""
+    sid = request.sid
     player_id = data.get('player_id') if isinstance(data, dict) else None
+    room_code = data.get('room_code', '').upper() if isinstance(data, dict) else None
     
-    if not player_id:
+    game = None
+    player = None
+    
+    # Try to find the game by player_id first
+    if player_id:
+        game, player, room_code = get_game_and_player(player_id)
+    
+    # If no player found, try by room_code (for reactor/desktop clients)
+    if not game and room_code:
+        game = game_manager.get_game(room_code)
+    
+    # If still no game, try by sid
+    if not game:
+        game, room_code = game_manager.get_game_by_sid(sid)
+    
+    if not game:
+        emit('left_room')  # Still emit so client can reset
         return
     
-    game, player, room_code = get_game_and_player(player_id)
+    # Check if this is the reactor leaving
+    is_reactor = (game.reactor_sid == sid)
     
-    if not game or not player:
-        return
+    # Check if this is the room creator (before becoming a player)
+    is_creator_socket = (game.creator_sid == sid)
     
-    # Remove player from game
-    game.players.remove(player)
-    game_manager.unregister_player(player_id)
+    if player:
+        # If game is running, mark player as dead instead of removing them
+        if game.game_running and player.alive:
+            game.kill_player(player.player_id, death_cause='left_game')
+            logger.info(f"Player {player.username} left during active game - marked as dead in room {room_code}")
+        else:
+            # Game not running or player already dead - remove them from the game
+            game.players.remove(player)
+            logger.info(f"Player {player.username} left room {room_code}")
+        
+        game_manager.unregister_player(player_id)
+    
+    if is_reactor:
+        game.reactor_sid = None
+        game.has_reactor = False
+        logger.info(f"Reactor left room {room_code}")
+    
+    # Clean up sid mapping and leave the socket.io room
+    game_manager.unregister_sid(sid)
     leave_room(room_code)
     
-    # Notify the leaving player
+    # Notify the leaving client
     emit('left_room')
     
-    # If no players left, delete the room
-    if len(game.players) == 0:
+    # If no players left and no reactor, delete the room
+    # OR if the creator left before opening the room
+    should_delete = False
+    if len(game.players) == 0 and not game.reactor_sid:
+        should_delete = True
+    elif is_creator_socket and not game.is_open:
+        # Creator left during room setup
+        should_delete = True
+    
+    if should_delete:
+        # Notify any remaining clients
+        socketio.emit('room_disbanded', {'message': 'Room has been closed'}, room=room_code)
         game_manager.remove_game(room_code)
-        logger.info(f"Room {room_code} deleted (no players remaining)")
-    else:
+        logger.info(f"Room {room_code} deleted")
+    elif player:
         # Notify remaining players
         sendPlayerList(game, room_code)
-        logger.info(f"Player {player.username} left room {room_code}")
 
 
 # ============ TASK HANDLING ============
@@ -625,6 +721,23 @@ def handleTaskComplete(data):
     if not game or not player:
         return
     
+    # Determine what task the player was actually working on
+    # If they had a fake task that was PREVIOUSLY shown (not just queued), they completed that
+    # Otherwise they completed their real task
+    # 
+    # The key insight: when a fake task is queued, it becomes the "next" task.
+    # But the player is still working on their current real task.
+    # Once they complete their real task, we THEN show them the fake task.
+    # So on completion:
+    # - If fake_task is set AND player.task has is_fake=True, they completed the fake task
+    # - If fake_task is set AND player.task does NOT have is_fake, they completed real task, show fake next
+    # - If no fake_task, they completed real task, show real next
+    
+    # Check if the player's REAL task (player.task) was a fake one they were shown previously
+    was_fake_task = player.task and player.task.get('is_fake', False)
+    
+    logger.debug(f"Task completion - player.task: {player.task}, player.fake_task: {player.fake_task}, was_fake: {was_fake_task}")
+    
     # If task pool is empty, rebuild it from the original collaborative tasks
     if len(game.task_handler.tasks) == 0:
         if len(game.collaborative_tasks) > 0:
@@ -639,34 +752,47 @@ def handleTaskComplete(data):
             logger.info(f"Task pool reset from tasks.json in room {room_code}")
     
     if len(game.task_handler.tasks) > 0:
-        # Track previous percentage before incrementing
-        prev_percentage = (game.crew_score / game.taskGoal * 100) if game.taskGoal else 0
-        
-        game.crew_score += 1
-        socketio.emit("crew_score", {"score": game.crew_score}, room=room_code)
-        logger.info(f"Player {player.player_id} completed a task. Crew score: {game.crew_score}")
-        
-        # Calculate new percentage and play milestone sounds
-        if game.taskGoal:
-            new_percentage = game.crew_score / game.taskGoal * 100
+        # Only increment score for real tasks, not fake ones
+        if not was_fake_task:
+            # Track previous percentage before incrementing
+            prev_percentage = (game.crew_score / game.taskGoal * 100) if game.taskGoal else 0
             
-            # Play sound when crossing milestone thresholds
-            if prev_percentage < 20 <= new_percentage:
-                game.speaker.play_sound("20_percent_tasks")
-                logger.info(f"Milestone reached: 20% tasks complete in room {room_code}")
-            elif prev_percentage < 50 <= new_percentage:
-                game.speaker.play_sound("50_percent_tasks")
-                logger.info(f"Milestone reached: 50% tasks complete in room {room_code}")
-            elif prev_percentage < 80 <= new_percentage:
-                game.speaker.play_sound("80_percent_tasks")
-                logger.info(f"Milestone reached: 80% tasks complete in room {room_code}")
-            elif prev_percentage < 95 <= new_percentage:
-                game.speaker.play_sound("95_percent_tasks")
-                logger.info(f"Milestone reached: 95% tasks complete in room {room_code}")
+            game.crew_score += 1
+            socketio.emit("crew_score", {"score": game.crew_score}, room=room_code)
+            logger.info(f"Player {player.player_id} completed a task. Crew score: {game.crew_score}")
+            
+            # Calculate new percentage and play milestone sounds
+            if game.taskGoal:
+                new_percentage = game.crew_score / game.taskGoal * 100
+                
+                # Play sound when crossing milestone thresholds
+                if prev_percentage < 20 <= new_percentage:
+                    game.speaker.play_sound("20_percent_tasks")
+                    logger.info(f"Milestone reached: 20% tasks complete in room {room_code}")
+                elif prev_percentage < 50 <= new_percentage:
+                    game.speaker.play_sound("50_percent_tasks")
+                    logger.info(f"Milestone reached: 50% tasks complete in room {room_code}")
+                elif prev_percentage < 80 <= new_percentage:
+                    game.speaker.play_sound("80_percent_tasks")
+                    logger.info(f"Milestone reached: 80% tasks complete in room {room_code}")
+                elif prev_percentage < 95 <= new_percentage:
+                    game.speaker.play_sound("95_percent_tasks")
+                    logger.info(f"Milestone reached: 95% tasks complete in room {room_code}")
+        else:
+            logger.info(f"Player {player.player_id} completed a FAKE task (no score)")
         
-        player.task = game.getTask()
-        emit("task", {"task": player.task}, to=player.sid)
-        logger.debug(f"Assigned new task to player {player.player_id}: {player.task}")
+        # Assign next task - check if there's a queued fake task first
+        if player.fake_task:
+            # There's a fake task queued - move it to player.task and send it
+            player.task = player.fake_task
+            player.fake_task = None  # Clear the queue
+            emit("task", {"task": player.task}, to=player.sid)
+            logger.info(f"Sent FAKE task to player {player.player_id}: {player.task}")
+        else:
+            # Get a real task
+            player.task = game.getTask()
+            emit("task", {"task": player.task}, to=player.sid)
+            logger.debug(f"Assigned new task to player {player.player_id}: {player.task}")
 
 
 # ============ CARD HANDLING ============
@@ -682,7 +808,9 @@ def playCard(data):
     
     card = player.get_card(data.get('card_id'))
     if card:
-        card.play_card(player)
+        # Pass extra_data for cards that require additional input (e.g., Fake Task)
+        extra_data = data.get('extra_data')
+        card.play_card(player, extra_data)
         print(data)
 
 
@@ -833,12 +961,15 @@ def handlePinEntry(data):
 
 @socketio.on('player_dead')
 def handleDeath(data):
-    """Handle player death."""
+    """Handle player reporting their own death (I'm Dead button)."""
     player_id = data.get('player_id')
     game, player, room_code = get_game_and_player(player_id)
     
-    if game:
-        game.kill_player(player_id)
+    if game and player:
+        # Get the task they were working on for a personalized death message
+        current_task = player.get_task()
+        task_name = current_task.get('task') if current_task else None
+        game.kill_player(player_id, death_cause='murdered_during_task', task_name=task_name)
 
 
 # ============ TASK LIST MANAGEMENT ============
@@ -1074,6 +1205,9 @@ def handle_apply_task_list_to_game(data):
     })
     # Also send updated config
     emit('game_config', game.get_config())
+    
+    # Broadcast locations to all players in the room so they have the updated locations
+    socketio.emit('task_locations', game.locations, room=room_code)
 
 
 # ============ COLLABORATIVE TASK CREATION ============

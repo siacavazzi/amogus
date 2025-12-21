@@ -31,9 +31,11 @@ function ReactorWaiting() {
   const SONOS_CONNECTOR_URL = "https://github.com/siacavazzi/amogus-sonos-connector";
 
   const handleLeaveRoom = () => {
+    // Clear local storage first
+    localStorage.removeItem('room_code');
+    sessionStorage.removeItem('is_room_creator');
+    // Send leave_room with room_code (reactor doesn't have player_id)
     socket.emit('leave_room', { room_code: roomCode });
-    // Force page reload to reset state
-    window.location.reload();
   };
 
   return (

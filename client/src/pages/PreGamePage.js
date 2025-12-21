@@ -163,6 +163,7 @@ function PreGamePage() {
             console.log('Locations updated from server:', newLocations);
             const realFromServer = newLocations.filter(l => l !== 'Other');
             setLocalLocations(realFromServer);
+            setLocationsInitialized(true);  // Mark as initialized when we get an update
         };
         
         socket.on('task_locations', handleLocationUpdate);

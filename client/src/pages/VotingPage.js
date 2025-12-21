@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import PlayerCard from "../components/PlayerCard";
 import { DataContext } from "../GameContext";
+import LeaveGameButton from "../components/LeaveGameButton";
 import { CheckCircle, XCircle } from "lucide-react";
 
 export default function VotingPage() {
@@ -47,6 +48,9 @@ export default function VotingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-tr from-gray-900 via-gray-800 to-black p-4 pb-48 flex flex-col items-center text-white">
+      {/* Leave Game Button */}
+      <LeaveGameButton className="fixed top-4 right-4 z-50" />
+
       <div className="max-w-6xl w-full">
         <h1 className="pt-6 text-center text-3xl sm:text-4xl font-bold mb-4 tracking-wider text-indigo-300">Voting Round</h1>
 
