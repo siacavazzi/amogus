@@ -163,6 +163,30 @@ export default function GameContext({ children }) {
 
     const socketRef = useRef(null);
 
+    // Handle page visibility changes (mobile browser suspension/resume)
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible' && socketRef.current) {
+                console.log('Page became visible, checking connection...');
+                // If socket is disconnected, try to reconnect
+                if (!socketRef.current.connected) {
+                    console.log('Socket disconnected, attempting to reconnect...');
+                    socketRef.current.connect();
+                } else {
+                    // Socket is connected but we might need to rejoin the room
+                    const playerId = localStorage.getItem('player_id');
+                    if (playerId && !playerState?.username) {
+                        console.log('Connected but no player state, attempting rejoin...');
+                        socketRef.current.emit('rejoin', { player_id: playerId });
+                    }
+                }
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    }, [playerState?.username]);
+
     useEffect(() => {
         socketRef.current = io(ENDPOINT, {
             reconnection: true,
@@ -258,7 +282,10 @@ export default function GameContext({ children }) {
         })
 
         socketRef.current.on('disconnect', () => {
-            resetState();
+            // Only mark as disconnected, don't clear state
+            // Socket.io will auto-reconnect and we'll rejoin with our player_id
+            setConnected(false);
+            console.log('Socket disconnected, will attempt to reconnect...');
         });
 
         socketRef.current.on('message', (data) => {

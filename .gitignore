@@ -45,3 +45,4 @@ server/logs/
 .env
 .env.local
 .env.production
+*.pyc
