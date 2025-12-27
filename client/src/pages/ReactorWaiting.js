@@ -39,7 +39,7 @@ function ReactorWaiting() {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen h-full bg-gradient-to-b from-gray-900 via-gray-800 to-blue-900 text-white p-8 pt-12 pb-20 overflow-y-auto">
+    <div className="fixed inset-0 flex flex-col items-center bg-gradient-to-b from-gray-900 via-gray-800 to-blue-900 text-white p-8 pt-12 pb-20 overflow-y-auto">
       {/* Leave Room Button - Fixed Position */}
       <button
         onClick={handleLeaveRoom}

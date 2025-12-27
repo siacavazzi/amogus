@@ -327,7 +327,7 @@ def handleRejoin(data):
         
         if game.end_state:
             logger.info(f"Game over: {game.end_state}")
-            emit("end_game", game.end_state)
+            emit("end_game", {'result': game.end_state, 'stats': game.stats})
         
         if len(game.card_deck.active_cards) > 0:
             game.card_deck.emit_active_cards()
@@ -754,6 +754,9 @@ def handleTaskComplete(data):
     if len(game.task_handler.tasks) > 0:
         # Only increment score for real tasks, not fake ones
         if not was_fake_task:
+            # Track task completion in stats
+            game.stats['tasks_completed'] += 1
+            
             # Track previous percentage before incrementing
             prev_percentage = (game.crew_score / game.taskGoal * 100) if game.taskGoal else 0
             
@@ -779,6 +782,11 @@ def handleTaskComplete(data):
                     game.speaker.play_sound("95_percent_tasks")
                     logger.info(f"Milestone reached: 95% tasks complete in room {room_code}")
         else:
+            # Track fake task completion in stats
+            game.stats['fake_tasks_completed'].append({
+                'player_name': player.username,
+                'task_text': player.task.get('task', 'Unknown task') if player.task else 'Unknown task'
+            })
             logger.info(f"Player {player.player_id} completed a FAKE task (no score)")
         
         # Assign next task - check if there's a queued fake task first

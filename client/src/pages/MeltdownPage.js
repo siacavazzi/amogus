@@ -193,7 +193,7 @@ function ReactorMeltdown() {
 
     return (
         <div
-            className={`relative flex flex-col items-center justify-center min-h-screen h-full p-4 pt-12 pb-8
+            className={`fixed inset-0 flex flex-col items-center justify-center p-4 pt-12 pb-8
                         text-white transition-colors duration-500 overflow-hidden
                         ${isCorrectFlash ? "bg-green-900" : "bg-gradient-to-b from-gray-900 via-red-950 to-gray-900"}`}
         >

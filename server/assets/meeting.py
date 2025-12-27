@@ -26,7 +26,7 @@ class Meeting:
             self.game.end_state = 'sus_victory'
             # Emit player list BEFORE end_game so clients have updated death info
             self.game.emit_player_list()
-            self.game.emit_to_room("end_game", self.game.end_state)
+            self.game.emit_to_room("end_game", {'result': self.game.end_state, 'stats': self.game.stats})
             return
         self.stage = 'voting'
         self.game.emit_to_room("meeting", self.to_json())
@@ -154,6 +154,9 @@ class Meeting:
             # Determine who was voted out (player with the most votes)
             self.voted_out = self.determine_voted_out(final_votes)
             if self.voted_out:
+                # Track the vote-out in stats
+                self.game.stats['players_voted_out'] += 1
+                
                 # Determine if they were actually an intruder
                 voted_player = self.game.getPlayerById(self.voted_out)
                 if voted_player:

@@ -54,7 +54,7 @@ const MeetingWaitingPage = () => {
   };
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white p-6 pb-32 overflow-hidden">
+    <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white p-6 pb-32 overflow-hidden">
       {/* Leave Game Button */}
       <LeaveGameButton className="fixed top-4 right-4 z-50" />
 

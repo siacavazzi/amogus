@@ -68,6 +68,16 @@ class Game:
         # Reset voting system
         self.reset_votes = set()  # Player IDs who want to play again
         
+        # Game statistics tracking
+        self.stats = {
+            'meetings_called': 0,
+            'players_voted_out': 0,
+            'cards_played': 0,
+            'meltdowns_triggered': 0,
+            'tasks_completed': 0,
+            'fake_tasks_completed': [],  # List of {player_name, task_text}
+        }
+        
         # Create card deck after has_reactor is set
         self.card_deck = CardDeck(locations, socket, self)
 
@@ -133,6 +143,7 @@ class Game:
                 self.socket.emit(event)
 
     def start_meltdown(self):
+        self.stats['meltdowns_triggered'] += 1
         self.speaker.loop_sound("meltdown", self.meltdown_time - self.meltdown_time_mod)
         self.active_meltdown = Meltdown(self.players, self.meltdown_time - self.meltdown_time_mod, self.socket, self.speaker, self.code_percent)
         self.meltdown_time_mod = 0
@@ -157,7 +168,7 @@ class Game:
         self.end_time = time.time()
         # Emit player list BEFORE end_game so clients have updated death info
         self.emit_player_list()
-        self.emit_to_room("end_game", self.end_state)
+        self.emit_to_room("end_game", {'result': self.end_state, 'stats': self.stats})
 
         if self.speaker:
             self.speaker.play_sound("sus_victory")
@@ -298,6 +309,16 @@ class Game:
         self.card_deck = CardDeck(self.locations, self.socket, self)
         self.reset_votes = set()  # Clear reset votes
         
+        # Reset game statistics
+        self.stats = {
+            'meetings_called': 0,
+            'players_voted_out': 0,
+            'cards_played': 0,
+            'meltdowns_triggered': 0,
+            'tasks_completed': 0,
+            'fake_tasks_completed': [],
+        }
+        
         # Only reset task handler if no task list was applied
         # Otherwise preserve the loaded tasks for replaying
         if not self.task_list_applied:
@@ -322,6 +343,7 @@ class Game:
 
     def start_meeting(self, player_who_started_it):
         self.meeting = Meeting(self.vote_time, self.socket, player_who_started_it, self)
+        self.stats['meetings_called'] += 1
         self.speaker.play_sound('meeting')
         self.emit_to_room("meeting", self.meeting.to_json())
 
@@ -371,7 +393,7 @@ class Game:
                 self.speaker.play_sound('sus_victory')
                 # Emit player list BEFORE end_game so clients have updated death info
                 self.emit_player_list()
-                self.emit_to_room("end_game", self.end_state)
+                self.emit_to_room("end_game", {'result': self.end_state, 'stats': self.stats})
                 return
     
             
@@ -383,7 +405,7 @@ class Game:
                 self.speaker.play_sound('crew_victory')
                 # Emit player list BEFORE end_game so clients have updated death info
                 self.emit_player_list()
-                self.emit_to_room("end_game", self.end_state)
+                self.emit_to_room("end_game", {'result': self.end_state, 'stats': self.stats})
                 return
                 
         if self.meeting:

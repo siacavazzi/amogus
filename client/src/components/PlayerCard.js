@@ -3,7 +3,7 @@ import { ENDPOINT } from "../ENDPOINT";
 import { Skull, Vote, Radiation, DoorOpen, UserX, Shield } from 'lucide-react';
 
 // Map death causes to icons and colors
-const getDeathInfo = (cause) => {
+export const getDeathInfo = (cause) => {
   switch (cause) {
     case 'voted_out':
     case 'voted_out_intruder':
@@ -169,7 +169,7 @@ export const PlayerCardCompact = ({
           )}
         </div>
         {showDeathInfo && player.death_message && (
-          <p className="text-xs text-gray-400 line-clamp-1 mt-0.5">
+          <p className="text-xs text-gray-400 mt-1 break-words whitespace-normal text-left">
             {player.death_message}
           </p>
         )}

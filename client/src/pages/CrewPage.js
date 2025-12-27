@@ -5,6 +5,9 @@ import AnimationOverlay from "../components/AnimationOverlay";
 import MUECustomSlider from "../components/swiper";
 import LeaveGameButton from "../components/LeaveGameButton";
 import { AlertTriangle, MapPin, Target, Clock, Crosshair, Radio } from "lucide-react";
+import { RotatingRing, GridOverlay } from "../components/ui";
+import { StatusBadge, PrimaryButton } from "../components/ui";
+import { Card, CardHeader, CardBody } from "../components/ui";
 
 const CrewmemberPage = ({ setShowSusPage }) => {
   const {
@@ -64,9 +67,9 @@ const CrewmemberPage = ({ setShowSusPage }) => {
   };
 
   return (
-    <div className="relative flex flex-col items-center min-h-screen h-full p-6 pt-12 pb-32 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white overflow-hidden">
+    <div className="fixed inset-0 flex flex-col items-center p-6 pt-12 pb-32 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white overflow-y-auto">
       {/* Leave Game Button - Fixed Position */}
-      <LeaveGameButton className="fixed top-4 right-4 z-50" />
+      <LeaveGameButton className="fixed top-8 right-4 z-50" />
 
       {/* Animated Background Effects */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -79,28 +82,22 @@ const CrewmemberPage = ({ setShowSusPage }) => {
         ></div>
         
         {/* Rotating rings */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-cyan-500/10 rounded-full animate-spin" style={{ animationDuration: '30s' }}></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] border border-cyan-500/5 rounded-full animate-spin" style={{ animationDuration: '45s', animationDirection: 'reverse' }}></div>
+        <RotatingRing size="600px" borderColor="border-cyan-500/10" duration={30} />
+        <RotatingRing size="700px" borderColor="border-cyan-500/5" duration={45} reverse />
         
         {/* Grid overlay for sci-fi feel */}
-        <div className="absolute inset-0 opacity-5" style={{
-          backgroundImage: 'linear-gradient(rgba(34, 211, 238, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(34, 211, 238, 0.3) 1px, transparent 1px)',
-          backgroundSize: '50px 50px'
-        }}></div>
+        <GridOverlay color="rgba(34, 211, 238, 0.3)" size={50} opacity={0.05} />
       </div>
 
       {/* Status Bar */}
       <div className="relative z-10 flex items-center gap-4 mb-6">
-        <div className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all duration-300 ${
-          killCooldown > 0 
-            ? 'bg-orange-500/20 border-orange-500' 
-            : 'bg-cyan-500/20 border-cyan-500'
-        }`}>
-          <Radio size={18} className={`${killCooldown > 0 ? 'text-orange-400' : 'text-cyan-400'} animate-pulse`} />
-          <span className={`font-medium text-sm ${killCooldown > 0 ? 'text-orange-400' : 'text-cyan-400'}`}>
-            {killCooldown > 0 ? 'STANDBY' : 'ACTIVE'}
-          </span>
-        </div>
+        <StatusBadge 
+          icon={Radio} 
+          variant={killCooldown > 0 ? 'orange' : 'cyan'}
+          animate
+        >
+          {killCooldown > 0 ? 'STANDBY' : 'ACTIVE'}
+        </StatusBadge>
       </div>
 
       {/* Emergency Button */}

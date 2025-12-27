@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { Zap, Skull, AlertTriangle, Radio, Wifi, WifiOff } from "lucide-react";
 import LeaveGameButton from "../components/LeaveGameButton";
+import { Vignette } from "../components/ui";
 
 // Matrix rain character component with typing effect that falls down the screen
 const MatrixColumn = ({ delay, duration, left, maxChars = 20 }) => {
@@ -204,7 +205,7 @@ const HackedPage = ({ hackTime, setHackTime }) => {
   const isUrgent = hackTime <= 10;
 
   return (
-    <div className="relative flex items-center justify-center min-h-screen h-full bg-black overflow-hidden">
+    <div className="fixed inset-0 flex items-center justify-center bg-black overflow-hidden">
       {/* Leave Game Button */}
       <LeaveGameButton className="fixed top-4 right-4 z-50" />
 
@@ -395,9 +396,7 @@ const HackedPage = ({ hackTime, setHackTime }) => {
       </div>
 
       {/* Vignette effect */}
-      <div className="absolute inset-0 pointer-events-none" style={{
-        background: 'radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.8) 100%)'
-      }} />
+      <Vignette intensity={70} />
     </div>
   );
 };

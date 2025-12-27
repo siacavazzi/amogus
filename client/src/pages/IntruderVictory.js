@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
 import EndGameButtons from '../components/EndGameButtons';
 import DeathSummary from '../components/DeathSummary';
+import GameStats from '../components/GameStats';
 import { DataContext } from '../GameContext';
 import { Skull, Swords, Crown, Flame } from 'lucide-react';
 import { ProfilePicture } from '../components/PlayerCard';
+import { GlowingOrb, GridOverlay } from '../components/ui';
+import { Card, StatusBadge } from '../components/ui';
 
 const IntruderVictoryScreen = ({ message = "Intruders Win!" }) => {
     const { players } = useContext(DataContext);
@@ -16,7 +19,6 @@ const IntruderVictoryScreen = ({ message = "Intruders Win!" }) => {
     const deadCrew = players.filter(p => !p.alive && !p.sus);
 
     useEffect(() => {
-        // Trigger content reveal animation
         const timer = setTimeout(() => setShowContent(true), 300);
         
         // Generate flame particles
@@ -42,12 +44,12 @@ const IntruderVictoryScreen = ({ message = "Intruders Win!" }) => {
     }, []);
 
     return (
-        <div className="relative flex flex-col items-center min-h-screen bg-gradient-to-b from-gray-900 via-red-950/40 to-gray-900 text-white p-6 pt-12 pb-32 overflow-hidden">
+        <div className="fixed inset-0 flex flex-col items-center bg-gradient-to-b from-gray-900 via-red-950/40 to-gray-900 text-white p-6 pt-12 pb-32 overflow-y-auto">
             {/* Animated Background Effects */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none">
                 {/* Ominous glow */}
-                <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-3xl bg-red-600/30 animate-pulse" />
-                <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full blur-2xl bg-red-500/40 animate-pulse" style={{ animationDelay: '0.5s' }} />
+                <GlowingOrb top="25%" left="50%" size="600px" color="bg-red-600/30" delay={0} />
+                <GlowingOrb top="25%" left="50%" size="300px" color="bg-red-500/40" delay={0.5} />
                 
                 {/* Blood splatter effect circles */}
                 <div className="absolute top-[20%] left-[10%] w-32 h-32 rounded-full bg-red-900/30 blur-2xl" />
@@ -67,11 +69,7 @@ const IntruderVictoryScreen = ({ message = "Intruders Win!" }) => {
                     >
                         <Flame 
                             size={p.size} 
-                            className="text-red-500/40"
-                            style={{ 
-                                filter: 'blur(1px)',
-                                animation: 'flicker 0.5s ease-in-out infinite alternate'
-                            }}
+                            className="text-red-500/40 animate-flicker"
                         />
                     </div>
                 ))}
@@ -81,13 +79,7 @@ const IntruderVictoryScreen = ({ message = "Intruders Win!" }) => {
                 <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-red-600 to-transparent opacity-60" />
 
                 {/* Grid overlay with red tint */}
-                <div 
-                    className="absolute inset-0 opacity-5"
-                    style={{
-                        backgroundImage: 'linear-gradient(rgba(239,68,68,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(239,68,68,0.3) 1px, transparent 1px)',
-                        backgroundSize: '60px 60px'
-                    }}
-                />
+                <GridOverlay color="rgba(239,68,68,0.3)" />
             </div>
 
             <div className={`relative z-10 text-center flex flex-col items-center w-full max-w-lg transition-all duration-1000 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
@@ -101,10 +93,9 @@ const IntruderVictoryScreen = ({ message = "Intruders Win!" }) => {
                 </div>
 
                 {/* Victory Badge */}
-                <div className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-red-500/20 border border-red-500/50 mb-4">
-                    <Swords size={18} className="text-red-400" />
-                    <span className="font-semibold text-red-300 uppercase tracking-wider text-sm">Hostile Takeover</span>
-                </div>
+                <StatusBadge icon={Swords} variant="red" size="large" className="mb-4">
+                    <span className="uppercase tracking-wider">Hostile Takeover</span>
+                </StatusBadge>
 
                 {/* Glitchy Title */}
                 <div className="relative mb-3">
@@ -164,10 +155,13 @@ const IntruderVictoryScreen = ({ message = "Intruders Win!" }) => {
                 {/* Death Summary */}
                 <DeathSummary title="The Body Count" showSurvivors={false} theme="intruder" />
                 
+                {/* Game Stats */}
+                <GameStats />
+                
                 {/* End Game Buttons */}
-                <div className="mt-8 p-6 bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-red-500/20 w-full">
+                <Card variant="glass" padding="default" className="mt-8 w-full border-red-500/20">
                     <EndGameButtons />
-                </div>
+                </Card>
             </div>
         </div>
     );

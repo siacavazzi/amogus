@@ -96,6 +96,152 @@ html, body, #root {
   .animate-coolant-wave-2 {
     animation: coolantWave2 2.5s ease-in-out infinite;
   }
+  
+  /* Fade in scale animation */
+  @keyframes fadeInScale {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  .animate-fadeInScale {
+    animation: fadeInScale 0.5s ease-out;
+  }
+  
+  /* Float animation for ghost/icons */
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+  
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  /* Slow pulse animation */
+  @keyframes pulse-slow {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+  
+  .animate-pulse-slow {
+    animation: pulse-slow 3s ease-in-out infinite;
+  }
+
+  /* Float up animation for particles */
+  @keyframes floatUp {
+    0% {
+      transform: translateY(0) scale(1);
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.6;
+    }
+    90% {
+      opacity: 0.3;
+    }
+    100% {
+      transform: translateY(-100vh) scale(0.5);
+      opacity: 0;
+    }
+  }
+
+  .animate-float-up {
+    animation: floatUp 8s ease-in-out infinite;
+  }
+
+  /* Scan down animation */
+  @keyframes scanDown {
+    0% {
+      top: -5%;
+    }
+    100% {
+      top: 105%;
+    }
+  }
+
+  .animate-scan-down {
+    animation: scanDown 4s linear infinite;
+  }
+
+  /* Ghost float animation (vertical bob for dead page) */
+  @keyframes ghostFloat {
+    0% {
+      transform: translateY(100vh);
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.3;
+    }
+    90% {
+      opacity: 0.1;
+    }
+    100% {
+      transform: translateY(-100vh);
+      opacity: 0;
+    }
+  }
+
+  /* Glitch animations */
+  @keyframes glitch-intense {
+    0%, 100% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(-2px, -2px); }
+    60% { transform: translate(2px, 2px); }
+    80% { transform: translate(2px, -2px); }
+  }
+
+  .animate-glitch-intense {
+    animation: glitch-intense 0.3s ease-in-out infinite;
+  }
+
+  /* Flicker animation */
+  @keyframes flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+  }
+
+  .animate-flicker {
+    animation: flicker 0.5s ease-in-out infinite alternate;
+  }
+
+  @keyframes flicker-fast {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 0.4; }
+  }
+
+  .animate-flicker-fast {
+    animation: flicker-fast 0.2s ease-in-out infinite alternate;
+  }
+
+  /* Hex float animation */
+  @keyframes hex-float {
+    0%, 100% {
+      transform: translateY(0) rotate(0deg);
+      opacity: 0.3;
+    }
+    50% {
+      transform: translateY(-10px) rotate(5deg);
+      opacity: 0.5;
+    }
+  }
+
+  .animate-hex-float {
+    animation: hex-float 4s ease-in-out infinite;
+  }
 }
 
 code {

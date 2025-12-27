@@ -59,7 +59,7 @@ function ReactorNormal() {
     };
 
     return (
-        <div className="relative flex flex-col items-center justify-center min-h-screen h-full bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white overflow-hidden pt-8 pb-20">
+        <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white overflow-hidden pt-8 pb-20">
             {/* Leave Room Button */}
             <button
                 onClick={handleLeaveRoom}

@@ -8,7 +8,7 @@ DEATH_MESSAGES = {
     'voted_out': [
         "was yeeted into the cold vacuum of space by popular demand",
         "got democratically deleted from existence",
-        "was voted off the island (the island is a spaceship)",
+        "was voted off the island",
         "learned that democracy sometimes really sucks",
         "was ejected with extreme prejudice",
         "took an unscheduled spacewalk without a suit",

@@ -9,7 +9,7 @@ function MeltdownInfo() {
 
     return (
         <div
-            className={`relative flex flex-col items-center justify-center min-h-screen h-full p-4 pt-12 pb-8
+            className={`fixed inset-0 flex flex-col items-center justify-center p-4 pt-12 pb-8
                         text-white overflow-hidden
                         bg-gradient-to-b from-gray-900 via-red-950 to-gray-900
                         ${meltdownTimer <= 10 ? "" : ""}`}

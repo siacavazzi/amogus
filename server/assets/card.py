@@ -45,6 +45,10 @@ class Card:
         extra_data: Optional dict with additional data for cards that require input (e.g., fake task details)
         """
         remove_card = True
+        
+        # Track card play in game stats
+        self.game.stats['cards_played'] += 1
+        
         if self.action == 'EMP':
             self.game.start_hack(self.duration)
         elif self.action == 'Self Report':

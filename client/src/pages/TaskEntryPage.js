@@ -19,11 +19,11 @@ function TaskEntryPage() {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-gray-800 to-gray-900 p-6">
+        <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-tr from-gray-800 to-gray-900 p-6">
             <button
                 type="button"
                 onClick={() => setTaskEntry(false)}
-                className="absolute top-6 left-6 flex items-center text-gray-300 hover:text-white transition-colors"
+                className="fixed top-6 left-6 flex items-center text-gray-300 hover:text-white transition-colors z-50"
             >
                 <ChevronLeft className="mr-1" />
                 <span className="text-sm">Back</span>

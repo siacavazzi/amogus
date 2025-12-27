@@ -7,7 +7,7 @@ const GameRunningPage = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center p-8 bg-gray-800 text-white min-h-screen">
+    <div className="fixed inset-0 flex flex-col items-center justify-center p-8 bg-gray-800 text-white">
       <h1 className="mb-6 text-4xl font-bold text-blue-500">Game Already Running</h1>
       <p className="mb-8 text-lg text-center">
         RELOAD if you are already playing to remove this page

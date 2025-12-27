@@ -290,7 +290,7 @@ function TaskCreationPage() {
     }, {});
 
     return (
-        <div className="min-h-screen bg-gradient-to-tr from-gray-800 to-gray-900 p-4 pb-32">
+        <div className="fixed inset-0 bg-gradient-to-tr from-gray-800 to-gray-900 p-4 pb-32 overflow-y-auto">
             <div className="max-w-2xl mx-auto">
                 {/* Room Code Display */}
                 {roomCode && (

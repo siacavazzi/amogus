@@ -12,7 +12,7 @@ function ConnectingPage() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 p-4">
+    <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 via-black to-gray-800 p-4">
       <div className="flex flex-col items-center bg-gray-800/80 backdrop-blur-sm p-8 rounded-xl shadow-2xl">
         <img
           src="https://media.tenor.com/gQV5VzHLWQIAAAAM/among-us-sus.gif"

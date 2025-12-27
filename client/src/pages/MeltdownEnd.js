@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import EndGameButtons from '../components/EndGameButtons';
 import DeathSummary from '../components/DeathSummary';
+import GameStats from '../components/GameStats';
 import { DataContext } from '../GameContext';
 import { Radiation, AlertTriangle, Flame, Zap } from 'lucide-react';
 import { ProfilePicture } from '../components/PlayerCard';
@@ -44,7 +45,7 @@ const NuclearMeltdownScreen = ({ message = "Meltdown!" }) => {
 
     return (
         <div 
-            className="relative flex flex-col items-center min-h-screen bg-gradient-to-b from-orange-950 via-red-950/80 to-gray-900 text-white p-6 pt-12 pb-32 overflow-hidden"
+            className="fixed inset-0 flex flex-col items-center bg-gradient-to-b from-orange-950 via-red-950/80 to-gray-900 text-white p-6 pt-12 pb-32 overflow-y-auto"
             style={{ transform: `translate(${shakeIntensity}px, ${shakeIntensity}px)` }}
         >
             {/* Animated Background Effects */}
@@ -158,6 +159,9 @@ const NuclearMeltdownScreen = ({ message = "Meltdown!" }) => {
 
                 {/* Death Summary */}
                 <DeathSummary title="Vaporized" showSurvivors={false} theme="meltdown" />
+                
+                {/* Game Stats */}
+                <GameStats />
                 
                 {/* End Game Buttons */}
                 <div className="mt-8 p-6 bg-gray-900/70 backdrop-blur-sm rounded-2xl border border-orange-500/30 w-full">

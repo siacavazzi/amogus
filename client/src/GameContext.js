@@ -49,6 +49,7 @@ export default function GameContext({ children }) {
     const [meltdownTimer, setMeltdownTimer] = useState(false);
     const [codesNeeded, setCodesNeeded] = useState(undefined);
     const [endState, setEndState] = useState(undefined);
+    const [gameStats, setGameStats] = useState(undefined);
     const [taskEntry , setTaskEntry] = useState(false);
     const [taskLocations, setTaskLocations] = useState([]);
     const [deniedLocation, setDeniedLocation] = useState(undefined)
@@ -86,6 +87,7 @@ export default function GameContext({ children }) {
         setMeltdownTimer(undefined);
         setMeltdownCode(undefined);
         setEndState(undefined);
+        setGameStats(undefined);
         setDeniedLocation(undefined);
         setTaskLocations([])
         setVotes({})
@@ -266,7 +268,13 @@ export default function GameContext({ children }) {
         });
 
         socketRef.current.on('end_game', (data) => {
-            setEndState(data);
+            // Handle both old format (string) and new format (object with result and stats)
+            if (typeof data === 'string') {
+                setEndState(data);
+            } else {
+                setEndState(data.result);
+                setGameStats(data.stats);
+            }
         });
 
         socketRef.current.on('codes_needed', (data) => {
@@ -567,6 +575,7 @@ export default function GameContext({ children }) {
         meltdownTimer,
         codesNeeded,
         endState,
+        gameStats,
         setCodesNeeded,
         taskEntry,
         setTaskEntry,
@@ -601,6 +610,7 @@ export default function GameContext({ children }) {
         resetVotes,
     }), [
         endState,
+        gameStats,
         meltdownCode,
         codesNeeded,
         meltdownTimer,

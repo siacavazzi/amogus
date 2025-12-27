@@ -1,48 +1,43 @@
 import React, { useState, useEffect, useContext } from 'react';
 import EndGameButtons from '../components/EndGameButtons';
 import DeathSummary from '../components/DeathSummary';
+import GameStats from '../components/GameStats';
 import { DataContext } from '../GameContext';
 import { Shield, Star, Trophy, Sparkles } from 'lucide-react';
 import { PlayerBadge } from '../components/PlayerCard';
+import { 
+    GlowingOrb, 
+    GridOverlay, 
+    RotatingRing,
+    useCelebrationParticles 
+} from '../components/ui';
+import { Card, StatusBadge } from '../components/ui';
 
 const CrewVictoryScreen = ({ message = "Crewmates Win!" }) => {
     const { players } = useContext(DataContext);
     const [showContent, setShowContent] = useState(false);
-    const [particles, setParticles] = useState([]);
+    const particles = useCelebrationParticles(30);
 
     // Get surviving crewmates for the victory display
     const survivingCrew = players.filter(p => p.alive && !p.sus);
     const exposedIntruders = players.filter(p => p.sus);
 
     useEffect(() => {
-        // Trigger content reveal animation
         const timer = setTimeout(() => setShowContent(true), 300);
-        
-        // Generate celebration particles
-        const newParticles = Array.from({ length: 30 }, (_, i) => ({
-            id: i,
-            x: Math.random() * 100,
-            delay: Math.random() * 2,
-            duration: 2 + Math.random() * 3,
-            size: 4 + Math.random() * 8,
-            type: Math.random() > 0.5 ? 'star' : 'circle'
-        }));
-        setParticles(newParticles);
-        
         return () => clearTimeout(timer);
     }, []);
 
     return (
-        <div className="relative flex flex-col items-center min-h-screen bg-gradient-to-b from-gray-900 via-cyan-950/30 to-gray-900 text-white p-6 pt-12 pb-32 overflow-hidden">
+        <div className="fixed inset-0 flex flex-col items-center bg-gradient-to-b from-gray-900 via-cyan-950/30 to-gray-900 text-white p-6 pt-12 pb-32 overflow-y-auto">
             {/* Animated Background Effects */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none">
                 {/* Victory glow */}
-                <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-3xl bg-cyan-500/20 animate-pulse" />
-                <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full blur-2xl bg-blue-500/30 animate-pulse" style={{ animationDelay: '0.5s' }} />
+                <GlowingOrb top="25%" left="50%" size="600px" color="bg-cyan-500/20" delay={0} />
+                <GlowingOrb top="25%" left="50%" size="300px" color="bg-blue-500/30" delay={0.5} />
                 
                 {/* Celebration rings */}
-                <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] border-2 border-cyan-500/20 rounded-full animate-ping" style={{ animationDuration: '3s' }} />
-                <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] border border-cyan-500/10 rounded-full animate-ping" style={{ animationDuration: '4s', animationDelay: '0.5s' }} />
+                <RotatingRing size="400px" borderColor="border-cyan-500/20" borderWidth="border-2" duration={3} />
+                <RotatingRing size="500px" borderColor="border-cyan-500/10" duration={4} />
                 
                 {/* Floating particles */}
                 {particles.map((p) => (
@@ -69,13 +64,7 @@ const CrewVictoryScreen = ({ message = "Crewmates Win!" }) => {
                 ))}
 
                 {/* Grid overlay */}
-                <div 
-                    className="absolute inset-0 opacity-5"
-                    style={{
-                        backgroundImage: 'linear-gradient(rgba(6,182,212,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(6,182,212,0.3) 1px, transparent 1px)',
-                        backgroundSize: '60px 60px'
-                    }}
-                />
+                <GridOverlay color="rgba(6,182,212,0.3)" />
             </div>
 
             <div className={`relative z-10 text-center flex flex-col items-center w-full max-w-lg transition-all duration-1000 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
@@ -89,10 +78,9 @@ const CrewVictoryScreen = ({ message = "Crewmates Win!" }) => {
                 </div>
 
                 {/* Victory Badge */}
-                <div className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-cyan-500/20 border border-cyan-500/50 mb-4">
-                    <Shield size={18} className="text-cyan-400" />
-                    <span className="font-semibold text-cyan-300 uppercase tracking-wider text-sm">Mission Complete</span>
-                </div>
+                <StatusBadge icon={Shield} variant="cyan" size="large" className="mb-4">
+                    <span className="uppercase tracking-wider">Mission Complete</span>
+                </StatusBadge>
 
                 <h1 className="text-4xl md:text-5xl font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-cyan-400 drop-shadow-[0_0_30px_rgba(6,182,212,0.5)]">
                     {message}
@@ -122,10 +110,13 @@ const CrewVictoryScreen = ({ message = "Crewmates Win!" }) => {
                 {/* Death Summary */}
                 <DeathSummary title="Lost Along The Way" showSurvivors={true} theme="crew" />
                 
+                {/* Game Stats */}
+                <GameStats />
+                
                 {/* End Game Buttons */}
-                <div className="mt-8 p-6 bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 w-full">
+                <Card variant="glass" padding="default" className="mt-8 w-full">
                     <EndGameButtons />
-                </div>
+                </Card>
             </div>
         </div>
     );

@@ -3,6 +3,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import { DataContext } from '../GameContext';
 import LeaveGameButton from '../components/LeaveGameButton';
 import { LogOut, Zap, Clock, MapPin, AlertTriangle, Eye, X, Send, Users, FileText } from 'lucide-react';
+import { StatusBadge, PrimaryButton } from '../components/ui';
+import { Card } from '../components/ui';
 
 // ActionCard component defined OUTSIDE to prevent re-creation on every render
 function ActionCard({ action, text, location, duration, id, time_left, active = false, countdown, requires_input, onPlay }) {
@@ -132,9 +134,9 @@ const IntruderPage = ({ setShowSusPage }) => {
   const activeCardsList = activeCards.filter((card) => !(card.time_left && card.time_left <= 0));
 
   return (
-    <div className="relative flex flex-col items-center min-h-screen h-full p-4 pt-10 pb-32 bg-gradient-to-b from-red-950 via-red-900/90 to-gray-900 text-white overflow-y-auto">
+    <div className="fixed inset-0 flex flex-col items-center p-4 pt-12 pb-32 bg-gradient-to-b from-red-950 via-red-900/90 to-gray-900 text-white overflow-y-auto">
       {/* Leave Game Button - Fixed Position */}
-      <LeaveGameButton className="fixed top-4 right-4 z-50" />
+      <LeaveGameButton className="fixed top-8 right-4 z-50" />
 
       {/* Fake Task Modal */}
       {showFakeTaskModal && (
