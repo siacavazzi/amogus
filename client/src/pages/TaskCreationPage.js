@@ -164,15 +164,6 @@ function TaskCreationPage() {
         socket.on('collaborative_task_removed', handleTaskRemoved);
         socket.on('collaborative_tasks_saved', handleTasksSaved);
 
-        // Listen for location updates
-        const handleLocationUpdate = (newLocations) => {
-            console.log('TaskCreationPage: Locations updated from server:', newLocations);
-            const realFromServer = newLocations.filter(l => l !== 'Other');
-            setLocalLocations(realFromServer);
-            setLocationsInitialized(true);
-        };
-        socket.on('task_locations', handleLocationUpdate);
-
         // Request current tasks
         socket.emit('get_collaborative_tasks', { room_code: roomCode });
 
@@ -181,7 +172,6 @@ function TaskCreationPage() {
             socket.off('collaborative_task_added', handleTaskAdded);
             socket.off('collaborative_task_removed', handleTaskRemoved);
             socket.off('collaborative_tasks_saved', handleTasksSaved);
-            socket.off('task_locations', handleLocationUpdate);
         };
     }, [socket, roomCode]);
 
@@ -290,7 +280,7 @@ function TaskCreationPage() {
     }, {});
 
     return (
-        <div className="fixed inset-0 bg-gradient-to-tr from-gray-800 to-gray-900 p-4 pb-32 overflow-y-auto">
+        <div className="min-h-screen bg-gradient-to-tr from-gray-800 to-gray-900 p-4 pb-32">
             <div className="max-w-2xl mx-auto">
                 {/* Room Code Display */}
                 {roomCode && (

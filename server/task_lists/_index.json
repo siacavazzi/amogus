@@ -22,7 +22,8 @@
       "LQAD7H"
     ],
     "device_b2nahin7smizkkcmr": [
-      "LQAD7H"
+      "LQAD7H",
+      "YM6SYF"
     ],
     "device_ds7d1lho7mjf6bm1e": [
       "6SY5NT"
@@ -36,6 +37,7 @@
     "987647": "Task List",
     "LQAD7H": "Test list 123",
     "N6NZ9W": "Test list 123 (Copy)",
-    "6SY5NT": "Test list 123 (Copy)"
+    "6SY5NT": "Test list 123 (Copy)",
+    "YM6SYF": "other test"
   }
 }

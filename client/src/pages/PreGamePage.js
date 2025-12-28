@@ -182,14 +182,12 @@ function PreGamePage() {
     
     // Set default location when locations are available
     useEffect(() => {
-        if (realLocations.length > 0) {
-            // Always prefer a real location over 'Other'
-            if (!selectedLocation || selectedLocation === 'Other') {
-                setSelectedLocation(realLocations[0]);
-            } else if (!realLocations.includes(selectedLocation) && selectedLocation !== 'Other') {
-                // Selected location was removed, reset to first real location
-                setSelectedLocation(realLocations[0]);
-            }
+        if (realLocations.length > 0 && !selectedLocation) {
+            // Set initial selection to first real location
+            setSelectedLocation(realLocations[0]);
+        } else if (selectedLocation && selectedLocation !== 'Other' && !realLocations.includes(selectedLocation)) {
+            // Selected location was removed, reset to first real location
+            setSelectedLocation(realLocations[0]);
         }
     }, [realLocations, selectedLocation]);
 
