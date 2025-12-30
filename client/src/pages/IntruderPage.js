@@ -78,8 +78,12 @@ const IntruderPage = ({ setShowSusPage }) => {
     socket,
     activeCards,
     players,
-    taskLocations
+    taskLocations,
+    intrudersRevealed
   } = useContext(DataContext);
+
+  // Check if intruders have been revealed (tasks 100%)
+  const isCompromised = !!intrudersRevealed;
 
   // Fake Task modal state
   const [showFakeTaskModal, setShowFakeTaskModal] = useState(false);
@@ -130,6 +134,17 @@ const IntruderPage = ({ setShowSusPage }) => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Auto-exit vent screen when intruders are revealed (tasks 100%)
+  useEffect(() => {
+    if (intrudersRevealed) {
+      // Small delay so the player sees the "POSITION COMPROMISED" state briefly
+      const timer = setTimeout(() => {
+        setShowSusPage(false);
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [intrudersRevealed, setShowSusPage]);
 
   const activeCardsList = activeCards.filter((card) => !(card.time_left && card.time_left <= 0));
 
@@ -256,18 +271,51 @@ const IntruderPage = ({ setShowSusPage }) => {
 
       {/* DANGER Header */}
       <div className="relative z-10 flex flex-col items-center gap-3 mb-6">
-        {/* Warning Badge */}
-        <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/30 border-2 border-red-500">
-          <AlertTriangle size={20} className="text-red-300" />
-          <span className="font-bold text-red-200 text-sm tracking-wider">VENT NETWORK ACTIVE</span>
-          <AlertTriangle size={20} className="text-red-300" />
-        </div>
-        
-        {/* Exposure warning */}
-        <div className="flex items-center gap-2 text-yellow-400/80 text-sm">
-          <Eye size={16} />
-          <span>You are exposed - find safety!</span>
-        </div>
+        {isCompromised ? (
+          <>
+            {/* COMPROMISED state - big red warning */}
+            <div className="flex items-center gap-2 px-6 py-3 rounded-full bg-red-600/40 border-2 border-red-500 animate-pulse">
+              <AlertTriangle size={24} className="text-red-300" />
+              <span className="font-black text-red-200 text-lg tracking-wider">POSITION COMPROMISED</span>
+              <AlertTriangle size={24} className="text-red-300" />
+            </div>
+            
+            {/* Locked out message */}
+            <div className="bg-red-500/20 border border-red-500/50 rounded-xl px-4 py-3 max-w-sm">
+              <p className="text-red-300 text-center text-sm font-bold">
+                LOCKED OUT OF ALL SYSTEMS
+              </p>
+              <p className="text-red-400/80 text-center text-xs mt-1">
+                Eliminate remaining crew immediately!
+              </p>
+            </div>
+            
+            {/* Disabled badges */}
+            <div className="flex flex-wrap justify-center gap-2">
+              <span className="px-3 py-1 bg-gray-800/80 border border-red-500/30 rounded-full text-red-400/60 text-xs font-bold line-through">
+                VENTS DISABLED
+              </span>
+              <span className="px-3 py-1 bg-gray-800/80 border border-red-500/30 rounded-full text-red-400/60 text-xs font-bold">
+                IDENTITY EXPOSED
+              </span>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Normal state - vent network active */}
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/30 border-2 border-red-500">
+              <AlertTriangle size={20} className="text-red-300" />
+              <span className="font-bold text-red-200 text-sm tracking-wider">VENT NETWORK ACTIVE</span>
+              <AlertTriangle size={20} className="text-red-300" />
+            </div>
+            
+            {/* Exposure warning */}
+            <div className="flex items-center gap-2 text-yellow-400/80 text-sm">
+              <Eye size={16} />
+              <span>You are exposed - find safety!</span>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Active Cards Section */}
@@ -344,14 +392,22 @@ const IntruderPage = ({ setShowSusPage }) => {
 
       {/* Exit Vent Button - Fixed at Bottom */}
       <div className="fixed bottom-0 left-0 right-0 z-20 p-4 pb-6 bg-gradient-to-t from-gray-900 via-gray-900/98 to-transparent">
-        <button
-          onClick={() => setShowSusPage(false)}
-          type="button"
-          className="w-full max-w-2xl mx-auto flex items-center justify-center gap-4 px-8 py-5 bg-green-600 text-white rounded-2xl text-xl font-bold"
-        >
-          <LogOut size={26} />
-          <span>EXIT TO SAFETY</span>
-        </button>
+        {isCompromised ? (
+          // Compromised state - can't use vents anymore
+          <div className="w-full max-w-2xl mx-auto flex items-center justify-center gap-4 px-8 py-5 bg-gray-800 text-gray-500 rounded-2xl text-xl font-bold border-2 border-red-500/30">
+            <AlertTriangle size={26} className="text-red-500/50" />
+            <span className="line-through">VENTS LOCKED</span>
+          </div>
+        ) : (
+          <button
+            onClick={() => setShowSusPage(false)}
+            type="button"
+            className="w-full max-w-2xl mx-auto flex items-center justify-center gap-4 px-8 py-5 bg-green-600 text-white rounded-2xl text-xl font-bold"
+          >
+            <LogOut size={26} />
+            <span>EXIT TO SAFETY</span>
+          </button>
+        )}
       </div>
     </div>
   );

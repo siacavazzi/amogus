@@ -49,6 +49,7 @@ const remoteSoundFiles = {
   fifty_perc: { src: [`${REMOTE_AUDIO_BASE}50_percent_tasks.mp3`], preload: false, html5: true },
   eighty_perc: { src: [`${REMOTE_AUDIO_BASE}80_percent_tasks.mp3`], preload: false, html5: true },
   ninety_perc: { src: [`${REMOTE_AUDIO_BASE}95_percent_tasks.mp3`], preload: false, html5: true },
+  intruders_revealed: { src: [`${REMOTE_AUDIO_BASE}intruders_revealed.mp3`], preload: false, html5: true },
   // Aliases to match backend sound names
   '20_percent_tasks': { src: [`${REMOTE_AUDIO_BASE}20_percent_tasks.mp3`], preload: false, html5: true },
   '50_percent_tasks': { src: [`${REMOTE_AUDIO_BASE}50_percent_tasks.mp3`], preload: false, html5: true },

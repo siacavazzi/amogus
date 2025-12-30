@@ -40,7 +40,7 @@ NUMBER_OF_INTRUDERS = 2
 
 # Probability of intruder drawing a card (0.0 to 1.0)
 # Reduce this if intruders are too powerful
-CARD_DRAW_PROBABILITY = 0.90
+CARD_DRAW_PROBABILITY = 1
 
 # Number of cards intruders start with
 STARTING_CARDS = 2
@@ -48,7 +48,7 @@ STARTING_CARDS = 2
 ##### TASK SETTINGS #######
 
 # Average number of tasks each player needs to finish for crew to win
-TASK_RATIO = 12
+TASK_RATIO = 10
 
 ##### SOUND SETTINGS #######
 

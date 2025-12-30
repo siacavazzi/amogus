@@ -4,7 +4,7 @@ import { DataContext } from "../GameContext";
 import AnimationOverlay from "../components/AnimationOverlay";
 import MUECustomSlider from "../components/swiper";
 import LeaveGameButton from "../components/LeaveGameButton";
-import { AlertTriangle, MapPin, Target, Clock, Crosshair, Radio } from "lucide-react";
+import { AlertTriangle, MapPin, Target, Clock, Crosshair, Radio, Skull } from "lucide-react";
 import { RotatingRing, GridOverlay } from "../components/ui";
 import { StatusBadge, PrimaryButton } from "../components/ui";
 import { Card, CardHeader, CardBody } from "../components/ui";
@@ -20,7 +20,11 @@ const CrewmemberPage = ({ setShowSusPage }) => {
     playerState,
     killCooldown,
     setKillCooldown,
+    intrudersRevealed,
   } = useContext(DataContext);
+
+  // Check if intruders have been revealed (tasks 100%)
+  const tasksComplete = !!intrudersRevealed;
 
   const [pulseIntensity, setPulseIntensity] = useState(0);
 
@@ -137,7 +141,32 @@ const CrewmemberPage = ({ setShowSusPage }) => {
 
           {/* Card Body */}
           <div className="p-6">
-            {task && !playerState?.sus ? (
+            {tasksComplete && !playerState?.sus ? (
+              // Tasks complete - hunt the intruders!
+              <div className="flex flex-col items-center text-center py-4">
+                <div className="relative mb-4">
+                  <div className="absolute inset-0 blur-lg bg-emerald-500/30 rounded-full"></div>
+                  <div className="relative w-16 h-16 rounded-full bg-emerald-500/20 border-2 border-emerald-500 flex items-center justify-center">
+                    <Skull size={32} className="text-emerald-400" />
+                  </div>
+                </div>
+                <h3 className="text-2xl font-black text-emerald-400 mb-2">
+                  ELIMINATE INTRUDERS
+                </h3>
+                <p className="text-gray-400 text-sm">
+                  All tasks complete! Find and vote out the intruders.
+                </p>
+                {intrudersRevealed?.intruder_names && (
+                  <div className="flex flex-wrap justify-center gap-2 mt-4">
+                    {intrudersRevealed.intruder_names.map((name, i) => (
+                      <span key={i} className="px-3 py-1 bg-red-500/20 border border-red-500/50 rounded-full text-red-400 text-sm font-bold">
+                        {name}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : task && !playerState?.sus ? (
               <div className="flex flex-col items-center text-center">
                 {/* Task Name */}
                 <div className="relative mb-4">
@@ -188,24 +217,26 @@ const CrewmemberPage = ({ setShowSusPage }) => {
         </div>
       </div>
 
-      {/* Slider - Fixed at Bottom */}
-      <div className="fixed bottom-0 left-0 right-0 z-20 p-4 pb-6 bg-gradient-to-t from-gray-900 via-gray-900/95 to-transparent">
-        <div className="max-w-xl mx-auto">
-          <MUECustomSlider
-            text={
-              playerState?.sus
-                ? killCooldown > 0
-                  ? "Cooldown active"
-                  : "Slide to eliminate"
-                : task 
-                  ? "Slide to complete task"
-                  : "No task assigned"
-            }
-            onSuccess={handleCompleteTask}
-            sus={playerState?.sus}
-          />
+      {/* Slider - Fixed at Bottom (hidden when tasks complete for crew) */}
+      {!(tasksComplete && !playerState?.sus) && (
+        <div className="fixed bottom-0 left-0 right-0 z-20 p-4 pb-6 bg-gradient-to-t from-gray-900 via-gray-900/95 to-transparent">
+          <div className="max-w-xl mx-auto">
+            <MUECustomSlider
+              text={
+                playerState?.sus
+                  ? killCooldown > 0
+                    ? "Cooldown active"
+                    : "Slide to eliminate"
+                  : task 
+                    ? "Slide to complete task"
+                    : "No task assigned"
+              }
+              onSuccess={handleCompleteTask}
+              sus={playerState?.sus}
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Animation Overlay */}
       {showAnimation && <AnimationOverlay onComplete={handleAnimationComplete} />}

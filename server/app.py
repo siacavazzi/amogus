@@ -345,6 +345,16 @@ def handleRejoin(data):
         if game.denied_location:
             emit('active_denial', game.denied_location)
         
+        if game.intruders_revealed:
+            # Re-send intruders revealed state
+            intruder_names = [p.username for p in game.players if p.sus and p.alive]
+            intruder_ids = [p.player_id for p in game.players if p.sus and p.alive]
+            emit('intruders_revealed', {
+                'intruder_names': intruder_names,
+                'intruder_ids': intruder_ids,
+                'message': f"TASKS COMPLETE! The intruder{'s are' if len(intruder_names) > 1 else ' is'}: {', '.join(intruder_names)}!"
+            })
+        
         if player.meltdown_code and game.active_meltdown:
             emit("meltdown_code", player.meltdown_code, to=player.sid)
             logger.debug(f"Sent meltdown code to player {player.player_id}")
@@ -781,6 +791,11 @@ def handleTaskComplete(data):
                 elif prev_percentage < 95 <= new_percentage:
                     game.speaker.play_sound("95_percent_tasks")
                     logger.info(f"Milestone reached: 95% tasks complete in room {room_code}")
+                
+                # Check if tasks are 100% complete - reveal intruders!
+                if new_percentage >= 100 and not game.intruders_revealed:
+                    game.reveal_intruders()
+                    logger.info(f"Tasks 100% complete in room {room_code} - INTRUDERS REVEALED!")
         else:
             # Track fake task completion in stats
             game.stats['fake_tasks_completed'].append({
@@ -788,6 +803,12 @@ def handleTaskComplete(data):
                 'task_text': player.task.get('task', 'Unknown task') if player.task else 'Unknown task'
             })
             logger.info(f"Player {player.player_id} completed a FAKE task (no score)")
+            
+            # Notify the player they completed a fake task
+            emit("fake_task_completed", {
+                "task": player.task.get('task', 'Unknown task') if player.task else 'Unknown task',
+                "location": player.task.get('location', 'Unknown') if player.task else 'Unknown'
+            }, to=player.sid)
         
         # Assign next task - check if there's a queued fake task first
         if player.fake_task:

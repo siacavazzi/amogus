@@ -68,6 +68,9 @@ class Game:
         # Reset voting system
         self.reset_votes = set()  # Player IDs who want to play again
         
+        # Intruder reveal - when tasks are 100% complete, identities are revealed
+        self.intruders_revealed = False
+        
         # Game statistics tracking
         self.stats = {
             'meetings_called': 0,
@@ -210,10 +213,36 @@ class Game:
         return new_player
     
     def getTask(self):
-        if self.completed_tasks >= self.taskGoal:
-            self.end_state = 'victory'
-            self.speaker.play_sound('victory')
+        """Get the next task for a player."""
         return self.task_handler.get_task(self.denied_location)
+    
+    def reveal_intruders(self):
+        """Reveal intruder identities to all players when tasks reach 100%.
+        
+        This doesn't end the game - intruders can still win by eliminating crew
+        or triggering a meltdown. It just creates chaos by revealing who they are!
+        """
+        if self.intruders_revealed:
+            return  # Already revealed
+        
+        self.intruders_revealed = True
+        
+        # Get list of intruder names
+        intruder_names = [p.username for p in self.players if p.sus and p.alive]
+        intruder_ids = [p.player_id for p in self.players if p.sus and p.alive]
+        
+        # Play a dramatic sound
+        self.speaker.play_sound('intruders_revealed')
+        
+        # Emit the reveal event to all players
+        self.emit_to_room('intruders_revealed', {
+            'intruder_names': intruder_names,
+            'intruder_ids': intruder_ids,
+            'message': f"TASKS COMPLETE! The intruder{'s are' if len(intruder_names) > 1 else ' is'}: {', '.join(intruder_names)}!"
+        })
+        
+        # Update player list so clients can show who is sus
+        self.emit_player_list()
 
     def resetRoles(self):
         for player in self.players:
@@ -286,6 +315,7 @@ class Game:
         self.denied_location = None
         self.meltdown_time_mod = 0
         self.active_cards = []
+        self.intruders_revealed = False
         self.card_deck = CardDeck(self.locations, self.socket, self)
         self.task_handler.reset()
         self.last_activity = time.time()
@@ -306,6 +336,7 @@ class Game:
         self.active_cards = []  # Clear active cards (Area Denial, etc.)
         self.numIntruders = self.initial_numIntruders  # Restore initial intruder count
         self.numCrew = None  # Will be recalculated on game start
+        self.intruders_revealed = False
         self.card_deck = CardDeck(self.locations, self.socket, self)
         self.reset_votes = set()  # Clear reset votes
         

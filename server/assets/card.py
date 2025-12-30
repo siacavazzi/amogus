@@ -161,11 +161,7 @@ class CardDeck:
             Card('EMP', 'Disable all devices for the duration', self, duration=60),
             Card('EMP', 'Disable all devices for the duration', self, duration=60),
 
-            Card('Taunt', 'Make crewmates scared', self, sound='fear'),
-            Card('Taunt', 'Taunt crewmates with work PTSD', self, sound='annoying_notif'),
-            Card('Taunt', 'Make crewmates suspicious', self, sound='sus'),
-            Card('Taunt', 'M E O W', self, sound='meow'),
-
+            Card('Fake Task', 'Send a fake task to a crewmate of your choice', self, requires_input=True),
             Card('Fake Task', 'Send a fake task to a crewmate of your choice', self, requires_input=True),
             Card('Fake Task', 'Send a fake task to a crewmate of your choice', self, requires_input=True),
             Card('Fake Task', 'Send a fake task to a crewmate of your choice', self, requires_input=True),

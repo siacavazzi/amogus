@@ -55,9 +55,9 @@ function GameConfigPage() {
         meltdown_time: 60,
         code_percent: 0.6,
         num_intruders: 2,
-        card_draw_probability: 0.9,
+        card_draw_probability: 1,
         starting_cards: 2,
-        task_ratio: 12,
+        task_ratio: 10,
     });
     
     const [showAdvanced, setShowAdvanced] = useState(false);

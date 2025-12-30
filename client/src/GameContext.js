@@ -5,6 +5,8 @@ import { AudioHandler } from './AudioHandler';
 import PlayerRole from './components/PlayerRole';
 import MeetingDisplay from './components/MeetingDisplay';
 import MeltdownAvertedDisplay from './components/MeltdownAverted';
+import FakeTaskReveal from './components/FakeTaskReveal';
+import IntrudersRevealedDisplay from './components/IntrudersRevealedDisplay';
 import { isMobile as isMobileDevice } from 'react-device-detect';
 
 // Allow URL param override for testing: ?mobile=true or ?mobile=false
@@ -61,6 +63,8 @@ export default function GameContext({ children }) {
     const [modalOpen, setModalOpen] = useState(false)
     const [taskCreationMode, setTaskCreationMode] = useState(false)
     const [resetVotes, setResetVotes] = useState({ current: 0, needed: 0, voters: [] })
+    const [fakeTaskReveal, setFakeTaskReveal] = useState(null) // { task, location } when showing fake task animation
+    const [intrudersRevealed, setIntrudersRevealed] = useState(null) // { intruder_names, intruder_ids, message } when tasks 100%
     let otherIntruders = [];
     // const [meetineTimeLeft, setMee]
 
@@ -98,6 +102,7 @@ export default function GameContext({ children }) {
         setTaskCreationMode(false)
         setKillCooldown(0)
         setResetVotes({ current: 0, needed: 0, voters: [] })
+        setIntrudersRevealed(null)
     }
 
     const resetState = () => {
@@ -304,6 +309,25 @@ export default function GameContext({ children }) {
             }
         });
 
+        // Intruders revealed - tasks 100% complete!
+        socketRef.current.on('intruders_revealed', (data) => {
+            console.log('Intruders revealed:', data);
+            setIntrudersRevealed(data);
+            setAudio('intruders_revealed');
+            
+            // Check if current player is an intruder
+            const myPlayerId = localStorage.getItem('player_id');
+            const isIntruder = data.intruder_ids?.includes(myPlayerId);
+            
+            isMobile && setDialog({ 
+                title: isIntruder ? "🚨 EXPOSED! 🚨" : "🚨 TASKS COMPLETE! 🚨", 
+                body: <IntrudersRevealedDisplay 
+                    intruderNames={data.intruder_names || []} 
+                    isIntruder={isIntruder}
+                />
+            });
+        });
+
         socketRef.current.on('codes_needed', (data) => {
             setCodesNeeded(data)
         });
@@ -341,6 +365,7 @@ export default function GameContext({ children }) {
             setKillCooldown(0);
             setTaskCreationMode(false);
             setResetVotes({ current: 0, needed: 0, voters: [] });
+            setIntrudersRevealed(null);
             // Clear any open modals/dialogs
             setModalOpen(false);
             setDialog(undefined);
@@ -393,6 +418,15 @@ export default function GameContext({ children }) {
                 setRunning(true)
             }
             setTask(data.task);
+        });
+
+        // Handle fake task completion - show reveal animation
+        socketRef.current.on('fake_task_completed', (data) => {
+            console.log('Fake task completed:', data);
+            setFakeTaskReveal({
+                task: data.task,
+                location: data.location
+            });
         });
 
         socketRef.current.on('crew_score', (data) => {
@@ -635,6 +669,8 @@ export default function GameContext({ children }) {
         resetState,
         // Reset votes for play again
         resetVotes,
+        // Intruder reveal (tasks 100%)
+        intrudersRevealed,
     }), [
         endState,
         gameStats,
@@ -670,12 +706,21 @@ export default function GameContext({ children }) {
         roomOpen,
         taskCreationMode,
         resetVotes,
+        intrudersRevealed,
     ]);
 
     return (
         <DataContext.Provider value={contextValue}>
             <AudioHandler />
             {children}
+            {/* Fake Task Reveal Animation */}
+            {fakeTaskReveal && (
+                <FakeTaskReveal
+                    task={fakeTaskReveal.task}
+                    location={fakeTaskReveal.location}
+                    onComplete={() => setFakeTaskReveal(null)}
+                />
+            )}
         </DataContext.Provider>
     );
 }

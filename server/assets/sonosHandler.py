@@ -79,6 +79,7 @@ class GameSpeaker:
             "50_percent_tasks": "50_percent_tasks.mp3",
             "80_percent_tasks": "80_percent_tasks.mp3",
             "95_percent_tasks": "95_percent_tasks.mp3",
+            "intruders_revealed": "intruders_revealed.mp3",
         }
 
     def _emit_to_sonos_connectors(self, event, data):
