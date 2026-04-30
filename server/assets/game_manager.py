@@ -1,3 +1,4 @@
+import os
 import random
 import string
 import time
@@ -5,6 +6,7 @@ from threading import Thread, Lock
 from assets.game import Game
 from assets.taskHandler import TaskHandler
 from assets.sonosHandler import GameSpeaker
+from assets.stats_tracker import StatsTracker
 
 
 class GameManager:
@@ -13,7 +15,7 @@ class GameManager:
     Each game is identified by a unique room code.
     """
 
-    def __init__(self, socketio, speaker, config):
+    def __init__(self, socketio, speaker, config, stats_path=None):
         self.socketio = socketio
         self.speaker = speaker
         self.config = config
@@ -21,7 +23,12 @@ class GameManager:
         self.player_to_game = {}  # {player_id: room_code}
         self.sid_to_game = {}  # {socket_sid: room_code}
         self.lock = Lock()
-        
+
+        # Persistent usage stats
+        if stats_path is None:
+            stats_path = os.path.join(os.path.dirname(__file__), '..', 'stats.json')
+        self.stats_tracker = StatsTracker(stats_path)
+
         # Start cleanup thread for inactive games
         self._start_cleanup_thread()
 
@@ -66,10 +73,15 @@ class GameManager:
                 room_code=room_code  # Pass room code for scoped emissions
             )
             
+            # Hook end-of-game reporting via Game's optional callback
+            game.on_end_callback = self.stats_tracker.record_game_ended
+
             self.games[room_code] = game
             self.sid_to_game[sid] = room_code
-            
-            return room_code, game
+
+        # Record outside the lock (StatsTracker has its own lock)
+        self.stats_tracker.record_game_created(room_code)
+        return room_code, game
 
     def get_game(self, room_code):
         """Get a game by room code."""
@@ -94,6 +106,8 @@ class GameManager:
         with self.lock:
             self.player_to_game[player_id] = room_code
             self.sid_to_game[sid] = room_code
+        # Track unique players across all games
+        self.stats_tracker.record_player_seen(player_id)
 
     def unregister_sid(self, sid):
         """Remove a socket ID mapping (on disconnect)."""
@@ -155,6 +169,56 @@ class GameManager:
                 'created': getattr(game, 'created_at', None)
             }
             for code, game in self.games.items()
+        }
+
+    def get_admin_stats(self, task_list_count=None):
+        """Build a snapshot of usage stats for the admin dashboard."""
+        snapshot = self.stats_tracker.snapshot()
+        now = time.time()
+        day_seconds = 24 * 60 * 60
+
+        completed = snapshot['completed_games']
+        completed_today = [g for g in completed if g.get('ended_at') and now - g['ended_at'] <= day_seconds]
+
+        durations = [g['duration_seconds'] for g in completed if g.get('duration_seconds')]
+        avg_duration = int(sum(durations) / len(durations)) if durations else 0
+
+        # Live games right now
+        live_games = []
+        with self.lock:
+            for code, game in self.games.items():
+                live_games.append({
+                    'room_code': code,
+                    'created_at': getattr(game, 'created_at', None),
+                    'last_activity': getattr(game, 'last_activity', None),
+                    'running': bool(getattr(game, 'game_running', False)),
+                    'in_meeting': bool(getattr(game, 'meeting', False)),
+                    'player_count': len(getattr(game, 'players', [])),
+                    'has_ended': bool(getattr(game, 'end_state', None)),
+                    'end_state': getattr(game, 'end_state', None),
+                    'task_list_applied': bool(getattr(game, 'task_list_applied', False)),
+                })
+
+        return {
+            'generated_at': now,
+            'totals': {
+                'games_created': snapshot['total_games_created'],
+                'games_completed': snapshot['total_games_completed'],
+                'unique_players': snapshot['unique_player_ids_count'],
+                'saved_task_lists': task_list_count if task_list_count is not None else 0,
+            },
+            'today': {
+                'games_completed': len(completed_today),
+            },
+            'live': {
+                'active_games': len(live_games),
+                'players_in_games': sum(g['player_count'] for g in live_games),
+                'games': live_games,
+            },
+            'averages': {
+                'game_duration_seconds': avg_duration,
+            },
+            'recent_games': list(reversed(completed[-25:])),
         }
 
     def _start_cleanup_thread(self):

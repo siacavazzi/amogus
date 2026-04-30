@@ -46,3 +46,7 @@ server/logs/
 .env.local
 .env.production
 *.pyc
+
+# Runtime data
+server/stats.json
+/task_lists/

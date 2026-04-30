@@ -22,7 +22,6 @@ function TaskCreationPage() {
     const [tasks, setTasks] = useState([]);
     const [newTaskText, setNewTaskText] = useState('');
     const [selectedLocation, setSelectedLocation] = useState('');
-    const [selectedDifficulty, setSelectedDifficulty] = useState(2);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [minTasks, setMinTasks] = useState(10);
     const inputRef = useRef(null);
@@ -185,7 +184,6 @@ function TaskCreationPage() {
             task: {
                 task: newTaskText.trim(),
                 location: selectedLocation,
-                difficulty: selectedDifficulty,
                 added_by: playerName
             }
         });
@@ -509,15 +507,6 @@ function TaskCreationPage() {
                                     <option key={loc} value={loc}>{loc}</option>
                                 ))}
                             </select>
-                            <select
-                                value={selectedDifficulty}
-                                onChange={(e) => setSelectedDifficulty(parseInt(e.target.value))}
-                                className="w-24 px-3 py-2 bg-gray-600 border border-gray-500 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                            >
-                                <option value={1}>Easy</option>
-                                <option value={2}>Medium</option>
-                                <option value={3}>Hard</option>
-                            </select>
                             <button
                                 onClick={handleAddTask}
                                 disabled={!newTaskText.trim() || isSubmitting}
@@ -547,10 +536,11 @@ function TaskCreationPage() {
                                     >
                                         <div className="flex-1 min-w-0">
                                             <p className="text-gray-200 truncate">{task.task}</p>
-                                            <p className="text-gray-500 text-xs">
-                                                {'⭐'.repeat(task.difficulty || 2)} 
-                                                {task.added_by && ` • Added by ${task.added_by}`}
-                                            </p>
+                                            {task.added_by && (
+                                                <p className="text-gray-500 text-xs">
+                                                    Added by {task.added_by}
+                                                </p>
+                                            )}
                                         </div>
                                         <button
                                             onClick={() => handleRemoveTask(task.originalIndex)}

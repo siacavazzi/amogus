@@ -11,6 +11,11 @@ class TaskHandler:
         self.location_denial = None
         self._load_tasks()
 
+    def _normalize_task(self, task):
+        normalized_task = dict(task)
+        normalized_task.pop("difficulty", None)
+        return normalized_task
+
     def _load_tasks(self):
         # Check if the file exists
         if not os.path.exists(self.file_path):
@@ -32,14 +37,9 @@ class TaskHandler:
                         "File content is not a list of valid task objects."
                     )
 
-                # Filter tasks by valid locations and set default difficulty
+                # Filter tasks by valid locations and strip deprecated task metadata
                 self.tasks = [
-                    {
-                        **task,
-                        "difficulty": self._validate_difficulty(
-                            task.get("difficulty", 2)
-                        ),
-                    }
+                    self._normalize_task(task)
                     for task in data
                     if task["location"] in self.locations
                 ]
@@ -63,13 +63,8 @@ class TaskHandler:
             )
             return
 
-        # Ensure difficulty is set to 2 if not provided and validate it
-        task_obj["difficulty"] = self._validate_difficulty(
-            task_obj.get("difficulty", 2)
-        )
-
         # Append the new task object to the tasks array
-        self.tasks.append(task_obj)
+        self.tasks.append(self._normalize_task(task_obj))
 
         # Write the updated tasks array to the file
         with open(self.file_path, "w") as f:
@@ -104,8 +99,3 @@ class TaskHandler:
 
         return task
 
-    def _validate_difficulty(self, difficulty):
-        if not isinstance(difficulty, int) or not (1 <= difficulty <= 3):
-            print(f"Invalid difficulty '{difficulty}'. Defaulting to 2.")
-            return 2
-        return difficulty

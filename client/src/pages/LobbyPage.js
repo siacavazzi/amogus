@@ -241,7 +241,7 @@ function LobbyPage() {
                 {/* Footer */}
                 <div className="mt-6 text-center">
                     <a 
-                        href="/how-to-play.html" 
+                        href="/how-to-play" 
                         className="inline-flex items-center gap-2 px-4 py-2 text-gray-500 hover:text-indigo-400 transition-colors text-sm group"
                     >
                         <HelpCircle size={16} className="group-hover:rotate-12 transition-transform" />

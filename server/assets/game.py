@@ -49,6 +49,11 @@ class Game:
         self.created_at = time.time()
         self.last_activity = time.time()
         self.end_time = None
+
+        # Optional callback fired the first time end_game is emitted
+        # (used by GameManager to record usage stats)
+        self.on_end_callback = None
+        self._stats_recorded = False
         self.is_open = False  # Room not open until creator configures it
         self.creator_sid = None  # Track who created the room (socket id, can change on reconnect)
         self.creator_player_id = None  # Track who created the room (player id, persistent)
@@ -133,6 +138,16 @@ class Game:
     def emit_to_room(self, event, data=None):
         """Emit an event to all players in this game's room."""
         self.last_activity = time.time()
+
+        # Fire end-of-game stats callback once when the game ends
+        if event == 'end_game' and not self._stats_recorded:
+            self._stats_recorded = True
+            if self.on_end_callback:
+                try:
+                    self.on_end_callback(self)
+                except Exception:
+                    pass
+
         if self.room_code:
             if data is not None:
                 self.socket.emit(event, data, room=self.room_code)
@@ -319,6 +334,7 @@ class Game:
         self.card_deck = CardDeck(self.locations, self.socket, self)
         self.task_handler.reset()
         self.last_activity = time.time()
+        self._stats_recorded = False
 
     def reset_game_state(self):
         """Reset game state but keep players - for playing again."""
@@ -339,6 +355,7 @@ class Game:
         self.intruders_revealed = False
         self.card_deck = CardDeck(self.locations, self.socket, self)
         self.reset_votes = set()  # Clear reset votes
+        self._stats_recorded = False  # Allow next end to record stats
         
         # Reset game statistics
         self.stats = {

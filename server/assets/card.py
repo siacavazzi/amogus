@@ -88,7 +88,6 @@ class Card:
                     target_player.fake_task = {
                         'task': task_text,
                         'location': task_location,
-                        'difficulty': 2,
                         'is_fake': True  # Mark as fake for potential future use
                     }
                     # Play the 'sus' sound

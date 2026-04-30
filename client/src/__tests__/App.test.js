@@ -19,7 +19,21 @@ jest.mock('../GameContext', () => {
 // Mock PageController
 jest.mock('../PageController', () => () => <div data-testid="page-controller">PageController</div>);
 
+// Mock HowToPlayPage
+jest.mock('../pages/howToPlay/HowToPlayPage', () => () => (
+    <div data-testid="how-to-play-page">HowToPlayPage</div>
+));
+
+// Mock LandingPage
+jest.mock('../pages/landing/LandingPage', () => () => (
+    <div data-testid="landing-page">LandingPage</div>
+));
+
 describe('App', () => {
+    beforeEach(() => {
+        window.history.pushState({}, '', '/play');
+    });
+
     it('renders without crashing', () => {
         const App = require('../App').default;
         const { container } = render(<App />);
@@ -36,5 +50,28 @@ describe('App', () => {
         const App = require('../App').default;
         const { getByTestId } = render(<App />);
         expect(getByTestId('page-controller')).toBeInTheDocument();
+    });
+
+    it('renders the landing page on the root route', () => {
+        window.history.pushState({}, '', '/');
+
+        const App = require('../App').default;
+        const { getByTestId, queryByTestId } = render(<App />);
+
+        expect(getByTestId('landing-page')).toBeInTheDocument();
+        expect(queryByTestId('game-context')).not.toBeInTheDocument();
+        expect(queryByTestId('page-controller')).not.toBeInTheDocument();
+        expect(queryByTestId('how-to-play-page')).not.toBeInTheDocument();
+    });
+
+    it('renders the how-to-play page on /how-to-play', () => {
+        window.history.pushState({}, '', '/how-to-play');
+
+        const App = require('../App').default;
+        const { getByTestId, queryByTestId } = render(<App />);
+
+        expect(getByTestId('how-to-play-page')).toBeInTheDocument();
+        expect(queryByTestId('game-context')).not.toBeInTheDocument();
+        expect(queryByTestId('landing-page')).not.toBeInTheDocument();
     });
 });

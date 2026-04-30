@@ -1,5 +1,6 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { Camera, RotateCcw, Check, X } from 'lucide-react';
+import { CircleIconButton, SecondaryButton, ButtonGroup } from './ui';
 
 function CameraCapture({ onCapture, onCancel }) {
     const videoRef = useRef(null);
@@ -146,12 +147,9 @@ function CameraCapture({ onCapture, onCancel }) {
                 <div className="bg-red-500 bg-opacity-20 border border-red-500 rounded-lg p-4 mb-4 text-center">
                     <p className="text-red-400">{error}</p>
                 </div>
-                <button
-                    onClick={skipPhoto}
-                    className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-                >
+                <SecondaryButton onClick={skipPhoto} fullWidth={false}>
                     Skip Photo
-                </button>
+                </SecondaryButton>
             </div>
         );
     }
@@ -176,29 +174,30 @@ function CameraCapture({ onCapture, onCancel }) {
                     </div>
 
                     {/* Camera Controls */}
-                    <div className="flex gap-4 mb-4">
-                        <button
+                    <ButtonGroup className="mb-4">
+                        <CircleIconButton
                             onClick={toggleCamera}
-                            className="p-3 bg-gray-600 rounded-full hover:bg-gray-700 transition-colors"
+                            variant="gray"
                             title="Switch Camera"
                         >
-                            <RotateCcw size={24} className="text-white" />
-                        </button>
-                        <button
+                            <RotateCcw size={24} />
+                        </CircleIconButton>
+                        <CircleIconButton
                             onClick={capturePhoto}
-                            className="p-4 bg-indigo-600 rounded-full hover:bg-indigo-700 transition-colors"
+                            variant="primary"
+                            size="large"
                             title="Take Photo"
                         >
-                            <Camera size={32} className="text-white" />
-                        </button>
-                        <button
+                            <Camera size={32} />
+                        </CircleIconButton>
+                        <CircleIconButton
                             onClick={skipPhoto}
-                            className="p-3 bg-gray-600 rounded-full hover:bg-gray-700 transition-colors"
+                            variant="gray"
                             title="Skip"
                         >
-                            <X size={24} className="text-white" />
-                        </button>
-                    </div>
+                            <X size={24} />
+                        </CircleIconButton>
+                    </ButtonGroup>
                     <p className="text-gray-400 text-sm">Take a selfie for your profile!</p>
                 </>
             ) : (
@@ -214,22 +213,16 @@ function CameraCapture({ onCapture, onCancel }) {
                     </div>
 
                     {/* Confirm/Retake Controls */}
-                    <div className="flex gap-4 mb-4">
-                        <button
-                            onClick={retakePhoto}
-                            className="flex items-center gap-2 px-4 py-2 bg-gray-600 rounded-lg hover:bg-gray-700 transition-colors"
-                        >
-                            <RotateCcw size={20} className="text-white" />
-                            <span className="text-white">Retake</span>
-                        </button>
-                        <button
-                            onClick={confirmPhoto}
-                            className="flex items-center gap-2 px-4 py-2 bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
-                        >
-                            <Check size={20} className="text-white" />
-                            <span className="text-white">Use Photo</span>
-                        </button>
-                    </div>
+                    <ButtonGroup className="mb-4">
+                        <SecondaryButton onClick={retakePhoto} fullWidth={false}>
+                            <RotateCcw size={20} />
+                            <span>Retake</span>
+                        </SecondaryButton>
+                        <SecondaryButton onClick={confirmPhoto} variant="cyan" fullWidth={false}>
+                            <Check size={20} />
+                            <span>Use Photo</span>
+                        </SecondaryButton>
+                    </ButtonGroup>
                     <p className="text-gray-400 text-sm">Looking good! 📸</p>
                 </>
             )}

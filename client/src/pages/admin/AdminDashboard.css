@@ -1,0 +1,222 @@
+/* Hidden admin dashboard — utilitarian, matches dark game palette */
+
+html.adm-document,
+body.adm-document {
+  background: #030712;
+}
+
+body.adm-document {
+  color: #e5e7eb;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+               'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.adm-shell {
+  min-height: 100dvh;
+  background: #030712;
+  padding: 24px clamp(16px, 4vw, 40px) 64px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ---- Login ---- */
+.adm-login {
+  max-width: 360px;
+  margin: 18vh auto 0;
+  display: grid;
+  gap: 12px;
+  padding: 28px;
+  background: rgba(17, 24, 39, 0.85);
+  border: 1px solid rgba(55, 65, 81, 0.7);
+  border-radius: 18px;
+  backdrop-filter: blur(12px);
+}
+
+.adm-login__title {
+  margin: 0 0 4px;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #f9fafb;
+  letter-spacing: -0.01em;
+}
+
+.adm-login__input {
+  padding: 12px 14px;
+  background: rgba(3, 7, 18, 0.7);
+  border: 1px solid rgba(75, 85, 99, 0.7);
+  border-radius: 10px;
+  color: #f3f4f6;
+  font-size: 0.95rem;
+}
+
+.adm-login__input:focus {
+  outline: none;
+  border-color: #818cf8;
+}
+
+.adm-login__button {
+  padding: 12px 16px;
+  background: linear-gradient(90deg, #6366f1, #a855f7);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.adm-login__button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.adm-login__error {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #f87171;
+}
+
+.adm-loading {
+  text-align: center;
+  margin-top: 20vh;
+  color: #9ca3af;
+}
+
+/* ---- Topbar ---- */
+.adm-topbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.adm-eyebrow {
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #a5b4fc;
+}
+
+.adm-title {
+  margin: 4px 0 0;
+  font-size: clamp(1.6rem, 3vw, 2rem);
+  font-weight: 800;
+  color: #f9fafb;
+  letter-spacing: -0.01em;
+}
+
+.adm-topbar__meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 0.82rem;
+  color: #9ca3af;
+}
+
+.adm-link-button {
+  background: none;
+  border: none;
+  color: #c7d2fe;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.adm-link-button:hover {
+  background: rgba(99, 102, 241, 0.15);
+}
+
+/* ---- Stats grid ---- */
+.adm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.adm-stat {
+  padding: 18px 20px;
+  background: rgba(17, 24, 39, 0.7);
+  border: 1px solid rgba(55, 65, 81, 0.6);
+  border-radius: 14px;
+  backdrop-filter: blur(8px);
+}
+
+.adm-stat__value {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #f3f4f6;
+  letter-spacing: -0.02em;
+}
+
+.adm-stat__label {
+  margin-top: 4px;
+  font-size: 0.78rem;
+  color: #9ca3af;
+}
+
+/* ---- Cards / tables ---- */
+.adm-card {
+  margin-top: 18px;
+  padding: 22px;
+  background: rgba(17, 24, 39, 0.7);
+  border: 1px solid rgba(55, 65, 81, 0.6);
+  border-radius: 18px;
+  backdrop-filter: blur(8px);
+}
+
+.adm-card h2 {
+  margin: 0 0 14px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #f3f4f6;
+}
+
+.adm-empty {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.adm-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.adm-table th,
+.adm-table td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(55, 65, 81, 0.5);
+}
+
+.adm-table th {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #9ca3af;
+}
+
+.adm-table td {
+  color: #e5e7eb;
+}
+
+.adm-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-weight: 700;
+  color: #c7d2fe;
+}
+
+@media (max-width: 600px) {
+  .adm-table {
+    font-size: 0.82rem;
+  }
+}

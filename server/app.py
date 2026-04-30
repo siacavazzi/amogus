@@ -82,6 +82,30 @@ def list_games():
     return game_manager.get_all_games()
 
 
+@app.route('/api/admin/stats')
+def admin_stats():
+    """Password-protected usage stats for the hidden /dashboard page.
+
+    Auth: send the password in the `X-Admin-Password` header (or `?password=`
+    query param). Set the `ADMIN_PASSWORD` env var on the server to enable.
+    If `ADMIN_PASSWORD` is unset the endpoint stays disabled.
+    """
+    expected = os.environ.get('ADMIN_PASSWORD')
+    if not expected:
+        return {'error': 'admin endpoint disabled (set ADMIN_PASSWORD env var)'}, 503
+
+    provided = request.headers.get('X-Admin-Password') or request.args.get('password')
+    if not provided or provided != expected:
+        return {'error': 'unauthorized'}, 401
+
+    try:
+        task_list_count = len(task_list_manager.index.get('code_to_name', {}))
+    except Exception:
+        task_list_count = 0
+
+    return game_manager.get_admin_stats(task_list_count=task_list_count)
+
+
 @app.route('/health')
 def health_check():
     """Health check endpoint for load balancers and monitoring."""
@@ -1012,7 +1036,8 @@ def handle_get_my_task_lists(data):
         return
     
     lists = task_list_manager.get_player_task_lists(player_id)
-    emit('my_task_lists', {'lists': lists})
+    starter_template = task_list_manager.get_default_task_list_template()
+    emit('my_task_lists', {'lists': lists, 'starter_template': starter_template})
 
 
 @socketio.on('load_task_list')
@@ -1371,7 +1396,7 @@ def handle_add_collaborative_task(data):
     
     # Set defaults
     task.setdefault('location', 'Other')
-    task.setdefault('difficulty', 2)
+    task.pop('difficulty', None)
     
     # Add to collaborative tasks
     game.collaborative_tasks.append(task)

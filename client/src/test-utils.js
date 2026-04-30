@@ -63,7 +63,6 @@ export const mockTask = {
     id: 'task1',
     task: 'Make a sandwich',  // The actual task name
     location: 'Kitchen',
-    difficulty: 2,
 };
 
 // Mock meeting state for voting

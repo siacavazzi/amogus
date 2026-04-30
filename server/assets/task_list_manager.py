@@ -6,6 +6,12 @@ from threading import Lock
 import time
 
 
+STARTER_TEMPLATE_CODE = "STARTER"
+STARTER_TEMPLATE_KEY = "starter_house"
+STARTER_TEMPLATE_NAME = "Example List"
+STARTER_TEMPLATE_DESCRIPTION = "A ready-to-run example you can edit. Add, remove, or tweak tasks to fit your space."
+
+
 class TaskListManager:
     """
     Manages persistent task lists that can be saved, loaded, and shared.
@@ -55,7 +61,44 @@ class TaskListManager:
         """Get the file path for a task list."""
         return os.path.join(self.storage_dir, f"{code}.json")
 
-    def create_task_list(self, player_id, name, tasks=None, locations=None):
+    def _get_default_task_list_path(self):
+        """Get the absolute path to the shared starter task template."""
+        return os.path.join(os.path.dirname(os.path.dirname(__file__)), "tasks.json")
+
+    def _load_default_tasks(self):
+        """Load the shared starter task template from disk."""
+        default_file = self._get_default_task_list_path()
+        if not os.path.exists(default_file):
+            return None
+
+        try:
+            with open(default_file, "r") as f:
+                return self._normalize_tasks(json.load(f))
+        except (json.JSONDecodeError, IOError):
+            return None
+
+    def _normalize_task(self, task):
+        normalized_task = dict(task)
+        normalized_task.pop("difficulty", None)
+        return normalized_task
+
+    def _normalize_tasks(self, tasks):
+        return [self._normalize_task(task) for task in (tasks or [])]
+
+    def _extract_locations(self, tasks):
+        """Preserve location order while ensuring Other is available."""
+        locations = []
+        for task in tasks:
+            location = task.get("location", "Other")
+            if location not in locations:
+                locations.append(location)
+
+        if "Other" not in locations:
+            locations.append("Other")
+
+        return locations
+
+    def create_task_list(self, player_id, name, tasks=None, locations=None, source_template=None):
         """
         Create a new task list.
         
@@ -88,7 +131,8 @@ class TaskListManager:
                 "created_at": time.time(),
                 "updated_at": time.time(),
                 "locations": final_locations,
-                "tasks": tasks or []
+                "tasks": self._normalize_tasks(tasks),
+                "source_template": source_template,
             }
             
             # Save the task list file
@@ -123,7 +167,9 @@ class TaskListManager:
         
         try:
             with open(list_path, "r") as f:
-                return json.load(f)
+                task_list = json.load(f)
+                task_list["tasks"] = self._normalize_tasks(task_list.get("tasks", []))
+                return task_list
         except (json.JSONDecodeError, IOError) as e:
             print(f"Failed to load task list {code}: {e}")
             return None
@@ -157,7 +203,7 @@ class TaskListManager:
                 self._save_index()
             
             if "tasks" in updates:
-                task_list["tasks"] = updates["tasks"]
+                task_list["tasks"] = self._normalize_tasks(updates["tasks"])
             
             if "locations" in updates:
                 task_list["locations"] = updates["locations"]
@@ -180,7 +226,7 @@ class TaskListManager:
         
         Args:
             code: The task list code
-            task_obj: Dict with 'task', 'location', and optionally 'difficulty'
+            task_obj: Dict with 'task' and 'location'
             player_id: Optional - if provided, verifies ownership
         
         Returns:
@@ -200,17 +246,12 @@ class TaskListManager:
         
         # Set defaults
         task_obj.setdefault("location", "Other")
-        task_obj.setdefault("difficulty", 2)
         
         # Validate location
         if task_obj["location"] not in task_list["locations"]:
             return False
         
-        # Validate difficulty
-        if not isinstance(task_obj.get("difficulty"), int) or not (1 <= task_obj["difficulty"] <= 3):
-            task_obj["difficulty"] = 2
-        
-        task_list["tasks"].append(task_obj)
+        task_list["tasks"].append(self._normalize_task(task_obj))
         return self.update_task_list(code, {"tasks": task_list["tasks"]}, player_id)
 
     def remove_task(self, code, task_index, player_id=None):
@@ -257,7 +298,8 @@ class TaskListManager:
                     "name": task_list["name"],
                     "task_count": len(task_list["tasks"]),
                     "locations": task_list["locations"],
-                    "updated_at": task_list["updated_at"]
+                    "updated_at": task_list["updated_at"],
+                    "source_template": task_list.get("source_template")
                 })
         
         # Sort by most recently updated
@@ -388,24 +430,36 @@ class TaskListManager:
         Returns:
             The new task list code, or None on failure
         """
-        default_file = "tasks.json"
-        if not os.path.exists(default_file):
+        tasks = self._load_default_tasks()
+        if not tasks:
             return None
-        
-        try:
-            with open(default_file, "r") as f:
-                tasks = json.load(f)
-        except (json.JSONDecodeError, IOError):
-            return None
-        
-        # Extract unique locations from tasks
-        locations = list(set(task.get("location", "Other") for task in tasks))
-        if "Other" not in locations:
-            locations.append("Other")
+
+        locations = self._extract_locations(tasks)
         
         return self.create_task_list(
             player_id=player_id,
             name=name,
-            tasks=tasks,
-            locations=locations
+            tasks=[task.copy() for task in tasks],
+            locations=locations,
+            source_template=STARTER_TEMPLATE_KEY
         )
+
+    def get_default_task_list_template(self):
+        """Return metadata for the shared starter task template."""
+        tasks = self._load_default_tasks()
+        if not tasks:
+            return None
+
+        locations = self._extract_locations(tasks)
+        preview_tasks = [task.copy() for task in tasks[:6]]
+
+        return {
+            "code": STARTER_TEMPLATE_CODE,
+            "template_key": STARTER_TEMPLATE_KEY,
+            "name": STARTER_TEMPLATE_NAME,
+            "description": STARTER_TEMPLATE_DESCRIPTION,
+            "task_count": len(tasks),
+            "locations": locations,
+            "tasks_preview": preview_tasks,
+            "is_template": True,
+        }

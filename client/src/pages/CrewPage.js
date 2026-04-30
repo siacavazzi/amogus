@@ -112,9 +112,11 @@ const CrewmemberPage = ({ setShowSusPage }) => {
         >
           <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-orange-400 to-red-400 opacity-0 group-hover:opacity-20 blur-xl transition-opacity"></div>
           <AlertTriangle className="mr-3" size={22} />
-          <span className="font-bold text-lg tracking-wide">
-            {playerState?.sus ? "ENTER VENT" : "CALL MEETING"}
-          </span>
+          {!(tasksComplete && playerState?.sus) && (
+            <span className="font-bold text-lg tracking-wide">
+              {playerState?.sus ? "ENTER VENT" : "CALL MEETING"}
+            </span>
+          )}
         </button>
       </div>
 

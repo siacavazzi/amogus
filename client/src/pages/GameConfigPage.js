@@ -65,6 +65,8 @@ function GameConfigPage() {
     
     // Task list state
     const [myTaskLists, setMyTaskLists] = useState([]);
+    const [starterTemplate, setStarterTemplate] = useState(null);
+    const [starterTemplateDismissed, setStarterTemplateDismissed] = useState(false);
     const [loadTaskListCode, setLoadTaskListCode] = useState('');
     const [currentTaskList, setCurrentTaskList] = useState(null);
     const [taskListLoading, setTaskListLoading] = useState(false);
@@ -111,6 +113,7 @@ function GameConfigPage() {
         const handleMyTaskLists = (data) => {
             console.log('Received my task lists:', data);
             setMyTaskLists(data.lists || []);
+            setStarterTemplate(data.starter_template || null);
         };
 
         const handleTaskListLoaded = (data) => {
@@ -177,11 +180,36 @@ function GameConfigPage() {
     const loadTaskListByCode = () => {
         if (!loadTaskListCode.trim()) return;
         setTaskListLoading(true);
+        setTaskListApplied(false);
         const code = loadTaskListCode.trim().toUpperCase();
         socket.emit('load_task_list', { code });
         // Auto-save to user's list when loading by code
         socket.emit('save_task_list_to_user', { player_id: deviceId, code });
         setLoadTaskListCode('');
+    };
+
+    const starterListCopy = starterTemplate
+        ? myTaskLists.find((list) => list.source_template === starterTemplate.template_key)
+        : null;
+    const starterLocationCount = (starterTemplate?.locations || []).filter((location) => location !== 'Other').length;
+    const showStarterTemplatePromo = starterTemplate && !starterListCopy && !starterTemplateDismissed;
+
+    const useStarterTaskList = () => {
+        if (!socket || !starterTemplate) return;
+
+        setTaskListLoading(true);
+        setTaskListApplied(false);
+
+        if (starterListCopy) {
+            socket.emit('load_task_list', { code: starterListCopy.code });
+            return;
+        }
+
+        socket.emit('create_task_list', {
+            player_id: deviceId,
+            name: starterTemplate.name,
+            from_default: true,
+        });
     };
 
     const applyTaskListToGame = () => {
@@ -206,9 +234,15 @@ function GameConfigPage() {
 
     const handleOpenRoom = () => {
         setIsSaving(true);
+        const configToSave = {
+            ...config,
+            locations: currentTaskList?.locations
+                ? currentTaskList.locations.filter((location) => location !== 'Other')
+                : config.locations,
+        };
         socket.emit('update_game_config', { 
             room_code: roomCode, 
-            config: config 
+            config: configToSave 
         });
         socket.emit('open_room', { room_code: roomCode });
     };
@@ -281,6 +315,53 @@ function GameConfigPage() {
                     Load a saved task list, or skip to create tasks with your group
                 </p>
             </div>
+
+            {showStarterTemplatePromo && (
+                <div className="bg-gradient-to-r from-indigo-500/10 via-gray-900/80 to-cyan-500/10 backdrop-blur-xl border border-indigo-500/20 rounded-xl p-3 mb-4 shadow-lg shadow-indigo-950/20">
+                    <div className="flex items-start gap-3">
+                        <div className="p-2 bg-indigo-500/15 rounded-xl border border-indigo-500/20 shrink-0">
+                            <Sparkles size={16} className="text-indigo-300" />
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-2">
+                                <div className="min-w-0">
+                                    <p className="text-indigo-300/80 text-[11px] font-semibold uppercase tracking-[0.22em] mb-1">Example List</p>
+                                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                                        <h2 className="text-white text-sm font-semibold">{starterTemplate.name}</h2>
+                                        <span className="text-gray-500 text-xs">
+                                            {starterTemplate.task_count} tasks • {starterLocationCount} locations
+                                        </span>
+                                    </div>
+                                    <p className="text-gray-400 text-xs mt-1">{starterTemplate.description}</p>
+                                </div>
+
+                                <button
+                                    onClick={() => setStarterTemplateDismissed(true)}
+                                    className="p-1.5 text-gray-500 hover:text-gray-300 hover:bg-gray-800/80 rounded-lg transition-all shrink-0"
+                                    title="Dismiss example list"
+                                    aria-label="Dismiss example list"
+                                >
+                                    <X size={14} />
+                                </button>
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-3">
+                                <button
+                                    onClick={useStarterTaskList}
+                                    disabled={taskListLoading}
+                                    className="px-3.5 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg text-white text-sm font-semibold hover:from-indigo-500 hover:to-purple-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                                >
+                                    Add Example List
+                                </button>
+                                <p className="text-gray-500 text-xs">
+                                    A starting point you can fully edit. Add, remove, or rewrite tasks to fit your space.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <div className="bg-gray-900/60 backdrop-blur-xl border border-gray-800/80 rounded-2xl p-5 mb-5">
                 {/* Load by code */}
