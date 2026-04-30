@@ -8,10 +8,15 @@
   <url>
     <loc>https://susparty.com/how-to-play</loc>
     <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://susparty.com/faq</loc>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://susparty.com/play</loc>
+    <loc>https://susparty.com/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>

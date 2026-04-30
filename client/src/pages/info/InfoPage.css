@@ -1,0 +1,162 @@
+/* Shared styles for static info pages (FAQ, About). Reuses landing page palette. */
+
+.info-shell {
+    position: relative;
+    min-height: 100dvh;
+    background: #030712;
+    overflow-x: hidden;
+    color: #e5e7eb;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+                 'Helvetica Neue', Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+.info-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.info-orb--indigo {
+    top: -10%;
+    left: -8%;
+    width: 480px;
+    height: 480px;
+    background: rgba(99, 102, 241, 0.22);
+}
+
+.info-orb--purple {
+    bottom: -12%;
+    right: -10%;
+    width: 420px;
+    height: 420px;
+    background: rgba(168, 85, 247, 0.18);
+}
+
+.info-page {
+    position: relative;
+    z-index: 1;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+}
+
+.info-nav {
+    margin-bottom: 32px;
+}
+
+.info-nav__back {
+    color: #a5b4fc;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+.info-nav__back:hover {
+    color: #c7d2fe;
+}
+
+.info-header {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.info-eyebrow {
+    margin: 0 0 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #a5b4fc;
+}
+
+.info-title {
+    margin: 0 0 16px;
+    font-size: clamp(2rem, 6vw, 3rem);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    background: linear-gradient(90deg, #a5b4fc 0%, #c084fc 45%, #f472b6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.info-lead {
+    margin: 0 auto;
+    max-width: 56ch;
+    color: #d1d5db;
+    font-size: 1.05rem;
+    line-height: 1.6;
+}
+
+.info-body {
+    color: #cbd5e1;
+}
+
+.info-faq {
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(55, 65, 81, 0.5);
+}
+
+.info-faq:last-child { border-bottom: none; }
+
+.info-faq__q {
+    margin: 0 0 8px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #f3f4f6;
+}
+
+.info-faq__a {
+    margin: 0;
+    line-height: 1.65;
+    color: #cbd5e1;
+}
+
+.info-prose h2 {
+    margin: 32px 0 12px;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #f3f4f6;
+    letter-spacing: -0.005em;
+}
+
+.info-prose p,
+.info-prose ul {
+    margin: 0 0 14px;
+    line-height: 1.7;
+}
+
+.info-prose ul {
+    padding-left: 1.25rem;
+}
+
+.info-prose li {
+    margin-bottom: 6px;
+}
+
+.info-prose a,
+.info-faq__a a,
+.info-footer a {
+    color: #c084fc;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.info-prose a:hover,
+.info-footer a:hover {
+    color: #f0abfc;
+}
+
+.info-footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(55, 65, 81, 0.4);
+    text-align: center;
+    color: #9ca3af;
+    font-size: 0.95rem;
+}
