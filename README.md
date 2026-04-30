@@ -10,26 +10,26 @@ No accounts. No install. No ads. No catches.
 
 ## What it is
 
-You and your friends gather in a house, apartment, dorm, office, wherever. One device (a laptop, TV, or tablet) runs the shared "Reactor" screen. Everyone else joins on their phone with a 6-character room code.
+You and your friends gather in a house, apartment, dorm, office, wherever. One device (a laptop, TV, or tablet) runs the shared "Reactor" screen. Everyone else joins on their phone with a 4-character room code.
 
 - **Crewmates** run around completing real physical tasks ("open the fridge", "find the card in the bookshelf", etc.)
 - **Intruders** sneak around, kill players one-on-one, sabotage tasks, and lie in meetings
 - When a body gets reported, anyone can call a meeting → discussion → vote → eject
 - Crew win by finishing all tasks or voting out every intruder. Intruders win by reaching parity.
 
-Best with **5–12 players**. Setup takes about 5 minutes — pick locations in your house and use the example task list (or write your own).
+Best with **5–15 players**. Setup takes about 5 minutes — pick locations in your house and use the example task list (or write your own).
 
 ---
 
 ## The Sonos thing
 
-If you have a Sonos speaker, Sus Party can pipe game audio through it instead of a tinny laptop speaker. The reactor alarm screams from across the house. Meeting bells echo through every room. Discovery sounds play from the speaker nearest the body.
+If you have a Sonos speaker, Sus Party can pipe game audio through it instead of a tinny laptop speaker. The reactor alarm screams from across the house. Meeting bells echo through every room.
 
 It's optional, but it's the part everyone remembers. It turns the game from "phone game with extra steps" into something genuinely cinematic.
 
-- Drop in your Sonos household, pick which rooms participate, and play
-- Bedroom speakers can be auto-skipped so you don't wake anyone up
-- Setup happens on the Reactor screen — no config files
+- Run the small connector app on a machine on the same Wi-Fi as your speakers
+- It connects to your game with the same room code players use
+- The connector handles speaker selection on its end — setup is on the connector, not the game
 
 The Sonos integration lives in a separate connector you run on the same Wi-Fi:
 **[github.com/siacavazzi/amogus-sonos-connector](https://github.com/siacavazzi/amogus-sonos-connector)**

@@ -53,7 +53,7 @@ function AboutPage() {
 
                     <h2>How it's built</h2>
                     <p>
-                        Sus Party is a React PWA on the front-end and a Flask + Socket.IO server on the back-end, with everything coordinated through 6-character room codes. There's an optional Sonos connector that runs on your local Wi-Fi so reactor alarms and meeting bells play through real speakers.
+                        Sus Party is a React PWA on the front-end and a Flask + Socket.IO server on the back-end, with everything coordinated through 4-character room codes. There's an optional Sonos connector that runs on your local Wi-Fi so reactor alarms and meeting bells play through real speakers.
                     </p>
                     <ul>
                         <li>Source: <a href="https://github.com/siacavazzi/amogus" target="_blank" rel="noopener noreferrer">github.com/siacavazzi/amogus</a></li>

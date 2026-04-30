@@ -76,7 +76,7 @@ function LandingPage() {
           </ul>
         </div>
 
-        <p className="lp-footnote">Best with 5–12 players · One host phone runs the room</p>
+        <p className="lp-footnote">Best with 5–15 players · One host phone runs the room</p>
       </main>
 
       <section className="lp-seo" aria-labelledby="lp-seo-heading">

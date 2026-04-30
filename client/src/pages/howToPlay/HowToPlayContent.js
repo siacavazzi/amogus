@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 
 export const heroStats = [
-  { value: '5-16', label: 'Players' },
+  { value: '5-15', label: 'Players' },
   { value: '30-60 min', label: 'Typical game time' },
   { value: '1 phone each', label: 'Phones are the controller' },
   { value: 'Multi-room space', label: 'House, office, dorm, or similar' },

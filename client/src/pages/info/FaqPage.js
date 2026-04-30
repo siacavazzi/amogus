@@ -24,7 +24,7 @@ const FAQS = [
     },
     {
         q: 'How do you set up Among Us in real life?',
-        a: 'On a laptop, TV, or tablet, open susparty.com — that device becomes the shared "Reactor" screen. Everyone else joins on their phone with the room code. The host configures rooms in your house as locations, picks a task list, and starts the game. Setup takes about 5 minutes.',
+        a: 'On a laptop, TV, or tablet, open susparty.com — that device becomes the shared "Reactor" screen. Everyone else joins on their phone with the 4-character room code. The host configures rooms in your house as locations, picks a task list, and starts the game. Setup takes about 5 minutes.',
     },
     {
         q: 'Do you need an app to play Among Us in real life?',
@@ -40,7 +40,7 @@ const FAQS = [
     },
     {
         q: 'Does Sus Party work with Sonos speakers?',
-        a: 'Yes. There\u2019s an optional Sonos integration that pipes the reactor alarm and meeting bells through your speakers. It runs as a small connector on your Wi-Fi, then the Reactor screen auto-detects it. It\u2019s completely optional, but it dramatically changes the vibe.',
+        a: 'Yes. There’s an optional Sonos integration that pipes the reactor alarm and meeting bells through your speakers. You run a small connector app on the same Wi-Fi as your speakers and join your game with the room code. It’s completely optional, but it dramatically changes the vibe.',
     },
     {
         q: 'Can I play remotely / over video chat?',
