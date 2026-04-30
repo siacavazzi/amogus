@@ -7,26 +7,60 @@
     <meta name="theme-color" content="#111827" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <!-- Primary meta -->
+    <title>Sus Party — Real-life social deduction party game</title>
     <meta
       name="description"
-      content="Sus Party - The ultimate social deduction party game"
+      content="A free, real-life social deduction party game inspired by Among Us. Players use their phones as controllers while running tasks, sabotaging, and voting in your actual house. No signup, no install."
     />
+    <meta name="keywords" content="sus party, social deduction, party game, among us irl, in-person party game, free party game, phones as controllers, real life among us, sonos party game" />
+    <meta name="author" content="Sus Party" />
+    <link rel="canonical" href="https://susparty.com/" />
+
+    <!-- Open Graph (Facebook, iMessage, Discord, Slack, etc.) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Sus Party" />
+    <meta property="og:url" content="https://susparty.com/" />
+    <meta property="og:title" content="Sus Party — Real-life social deduction party game" />
+    <meta property="og:description" content="Free in-person party game inspired by Among Us. Phones as controllers, real tasks around your house, meetings, votes, optional Sonos speaker for the reactor alarm. No signup." />
+    <meta property="og:image" content="https://susparty.com/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Sus Party — a real-life social deduction party game" />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Sus Party — Real-life social deduction party game" />
+    <meta name="twitter:description" content="Free in-person party game inspired by Among Us. Phones as controllers, real tasks around your house. Optional Sonos integration. No signup." />
+    <meta name="twitter:image" content="https://susparty.com/og-image.png" />
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Game",
+        "name": "Sus Party",
+        "description": "A free, real-life social deduction party game inspired by Among Us. Players use their phones as controllers while running tasks, sabotaging, and voting in your actual house.",
+        "url": "https://susparty.com/",
+        "image": "https://susparty.com/og-image.png",
+        "genre": ["Party Game", "Social Deduction"],
+        "numberOfPlayers": "5-15",
+        "applicationCategory": "Game",
+        "operatingSystem": "Web",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        }
+      }
+    </script>
+
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <title>Sus Party</title>
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <noscript>You need to enable JavaScript to run Sus Party.</noscript>
     <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
-
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
-
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
   </body>
 </html>

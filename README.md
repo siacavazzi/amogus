@@ -1,229 +1,86 @@
-# Sus Party 🎉
+# Sus Party
 
-A real-life social deduction party game loosely inspired by Among Us! Play with friends in person using your phones as controllers while completing tasks around your physical location.
+A real-life social deduction party game inspired by Among Us. Play in your actual house. Phones are the controllers.
 
-## Features
+**Play it now → [susparty.com](https://susparty.com)**
 
-- 🎮 Real-time multiplayer gameplay via WebSockets
-- 📱 Mobile-friendly web interface
-- 🗳️ Voting system during meetings
-- ⚠️ Meltdown events with code entry mechanics
-- 🔊 Optional Sonos speaker integration for sound effects
-- 🃏 Card system for intruders
+No accounts. No install. No ads. No catches.
 
-## Prerequisites
+---
 
-Before you begin, ensure you have the following installed:
+## What it is
 
-- **Node.js** (v14 or higher) - [Download](https://nodejs.org/)
-- **Python 3.8+** - [Download](https://www.python.org/downloads/)
-- **pipenv** - Install via `pip install pipenv`
+You and your friends gather in a house, apartment, dorm, office, wherever. One device (a laptop, TV, or tablet) runs the shared "Reactor" screen. Everyone else joins on their phone with a 6-character room code.
 
-## Project Structure
+- **Crewmates** run around completing real physical tasks ("open the fridge", "find the card in the bookshelf", etc.)
+- **Intruders** sneak around, kill players one-on-one, sabotage tasks, and lie in meetings
+- When a body gets reported, anyone can call a meeting → discussion → vote → eject
+- Crew win by finishing all tasks or voting out every intruder. Intruders win by reaching parity.
 
-```
-amogus/
-├── client/          # React frontend application
-│   ├── src/
-│   │   ├── pages/   # Game screens (Login, Voting, Tasks, etc.)
-│   │   └── ...
-│   └── package.json
-├── server/          # Flask backend server
-│   ├── app.py       # Main server file with game configuration
-│   ├── assets/      # Game logic (cards, meetings, players, etc.)
-│   └── Pipfile
-└── README.md
-```
+Best with **5–12 players**. Setup takes about 5 minutes — pick locations in your house and use the example task list (or write your own).
 
-## Setup Instructions
+---
 
-### 1. Clone the Repository
+## The Sonos thing
 
-```bash
-git clone <repository-url>
-cd amogus
-```
+If you have a Sonos speaker, Sus Party can pipe game audio through it instead of a tinny laptop speaker. The reactor alarm screams from across the house. Meeting bells echo through every room. Discovery sounds play from the speaker nearest the body.
 
-### 2. Backend Setup (Flask Server)
+It's optional, but it's the part everyone remembers. It turns the game from "phone game with extra steps" into something genuinely cinematic.
 
-```bash
-# Navigate to the server directory
-cd server
+- Drop in your Sonos household, pick which rooms participate, and play
+- Bedroom speakers can be auto-skipped so you don't wake anyone up
+- Setup happens on the Reactor screen — no config files
 
-# Install Python dependencies using pipenv
-pipenv install
+The Sonos integration lives in a separate connector you run on the same Wi-Fi:
+**[github.com/siacavazzi/amogus-sonos-connector](https://github.com/siacavazzi/amogus-sonos-connector)**
 
-# Activate the virtual environment
-pipenv shell
+---
 
-# Start the backend server
-python app.py
-```
+## How to play
 
-The server will start on `http://0.0.0.0:5001`. Note the IP address printed in the console - you'll need this for the frontend configuration.
+1. On a laptop, TV, or tablet, open **[susparty.com](https://susparty.com)** — that device becomes the Reactor screen
+2. Create a game and share the room code
+3. Everyone else opens **susparty.com** on their phone and joins with the code
+4. The host configures locations, tasks, and (optionally) Sonos
+5. Hit start. Spread out. Try not to die.
 
-### 3. Frontend Setup (React Client)
+Full rules, role descriptions, and tips: **[susparty.com/how-to-play](https://susparty.com/how-to-play)**
 
-Open a new terminal window:
+---
 
-```bash
-# Navigate to the client directory
-cd client
+## Why it exists
 
-# Install Node.js dependencies
-npm install
+Built it because party games on a couch are great but party games where you actually *move* are better. Wanted the social deduction of Among Us / Mafia / Werewolf without losing the physical chaos of Sardines or Hide-and-Seek. This is the result.
 
-# Start the development server
-npm start
-```
+It's free because it should be. There's no business model. Run it once at a party and that's enough.
 
-The React app will start on `http://localhost:3000`.
+---
 
-### 4. Configure the Connection
+## Tech, briefly
 
-**Important:** You need to update the backend endpoint in the frontend to match your server's IP address.
+- **Frontend:** React 18 + Tailwind, mobile-first PWA
+- **Backend:** Flask + Flask-SocketIO (eventlet), room-scoped real-time state
+- **Sonos:** separate Node connector that talks to your speakers over LAN
+- **Hosting:** single DigitalOcean droplet behind nginx
 
-1. Open `client/src/ENDPOINT.js`
-2. Update the `ENDPOINT` variable with your server's IP address:
+Source: this repo. Sonos connector: [amogus-sonos-connector](https://github.com/siacavazzi/amogus-sonos-connector).
 
-```javascript
-export const ENDPOINT = '<YOUR_SERVER_IP>:5001'
-```
+---
 
-For example, if your server is running on `192.168.1.100`:
-```javascript
-export const ENDPOINT = '192.168.1.100:5001'
-```
+## Self-hosting
 
-> **Tip:** The server prints the correct IP address when it starts. Look for the message: `Please set ENDPOINT to: http://<IP>:5001`
+You almost certainly don't need to. **[susparty.com](https://susparty.com)** is the same code, runs free, and supports unlimited concurrent games via room codes. Just use it.
 
-## Game Configuration
+If you want to run your own copy anyway (private LAN-only, custom rules, hacking on the code), see [`SELF_HOSTING.md`](SELF_HOSTING.md).
 
-All game settings are stored in `server/config.py`. Edit this file to customize gameplay for your venue and group size.
+---
 
-### Location Settings
+## Contributing / feedback
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `LOCATIONS` | `['Basement', '1st Floor', '2nd Floor', '3rd Floor']` | Physical locations in your venue where tasks will be assigned. Customize these to match real places players can go. "Other" is automatically added. |
+Bug reports, feature ideas, and "I played this with 14 people and here's what broke" stories are all welcome. Open an issue or PR.
 
-### Meeting & Voting Settings
-
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `VOTE_TIME` | `180` | Duration of the voting phase during meetings (in seconds) |
-| `VOTE_THRESHOLD` | `0.66` | Fraction of votes needed to eject a player. `0.66` = 2/3 majority required |
-
-### Meltdown Settings
-
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `MELTDOWN_TIME` | `60` | Time (in seconds) players have to stop a meltdown before it ends the game |
-| `CODE_PERCENT` | `0.6` | Fraction of players who must enter their code to stop a meltdown. `0.6` = 60% of players |
-
-### Intruder Settings
-
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `NUMBER_OF_INTRUDERS` | `2` | Number of intruders assigned each game. Adjust based on group size |
-| `CARD_DRAW_PROBABILITY` | `0.90` | Chance (0.0-1.0) an intruder draws a card. Lower this if intruders are too powerful |
-| `STARTING_CARDS` | `2` | Number of ability cards intruders start with |
-
-### Task Settings
-
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `TASK_RATIO` | `12` | Average number of tasks each crewmate needs to complete for crew to win |
-
-### Sound Settings
-
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `SONOS_ENABLED` | `False` | Enable Sonos speaker integration for game sound effects |
-| `SPEAKER_VOLUME` | `50` | Speaker volume percentage (0-100) |
-| `IGNORE_BEDROOM_SPEAKERS` | `True` | Skip speakers with "bed" in the name (to avoid disturbing people) |
-
-### Example Configuration
-
-To customize for a larger group in an office building:
-
-```python
-# config.py
-LOCATIONS = [
-    'Lobby',
-    'Conference Room A',
-    'Conference Room B',
-    'Kitchen',
-    'Server Room',
-    'Rooftop',
-]
-
-VOTE_TIME = 120           # Shorter voting time
-NUMBER_OF_INTRUDERS = 3   # More intruders for larger group
-TASK_RATIO = 15           # More tasks to complete
-MELTDOWN_TIME = 45        # Less time for meltdowns
-```
-
-### Adding Custom Tasks
-
-Tasks can be added via the `server/tasks.json` file or through the socket interface. Each task should include a location that matches one of the defined `locations` in `app.py`.
-
-## Running the Game
-
-1. **Start the backend server** (must be running first)
-2. **Start the frontend** 
-3. **Connect players** - Have all players open the frontend URL on their phones
-4. **Enter usernames** - Each player enters their name
-5. **Start the game** - Once all players have joined, start the game
-6. **Play!** - Complete tasks, call meetings, and find the intruders!
-
-## Playing on Local Network
-
-For the best experience playing with friends:
-
-1. Run the server on a computer connected to the same WiFi network as all players
-2. Update `ENDPOINT.js` with the server computer's local IP address
-3. Have players access the game via `http://<SERVER_IP>:3000` on their phones
-
-## Sound Effects (Optional)
-
-If you have Sonos speakers, you can enable sound effects:
-
-1. Set `sonos_enabled = True` in `server/app.py`
-2. Ensure your server is on the same network as your Sonos speakers
-3. Adjust `speaker_volume` as needed
-4. Set `ignore_bedroom_speakers = True` to skip bedroom speakers
-
-## Troubleshooting
-
-### Connection Issues
-- Ensure both client and server are on the same network
-- Verify the `ENDPOINT` in `client/src/ENDPOINT.js` matches your server IP
-- Check that port 5001 (backend) and 3000 (frontend) are not blocked by firewall
-
-### Server Won't Start
-- Make sure you're in the pipenv shell: `pipenv shell`
-- Verify Python 3.8+ is installed: `python --version`
-- Check if port 5001 is already in use
-
-### Frontend Won't Start
-- Delete `node_modules` and run `npm install` again
-- Ensure Node.js v14+ is installed: `node --version`
-
-## Development
-
-### Backend Logs
-Server logs are written to `server/logs/app.log` for debugging.
-
-### Building for Production
-
-```bash
-cd client
-npm run build
-```
-
-This creates an optimized build in `client/build/` that can be served by any static file server.
+---
 
 ## License
 
-This project is for educational and entertainment purposes. Loosely inspired by social deduction games like Among Us.
+For non-commercial use. Loosely inspired by social deduction games like Among Us. Not affiliated with Innersloth.
