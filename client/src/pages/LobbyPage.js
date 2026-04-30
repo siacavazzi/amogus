@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
+import { isMobile as isMobileDevice } from 'react-device-detect';
 import { DataContext } from '../GameContext';
-import { Users, Plus, ArrowRight, HelpCircle, Zap, Shield, Skull, Wifi } from 'lucide-react';
+import { Users, Plus, ArrowRight, HelpCircle, Zap, Shield, Skull, Wifi, Monitor, Radio, Speaker, Smartphone, AlertTriangle, ChevronRight } from 'lucide-react';
 import { 
     useFloatingParticles, 
     FloatingParticles, 
@@ -31,6 +32,17 @@ function LobbyPage() {
     const [error, setError] = useState('');
     const [showContent, setShowContent] = useState(false);
     const { socket } = useContext(DataContext);
+
+    // Resolve effective device mode (matches GameContext / PageController logic)
+    const mobileOverride = new URLSearchParams(window.location.search).get('mobile');
+    const isMobile = mobileOverride !== null ? mobileOverride === 'true' : isMobileDevice;
+    const isReactorDevice = !isMobile;
+
+    const switchToMobileHref = (() => {
+        const params = new URLSearchParams(window.location.search);
+        params.set('mobile', 'true');
+        return `${window.location.pathname}?${params.toString()}`;
+    })();
 
     // Use shared floating particles hook
     const particles = useFloatingParticles(20, 'default');
@@ -98,7 +110,7 @@ function LobbyPage() {
     };
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-950 overflow-hidden">
+        <div className={`fixed inset-0 flex ${isReactorDevice ? 'items-start justify-center overflow-y-auto py-8' : 'items-center justify-center overflow-hidden'} bg-gray-950`}>
             {/* Animated background layers */}
             <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-indigo-950/20 to-gray-950" />
             
@@ -120,7 +132,7 @@ function LobbyPage() {
             <Vignette intensity={60} />
 
             {/* Main content */}
-            <div className={`relative z-10 w-full max-w-md mx-4 transition-all duration-700 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <div className={`relative z-10 w-full ${isReactorDevice ? 'max-w-4xl' : 'max-w-md'} mx-4 transition-all duration-700 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                 {/* Logo and Title Section */}
                 <div className="text-center mb-8">
                     {/* Animated logo container */}
@@ -160,7 +172,168 @@ function LobbyPage() {
                     </div>
                 </div>
 
-                {/* Main Card */}
+                {/* Reactor mode: join card LEFT, info cards RIGHT (side-by-side) */}
+                {isReactorDevice ? (
+                    <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-6 items-start">
+                        {/* Left column: join card */}
+                        <div>
+                            <Card variant="default" padding="default">
+                                {error && (
+                                    <div className="mb-5 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-center text-sm flex items-center justify-center gap-2 animate-fadeIn">
+                                        <Skull size={16} />
+                                        {error}
+                                    </div>
+                                )}
+
+                                <PrimaryButton
+                                    onClick={handleCreateGame}
+                                    loading={isCreating}
+                                    loadingText="Creating Room..."
+                                    variant="indigo"
+                                >
+                                    <Plus size={22} strokeWidth={2.5} />
+                                    <span className="text-lg font-bold">Create New Game</span>
+                                </PrimaryButton>
+
+                                <div className="flex items-center my-6">
+                                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent" />
+                                    <span className="px-4 text-gray-600 text-xs uppercase tracking-wider">or join existing</span>
+                                    <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent" />
+                                </div>
+
+                                <form onSubmit={handleJoinGame}>
+                                    <div className="mb-4">
+                                        <label htmlFor="roomCode" className="block text-gray-400 text-sm mb-2 ml-1">Enter Room Code</label>
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                id="roomCode"
+                                                value={inputRoomCode}
+                                                onChange={(e) => {
+                                                    const value = e.target.value.toUpperCase().replace(/[^A-Za-z]/g, '').slice(0, 4);
+                                                    setInputRoomCode(value);
+                                                }}
+                                                className="w-full px-6 py-4 bg-gray-800/80 border-2 border-gray-700/80 rounded-2xl text-white text-center text-3xl font-mono tracking-[0.5em] uppercase focus:outline-none focus:border-emerald-500/50 focus:bg-gray-800 transition-all placeholder:text-gray-600 placeholder:tracking-[0.3em]"
+                                                placeholder="XXXX"
+                                                maxLength={4}
+                                                autoComplete="off"
+                                                autoCapitalize="characters"
+                                                spellCheck="false"
+                                            />
+                                            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-3">
+                                                {[0, 1, 2, 3].map(i => (
+                                                    <div
+                                                        key={i}
+                                                        className={`w-6 h-0.5 rounded-full transition-colors ${inputRoomCode.length > i ? 'bg-emerald-500' : 'bg-gray-700'}`}
+                                                    />
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <PrimaryButton
+                                        type="submit"
+                                        disabled={inputRoomCode.length !== 4}
+                                        loading={isJoining}
+                                        loadingText="Joining..."
+                                        variant="emerald"
+                                    >
+                                        <Users size={18} />
+                                        <span className="font-bold">Join Game</span>
+                                        <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                                    </PrimaryButton>
+                                </form>
+                            </Card>
+                        </div>
+
+                        {/* Right column: info cards stacked + switch link */}
+                        <div className="space-y-4 animate-fadeIn">
+                            <div className="p-5 bg-gradient-to-br from-indigo-500/10 via-gray-900/70 to-cyan-500/10 border border-indigo-500/25 rounded-xl">
+                                <div className="flex items-start gap-3">
+                                    <div className="p-2 bg-indigo-500/15 rounded-lg border border-indigo-500/20 shrink-0">
+                                        <Monitor size={18} className="text-indigo-300" />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <p className="text-indigo-300/80 text-[11px] font-semibold uppercase tracking-[0.22em] mb-1">This device = Reactor</p>
+                                        <p className="text-gray-300 text-sm leading-snug">
+                                            Larger screens act as the <span className="text-white font-semibold">Reactor</span>: a shared display for the meltdown code-entry mini-game and meeting status. It is not a player.
+                                        </p>
+                                        <p className="text-gray-500 text-xs mt-2">
+                                            Set it down somewhere central. Players use their phones. <a href="/how-to-play#meltdown" className="text-indigo-400 hover:text-indigo-300 underline underline-offset-2">More about the reactor</a>.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="p-5 bg-gray-900/60 border border-gray-800/80 rounded-xl">
+                                <div className="flex items-start gap-3">
+                                    <div className="p-2 bg-purple-500/15 rounded-lg border border-purple-500/20 shrink-0">
+                                        <Speaker size={18} className="text-purple-300" />
+                                    </div>
+                                    <div className="min-w-0 w-full">
+                                        <p className="text-purple-300/80 text-[11px] font-semibold uppercase tracking-[0.22em] mb-1">Sonos integration</p>
+                                        <p className="text-gray-300 text-sm leading-snug">
+                                            Optional. Pipe meeting calls, meltdown alarms, and round audio through a Sonos speaker for in-room ambience.
+                                        </p>
+                                        <p className="text-gray-500 text-xs mt-2 flex items-center gap-1.5">
+                                            <Radio size={12} className="text-purple-400" />
+                                            Configure it on the Reactor screen after creating a game.
+                                        </p>
+
+                                        <details className="mt-3 group">
+                                            <summary className="flex items-center gap-1.5 text-purple-300 hover:text-purple-200 text-xs font-medium cursor-pointer select-none list-none">
+                                                <ChevronRight size={12} className="transition-transform group-open:rotate-90" />
+                                                How does it work?
+                                            </summary>
+                                            <div className="mt-2 pl-4 space-y-2 text-xs text-gray-400 leading-relaxed border-l border-purple-500/20">
+                                                <p>
+                                                    Sus Party can connect to a Sonos speaker on your local network and play sound effects through it instead of (or in addition to) the Reactor's own speakers.
+                                                </p>
+                                                <ul className="list-disc list-inside space-y-1">
+                                                    <li>Meeting calls and meltdown alarms become room-filling.</li>
+                                                    <li>Players hear cues even when their phone is silent.</li>
+                                                    <li>Setup happens on the Reactor screen \u2014 pick a speaker from the dropdown.</li>
+                                                </ul>
+                                                <p className="text-gray-500">
+                                                    Requires the Reactor device and the Sonos speaker on the same Wi-Fi network. Skip it if you don't have one \u2014 the game runs fine without it.
+                                                </p>                                                <p>
+                                                    <a
+                                                        href="https://github.com/siacavazzi/amogus-sonos-connector"
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="inline-flex items-center gap-1 text-purple-300 hover:text-purple-200 underline underline-offset-2"
+                                                    >
+                                                        Sonos connector source on GitHub
+                                                        <ArrowRight size={11} className="-rotate-45" />
+                                                    </a>
+                                                </p>                                            </div>
+                                        </details>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <a
+                                href={switchToMobileHref}
+                                className="flex items-start gap-3 p-3 bg-gray-900/40 border border-gray-800/60 hover:border-amber-500/40 rounded-xl transition-colors group"
+                            >
+                                <div className="p-1.5 bg-amber-500/10 rounded-lg border border-amber-500/20 shrink-0">
+                                    <Smartphone size={14} className="text-amber-300" />
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                    <p className="text-gray-300 text-sm font-medium group-hover:text-white transition-colors">
+                                        Use this device as a player instead
+                                    </p>
+                                    <p className="text-gray-500 text-xs mt-0.5 flex items-start gap-1.5">
+                                        <AlertTriangle size={11} className="text-amber-400/80 mt-0.5 shrink-0" />
+                                        <span>
+                                            Not recommended. Players need a phone they can carry around the house - the game involves walking between rooms to do tasks, find bodies, and reach the meeting area. A laptop or desktop won&rsquo;t work mid-game.
+                                        </span>
+                                    </p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                ) : (
                 <Card variant="default" padding="default">
                     {/* Error message */}
                     {error && (
@@ -237,6 +410,7 @@ function LobbyPage() {
                         </PrimaryButton>
                     </form>
                 </Card>
+                )}
 
                 {/* Footer */}
                 <div className="mt-6 text-center">

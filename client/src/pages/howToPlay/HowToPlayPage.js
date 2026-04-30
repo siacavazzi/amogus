@@ -57,6 +57,22 @@ function useMarketingDocument() {
 function HowToPlayPage() {
   useMarketingDocument();
 
+  // SPA hash-scroll: the browser misses the initial #anchor jump because the
+  // page mounts after the URL is already set, so we re-trigger it here.
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (!hash) return;
+    const id = hash.slice(1);
+    // Wait one frame so sections are in the DOM and CSS has applied.
+    const raf = requestAnimationFrame(() => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
   return (
     <div className="htp-shell">
       <div className="htp-page">

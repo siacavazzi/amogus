@@ -169,7 +169,7 @@ export const meltdownCards = [
     tone: 'gold',
     title: 'How it starts',
     description:
-      'An intruder can trigger meltdown with a sabotage card. When that happens, players receive a 4-digit code on their phones and have to move fast.',
+      'An intruder can trigger meltdown by physically triggering it at the reactor or with a sabotage card. When that happens, players receive a 4-digit code on their phones and have to move fast.',
   },
   {
     icon: Monitor,
