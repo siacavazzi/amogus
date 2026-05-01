@@ -23,7 +23,8 @@
     ],
     "device_b2nahin7smizkkcmr": [
       "LQAD7H",
-      "YM6SYF"
+      "YM6SYF",
+      "J4A7XQ"
     ],
     "device_ds7d1lho7mjf6bm1e": [
       "6SY5NT"
@@ -38,6 +39,7 @@
     "LQAD7H": "Test list 123",
     "N6NZ9W": "Test list 123 (Copy)",
     "6SY5NT": "Test list 123 (Copy)",
-    "YM6SYF": "other test"
+    "YM6SYF": "other test",
+    "J4A7XQ": "Example List"
   }
 }

@@ -32,7 +32,7 @@ export function ReactorModeBanner({ variant = 'full', className = '', showSwitch
                 <Monitor size={16} className="text-indigo-300 shrink-0" />
                 <p className="text-gray-300 text-sm leading-snug">
                     <span className="text-white font-semibold">This device is the Reactor</span>
-                    <span className="text-gray-500"> — shared display for meltdown and meetings, not a player.</span>
+                    <span className="text-gray-500"> (shared display for meltdown and meetings, not a player).</span>
                 </p>
                 {showSwitchLink && (
                     <a

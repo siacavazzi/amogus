@@ -5,7 +5,7 @@ import './AdminDashboard.css';
 const STORAGE_KEY = 'sus_party_admin_pw';
 
 function formatDuration(seconds) {
-  if (!seconds && seconds !== 0) return '—';
+  if (!seconds && seconds !== 0) return '-';
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
   if (m === 0) return `${s}s`;
@@ -13,13 +13,13 @@ function formatDuration(seconds) {
 }
 
 function formatTime(epochSeconds) {
-  if (!epochSeconds) return '—';
+  if (!epochSeconds) return '-';
   const d = new Date(epochSeconds * 1000);
   return d.toLocaleString();
 }
 
 function relativeTime(epochSeconds) {
-  if (!epochSeconds) return '—';
+  if (!epochSeconds) return '-';
   const diff = Math.max(0, Date.now() / 1000 - epochSeconds);
   if (diff < 60) return `${Math.floor(diff)}s ago`;
   if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
@@ -224,7 +224,7 @@ function AdminDashboard() {
             <tbody>
               {recentGames.map((g, i) => (
                 <tr key={`${g.room_code}-${g.ended_at}-${i}`}>
-                  <td className="adm-mono">{g.room_code || '—'}</td>
+                  <td className="adm-mono">{g.room_code || '-'}</td>
                   <td>{outcomeLabel(g.end_state)}</td>
                   <td>{g.player_count}</td>
                   <td>{formatDuration(g.duration_seconds)}</td>
@@ -252,7 +252,7 @@ function Stat({ label, value }) {
 }
 
 function liveStatusLabel(g) {
-  if (g.has_ended) return `Ended (${g.end_state || '—'})`;
+  if (g.has_ended) return `Ended (${g.end_state || '-'})`;
   if (g.in_meeting) return 'In meeting';
   if (g.running) return 'Running';
   return 'Lobby';
@@ -263,7 +263,7 @@ function outcomeLabel(state) {
     case 'victory': return 'Crew win';
     case 'sus_victory': return 'Intruder win';
     case 'meltdown_fail': return 'Meltdown';
-    default: return state || '—';
+    default: return state || '-';
   }
 }
 

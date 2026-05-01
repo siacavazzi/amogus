@@ -8,7 +8,7 @@ const FAQS = [
     },
     {
         q: 'Do I need to install an app?',
-        a: 'No. Sus Party runs entirely in the browser. Just open susparty.com on any phone — iPhone, Android, anything with a modern browser.',
+        a: 'No. Sus Party runs entirely in the browser. Just open susparty.com on any phone: iPhone, Android, anything with a modern browser.',
     },
     {
         q: 'How many players can play?',
@@ -16,7 +16,7 @@ const FAQS = [
     },
     {
         q: 'Can I play Among Us in real life with friends?',
-        a: 'Yes — that is exactly what Sus Party is. Gather a group in a house, apartment, dorm, or office, hand everyone their phone, and run a real-life game with the same crewmate / imposter / meeting structure as Among Us.',
+        a: 'Yes. That is exactly what Sus Party is. Gather a group in a house, apartment, dorm, or office, hand everyone their phone, and run a real-life game with the same crewmate / imposter / meeting structure as Among Us.',
     },
     {
         q: 'What are good tasks for Among Us in real life?',
@@ -24,11 +24,11 @@ const FAQS = [
     },
     {
         q: 'How do you set up Among Us in real life?',
-        a: 'On a laptop, TV, or tablet, open susparty.com — that device becomes the shared "Reactor" screen. Everyone else joins on their phone with the 4-character room code. The host configures rooms in your house as locations, picks a task list, and starts the game. Setup takes about 5 minutes.',
+        a: 'On a laptop, TV, or tablet, open susparty.com. That device becomes the shared "Reactor" screen. Everyone else joins on their phone with the 4-character room code. The host configures rooms in your house as locations, picks a task list, and starts the game. Setup takes about 5 minutes.',
     },
     {
         q: 'Do you need an app to play Among Us in real life?',
-        a: 'Not with Sus Party. The whole game runs in your browser — both the shared Reactor screen and each player\u2019s phone controller. No App Store, no Play Store, no installs.',
+        a: 'Not with Sus Party. The whole game runs in your browser: both the shared Reactor screen and each player’s phone controller. No App Store, no Play Store, no installs.',
     },
     {
         q: 'Is there a free Among Us party game?',
@@ -44,7 +44,7 @@ const FAQS = [
     },
     {
         q: 'Can I play remotely / over video chat?',
-        a: 'No. Sus Party is built for in-person play — moving between rooms is the whole point. For remote social deduction, original Among Us or browser games like Werewords are better fits.',
+        a: 'No. Sus Party is built for in-person play. Moving between rooms is the whole point. For remote social deduction, original Among Us or browser games like Werewords are better fits.',
     },
     {
         q: 'Is Sus Party affiliated with Innersloth or Among Us?',
@@ -89,7 +89,7 @@ function FaqPage() {
     };
 
     return (
-        <InfoChrome titleSuffix="FAQ — Sus Party | Among Us in Real Life">
+        <InfoChrome titleSuffix="FAQ · Sus Party | Among Us in Real Life">
             <div className="info-shell">
                 <div className="info-orb info-orb--indigo" aria-hidden="true" />
                 <div className="info-orb info-orb--purple" aria-hidden="true" />

@@ -17,7 +17,7 @@ You and your friends gather in a house, apartment, dorm, office, wherever. One d
 - When a body gets reported, anyone can call a meeting → discussion → vote → eject
 - Crew win by finishing all tasks or voting out every intruder. Intruders win by reaching parity.
 
-Best with **5–15 players**. Setup takes about 5 minutes — pick locations in your house and use the example task list (or write your own).
+Best with **5–15 players**. Setup takes about 5 minutes: pick locations in your house and use the example task list (or write your own).
 
 ---
 
@@ -29,7 +29,7 @@ It's optional, but it's the part everyone remembers. It turns the game from "pho
 
 - Run the small connector app on a machine on the same Wi-Fi as your speakers
 - It connects to your game with the same room code players use
-- The connector handles speaker selection on its end — setup is on the connector, not the game
+- The connector handles speaker selection on its end. Setup is on the connector, not the game
 
 The Sonos integration lives in a separate connector you run on the same Wi-Fi:
 **[github.com/siacavazzi/amogus-sonos-connector](https://github.com/siacavazzi/amogus-sonos-connector)**
@@ -38,7 +38,7 @@ The Sonos integration lives in a separate connector you run on the same Wi-Fi:
 
 ## How to play
 
-1. On a laptop, TV, or tablet, open **[susparty.com](https://susparty.com)** — that device becomes the Reactor screen
+1. On a laptop, TV, or tablet, open **[susparty.com](https://susparty.com)**. That device becomes the Reactor screen
 2. Create a game and share the room code
 3. Everyone else opens **susparty.com** on their phone and joins with the code
 4. The host configures locations, tasks, and (optionally) Sonos

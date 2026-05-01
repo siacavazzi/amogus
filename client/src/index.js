@@ -11,7 +11,7 @@ const tree = (
 );
 
 if (rootElement.hasChildNodes()) {
-    // Pre-rendered HTML present (e.g. produced by react-snap) — hydrate.
+    // Pre-rendered HTML present (e.g. produced by react-snap). Hydrate.
     hydrateRoot(rootElement, tree);
 } else {
     createRoot(rootElement).render(tree);

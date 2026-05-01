@@ -5,6 +5,7 @@ import LeaveGameButton from '../components/LeaveGameButton';
 import { LogOut, Zap, Clock, MapPin, AlertTriangle, Eye, X, Send, Users, FileText } from 'lucide-react';
 import { StatusBadge, PrimaryButton } from '../components/ui';
 import { Card } from '../components/ui';
+import CardCarousel from '../components/CardCarousel';
 
 // ActionCard component defined OUTSIDE to prevent re-creation on every render
 function ActionCard({ action, text, location, duration, id, time_left, active = false, countdown, requires_input, onPlay }) {
@@ -149,7 +150,7 @@ const IntruderPage = ({ setShowSusPage }) => {
   const activeCardsList = activeCards.filter((card) => !(card.time_left && card.time_left <= 0));
 
   return (
-    <div className="fixed inset-0 flex flex-col items-center p-4 pt-12 pb-32 bg-gradient-to-b from-red-950 via-red-900/90 to-gray-900 text-white overflow-y-auto">
+    <div className="fixed inset-0 flex flex-col items-center p-3 pt-10 pb-24 bg-gradient-to-b from-red-700 via-red-900 to-red-950 text-white overflow-hidden">
       {/* Leave Game Button - Fixed Position */}
       <LeaveGameButton className="fixed top-8 right-4 z-50" />
 
@@ -257,20 +258,25 @@ const IntruderPage = ({ setShowSusPage }) => {
       {/* DANGER Background Effects - Very visible from distance */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         {/* Pulsing red glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full blur-3xl bg-red-600/30 animate-pulse"></div>
-        
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] rounded-full blur-3xl bg-red-500/45 animate-pulse"></div>
+        {/* Secondary deeper glow for layered red intensity */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full blur-3xl bg-red-700/40"></div>
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full blur-3xl bg-red-800/40"></div>
+
         {/* Warning stripes at top and bottom */}
         <div className="absolute top-0 left-0 right-0 h-3 bg-gradient-to-r from-yellow-500 via-red-600 to-yellow-500"></div>
         <div className="absolute bottom-0 left-0 right-0 h-3 bg-gradient-to-r from-yellow-500 via-red-600 to-yellow-500"></div>
-        
+
         {/* Diagonal warning stripes overlay */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{
+        <div className="absolute inset-0 opacity-[0.05]" style={{
           backgroundImage: 'repeating-linear-gradient(45deg, #fbbf24 0, #fbbf24 10px, transparent 10px, transparent 20px)',
         }}></div>
       </div>
 
-      {/* DANGER Header */}
-      <div className="relative z-10 flex flex-col items-center gap-3 mb-6">
+      {/* DANGER Header. flex-shrink-0 so it never gets crushed, but
+          margin tightens when active effects are present so the
+          carousel + PLAY button fit on short screens. */}
+      <div className={`relative z-10 flex flex-col items-center gap-2 flex-shrink-0 ${activeCardsList.length > 0 ? 'mb-2' : 'mb-6'}`}>
         {isCompromised ? (
           <>
             {/* COMPROMISED state - big red warning */}
@@ -318,12 +324,14 @@ const IntruderPage = ({ setShowSusPage }) => {
         )}
       </div>
 
-      {/* Active Cards Section */}
+      {/* Active Cards Section. Capped tightly and scrollable so it
+          can never push the sabotage carousel + PLAY button below the
+          fold on short / squat screens (e.g. iPhone SE). */}
       {activeCardsList.length > 0 && (
-        <div className="relative z-10 w-full max-w-2xl mb-6">
-          <div className="flex items-center gap-2 mb-3">
+        <div className="relative z-10 w-full max-w-2xl mb-3 flex-shrink-0 max-h-[26vh] overflow-y-auto">
+          <div className="flex items-center gap-2 mb-2">
             <div className="w-3 h-3 bg-emerald-400 rounded-full"></div>
-            <h2 className="text-lg font-bold text-emerald-300">Active Effects</h2>
+            <h2 className="text-base font-bold text-emerald-300">Active Effects</h2>
           </div>
           <div className="grid gap-4">
             {activeCardsList.map((card) => {
@@ -348,14 +356,15 @@ const IntruderPage = ({ setShowSusPage }) => {
         </div>
       )}
 
-      {/* Available Cards Section */}
-      <div className="relative z-10 w-full max-w-2xl">
+      {/* Available Cards Section — swipeable carousel. flex-1 so the
+          deck fills whatever space is left under the header / active
+          effects, no page scroll required. */}
+      <div className="relative z-10 w-full max-w-2xl flex-1 min-h-0 flex flex-col">
         <div className="flex items-center gap-2 mb-3">
           <Zap size={20} className="text-red-400" />
           <h2 className="text-lg font-bold text-red-200">Sabotage Cards</h2>
-          <span className="text-red-400/60 text-sm ml-auto">Tap to activate</span>
         </div>
-        
+
         {(!playerState.cards || playerState.cards.length === 0) ? (
           <div className="bg-gray-900/50 rounded-2xl p-8 border-2 border-dashed border-red-500/30 text-center">
             <Zap size={32} className="text-red-500/40 mx-auto mb-3" />
@@ -363,30 +372,16 @@ const IntruderPage = ({ setShowSusPage }) => {
             <p className="text-gray-500 text-sm mt-2">Complete tasks to draw cards</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4">
-            {playerState.cards.map((cardJson) => {
-              try {
-                const card = JSON.parse(cardJson);
-                const { action, text, location, duration, id, requires_input } = card;
-                return (
-                  <ActionCard
-                    key={id}
-                    id={id}
-                    action={action}
-                    text={text}
-                    location={location}
-                    duration={duration}
-                    time_left={999}
-                    requires_input={requires_input}
-                    onPlay={playCard}
-                  />
-                );
-              } catch (error) {
-                console.error('Error parsing game action card:', error);
-                return null;
-              }
-            })}
-          </div>
+          <CardCarousel
+            cards={(playerState.cards || [])
+              .map((cardJson) => {
+                try { return JSON.parse(cardJson); }
+                catch (e) { console.error('Error parsing game action card:', e); return null; }
+              })
+              .filter(Boolean)}
+            onPlayCard={(card) => playCard(card.id, card.requires_input, card.action)}
+            compact={activeCardsList.length > 0}
+          />
         )}
       </div>
 

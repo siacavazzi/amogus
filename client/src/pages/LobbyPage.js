@@ -292,10 +292,10 @@ function LobbyPage() {
                                                 <ul className="list-disc list-inside space-y-1">
                                                     <li>Meeting calls and meltdown alarms become room-filling.</li>
                                                     <li>Players hear cues even when their phone is silent.</li>
-                                                    <li>Setup happens on the Reactor screen \u2014 pick a speaker from the dropdown.</li>
+                                                    <li>Setup happens on the Reactor screen. Pick a speaker from the dropdown.</li>
                                                 </ul>
                                                 <p className="text-gray-500">
-                                                    Requires the Reactor device and the Sonos speaker on the same Wi-Fi network. Skip it if you don't have one \u2014 the game runs fine without it.
+                                                    Requires the Reactor device and the Sonos speaker on the same Wi-Fi network. Skip it if you don't have one. The game runs fine without it.
                                                 </p>                                                <p>
                                                     <a
                                                         href="https://github.com/siacavazzi/amogus-sonos-connector"

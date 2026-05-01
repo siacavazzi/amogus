@@ -25,7 +25,7 @@ function useInfoChrome(title) {
 }
 
 function AboutPage() {
-    useInfoChrome('About — Sus Party | Among Us in Real Life');
+    useInfoChrome('About · Sus Party | Among Us in Real Life');
 
     return (
         <div className="info-shell">
@@ -41,7 +41,7 @@ function AboutPage() {
                     <p className="info-eyebrow">About</p>
                     <h1 className="info-title">About Sus Party</h1>
                     <p className="info-lead">
-                        Sus Party is a free, fan-made, in-person party game inspired by Among Us — built because party games where you actually move around the house are more fun than party games on the couch.
+                        Sus Party is a free, fan-made, in-person party game inspired by Among Us. Built because party games where you actually move around the house are more fun than party games on the couch.
                     </p>
                 </header>
 
