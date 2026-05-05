@@ -228,7 +228,7 @@ function CarouselCard({
     );
 }
 
-export default function CardCarousel({ cards, onPlayCard, compact = false }) {
+export default function CardCarousel({ cards, onPlayCard, compact = false, onActiveIndexChange }) {
     const [activeIndex, setActiveIndex] = useState(0);
     const [dragX, setDragX] = useState(0);
     const [isAnimating, setIsAnimating] = useState(false);
@@ -264,6 +264,11 @@ export default function CardCarousel({ cards, onPlayCard, compact = false }) {
             setActiveIndex(cards.length - 1);
         }
     }, [cards.length, activeIndex]);
+
+    useEffect(() => {
+        if (!onActiveIndexChange || cards.length === 0) return;
+        onActiveIndexChange(activeIndex, cards[activeIndex]);
+    }, [activeIndex, cards, onActiveIndexChange]);
 
     const animateTo = useCallback((newIndex) => {
         setIsAnimating(true);

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './LandingPage.css';
 import PhoneShowcase from './PhoneShowcase';
 
-const TAGLINE_WORDS = ['Sneak.', 'Lie.', 'Vote.', 'Repeat.'];
+const TAGLINE_WORDS = ['Gaslight.', 'Sneak.', 'Vote.', 'Repeat.'];
 
 const STEPS = [
     {
@@ -17,7 +17,7 @@ const STEPS = [
     },
     {
         n: '03',
-        title: 'Sneak. Lie. Vote. Repeat.',
+        title: 'Gaslight. Sneak. Vote. Repeat.',
         body: 'Crewmates rush real-life tasks. Intruders pick people off and stir chaos. Meetings decide who walks the plank.',
     },
 ];

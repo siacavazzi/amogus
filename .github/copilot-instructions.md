@@ -60,6 +60,7 @@ cd client
 npm install
 
 # Start development server (runs on http://localhost:3000)
+# Must cd into client/ first — npm start will fail if run from the repo root
 npm start
 
 # Build for production
@@ -81,12 +82,13 @@ npm test -- --watchAll=false
 ```bash
 cd server
 
-# Install dependencies (choose one method)
-pip install -r requirements.txt
-# OR with pipenv:
-pipenv install && pipenv shell
+# Activate the virtualenv (required)
+source ../.venv/bin/activate
 
-# Run development server (runs on http://0.0.0.0:5001)
+# Install dependencies (first time only)
+pip install -r requirements.txt
+
+# Run development server (listens on 0.0.0.0:5001)
 python app.py
 
 # Test import (quick validation)
@@ -95,7 +97,8 @@ python -c "import app"
 
 **Important Notes:**
 - Server requires Python 3.8+
-- The server auto-detects and prints the local IP address for client configuration
+- Always activate the virtualenv at `.venv/` (repo root) before running the server
+- On startup the server logs your LAN IP (e.g. `http://192.168.x.x:5001`) — this is intentional so other devices on the network (phones) know where to connect. The server also accepts `localhost:5001` normally
 - Logs are written to `server/logs/app.log`
 
 ---

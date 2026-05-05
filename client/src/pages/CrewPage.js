@@ -9,7 +9,12 @@ import { RotatingRing, GridOverlay } from "../components/ui";
 import { StatusBadge, PrimaryButton } from "../components/ui";
 import { Card, CardHeader, CardBody } from "../components/ui";
 
-const CrewmemberPage = ({ setShowSusPage }) => {
+const CrewmemberPage = ({
+  setShowSusPage,
+  tutorialMode = false,
+  onTutorialCompleteTask = null,
+  tutorialHighlightTarget = null,
+}) => {
   const {
     task,
     socket,
@@ -20,11 +25,14 @@ const CrewmemberPage = ({ setShowSusPage }) => {
     playerState,
     killCooldown,
     setKillCooldown,
+    killCooldownMax = 15,
     intrudersRevealed,
   } = useContext(DataContext);
 
   // Check if intruders have been revealed (tasks 100%)
   const tasksComplete = !!intrudersRevealed;
+  const highlightTopAction = tutorialMode && tutorialHighlightTarget === 'top-action';
+  const highlightSlider = tutorialMode && tutorialHighlightTarget === 'slider';
 
   const [pulseIntensity, setPulseIntensity] = useState(0);
 
@@ -49,6 +57,15 @@ const CrewmemberPage = ({ setShowSusPage }) => {
   };
 
   const handleCompleteTask = () => {
+    if (onTutorialCompleteTask) {
+      onTutorialCompleteTask({
+        isIntruder: !!playerState?.sus,
+        hasTask: !!task,
+        killCooldown,
+      });
+      return;
+    }
+
     if (playerState?.sus) {
       if (killCooldown > 0) return; // Prevent action during cooldown
       setAudio("kill_player");
@@ -73,7 +90,7 @@ const CrewmemberPage = ({ setShowSusPage }) => {
   return (
     <div className="fixed inset-0 flex flex-col items-center p-6 pt-12 pb-32 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white overflow-y-auto">
       {/* Leave Game Button - Fixed Position */}
-      <LeaveGameButton className="fixed top-8 right-4 z-50" />
+      {!tutorialMode && <LeaveGameButton className="fixed top-8 right-4 z-50" />}
 
       {/* Animated Background Effects */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -105,7 +122,10 @@ const CrewmemberPage = ({ setShowSusPage }) => {
       </div>
 
       {/* Emergency Button */}
-      <div className="relative z-10 mb-8">
+      <div
+        className={`relative z-10 mb-8 ${highlightTopAction ? 'animate-pulse' : ''}`}
+        style={highlightTopAction ? { borderRadius: '1.75rem', outline: '3px solid rgba(252,211,77,0.85)', outlineOffset: '4px', boxShadow: '0 0 30px rgba(251,191,36,0.4)' } : {}}
+      >
         <button
           onClick={handleClickButton}
           className="group relative flex items-center justify-center px-8 py-4 rounded-2xl shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-orange-500 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500 transform hover:scale-105 hover:shadow-[0_0_30px_rgba(249,115,22,0.4)]"
@@ -201,7 +221,7 @@ const CrewmemberPage = ({ setShowSusPage }) => {
                     <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
                       <div 
                         className="h-full bg-gradient-to-r from-orange-500 to-orange-400 transition-all duration-1000"
-                        style={{ width: `${((15 - killCooldown) / 15) * 100}%` }}
+                        style={{ width: `${killCooldownMax > 0 ? ((killCooldownMax - killCooldown) / killCooldownMax) * 100 : 0}%` }}
                       ></div>
                     </div>
                   </div>
@@ -222,7 +242,10 @@ const CrewmemberPage = ({ setShowSusPage }) => {
       {/* Slider - Fixed at Bottom (hidden when tasks complete for crew) */}
       {!(tasksComplete && !playerState?.sus) && (
         <div className="fixed bottom-0 left-0 right-0 z-20 p-4 pb-6 bg-gradient-to-t from-gray-900 via-gray-900/95 to-transparent">
-          <div className="max-w-xl mx-auto">
+          <div
+            className={`max-w-xl mx-auto ${highlightSlider ? 'animate-pulse' : ''}`}
+            style={highlightSlider ? { borderRadius: '1.5rem', outline: '3px solid rgba(103,232,249,0.85)', outlineOffset: '4px', boxShadow: '0 0 30px rgba(34,211,238,0.4)' } : {}}
+          >
             <MUECustomSlider
               text={
                 playerState?.sus
@@ -251,10 +274,16 @@ CrewmemberPage.propTypes = {
     task: PropTypes.string,
     location: PropTypes.string,
   }),
+  tutorialMode: PropTypes.bool,
+  onTutorialCompleteTask: PropTypes.func,
+  tutorialHighlightTarget: PropTypes.oneOf(['top-action', 'slider']),
 };
 
 CrewmemberPage.defaultProps = {
   task: { task: "", location: "" },
+  tutorialMode: false,
+  onTutorialCompleteTask: null,
+  tutorialHighlightTarget: null,
 };
 
 export default CrewmemberPage;

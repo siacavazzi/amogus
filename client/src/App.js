@@ -3,6 +3,7 @@ import GameContext from './GameContext';
 import PageController from './PageController';
 import HowToPlayPage from './pages/howToPlay/HowToPlayPage';
 import LandingPage from './pages/landing/LandingPage';
+import TutorialPage from './pages/tutorial/TutorialPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import FaqPage from './pages/info/FaqPage';
 import AboutPage from './pages/info/AboutPage';
@@ -22,6 +23,10 @@ function getRoute() {
 
   if (normalizedPath === '/how-to-play' || normalizedPath.startsWith('/how-to-play/')) {
     return 'how-to-play';
+  }
+
+  if (normalizedPath === '/tutorial' || normalizedPath.startsWith('/tutorial/')) {
+    return 'tutorial';
   }
 
   if (normalizedPath === '/faq' || normalizedPath.startsWith('/faq/')) {
@@ -52,6 +57,10 @@ function App() {
 
   if (route === 'how-to-play') {
     return <HowToPlayPage />;
+  }
+
+  if (route === 'tutorial') {
+    return <TutorialPage />;
   }
 
   if (route === 'faq') {

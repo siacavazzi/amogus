@@ -93,6 +93,9 @@ function HowToPlayPage() {
               <ButtonLink href="/play" variant="primary">
                 Play now
               </ButtonLink>
+              <ButtonLink href="/tutorial?returnTo=how-to-play" variant="secondary">
+                Start tutorial
+              </ButtonLink>
               <ButtonLink href="#setup" variant="secondary">
                 Start with setup
               </ButtonLink>

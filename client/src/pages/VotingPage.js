@@ -6,8 +6,10 @@ import { CheckCircle, XCircle, Vote, Timer, Users, AlertTriangle, Gavel } from "
 import { GridOverlay } from "../components/ui";
 import { PrimaryButton, SecondaryButton, StatusBadge } from "../components/ui";
 
-export default function VotingPage() {
+export default function VotingPage({ tutorialMode = false, tutorialHighlightTarget = null }) {
   const { players, socket, setMessage, meetingState, vetoVotes, votes, playerState } = useContext(DataContext);
+  const highlightPlayers = tutorialMode && (tutorialHighlightTarget === 'players' || tutorialHighlightTarget === 'vote-flow');
+  const highlightActions = tutorialMode && (tutorialHighlightTarget === 'actions' || tutorialHighlightTarget === 'vote-flow');
 
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [timeLeft, setTimeLeft] = useState(meetingState.time_left);
@@ -59,7 +61,7 @@ export default function VotingPage() {
       <GridOverlay color="rgba(139, 92, 246, 0.3)" size={40} />
       
       {/* Leave Game Button */}
-      <LeaveGameButton className="fixed top-4 right-4 z-50" />
+      {!tutorialMode && <LeaveGameButton className="fixed top-4 right-4 z-50" />}
 
       {/* Header Section */}
       <div className="relative z-10 pt-4 px-4">
@@ -125,27 +127,32 @@ export default function VotingPage() {
 
       {/* Scrollable Players Grid */}
       <div className="flex-1 overflow-y-auto px-4 pb-44 relative z-10">
-        <div className="max-w-2xl mx-auto grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {players.map((player) => {
-            const isMe = playerState?.player_id === player.player_id;
-            const isDead = !player.alive;
+        <div
+          className={`max-w-2xl mx-auto ${highlightPlayers ? 'animate-pulse' : ''}`}
+          style={highlightPlayers ? { borderRadius: '2rem', outline: '3px solid rgba(192,132,252,0.85)', outlineOffset: '4px', boxShadow: '0 0 30px rgba(192,132,252,0.4)' } : {}}
+        >
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {players.map((player) => {
+              const isMe = playerState?.player_id === player.player_id;
+              const isDead = !player.alive;
 
-            return (
-              <PlayerCard
-                key={player.player_id}
-                player={player}
-                selected={selectedPlayer?.player_id === player.player_id}
-                votes={(votes?.[player?.player_id] ?? 0)}
-                onClick={
-                  isDead || isMe
-                    ? null
-                    : () => setSelectedPlayer(player)
-                }
-                isMe={isMe}
-                isClickable={!isDead && !isMe}
-              />
-            );
-          })}
+              return (
+                <PlayerCard
+                  key={player.player_id}
+                  player={player}
+                  selected={selectedPlayer?.player_id === player.player_id}
+                  votes={(votes?.[player?.player_id] ?? 0)}
+                  onClick={
+                    isDead || isMe
+                      ? null
+                      : () => setSelectedPlayer(player)
+                  }
+                  isMe={isMe}
+                  isClickable={!isDead && !isMe}
+                />
+              );
+            })}
+          </div>
         </div>
       </div>
 
@@ -155,7 +162,10 @@ export default function VotingPage() {
         <div className="h-8 bg-gradient-to-t from-gray-900 to-transparent" />
         
         <div className="bg-gray-900 border-t border-gray-800 px-4 pb-6 pt-2">
-          <div className="max-w-md mx-auto flex flex-col gap-3">
+          <div
+            className={`max-w-md mx-auto flex flex-col gap-3 ${highlightActions ? 'animate-pulse' : ''}`}
+            style={highlightActions ? { borderRadius: '2rem', outline: '3px solid rgba(192,132,252,0.85)', outlineOffset: '4px', boxShadow: '0 0 30px rgba(192,132,252,0.4)' } : {}}
+          >
             {/* Main vote button */}
             <PrimaryButton
               onClick={handleVote}

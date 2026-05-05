@@ -4,6 +4,10 @@ import PlayerCard from '../components/PlayerCard';
 import { Plus, X, Check, Send, MapPin, Copy, Save, Play, LogOut, Users, ClipboardList, ToggleLeft, ToggleRight, Pencil, Zap, Wifi } from 'lucide-react';
 import { FloatingParticles, useFloatingParticles, GlowingOrb, GridOverlay } from '../components/ui';
 
+function sameLocations(left, right) {
+    return left.length === right.length && left.every((location, index) => location === right[index]);
+}
+
 // Get or create a persistent device ID for task list ownership
 function getDeviceId() {
     let deviceId = localStorage.getItem('device_id');
@@ -152,32 +156,15 @@ function PreGamePage() {
         }
     }, [needsLocationSetup, tasks.length, activeTab, isRoomCreator]);
     
-    // Initialize local locations from server locations
+    // Keep local locations synced to the latest server view so a late
+    // task_locations payload can repair any earlier stale snapshot.
     useEffect(() => {
-        if (taskLocations.length > 0 && !locationsInitialized) {
-            const realFromServer = taskLocations.filter(l => l !== 'Other');
-            setLocalLocations(realFromServer);
-            setLocationsInitialized(true);
-        }
-    }, [taskLocations, locationsInitialized]);
-    
-    // Listen for location updates from other devices
-    useEffect(() => {
-        if (!socket) return;
-        
-        const handleLocationUpdate = (newLocations) => {
-            console.log('Locations updated from server:', newLocations);
-            const realFromServer = newLocations.filter(l => l !== 'Other');
-            setLocalLocations(realFromServer);
-            setLocationsInitialized(true);  // Mark as initialized when we get an update
-        };
-        
-        socket.on('task_locations', handleLocationUpdate);
-        
-        return () => {
-            socket.off('task_locations', handleLocationUpdate);
-        };
-    }, [socket]);
+        const realFromServer = taskLocations.filter(l => l !== 'Other');
+        setLocalLocations((previous) => (
+            sameLocations(previous, realFromServer) ? previous : realFromServer
+        ));
+        setLocationsInitialized(taskLocations.length > 0);
+    }, [taskLocations]);
     
     // Set default location when locations are available
     useEffect(() => {

@@ -4,8 +4,9 @@ import MUECustomSlider from '../components/swiper';
 import LeaveGameButton from '../components/LeaveGameButton';
 import { AlertTriangle, Users, CheckCircle2, Clock, Skull } from 'lucide-react';
 
-const MeetingWaitingPage = () => {
+const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = null }) => {
   const { playerState, players, meetingState, socket } = useContext(DataContext);
+  const highlightReadySlider = tutorialMode && tutorialHighlightTarget === 'ready-slider';
 
   const [readyPlayers, setReadyPlayers] = useState(0);
   const [waitingPlayers, setWaitingPlayers] = useState([]);
@@ -56,7 +57,7 @@ const MeetingWaitingPage = () => {
   return (
     <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white p-6 pb-32 overflow-hidden">
       {/* Leave Game Button */}
-      <LeaveGameButton className="fixed top-4 right-4 z-50" />
+      {!tutorialMode && <LeaveGameButton className="fixed top-4 right-4 z-50" />}
 
       {/* Animated Background Effects */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -218,7 +219,12 @@ const MeetingWaitingPage = () => {
       {/* Slider fixed at bottom */}
       {!playerState.ready && (
         <div className="fixed bottom-0 left-0 right-0 z-50 pb-safe">
-          <MUECustomSlider text="Slide to ready up" onSuccess={handleReadyUp} />
+          <div
+            className={highlightReadySlider ? 'animate-pulse' : ''}
+            style={highlightReadySlider ? { borderRadius: '1.5rem', outline: '3px solid rgba(252,211,77,0.85)', outlineOffset: '4px', boxShadow: '0 0 30px rgba(251,191,36,0.4)' } : {}}
+          >
+            <MUECustomSlider text="Slide to ready up" onSuccess={handleReadyUp} />
+          </div>
         </div>
       )}
     </div>

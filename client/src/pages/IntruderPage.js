@@ -73,7 +73,12 @@ function ActionCard({ action, text, location, duration, id, time_left, active = 
   );
 }
 
-const IntruderPage = ({ setShowSusPage }) => {
+const IntruderPage = ({
+  setShowSusPage,
+  tutorialMode = false,
+  onTutorialCardFocusChange,
+  tutorialHighlightTarget = null,
+}) => {
   const {
     playerState,
     socket,
@@ -85,6 +90,8 @@ const IntruderPage = ({ setShowSusPage }) => {
 
   // Check if intruders have been revealed (tasks 100%)
   const isCompromised = !!intrudersRevealed;
+  const highlightCards = tutorialMode && tutorialHighlightTarget === 'cards';
+  const highlightExit = tutorialMode && tutorialHighlightTarget === 'exit';
 
   // Fake Task modal state
   const [showFakeTaskModal, setShowFakeTaskModal] = useState(false);
@@ -152,7 +159,7 @@ const IntruderPage = ({ setShowSusPage }) => {
   return (
     <div className="fixed inset-0 flex flex-col items-center p-3 pt-10 pb-24 bg-gradient-to-b from-red-700 via-red-900 to-red-950 text-white overflow-hidden">
       {/* Leave Game Button - Fixed Position */}
-      <LeaveGameButton className="fixed top-8 right-4 z-50" />
+      {!tutorialMode && <LeaveGameButton className="fixed top-8 right-4 z-50" />}
 
       {/* Fake Task Modal */}
       {showFakeTaskModal && (
@@ -372,16 +379,22 @@ const IntruderPage = ({ setShowSusPage }) => {
             <p className="text-gray-500 text-sm mt-2">Complete tasks to draw cards</p>
           </div>
         ) : (
-          <CardCarousel
-            cards={(playerState.cards || [])
-              .map((cardJson) => {
-                try { return JSON.parse(cardJson); }
-                catch (e) { console.error('Error parsing game action card:', e); return null; }
-              })
-              .filter(Boolean)}
-            onPlayCard={(card) => playCard(card.id, card.requires_input, card.action)}
-            compact={activeCardsList.length > 0}
-          />
+          <div
+            className={highlightCards ? 'animate-pulse' : ''}
+            style={highlightCards ? { borderRadius: '2rem', outline: '3px solid rgba(251,113,133,0.85)', outlineOffset: '4px', boxShadow: '0 0 30px rgba(251,113,133,0.4)' } : {}}
+          >
+            <CardCarousel
+              cards={(playerState.cards || [])
+                .map((cardJson) => {
+                  try { return JSON.parse(cardJson); }
+                  catch (e) { console.error('Error parsing game action card:', e); return null; }
+                })
+                .filter(Boolean)}
+              onPlayCard={(card) => playCard(card.id, card.requires_input, card.action)}
+              compact={activeCardsList.length > 0}
+              onActiveIndexChange={onTutorialCardFocusChange}
+            />
+          </div>
         )}
       </div>
 
@@ -394,14 +407,19 @@ const IntruderPage = ({ setShowSusPage }) => {
             <span className="line-through">VENTS LOCKED</span>
           </div>
         ) : (
-          <button
-            onClick={() => setShowSusPage(false)}
-            type="button"
-            className="w-full max-w-2xl mx-auto flex items-center justify-center gap-4 px-8 py-5 bg-green-600 text-white rounded-2xl text-xl font-bold"
+          <div
+            className={`w-full max-w-2xl mx-auto ${highlightExit ? 'animate-pulse' : ''}`}
+            style={highlightExit ? { borderRadius: '2rem', outline: '3px solid rgba(110,231,183,0.85)', outlineOffset: '4px', boxShadow: '0 0 30px rgba(110,231,183,0.4)' } : {}}
           >
-            <LogOut size={26} />
-            <span>EXIT TO SAFETY</span>
-          </button>
+            <button
+              onClick={() => setShowSusPage(false)}
+              type="button"
+              className="w-full flex items-center justify-center gap-4 px-8 py-5 bg-green-600 text-white rounded-2xl text-xl font-bold"
+            >
+              <LogOut size={26} />
+              <span>EXIT TO SAFETY</span>
+            </button>
+          </div>
         )}
       </div>
     </div>

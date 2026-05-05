@@ -7,6 +7,7 @@ import MeetingDisplay from './components/MeetingDisplay';
 import MeltdownAvertedDisplay from './components/MeltdownAverted';
 import FakeTaskReveal from './components/FakeTaskReveal';
 import IntrudersRevealedDisplay from './components/IntrudersRevealedDisplay';
+import { markHasPlayedGame } from './tutorial/tutorialStorage';
 import { isMobile as isMobileDevice } from 'react-device-detect';
 
 // Allow URL param override for testing: ?mobile=true or ?mobile=false
@@ -25,6 +26,7 @@ export default function GameContext({ children }) {
     // Room/lobby state
     const [roomCode, setRoomCode] = useState(localStorage.getItem('room_code') || '');
     const [inRoom, setInRoom] = useState(false);
+    const inRoomRef = useRef(false);
     const [isRoomCreator, setIsRoomCreator] = useState(() => {
         // Initialize from sessionStorage for persistence across page reloads (within same session)
         return sessionStorage.getItem('is_room_creator') === 'true';
@@ -67,6 +69,9 @@ export default function GameContext({ children }) {
     const [intrudersRevealed, setIntrudersRevealed] = useState(null) // { intruder_names, intruder_ids, message } when tasks 100%
     let otherIntruders = [];
     // const [meetineTimeLeft, setMee]
+
+    // Keep inRoomRef in sync so socket handlers (set up with [] deps) can read current value
+    useEffect(() => { inRoomRef.current = inRoom; }, [inRoom]);
 
     // Reset all state to initial values (keeps connection)
     const resetGameState = () => {
@@ -279,7 +284,12 @@ export default function GameContext({ children }) {
                 sessionStorage.removeItem('is_room_creator');
                 resetGameState();
             }
-            isMobile && setDialog({ title: "Error", body: data.message });
+            // Only show the error dialog if we're actually still in a room.
+            // Suppresses spurious "Game not found" errors that fire after the
+            // client has already left (the game may have been deleted on the server).
+            if (isMobile && inRoomRef.current) {
+                setDialog({ title: "Error", body: data.message });
+            }
         });
 
         socketRef.current.on('task_locations', (data) => {
@@ -434,6 +444,7 @@ export default function GameContext({ children }) {
         });
 
         socketRef.current.on('game_start', () => {
+            markHasPlayedGame();
             setRunning(true)
             setTaskCreationMode(false)  // Exit task creation mode when game starts
         });

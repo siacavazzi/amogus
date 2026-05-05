@@ -6,8 +6,9 @@ import { Vote, UserX, ShieldOff, ShieldCheck, AlertTriangle, ArrowRight } from "
 import { FloatingParticles, useFloatingParticles } from "../components/ui";
 import { PrimaryButton } from "../components/ui";
 
-export default function MeetingResultPage() {
+export default function MeetingResultPage({ tutorialMode = false, tutorialHighlightTarget = null }) {
   const { meetingState, players, setMeetingState, setVotes, setVetoVotes } = useContext(DataContext);
+  const highlightContinue = tutorialMode && tutorialHighlightTarget === 'continue';
   const [phase, setPhase] = useState('initial'); // 'initial', 'reveal', 'complete'
   const [votedOutPlayer, setVotedOutPlayer] = useState(undefined);
   
@@ -184,7 +185,7 @@ export default function MeetingResultPage() {
       </div>
       
       {/* Leave Game Button */}
-      <LeaveGameButton className="fixed top-4 right-4 z-50" />
+      {!tutorialMode && <LeaveGameButton className="fixed top-4 right-4 z-50" />}
 
       {/* Main content */}
       <div className="relative z-10 flex flex-col items-center p-6">
@@ -195,7 +196,10 @@ export default function MeetingResultPage() {
       <div className={`fixed bottom-8 left-0 right-0 px-6 transition-all duration-700 ${
         phase === 'complete' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
       }`}>
-        <div className="max-w-sm mx-auto">
+        <div
+          className={`max-w-sm mx-auto ${highlightContinue ? 'animate-pulse' : ''}`}
+          style={highlightContinue ? { borderRadius: '2rem', outline: '3px solid rgba(192,132,252,0.85)', outlineOffset: '4px', boxShadow: '0 0 30px rgba(192,132,252,0.4)' } : {}}
+        >
           <PrimaryButton onClick={() => setMeetingState(undefined)} variant="purple">
             Continue
             <ArrowRight size={20} />

@@ -7940,3 +7940,150 @@
 2026-04-30 20:30:32,429 - app_logger - INFO - Sending player list to room AFHO
 2026-04-30 20:30:32,429 - app_logger - DEBUG - Player List: ['{"sid": "ng5zhnXrNHyP9S7zAAAo", "player_id": "e29f8639-4a71-4fb7-9efd-18765b7ef246", "username": "ppp", "active": true, "sus": true, "alive": false, "pic": 12, "selfie": null, "meltdown_code": null, "cards": ["{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 60, \\"time_left\\": 60, \\"id\\": \\"7687290e-6ca0-4eb3-876b-1803140ff485\\", \\"countdown\\": false, \\"requires_input\\": false}", "{\\"action\\": \\"Fake Task\\", \\"text\\": \\"Send a fake task to a crewmate of your choice\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"7ca25618-253f-485b-a36d-79dc4485b0cd\\", \\"countdown\\": false, \\"requires_input\\": true}", "{\\"action\\": \\"Fake Task\\", \\"text\\": \\"Send a fake task to a crewmate of your choice\\", \\"location\\": null, \\"duration\\": null, \\"time_left\\": null, \\"id\\": \\"94f449c5-b8d8-4b8c-8216-1ce04531f24c\\", \\"countdown\\": false, \\"requires_input\\": true}", "{\\"action\\": \\"EMP\\", \\"text\\": \\"Disable all devices for the duration\\", \\"location\\": null, \\"duration\\": 30, \\"time_left\\": 30, \\"id\\": \\"8cdf33e8-d899-47a5-873f-4f023fcafb3e\\", \\"countdown\\": false, \\"requires_input\\": false}"], "ready": true, "death_cause": "left_game", "death_message": "rage quit the game"}']
 2026-04-30 20:30:34,888 - app_logger - INFO - Client disconnected: ng5zhnXrNHyP9S7zAAAo
+2026-04-30 22:32:39,754 - app_logger - INFO - Client disconnected: zTxwc4oLz86Ub034AAAE
+2026-04-30 22:32:41,211 - app_logger - INFO - Client connected: QWKCrn95jAwFCwc-AAAq
+2026-04-30 22:55:26,914 - app_logger - INFO - Client connected: cEu1-zr7pcFiW0-8AAAt
+2026-05-01 15:00:29,338 - app_logger - INFO - Starting server...
+2026-05-01 15:00:29,338 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.54:5001
+2026-05-01 15:00:29,338 - app_logger - INFO -  * For HTTPS, generate certificates with:
+2026-05-01 15:00:29,338 - app_logger - INFO -    openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365
+2026-05-01 15:01:42,679 - app_logger - INFO - Client connected: MxFQXEEQRlQrqN3oAAAC
+2026-05-01 15:01:45,592 - app_logger - INFO - Client disconnected: MxFQXEEQRlQrqN3oAAAC
+2026-05-01 15:01:45,696 - app_logger - INFO - Client connected: 5BD1yzYaxZ0tHr_DAAAF
+2026-05-01 15:01:47,391 - app_logger - INFO - Game created with room code: AXAS
+2026-05-01 15:01:50,113 - app_logger - INFO - Applied task list J4A7XQ to game AXAS: 26 tasks loaded, task_list_applied=True
+2026-05-01 15:01:50,113 - app_logger - INFO - Task handler now has 26 tasks
+2026-05-01 15:01:51,729 - app_logger - INFO - Game AXAS config updated: {'locations': ['Kitchen', 'Living Room'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_intruders': 1, 'card_draw_probability': 1, 'starting_cards': 2, 'task_ratio': 10}
+2026-05-01 15:01:51,732 - app_logger - INFO - Room AXAS is now open for players
+2026-05-01 15:01:57,452 - app_logger - INFO - Saved selfie for poop: f22edc37775644e1bfe4237eb51097be.jpg
+2026-05-01 15:01:57,453 - app_logger - INFO - Set creator_player_id to fa25dcf0-5447-4e74-9d91-2a289f42f2a2 for room AXAS (first player)
+2026-05-01 15:01:57,454 - app_logger - INFO - New player poop joined room AXAS with ID fa25dcf0-5447-4e74-9d91-2a289f42f2a2, is_creator=True
+2026-05-01 15:01:57,454 - app_logger - INFO - Sending player list to room AXAS
+2026-05-01 15:01:57,454 - app_logger - DEBUG - Player List: ['{"sid": "5BD1yzYaxZ0tHr_DAAAF", "player_id": "fa25dcf0-5447-4e74-9d91-2a289f42f2a2", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 8, "selfie": "f22edc37775644e1bfe4237eb51097be.jpg", "meltdown_code": null, "cards": [], "ready": false, "death_cause": null, "death_message": null}']
+2026-05-01 15:01:57,454 - app_logger - INFO - Ownership check for J4A7XQ: stored_creator=device_b2nahin7smizkkcmr, device_id=device_b2nahin7smizkkcmr, is_owner=True
+2026-05-01 15:01:57,455 - app_logger - INFO - Ownership check for J4A7XQ: stored_creator=device_b2nahin7smizkkcmr, device_id=device_b2nahin7smizkkcmr, is_owner=True
+2026-05-01 15:01:59,472 - app_logger - INFO - save_collaborative_tasks called: room=AXAS, device_id=device_b2nahin7smizkkcmr, force_new=False
+2026-05-01 15:01:59,473 - app_logger - INFO - Game found, collaborative_task_list_code=J4A7XQ, num_tasks=26
+2026-05-01 15:01:59,474 - app_logger - INFO - Existing list found: stored_creator=device_b2nahin7smizkkcmr, device_id=device_b2nahin7smizkkcmr, match=True
+2026-05-01 15:01:59,476 - app_logger - INFO - Updated collaborative task list J4A7XQ in room AXAS
+2026-05-01 15:03:54,157 - app_logger - INFO - Player poop left room AXAS
+2026-05-01 15:03:54,158 - app_logger - INFO - Room AXAS deleted
+2026-05-01 15:03:55,568 - app_logger - INFO - Game created with room code: UPFU
+2026-05-01 15:03:58,374 - app_logger - INFO - Applied task list J4A7XQ to game UPFU: 26 tasks loaded, task_list_applied=True
+2026-05-01 15:03:58,374 - app_logger - INFO - Task handler now has 26 tasks
+2026-05-01 15:03:59,974 - app_logger - INFO - Game UPFU config updated: {'locations': ['Kitchen', 'Living Room'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_intruders': 2, 'card_draw_probability': 1, 'starting_cards': 2, 'task_ratio': 10}
+2026-05-01 15:03:59,978 - app_logger - INFO - Room UPFU is now open for players
+2026-05-01 15:07:01,942 - app_logger - INFO - Client disconnected: 5BD1yzYaxZ0tHr_DAAAF
+2026-05-01 15:07:02,251 - app_logger - INFO - Client connected: jY7MXd5VxfSGkLWJAAAI
+2026-05-01 15:07:05,592 - app_logger - INFO - Client disconnected: jY7MXd5VxfSGkLWJAAAI
+2026-05-01 15:07:07,160 - app_logger - INFO - Client connected: DCCWVpwDxg1gMVq_AAAL
+2026-05-01 15:07:07,163 - app_logger - INFO - Reactor registered for room UPFU (sid: DCCWVpwDxg1gMVq_AAAL)
+2026-05-01 15:07:10,275 - app_logger - INFO - Reactor left room UPFU
+2026-05-01 15:07:10,276 - app_logger - INFO - Room UPFU deleted
+2026-05-01 15:07:12,295 - app_logger - INFO - Client disconnected: DCCWVpwDxg1gMVq_AAAL
+2026-05-01 15:07:12,359 - app_logger - INFO - Client connected: rqk69DWtFU1oOrakAAAO
+2026-05-01 15:07:13,545 - app_logger - INFO - Game created with room code: EJOY
+2026-05-01 15:07:15,859 - app_logger - INFO - Applied task list J4A7XQ to game EJOY: 26 tasks loaded, task_list_applied=True
+2026-05-01 15:07:15,859 - app_logger - INFO - Task handler now has 26 tasks
+2026-05-01 15:07:21,001 - app_logger - INFO - Game EJOY config updated: {'locations': ['Kitchen', 'Living Room'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_intruders': 1, 'card_draw_probability': 1, 'starting_cards': 5, 'task_ratio': 10}
+2026-05-01 15:07:21,006 - app_logger - INFO - Room EJOY is now open for players
+2026-05-01 15:07:33,379 - app_logger - INFO - Saved selfie for poop: 74772db43f3844a99ebbe90e54496523.jpg
+2026-05-01 15:07:33,382 - app_logger - INFO - Set creator_player_id to 3ddecba3-2f55-41b9-8bd5-6f6fb00d832d for room EJOY (first player)
+2026-05-01 15:07:33,382 - app_logger - INFO - New player poop joined room EJOY with ID 3ddecba3-2f55-41b9-8bd5-6f6fb00d832d, is_creator=True
+2026-05-01 15:07:33,382 - app_logger - INFO - Sending player list to room EJOY
+2026-05-01 15:07:33,382 - app_logger - DEBUG - Player List: ['{"sid": "rqk69DWtFU1oOrakAAAO", "player_id": "3ddecba3-2f55-41b9-8bd5-6f6fb00d832d", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 6, "selfie": "74772db43f3844a99ebbe90e54496523.jpg", "meltdown_code": null, "cards": [], "ready": false, "death_cause": null, "death_message": null}']
+2026-05-01 15:07:33,384 - app_logger - INFO - Ownership check for J4A7XQ: stored_creator=device_b2nahin7smizkkcmr, device_id=device_b2nahin7smizkkcmr, is_owner=True
+2026-05-01 15:07:33,384 - app_logger - INFO - Ownership check for J4A7XQ: stored_creator=device_b2nahin7smizkkcmr, device_id=device_b2nahin7smizkkcmr, is_owner=True
+2026-05-01 15:07:35,403 - app_logger - INFO - save_collaborative_tasks called: room=EJOY, device_id=device_b2nahin7smizkkcmr, force_new=False
+2026-05-01 15:07:35,403 - app_logger - INFO - Game found, collaborative_task_list_code=J4A7XQ, num_tasks=26
+2026-05-01 15:07:35,403 - app_logger - INFO - Existing list found: stored_creator=device_b2nahin7smizkkcmr, device_id=device_b2nahin7smizkkcmr, match=True
+2026-05-01 15:07:35,408 - app_logger - INFO - Updated collaborative task list J4A7XQ in room EJOY
+2026-05-01 15:07:38,391 - app_logger - INFO - Player poop left room EJOY
+2026-05-01 15:07:38,393 - app_logger - INFO - Room EJOY deleted
+2026-05-01 15:07:40,079 - app_logger - INFO - Game created with room code: LZED
+2026-05-01 15:07:42,636 - app_logger - INFO - Applied task list J4A7XQ to game LZED: 26 tasks loaded, task_list_applied=True
+2026-05-01 15:07:42,636 - app_logger - INFO - Task handler now has 26 tasks
+2026-05-01 15:07:46,559 - app_logger - INFO - Game LZED config updated: {'locations': ['Kitchen', 'Living Room'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_intruders': 1, 'card_draw_probability': 1, 'starting_cards': 5, 'task_ratio': 10}
+2026-05-01 15:07:46,567 - app_logger - INFO - Room LZED is now open for players
+2026-05-01 15:08:23,672 - app_logger - INFO - Client disconnected: rqk69DWtFU1oOrakAAAO
+2026-05-01 15:08:23,786 - app_logger - INFO - Client connected: geovUAN9CKi0GaUCAAAR
+2026-05-01 15:08:23,788 - app_logger - INFO - Reactor registered for room LZED (sid: geovUAN9CKi0GaUCAAAR)
+2026-05-01 15:08:40,292 - app_logger - INFO - Client disconnected: geovUAN9CKi0GaUCAAAR
+2026-05-01 15:08:41,487 - app_logger - INFO - Client connected: XONCVTKgb1AoEx15AAAU
+2026-05-01 15:08:41,489 - app_logger - INFO - Reactor registered for room LZED (sid: XONCVTKgb1AoEx15AAAU)
+2026-05-01 15:08:53,979 - app_logger - INFO - Reactor left room LZED
+2026-05-01 15:08:53,981 - app_logger - INFO - Room LZED deleted
+2026-05-01 15:08:55,850 - app_logger - INFO - Client disconnected: XONCVTKgb1AoEx15AAAU
+2026-05-01 15:08:55,931 - app_logger - INFO - Client connected: gM8q3s74jwEzkEusAAAX
+2026-05-01 15:11:15,609 - app_logger - INFO - Client disconnected: gM8q3s74jwEzkEusAAAX
+2026-05-01 15:11:15,892 - app_logger - INFO - Client connected: HSus4XgSFtNUGTQZAAAa
+2026-05-01 15:11:17,056 - app_logger - INFO - Game created with room code: CRII
+2026-05-01 15:11:19,318 - app_logger - INFO - Applied task list J4A7XQ to game CRII: 26 tasks loaded, task_list_applied=True
+2026-05-01 15:11:19,319 - app_logger - INFO - Task handler now has 26 tasks
+2026-05-01 15:11:22,818 - app_logger - INFO - Game CRII config updated: {'locations': ['Kitchen', 'Living Room'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_intruders': 1, 'card_draw_probability': 1, 'starting_cards': 5, 'task_ratio': 10}
+2026-05-01 15:11:22,822 - app_logger - INFO - Room CRII is now open for players
+2026-05-01 15:11:30,898 - app_logger - INFO - Saved selfie for poop: 1121f70c99ea4ad981336bea243e1cb1.jpg
+2026-05-01 15:11:30,901 - app_logger - INFO - Set creator_player_id to 295667df-0311-472b-af00-c2247d6aeae2 for room CRII (first player)
+2026-05-01 15:11:30,901 - app_logger - INFO - New player poop joined room CRII with ID 295667df-0311-472b-af00-c2247d6aeae2, is_creator=True
+2026-05-01 15:11:30,901 - app_logger - INFO - Sending player list to room CRII
+2026-05-01 15:11:30,901 - app_logger - DEBUG - Player List: ['{"sid": "HSus4XgSFtNUGTQZAAAa", "player_id": "295667df-0311-472b-af00-c2247d6aeae2", "username": "poop", "active": true, "sus": false, "alive": true, "pic": 3, "selfie": "1121f70c99ea4ad981336bea243e1cb1.jpg", "meltdown_code": null, "cards": [], "ready": false, "death_cause": null, "death_message": null}']
+2026-05-01 15:11:30,902 - app_logger - INFO - Ownership check for J4A7XQ: stored_creator=device_b2nahin7smizkkcmr, device_id=device_b2nahin7smizkkcmr, is_owner=True
+2026-05-01 15:11:30,903 - app_logger - INFO - Ownership check for J4A7XQ: stored_creator=device_b2nahin7smizkkcmr, device_id=device_b2nahin7smizkkcmr, is_owner=True
+2026-05-01 15:11:32,925 - app_logger - INFO - save_collaborative_tasks called: room=CRII, device_id=device_b2nahin7smizkkcmr, force_new=False
+2026-05-01 15:11:32,926 - app_logger - INFO - Game found, collaborative_task_list_code=J4A7XQ, num_tasks=26
+2026-05-01 15:11:32,927 - app_logger - INFO - Existing list found: stored_creator=device_b2nahin7smizkkcmr, device_id=device_b2nahin7smizkkcmr, match=True
+2026-05-01 15:11:32,929 - app_logger - INFO - Updated collaborative task list J4A7XQ in room CRII
+2026-05-01 15:11:49,662 - app_logger - INFO - Player poop left room CRII
+2026-05-01 15:11:49,664 - app_logger - INFO - Room CRII deleted
+2026-05-01 15:12:05,574 - app_logger - INFO - Game created with room code: GFVT
+2026-05-01 15:12:08,050 - app_logger - INFO - Applied task list J4A7XQ to game GFVT: 26 tasks loaded, task_list_applied=True
+2026-05-01 15:12:08,050 - app_logger - INFO - Task handler now has 26 tasks
+2026-05-01 15:12:08,830 - app_logger - INFO - Game GFVT config updated: {'locations': ['Kitchen', 'Living Room'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_intruders': 2, 'card_draw_probability': 1, 'starting_cards': 2, 'task_ratio': 10}
+2026-05-01 15:12:08,835 - app_logger - INFO - Room GFVT is now open for players
+2026-05-01 15:14:34,996 - app_logger - INFO - Room GFVT deleted
+2026-05-01 15:14:35,984 - app_logger - INFO - Game created with room code: DYEA
+2026-05-01 15:14:44,009 - app_logger - INFO - Applied task list J4A7XQ to game DYEA: 26 tasks loaded, task_list_applied=True
+2026-05-01 15:14:44,010 - app_logger - INFO - Task handler now has 26 tasks
+2026-05-01 15:14:47,334 - app_logger - INFO - Game DYEA config updated: {'locations': ['Kitchen', 'Living Room'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_intruders': 1, 'card_draw_probability': 1, 'starting_cards': 2, 'task_ratio': 10}
+2026-05-01 15:14:47,340 - app_logger - INFO - Room DYEA is now open for players
+2026-05-01 15:14:50,626 - app_logger - INFO - Set creator_player_id to 8ecc0c65-4687-4bb3-8587-223fbee25692 for room DYEA (first player)
+2026-05-01 15:14:50,626 - app_logger - INFO - New player sam joined room DYEA with ID 8ecc0c65-4687-4bb3-8587-223fbee25692, is_creator=True
+2026-05-01 15:14:50,626 - app_logger - INFO - Sending player list to room DYEA
+2026-05-01 15:14:50,626 - app_logger - DEBUG - Player List: ['{"sid": "HSus4XgSFtNUGTQZAAAa", "player_id": "8ecc0c65-4687-4bb3-8587-223fbee25692", "username": "sam", "active": true, "sus": false, "alive": true, "pic": 10, "selfie": null, "meltdown_code": null, "cards": [], "ready": false, "death_cause": null, "death_message": null}']
+2026-05-01 15:14:50,633 - app_logger - INFO - Ownership check for J4A7XQ: stored_creator=device_b2nahin7smizkkcmr, device_id=device_b2nahin7smizkkcmr, is_owner=True
+2026-05-01 15:14:50,633 - app_logger - INFO - Ownership check for J4A7XQ: stored_creator=device_b2nahin7smizkkcmr, device_id=device_b2nahin7smizkkcmr, is_owner=True
+2026-05-01 15:14:53,997 - app_logger - INFO - Player sam left room DYEA
+2026-05-01 15:14:54,001 - app_logger - INFO - Room DYEA deleted
+2026-05-01 15:14:54,002 - app_logger - INFO - save_collaborative_tasks called: room=DYEA, device_id=device_b2nahin7smizkkcmr, force_new=False
+2026-05-01 15:16:54,430 - app_logger - INFO - Client disconnected: HSus4XgSFtNUGTQZAAAa
+2026-05-01 15:16:54,463 - app_logger - INFO - Client connected: 9HsP9m0xp_5AHs0pAAAd
+2026-05-01 15:18:37,098 - app_logger - INFO - Client disconnected: 9HsP9m0xp_5AHs0pAAAd
+2026-05-01 15:18:37,398 - app_logger - INFO - Client connected: GYKxh-rYog-eNR21AAAg
+2026-05-01 15:18:55,824 - app_logger - INFO - Client disconnected: GYKxh-rYog-eNR21AAAg
+2026-05-01 15:19:02,582 - app_logger - INFO - Client connected: PsUZtGf40b5y3W21AAAj
+2026-05-01 15:19:32,824 - app_logger - INFO - Game created with room code: EDPN
+2026-05-01 15:19:32,827 - app_logger - INFO - Reactor registered for room EDPN (sid: PsUZtGf40b5y3W21AAAj)
+2026-05-01 15:19:38,478 - app_logger - INFO - Applied task list J4A7XQ to game EDPN: 26 tasks loaded, task_list_applied=True
+2026-05-01 15:19:38,478 - app_logger - INFO - Task handler now has 26 tasks
+2026-05-01 15:31:22,353 - app_logger - INFO - Client disconnected: PsUZtGf40b5y3W21AAAj
+2026-05-01 15:31:22,376 - app_logger - INFO - Client connected: ajmQeRZTHsotx-8JAAAl
+2026-05-01 15:31:22,392 - app_logger - INFO - Reactor registered for room EDPN (sid: ajmQeRZTHsotx-8JAAAl)
+2026-05-01 15:52:29,123 - app_logger - INFO - Reactor left room EDPN
+2026-05-01 15:52:29,127 - app_logger - INFO - Room EDPN deleted
+2026-05-01 15:52:30,492 - app_logger - INFO - Client disconnected: ajmQeRZTHsotx-8JAAAl
+2026-05-01 15:52:30,874 - app_logger - INFO - Client connected: Xj_OmM_uH71DYPBsAAAo
+2026-05-01 15:52:33,083 - app_logger - INFO - Client disconnected: Xj_OmM_uH71DYPBsAAAo
+2026-05-01 16:33:49,182 - app_logger - INFO - Client connected: xrUZG2WbzOhUPJx7AAAr
+2026-05-01 17:03:53,707 - app_logger - INFO - Client disconnected: xrUZG2WbzOhUPJx7AAAr
+2026-05-01 17:03:55,193 - app_logger - INFO - Client connected: ZJQYNPhCF-STajy9AAAt
+2026-05-03 09:19:26,466 - app_logger - INFO - Client disconnected: ZJQYNPhCF-STajy9AAAt
+2026-05-03 09:28:39,091 - app_logger - INFO - Client connected: p8nbotX9wLBqu324AAAv
+2026-05-03 09:28:50,253 - app_logger - INFO - Client disconnected: p8nbotX9wLBqu324AAAv
+2026-05-03 09:29:26,553 - app_logger - INFO - Client connected: Jo3Ya0OImRyNxxAxAAAy
+2026-05-03 09:47:10,539 - app_logger - INFO - Client disconnected: Jo3Ya0OImRyNxxAxAAAy
+2026-05-03 09:47:20,620 - app_logger - INFO - Client connected: DVcf_combrFvM2mSAAA0
+2026-05-03 09:47:28,219 - app_logger - INFO - Client disconnected: DVcf_combrFvM2mSAAA0
+2026-05-03 09:47:51,133 - app_logger - INFO - Client connected: KkVh9TKs7hbtDto7AAA3
+2026-05-03 09:51:37,691 - app_logger - INFO - Client disconnected: KkVh9TKs7hbtDto7AAA3
+2026-05-05 17:08:35,943 - app_logger - INFO - Client connected: lfLNgPWMWq8YSDhdAAA7
+2026-05-05 17:11:49,029 - app_logger - INFO - Client disconnected: lfLNgPWMWq8YSDhdAAA7

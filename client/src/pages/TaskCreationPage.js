@@ -2,6 +2,10 @@ import React, { useState, useContext, useEffect, useRef } from 'react';
 import { DataContext } from '../GameContext';
 import { Plus, X, Check, Send, ThumbsDown, MapPin, Copy, Save, Play, LogOut } from 'lucide-react';
 
+function sameLocations(left, right) {
+    return left.length === right.length && left.every((location, index) => location === right[index]);
+}
+
 // Get or create a persistent device ID for task list ownership
 function getDeviceId() {
     let deviceId = localStorage.getItem('device_id');
@@ -61,14 +65,15 @@ function TaskCreationPage() {
         }
     }, [needsLocationSetup, tasks.length]);
     
-    // Initialize local locations from server locations (only real ones, not 'Other')
+    // Keep local locations synced to the latest server view so a late
+    // task_locations payload can repair any earlier stale snapshot.
     useEffect(() => {
-        if (taskLocations.length > 0 && !locationsInitialized) {
-            const realFromServer = taskLocations.filter(l => l !== 'Other');
-            setLocalLocations(realFromServer);
-            setLocationsInitialized(true);
-        }
-    }, [taskLocations, locationsInitialized]);
+        const realFromServer = taskLocations.filter(l => l !== 'Other');
+        setLocalLocations((previous) => (
+            sameLocations(previous, realFromServer) ? previous : realFromServer
+        ));
+        setLocationsInitialized(taskLocations.length > 0);
+    }, [taskLocations]);
     
     // Set default location when locations are available
     useEffect(() => {

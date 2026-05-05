@@ -161,20 +161,31 @@ function CameraCapture({ onCapture, onCancel }) {
 
             {!capturedImage ? (
                 <>
-                    {/* Camera Preview */}
-                    <div className="relative w-64 h-64 rounded-full overflow-hidden border-4 border-indigo-500 mb-4">
+                    {/* Camera Preview — portrait frame */}
+                    <div className="relative w-full aspect-square rounded-2xl overflow-hidden border-2 border-indigo-500/50 shadow-xl shadow-indigo-500/10 mb-4">
                         <video
                             ref={videoRef}
                             autoPlay
                             playsInline
                             muted
-                            className="w-full h-full object-cover"
+                            className="absolute inset-0 w-full h-full object-cover"
                             style={{ transform: facingMode === 'user' ? 'scaleX(-1)' : 'none' }}
                         />
+                        {/* Face guide */}
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <div className="w-3/4 aspect-square rounded-full border-2 border-white/20 border-dashed" />
+                        </div>
+                        {/* Corner nicks */}
+                        <div className="absolute top-3 left-3 w-4 h-4 border-t-2 border-l-2 border-indigo-400/60 rounded-tl-sm pointer-events-none" />
+                        <div className="absolute top-3 right-3 w-4 h-4 border-t-2 border-r-2 border-indigo-400/60 rounded-tr-sm pointer-events-none" />
+                        <div className="absolute bottom-3 left-3 w-4 h-4 border-b-2 border-l-2 border-indigo-400/60 rounded-bl-sm pointer-events-none" />
+                        <div className="absolute bottom-3 right-3 w-4 h-4 border-b-2 border-r-2 border-indigo-400/60 rounded-br-sm pointer-events-none" />
+                        {/* Bottom fade */}
+                        <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
                     </div>
 
                     {/* Camera Controls */}
-                    <ButtonGroup className="mb-4">
+                    <ButtonGroup className="mb-3">
                         <CircleIconButton
                             onClick={toggleCamera}
                             variant="gray"
@@ -198,22 +209,32 @@ function CameraCapture({ onCapture, onCancel }) {
                             <X size={24} />
                         </CircleIconButton>
                     </ButtonGroup>
-                    <p className="text-gray-400 text-sm">Take a selfie for your profile!</p>
+                    <p className="text-gray-500 text-xs text-center">Position your face in the frame</p>
                 </>
             ) : (
                 <>
                     {/* Captured Image Preview */}
-                    <div className="relative w-64 h-64 rounded-full overflow-hidden border-4 border-green-500 mb-4">
+                    <div className="relative w-full aspect-square rounded-2xl overflow-hidden border-2 border-green-500/60 shadow-xl shadow-green-500/10 mb-4">
                         <img
                             src={capturedImage}
                             alt="Captured selfie"
-                            className="w-full h-full object-cover"
+                            className="absolute inset-0 w-full h-full object-cover"
                             style={{ transform: facingMode === 'user' ? 'scaleX(-1)' : 'none' }}
                         />
+                        {/* Confirm badge */}
+                        <div className="absolute top-3 right-3 w-7 h-7 bg-green-500/90 rounded-full flex items-center justify-center backdrop-blur-sm">
+                            <Check size={14} className="text-white" />
+                        </div>
+                        {/* Corner nicks */}
+                        <div className="absolute top-3 left-3 w-4 h-4 border-t-2 border-l-2 border-green-400/60 rounded-tl-sm pointer-events-none" />
+                        <div className="absolute bottom-3 left-3 w-4 h-4 border-b-2 border-l-2 border-green-400/60 rounded-bl-sm pointer-events-none" />
+                        <div className="absolute bottom-3 right-3 w-4 h-4 border-b-2 border-r-2 border-green-400/60 rounded-br-sm pointer-events-none" />
+                        {/* Bottom fade */}
+                        <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
                     </div>
 
                     {/* Confirm/Retake Controls */}
-                    <ButtonGroup className="mb-4">
+                    <ButtonGroup className="mb-3">
                         <SecondaryButton onClick={retakePhoto} fullWidth={false}>
                             <RotateCcw size={20} />
                             <span>Retake</span>
@@ -223,7 +244,7 @@ function CameraCapture({ onCapture, onCancel }) {
                             <span>Use Photo</span>
                         </SecondaryButton>
                     </ButtonGroup>
-                    <p className="text-gray-400 text-sm">Looking good! 📸</p>
+                    <p className="text-gray-500 text-xs text-center">Looking good!</p>
                 </>
             )}
         </div>

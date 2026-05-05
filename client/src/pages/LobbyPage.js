@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { isMobile as isMobileDevice } from 'react-device-detect';
 import { DataContext } from '../GameContext';
-import { Users, Plus, ArrowRight, HelpCircle, Zap, Shield, Skull, Wifi, Monitor, Radio, Speaker, Smartphone, AlertTriangle, ChevronRight } from 'lucide-react';
+import { Users, Plus, ArrowRight, HelpCircle, Zap, Shield, Skull, Wifi, Monitor, Radio, Speaker, Smartphone, AlertTriangle, ChevronRight, Sparkles, GraduationCap } from 'lucide-react';
 import { 
     useFloatingParticles, 
     FloatingParticles, 
@@ -13,6 +13,7 @@ import {
 } from '../components/ui';
 import { PrimaryButton } from '../components/ui';
 import { Card } from '../components/ui';
+import { dismissTutorialPrompt, shouldRecommendTutorial } from '../tutorial/tutorialStorage';
 
 // Feature badge component
 const FeatureBadge = ({ icon: Icon, text, delay }) => (
@@ -31,6 +32,7 @@ function LobbyPage() {
     const [isJoining, setIsJoining] = useState(false);
     const [error, setError] = useState('');
     const [showContent, setShowContent] = useState(false);
+    const [showTutorialPrompt, setShowTutorialPrompt] = useState(false);
     const { socket } = useContext(DataContext);
 
     // Resolve effective device mode (matches GameContext / PageController logic)
@@ -43,6 +45,7 @@ function LobbyPage() {
         params.set('mobile', 'true');
         return `${window.location.pathname}?${params.toString()}`;
     })();
+    const tutorialHref = '/tutorial?returnTo=play';
 
     // Use shared floating particles hook
     const particles = useFloatingParticles(20, 'default');
@@ -52,6 +55,10 @@ function LobbyPage() {
         const timer = setTimeout(() => setShowContent(true), 100);
         return () => clearTimeout(timer);
     }, []);
+
+    useEffect(() => {
+        setShowTutorialPrompt(isMobile && shouldRecommendTutorial());
+    }, [isMobile]);
 
     // Listen for errors and success to reset the button states
     useEffect(() => {
@@ -109,8 +116,73 @@ function LobbyPage() {
         }, 10000);
     };
 
+    const handleSkipTutorialPrompt = () => {
+        dismissTutorialPrompt();
+        setShowTutorialPrompt(false);
+    };
+
     return (
         <div className={`fixed inset-0 flex ${isReactorDevice ? 'items-start justify-center overflow-y-auto py-8' : 'items-center justify-center overflow-hidden'} bg-gray-950`}>
+            {showTutorialPrompt && (
+                <div className="fixed inset-0 z-40 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+                    <div className="w-full max-w-lg rounded-3xl border border-indigo-500/30 bg-gray-950/95 shadow-2xl shadow-indigo-900/30 overflow-hidden">
+                        <div className="border-b border-indigo-500/20 bg-gradient-to-r from-indigo-500/15 via-cyan-500/10 to-transparent px-6 py-5">
+                            <div className="inline-flex items-center gap-2 rounded-full border border-indigo-400/20 bg-indigo-500/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-indigo-200">
+                                <Sparkles size={14} />
+                                First game recommendation
+                            </div>
+                            <h2 className="mt-4 text-2xl font-black tracking-tight text-white">Try the tutorial first</h2>
+                            <p className="mt-2 text-sm leading-relaxed text-gray-300">
+                                Sus Party moves quickly once the round starts. A short tutorial can walk players through tasks, meetings, and the basic gestures before anyone joins a real room.
+                            </p>
+                        </div>
+
+                        <div className="px-6 py-5">
+                            <div className="grid gap-3 sm:grid-cols-3">
+                                <div className="rounded-2xl border border-gray-800/80 bg-gray-900/70 p-4">
+                                    <div className="mb-2 inline-flex rounded-xl border border-cyan-400/20 bg-cyan-500/10 p-2 text-cyan-300">
+                                        <GraduationCap size={18} />
+                                    </div>
+                                    <p className="text-sm font-semibold text-white">Crew basics</p>
+                                    <p className="mt-1 text-xs leading-relaxed text-gray-400">Learn how tasks and swipe-to-complete work.</p>
+                                </div>
+                                <div className="rounded-2xl border border-gray-800/80 bg-gray-900/70 p-4">
+                                    <div className="mb-2 inline-flex rounded-xl border border-amber-400/20 bg-amber-500/10 p-2 text-amber-300">
+                                        <Users size={18} />
+                                    </div>
+                                    <p className="text-sm font-semibold text-white">Meetings</p>
+                                    <p className="mt-1 text-xs leading-relaxed text-gray-400">See when to call a meeting and how voting works.</p>
+                                </div>
+                                <div className="rounded-2xl border border-gray-800/80 bg-gray-900/70 p-4">
+                                    <div className="mb-2 inline-flex rounded-xl border border-rose-400/20 bg-rose-500/10 p-2 text-rose-300">
+                                        <Skull size={18} />
+                                    </div>
+                                    <p className="text-sm font-semibold text-white">Intruder tools</p>
+                                    <p className="mt-1 text-xs leading-relaxed text-gray-400">Cards and cooldown training are being scaffolded next.</p>
+                                </div>
+                            </div>
+
+                            <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+                                <a
+                                    href={tutorialHref}
+                                    className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border border-indigo-400/30 bg-indigo-500/20 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-500/30"
+                                >
+                                    <Sparkles size={16} />
+                                    <span>Start tutorial</span>
+                                </a>
+                                <button
+                                    type="button"
+                                    onClick={handleSkipTutorialPrompt}
+                                    className="inline-flex flex-1 items-center justify-center rounded-2xl border border-gray-700/80 bg-gray-900/80 px-4 py-3 text-sm font-semibold text-gray-300 transition-colors hover:border-gray-600 hover:text-white"
+                                >
+                                    Skip for now
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Animated background layers */}
             <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-indigo-950/20 to-gray-950" />
             
@@ -203,11 +275,11 @@ function LobbyPage() {
 
                                 <form onSubmit={handleJoinGame}>
                                     <div className="mb-4">
-                                        <label htmlFor="roomCode" className="block text-gray-400 text-sm mb-2 ml-1">Enter Room Code</label>
+                                        <label htmlFor="game-entry-code" className="block text-gray-400 text-sm mb-2 ml-1">Enter Room Code</label>
                                         <div className="relative">
                                             <input
                                                 type="text"
-                                                id="roomCode"
+                                                id="game-entry-code"
                                                 value={inputRoomCode}
                                                 onChange={(e) => {
                                                     const value = e.target.value.toUpperCase().replace(/[^A-Za-z]/g, '').slice(0, 4);
@@ -216,7 +288,7 @@ function LobbyPage() {
                                                 className="w-full px-6 py-4 bg-gray-800/80 border-2 border-gray-700/80 rounded-2xl text-white text-center text-3xl font-mono tracking-[0.5em] uppercase focus:outline-none focus:border-emerald-500/50 focus:bg-gray-800 transition-all placeholder:text-gray-600 placeholder:tracking-[0.3em]"
                                                 placeholder="XXXX"
                                                 maxLength={4}
-                                                autoComplete="off"
+                                                autoComplete="one-time-code"
                                                 autoCapitalize="characters"
                                                 spellCheck="false"
                                             />
@@ -364,13 +436,13 @@ function LobbyPage() {
                     {/* Join Game Form */}
                     <form onSubmit={handleJoinGame}>
                         <div className="mb-4">
-                            <label htmlFor="roomCode" className="block text-gray-400 text-sm mb-2 ml-1">
+                            <label htmlFor="game-entry-code" className="block text-gray-400 text-sm mb-2 ml-1">
                                 Enter Room Code
                             </label>
                             <div className="relative">
                                 <input
                                     type="text"
-                                    id="roomCode"
+                                    id="game-entry-code"
                                     value={inputRoomCode}
                                     onChange={(e) => {
                                         const value = e.target.value.toUpperCase().replace(/[^A-Za-z]/g, '').slice(0, 4);
@@ -379,7 +451,7 @@ function LobbyPage() {
                                     className="w-full px-6 py-4 bg-gray-800/80 border-2 border-gray-700/80 rounded-2xl text-white text-center text-3xl font-mono tracking-[0.5em] uppercase focus:outline-none focus:border-emerald-500/50 focus:bg-gray-800 transition-all placeholder:text-gray-600 placeholder:tracking-[0.3em]"
                                     placeholder="XXXX"
                                     maxLength={4}
-                                    autoComplete="off"
+                                    autoComplete="one-time-code"
                                     autoCapitalize="characters"
                                     spellCheck="false"
                                 />
@@ -413,13 +485,20 @@ function LobbyPage() {
                 )}
 
                 {/* Footer */}
-                <div className="mt-6 text-center">
+                <div className="mt-6 flex items-center justify-center gap-2 text-center">
                     <a 
                         href="/how-to-play" 
                         className="inline-flex items-center gap-2 px-4 py-2 text-gray-500 hover:text-indigo-400 transition-colors text-sm group"
                     >
                         <HelpCircle size={16} className="group-hover:rotate-12 transition-transform" />
                         <span>How to Play</span>
+                    </a>
+                    <a 
+                        href={tutorialHref}
+                        className="inline-flex items-center gap-2 px-4 py-2 text-gray-500 hover:text-cyan-300 transition-colors text-sm group"
+                    >
+                        <Sparkles size={16} className="group-hover:scale-110 transition-transform" />
+                        <span>Tutorial</span>
                     </a>
                 </div>
                 

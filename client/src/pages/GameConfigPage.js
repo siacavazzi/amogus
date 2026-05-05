@@ -74,6 +74,8 @@ function GameConfigPage() {
     
     // Use device ID instead of player ID for task list ownership
     const deviceId = useRef(getDeviceId()).current;
+    const pendingSettingsStepRef = useRef(false);
+    const pendingRoomOpenRef = useRef(false);
 
     useEffect(() => {
         const timer = setTimeout(() => setShowContent(true), 100);
@@ -97,6 +99,11 @@ function GameConfigPage() {
         const handleConfig = (data) => {
             console.log('Received game config:', data);
             setConfig(data);
+
+            if (pendingRoomOpenRef.current) {
+                pendingRoomOpenRef.current = false;
+                socket.emit('open_room', { room_code: roomCode });
+            }
         };
 
         socket.on('game_config', handleConfig);
@@ -104,7 +111,7 @@ function GameConfigPage() {
         return () => {
             socket.off('game_config', handleConfig);
         };
-    }, [socket]);
+    }, [socket, roomCode]);
 
     // Listen for task list events
     useEffect(() => {
@@ -140,6 +147,11 @@ function GameConfigPage() {
             console.log('Task list applied to game:', data);
             setTaskListLoading(false);
             setTaskListApplied(true);
+
+            if (pendingSettingsStepRef.current) {
+                pendingSettingsStepRef.current = false;
+                setStep('settings');
+            }
         };
 
         const handleTaskListDeleted = (data) => {
@@ -151,6 +163,9 @@ function GameConfigPage() {
         const handleError = (data) => {
             console.error('Error:', data);
             setTaskListLoading(false);
+            setIsSaving(false);
+            pendingSettingsStepRef.current = false;
+            pendingRoomOpenRef.current = false;
         };
 
         socket.on('my_task_lists', handleMyTaskLists);
@@ -234,6 +249,7 @@ function GameConfigPage() {
 
     const handleOpenRoom = () => {
         setIsSaving(true);
+        pendingRoomOpenRef.current = true;
         const configToSave = {
             ...config,
             locations: currentTaskList?.locations
@@ -244,7 +260,6 @@ function GameConfigPage() {
             room_code: roomCode, 
             config: configToSave 
         });
-        socket.emit('open_room', { room_code: roomCode });
     };
 
     const handleLeaveRoom = () => {
@@ -271,7 +286,10 @@ function GameConfigPage() {
     const proceedToSettings = () => {
         // Apply task list if one is loaded but not yet applied
         if (currentTaskList && !taskListApplied) {
+            pendingSettingsStepRef.current = true;
+            setTaskListLoading(true);
             applyTaskListToGame();
+            return;
         }
         setStep('settings');
     };
@@ -499,14 +517,24 @@ function GameConfigPage() {
             <div className="space-y-4">
                 <button
                     onClick={proceedToSettings}
+                    disabled={taskListLoading}
                     className="w-full relative group"
                 >
                     <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl blur opacity-30 group-hover:opacity-50 transition-opacity"></div>
-                    <div className="relative bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 px-6 rounded-xl transition-all flex items-center justify-center gap-3 font-bold text-lg group-hover:scale-[1.02]">
+                    <div className="relative bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 px-6 rounded-xl transition-all flex items-center justify-center gap-3 font-bold text-lg group-hover:scale-[1.02] disabled:scale-100">
                         {currentTaskList ? (
                             <>
-                                <span>Use This Task List</span>
-                                <ArrowRight size={20} />
+                                {taskListLoading ? (
+                                    <>
+                                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                        <span>Applying Task List...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span>Use This Task List</span>
+                                        <ArrowRight size={20} />
+                                    </>
+                                )}
                             </>
                         ) : (
                             <>

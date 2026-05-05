@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { ChevronLeft, Camera, User, Sparkles, ArrowRight } from 'lucide-react';
 import { DataContext } from '../GameContext';
 import CameraCapture from '../components/CameraCapture';
+import LeaveGameButton from '../components/LeaveGameButton';
 import { 
     useFloatingParticles, 
     FloatingParticles, 
@@ -68,7 +69,7 @@ function LoginPage() {
             {/* Floating particles */}
             <FloatingParticles particles={particles} />
             
-            {/* Back Button */}
+            {/* Back Button (camera step only) */}
             {step === 'camera' && (
                 <button
                     type="button"
@@ -80,25 +81,34 @@ function LoginPage() {
                 </button>
             )}
 
+            {/* Leave button — always visible on username + camera steps */}
+            {(step === 'username' || step === 'camera') && (
+                <div className="fixed top-6 right-6 z-50">
+                    <LeaveGameButton />
+                </div>
+            )}
+
             {/* Main content */}
             <div className={`relative z-10 w-full max-w-sm mx-4 transition-all duration-700 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                 {/* Step 1: Username Entry */}
                 {step === 'username' && (
                     <>
-                        {/* Header */}
-                        <div className="text-center mb-8">
-                            <div className="relative inline-block mb-4">
-                                <div className="absolute inset-0 bg-indigo-500/20 blur-2xl rounded-full scale-150" />
-                                <div className="relative w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center shadow-2xl shadow-indigo-500/30">
-                                    <User size={36} className="text-white" />
+                        <Card variant="default" padding="default">
+                            {/* ID card header — matches camera step */}
+                            <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-700/50">
+                                <div className="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center flex-shrink-0">
+                                    <User size={20} className="text-indigo-400" />
+                                </div>
+                                <div className="min-w-0">
+                                    <p className="text-base font-bold text-white">Join the Game</p>
+                                    <p className="text-[11px] text-gray-500 font-mono uppercase tracking-widest">Crew ID · {roomCode}</p>
+                                </div>
+                                <div className="ml-auto flex items-center gap-1 px-2 py-1 bg-indigo-500/20 border border-indigo-500/30 rounded-full flex-shrink-0">
+                                    <Sparkles size={11} className="text-indigo-400" />
+                                    <span className="text-indigo-400 text-[10px] font-semibold uppercase tracking-widest">New</span>
                                 </div>
                             </div>
-                            <h2 className="text-2xl font-bold text-white mb-1">Join the Game</h2>
-                            <p className="text-gray-500 text-sm">Room: <span className="text-indigo-400 font-mono font-bold">{roomCode}</span></p>
-                        </div>
 
-                        {/* Card */}
-                        <Card variant="default" padding="default">
                             <form onSubmit={handleUsernameSubmit}>
                                 <div className="mb-5">
                                     <label htmlFor="username" className="block text-gray-400 text-sm mb-2 ml-1">
@@ -113,7 +123,7 @@ function LoginPage() {
                                         placeholder="Enter your name"
                                         required
                                         autoFocus
-                                        autoComplete="off"
+                                        autoComplete="nickname"
                                     />
                                 </div>
                                 <PrimaryButton
@@ -135,13 +145,19 @@ function LoginPage() {
                 {/* Step 2: Camera Capture */}
                 {step === 'camera' && (
                     <Card variant="default" padding="default">
-                        <div className="text-center mb-4">
-                            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-500/20 border border-indigo-500/30 rounded-full text-indigo-400 text-sm mb-3">
-                                <Sparkles size={14} />
-                                <span>Almost there!</span>
+                        {/* ID card issuing header */}
+                        <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-700/50">
+                            <div className="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center flex-shrink-0">
+                                <Camera size={20} className="text-indigo-400" />
                             </div>
-                            <h2 className="text-xl font-bold text-white">Hey {username}!</h2>
-                            <p className="text-gray-500 text-sm mt-1">Take a selfie for your profile</p>
+                            <div className="min-w-0">
+                                <p className="text-base font-bold text-white truncate">{username}</p>
+                                <p className="text-[11px] text-gray-500 font-mono uppercase tracking-widest">Crew ID · {roomCode}</p>
+                            </div>
+                            <div className="ml-auto flex items-center gap-1 px-2 py-1 bg-indigo-500/20 border border-indigo-500/30 rounded-full flex-shrink-0">
+                                <Sparkles size={11} className="text-indigo-400" />
+                                <span className="text-indigo-400 text-[10px] font-semibold uppercase tracking-widest">Draft</span>
+                            </div>
                         </div>
                         <CameraCapture 
                             onCapture={handleCameraCapture}

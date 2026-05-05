@@ -175,6 +175,7 @@ def handle_update_game_config(data):
     game.update_config(config)
     logger.info(f"Game {room_code} config updated: {config}")
     emit('game_config', game.get_config())
+    socketio.emit('task_locations', game.locations, room=room_code)
 
 
 @socketio.on('open_room')

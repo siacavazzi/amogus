@@ -67,10 +67,10 @@ function CrewScreen() {
                     <span className="lp-crew__card-title">Current Task</span>
                 </div>
                 <div className="lp-crew__card-body">
-                    <h3 className="lp-crew__task">Swap the dish towel</h3>
+                    <h3 className="lp-crew__task">Turn off a light</h3>
                     <div className="lp-crew__location">
                         <MapPin size={11} />
-                        <span>Kitchen</span>
+                        <span>Basement</span>
                     </div>
                 </div>
             </div>

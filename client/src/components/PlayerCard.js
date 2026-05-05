@@ -217,37 +217,121 @@ const PlayerCard = ({
   isMe = false,
   isClickable = true,
 }) => {
+  const isDead = !player.alive;
+  const deathInfo = isDead && player.death_cause ? getDeathInfo(player.death_cause) : null;
+  const DeathIcon = deathInfo?.icon;
+
+  // Glow and border colours based on state
+  const glowColor = selected
+    ? 'shadow-green-500/40'
+    : isDead
+    ? 'shadow-red-900/40'
+    : isMe
+    ? 'shadow-indigo-500/30'
+    : 'shadow-black/40';
+
+  const borderColor = selected
+    ? 'border-green-500/70'
+    : isDead
+    ? 'border-red-900/50'
+    : isMe
+    ? 'border-indigo-500/50'
+    : 'border-gray-700/60';
+
+  const selfieUrl = player.selfie ? `${require('../ENDPOINT').ENDPOINT}/selfies/${player.selfie}` : null;
+
   return (
     <div
       onClick={isClickable ? onClick : null}
-      className={`relative bg-gray-800 shadow-md rounded-xl p-4 flex flex-col items-center transition-transform transform 
-              ${isClickable ? "hover:scale-105 cursor-pointer" : "opacity-50 cursor-not-allowed"}
-              ${selected ? "border-4 border-green-500" : "border-2 border-transparent"}`}
+      className={`
+        relative overflow-hidden rounded-2xl border ${borderColor}
+        shadow-lg ${glowColor}
+        bg-gray-900
+        flex flex-col
+        transition-all duration-200
+        ${isClickable ? 'cursor-pointer hover:scale-[1.04] hover:shadow-xl active:scale-[0.98]' : 'opacity-50 cursor-not-allowed'}
+        ${selected ? 'ring-2 ring-green-500/60' : ''}
+      `}
+      style={{ aspectRatio: '3/4' }}
     >
-      <div className="mb-3">
-        <ProfilePicture 
-          imageCode={player.pic} 
-          selfie={player.selfie}
-          isDead={!player.alive}
-          deathCause={player.death_cause}
-        />
-      </div>
-      <h3 className="text-base sm:text-lg font-semibold text-gray-200 text-center truncate w-full">
-        {player.username} {isMe && <span className="text-indigo-400">(me)</span>}
-      </h3>
-      <p
-        className={`mt-1 text-xs font-medium ${player.alive ? "text-green-400" : "text-red-500"
-          }`}
-      >
-        {player.alive ? "Alive" : "Dead"}
-      </p>
+      {/* ── Portrait area (top ~70%) ── */}
+      <div className="relative flex-1 overflow-hidden bg-gray-950">
+        {selfieUrl ? (
+          <img
+            src={selfieUrl}
+            alt={player.username}
+            className={`absolute inset-0 w-full h-full object-cover ${isDead ? 'grayscale opacity-60' : ''}`}
+            onError={(e) => {
+              e.target.onerror = null;
+              if (player.pic) {
+                e.target.src = require(`../imgs/${player.pic}.gif`);
+                e.target.className = `absolute inset-0 w-full h-full object-cover object-center ${isDead ? 'grayscale opacity-60' : ''}`;
+              }
+            }}
+          />
+        ) : player.pic ? (
+          <img
+            src={require(`../imgs/${player.pic}.gif`)}
+            alt={player.username}
+            className={`absolute inset-0 w-full h-full object-cover object-center ${isDead ? 'grayscale opacity-60' : ''}`}
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-800">
+            <Shield size={40} className="text-gray-600" />
+          </div>
+        )}
 
-      {/* Optional Votes Display */}
-      {votes > 0 && (
-        <div className="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold py-1 px-2 rounded-full shadow-md">
-          {votes} {votes === 1 ? "Vote" : "Votes"}
-        </div>
-      )}
+        {/* Bottom portrait fade into the footer */}
+        <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-gray-900 to-transparent pointer-events-none" />
+
+        {/* Corner nicks */}
+        <div className="absolute top-2 left-2 w-3 h-3 border-t-2 border-l-2 border-current opacity-40 rounded-tl-sm"
+          style={{ color: selected ? '#22c55e' : isDead ? '#ef4444' : '#818cf8' }} />
+        <div className="absolute top-2 right-2 w-3 h-3 border-t-2 border-r-2 border-current opacity-40 rounded-tr-sm"
+          style={{ color: selected ? '#22c55e' : isDead ? '#ef4444' : '#818cf8' }} />
+
+        {/* Death cause badge */}
+        {isDead && DeathIcon && (
+          <div className={`absolute top-2.5 left-1/2 -translate-x-1/2 flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider ${deathInfo.bg} ${deathInfo.border} border ${deathInfo.color} backdrop-blur-sm`}>
+            <DeathIcon size={9} />
+            <span>Eliminated</span>
+          </div>
+        )}
+
+        {/* Vote counter */}
+        {votes > 0 && (
+          <div className="absolute top-2 right-2 bg-red-600 text-white text-[10px] font-bold py-0.5 px-1.5 rounded-full shadow-md">
+            {votes}▲
+          </div>
+        )}
+      </div>
+
+      {/* ── Name / status footer ── */}
+      <div className="px-2.5 py-2 bg-gray-900/95 backdrop-blur-sm border-t border-gray-700/50 flex flex-col gap-0.5">
+        {/* Thin coloured accent line at the very top of the footer */}
+        <div
+          className="absolute left-0 right-0 h-px"
+          style={{
+            bottom: '100%',
+            background: selected
+              ? 'linear-gradient(90deg, transparent, #22c55e, transparent)'
+              : isDead
+              ? 'linear-gradient(90deg, transparent, #ef4444, transparent)'
+              : isMe
+              ? 'linear-gradient(90deg, transparent, #818cf8, transparent)'
+              : 'linear-gradient(90deg, transparent, #4b5563, transparent)',
+          }}
+        />
+
+        <p className="text-sm font-bold text-white truncate leading-tight text-center">
+          {player.username}
+          {isMe && <span className="text-indigo-400 font-normal text-xs"> · me</span>}
+        </p>
+
+        <p className={`text-[10px] font-semibold tracking-widest uppercase text-center ${isDead ? 'text-red-400' : 'text-green-400'}`}>
+          {isDead ? '● ELIMINATED' : '● ACTIVE'}
+        </p>
+      </div>
     </div>
   );
 };
