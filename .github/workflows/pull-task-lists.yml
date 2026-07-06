@@ -1,0 +1,27 @@
+name: Pull task lists from droplet
+
+on:
+  workflow_dispatch:
+
+jobs:
+  export-task-lists:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DROPLET_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.DROPLET_IP }} >> ~/.ssh/known_hosts
+
+      - name: Export task lists
+        run: |
+          mkdir -p export
+          ssh root@${{ secrets.DROPLET_IP }} 'cd /opt/amogus/server && tar -czf - task_lists' > export/task_lists.tgz
+
+      - name: Upload task lists artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: droplet-task-lists
+          path: export/task_lists.tgz
+          retention-days: 1
