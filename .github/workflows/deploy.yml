@@ -59,8 +59,18 @@ jobs:
             ./deploy/ root@${{ secrets.DROPLET_IP }}:/opt/amogus/deploy/
 
       - name: Restart application
+        env:
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
         run: |
-          ssh root@${{ secrets.DROPLET_IP }} << 'EOF'
+          ADMIN_PASSWORD_B64="$(printf '%s' "$ADMIN_PASSWORD" | base64 -w 0)"
+          ssh root@${{ secrets.DROPLET_IP }} "ADMIN_PASSWORD_B64='$ADMIN_PASSWORD_B64' bash -s" << 'EOF'
+            set -e
+            if [ -n "${ADMIN_PASSWORD_B64:-}" ]; then
+              install -d -m 0755 /etc/systemd/system/amogus.service.d
+              ADMIN_PASSWORD="$(printf '%s' "$ADMIN_PASSWORD_B64" | base64 -d)"
+              printf '[Service]\nEnvironment="ADMIN_PASSWORD=%s"\n' "$ADMIN_PASSWORD" > /etc/systemd/system/amogus.service.d/admin-password.conf
+              systemctl daemon-reload
+            fi
             # Ensure all Python dependencies are installed
             /opt/amogus/venv/bin/pip install -q flask flask-socketio flask-cors eventlet gunicorn soco
             systemctl restart amogus
