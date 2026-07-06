@@ -131,7 +131,7 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
           className={`max-w-2xl mx-auto ${highlightPlayers ? 'animate-pulse' : ''}`}
           style={highlightPlayers ? { borderRadius: '2rem', outline: '3px solid rgba(192,132,252,0.85)', outlineOffset: '4px', boxShadow: '0 0 30px rgba(192,132,252,0.4)' } : {}}
         >
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
             {players.map((player) => {
               const isMe = playerState?.player_id === player.player_id;
               const isDead = !player.alive;

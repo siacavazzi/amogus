@@ -47,8 +47,20 @@ const FAQS = [
         a: 'No. Sus Party is built for in-person play. Moving between rooms is the whole point. For remote social deduction, original Among Us or browser games like Werewords are better fits.',
     },
     {
+        q: 'Can you play Among Us in real life?',
+        a: "Yes. Playing Among Us in real life means running the same social deduction game — tasks, secret intruders, emergency meetings, voting — in a physical space like a house, apartment, dorm, or office. Sus Party handles all the coordination automatically from each player's phone. Read our full guide on how to play Among Us IRL.",
+    },
+    {
+        q: 'How many people do you need for Among Us IRL?',
+        a: 'Minimum five players, but eight to twelve is the sweet spot. With fewer than five the game is too predictable; above fifteen it can be hard to manage meetings. Sus Party supports five to fifteen players.',
+    },
+    {
+        q: 'What are good Among Us IRL tasks?',
+        a: 'Good tasks are short physical actions tied to a specific room — things like "count the forks in the drawer", "fill a glass of water", or "find the item with the earliest expiry in the fridge". The best tasks scatter players across the space so intruders have opportunities to strike. See our full Among Us IRL task ideas guide for 100+ examples.',
+    },
+    {
         q: 'Is Sus Party affiliated with Innersloth or Among Us?',
-        a: 'No. Sus Party is an independent fan-made party game inspired by Among Us. It is not affiliated with, endorsed by, or associated with Innersloth.',
+        a: 'No. Sus Party is an independent social deduction party game and is not affiliated with, endorsed by, or sponsored by Innersloth or Among Us.',
     },
 ];
 
@@ -118,8 +130,13 @@ function FaqPage() {
 
                     <footer className="info-footer">
                         <p>
-                            Still curious? Read the <a href="/how-to-play">full how-to-play guide</a> or{' '}
+                            Still curious? Read the{' '}
+                            <a href="/how-to-play">Sus Party host guide</a>,{' '}
+                            <a href="/how-to-play-among-us-irl">full Among Us IRL rules</a>, or{' '}
                             <a href="/">start a game</a>.
+                        </p>
+                        <p style={{ marginTop: 12, fontSize: '0.8rem', color: '#4b5563' }}>
+                            Sus Party is an independent social deduction party game and is not affiliated with, endorsed by, or sponsored by Innersloth or Among Us.
                         </p>
                     </footer>
                 </main>

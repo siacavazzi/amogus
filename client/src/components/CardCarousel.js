@@ -24,7 +24,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
     Zap, Clock, MapPin, Hand,
     Radiation, ClipboardX, Megaphone, Volume2, Ban, RefreshCw, FastForward,
-    Skull,
+    Skull, MessageSquare,
 } from 'lucide-react';
 
 const SWIPE_THRESHOLD_RATIO = 0.22; // fraction of width before commit
@@ -77,6 +77,13 @@ const CARD_THEMES = {
         dot:    'bg-orange-400',
         button: 'from-orange-700 to-orange-900 border-orange-400/60 shadow-orange-900/40',
     },
+    'Taunt Message': {
+        active: 'from-slate-800 via-slate-900 to-slate-950 border-fuchsia-400/70 shadow-fuchsia-900/40',
+        peek:   'from-slate-800 via-slate-900 to-slate-950 border-fuchsia-500/25',
+        icon:   'bg-fuchsia-400/15 ring-1 ring-fuchsia-300/30',
+        dot:    'bg-fuchsia-400',
+        button: 'from-fuchsia-700 to-fuchsia-900 border-fuchsia-400/60 shadow-fuchsia-900/40',
+    },
     'Area Denial': {
         active: 'from-slate-800 via-slate-900 to-slate-950 border-violet-400/70 shadow-violet-900/40',
         peek:   'from-slate-800 via-slate-900 to-slate-950 border-violet-500/25',
@@ -121,6 +128,7 @@ const ACTION_ICONS = {
     'Remote Sabotage': Radiation,
     'Self Report': Megaphone,
     'Taunt': Volume2,
+    'Taunt Message': MessageSquare,
     'Area Denial': Ban,
     'Discard and Draw': RefreshCw,
     'Shorten Meltdown': FastForward,
@@ -437,7 +445,7 @@ export default function CardCarousel({ cards, onPlayCard, compact = false, onAct
     // and ceiling) so on short screens the deck still fits below the
     // active effects panel instead of being pushed off-screen.
     const deckHeight = compact
-        ? 'flex-1 min-h-0'
+        ? 'flex-1 min-h-[180px] max-h-[420px]'
         : 'flex-1 min-h-[200px] max-h-[640px]';
 
     return (

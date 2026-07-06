@@ -17,7 +17,8 @@ const path = require('path');
 const handler = require('serve-handler');
 const puppeteer = require('puppeteer');
 
-const ROUTES = ['/', '/how-to-play', '/faq', '/about'];
+const seoRoutes = require('../src/seo/routes.json');
+const ROUTES = seoRoutes.filter((r) => r.prerender !== false).map((r) => r.path);
 const BUILD_DIR = path.resolve(__dirname, '..', 'build');
 const TIMEOUT_MS = 30000;
 

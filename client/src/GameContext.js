@@ -7,8 +7,10 @@ import MeetingDisplay from './components/MeetingDisplay';
 import MeltdownAvertedDisplay from './components/MeltdownAverted';
 import FakeTaskReveal from './components/FakeTaskReveal';
 import IntrudersRevealedDisplay from './components/IntrudersRevealedDisplay';
+import TauntNotification from './components/TauntNotification';
 import { markHasPlayedGame } from './tutorial/tutorialStorage';
 import { isMobile as isMobileDevice } from 'react-device-detect';
+import { getRoomCodeFromSearch } from './utils/inviteLinks';
 
 // Allow URL param override for testing: ?mobile=true or ?mobile=false
 const urlParams = new URLSearchParams(window.location.search);
@@ -172,6 +174,7 @@ export default function GameContext({ children }) {
     }, [message])
 
     const socketRef = useRef(null);
+    const autoJoinInviteRef = useRef(null);
 
     // Handle page visibility changes (mobile browser suspension/resume)
     useEffect(() => {
@@ -208,9 +211,33 @@ export default function GameContext({ children }) {
         socketRef.current.on('connect', () => {
             setConnected(true);
             // Try to rejoin existing game if we have a player_id
-            const playerId = localStorage.getItem('player_id');
-            const roomCode = localStorage.getItem('room_code');
-            if (playerId) {
+            let playerId = localStorage.getItem('player_id');
+            let roomCode = localStorage.getItem('room_code');
+            const inviteRoomCode = getRoomCodeFromSearch();
+
+            if (inviteRoomCode && inviteRoomCode !== roomCode) {
+                localStorage.removeItem('player_id');
+                localStorage.removeItem('room_code');
+                sessionStorage.removeItem('is_room_creator');
+                playerId = null;
+                roomCode = null;
+                setPlayerState({ username: '', playerId: '' });
+                setRoomCode('');
+                setInRoom(false);
+                setIsRoomCreator(false);
+                setRoomOpen(false);
+            }
+
+            if (inviteRoomCode && !playerId && autoJoinInviteRef.current !== inviteRoomCode) {
+                autoJoinInviteRef.current = inviteRoomCode;
+                // Remove the invite param immediately so reloads don't re-trigger this
+                const cleanUrl = window.location.pathname + window.location.hash;
+                window.history.replaceState(null, '', cleanUrl);
+                socketRef.current.emit('join_game', {
+                    room_code: inviteRoomCode,
+                    player_id: undefined,
+                });
+            } else if (playerId) {
                 socketRef.current.emit('rejoin', {
                     player_id: playerId,
                 });
@@ -252,6 +279,7 @@ export default function GameContext({ children }) {
             console.log('Setting isRoomCreator to:', isCreator);
             setRoomOpen(true);  // If we joined, the room must be open
             localStorage.setItem('room_code', data.room_code);
+            autoJoinInviteRef.current = null;
             
             // Desktop clients register as reactor
             if (!isMobile) {
@@ -276,13 +304,21 @@ export default function GameContext({ children }) {
 
         socketRef.current.on('error', (data) => {
             console.error('Socket error:', data);
+            const inviteRoomCode = autoJoinInviteRef.current;
             // Check if this is a "game/room not found" error - clear stale data
             const msg = (data.message || '').toLowerCase();
-            if (msg.includes('game not found') || msg.includes('not in a game room')) {
+            if (inviteRoomCode || msg.includes('game not found') || msg.includes('not in a game room')) {
                 localStorage.removeItem('player_id');
                 localStorage.removeItem('room_code');
                 sessionStorage.removeItem('is_room_creator');
                 resetGameState();
+            }
+            if (inviteRoomCode) {
+                autoJoinInviteRef.current = null;
+                // Ensure the param is gone even if the replaceState on attempt didn't fire
+                const cleanUrl = window.location.pathname + window.location.hash;
+                window.history.replaceState(null, '', cleanUrl);
+                isMobile && setDialog({ title: "Room Unavailable", body: data.message || "That room link is no longer available." });
             }
             // Only show the error dialog if we're actually still in a room.
             // Suppresses spurious "Game not found" errors that fire after the
@@ -307,6 +343,13 @@ export default function GameContext({ children }) {
             if(data.player === localStorage.getItem("player_id")) {
                 isMobile && setDialog({ title: "Message", body: data.message });
             }
+        });
+
+        socketRef.current.on('taunt_received', (data) => {
+            isMobile && setDialog({
+                title: "You've received a message...",
+                body: <TauntNotification message={data.message || ""} />
+            });
         });
 
         socketRef.current.on('end_game', (data) => {

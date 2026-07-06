@@ -10,6 +10,12 @@ function ActionCard({ action, text, location, duration, id, time_left, active = 
   }
 
   const formattedAction = action.replace('_', ' ');
+  const durationLabel = (() => {
+    if (!duration) return null;
+    if (countdown) return `${time_left}s left`;
+    if (active && action === 'Shorten Meltdown') return `Next meltdown -${duration}s`;
+    return `${duration}s`;
+  })();
 
   return (
     <button 
@@ -49,12 +55,10 @@ function ActionCard({ action, text, location, duration, id, time_left, active = 
           </div>
         )}
 
-        {duration && (
+        {durationLabel && (
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/30 text-sm">
             <Clock size={14} className="text-gray-300" />
-            <span className="text-gray-200">
-              {countdown ? `${time_left}s left` : `${duration}s`}
-            </span>
+            <span className="text-gray-200">{durationLabel}</span>
           </div>
         )}
       </div>
@@ -88,7 +92,7 @@ const ImposterPage = ({ setShowSusPage }) => {
     window.scrollTo(0, 0);
   }, []);
 
-  const activeCardsList = activeCards.filter((card) => !(card.time_left && card.time_left <= 0));
+  const activeCardsList = activeCards.filter((card) => card.time_left === undefined || card.time_left === null || card.time_left > 0);
 
   return (
     <div className="fixed inset-0 flex flex-col items-center p-4 pt-12 pb-32 bg-gradient-to-b from-red-950 via-red-900/90 to-gray-900 text-white overflow-y-auto">

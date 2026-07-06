@@ -106,6 +106,17 @@ export const mockActiveCards = [
         countdown: false,
         requires_input: true,
     },
+    {
+        id: 'card3',
+        action: 'Taunt Message',
+        text: 'Send a message to a crewmate',
+        location: null,
+        duration: null,
+        time_left: undefined,
+        active: false,
+        countdown: false,
+        requires_input: true,
+    },
 ];
 
 // Mock task locations

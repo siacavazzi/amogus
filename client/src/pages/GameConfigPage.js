@@ -1,6 +1,54 @@
 import React, { useState, useContext, useEffect, useRef, useMemo } from 'react';
 import { DataContext } from '../GameContext';
-import { Users, Play, ChevronDown, ChevronUp, List, Download, Trash2, Check, LogOut, MapPin, Settings, ArrowRight, ArrowLeft, X, Zap, Copy, Sparkles } from 'lucide-react';
+import { Users, Play, ChevronDown, ChevronUp, List, Download, Trash2, Check, LogOut, MapPin, Settings, ArrowRight, ArrowLeft, X, Zap, Copy, Sparkles, Minus, Plus } from 'lucide-react';
+
+const DEFAULT_CARD_DECK_COUNTS = {
+    self_report: 4,
+    emp: 4,
+    fake_task: 6,
+    taunt_message: 6,
+    remote_sabotage: 3,
+    shorten_meltdown: 3,
+    area_denial_per_location: 2,
+};
+
+const CARD_DECK_PRESETS = [
+    {
+        key: 'default',
+        label: 'Default',
+        description: 'The normal mixed sabotage deck.',
+    },
+    {
+        key: 'fake_task_chaos',
+        label: 'Fake Task Chaos',
+        description: 'Only fake task cards. Maximum nonsense.',
+    },
+    {
+        key: 'sabotage_heavy',
+        label: 'Sabotage Heavy',
+        description: 'More EMP, Area Denial, and reactor pressure.',
+    },
+    {
+        key: 'no_reactor_cards',
+        label: 'No Reactor Cards',
+        description: 'A mixed deck without meltdown cards.',
+    },
+    {
+        key: 'custom',
+        label: 'Custom',
+        description: 'Set exact card counts manually.',
+    },
+];
+
+const CARD_COUNT_CONTROLS = [
+    { key: 'self_report', label: 'Self Report', description: 'Call a body-found meeting.' },
+    { key: 'emp', label: 'EMP', description: 'Temporarily disable player devices.' },
+    { key: 'fake_task', label: 'Fake Task', description: 'Send fake tasks to crewmates.' },
+    { key: 'taunt_message', label: 'Taunt Message', description: 'Send anonymous taunts to crewmates.' },
+    { key: 'remote_sabotage', label: 'Remote Sabotage', description: 'Trigger reactor meltdown remotely.' },
+    { key: 'shorten_meltdown', label: 'Shorten Meltdown', description: 'Reduce the next meltdown timer.' },
+    { key: 'area_denial_per_location', label: 'Area Denial / Location', description: 'Cards created for each enabled location.' },
+];
 
 // Floating particle component
 const FloatingParticle = ({ delay, duration, size, left, color }) => (
@@ -58,6 +106,8 @@ function GameConfigPage() {
         card_draw_probability: 1,
         starting_cards: 2,
         task_ratio: 10,
+        card_deck_preset: 'default',
+        card_deck_counts: DEFAULT_CARD_DECK_COUNTS,
     });
     
     const [showAdvanced, setShowAdvanced] = useState(false);
@@ -98,7 +148,16 @@ function GameConfigPage() {
 
         const handleConfig = (data) => {
             console.log('Received game config:', data);
-            setConfig(data);
+            setConfig((prev) => ({
+                ...prev,
+                ...data,
+                card_deck_preset: data.card_deck_preset || prev.card_deck_preset || 'default',
+                card_deck_counts: {
+                    ...DEFAULT_CARD_DECK_COUNTS,
+                    ...(prev.card_deck_counts || {}),
+                    ...(data.card_deck_counts || {}),
+                },
+            }));
 
             if (pendingRoomOpenRef.current) {
                 pendingRoomOpenRef.current = false;
@@ -189,6 +248,29 @@ function GameConfigPage() {
 
     const updateConfig = (key, value) => {
         setConfig(prev => ({ ...prev, [key]: value }));
+    };
+
+    const selectCardDeckPreset = (preset) => {
+        setConfig(prev => ({
+            ...prev,
+            card_deck_preset: preset,
+            card_deck_counts: prev.card_deck_counts || DEFAULT_CARD_DECK_COUNTS,
+        }));
+    };
+
+    const updateCardDeckCount = (key, delta) => {
+        setConfig(prev => {
+            const counts = {
+                ...DEFAULT_CARD_DECK_COUNTS,
+                ...(prev.card_deck_counts || {}),
+            };
+            counts[key] = Math.max(0, Math.min(30, (counts[key] || 0) + delta));
+            return {
+                ...prev,
+                card_deck_preset: 'custom',
+                card_deck_counts: counts,
+            };
+        });
     };
 
     // Task list handlers
@@ -316,6 +398,34 @@ function GameConfigPage() {
             {description && (
                 <p className="text-gray-500 text-xs mt-1.5">{description}</p>
             )}
+        </div>
+    );
+
+    const CountStepper = ({ label, description, value, onDecrease, onIncrease }) => (
+        <div className="flex items-center justify-between gap-3 py-3 border-b border-gray-800/50 last:border-b-0">
+            <div className="min-w-0">
+                <div className="text-gray-300 text-sm font-medium">{label}</div>
+                <div className="text-gray-500 text-xs mt-0.5">{description}</div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+                <button
+                    type="button"
+                    onClick={onDecrease}
+                    aria-label={`Decrease ${label}`}
+                    className="w-9 h-9 rounded-lg bg-gray-800/80 border border-gray-700 text-gray-300 hover:bg-gray-700 flex items-center justify-center"
+                >
+                    <Minus size={16} />
+                </button>
+                <span className="w-10 text-center text-indigo-300 font-mono font-bold">{value}</span>
+                <button
+                    type="button"
+                    onClick={onIncrease}
+                    aria-label={`Increase ${label}`}
+                    className="w-9 h-9 rounded-lg bg-gray-800/80 border border-gray-700 text-gray-300 hover:bg-gray-700 flex items-center justify-center"
+                >
+                    <Plus size={16} />
+                </button>
+            </div>
         </div>
     );
 
@@ -629,6 +739,67 @@ function GameConfigPage() {
                                 <Sparkles size={16} className="text-purple-400" />
                                 Intruder Cards
                             </h3>
+
+                            <div className="mb-5">
+                                <div className="flex justify-between items-center mb-2">
+                                    <label className="text-gray-300 text-sm font-medium">Card Deck</label>
+                                    <span className="text-purple-400 text-xs font-bold uppercase tracking-wide">
+                                        {(config.card_deck_preset || 'default').replace(/_/g, ' ')}
+                                    </span>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    {CARD_DECK_PRESETS.map((preset) => {
+                                        const active = (config.card_deck_preset || 'default') === preset.key;
+                                        return (
+                                            <button
+                                                key={preset.key}
+                                                type="button"
+                                                onClick={() => selectCardDeckPreset(preset.key)}
+                                                className={`text-left p-3 rounded-lg border transition-all ${
+                                                    active
+                                                        ? 'bg-purple-500/15 border-purple-400/60 shadow-lg shadow-purple-900/20'
+                                                        : 'bg-gray-800/40 border-gray-700/60 hover:bg-gray-800/70 hover:border-gray-600'
+                                                }`}
+                                            >
+                                                <div className="text-sm font-bold text-gray-100">{preset.label}</div>
+                                                <div className="text-xs text-gray-500 mt-1 leading-snug">{preset.description}</div>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                                <p className="text-gray-500 text-xs mt-2">
+                                    Default preserves the normal deck. Custom lets you set exact counts.
+                                </p>
+                            </div>
+
+                            {(config.card_deck_preset || 'default') === 'custom' && (
+                                <div className="mb-5 bg-gray-950/40 border border-gray-800/80 rounded-lg p-3">
+                                    <div className="flex items-center justify-between mb-1">
+                                        <div className="text-gray-300 text-sm font-medium">Custom Card Counts</div>
+                                        <div className="text-gray-500 text-xs">0-30 each</div>
+                                    </div>
+                                    <p className="text-gray-500 text-xs mb-2">
+                                        Reactor cards are ignored when no reactor is connected. Area Denial count is per location.
+                                    </p>
+                                    {CARD_COUNT_CONTROLS.map((cardControl) => {
+                                        const counts = {
+                                            ...DEFAULT_CARD_DECK_COUNTS,
+                                            ...(config.card_deck_counts || {}),
+                                        };
+                                        return (
+                                            <CountStepper
+                                                key={cardControl.key}
+                                                label={cardControl.label}
+                                                description={cardControl.description}
+                                                value={counts[cardControl.key] || 0}
+                                                onDecrease={() => updateCardDeckCount(cardControl.key, -1)}
+                                                onIncrease={() => updateCardDeckCount(cardControl.key, 1)}
+                                            />
+                                        );
+                                    })}
+                                </div>
+                            )}
+
                             <SliderInput
                                 label="Starting Cards"
                                 value={config.starting_cards}

@@ -108,6 +108,32 @@ describe('IntruderPage', () => {
             // Should show modal for selecting target player and task details
             expect(screen.getByText(/Send Fake Task/i)).toBeInTheDocument();
         });
+
+        it('opens taunt modal and emits taunt card payload', () => {
+            const { contextValue } = renderWithContext(
+                <IntruderPage setShowSusPage={mockSetShowSusPage} />,
+                intruderContext
+            );
+
+            const tauntCard = screen.getByText(/Taunt Message/i).closest('button');
+            fireEvent.click(tauntCard);
+
+            expect(screen.getByRole('heading', { name: /Send Taunt/i })).toBeInTheDocument();
+
+            fireEvent.change(screen.getByRole('combobox'), { target: { value: 'player1' } });
+            fireEvent.change(screen.getByPlaceholderText(/You walked right past me/i), {
+                target: { value: 'Nice task route.' }
+            });
+            fireEvent.click(screen.getByRole('button', { name: /Send Taunt/i }));
+
+            expect(contextValue.socket.emit).toHaveBeenCalledWith('play_card', expect.objectContaining({
+                card_id: 'card3',
+                extra_data: {
+                    target_player_id: 'player1',
+                    message: 'Nice task route.'
+                }
+            }));
+        });
     });
 
     describe('Active Cards Display', () => {
@@ -162,6 +188,33 @@ describe('IntruderPage', () => {
             
             // Should not show the expired card
             expect(screen.queryByText(/Hack/i)).not.toBeInTheDocument();
+            expect(screen.queryByText(/Active Effects/i)).not.toBeInTheDocument();
+        });
+
+        it('shows shorten meltdown as a pending modifier, not a countdown', () => {
+            const shortenMeltdownContext = {
+                ...intruderContext,
+                activeCards: [
+                    {
+                        id: 'shorten1',
+                        action: 'Shorten Meltdown',
+                        text: 'Reduce the amount of time players have to stop the next meltdown',
+                        location: null,
+                        duration: 15,
+                        time_left: 15,
+                        countdown: false,
+                        requires_input: false,
+                    },
+                ],
+            };
+
+            renderWithContext(
+                <IntruderPage setShowSusPage={mockSetShowSusPage} />,
+                shortenMeltdownContext
+            );
+
+            expect(screen.getByText(/Next meltdown -15s/i)).toBeInTheDocument();
+            expect(screen.queryByText(/15s left/i)).not.toBeInTheDocument();
         });
     });
 

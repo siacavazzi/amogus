@@ -7,10 +7,14 @@ import TutorialPage from './pages/tutorial/TutorialPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import FaqPage from './pages/info/FaqPage';
 import AboutPage from './pages/info/AboutPage';
+import AmongUsIrlPage from './pages/seo/AmongUsIrlPage';
+import HowToPlayIrlPage from './pages/seo/HowToPlayIrlPage';
+import TaskIdeasPage from './pages/seo/TaskIdeasPage';
+import TaskGeneratorPage from './pages/seo/TaskGeneratorPage';
+import { getRoomCodeFromSearch } from './utils/inviteLinks';
 
 function getRoute() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const roomCode = urlParams.get('room');
+  const roomCode = getRoomCodeFromSearch();
   const normalizedPath = window.location.pathname.replace(/\/+$/, '') || '/';
 
   if (
@@ -35,6 +39,22 @@ function getRoute() {
 
   if (normalizedPath === '/about' || normalizedPath.startsWith('/about/')) {
     return 'about';
+  }
+
+  if (normalizedPath === '/among-us-irl' || normalizedPath.startsWith('/among-us-irl/')) {
+    return 'among-us-irl';
+  }
+
+  if (normalizedPath === '/how-to-play-among-us-irl' || normalizedPath.startsWith('/how-to-play-among-us-irl/')) {
+    return 'how-to-play-irl';
+  }
+
+  if (normalizedPath === '/among-us-irl-task-ideas' || normalizedPath.startsWith('/among-us-irl-task-ideas/')) {
+    return 'task-ideas';
+  }
+
+  if (normalizedPath === '/among-us-irl-task-generator' || normalizedPath.startsWith('/among-us-irl-task-generator/')) {
+    return 'task-generator';
   }
 
   if (normalizedPath === '/dashboard' || normalizedPath.startsWith('/dashboard/')) {
@@ -69,6 +89,22 @@ function App() {
 
   if (route === 'about') {
     return <AboutPage />;
+  }
+
+  if (route === 'among-us-irl') {
+    return <AmongUsIrlPage />;
+  }
+
+  if (route === 'how-to-play-irl') {
+    return <HowToPlayIrlPage />;
+  }
+
+  if (route === 'task-ideas') {
+    return <TaskIdeasPage />;
+  }
+
+  if (route === 'task-generator') {
+    return <TaskGeneratorPage />;
   }
 
   if (route === 'dashboard') {

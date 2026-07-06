@@ -232,7 +232,11 @@ function LandingPage() {
                     </p>
 
                     <p className="lp-seo__cta">
-                        <a href="/how-to-play" className="lp-seo__link">Read the full how-to-play guide →</a>
+                        <a href="/among-us-irl" className="lp-seo__link">Among Us IRL guide →</a>
+                        {' · '}
+                        <a href="/among-us-irl-task-ideas" className="lp-seo__link">Task ideas →</a>
+                        {' · '}
+                        <a href="/how-to-play" className="lp-seo__link">How to play →</a>
                     </p>
                 </div>
             </section>
@@ -259,6 +263,9 @@ function LandingPage() {
                             <a className="lp-link" href="https://github.com/siacavazzi" target="_blank" rel="noreferrer noopener">
                                 @siacavazzi
                             </a>
+                        </p>
+                        <p className="lp-footer__line lp-footer__line--muted" style={{ fontSize: '0.75rem', marginTop: 8 }}>
+                            Sus Party is an independent social deduction party game and is not affiliated with, endorsed by, or sponsored by Innersloth or Among Us.
                         </p>
                     </div>
                 </div>

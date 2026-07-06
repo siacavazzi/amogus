@@ -35,6 +35,8 @@ class Game:
         self.locations = locations
         self.active_cards = []
         self.card_draw_probability = card_draw_probability
+        self.card_deck_preset = 'default'
+        self.card_deck_counts = DEFAULT_CARD_DECK_COUNTS.copy()
 
         # Tasks per player
         self.task_ratio = task_ratio
@@ -83,7 +85,9 @@ class Game:
             'cards_played': 0,
             'meltdowns_triggered': 0,
             'tasks_completed': 0,
+            'fake_tasks_sent': [],  # List of {sender_name, target_name, task_text, task_location}
             'fake_tasks_completed': [],  # List of {player_name, task_text}
+            'taunts_sent': [],  # List of {sender_name, target_name, message}
         }
         
         # Create card deck after has_reactor is set
@@ -101,10 +105,16 @@ class Game:
             'card_draw_probability': self.card_draw_probability,
             'starting_cards': self.starting_cards,
             'task_ratio': self.task_ratio,
+            'card_deck_preset': self.card_deck_preset,
+            'card_deck_counts': self.card_deck_counts.copy(),
+            'card_deck_count_keys': CARD_DECK_COUNT_KEYS,
+            'card_deck_presets': get_available_card_deck_presets(),
         }
 
     def update_config(self, config):
         """Update game configuration from a dict."""
+        rebuild_card_deck = False
+
         if 'locations' in config:
             self.locations = config['locations'].copy()
             if 'Other' not in self.locations:
@@ -114,8 +124,15 @@ class Game:
             # Otherwise we'd lose the loaded task list!
             if not self.task_list_applied:
                 self.task_handler.reset()  # Reload tasks with new locations
-            # Rebuild card deck with new locations
-            self.card_deck = CardDeck(self.locations, self.socket, self)
+            rebuild_card_deck = True
+
+        if 'card_deck_preset' in config:
+            self.card_deck_preset = sanitize_card_deck_preset(config['card_deck_preset'])
+            rebuild_card_deck = True
+
+        if 'card_deck_counts' in config:
+            self.card_deck_counts = sanitize_card_deck_counts(config['card_deck_counts'])
+            rebuild_card_deck = True
         
         if 'vote_time' in config:
             self.vote_time = int(config['vote_time'])
@@ -135,18 +152,23 @@ class Game:
         if 'task_ratio' in config:
             self.task_ratio = int(config['task_ratio'])
 
+        if rebuild_card_deck:
+            self.card_deck = CardDeck(self.locations, self.socket, self)
+
     def emit_to_room(self, event, data=None):
         """Emit an event to all players in this game's room."""
         self.last_activity = time.time()
 
         # Fire end-of-game stats callback once when the game ends
         if event == 'end_game' and not self._stats_recorded:
-            self._stats_recorded = True
             if self.on_end_callback:
                 try:
                     self.on_end_callback(self)
                 except Exception:
+                    self._stats_recorded = True
                     pass
+            else:
+                self._stats_recorded = True
 
         if self.room_code:
             if data is not None:
@@ -162,12 +184,15 @@ class Game:
 
     def start_meltdown(self):
         self.stats['meltdowns_triggered'] += 1
-        self.speaker.loop_sound("meltdown", self.meltdown_time - self.meltdown_time_mod)
-        self.active_meltdown = Meltdown(self.players, self.meltdown_time - self.meltdown_time_mod, self.socket, self.speaker, self.code_percent)
+        meltdown_duration = max(self.meltdown_time - self.meltdown_time_mod, 1)
+        self.speaker.loop_sound("meltdown", meltdown_duration)
+        self.active_meltdown = Meltdown(self.players, meltdown_duration, self.socket, self.speaker, self.code_percent)
         self.meltdown_time_mod = 0
-        for card in self.active_cards:
-            if card.action == 'reduce_meltdown':
-                self.active_cards.remove(card)
+        self.card_deck.active_cards = [
+            card for card in self.card_deck.active_cards
+            if card.action != 'Shorten Meltdown'
+        ]
+        self.card_deck.emit_active_cards()
         self.active_meltdown.game = self
         self.active_meltdown.start_countdown()
 
@@ -288,7 +313,9 @@ class Game:
         for i in range(0, self.numIntruders):
             self.players[i].sus = True
             for _ in range(0, self.starting_cards):
-                self.players[i].cards.append(self.card_deck.draw_card())
+                card = self.card_deck.draw_card()
+                if card:
+                    self.players[i].cards.append(card)
 
         random.shuffle(self.players)
         print("assigning roles...")

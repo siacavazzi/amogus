@@ -1,0 +1,58 @@
+[
+  {
+    "path": "/",
+    "canonical": "https://susparty.com/",
+    "priority": "1.0",
+    "changefreq": "weekly",
+    "prerender": true
+  },
+  {
+    "path": "/among-us-irl",
+    "canonical": "https://susparty.com/among-us-irl",
+    "priority": "0.95",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
+    "path": "/how-to-play-among-us-irl",
+    "canonical": "https://susparty.com/how-to-play-among-us-irl",
+    "priority": "0.9",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
+    "path": "/among-us-irl-task-ideas",
+    "canonical": "https://susparty.com/among-us-irl-task-ideas",
+    "priority": "0.9",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
+    "path": "/among-us-irl-task-generator",
+    "canonical": "https://susparty.com/among-us-irl-task-generator",
+    "priority": "0.85",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
+    "path": "/how-to-play",
+    "canonical": "https://susparty.com/how-to-play",
+    "priority": "0.8",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
+    "path": "/faq",
+    "canonical": "https://susparty.com/faq",
+    "priority": "0.75",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
+    "path": "/about",
+    "canonical": "https://susparty.com/about",
+    "priority": "0.5",
+    "changefreq": "yearly",
+    "prerender": true
+  }
+]

@@ -2,7 +2,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { DataContext } from '../GameContext';
 import LeaveGameButton from '../components/LeaveGameButton';
-import { LogOut, Zap, Clock, MapPin, AlertTriangle, Eye, X, Send, Users, FileText } from 'lucide-react';
+import { LogOut, Zap, Clock, MapPin, AlertTriangle, Eye, X, Send, Users, FileText, MessageSquare } from 'lucide-react';
 import { StatusBadge, PrimaryButton } from '../components/ui';
 import { Card } from '../components/ui';
 import CardCarousel from '../components/CardCarousel';
@@ -14,6 +14,12 @@ function ActionCard({ action, text, location, duration, id, time_left, active = 
   }
 
   const formattedAction = action.replace('_', ' ');
+  const durationLabel = (() => {
+    if (!duration) return null;
+    if (countdown) return `${time_left}s left`;
+    if (active && action === 'Shorten Meltdown') return `Next meltdown -${duration}s`;
+    return `${duration}s`;
+  })();
 
   return (
     <button 
@@ -53,12 +59,10 @@ function ActionCard({ action, text, location, duration, id, time_left, active = 
           </div>
         )}
 
-        {duration && (
+        {durationLabel && (
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/30 text-sm">
             <Clock size={14} className="text-gray-300" />
-            <span className="text-gray-200">
-              {countdown ? `${time_left}s left` : `${duration}s`}
-            </span>
+            <span className="text-gray-200">{durationLabel}</span>
           </div>
         )}
       </div>
@@ -99,6 +103,8 @@ const IntruderPage = ({
   const [targetPlayerId, setTargetPlayerId] = useState('');
   const [fakeTaskText, setFakeTaskText] = useState('');
   const [fakeTaskLocation, setFakeTaskLocation] = useState('');
+  const [showTauntModal, setShowTauntModal] = useState(false);
+  const [tauntMessage, setTauntMessage] = useState('');
 
   // Get list of alive crewmates (non-intruders)
   const aliveCrewmates = players.filter(p => p.alive && !p.sus);
@@ -114,6 +120,11 @@ const IntruderPage = ({
       setFakeTaskText('');
       setFakeTaskLocation(availableLocations[0] || 'Other');
       setShowFakeTaskModal(true);
+    } else if (requires_input && action === 'Taunt Message') {
+      setSelectedCardId(id);
+      setTargetPlayerId('');
+      setTauntMessage('');
+      setShowTauntModal(true);
     } else {
       // Normal card play
       socket.emit('play_card', { player_id: localStorage.getItem('player_id'), card_id: id });
@@ -139,6 +150,24 @@ const IntruderPage = ({
     setSelectedCardId(null);
   }
 
+  function sendTaunt() {
+    if (!targetPlayerId || !tauntMessage.trim()) {
+      return;
+    }
+
+    socket.emit('play_card', {
+      player_id: localStorage.getItem('player_id'),
+      card_id: selectedCardId,
+      extra_data: {
+        target_player_id: targetPlayerId,
+        message: tauntMessage.trim()
+      }
+    });
+
+    setShowTauntModal(false);
+    setSelectedCardId(null);
+  }
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -154,7 +183,7 @@ const IntruderPage = ({
     }
   }, [intrudersRevealed, setShowSusPage]);
 
-  const activeCardsList = activeCards.filter((card) => !(card.time_left && card.time_left <= 0));
+  const activeCardsList = activeCards.filter((card) => card.time_left === undefined || card.time_left === null || card.time_left > 0);
 
   return (
     <div className="fixed inset-0 flex flex-col items-center p-3 pt-10 pb-24 bg-gradient-to-b from-red-700 via-red-900 to-red-950 text-white overflow-hidden">
@@ -256,6 +285,83 @@ const IntruderPage = ({
               >
                 <Send size={18} />
                 Send Task
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Taunt Modal */}
+      {showTauntModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80">
+          <div className="w-full max-w-md bg-gray-800 rounded-2xl border-2 border-orange-500 overflow-hidden">
+            <div className="flex items-center justify-between p-4 bg-orange-900/50 border-b border-orange-500/50">
+              <div className="flex items-center gap-2">
+                <MessageSquare size={20} className="text-orange-300" />
+                <h3 className="text-lg font-bold text-white">Send Taunt</h3>
+              </div>
+              <button
+                onClick={() => setShowTauntModal(false)}
+                className="p-2 rounded-lg hover:bg-orange-800/50 transition-colors"
+              >
+                <X size={20} className="text-gray-400" />
+              </button>
+            </div>
+
+            <div className="p-4 space-y-4">
+              <div>
+                <label className="flex items-center gap-2 text-sm text-gray-300 mb-2">
+                  <Users size={16} />
+                  Select Target Crewmate
+                </label>
+                <select
+                  value={targetPlayerId}
+                  onChange={(e) => setTargetPlayerId(e.target.value)}
+                  className="w-full p-3 bg-gray-700 border border-gray-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                >
+                  <option value="">Choose a crewmate...</option>
+                  {aliveCrewmates.map((player) => (
+                    <option key={player.player_id} value={player.player_id}>
+                      {player.username}
+                    </option>
+                  ))}
+                </select>
+                {aliveCrewmates.length === 0 && (
+                  <p className="text-orange-400 text-sm mt-1">No alive crewmates to target!</p>
+                )}
+              </div>
+
+              <div>
+                <label className="flex items-center gap-2 text-sm text-gray-300 mb-2">
+                  <MessageSquare size={16} />
+                  Taunt Message
+                </label>
+                <textarea
+                  value={tauntMessage}
+                  onChange={(e) => setTauntMessage(e.target.value)}
+                  placeholder="e.g., You walked right past me."
+                  className="w-full p-3 bg-gray-700 border border-gray-600 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
+                  rows={3}
+                  maxLength={200}
+                />
+                <p className="text-gray-500 text-xs mt-1 text-right">{tauntMessage.length}/200</p>
+              </div>
+            </div>
+
+            <div className="p-4 bg-gray-900/50 border-t border-gray-700 flex gap-3">
+              <button
+                onClick={() => setShowTauntModal(false)}
+                className="flex-1 py-3 px-4 bg-gray-700 text-white rounded-xl font-medium hover:bg-gray-600 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={sendTaunt}
+                disabled={!targetPlayerId || !tauntMessage.trim()}
+                className="flex-1 py-3 px-4 bg-orange-600 text-white rounded-xl font-bold hover:bg-orange-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                <Send size={18} />
+                Send Taunt
               </button>
             </div>
           </div>

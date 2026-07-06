@@ -1,8 +1,9 @@
 import React, { useState, useContext, useEffect, useRef, useMemo } from 'react';
 import { DataContext } from '../GameContext';
 import PlayerCard from '../components/PlayerCard';
-import { Plus, X, Check, Send, MapPin, Copy, Save, Play, LogOut, Users, ClipboardList, ToggleLeft, ToggleRight, Pencil, Zap, Wifi } from 'lucide-react';
+import { Plus, X, Check, Send, MapPin, Copy, Save, Play, LogOut, Users, ClipboardList, ToggleLeft, ToggleRight, Pencil, Zap, Wifi, Share2 } from 'lucide-react';
 import { FloatingParticles, useFloatingParticles, GlowingOrb, GridOverlay } from '../components/ui';
+import { buildRoomInviteUrl } from '../utils/inviteLinks';
 
 function sameLocations(left, right) {
     return left.length === right.length && left.every((location, index) => location === right[index]);
@@ -54,6 +55,7 @@ function PreGamePage() {
     const [isSaving, setIsSaving] = useState(false);
     const [codeCopied, setCodeCopied] = useState(false);
     const [roomCodeCopied, setRoomCodeCopied] = useState(false);
+    const [inviteShared, setInviteShared] = useState(false);
     const [isTaskListOwner, setIsTaskListOwner] = useState(true); // Track if user owns the loaded task list
     const deviceId = useRef(getDeviceId()).current;
     const autoSaveTimeoutRef = useRef(null);
@@ -384,6 +386,42 @@ function PreGamePage() {
         }
     };
 
+    const copyInviteLink = async (inviteUrl) => {
+        await navigator.clipboard.writeText(inviteUrl);
+        setInviteShared(true);
+        setTimeout(() => setInviteShared(false), 2000);
+    };
+
+    const shareInviteLink = async () => {
+        const inviteUrl = buildRoomInviteUrl(roomCode);
+        if (!inviteUrl) return;
+
+        const shareData = {
+            title: 'Join my Sus Party room',
+            text: `Join my Sus Party room ${roomCode}`,
+            url: inviteUrl,
+        };
+
+        try {
+            if (navigator.share) {
+                await navigator.share(shareData);
+                setInviteShared(true);
+                setTimeout(() => setInviteShared(false), 2000);
+                return;
+            }
+            await copyInviteLink(inviteUrl);
+        } catch (err) {
+            if (err?.name === 'AbortError') {
+                return;
+            }
+            try {
+                await copyInviteLink(inviteUrl);
+            } catch (copyErr) {
+                console.error('Failed to share invite:', err, copyErr);
+            }
+        }
+    };
+
     const handleLeaveRoom = () => {
         if (window.confirm('Are you sure you want to leave this room?')) {
             socket.emit('leave_room', { player_id: playerId });
@@ -456,49 +494,76 @@ function PreGamePage() {
                     
                 {/* Room Code Display */}
                 {roomCode && (
-                    <div className="flex justify-center mb-6">
-                        <div className="bg-gray-900/80 backdrop-blur-xl border border-gray-800/80 rounded-2xl px-6 py-4 flex items-center gap-4">
-                            {/* Live indicator */}
-                            <div className="flex items-center gap-2">
-                                <div className="relative">
-                                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                    <div className="absolute inset-0 w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
+                    <div className="mb-4">
+                        {/* Code bar */}
+                        <div className="flex justify-center mb-3">
+                            <div className="bg-gray-900/80 backdrop-blur-xl border border-gray-800/80 rounded-2xl px-5 py-3 flex items-center gap-3">
+                                {/* Live indicator */}
+                                <div className="flex items-center gap-2">
+                                    <div className="relative">
+                                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                        <div className="absolute inset-0 w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
+                                    </div>
+                                    <span className="text-green-400 text-xs font-medium uppercase tracking-wider">Live</span>
                                 </div>
-                                <span className="text-green-400 text-xs font-medium uppercase tracking-wider">Live</span>
+                                
+                                <div className="w-px h-6 bg-gray-700"></div>
+                                
+                                {/* Room code */}
+                                <div className="flex items-center gap-2">
+                                    <span className="text-gray-500 text-sm">Room</span>
+                                    <span className="text-2xl font-mono font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent tracking-widest">
+                                        {roomCode}
+                                    </span>
+                                </div>
+                                
+                                <button
+                                    onClick={copyRoomCode}
+                                    className="p-1.5 hover:bg-gray-800 rounded-xl transition-all group"
+                                    title="Copy room code"
+                                    aria-label="Copy room code"
+                                >
+                                    {roomCodeCopied ? (
+                                        <Check className="text-green-400" size={16} />
+                                    ) : (
+                                        <Copy className="text-gray-500 group-hover:text-indigo-400 transition-colors" size={16} />
+                                    )}
+                                </button>
+
+                                <div className="w-px h-6 bg-gray-700"></div>
+                                
+                                <button
+                                    onClick={handleLeaveRoom}
+                                    className="p-1.5 hover:bg-red-500/10 rounded-xl transition-all group"
+                                    title="Leave room"
+                                >
+                                    <LogOut className="text-gray-500 group-hover:text-red-400 transition-colors" size={16} />
+                                </button>
                             </div>
-                            
-                            <div className="w-px h-8 bg-gray-700"></div>
-                            
-                            {/* Room code */}
-                            <div className="flex items-center gap-3">
-                                <span className="text-gray-500 text-sm">Room</span>
-                                <span className="text-2xl font-mono font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent tracking-widest">
-                                    {roomCode}
-                                </span>
-                            </div>
-                            
-                            <button
-                                onClick={copyRoomCode}
-                                className="p-2 hover:bg-gray-800 rounded-xl transition-all group"
-                                title="Copy room code"
-                            >
-                                {roomCodeCopied ? (
-                                    <Check className="text-green-400" size={18} />
-                                ) : (
-                                    <Copy className="text-gray-500 group-hover:text-indigo-400 transition-colors" size={18} />
-                                )}
-                            </button>
-                            
-                            <div className="w-px h-8 bg-gray-700"></div>
-                            
-                            <button
-                                onClick={handleLeaveRoom}
-                                className="p-2 hover:bg-red-500/10 rounded-xl transition-all group"
-                                title="Leave room"
-                            >
-                                <LogOut className="text-gray-500 group-hover:text-red-400 transition-colors" size={18} />
-                            </button>
                         </div>
+
+                        {/* Prominent invite button */}
+                        <button
+                            onClick={shareInviteLink}
+                            className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-2xl font-semibold transition-all text-sm
+                                bg-gradient-to-r from-indigo-600 to-purple-600 text-white
+                                hover:from-indigo-500 hover:to-purple-500
+                                active:scale-[0.98]
+                                shadow-lg shadow-indigo-900/40"
+                            aria-label="Invite players to room"
+                        >
+                            {inviteShared ? (
+                                <>
+                                    <Check size={18} />
+                                    Link copied!
+                                </>
+                            ) : (
+                                <>
+                                    <Share2 size={18} />
+                                    Invite Players
+                                </>
+                            )}
+                        </button>
                     </div>
                 )}
 
@@ -534,7 +599,7 @@ function PreGamePage() {
                 {activeTab === 'players' && (
                     <>
                         {/* Players Grid - 2 columns on mobile */}
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+                        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3">
                             {players.map((player, index) => (
                                 <div 
                                     key={player.id}

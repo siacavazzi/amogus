@@ -5,6 +5,94 @@ import time
 from threading import Thread
 from assets.utils import *
 
+CARD_DECK_PRESET_DEFAULT = 'default'
+CARD_DECK_PRESET_CUSTOM = 'custom'
+CARD_COUNT_MAX = 30
+
+CARD_DECK_COUNT_KEYS = [
+    'self_report',
+    'emp',
+    'fake_task',
+    'taunt_message',
+    'remote_sabotage',
+    'shorten_meltdown',
+    'area_denial_per_location',
+]
+
+DEFAULT_CARD_DECK_COUNTS = {
+    'self_report': 4,
+    'emp': 4,
+    'fake_task': 6,
+    'taunt_message': 6,
+    'remote_sabotage': 3,
+    'shorten_meltdown': 3,
+    'area_denial_per_location': 2,
+}
+
+CARD_DECK_PRESETS = {
+    CARD_DECK_PRESET_DEFAULT: DEFAULT_CARD_DECK_COUNTS,
+    'fake_task_chaos': {
+        'self_report': 0,
+        'emp': 0,
+        'fake_task': 24,
+        'taunt_message': 0,
+        'remote_sabotage': 0,
+        'shorten_meltdown': 0,
+        'area_denial_per_location': 0,
+    },
+    'sabotage_heavy': {
+        'self_report': 0,
+        'emp': 8,
+        'fake_task': 0,
+        'taunt_message': 0,
+        'remote_sabotage': 6,
+        'shorten_meltdown': 6,
+        'area_denial_per_location': 3,
+    },
+    'no_reactor_cards': {
+        'self_report': 4,
+        'emp': 4,
+        'fake_task': 6,
+        'taunt_message': 6,
+        'remote_sabotage': 0,
+        'shorten_meltdown': 0,
+        'area_denial_per_location': 2,
+    },
+}
+
+
+def sanitize_card_deck_preset(preset):
+    if preset in CARD_DECK_PRESETS or preset == CARD_DECK_PRESET_CUSTOM:
+        return preset
+    return CARD_DECK_PRESET_DEFAULT
+
+
+def sanitize_card_deck_counts(counts):
+    sanitized = DEFAULT_CARD_DECK_COUNTS.copy()
+    if not isinstance(counts, dict):
+        return sanitized
+
+    for key in CARD_DECK_COUNT_KEYS:
+        if key not in counts:
+            continue
+        try:
+            value = int(counts.get(key, 0))
+        except (TypeError, ValueError):
+            value = 0
+        sanitized[key] = max(0, min(CARD_COUNT_MAX, value))
+    return sanitized
+
+
+def get_card_deck_counts_for_preset(preset, custom_counts=None):
+    preset = sanitize_card_deck_preset(preset)
+    if preset == CARD_DECK_PRESET_CUSTOM:
+        return sanitize_card_deck_counts(custom_counts)
+    return sanitize_card_deck_counts(CARD_DECK_PRESETS.get(preset, DEFAULT_CARD_DECK_COUNTS))
+
+
+def get_available_card_deck_presets():
+    return list(CARD_DECK_PRESETS.keys()) + [CARD_DECK_PRESET_CUSTOM]
+
 class Card:
 
     def __init__(self, action, text, card_deck, location=None, duration=None, sound=None, countdown=False, requires_input=False):
@@ -32,6 +120,7 @@ class Card:
             self.game.denied_location = None
         if self in self.card_deck.active_cards:
             self.card_deck.active_cards.remove(self)
+            self.card_deck.emit_active_cards()
     
     def notify_intruders(self, player):
         for other_player in self.game.players:
@@ -84,12 +173,20 @@ class Card:
                         break
                 
                 if target_player and not target_player.sus and target_player.alive:
+                    task_text = task_text[:200]
+                    task_location = task_location[:80]
                     # Set the fake task - will be shown after current task is completed
                     target_player.fake_task = {
                         'task': task_text,
                         'location': task_location,
                         'is_fake': True  # Mark as fake for potential future use
                     }
+                    self.game.stats['fake_tasks_sent'].append({
+                        'sender_name': player.username,
+                        'target_name': target_player.username,
+                        'task_text': task_text,
+                        'task_location': task_location
+                    })
                     # Play the 'sus' sound
                     self.game.speaker.play_sound('sus')
                     # Notify other intruders
@@ -98,6 +195,36 @@ class Card:
                     print(f"Fake task '{task_text}' at '{task_location}' queued for {target_player.username}")
                 else:
                     send_message_to_player(self.socket, player.player_id, "Invalid target - must be alive crewmate")
+                    remove_card = False
+        elif self.action == 'Taunt Message':
+            if not extra_data:
+                print("Taunt Message card requires extra_data")
+                remove_card = False
+            else:
+                target_player_id = extra_data.get('target_player_id')
+                message = (extra_data.get('message') or '').strip()[:200]
+
+                target_player = None
+                for p in self.game.players:
+                    if p.player_id == target_player_id:
+                        target_player = p
+                        break
+
+                if target_player and not target_player.sus and target_player.alive and message:
+                    self.socket.emit('taunt_received', {
+                        'message': message
+                    }, to=target_player.sid)
+                    self.game.stats['taunts_sent'].append({
+                        'sender_name': player.username,
+                        'target_name': target_player.username,
+                        'message': message
+                    })
+                    self.game.speaker.play_sound('sus')
+                    self.notify_intruders(player)
+                    send_message_to_player(self.socket, player.player_id, f"Taunt sent to {target_player.username}")
+                    print(f"Taunt message sent to {target_player.username}: {message}")
+                else:
+                    send_message_to_player(self.socket, player.player_id, "Invalid taunt - choose an alive crewmate and enter a message")
                     remove_card = False
         elif self.action == 'Discard and Draw':
             remove_card = False
@@ -109,7 +236,8 @@ class Card:
                 player.cards.append(card)
 
         elif self.action == 'Shorten Meltdown':
-            self.card_deck.active_cards.append(self)
+            if self not in self.card_deck.active_cards:
+                self.card_deck.active_cards.append(self)
             self.notify_intruders(player)
             self.game.meltdown_time_mod += self.duration
         
@@ -148,7 +276,19 @@ class CardDeck:
     def _build_deck(self):
         """Build the card deck, optionally excluding reactor cards."""
         has_reactor = self.game.has_reactor if self.game else True
-        
+
+        preset = sanitize_card_deck_preset(getattr(self.game, 'card_deck_preset', CARD_DECK_PRESET_DEFAULT))
+        if preset != CARD_DECK_PRESET_DEFAULT:
+            custom_counts = getattr(self.game, 'card_deck_counts', DEFAULT_CARD_DECK_COUNTS)
+            counts = get_card_deck_counts_for_preset(preset, custom_counts)
+            self._build_configured_deck(counts, has_reactor)
+            print(f"Card deck built with {len(self.cards)} cards (reactor: {has_reactor}, preset: {preset})")
+            return
+
+        self._build_default_deck(has_reactor)
+        print(f"Card deck built with {len(self.cards)} cards (reactor: {has_reactor}, preset: {preset})")
+
+    def _build_default_deck(self, has_reactor):
         self.cards = [
             Card('Self Report', 'Call a body found meeting', self), 
             Card('Self Report', 'Call a body found meeting', self), 
@@ -166,6 +306,13 @@ class CardDeck:
             Card('Fake Task', 'Send a fake task to a crewmate of your choice', self, requires_input=True),
             Card('Fake Task', 'Send a fake task to a crewmate of your choice', self, requires_input=True),
             Card('Fake Task', 'Send a fake task to a crewmate of your choice', self, requires_input=True),
+
+            Card('Taunt Message', 'Send a message to a crewmate of your choice', self, requires_input=True),
+            Card('Taunt Message', 'Send a message to a crewmate of your choice', self, requires_input=True),
+            Card('Taunt Message', 'Send a message to a crewmate of your choice', self, requires_input=True),
+            Card('Taunt Message', 'Send a message to a crewmate of your choice', self, requires_input=True),
+            Card('Taunt Message', 'Send a message to a crewmate of your choice', self, requires_input=True),
+            Card('Taunt Message', 'Send a message to a crewmate of your choice', self, requires_input=True),
             
         ]
 
@@ -188,7 +335,37 @@ class CardDeck:
                 if random.random() > 0.4:
                     self.cards.append(Card('Area Denial', 'Stop sending tasks to a specific location', self, duration=60, countdown=True, location=location))
 
-        print(f"Card deck built with {len(self.cards)} cards (reactor: {has_reactor})")
+    def _build_configured_deck(self, counts, has_reactor):
+        self.cards = []
+
+        for _ in range(counts.get('self_report', 0)):
+            self.cards.append(Card('Self Report', 'Call a body found meeting', self))
+
+        emp_durations = [30, 30, 60, 60]
+        for i in range(counts.get('emp', 0)):
+            self.cards.append(Card('EMP', 'Disable all devices for the duration', self, duration=emp_durations[i % len(emp_durations)]))
+
+        for _ in range(counts.get('fake_task', 0)):
+            self.cards.append(Card('Fake Task', 'Send a fake task to a crewmate of your choice', self, requires_input=True))
+
+        for _ in range(counts.get('taunt_message', 0)):
+            self.cards.append(Card('Taunt Message', 'Send a message to a crewmate of your choice', self, requires_input=True))
+
+        include_reactor_cards = has_reactor and getattr(self.game, 'card_deck_preset', CARD_DECK_PRESET_DEFAULT) != 'no_reactor_cards'
+        if include_reactor_cards:
+            shorten_durations = [10, 12, 15]
+            for i in range(counts.get('shorten_meltdown', 0)):
+                self.cards.append(Card('Shorten Meltdown', 'Reduce the amount of time players have to stop the next meltdown', self, duration=shorten_durations[i % len(shorten_durations)]))
+
+            for _ in range(counts.get('remote_sabotage', 0)):
+                self.cards.append(Card('Remote Sabotage', 'Trigger a sabotage remotely', self))
+
+        area_denial_count = counts.get('area_denial_per_location', 0)
+        area_denial_durations = [120, 60]
+        for location in self.locations:
+            if location != 'Other':
+                for i in range(area_denial_count):
+                    self.cards.append(Card('Area Denial', 'Stop sending tasks to a specific location', self, duration=area_denial_durations[i % len(area_denial_durations)], countdown=True, location=location))
 
     def draw_card(self, probability=1):
         if random.random() > probability:

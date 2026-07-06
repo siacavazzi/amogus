@@ -101,6 +101,9 @@ class StatsTracker:
                 'cards_played': stats.get('cards_played', 0),
                 'meltdowns_triggered': stats.get('meltdowns_triggered', 0),
                 'tasks_completed': stats.get('tasks_completed', 0),
+                'fake_tasks_sent': stats.get('fake_tasks_sent', []),
+                'fake_tasks_completed': stats.get('fake_tasks_completed', []),
+                'taunts_sent': stats.get('taunts_sent', []),
             }
 
             self.data['total_games_completed'] += 1

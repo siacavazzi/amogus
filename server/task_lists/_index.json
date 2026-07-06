@@ -28,6 +28,9 @@
     ],
     "device_ds7d1lho7mjf6bm1e": [
       "6SY5NT"
+    ],
+    "device_4o6nqxbzamox9slox": [
+      "R5UJJJ"
     ]
   },
   "code_to_name": {
@@ -40,6 +43,7 @@
     "N6NZ9W": "Test list 123 (Copy)",
     "6SY5NT": "Test list 123 (Copy)",
     "YM6SYF": "other test",
-    "J4A7XQ": "Example List"
+    "J4A7XQ": "Example List",
+    "R5UJJJ": "Example List"
   }
 }

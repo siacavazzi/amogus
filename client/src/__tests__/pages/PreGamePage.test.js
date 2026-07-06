@@ -20,6 +20,17 @@ describe('PreGamePage', () => {
         running: false,
     };
 
+    beforeEach(() => {
+        Object.defineProperty(navigator, 'clipboard', {
+            configurable: true,
+            value: {
+                writeText: jest.fn().mockResolvedValue(undefined),
+            },
+        });
+        delete navigator.share;
+        window.history.pushState({}, '', '/play');
+    });
+
     describe('Rendering', () => {
         it('renders the pre-game page with room code', () => {
             renderWithContext(<PreGamePage />, defaultContext);
@@ -78,6 +89,31 @@ describe('PreGamePage', () => {
             
             // Copy button should exist (implementation may vary)
             expect(screen.getByText(/TEST1/)).toBeInTheDocument();
+        });
+
+        it('copies the invite URL when native share is unavailable', async () => {
+            renderWithContext(<PreGamePage />, { ...defaultContext, roomCode: 'ABCD' });
+
+            fireEvent.click(screen.getByRole('button', { name: /share invite link/i }));
+
+            await waitFor(() => {
+                expect(navigator.clipboard.writeText).toHaveBeenCalledWith('http://localhost/play?room=ABCD');
+            });
+        });
+
+        it('opens the native share sheet when supported', async () => {
+            navigator.share = jest.fn().mockResolvedValue(undefined);
+            renderWithContext(<PreGamePage />, { ...defaultContext, roomCode: 'ABCD' });
+
+            fireEvent.click(screen.getByRole('button', { name: /share invite link/i }));
+
+            await waitFor(() => {
+                expect(navigator.share).toHaveBeenCalledWith(expect.objectContaining({
+                    title: 'Join my Sus Party room',
+                    url: 'http://localhost/play?room=ABCD',
+                }));
+            });
+            expect(navigator.clipboard.writeText).not.toHaveBeenCalled();
         });
     });
 

@@ -45,9 +45,9 @@ const Modal = () => {
 
   return (
     <>
-      {/* Backdrop with blur */}
+      {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+        className="fixed inset-0 bg-black/70 backdrop-blur-md z-50"
         onClick={() => !isAudioModal && setOpen(false)}
         aria-hidden="true"
       />
@@ -63,25 +63,28 @@ const Modal = () => {
         <div
           ref={modalRef}
           tabIndex="-1"
-          className="pointer-events-auto w-full max-w-md mx-auto overflow-hidden focus:outline-none rounded-2xl border border-gray-700/50 bg-gray-900/95 shadow-2xl"
+          className="pointer-events-auto w-full max-w-md mx-auto overflow-hidden focus:outline-none rounded-3xl border border-white/10 bg-gray-950 shadow-2xl animate-fadeInScale"
           style={{
-            boxShadow: '0 0 40px rgba(0, 0, 0, 0.5), 0 0 80px rgba(34, 211, 238, 0.1)',
+            boxShadow: '0 0 0 1px rgba(255,255,255,0.06), 0 24px 64px rgba(0,0,0,0.7), 0 0 80px rgba(99,102,241,0.12)',
           }}
         >
+          {/* Top accent line */}
+          <div className="h-px bg-gradient-to-r from-transparent via-indigo-500/60 to-transparent" />
+
           {/* Header */}
-          <div className="relative px-6 py-4 border-b border-gray-700/50 bg-gray-800/50">
+          <div className="relative px-6 pt-5 pb-4">
             <h2
               id="modal-title"
-              className="text-lg font-bold text-white"
+              className="text-base font-semibold text-white pr-8 leading-snug"
             >
               {dialog?.title || "Notification"}
             </h2>
             {!isAudioModal && (
               <button
                 onClick={() => setOpen(false)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700/50 transition-colors"
+                className="absolute right-4 top-4 p-1.5 rounded-xl text-gray-500 hover:text-white hover:bg-white/10 transition-colors"
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             )}
           </div>
@@ -89,7 +92,7 @@ const Modal = () => {
           {/* Body */}
           <div
             id="modal-description"
-            className="px-6 py-5 text-gray-300"
+            className="px-6 pb-2 text-gray-300 text-sm leading-relaxed"
           >
             {typeof dialog?.body === "string" ? (
               <p>{dialog.body}</p>
@@ -99,21 +102,21 @@ const Modal = () => {
           </div>
 
           {/* Footer */}
-          <div className="px-6 py-4 border-t border-gray-700/50 bg-gray-800/30">
+          <div className="px-6 pt-4 pb-6">
             {isAudioModal ? (
               <button
-                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white py-3 rounded-xl font-semibold hover:from-cyan-500 hover:to-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all"
+                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-2xl font-semibold hover:from-indigo-500 hover:to-purple-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-950 transition-all"
                 onClick={() => closeModal()}
               >
-                <Volume2 size={20} />
+                <Volume2 size={18} />
                 Enable Audio
               </button>
             ) : (
               <button
-                className="w-full bg-gray-700 text-white py-3 rounded-xl font-semibold hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all"
+                className="w-full bg-white/8 hover:bg-white/12 border border-white/10 text-white py-3 rounded-2xl font-semibold focus:outline-none focus:ring-2 focus:ring-white/20 focus:ring-offset-2 focus:ring-offset-gray-950 transition-all"
                 onClick={() => closeModal()}
               >
-                OK
+                Got it
               </button>
             )}
           </div>

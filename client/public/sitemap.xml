@@ -6,18 +6,38 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://susparty.com/how-to-play</loc>
+    <loc>https://susparty.com/among-us-irl</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.95</priority>
+  </url>
+  <url>
+    <loc>https://susparty.com/how-to-play-among-us-irl</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://susparty.com/faq</loc>
+    <loc>https://susparty.com/among-us-irl-task-ideas</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://susparty.com/among-us-irl-task-generator</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://susparty.com/how-to-play</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://susparty.com/about</loc>
+    <loc>https://susparty.com/faq</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://susparty.com/about</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
   </url>
 </urlset>

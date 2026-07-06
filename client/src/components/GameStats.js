@@ -6,7 +6,9 @@ import {
     Zap, 
     Radiation, 
     CheckCircle, 
-    AlertTriangle 
+    AlertTriangle,
+    MessageSquare,
+    Send
 } from 'lucide-react';
 
 const StatItem = ({ icon: Icon, label, value, color = "text-gray-300" }) => (
@@ -29,6 +31,10 @@ const GameStats = ({ showFakeTasks = true }) => {
     if (!gameStats) {
         return null;
     }
+
+    const fakeTasksSent = gameStats.fake_tasks_sent || [];
+    const fakeTasksCompleted = gameStats.fake_tasks_completed || [];
+    const tauntsSent = gameStats.taunts_sent || [];
 
     return (
         <div className="w-full max-w-md mx-auto mt-6">
@@ -67,19 +73,58 @@ const GameStats = ({ showFakeTasks = true }) => {
                         value={gameStats.meltdowns_triggered || 0}
                         color="text-orange-400"
                     />
+                    <StatItem 
+                        icon={Send} 
+                        label="Fake Tasks Sent" 
+                        value={fakeTasksSent.length}
+                        color="text-pink-400"
+                    />
+                    <StatItem 
+                        icon={MessageSquare} 
+                        label="Taunts Sent" 
+                        value={tauntsSent.length}
+                        color="text-fuchsia-400"
+                    />
                 </div>
 
+                {/* Fake Tasks Sent Section */}
+                {showFakeTasks && fakeTasksSent.length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-gray-700/50">
+                        <div className="flex items-center gap-2 mb-3">
+                            <Send size={18} className="text-pink-400" />
+                            <span className="text-pink-400 font-medium">
+                                Fake Tasks Sent ({fakeTasksSent.length})
+                            </span>
+                        </div>
+                        <div className="space-y-2 max-h-40 overflow-y-auto">
+                            {fakeTasksSent.map((fakeTask, index) => (
+                                <div 
+                                    key={index}
+                                    className="bg-pink-900/20 border border-pink-500/20 rounded-lg p-2"
+                                >
+                                    <div className="text-sm text-pink-200 font-medium">
+                                        {fakeTask.sender_name} to {fakeTask.target_name}
+                                    </div>
+                                    <div className="text-xs text-pink-300/70 truncate">
+                                        "{fakeTask.task_text}" at {fakeTask.task_location || 'Unknown'}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
                 {/* Fake Tasks Section */}
-                {showFakeTasks && gameStats.fake_tasks_completed && gameStats.fake_tasks_completed.length > 0 && (
+                {showFakeTasks && fakeTasksCompleted.length > 0 && (
                     <div className="mt-4 pt-4 border-t border-gray-700/50">
                         <div className="flex items-center gap-2 mb-3">
                             <AlertTriangle size={18} className="text-red-400" />
                             <span className="text-red-400 font-medium">
-                                Fake Tasks Completed ({gameStats.fake_tasks_completed.length})
+                                Fake Tasks Completed ({fakeTasksCompleted.length})
                             </span>
                         </div>
                         <div className="space-y-2 max-h-40 overflow-y-auto">
-                            {gameStats.fake_tasks_completed.map((fakeTask, index) => (
+                            {fakeTasksCompleted.map((fakeTask, index) => (
                                 <div 
                                     key={index}
                                     className="bg-red-900/20 border border-red-500/20 rounded-lg p-2"
@@ -89,6 +134,33 @@ const GameStats = ({ showFakeTasks = true }) => {
                                     </div>
                                     <div className="text-xs text-red-300/70 truncate">
                                         "{fakeTask.task_text}"
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Taunts Section */}
+                {tauntsSent.length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-gray-700/50">
+                        <div className="flex items-center gap-2 mb-3">
+                            <MessageSquare size={18} className="text-fuchsia-400" />
+                            <span className="text-fuchsia-400 font-medium">
+                                Taunts Sent ({tauntsSent.length})
+                            </span>
+                        </div>
+                        <div className="space-y-2 max-h-40 overflow-y-auto">
+                            {tauntsSent.map((taunt, index) => (
+                                <div 
+                                    key={index}
+                                    className="bg-fuchsia-900/20 border border-fuchsia-500/20 rounded-lg p-2"
+                                >
+                                    <div className="text-sm text-fuchsia-200 font-medium">
+                                        {taunt.sender_name} to {taunt.target_name}
+                                    </div>
+                                    <div className="text-xs text-fuchsia-300/70 truncate">
+                                        "{taunt.message}"
                                     </div>
                                 </div>
                             ))}
