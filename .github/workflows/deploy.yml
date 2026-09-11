@@ -30,6 +30,10 @@ jobs:
         env:
           CI: false  # Don't treat warnings as errors
 
+      - name: Check production pages in browser
+        working-directory: ./client
+        run: node scripts/check-built-app.js
+
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh

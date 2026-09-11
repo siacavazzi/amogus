@@ -1,5 +1,5 @@
 import React from 'react';
-import { createRoot, hydrateRoot } from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App';
 
@@ -10,10 +10,6 @@ const tree = (
     </React.StrictMode>
 );
 
-if (rootElement.hasChildNodes()) {
-    // Pre-rendered HTML present (e.g. produced by react-snap). Hydrate.
-    hydrateRoot(rootElement, tree);
-} else {
-    createRoot(rootElement).render(tree);
-}
-
+// Prerender captures browser DOM after effects, not React server markup.
+// Mount afresh: snapshots can contain elapsed timers or a different route.
+createRoot(rootElement).render(tree);
