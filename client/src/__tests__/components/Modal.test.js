@@ -45,13 +45,13 @@ describe('Modal', () => {
     });
 
     describe('Close Behavior', () => {
-        it('has OK button for normal modals', () => {
+        it('has Got it button for normal modals', () => {
             renderWithContext(<Modal />, {
                 dialog: { title: 'Test Modal', body: 'Content' }
             });
             
-            const okButton = screen.getByRole('button', { name: /OK/i });
-            expect(okButton).toBeInTheDocument();
+            const confirmButton = screen.getByRole('button', { name: /Got it/i });
+            expect(confirmButton).toBeInTheDocument();
         });
 
         it('has X close button for normal modals', () => {

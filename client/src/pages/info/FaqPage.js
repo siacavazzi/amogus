@@ -11,12 +11,16 @@ const FAQS = [
         a: 'No. Sus Party runs entirely in the browser. Just open susparty.com on any phone: iPhone, Android, anything with a modern browser.',
     },
     {
+        q: 'Is this the SusParty app on the App Store or Google Play?',
+        a: 'No. Sus Party at susparty.com is an independent browser game for play around your house. We are not affiliated with the SusParty mobile app or susparty.info. Our game has no app-store purchases or subscriptions. We cannot access accounts, purchases, or refunds for that separate app.',
+    },
+    {
         q: 'How many players can play?',
         a: 'Sus Party works best with 5–15 players. The host can adjust the number of imposters based on group size. You can play with as few as 4 in a pinch.',
     },
     {
-        q: 'Can I play Among Us in real life with friends?',
-        a: 'Yes. That is exactly what Sus Party is. Gather a group in a house, apartment, dorm, or office, hand everyone their phone, and run a real-life game with the same crewmate / imposter / meeting structure as Among Us.',
+        q: 'Can I play a social deduction game around the house?',
+        a: 'Yes. That is exactly what Sus Party is built for. Gather a group in a house, apartment, dorm, or office, hand everyone their phone, and run a room-to-room game with secret roles, real tasks, sabotage, meetings, and votes.',
     },
     {
         q: 'What are good tasks for Among Us in real life?',
@@ -48,7 +52,7 @@ const FAQS = [
     },
     {
         q: 'Can you play Among Us in real life?',
-        a: "Yes. Playing Among Us in real life means running the same social deduction game — tasks, secret intruders, emergency meetings, voting — in a physical space like a house, apartment, dorm, or office. Sus Party handles all the coordination automatically from each player's phone. Read our full guide on how to play Among Us IRL.",
+        a: "Yes. A room-to-room social deduction game means running tasks, secret intruders, emergency meetings, and voting in a physical space like a house, apartment, dorm, or office. Sus Party handles the coordination automatically from each player's phone.",
     },
     {
         q: 'How many people do you need for Among Us IRL?',
@@ -56,7 +60,7 @@ const FAQS = [
     },
     {
         q: 'What are good Among Us IRL tasks?',
-        a: 'Good tasks are short physical actions tied to a specific room — things like "count the forks in the drawer", "fill a glass of water", or "find the item with the earliest expiry in the fridge". The best tasks scatter players across the space so intruders have opportunities to strike. See our full Among Us IRL task ideas guide for 100+ examples.',
+        a: 'Good tasks are short physical actions tied to a specific room — things like "count the forks in the drawer", "fill a glass of water", or "find the item with the earliest expiry in the fridge". The best tasks scatter players across the space so intruders have opportunities to strike. See our full task ideas guide for 100+ examples.',
     },
     {
         q: 'Is Sus Party affiliated with Innersloth or Among Us?',
@@ -101,7 +105,7 @@ function FaqPage() {
     };
 
     return (
-        <InfoChrome titleSuffix="FAQ · Sus Party | Among Us in Real Life">
+        <InfoChrome titleSuffix="FAQ · Sus Party | Not Another Couch Party Game">
             <div className="info-shell">
                 <div className="info-orb info-orb--indigo" aria-hidden="true" />
                 <div className="info-orb info-orb--purple" aria-hidden="true" />
@@ -115,7 +119,7 @@ function FaqPage() {
                         <p className="info-eyebrow">Frequently Asked Questions</p>
                         <h1 className="info-title">Sus Party FAQ</h1>
                         <p className="info-lead">
-                            Quick answers about Sus Party, the free real-life Among Us-style party game you can play in your house.
+                            Quick answers about Sus Party, the free room-to-room social deduction game you can play in your house.
                         </p>
                     </header>
 

@@ -1,7 +1,7 @@
 {
   "short_name": "Sus Party",
-  "name": "Sus Party: Real-life social deduction party game",
-  "description": "Free in-person party game inspired by Among Us. Phones as controllers, real tasks around your house.",
+  "name": "Sus Party: Not another couch party game",
+  "description": "A free phone-guided social deduction game where your house becomes the board.",
   "icons": [
     {
       "src": "favicon.ico",

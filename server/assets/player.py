@@ -112,7 +112,6 @@ class Player:
 
     def reset(self):
         """Reset player state for a new game (keeps identity)."""
-        self.active = True
         self.sus = False
         self.alive = True
         self.task = None
@@ -132,8 +131,6 @@ class Player:
         return self.death_message
 
     def get_task(self):
-        if self.fake_task is not None:
-            return self.fake_task
         return self.task
     
     def get_card(self, id):
@@ -169,4 +166,3 @@ class Player:
         return (f"Player(sid={self.sid}, player_id={self.player_id}, "
                 f"username={self.username}, active={self.active}, "
                 f"sus={self.sus}, alive={self.alive})")
-

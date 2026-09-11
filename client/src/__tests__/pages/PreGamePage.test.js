@@ -9,7 +9,7 @@
  * - Has tabs for viewing players and creating/editing tasks
  */
 import React from 'react';
-import { renderWithContext, screen, fireEvent, waitFor, mockPlayers, mockTaskLocations } from '../../test-utils';
+import { renderWithContext, screen, fireEvent, waitFor, mockPlayers, mockTaskLocations, simulateSocketEvent } from '../../test-utils';
 import PreGamePage from '../../pages/PreGamePage';
 
 describe('PreGamePage', () => {
@@ -94,7 +94,7 @@ describe('PreGamePage', () => {
         it('copies the invite URL when native share is unavailable', async () => {
             renderWithContext(<PreGamePage />, { ...defaultContext, roomCode: 'ABCD' });
 
-            fireEvent.click(screen.getByRole('button', { name: /share invite link/i }));
+            fireEvent.click(screen.getByRole('button', { name: /invite players to room/i }));
 
             await waitFor(() => {
                 expect(navigator.clipboard.writeText).toHaveBeenCalledWith('http://localhost/play?room=ABCD');
@@ -105,7 +105,7 @@ describe('PreGamePage', () => {
             navigator.share = jest.fn().mockResolvedValue(undefined);
             renderWithContext(<PreGamePage />, { ...defaultContext, roomCode: 'ABCD' });
 
-            fireEvent.click(screen.getByRole('button', { name: /share invite link/i }));
+            fireEvent.click(screen.getByRole('button', { name: /invite players to room/i }));
 
             await waitFor(() => {
                 expect(navigator.share).toHaveBeenCalledWith(expect.objectContaining({
@@ -138,6 +138,48 @@ describe('PreGamePage', () => {
             // Non-host should not see start game controls
             const startButton = screen.queryByRole('button', { name: /start.*game/i });
             expect(startButton).not.toBeInTheDocument();
+        });
+
+        it('keeps start disabled until the server task minimum is met', async () => {
+            const players = [
+                { player_id: 'player1', username: 'Alice', sus: false, alive: true, ready: false, pic: 1, selfie: null },
+                { player_id: 'player2', username: 'Bob', sus: false, alive: true, ready: false, pic: 2, selfie: null },
+                { player_id: 'player3', username: 'Charlie', sus: false, alive: true, ready: false, pic: 3, selfie: null },
+                { player_id: 'player4', username: 'Diana', sus: false, alive: true, ready: false, pic: 4, selfie: null },
+            ];
+            const tasks = [
+                ...Array.from({ length: 5 }, (_, index) => ({ task: `Kitchen ${index}`, location: 'Kitchen' })),
+                ...Array.from({ length: 5 }, (_, index) => ({ task: `Yard ${index}`, location: 'Yard' })),
+            ];
+
+            const { contextValue } = renderWithContext(<PreGamePage />, {
+                ...defaultContext,
+                players,
+                taskLocations: ['Kitchen', 'Yard', 'Other'],
+                isRoomCreator: true,
+            });
+
+            await waitFor(() => {
+                expect(contextValue.socket.on).toHaveBeenCalledWith('collaborative_tasks', expect.any(Function));
+            });
+            simulateSocketEvent(contextValue.socket, 'collaborative_tasks', { tasks });
+
+            await waitFor(() => {
+                expect(screen.queryByRole('button', { name: /start game/i })).not.toBeInTheDocument();
+                expect(screen.getByText(/Need 2 more tasks total/i)).toBeInTheDocument();
+            });
+
+            simulateSocketEvent(contextValue.socket, 'collaborative_tasks', {
+                tasks: [
+                    ...tasks,
+                    { task: 'Kitchen extra', location: 'Kitchen' },
+                    { task: 'Yard extra', location: 'Yard' },
+                ],
+            });
+
+            await waitFor(() => {
+                expect(screen.getByRole('button', { name: /start game/i })).toBeInTheDocument();
+            });
         });
     });
 

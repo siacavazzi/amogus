@@ -76,6 +76,70 @@ def sendPlayerList(game, room_code, action='player_list'):
     socketio.emit('game_data', {'action': action, 'list': player_list}, room=room_code)
 
 
+def get_min_tasks_needed(game):
+    """Return the server-side minimum task count for starting a game."""
+    return max(len(game.players) * 3, 10)
+
+
+def get_role_start_error(game):
+    """Return a player-facing error when the selected roles cannot support a fair round."""
+    player_count = len(game.players)
+    intruder_count = game.numIntruders
+
+    if intruder_count < 1:
+        return 'At least 1 intruder is required.'
+
+    minimum_players = intruder_count * 2 + 1
+    if player_count < minimum_players:
+        return (
+            f'Need at least {minimum_players} players for {intruder_count} '
+            f'intruder{"s" if intruder_count != 1 else ""}.'
+        )
+
+    return None
+
+
+def get_connected_player_ids(game, room_code):
+    """Return player IDs whose current socket is still registered in this room."""
+    return {
+        player.player_id
+        for player in game.players
+        if player.sid and game_manager.sid_to_game.get(player.sid) == room_code
+    }
+
+
+def is_sid_connected_to_room(sid, room_code):
+    return bool(sid and game_manager.sid_to_game.get(sid) == room_code)
+
+
+def set_room_creator(game, room_code, player, notify=False):
+    """Assign the persistent room creator to a connected player."""
+    game.creator_player_id = player.player_id
+    game.creator_sid = player.sid
+    logger.info(f"Set creator_player_id to {player.player_id} for room {room_code}")
+    if notify:
+        socketio.emit(
+            'player_id',
+            {'player_id': player.player_id, 'pic': player.pic, 'is_creator': True},
+            to=player.sid,
+        )
+
+
+def reassign_room_creator(game, room_code):
+    """Promote a remaining connected player when the current host leaves."""
+    for player in game.players:
+        if is_sid_connected_to_room(player.sid, room_code):
+            set_room_creator(game, room_code, player, notify=True)
+            logger.info(f"Reassigned room creator to {player.player_id} for room {room_code}")
+            return player
+
+    game.creator_player_id = None
+    if not is_sid_connected_to_room(game.creator_sid, room_code):
+        game.creator_sid = None
+    logger.info(f"Room {room_code} has no connected player available for host reassignment")
+    return None
+
+
 @app.route('/api/games')
 def list_games():
     """API endpoint to list all active games (for debugging/admin)."""
@@ -231,6 +295,12 @@ def handle_join_game(data):
         is_creator = True
         game.creator_sid = sid  # Update the socket ID
         logger.info(f"Creator {player_id} reconnected to room {room_code}")
+    elif game.creator_player_id is None and (
+        sid == game.creator_sid or not is_sid_connected_to_room(game.creator_sid, room_code)
+    ):
+        is_creator = True
+        game.creator_sid = sid
+        logger.info(f"Creator socket refreshed for room {room_code}")
     
     emit('game_joined', {'room_code': room_code, 'is_creator': is_creator})
     emit('task_locations', game.locations)
@@ -329,6 +399,7 @@ def handleRejoin(data):
     
     logger.info(f"Player {player_id} rejoining room {room_code}, creator_player_id={game.creator_player_id}")
     player.sid = request.sid
+    player.active = True
     game_manager.update_sid(player_id, request.sid)
     join_room(room_code)
     
@@ -393,7 +464,15 @@ def handleRejoin(data):
 def handle_disconnect():
     sid = request.sid
     logger.info(f"Client disconnected: {sid}")
+    game, room_code = game_manager.get_game_by_sid(sid)
     game_manager.unregister_sid(sid)
+    player = game.getPlayerBySid(sid) if game else None
+    if player:
+        player.disconnect()
+        player.ready = False
+        if game.meeting and not game.end_state:
+            game.try_start_voting()
+        sendPlayerList(game, room_code)
 
 
 # ============ PLAYER MANAGEMENT ============
@@ -417,6 +496,7 @@ def handle_join(data):
         game, player, existing_room = get_game_and_player(player_id)
         if player:
             player.sid = sid
+            player.active = True
             player.username = username
             game_manager.update_sid(player_id, sid)
             join_room(existing_room)
@@ -469,13 +549,13 @@ def handle_join(data):
     game_manager.register_player(player.player_id, room_code, sid)
     join_room(room_code)
     
-    # Set creator_player_id if not yet set
-    # This handles the case where the host created the room and is now registering as a player
-    # The first player to join becomes the creator if no creator is set
-    if game.creator_player_id is None:
-        game.creator_player_id = player.player_id
-        game.creator_sid = sid  # Update to current socket
-        logger.info(f"Set creator_player_id to {player.player_id} for room {room_code} (first player)")
+    # Bind the persistent creator player to the creator socket. If the original
+    # creator socket is gone before a player exists, let the room recover by
+    # making the next joining player the host.
+    if game.creator_player_id is None and (
+        sid == game.creator_sid or not is_sid_connected_to_room(game.creator_sid, room_code)
+    ):
+        set_room_creator(game, room_code, player)
     
     # Check if this player is the creator
     is_creator = (player.player_id == game.creator_player_id)
@@ -507,8 +587,14 @@ def handle_start(data):
         logger.warning("Start game attempted but game is already running")
         return
 
+    role_error = get_role_start_error(game)
+    if role_error:
+        emit('error', {'message': role_error})
+        logger.warning(f"Start game rejected for room {room_code}: {role_error}")
+        return
+
     # Calculate minimum tasks needed
-    min_tasks = max(len(game.players) * 3, 10)
+    min_tasks = get_min_tasks_needed(game)
     
     # Log current state for debugging
     logger.info(f"Start game check - task_list_applied={game.task_list_applied}, task_handler.tasks={len(game.task_handler.tasks)}, collaborative_tasks={len(game.collaborative_tasks)}, min_tasks={min_tasks}")
@@ -598,12 +684,15 @@ def reset_game(data):
         logger.info(f"Game {room_code} has been force reset to lobby")
         return
     
-    # Add this player's vote
-    if player_id:
+    connected_player_ids = get_connected_player_ids(game, room_code)
+    game.reset_votes.intersection_update(connected_player_ids)
+
+    # Add this player's vote only if they are currently connected to this room.
+    if player_id and player_id in connected_player_ids:
         game.reset_votes.add(player_id)
     
     # Count how many players are in the game (excluding those who left)
-    total_players = len([p for p in game.players if p.sid])
+    total_players = len(connected_player_ids)
     votes_needed = total_players
     current_votes = len(game.reset_votes)
     
@@ -618,7 +707,7 @@ def reset_game(data):
     logger.info(f"Game {room_code}: Reset vote from {player_id}. {current_votes}/{votes_needed} votes.")
     
     # If all players have voted, reset the game
-    if current_votes >= votes_needed:
+    if votes_needed > 0 and current_votes >= votes_needed:
         for p in game.players:
             p.reset()
         game.reset_game_state()
@@ -691,17 +780,25 @@ def leave_room_handler(data):
     # Check if this is the room creator (before becoming a player)
     is_creator_socket = (game.creator_sid == sid)
     
+    was_creator_player = bool(player and player.player_id == game.creator_player_id)
+
     if player:
-        # If game is running, mark player as dead instead of removing them
-        if game.game_running and player.alive:
+        # During an active round, leaving counts as dying. After the round ends,
+        # remove the player so reset votes only wait on people still in the room.
+        if game.game_running and not game.end_state and player.alive:
             game.kill_player(player.player_id, death_cause='left_game')
             logger.info(f"Player {player.username} left during active game - marked as dead in room {room_code}")
         else:
             # Game not running or player already dead - remove them from the game
-            game.players.remove(player)
+            if player in game.players:
+                game.players.remove(player)
             logger.info(f"Player {player.username} left room {room_code}")
         
+        player.sid = None
         game_manager.unregister_player(player_id)
+
+        if was_creator_player:
+            reassign_room_creator(game, room_code)
     
     if is_reactor:
         game.reactor_sid = None
@@ -966,8 +1063,8 @@ def handleMeltdown(data=None):
     if game:
         # Verify this is either a reactor or a player in the game
         if game.reactor_sid == sid or (data and data.get('player_id')):
-            game.start_meltdown()
-            logger.warning(f"Meltdown started in room {room_code} (triggered by sid: {sid})")
+            if game.start_meltdown():
+                logger.warning(f"Meltdown started in room {room_code} (triggered by sid: {sid})")
         else:
             logger.warning(f"Meltdown rejected - unauthorized sid: {sid}")
     else:
@@ -1287,7 +1384,7 @@ def handle_toggle_task_creation_mode(data):
     
     if enable:
         # Only send to the requesting client, not the whole room
-        min_tasks = max(len(game.players) * 3, 10)
+        min_tasks = get_min_tasks_needed(game)
         emit('enter_task_creation', {
             'min_tasks': min_tasks,
             'current_tasks': len(game.collaborative_tasks),
@@ -1325,7 +1422,7 @@ def handle_get_collaborative_tasks(data):
         is_owner = False
         logger.warning(f"No device_id provided for ownership check of {game.collaborative_task_list_code}")
     
-    min_tasks = max(len(game.players) * 3, 10)
+    min_tasks = get_min_tasks_needed(game)
     emit('collaborative_tasks', {
         'tasks': game.collaborative_tasks,
         'min_tasks': min_tasks,
@@ -1403,7 +1500,7 @@ def handle_add_collaborative_task(data):
     game.collaborative_tasks.append(task)
     
     # Broadcast to all players in the room
-    min_tasks = len(game.players) * 3
+    min_tasks = get_min_tasks_needed(game)
     socketio.emit('collaborative_task_added', {
         'task': task,
         'total_tasks': len(game.collaborative_tasks),

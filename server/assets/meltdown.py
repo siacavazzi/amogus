@@ -35,20 +35,24 @@ class Meltdown:
     
     def _countdown_loop(self):
         """The actual countdown logic running in a background greenlet."""
+        if not self.meltdown_active:
+            return
         print(f"Meltdown initiated! {self.time_left} seconds remaining.")
         self.emit_to_room("codes_needed", self.codes_needed)
         self.distribute_codes()
-        while self.time_left > 0:
+        while self.meltdown_active and self.time_left > 0:
             if self.codes_entered >= self.codes_needed:
                 self.end_meltdown(success=True)
                 return
             eventlet.sleep(1)  # Asynchronous delay
+            if not self.meltdown_active:
+                return
             self.time_left -= 1
             self.emit_to_room('meltdown_update', self.time_left)
 
         # If the countdown reaches 0 and the meltdown is still active
         if self.meltdown_active:
-            self.end_meltdown(success=False)
+            self.end_meltdown(success=self.codes_entered >= self.codes_needed)
 
     def distribute_codes(self):
         for i in range(0, self.num_players):
@@ -58,6 +62,8 @@ class Meltdown:
 
 
     def check_pin(self, input_pin):
+        if not self.meltdown_active:
+            return False
         print(f"Input PIN: {input_pin} (type: {type(input_pin)})")
         print(f"Valid PINs: {self.valid_pins} (types: {[type(pin) for pin in self.valid_pins]})")
     
@@ -76,6 +82,8 @@ class Meltdown:
             self.valid_pins.remove(input_pin)
             self.codes_entered += 1
             self.emit_to_room("code_correct", self.codes_needed - self.codes_entered)
+            if self.codes_entered >= self.codes_needed:
+                self.end_meltdown(success=True)
             return True
     
         print("Invalid PIN")
@@ -85,6 +93,8 @@ class Meltdown:
 
     def end_meltdown(self, success):
         """Ends the meltdown and emits the result."""
+        if not self.meltdown_active:
+            return
         self.meltdown_active = False
         # Stop the looping meltdown alarm first
         self.speaker.stop()
@@ -98,5 +108,4 @@ class Meltdown:
             self.speaker.play_sound("meltdown_fail")
             if self.game:
                 self.game.meltdown()
-
 

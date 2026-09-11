@@ -50,3 +50,4 @@ server/logs/
 # Runtime data
 server/stats.json
 /task_lists/
+/droplet_exports

@@ -37,6 +37,7 @@ function PreGamePage() {
     
     // Task creation state
     const [tasks, setTasks] = useState([]);
+    const [serverMinTasks, setServerMinTasks] = useState(null);
     const [newTaskText, setNewTaskText] = useState('');
     const [selectedLocation, setSelectedLocation] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -187,6 +188,9 @@ function PreGamePage() {
             console.log('Collaborative tasks updated:', data);
             console.log('My device_id:', deviceId, 'is_owner from server:', data.is_owner);
             setTasks(data.tasks || []);
+            if (data.min_tasks !== undefined) {
+                setServerMinTasks(data.min_tasks);
+            }
             if (data.task_list_code) {
                 setTaskListCode(data.task_list_code);
             }
@@ -205,6 +209,9 @@ function PreGamePage() {
         const handleTaskAdded = (data) => {
             console.log('Task added:', data);
             setTasks(prev => [...prev, data.task]);
+            if (data.min_tasks !== undefined) {
+                setServerMinTasks(data.min_tasks);
+            }
             setIsSubmitting(false);
         };
 
@@ -442,14 +449,17 @@ function PreGamePage() {
 
     // Check if we have at least 5 tasks per real location
     const MIN_TASKS_PER_LOCATION = 5;
+    const requiredTotalTasks = Math.max(serverMinTasks || 0, players.length * 3, 10);
+    const missingTotalTasks = Math.max(0, requiredTotalTasks - tasks.length);
     const locationsWithEnoughTasks = realLocations.filter(loc => 
         (tasksByLocation[loc]?.length || 0) >= MIN_TASKS_PER_LOCATION
     );
     const hasEnoughTasks = realLocations.length >= 2 && 
         locationsWithEnoughTasks.length === realLocations.length;
+    const hasEnoughTotalTasks = missingTotalTasks === 0;
     
     // Only host can start game, and only when there are enough tasks
-    const canStartGame = isHost && hasEnoughTasks;
+    const canStartGame = isHost && hasEnoughTasks && hasEnoughTotalTasks;
     
     // Calculate what's missing
     const getTasksNeededMessage = () => {
@@ -458,6 +468,9 @@ function PreGamePage() {
         }
         if (!hasEnoughTasks) {
             return `Need ${MIN_TASKS_PER_LOCATION} tasks per location`;
+        }
+        if (!hasEnoughTotalTasks) {
+            return `Need ${missingTotalTasks} more task${missingTotalTasks !== 1 ? 's' : ''} total`;
         }
         return '';
     };
@@ -602,7 +615,7 @@ function PreGamePage() {
                         <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3">
                             {players.map((player, index) => (
                                 <div 
-                                    key={player.id}
+                                    key={player.player_id || player.id || index}
                                     className="transition-all duration-500"
                                     style={{ 
                                         animationDelay: `${index * 50}ms`,
@@ -1147,10 +1160,10 @@ function PreGamePage() {
                                 </div>
                             ) : (
                                 <div className="text-center py-4 bg-gray-900/80 backdrop-blur-xl border border-gray-800/80 rounded-2xl">
-                                    <p className="text-gray-400 text-sm flex items-center justify-center gap-2">
-                                        <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></div>
+                                    <div className="text-gray-400 text-sm flex items-center justify-center gap-2">
+                                        <span className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></span>
                                         Waiting for host to start the game...
-                                    </p>
+                                    </div>
                                 </div>
                             )}
                         </div>

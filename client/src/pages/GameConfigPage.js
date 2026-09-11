@@ -102,7 +102,7 @@ function GameConfigPage() {
         vote_threshold: 0.66,
         meltdown_time: 60,
         code_percent: 0.6,
-        num_intruders: 2,
+        num_intruders: 1,
         card_draw_probability: 1,
         starting_cards: 2,
         task_ratio: 10,

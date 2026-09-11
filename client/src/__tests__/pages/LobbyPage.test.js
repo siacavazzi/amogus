@@ -17,7 +17,7 @@ describe('LobbyPage', () => {
             renderWithContext(<LobbyPage />);
             
             // Should show the game title
-            expect(screen.getByText(/Sus Party/i)).toBeInTheDocument();
+            expect(screen.getByRole('heading', { name: /^Sus Party$/i })).toBeInTheDocument();
             
             // Should show create and join options
             expect(screen.getByText(/Create New Game/i)).toBeInTheDocument();

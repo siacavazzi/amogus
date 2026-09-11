@@ -25,7 +25,7 @@ function useInfoChrome(title) {
 }
 
 function AboutPage() {
-    useInfoChrome('About · Sus Party | Among Us in Real Life');
+    useInfoChrome('About · Sus Party | Not Another Couch Party Game');
 
     return (
         <div className="info-shell">
@@ -41,14 +41,14 @@ function AboutPage() {
                     <p className="info-eyebrow">About</p>
                     <h1 className="info-title">About Sus Party</h1>
                     <p className="info-lead">
-                        Sus Party is a free, fan-made, in-person party game inspired by Among Us. Built because party games where you actually move around the house are more fun than party games on the couch.
+                        Sus Party is a free, phone-guided social deduction game for house parties. Built because party games where you actually move around the house are more fun than party games on the couch.
                     </p>
                 </header>
 
                 <section className="info-body info-prose">
                     <h2>The idea</h2>
                     <p>
-                        Most digital party games keep everyone glued to a screen. Real-life social deduction games (Mafia, Werewolf, Secret Hitler) get people talking but don't have the constant low-grade tension of being stalked through a haunted spaceship. Sus Party tries to do both: phones-as-controllers like Jackbox, physical roaming like hide-and-seek, and the social deduction loop of Among Us.
+                        Most digital party games keep everyone glued to a screen. Classic social deduction games get people talking, but they usually happen around one table. Sus Party tries to do something more spatial: phones-as-controllers, physical roaming from room to room, secret roles, tasks, sabotage, and meetings that pull everyone back together.
                     </p>
 
                     <h2>How it's built</h2>
@@ -67,7 +67,7 @@ function AboutPage() {
 
                     <h2>Not affiliated with Innersloth</h2>
                     <p>
-                        Sus Party is a fan-made project loosely inspired by Among Us. It is not affiliated with, endorsed by, or associated with Innersloth.
+                        Sus Party is an independent social deduction party game. It is not affiliated with, endorsed by, or associated with Innersloth or Among Us.
                     </p>
 
                     <h2>Get involved</h2>

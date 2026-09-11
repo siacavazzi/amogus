@@ -62,7 +62,7 @@ function useLandingDocument() {
 
     html.classList.add('lp-document');
     body.classList.add('lp-document');
-    document.title = 'Sus Party · Among Us in Real Life | Free Party Game';
+    document.title = 'Sus Party | Not Another Couch Party Game';
 
     if (themeMeta) {
       themeMeta.setAttribute('content', '#030712');
@@ -105,7 +105,7 @@ function LandingPage() {
             <PhoneShowcase
                 heroSlot={
                     <div className="lp-page">
-                        <p className="lp-eyebrow">A real-life social deduction party game</p>
+                        <p className="lp-eyebrow">Not another couch party game. No app required.</p>
 
                         <h1 className="lp-title">
                             <span className="lp-title__text" data-text="Sus Party">Sus Party</span>
@@ -123,9 +123,10 @@ function LandingPage() {
                         </p>
 
                         <p className="lp-tagline">
-                            A social deduction party game that takes over your whole house. Roam
-                            room to room doing real tasks, sniff out the intruders hiding in your
-                            group, and bring your case to the meeting.
+                            Open your phone’s browser and play. Your house becomes the board.
+                            Phones guide the chaos, but everyone
+                            moves room to room: complete real tasks, survive sabotage, call
+                            meetings, and vote out the secret saboteur.
                         </p>
 
                         <div className="lp-actions">
@@ -138,19 +139,19 @@ function LandingPage() {
                         </div>
 
                         <div className="lp-inspired">
-                            <p className="lp-inspired__label">Inspired by</p>
-                            <ul className="lp-inspired__list" aria-label="Inspired by">
+                            <p className="lp-inspired__label">The mix</p>
+                            <ul className="lp-inspired__list" aria-label="Game ingredients">
                                 <li className="lp-pill lp-pill--crew">
-                                    <span className="lp-pill__name">Among Us</span>
-                                    <span className="lp-pill__note">Imposters &amp; tasks</span>
+                                    <span className="lp-pill__name">Real rooms</span>
+                                    <span className="lp-pill__note">The house is the map</span>
                                 </li>
                                 <li className="lp-pill lp-pill--intruder">
-                                    <span className="lp-pill__name">Mafia</span>
-                                    <span className="lp-pill__note">Real-room deduction</span>
+                                    <span className="lp-pill__name">Secret roles</span>
+                                    <span className="lp-pill__note">Trust gets expensive</span>
                                 </li>
                                 <li className="lp-pill lp-pill--meeting">
-                                    <span className="lp-pill__name">Quiplash</span>
-                                    <span className="lp-pill__note">Phones as controllers</span>
+                                    <span className="lp-pill__name">Phones guide it</span>
+                                    <span className="lp-pill__note">No install, no signup</span>
                                 </li>
                             </ul>
                         </div>
@@ -222,17 +223,18 @@ function LandingPage() {
             <section className="lp-seo" aria-labelledby="lp-seo-heading">
                 <div className="lp-seo__inner">
                     <h2 id="lp-seo-heading" className="lp-seo__heading">
-                        Among Us in real life. No setup required.
+                        Not another couch party game.
                     </h2>
                     <p className="lp-seo__lead">
-                        Sus Party is a free, in-person social deduction party game inspired by Among Us. Open
+                        Sus Party is a free, phone-guided social deduction game for house parties. Open
                         <a href="https://susparty.com"> susparty.com</a> on your phones, gather 5–15 friends, and
-                        play in your house. Tasks, sabotage, emergency meetings, votes. All on your phone, no app
-                        to install, no signup, no ads.
+                        turn your house into the board. Players move room to room, complete real tasks,
+                        survive sabotage, call meetings, and vote out the secret saboteur. No app to install,
+                        no signup, no ads.
                     </p>
 
                     <p className="lp-seo__cta">
-                        <a href="/among-us-irl" className="lp-seo__link">Among Us IRL guide →</a>
+                        <a href="/among-us-irl" className="lp-seo__link">Room-to-room game guide →</a>
                         {' · '}
                         <a href="/among-us-irl-task-ideas" className="lp-seo__link">Task ideas →</a>
                         {' · '}
@@ -245,7 +247,7 @@ function LandingPage() {
             <footer className="lp-footer">
                 <div className="lp-footer__inner">
                     <div className="lp-footer__cta">
-                        <h2 className="lp-footer__heading">Ready to find the imposter?</h2>
+                        <h2 className="lp-footer__heading">Ready to find the saboteur?</h2>
                         <a href="/play" className="lp-button lp-button--primary lp-footer__btn">
                             Start a game
                         </a>
@@ -263,6 +265,10 @@ function LandingPage() {
                             <a className="lp-link" href="https://github.com/siacavazzi" target="_blank" rel="noreferrer noopener">
                                 @siacavazzi
                             </a>
+                        </p>
+                        <p className="lp-footer__line lp-footer__line--muted" style={{ fontSize: '0.75rem', marginTop: 8 }}>
+                            Sus Party at susparty.com is a browser game, separate from the SusParty mobile app and susparty.info.{' '}
+                            <a className="lp-link" href="/faq">App and support clarification</a>.
                         </p>
                         <p className="lp-footer__line lp-footer__line--muted" style={{ fontSize: '0.75rem', marginTop: 8 }}>
                             Sus Party is an independent social deduction party game and is not affiliated with, endorsed by, or sponsored by Innersloth or Among Us.

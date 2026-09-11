@@ -5,11 +5,12 @@ import { AlertTriangle, Zap, Activity, LogOut } from "lucide-react";
 
 function ReactorNormal() {
     const { socket,
-        meeting,
+        meetingState,
         hackTime,
         endState,
         roomCode,
      } = useContext(DataContext);
+    const meeting = meetingState && meetingState.stage !== 'over';
     const [isSabotaging, setIsSabotaging] = useState(false);
     const [pulseIntensity, setPulseIntensity] = useState(0);
 

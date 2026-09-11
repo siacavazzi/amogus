@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import GameContext from './GameContext';
 import PageController from './PageController';
 import HowToPlayPage from './pages/howToPlay/HowToPlayPage';
@@ -12,6 +12,8 @@ import HowToPlayIrlPage from './pages/seo/HowToPlayIrlPage';
 import TaskIdeasPage from './pages/seo/TaskIdeasPage';
 import TaskGeneratorPage from './pages/seo/TaskGeneratorPage';
 import { getRoomCodeFromSearch } from './utils/inviteLinks';
+
+const StylePreview = lazy(() => import('./preview/StylePreview'));
 
 function getRoute() {
   const roomCode = getRoomCodeFromSearch();
@@ -66,6 +68,10 @@ function getRoute() {
 
 function App() {
   const route = getRoute();
+
+  if (process.env.NODE_ENV === 'development' && window.location.pathname === '/style-preview') {
+    return <Suspense fallback={<div>Loading preview…</div>}><StylePreview /></Suspense>;
+  }
 
   if (route === 'game') {
     return (

@@ -36,7 +36,7 @@ CODE_PERCENT = 0.6
 ##### INTRUDER SETTINGS #######
 
 # Number of intruders per game
-NUMBER_OF_INTRUDERS = 2
+NUMBER_OF_INTRUDERS = 1
 
 # Probability of intruder drawing a card (0.0 to 1.0)
 # Reduce this if intruders are too powerful

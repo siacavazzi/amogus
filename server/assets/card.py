@@ -145,7 +145,7 @@ class Card:
         elif self.action == 'Taunt':
             self.game.speaker.play_sound(self.sound)
         elif self.action == 'Remote Sabotage':
-            self.game.start_meltdown()
+            remove_card = self.game.start_meltdown()
     # active cards
         elif self.action == 'Area Denial':
             if not self.game.denied_location:
@@ -393,6 +393,5 @@ class CardDeck:
             output.append(card.export())
         print(output)
         self.game.emit_to_room('active_cards', output)
-
 
 

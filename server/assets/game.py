@@ -158,6 +158,8 @@ class Game:
     def emit_to_room(self, event, data=None):
         """Emit an event to all players in this game's room."""
         self.last_activity = time.time()
+        if event == 'end_game':
+            self.cancel_meltdown()
 
         # Fire end-of-game stats callback once when the game ends
         if event == 'end_game' and not self._stats_recorded:
@@ -183,6 +185,8 @@ class Game:
                 self.socket.emit(event)
 
     def start_meltdown(self):
+        if not self.game_running or self.end_state or self.meeting or self.active_meltdown:
+            return False
         self.stats['meltdowns_triggered'] += 1
         meltdown_duration = max(self.meltdown_time - self.meltdown_time_mod, 1)
         self.speaker.loop_sound("meltdown", meltdown_duration)
@@ -195,6 +199,13 @@ class Game:
         self.card_deck.emit_active_cards()
         self.active_meltdown.game = self
         self.active_meltdown.start_countdown()
+        return True
+
+    def cancel_meltdown(self):
+        if self.active_meltdown:
+            self.active_meltdown.meltdown_active = False
+            self.active_meltdown = None
+            self.speaker.stop()
 
     def check_pin(self, pin):
         self.active_meltdown.check_pin(pin)
@@ -341,6 +352,7 @@ class Game:
     
     def reset(self):
         """Full reset - clears players and all game state."""
+        self.cancel_meltdown()
         self.players = []
         self.crew_score = 0
         self.game_running = False
@@ -365,6 +377,7 @@ class Game:
 
     def reset_game_state(self):
         """Reset game state but keep players - for playing again."""
+        self.cancel_meltdown()
         self.crew_score = 0
         self.game_running = False
         self.active_hack = 0
@@ -431,12 +444,12 @@ class Game:
         return living_players
 
     def try_start_voting(self):
-        if self.meeting.stage != 'waiting':
+        if not self.meeting or self.meeting.stage != 'waiting':
             return 
-        
-        for player in self.players:
-            if player.alive and not player.ready:
-                return 
+
+        connected_living = [p for p in self.players if p.alive and p.sid and p.active]
+        if not connected_living or any(not p.ready for p in connected_living):
+            return
             
         self.meeting.start_voting()
         for player in self.players:
@@ -453,18 +466,23 @@ class Game:
             task_name: Optional task name if they died during a task
         """
         player = self.getPlayerById(player_id)
-        if not player:
+        if not player or not player.alive:
             return
         
         # Set death cause and message using the player's method
         death_message = player.set_death(death_cause, task_name)
         print(f"Player {player.username} died: {death_cause} - {death_message}")
 
+        if self.end_state:
+            self.emit_player_list()
+            return
+
         if not player.sus:
             self.numCrew -= 1
-            if self.numCrew <= 0:
+            if self.numIntruders > 0 and self.numCrew <= self.numIntruders:
                 self.end_state = 'sus_victory'
                 self.end_time = time.time()
+                self.cancel_meltdown()
                 self.speaker.play_sound('sus_victory')
                 # Emit player list BEFORE end_game so clients have updated death info
                 self.emit_player_list()
@@ -477,6 +495,7 @@ class Game:
             if self.numIntruders <= 0:
                 self.end_state = 'victory'
                 self.end_time = time.time()
+                self.cancel_meltdown()
                 self.speaker.play_sound('crew_victory')
                 # Emit player list BEFORE end_game so clients have updated death info
                 self.emit_player_list()
@@ -487,5 +506,3 @@ class Game:
             self.try_start_voting()
 
         self.emit_player_list()
-
-
