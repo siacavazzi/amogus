@@ -134,22 +134,8 @@ const DataBlock = ({ top, left, delay }) => (
   />
 );
 
-const HackedPage = ({ hackTime, setHackTime }) => {
+const HackedPage = ({ hackTime }) => {
   const [glitchIntensity, setGlitchIntensity] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setHackTime((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [setHackTime]);
 
   // Random glitch intensity for extra chaos
   useEffect(() => {

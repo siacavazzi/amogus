@@ -165,6 +165,24 @@ describe('CrewPage', () => {
             
             expect(screen.getByText(/Eliminate all crewmates/i)).toBeInTheDocument();
         });
+
+        it('selects the dead sound while preserving the elimination event and cooldown', () => {
+            window.localStorage.getItem.mockImplementation((key) =>
+                key === 'player_id' ? 'test_player_id' : null
+            );
+            const { contextValue } = renderWithContext(
+                <CrewmemberPage setShowSusPage={mockSetShowSusPage} />,
+                intruderContext
+            );
+
+            fireEvent.click(screen.getByTestId('slider-trigger'));
+
+            expect(contextValue.setAudio).toHaveBeenCalledWith('dead');
+            expect(contextValue.socket.emit).toHaveBeenCalledWith('kill_player', {
+                player_id: 'test_player_id',
+            });
+            expect(contextValue.setKillCooldown).toHaveBeenCalledWith(15);
+        });
     });
 
     describe('No Task State', () => {

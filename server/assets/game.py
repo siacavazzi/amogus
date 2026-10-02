@@ -252,7 +252,7 @@ class Game:
         random_number = 1
 
         if not self.backgrounds:
-            random_number = random.randint(1, len(self.backgrounds) - 1)
+            random_number = random.randint(0, 16)
         else:
             random_number = random.choice(self.backgrounds)
             print(random_number)
@@ -404,7 +404,9 @@ class Game:
             'cards_played': 0,
             'meltdowns_triggered': 0,
             'tasks_completed': 0,
+            'fake_tasks_sent': [],
             'fake_tasks_completed': [],
+            'taunts_sent': [],
         }
         
         # Only reset task handler if no task list was applied

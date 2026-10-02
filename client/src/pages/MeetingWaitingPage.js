@@ -55,7 +55,7 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
   };
 
   return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white p-6 pb-32 overflow-hidden">
+    <div className="fixed inset-0 flex flex-col items-center bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white p-6 pt-12 pb-32 overflow-y-auto">
       {/* Leave Game Button */}
       {!tutorialMode && <LeaveGameButton className="fixed top-4 right-4 z-50" />}
 
@@ -96,7 +96,7 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
         <div className="absolute bottom-0 right-0 w-32 h-32 border-r-2 border-b-2 border-orange-500/20" />
       </div>
 
-      <div className="relative z-10 text-center max-w-lg w-full">
+      <div className="relative z-10 text-center max-w-lg w-full shrink-0 my-auto">
         {/* Header Icon */}
         <div className="flex justify-center mb-4">
           <div className={`w-20 h-20 rounded-2xl ${allReady ? 'bg-green-500/20 border-green-500/30' : 'bg-orange-500/20 border-orange-500/30'} border flex items-center justify-center`}>

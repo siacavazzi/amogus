@@ -75,6 +75,14 @@ export default function GameContext({ children }) {
     // Keep inRoomRef in sync so socket handlers (set up with [] deps) can read current value
     useEffect(() => { inRoomRef.current = inRoom; }, [inRoom]);
 
+    useEffect(() => {
+        if (hackTime <= 0) {
+            return;
+        }
+        const timer = setTimeout(() => setHackTime(time => Math.max(0, time - 1)), 1000);
+        return () => clearTimeout(timer);
+    }, [hackTime]);
+
     // Reset all state to initial values (keeps connection)
     const resetGameState = () => {
         setGameState({})
@@ -291,6 +299,10 @@ export default function GameContext({ children }) {
             console.log('Reactor registered:', data);
             setRoomCode(data.room_code);
             setInRoom(true);
+            setRoomOpen(data.is_open || false);
+            setIsRoomCreator(data.is_creator || false);
+            localStorage.setItem('room_code', data.room_code);
+            sessionStorage.setItem('is_room_creator', String(data.is_creator || false));
         });
 
         socketRef.current.on('rejoin_failed', (data) => {
@@ -366,7 +378,6 @@ export default function GameContext({ children }) {
         socketRef.current.on('intruders_revealed', (data) => {
             console.log('Intruders revealed:', data);
             setIntrudersRevealed(data);
-            setAudio('intruders_revealed');
             
             // Check if current player is an intruder
             const myPlayerId = localStorage.getItem('player_id');
@@ -512,7 +523,6 @@ export default function GameContext({ children }) {
                 setShowSusPage(false)
                 
                 if (meetingData.stage === 'waiting') {
-                    setAudio('meeting');
                     isMobile && setDialog({ 
                         title: "Emergency Meeting Called!", 
                         body: <MeetingDisplay meetingData={meetingData} /> 
@@ -733,6 +743,7 @@ export default function GameContext({ children }) {
         meltdownTimer,
         hackTime, 
         audio,
+        audioEnabled,
         playerState,
         gameState,
         connected,
@@ -747,6 +758,7 @@ export default function GameContext({ children }) {
         taskGoal,
         susPoints,
         taskEntry,
+        taskLocations,
         deniedLocation,
         votes,
         vetoVotes,

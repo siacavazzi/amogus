@@ -136,6 +136,8 @@ class Meeting:
         """
         End the meeting and emit the final vote results, including who was voted out.
         """
+        if self.stage == 'over' or self.game.meeting is not self or self.game.end_state:
+            return
         self.stage = 'over'
 
         for player in self.game.players:
@@ -183,14 +185,14 @@ class Meeting:
         """
         Countdown the voting time and end the meeting.
         """
-        while self.time_left > 0:
-            if self.time_left == 10 and self.stage != 'over':
+        while self.stage == 'voting' and self.game.meeting is self and not self.game.end_state:
+            if self.time_left <= 0:
+                self.end_meeting()
+                return
+            if self.time_left == 10:
                 self.speaker.play_sound('hurry')
             time.sleep(1)
             self.time_left -= 1
-
-        if self.stage != 'over':
-            self.end_meeting()
 
     def to_json(self):
         """

@@ -68,7 +68,7 @@ const CrewmemberPage = ({
 
     if (playerState?.sus) {
       if (killCooldown > 0) return; // Prevent action during cooldown
-      setAudio("kill_player");
+      setAudio("dead");
       socket.emit("kill_player", { player_id: localStorage.getItem("player_id") }); // doesnt do anything yet...
       setKillCooldown(15); 
       return;

@@ -76,8 +76,6 @@ const initializeSounds = () => {
   return sounds;
 };
 
-// Reference to currently looping sound
-let loopingSound = null;
 let loopTimeout = null;
 
 export const AudioHandler = () => {
@@ -185,15 +183,14 @@ export const AudioHandler = () => {
 
   // Helper function to stop all sounds
   const stopAllSounds = useCallback(() => {
-    // Stop any looping sound
-    if (loopingSound && soundsRef.current?.[loopingSound]) {
-      soundsRef.current[loopingSound].stop();
-      loopingSound = null;
-    }
-    if (loopTimeout) {
+    if (loopTimeout !== null) {
       clearTimeout(loopTimeout);
       loopTimeout = null;
     }
+    Object.values(soundsRef.current || {}).forEach((sound) => {
+      sound.stop();
+      sound.loop(false);
+    });
   }, []);
 
   // Helper function to loop a sound for a duration
@@ -207,7 +204,6 @@ export const AudioHandler = () => {
     stopAllSounds();
     
     if (audioEnabled) {
-      loopingSound = soundName;
       const sound = soundsRef.current[soundName];
       sound.loop(true);
       sound.play();
@@ -217,7 +213,7 @@ export const AudioHandler = () => {
         loopTimeout = setTimeout(() => {
           sound.stop();
           sound.loop(false);
-          loopingSound = null;
+          loopTimeout = null;
         }, duration * 1000);
       }
     }

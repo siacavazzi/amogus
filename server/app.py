@@ -360,21 +360,50 @@ def handle_register_reactor(data):
     # Register this client as the reactor
     game.has_reactor = True
     game.reactor_sid = sid
+    if not game.creator_player_id and game.creator_sid not in game_manager.sid_to_game:
+        game.creator_sid = sid
     
     # Join the Socket.IO room so reactor receives room-wide events
     join_room(room_code)
     game_manager.sid_to_game[sid] = room_code
     
     logger.info(f"Reactor registered for room {room_code} (sid: {sid})")
-    emit('reactor_registered', {'room_code': room_code})
+    emit('reactor_registered', {
+        'room_code': room_code,
+        'is_open': game.is_open,
+        'is_creator': game.creator_sid == sid,
+    })
+    emit('task_locations', game.locations)
+    emit('game_data', {'action': 'rejoin', 'list': [player.to_json() for player in game.players]})
     
     # If game is running, send current game state to reactor
     if game.game_running:
         emit("game_start")
         emit("crew_score", {"score": game.crew_score})
         emit("task_goal", game.taskGoal)
+        if game.end_state:
+            emit('end_game', {'result': game.end_state, 'stats': game.stats})
+        emit('active_cards', [card.export() for card in game.card_deck.active_cards])
+        if game.active_hack > 0:
+            emit('hack', game.active_hack)
+        if game.meeting and not game.end_state:
+            emit('meeting', game.meeting.to_json())
+            if game.meeting.stage == 'voting':
+                emit('vote_update', {
+                    'votes': game.meeting.compute_vote_counts(),
+                    'vetoVotes': len(game.meeting.veto_votes),
+                })
+        if game.denied_location:
+            emit('active_denial', game.denied_location)
+        if game.intruders_revealed:
+            intruders = [player for player in game.players if player.sus and player.alive]
+            emit('intruders_revealed', {
+                'intruder_names': [player.username for player in intruders],
+                'intruder_ids': [player.player_id for player in intruders],
+            })
         if game.active_meltdown:
             emit("meltdown_update", game.active_meltdown.time_left)
+            emit('codes_needed', max(game.active_meltdown.codes_needed - game.active_meltdown.codes_entered, 0))
 
 
 # ============ CONNECTION HANDLING ============
@@ -466,6 +495,8 @@ def handle_disconnect():
     logger.info(f"Client disconnected: {sid}")
     game, room_code = game_manager.get_game_by_sid(sid)
     game_manager.unregister_sid(sid)
+    if game and game.reactor_sid == sid:
+        game.reactor_sid = None
     player = game.getPlayerBySid(sid) if game else None
     if player:
         player.disconnect()
@@ -631,7 +662,7 @@ def handle_start(data):
     game.card_deck = CardDeck(game.locations, game.socket, game)
     logger.info(f"Card deck rebuilt with locations: {game.locations}")
     
-    speaker.play_sound("theme")
+    game.speaker.play_sound("theme")
     game.game_running = True
     game.assignRoles()
     sendPlayerList(game, room_code, 'start_game')
@@ -792,6 +823,9 @@ def leave_room_handler(data):
             # Game not running or player already dead - remove them from the game
             if player in game.players:
                 game.players.remove(player)
+                if (player.pic not in game.backgrounds and
+                        not any(other.pic == player.pic for other in game.players)):
+                    game.backgrounds.append(player.pic)
             logger.info(f"Player {player.username} left room {room_code}")
         
         player.sid = None
@@ -977,7 +1011,6 @@ def handleMeeting(data):
         return
     
     if not game.meeting:
-        speaker.play_sound("meeting")
         game.start_meeting(player)
         logger.info(f"Meeting started in room {room_code}")
 
@@ -1616,7 +1649,7 @@ def handle_finalize_collaborative_tasks(data):
     logger.info(f"Card deck rebuilt with locations: {game.locations}")
     
     # Now actually start the game
-    speaker.play_sound("theme")
+    game.speaker.play_sound("theme")
     game.game_running = True
     game.assignRoles()
     sendPlayerList(game, room_code, 'start_game')

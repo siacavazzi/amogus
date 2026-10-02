@@ -435,7 +435,8 @@ class GameIntegrationTests(SocketGameTestCase):
         )
         reactor = self.make_client()
         reactor.emit("register_reactor", {"room_code": room_code})
-        self.assertEqual({"room_code": room_code}, self.first_event(self.drain(reactor), "reactor_registered"))
+        self.assertEqual({"room_code": room_code, "is_open": True, "is_creator": False},
+                         self.first_event(self.drain(reactor), "reactor_registered"))
         self.add_tasks(clients[0], room_code, 12)
         self.drain_all(clients)
 
