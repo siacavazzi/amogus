@@ -1014,19 +1014,17 @@ function PreGamePage() {
                             </div>
                         )}
 
-                        {/* ----- Tasks list, grouped by location -----
-                            Iterate over realLocations (not tasksByLocation)
-                            so empty locations still render and can be
-                            deleted with an explicit button. */}
+                        {/* Show all locations and the optional Other section. */}
                         {!showLocationSetup && (
                             <div className="space-y-3 mb-4">
-                                {realLocations.map((location) => {
+                                {locations.map((location) => {
                                     const locationTasks = tasksByLocation[location] || [];
-                                    const enough = locationTasks.length >= MIN_TASKS_PER_LOCATION;
-                                    const canDelete = canEditLocations && locationTasks.length === 0 && realLocations.length > 2;
+                                    const isOther = location === 'Other';
+                                    const enough = !isOther && locationTasks.length >= MIN_TASKS_PER_LOCATION;
+                                    const canDelete = !isOther && canEditLocations && locationTasks.length === 0 && realLocations.length > 2;
                                     const canShowRemove = isHost || collaborativeMode;
                                     return (
-                                        <div key={location} className="bg-gray-900/60 backdrop-blur-xl border border-gray-800/60 rounded-2xl overflow-hidden">
+                                        <section key={location} aria-label={`${location} tasks`} className="bg-gray-900/60 backdrop-blur-xl border border-gray-800/60 rounded-2xl overflow-hidden">
                                             <div className="bg-gray-800/40 px-4 py-2.5 flex justify-between items-center border-b border-gray-700/40">
                                                 <span className="font-medium text-white flex items-center gap-2 text-sm">
                                                     <MapPin size={13} className="text-indigo-400" />
@@ -1034,9 +1032,11 @@ function PreGamePage() {
                                                 </span>
                                                 <div className="flex items-center gap-2">
                                                     <span className={`text-[11px] font-mono px-2 py-0.5 rounded-md flex items-center gap-1 ${
-                                                        enough ? 'bg-green-500/15 text-green-400' : 'bg-yellow-500/15 text-yellow-400'
+                                                        isOther ? 'bg-gray-700/40 text-gray-300' : enough ? 'bg-green-500/15 text-green-400' : 'bg-yellow-500/15 text-yellow-400'
                                                     }`}>
-                                                        {locationTasks.length}/{MIN_TASKS_PER_LOCATION}
+                                                        {isOther
+                                                            ? `${locationTasks.length} task${locationTasks.length === 1 ? '' : 's'}`
+                                                            : `${locationTasks.length}/${MIN_TASKS_PER_LOCATION}`}
                                                         {enough && <Check size={11} />}
                                                     </span>
                                                     {canDelete && (
@@ -1083,17 +1083,9 @@ function PreGamePage() {
                                                     No tasks here yet
                                                 </div>
                                             )}
-                                        </div>
+                                        </section>
                                     );
                                 })}
-
-                                {realLocations.length === 0 && (
-                                    <div className="text-center py-12 text-gray-500">
-                                        <ClipboardList size={48} className="mx-auto mb-4 text-gray-700" />
-                                        <p className="text-lg mb-1 text-gray-400">No tasks yet</p>
-                                        <p className="text-sm">Add the first task above ☝️</p>
-                                    </div>
-                                )}
                             </div>
                         )}
 

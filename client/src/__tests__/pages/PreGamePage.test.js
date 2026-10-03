@@ -9,6 +9,7 @@
  * - Has tabs for viewing players and creating/editing tasks
  */
 import React from 'react';
+import { act, within } from '@testing-library/react';
 import { renderWithContext, screen, fireEvent, waitFor, mockPlayers, mockTaskLocations, simulateSocketEvent } from '../../test-utils';
 import PreGamePage from '../../pages/PreGamePage';
 
@@ -158,6 +159,7 @@ describe('PreGamePage', () => {
                 taskLocations: ['Kitchen', 'Yard', 'Other'],
                 isRoomCreator: true,
             });
+            fireEvent.click(screen.getByRole('button', { name: /^Tasks/i }));
 
             await waitFor(() => {
                 expect(contextValue.socket.on).toHaveBeenCalledWith('collaborative_tasks', expect.any(Function));
@@ -172,13 +174,14 @@ describe('PreGamePage', () => {
             simulateSocketEvent(contextValue.socket, 'collaborative_tasks', {
                 tasks: [
                     ...tasks,
-                    { task: 'Kitchen extra', location: 'Kitchen' },
-                    { task: 'Yard extra', location: 'Yard' },
+                    { task: 'Other extra one', location: 'Other' },
+                    { task: 'Other extra two', location: 'Other' },
                 ],
             });
 
             await waitFor(() => {
                 expect(screen.getByRole('button', { name: /start game/i })).toBeInTheDocument();
+                expect(within(screen.getByRole('region', { name: 'Other tasks' })).getByText('2 tasks')).toBeInTheDocument();
             });
         });
     });
@@ -195,6 +198,57 @@ describe('PreGamePage', () => {
             // Host should see some task management options
             // The exact UI depends on the tab state
             expect(screen.getByText('Alice')).toBeInTheDocument();
+        });
+
+        it('shows and removes an Other task in its optional section', () => {
+            const { contextValue } = renderWithContext(<PreGamePage />, {
+                ...hostContext,
+                taskLocations: ['Kitchen', 'Yard', 'Garage', 'Basement', 'Other'],
+            });
+            act(() => simulateSocketEvent(contextValue.socket, 'collaborative_tasks', {
+                tasks: [{ task: 'Kitchen task', location: 'Kitchen' }],
+            }));
+            fireEvent.click(screen.getByRole('button', { name: /^Tasks/i }));
+
+            const otherSection = screen.getByRole('region', { name: 'Other tasks' });
+            expect(within(otherSection).getByText('0 tasks')).toBeInTheDocument();
+            expect(within(otherSection).queryByTitle('Delete this location')).not.toBeInTheDocument();
+
+            fireEvent.change(screen.getByRole('combobox'), { target: { value: 'Other' } });
+            fireEvent.change(screen.getByPlaceholderText(/Add a task/), { target: { value: 'Do ten jumping jacks' } });
+            fireEvent.click(screen.getByTitle('Add task'));
+            expect(contextValue.socket.emit).toHaveBeenCalledWith('add_collaborative_task', expect.objectContaining({
+                task: expect.objectContaining({ task: 'Do ten jumping jacks', location: 'Other' }),
+            }));
+            act(() => simulateSocketEvent(contextValue.socket, 'collaborative_task_added', {
+                task: { task: 'Do ten jumping jacks', location: 'Other' }, total_tasks: 2,
+            }));
+
+            expect(within(otherSection).getByText('Do ten jumping jacks')).toBeInTheDocument();
+            expect(within(otherSection).getByText('1 task')).toBeInTheDocument();
+            fireEvent.click(within(otherSection).getByTitle('Remove task'));
+            expect(contextValue.socket.emit).toHaveBeenCalledWith('remove_collaborative_task', expect.objectContaining({
+                room_code: 'TEST1', task_index: 1,
+            }));
+            act(() => simulateSocketEvent(contextValue.socket, 'collaborative_task_removed', { index: 1 }));
+            expect(within(otherSection).queryByText('Do ten jumping jacks')).not.toBeInTheDocument();
+            expect(within(otherSection).getByText('0 tasks')).toBeInTheDocument();
+        });
+
+        it('shows an existing Other task to a player without edit permission', () => {
+            const { contextValue } = renderWithContext(<PreGamePage />, {
+                ...defaultContext,
+                taskLocations: ['Kitchen', 'Yard', 'Other'],
+                isRoomCreator: false,
+            });
+            act(() => simulateSocketEvent(contextValue.socket, 'collaborative_tasks', {
+                tasks: [{ task: 'Existing Other task', location: 'Other' }], collaborative_mode: false,
+            }));
+            fireEvent.click(screen.getByRole('button', { name: /^Tasks/i }));
+
+            const otherSection = screen.getByRole('region', { name: 'Other tasks' });
+            expect(within(otherSection).getByText('Existing Other task')).toBeInTheDocument();
+            expect(within(otherSection).queryByTitle('Remove task')).not.toBeInTheDocument();
         });
     });
 
