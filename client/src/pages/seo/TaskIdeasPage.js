@@ -5,8 +5,8 @@ import SeoPageLayout from './SeoPageLayout';
 const SCHEMA = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
-    name: 'Among Us IRL Task Ideas',
-    description: '100+ Among Us IRL task ideas organised by venue type',
+    name: 'Among Us IRL Task Ideas at Home',
+    description: '100+ free Among Us in real life task ideas for kitchens, living rooms, bedrooms, and other spaces',
     numberOfItems: 116,
     url: 'https://susparty.com/among-us-irl-task-ideas',
 };
@@ -218,9 +218,9 @@ const TIPS = [
 
 function TaskIdeasPage() {
     usePageMeta({
-        title: 'Among Us IRL Task Ideas for Houses, Dorms, Offices, and Parties | Sus Party',
+        title: 'Among Us IRL Task Ideas at Home (100+) | Sus Party',
         description:
-            '100+ Among Us IRL task ideas for every venue type: kitchen, living room, bedroom, dorm, office, outdoor, funny, and low-movement. Free to use — or load them into Sus Party.',
+            '100+ free Among Us in real life task ideas at home, with tasks for your kitchen, living room, and bedroom. Also covers dorms, offices, and low-movement play.',
         canonical: 'https://susparty.com/among-us-irl-task-ideas',
         ogImage: 'https://susparty.com/og-image.jpg',
         schema: SCHEMA,
@@ -236,10 +236,11 @@ function TaskIdeasPage() {
                     </a>{' '}
                     › Task ideas
                 </p>
-                <h1 className="seo-h1">Among Us IRL task ideas</h1>
+                <h1 className="seo-h1">Among Us IRL task ideas at home</h1>
                 <p className="seo-lead">
-                    More than 100 ready-to-use tasks for houses, apartments, dorms, offices, and
-                    parties. Grouped by location so you can pick the ones that fit your space.
+                    More than 100 free Among Us in real life tasks for your kitchen, living room,
+                    bedroom, and hallway. Also includes tasks for dorms, offices, and outdoor spaces.
+                    Pick the rooms that match your home and skip anything that is out of bounds.
                     Copy and paste, or load them straight into Sus Party.
                 </p>
                 <div className="seo-actions">
@@ -257,7 +258,7 @@ function TaskIdeasPage() {
                 {TASK_SECTIONS.map((section) => (
                     <section className="seo-section" key={section.label}>
                         <div className="seo-task-group">
-                            <p className="seo-task-group__label">{section.label}</p>
+                            <h2 className="seo-task-group__label">{section.label}</h2>
                             {section.intro && (
                                 <p style={{ color: '#9ca3af', fontSize: '0.9rem', marginBottom: 16 }}>
                                     {section.intro}

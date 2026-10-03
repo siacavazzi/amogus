@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { usePageMeta } from '../../seo/usePageMeta';
 import {
   flowSteps,
   heroStats,
@@ -26,36 +27,13 @@ import {
 } from './HowToPlayComponents';
 import './HowToPlayPage.css';
 
-function useMarketingDocument() {
-  useEffect(() => {
-    const html = document.documentElement;
-    const body = document.body;
-    const themeMeta = document.querySelector('meta[name="theme-color"]');
-    const previousTitle = document.title;
-    const previousTheme = themeMeta ? themeMeta.getAttribute('content') : null;
-
-    html.classList.add('htp-document');
-    body.classList.add('htp-document');
-    document.title = 'How to Play - Sus Party';
-
-    if (themeMeta) {
-      themeMeta.setAttribute('content', '#030712');
-    }
-
-    return () => {
-      html.classList.remove('htp-document');
-      body.classList.remove('htp-document');
-      document.title = previousTitle;
-
-      if (themeMeta && previousTheme) {
-        themeMeta.setAttribute('content', previousTheme);
-      }
-    };
-  }, []);
-}
-
 function HowToPlayPage() {
-  useMarketingDocument();
+  usePageMeta({
+    title: 'How to Play Sus Party | Among Us-Inspired IRL Game',
+    description: 'Set up your first Sus Party game at home. Learn how to host, join with a room code, add real-life tasks, use sabotage cards, and run meetings and votes.',
+    canonical: 'https://susparty.com/how-to-play',
+    documentClass: 'htp-document',
+  });
 
   // SPA hash-scroll: the browser misses the initial #anchor jump because the
   // page mounts after the URL is already set, so we re-trigger it here.

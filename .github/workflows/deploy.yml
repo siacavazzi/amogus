@@ -47,6 +47,7 @@ jobs:
           rsync -avz --delete \
             --exclude '__pycache__' \
             --exclude '*.pyc' \
+            --exclude 'stats.json*' \
             --exclude 'selfies/*' \
             --exclude 'task_lists/*' \
             --exclude 'logs/*' \

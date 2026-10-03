@@ -1,31 +1,13 @@
-import React, { useEffect } from 'react';
+import React from 'react';
+import { usePageMeta } from '../../seo/usePageMeta';
 import './InfoPage.css';
 
-function useInfoChrome(title) {
-    useEffect(() => {
-        const html = document.documentElement;
-        const body = document.body;
-        const themeMeta = document.querySelector('meta[name="theme-color"]');
-        const previousTitle = document.title;
-        const previousTheme = themeMeta ? themeMeta.getAttribute('content') : null;
-
-        html.classList.add('lp-document');
-        body.classList.add('lp-document');
-        document.title = title;
-
-        if (themeMeta) themeMeta.setAttribute('content', '#030712');
-
-        return () => {
-            html.classList.remove('lp-document');
-            body.classList.remove('lp-document');
-            document.title = previousTitle;
-            if (themeMeta && previousTheme) themeMeta.setAttribute('content', previousTheme);
-        };
-    }, [title]);
-}
-
 function AboutPage() {
-    useInfoChrome('About · Sus Party | Not Another Couch Party Game');
+    usePageMeta({
+        title: 'About Sus Party | Independent Real-Life Party Game',
+        description: 'Meet Sus Party, a free, open-source party game inspired by Among Us. Learn about the browser app, real-life play, and its independent creator.',
+        canonical: 'https://susparty.com/about',
+    });
 
     return (
         <div className="info-shell">

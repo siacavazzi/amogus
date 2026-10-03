@@ -62,9 +62,9 @@ const MISTAKES = [
 
 function HowToPlayIrlPage() {
     usePageMeta({
-        title: 'How to Play Among Us IRL — Rules, Setup, and Tasks | Sus Party',
+        title: 'How to Play Among Us IRL at Home | Sus Party',
         description:
-            'Complete rules for playing Among Us IRL: roles, tasks, meetings, voting, and win conditions. Covers both manual DIY play and using the Sus Party app.',
+            'Learn how to play Among Us in real life at home: set up rooms, assign roles, choose tasks, and run meetings and votes. Includes DIY and free browser-app setup.',
         canonical: 'https://susparty.com/how-to-play-among-us-irl',
         ogImage: 'https://susparty.com/og-image.jpg',
         schema: SCHEMA,
@@ -80,7 +80,7 @@ function HowToPlayIrlPage() {
                     </a>{' '}
                     › Rules guide
                 </p>
-                <h1 className="seo-h1">How to play Among Us IRL</h1>
+                <h1 className="seo-h1">How to play Among Us IRL at home</h1>
                 <p className="seo-lead">
                     A complete rules guide for running Among Us in real life — covering roles, tasks,
                     meetings, voting, and win conditions. Works whether you're running it manually or

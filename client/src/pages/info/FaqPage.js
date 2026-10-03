@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
+import { usePageMeta } from '../../seo/usePageMeta';
 import './InfoPage.css';
 
 const FAQS = [
@@ -68,32 +69,12 @@ const FAQS = [
     },
 ];
 
-function InfoChrome({ titleSuffix, children }) {
-    useEffect(() => {
-        const html = document.documentElement;
-        const body = document.body;
-        const themeMeta = document.querySelector('meta[name="theme-color"]');
-        const previousTitle = document.title;
-        const previousTheme = themeMeta ? themeMeta.getAttribute('content') : null;
-
-        html.classList.add('lp-document');
-        body.classList.add('lp-document');
-        document.title = titleSuffix;
-
-        if (themeMeta) themeMeta.setAttribute('content', '#030712');
-
-        return () => {
-            html.classList.remove('lp-document');
-            body.classList.remove('lp-document');
-            document.title = previousTitle;
-            if (themeMeta && previousTheme) themeMeta.setAttribute('content', previousTheme);
-        };
-    }, [titleSuffix]);
-
-    return children;
-}
-
 function FaqPage() {
+    usePageMeta({
+        title: 'Among Us IRL FAQ | Sus Party',
+        description: 'Answers about playing Among Us in real life with Sus Party: player counts, tasks at home, phones, setup, pricing, and how the free browser game works.',
+        canonical: 'https://susparty.com/faq',
+    });
     const jsonLd = {
         '@context': 'https://schema.org',
         '@type': 'FAQPage',
@@ -105,7 +86,7 @@ function FaqPage() {
     };
 
     return (
-        <InfoChrome titleSuffix="FAQ · Sus Party | Not Another Couch Party Game">
+        <>
             <div className="info-shell">
                 <div className="info-orb info-orb--indigo" aria-hidden="true" />
                 <div className="info-orb info-orb--purple" aria-hidden="true" />
@@ -117,7 +98,7 @@ function FaqPage() {
 
                     <header className="info-header">
                         <p className="info-eyebrow">Frequently Asked Questions</p>
-                        <h1 className="info-title">Sus Party FAQ</h1>
+                        <h1 className="info-title">Among Us IRL FAQ</h1>
                         <p className="info-lead">
                             Quick answers about Sus Party, the free room-to-room social deduction game you can play in your house.
                         </p>
@@ -150,7 +131,7 @@ function FaqPage() {
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
                 />
             </div>
-        </InfoChrome>
+        </>
     );
 }
 

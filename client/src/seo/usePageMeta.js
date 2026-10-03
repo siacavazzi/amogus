@@ -49,8 +49,9 @@ function setLinkCanonical(href) {
  * @param {string} opts.canonical      - canonical URL and og:url
  * @param {string} [opts.ogImage]      - og:image and twitter:image (defaults to base value)
  * @param {object} [opts.schema]       - JSON-LD schema object, injected into <head>
+ * @param {string} [opts.documentClass] - CSS class for the page theme
  */
-export function usePageMeta({ title, description, canonical, ogImage, schema }) {
+export function usePageMeta({ title, description, canonical, ogImage, schema, documentClass = 'lp-document' }) {
     useEffect(() => {
         const prevTitle = document.title;
         const prevDesc = setMetaByName('description', description);
@@ -69,8 +70,8 @@ export function usePageMeta({ title, description, canonical, ogImage, schema }) 
 
         document.title = title;
         if (themeMeta) themeMeta.setAttribute('content', '#030712');
-        html.classList.add('lp-document');
-        body.classList.add('lp-document');
+        html.classList.add(documentClass);
+        body.classList.add(documentClass);
 
         let schemaScript = null;
         if (schema) {
@@ -93,12 +94,12 @@ export function usePageMeta({ title, description, canonical, ogImage, schema }) 
             setMetaByName('twitter:description', prevTwDesc);
             if (prevTwImg !== null) setMetaByName('twitter:image', prevTwImg);
             if (themeMeta && prevTheme) themeMeta.setAttribute('content', prevTheme);
-            html.classList.remove('lp-document');
-            body.classList.remove('lp-document');
+            html.classList.remove(documentClass);
+            body.classList.remove(documentClass);
             if (schemaScript && document.head.contains(schemaScript)) {
                 document.head.removeChild(schemaScript);
             }
         };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [title, description, canonical, ogImage]);
+    }, [title, description, canonical, ogImage, documentClass]);
 }

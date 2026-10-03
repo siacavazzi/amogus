@@ -64,6 +64,18 @@ const COMPARISON = [
 
 const FAQS = [
     {
+        q: 'What app can I use to play Among Us in real life?',
+        a: 'Sus Party is a free browser app for an Among Us-inspired game at home. Each player uses a phone for their role, tasks, sabotage cards, meetings, and votes. No app download or account is required.',
+    },
+    {
+        q: 'Where do I get an Among Us IRL room code?',
+        a: 'Open susparty.com/play and create a game. Share its four-character room code with your friends so they can join from their own phones. Each host creates a separate room for their group.',
+    },
+    {
+        q: 'Can you play Among Us IRL online?',
+        a: 'Sus Party connects your phones online, but everyone plays together in the same house, apartment, dorm, or office. The tasks, eliminations, and meetings happen in person.',
+    },
+    {
         q: 'Can you play Among Us IRL without any app?',
         a: 'Yes — all you need is a way to assign roles (paper slips work) and an agreed task list. Sus Party is optional but it handles all the coordination automatically, which makes the game run much smoother.',
     },
@@ -87,9 +99,9 @@ const FAQS = [
 
 function AmongUsIrlPage() {
     usePageMeta({
-        title: 'Among Us IRL — Play Among Us in Real Life with Friends | Sus Party',
+        title: 'Free Among Us IRL App — Play in Real Life | Sus Party',
         description:
-            'Want to play Among Us IRL? Sus Party lets your group play an Among Us-style real-life social deduction game with phones, tasks, meetings, voting, and sabotages. Free, no install.',
+            'A free browser app for an Among Us-inspired game in real life. Play at home with friends, room codes, custom tasks, secret roles, meetings, and votes.',
         canonical: 'https://susparty.com/among-us-irl',
         ogImage: 'https://susparty.com/og-image.jpg',
         schema: SCHEMA,
@@ -100,9 +112,9 @@ function AmongUsIrlPage() {
             {/* ── Hero ──────────────────────────────────────────────────── */}
             <div className="seo-hero">
                 <p className="seo-eyebrow">Sus Party — Free · No Install · Browser-Based</p>
-                <h1 className="seo-h1">Among Us IRL: play&nbsp;Among&nbsp;Us in&nbsp;real&nbsp;life</h1>
+                <h1 className="seo-h1">A free Among Us IRL app</h1>
                 <p className="seo-lead">
-                    Playing Among Us IRL means running a real social deduction game through your house,
+                    Play Among Us in real life with Sus Party, a free browser app for your house,
                     dorm, or office. Players physically move between rooms completing tasks while secret
                     intruders blend in, eliminate crewmates, and try to survive the vote. Sus Party
                     handles all the coordination — for free, with no install.
@@ -231,7 +243,7 @@ function AmongUsIrlPage() {
                 {/* Example tasks */}
                 <section className="seo-section">
                     <p className="seo-section__kicker">Sample tasks</p>
-                    <h2>What Among Us IRL tasks look like</h2>
+                    <h2>Among Us tasks in real life at home</h2>
                     <p>
                         Good tasks are short, obvious to verify, and spread across multiple rooms. Here
                         are twelve from the Sus Party default set:
@@ -336,7 +348,7 @@ function AmongUsIrlPage() {
                     <div className="seo-highlight">
                         <p>
                             Sus Party is free to host. No account, no install — players join by typing a
-                            four-digit room code on any phone browser.
+                            four-character room code in any phone browser.
                         </p>
                     </div>
                 </section>
