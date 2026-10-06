@@ -15,10 +15,10 @@ import {
 } from 'lucide-react';
 
 export const heroStats = [
-  { value: '5-15', label: 'Players' },
-  { value: '30-60 min', label: 'Typical game time' },
+  { value: 'Free', label: 'Browser game, no account' },
   { value: '1 phone each', label: 'Phones are the controller' },
-  { value: 'Multi-room space', label: 'House, office, dorm, or similar' },
+  { value: 'Your space', label: 'Several rooms or two task stations' },
+  { value: '5-15', label: 'Players in a generated setup' },
 ];
 
 export const jumpLinks = [
@@ -45,7 +45,7 @@ export const setupCards = [
     tone: 'neutral',
     title: 'Task list',
     description:
-      'Make a list of short physical tasks around the venue. Players mark them complete on the honor system after they actually do them.',
+      'Generate a task pack for your areas or write your own list. Review the materials first. Players slide to complete each task after they do it.',
   },
   {
     icon: Monitor,
@@ -62,7 +62,7 @@ export const setupGuides = [
     tone: 'neutral',
     title: 'Good first-game setup',
     items: [
-      'Use 5 to 16 players. Around 8 to 12 usually feels best.',
+      'The generator prepares groups of 5 to 15. The game requires at least two crew members per intruder and has no fixed 15-player cap.',
       'Keep tasks short, obvious, and spread across several rooms.',
       'Make sure every player has a phone and knows how to swipe a task complete.',
     ],
@@ -262,9 +262,9 @@ export const hostCards = [
 ];
 
 export const pageCopy = {
-  heroTitle: 'Phones guide it. The game happens in your house.',
+  heroTitle: 'How to play Sus Party',
   heroBody:
-    'Sus Party is a real-world social deduction game. Crewmates move between rooms finishing physical tasks. Intruders blend in, eliminate people quietly, and try to survive the vote. If you have played Mafia or Among Us, this is the live-action version.',
+    'Turn your rooms into the map. Sus Party gives each player a private role and task list, then brings the group back together for accusations and votes. Prepare a task pack, share the room code, and use this guide for your first round.',
   heroNote: 'Short version: move, do tasks, watch people, call meetings, vote carefully.',
   venueTitle: 'Best venue',
   venueBody:

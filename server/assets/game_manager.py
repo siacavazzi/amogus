@@ -9,6 +9,9 @@ from assets.sonosHandler import GameSpeaker
 from assets.stats_tracker import StatsTracker
 
 
+ROOM_TIMEOUT_SECONDS = 24 * 60 * 60
+
+
 class GameManager:
     """
     Manages multiple concurrent game instances.
@@ -39,7 +42,7 @@ class GameManager:
             if code not in self.games:
                 return code
 
-    def create_game(self, sid):
+    def create_game(self, sid, acquisition=None):
         """Create a new game and return the room code."""
         with self.lock:
             room_code = self._generate_room_code()
@@ -75,12 +78,13 @@ class GameManager:
             
             # Hook end-of-game reporting via Game's optional callback
             game.on_end_callback = self.stats_tracker.record_game_ended
+            game.acquisition = StatsTracker.normalize_acquisition(acquisition)
 
             self.games[room_code] = game
             self.sid_to_game[sid] = room_code
 
         # Record outside the lock (StatsTracker has its own lock)
-        self.stats_tracker.record_game_created(room_code)
+        self.stats_tracker.record_game_created(room_code, game.acquisition)
         return room_code, game
 
     def get_game(self, room_code):
@@ -219,6 +223,8 @@ class GameManager:
                 'game_duration_seconds': avg_duration,
             },
             'recent_games': list(reversed(completed[-25:])),
+            'acquisition': sorted(snapshot['acquisition'], key=lambda row: row['rooms_created'], reverse=True),
+            'acquisition_since': snapshot['acquisition_since'],
         }
 
     def _start_cleanup_thread(self):
@@ -232,29 +238,22 @@ class GameManager:
         thread.start()
 
     def _cleanup_inactive_games(self):
-        """Remove games that have been inactive for too long."""
+        """Recheck room activity under its lock before removal."""
         current_time = time.time()
-        games_to_remove = []
-        
         with self.lock:
-            for room_code, game in self.games.items():
-                # Check if game has been inactive for 1 hour
+            rooms = list(self.games.items())
+
+        for room_code, game in rooms:
+            with game.state_lock:
+                if self.games.get(room_code) is not game:
+                    continue
                 last_activity = getattr(game, 'last_activity', current_time)
-                if current_time - last_activity > 3600:  # 1 hour
-                    games_to_remove.append(room_code)
-                
-                # Also remove games that ended more than 30 minutes ago
-                if game.end_state and hasattr(game, 'end_time'):
-                    if game.end_time and current_time - game.end_time > 1800:  # 30 minutes
-                        if room_code not in games_to_remove:
-                            games_to_remove.append(room_code)
-        
-        for room_code in games_to_remove:
-            # Notify clients before removing
-            game = self.games.get(room_code)
-            if game:
+                inactive = current_time - last_activity > ROOM_TIMEOUT_SECONDS
+                end_time = getattr(game, 'end_time', None)
+                expired_end = bool(game.end_state and end_time and current_time - end_time > ROOM_TIMEOUT_SECONDS)
+                if not inactive and not expired_end:
+                    continue
                 self.socketio.emit('room_disbanded', {
                     'message': 'Room closed due to inactivity'
                 }, room=room_code)
-            self.delete_game(room_code)
-            print(f"Cleaned up inactive game: {room_code}")
+                self.delete_game(room_code)

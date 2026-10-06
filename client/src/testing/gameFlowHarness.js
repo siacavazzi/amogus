@@ -88,10 +88,33 @@ if (typeof afterEach === 'function') {
 
 export function createControlledSocket() {
     const handlers = new Map();
+    const pendingAcks = [];
+    let nextAckTimeout = null;
 
     const socket = {
         connected: true,
-        emit: jest.fn(() => socket),
+        emit: jest.fn((eventName, ...args) => {
+            const callback = typeof args[args.length - 1] === 'function' ? args.pop() : null;
+            if (callback) {
+                const record = { eventName, args, callback, timeout: nextAckTimeout, timer: null, settled: false };
+                nextAckTimeout = null;
+                if (record.timeout !== null) {
+                    record.timer = setTimeout(() => {
+                        if (!record.settled) {
+                            record.settled = true;
+                            record.callback(new Error('operation has timed out'));
+                        }
+                    }, record.timeout);
+                }
+                pendingAcks.push(record);
+            }
+            return socket;
+        }),
+        volatile: null,
+        timeout: jest.fn((milliseconds) => {
+            nextAckTimeout = milliseconds;
+            return socket;
+        }),
         on: jest.fn((eventName, handler) => {
             if (!handlers.has(eventName)) {
                 handlers.set(eventName, new Set());
@@ -125,6 +148,14 @@ export function createControlledSocket() {
             const matchingEmits = socket.emits(eventName);
             return matchingEmits[matchingEmits.length - 1];
         },
+        pendingAcks,
+        ack: (index, response) => {
+            const record = pendingAcks[index];
+            if (!record) throw new Error(`No pending acknowledgment at index ${index}`);
+            if (record.timer) clearTimeout(record.timer);
+            record.settled = true;
+            record.callback(null, response);
+        },
         serverEmit: async (eventName, payload) => {
             const eventHandlers = Array.from(handlers.get(eventName) || []);
             if (eventHandlers.length === 0) {
@@ -136,6 +167,8 @@ export function createControlledSocket() {
             });
         },
     };
+
+    socket.volatile = socket;
 
     return socket;
 }
@@ -232,6 +265,8 @@ export const serverEvents = {
     activeCards: (cards) => cards.map((card) => JSON.stringify(card)),
     task: (overrides = {}) => ({
         task: {
+            assignment_id: 'assignment-1',
+            round_id: 'round-1',
             task: 'Fix wires',
             location: 'Kitchen',
             ...overrides,

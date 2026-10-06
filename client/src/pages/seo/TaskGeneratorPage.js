@@ -1,390 +1,213 @@
-import React, { useState, useCallback } from 'react';
+import React, { useMemo, useState } from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
 import { VENUE_ROOMS, generateTasks } from './taskPools';
+import { saveGameDraft } from './gameDraft';
 
-const VENUE_OPTIONS = [
-    { value: 'apartment', label: 'Apartment / flat' },
-    { value: 'house', label: 'House' },
-    { value: 'dorm', label: 'Dorm / student halls' },
-    { value: 'office', label: 'Office' },
-    { value: 'airbnb', label: 'Airbnb / holiday rental' },
-    { value: 'school', label: 'School or community centre' },
-    { value: 'other', label: 'Other' },
-];
+const VENUES = {
+    apartment: 'Apartment', house: 'House', dorm: 'Dorm', office: 'Office',
+    airbnb: 'Vacation house / Airbnb', school: 'Classroom / community space', other: 'Other space',
+};
 
-const MOVEMENT_OPTIONS = [
-    { value: 'low', label: 'Low — seated / standing in place' },
-    { value: 'normal', label: 'Normal — walking between rooms' },
-    { value: 'active', label: 'Active — anything goes' },
-];
+function initialOptions() {
+    const params = new URLSearchParams(window.location.search);
+    const venue = Object.hasOwn(VENUES, params.get('venue')) ? params.get('venue') : 'apartment';
+    const movement = ['low', 'normal', 'active'].includes(params.get('movement')) ? params.get('movement') : 'normal';
+    const playerCount = Math.max(5, Math.min(15, Math.floor(Number(params.get('players')) || 8)));
+    const requestedRooms = params.getAll('room').map(room => room.trim()).filter(room => room && room.length <= 60).slice(0, 12);
+    return {
+        venue, movement, playerCount,
+        taskStyle: ['standard', 'funny', 'mix'].includes(params.get('style')) ? params.get('style') : 'standard',
+        selectedRooms: requestedRooms.length >= 2 ? [...new Set(requestedRooms)] : defaultRooms(venue, movement),
+    };
+}
 
-const STYLE_OPTIONS = [
-    { value: 'standard', label: 'Standard' },
-    { value: 'funny', label: 'Funny / chaotic' },
-    { value: 'mix', label: 'Mix of both' },
-];
+function defaultRooms(venue, movement) {
+    return movement === 'low' ? ['Station A', 'Station B'] : VENUE_ROOMS[venue].filter(room =>
+        !/Bedroom|Bathroom|Outdoor|Outdoors|Garage/.test(room));
+}
 
 function TaskGeneratorPage() {
     usePageMeta({
-        title: 'Among Us IRL Task Generator — Make Tasks for Your Space | Sus Party',
-        description:
-            'Generate a custom Among Us IRL task list for your space. Pick your venue, rooms, player count, and style to get 20 ready-to-play tasks, sabotage ideas, and recommended settings.',
+        title: 'Among Us IRL Task Generator | Sus Party',
+        description: 'Generate tasks for an Among Us in real life game. Choose rooms, players, and task styles, then take the pack into a new Sus Party room. Free, no account.',
         canonical: 'https://susparty.com/among-us-irl-task-generator',
-        ogImage: 'https://susparty.com/og-image.jpg',
     });
+    const [options, setOptions] = useState(initialOptions);
+    const [shuffle, setShuffle] = useState(0);
+    const [newRoom, setNewRoom] = useState('');
+    const [status, setStatus] = useState('');
+    const result = useMemo(() => generateTasks({ ...options, random: shuffle === 0 ? () => 0.42 : Math.random }), [options, shuffle]);
+    const availableRooms = [...new Set([
+        ...(options.movement === 'low' ? ['Station A', 'Station B'] : VENUE_ROOMS[options.venue]),
+        ...options.selectedRooms,
+    ])];
+    const minimumTasks = options.playerCount * 3;
+    const ready = result.rooms.length >= 2 && result.tasks.length >= minimumTasks;
+    const taskText = result.tasks.map((task, index) => `${index + 1}. [${task.location}] ${task.task}`).join('\n');
 
-    const [venue, setVenue] = useState('apartment');
-    const [playerCount, setPlayerCount] = useState(8);
-    const [movement, setMovement] = useState('normal');
-    const [taskStyle, setTaskStyle] = useState('standard');
-    const [result, setResult] = useState(null);
-    const [copied, setCopied] = useState(false);
-
-    const suggestedRooms = VENUE_ROOMS[venue] || VENUE_ROOMS.other;
-
-    const handleGenerate = useCallback(() => {
-        const output = generateTasks({ venue, playerCount, movement, taskStyle });
-        setResult(output);
-        setCopied(false);
-        // Scroll to output after a tick
-        setTimeout(() => {
-            const el = document.getElementById('generator-output');
-            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 50);
-    }, [venue, playerCount, movement, taskStyle]);
-
-    const handleCopy = useCallback(() => {
-        if (!result) return;
-        const lines = [
-            `Among Us IRL — Task List`,
-            `Venue: ${VENUE_OPTIONS.find((v) => v.value === venue)?.label || venue}`,
-            `Players: ${playerCount}`,
-            '',
-            '=== TASKS ===',
-            ...result.tasks.map((t, i) => `${i + 1}. [${t.location}] ${t.task}`),
-            '',
-            '=== SABOTAGE IDEAS (intruders only) ===',
-            ...result.sabotages.map((s, i) => `${i + 1}. ${s}`),
-            '',
-            '=== RECOMMENDED SETTINGS ===',
-            `Intruders: ${result.recommendations.intruderCount}`,
-            `Est. duration: ${result.recommendations.durationMin}–${result.recommendations.durationMax} min`,
-            `Meltdown: ${result.recommendations.meltdown ? 'Recommended' : 'Optional'}`,
-            '',
-            'Generated at susparty.com/among-us-irl-task-generator',
-        ];
-        navigator.clipboard
-            .writeText(lines.join('\n'))
-            .then(() => {
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2500);
-            })
-            .catch(() => {
-                // Clipboard not available — ignore silently
-            });
-    }, [result, venue, playerCount]);
+    const update = (key, value) => {
+        setStatus('');
+        setOptions(previous => ({ ...previous, [key]: value,
+            ...(['venue', 'movement'].includes(key) ? {
+                selectedRooms: defaultRooms(key === 'venue' ? value : previous.venue, key === 'movement' ? value : previous.movement),
+            } : {}),
+        }));
+    };
+    const toggleRoom = room => setOptions(previous => ({ ...previous, selectedRooms: previous.selectedRooms.includes(room)
+        ? previous.selectedRooms.filter(value => value !== room) : [...previous.selectedRooms, room] }));
+    const addRoom = event => {
+        event.preventDefault();
+        const room = newRoom.trim();
+        if (!room || options.selectedRooms.includes(room) || options.selectedRooms.length >= 12) return;
+        setOptions(previous => ({ ...previous, selectedRooms: [...previous.selectedRooms, room] }));
+        setNewRoom('');
+    };
+    const copy = async text => {
+        try {
+            await navigator.clipboard.writeText(text);
+            setStatus('Copied.');
+        } catch (_) { setStatus('Copy is unavailable. Select the task text below and copy it manually.'); }
+    };
+    const shareSetup = () => {
+        const url = new URL('/among-us-irl-task-generator', window.location.origin);
+        url.searchParams.set('venue', options.venue);
+        url.searchParams.set('players', options.playerCount);
+        url.searchParams.set('movement', options.movement);
+        url.searchParams.set('style', options.taskStyle);
+        url.searchParams.set('utm_source', 'shared-link');
+        options.selectedRooms.forEach(room => url.searchParams.append('room', room));
+        copy(url.href);
+    };
+    const useTasks = event => {
+        const saved = saveGameDraft({
+            name: `${VENUES[options.venue]} task pack`, tasks: result.tasks,
+            locations: result.rooms, playerCount: options.playerCount, recommendations: result.recommendations,
+        });
+        if (!saved) {
+            event.preventDefault();
+            setStatus('Your browser cannot save this list. Copy the tasks or enable storage, then try again.');
+            return;
+        }
+        // This action explicitly starts a new host session, rather than rejoining an old room.
+        localStorage.removeItem('player_id');
+        localStorage.removeItem('room_code');
+        sessionStorage.removeItem('is_room_creator');
+    };
 
     return (
         <SeoPageLayout>
-            {/* ── Hero ──────────────────────────────────────────────────── */}
-            <div className="seo-hero">
-                <p className="seo-eyebrow">
-                    <a href="/among-us-irl" style={{ color: '#a5b4fc', textDecoration: 'none' }}>
-                        Among Us IRL
-                    </a>{' '}
-                    › Task generator
-                </p>
+            <header className="seo-hero">
+                <p className="seo-eyebrow"><a href="/among-us-irl">Among Us IRL</a> / Task generator</p>
                 <h1 className="seo-h1">Among Us IRL task generator</h1>
-                <p className="seo-lead">
-                    Tell the generator about your space and group. It will produce twenty tasks, three
-                    sabotage ideas, and recommended game settings — ready to use immediately or load
-                    into Sus Party.
-                </p>
-            </div>
-
-            <div className="seo-content">
-                <section className="seo-section" style={{ paddingTop: 0, borderTop: 'none' }}>
-                    {/* ── Form ──────────────────────────────────────────── */}
+                <p className="seo-lead">Your rooms, your friends, one playable task pack. Choose the areas below and review the list, then carry it into a new Sus Party game. No account or download.</p>
+                <div className="seo-actions">
+                    <a href="#generator-output" className="seo-btn--primary">See your task pack →</a>
+                    <a href="/how-to-play-among-us-irl" className="seo-btn--secondary">See how the game works</a>
+                </div>
+            </header>
+            <main className="seo-content">
+                <section className="seo-section" id="build">
+                    <h2>Your game setup</h2>
+                    <p>A sample list is ready. Choose only the areas your group can use, then adjust the count and task style. The generator prepares groups of five to fifteen; the game itself has no fixed fifteen-player cap.</p>
                     <div className="seo-generator">
-                        {/* Venue */}
                         <div className="seo-generator__field">
-                            <label htmlFor="gen-venue">Where are you playing?</label>
-                            <select
-                                id="gen-venue"
-                                value={venue}
-                                onChange={(e) => {
-                                    setVenue(e.target.value);
-                                    setResult(null);
-                                }}
-                            >
-                                {VENUE_OPTIONS.map((o) => (
-                                    <option key={o.value} value={o.value}>
-                                        {o.label}
-                                    </option>
-                                ))}
+                            <label htmlFor="gen-venue">Venue</label>
+                            <select id="gen-venue" value={options.venue} onChange={event => update('venue', event.target.value)}>
+                                {Object.entries(VENUES).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
                             </select>
                         </div>
-
-                        {/* Player count */}
                         <div className="seo-generator__field">
-                            <label htmlFor="gen-players">
-                                How many players?{' '}
-                                <span style={{ color: '#a5b4fc', fontWeight: 700 }}>
-                                    {playerCount}
-                                </span>
-                            </label>
-                            <div className="seo-generator__range-row">
-                                <input
-                                    id="gen-players"
-                                    type="range"
-                                    min={5}
-                                    max={15}
-                                    step={1}
-                                    value={playerCount}
-                                    onChange={(e) => {
-                                        setPlayerCount(Number(e.target.value));
-                                        setResult(null);
-                                    }}
-                                    aria-valuemin={5}
-                                    aria-valuemax={15}
-                                    aria-valuenow={playerCount}
-                                />
-                                <span className="seo-generator__range-val" aria-hidden="true">
-                                    {playerCount}
-                                </span>
-                            </div>
+                            <label htmlFor="gen-players">Players: {options.playerCount}</label>
+                            <input id="gen-players" type="range" min="5" max="15" step="1" value={options.playerCount}
+                                onChange={event => update('playerCount', Number(event.target.value))} />
+                            <p>The app requires at least three task entries per player. This list contains {result.tasks.length}.</p>
                         </div>
-
-                        {/* Movement level */}
                         <div className="seo-generator__field">
-                            <label htmlFor="gen-movement">Movement level</label>
-                            <select
-                                id="gen-movement"
-                                value={movement}
-                                onChange={(e) => {
-                                    setMovement(e.target.value);
-                                    setResult(null);
-                                }}
-                            >
-                                {MOVEMENT_OPTIONS.map((o) => (
-                                    <option key={o.value} value={o.value}>
-                                        {o.label}
-                                    </option>
-                                ))}
+                            <label htmlFor="gen-movement">Movement</label>
+                            <select id="gen-movement" value={options.movement} onChange={event => update('movement', event.target.value)}>
+                                <option value="low">Seated tasks at two stations</option>
+                                <option value="normal">Walk between areas</option>
+                                <option value="active">Include more movement</option>
                             </select>
                         </div>
-
-                        {/* Task style */}
                         <div className="seo-generator__field">
                             <label htmlFor="gen-style">Task style</label>
-                            <select
-                                id="gen-style"
-                                value={taskStyle}
-                                onChange={(e) => {
-                                    setTaskStyle(e.target.value);
-                                    setResult(null);
-                                }}
-                            >
-                                {STYLE_OPTIONS.map((o) => (
-                                    <option key={o.value} value={o.value}>
-                                        {o.label}
-                                    </option>
-                                ))}
+                            <select id="gen-style" value={options.taskStyle} onChange={event => update('taskStyle', event.target.value)}>
+                                <option value="standard">Standard</option><option value="funny">Include funny tasks</option><option value="mix">Mix</option>
                             </select>
                         </div>
-
-                        {/* Rooms info */}
-                        <div className="seo-generator__field">
-                            <label>
-                                Suggested rooms for{' '}
-                                {VENUE_OPTIONS.find((v) => v.value === venue)?.label || venue}
-                            </label>
-                            <div className="seo-tags" aria-label="Suggested room areas">
-                                {suggestedRooms.map((room) => (
-                                    <span key={room} className="seo-tag is-selected" aria-label={room}>
-                                        {room}
-                                    </span>
-                                ))}
-                            </div>
-                            <p
-                                style={{
-                                    color: '#6b7280',
-                                    fontSize: '0.8rem',
-                                    marginTop: 6,
-                                    marginBottom: 0,
-                                }}
-                            >
-                                Tasks are drawn from pools matching these areas.
-                            </p>
-                        </div>
-
-                        {/* Generate button */}
-                        <button
-                            className="seo-btn--primary"
-                            onClick={handleGenerate}
-                            style={{ marginTop: 4, width: '100%', justifyContent: 'center' }}
-                        >
-                            Generate my task list →
-                        </button>
-                    </div>
-
-                    {/* ── Output ────────────────────────────────────────── */}
-                    {result && (
-                        <div id="generator-output" className="seo-output">
-                            {/* Badges */}
-                            <div className="seo-output__meta">
-                                <span className="seo-output__badge">
-                                    <strong>Venue:</strong>{' '}
-                                    {VENUE_OPTIONS.find((v) => v.value === venue)?.label || venue}
-                                </span>
-                                <span className="seo-output__badge">
-                                    <strong>Players:</strong> {playerCount}
-                                </span>
-                                <span className="seo-output__badge">
-                                    <strong>Tasks:</strong> {result.tasks.length}
-                                </span>
-                            </div>
-
-                            {/* Recommended settings */}
-                            <div
-                                style={{
-                                    background: 'rgba(99,102,241,0.08)',
-                                    border: '1px solid rgba(99,102,241,0.2)',
-                                    borderRadius: 10,
-                                    padding: '14px 18px',
-                                    marginBottom: 20,
-                                    fontSize: '0.88rem',
-                                    color: '#c7d2fe',
-                                }}
-                            >
-                                <strong style={{ color: '#e5e7eb' }}>Recommended settings:</strong>{' '}
-                                {result.recommendations.intruderCount} intruder
-                                {result.recommendations.intruderCount !== 1 ? 's' : ''} ·{' '}
-                                {result.recommendations.durationMin}–{result.recommendations.durationMax}{' '}
-                                minute game · Meltdown{' '}
-                                {result.recommendations.meltdown ? 'recommended' : 'optional'}
-                            </div>
-
-                            {/* Task list */}
-                            <p className="seo-output__heading">Your 20 tasks</p>
-                            <div className="seo-output__tasks">
-                                {result.tasks.map((t, i) => (
-                                    <div className="seo-output__task" key={i}>
-                                        <span className="seo-output__loc">{t.location}</span>
-                                        <span className="seo-output__text">{t.task}</span>
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* Sabotage ideas */}
-                            <div className="seo-output__subs">
-                                <p className="seo-output__sub-label">Sabotage ideas (intruders only)</p>
-                                {result.sabotages.map((s, i) => (
-                                    <p className="seo-output__sub" key={i}>
-                                        {i + 1}. {s}
-                                    </p>
-                                ))}
-                            </div>
-
-                            {/* Actions */}
+                        <fieldset className="seo-generator__field seo-room-picker">
+                            <legend>Areas that players can use</legend>
+                            <div className="seo-tags">{availableRooms.map(room => (
+                                <label key={room} className="seo-room-option">
+                                    <input type="checkbox" checked={options.selectedRooms.includes(room)}
+                                        disabled={!options.selectedRooms.includes(room) && options.selectedRooms.length >= 12}
+                                        onChange={() => toggleRoom(room)} /> {room}
+                                </label>
+                            ))}</div>
+                            <p>Choose at least two areas. For seated play, use two table stations in one accessible room.</p>
+                        </fieldset>
+                        <form onSubmit={addRoom} className="seo-generator__field">
+                            <label htmlFor="gen-room">Add your own area</label>
                             <div className="seo-output__actions">
-                                <button
-                                    className="seo-btn--secondary"
-                                    onClick={handleCopy}
-                                    aria-label="Copy task list to clipboard"
-                                >
-                                    {copied ? '✓ Copied!' : 'Copy tasks'}
-                                </button>
-                                <button
-                                    className="seo-btn--secondary"
-                                    onClick={handleGenerate}
-                                    aria-label="Regenerate a new task list"
-                                >
-                                    Regenerate
-                                </button>
-                                <a href="/play" className="seo-btn--primary">
-                                    Start a game at Sus Party →
-                                </a>
+                                <input id="gen-room" value={newRoom} maxLength="60" onChange={event => setNewRoom(event.target.value)} placeholder="For example, Dining Table" />
+                                <button className="seo-btn--secondary" disabled={!newRoom.trim() || options.selectedRooms.length >= 12}>Add area</button>
                             </div>
-                        </div>
-                    )}
-                </section>
-
-                {/* How it works */}
-                <section className="seo-section">
-                    <p className="seo-section__kicker">How it works</p>
-                    <h2>What the generator produces</h2>
-                    <div className="seo-cards seo-cards--3">
-                        <div className="seo-card">
-                            <h3>20 tasks</h3>
-                            <p>
-                                Sampled from curated pools matched to your venue and movement preference.
-                                Every task is specific, verifiable, and completable in under a minute.
-                            </p>
-                        </div>
-                        <div className="seo-card">
-                            <h3>3 sabotage ideas</h3>
-                            <p>
-                                Suggestions intruders can use to slow the crew down or create confusion
-                                — all physical, no special equipment needed.
-                            </p>
-                        </div>
-                        <div className="seo-card">
-                            <h3>Recommended settings</h3>
-                            <p>
-                                Based on player count: how many intruders to use, estimated game
-                                duration, and whether to enable the meltdown mechanic.
-                            </p>
-                        </div>
+                        </form>
                     </div>
                 </section>
-
-                {/* Browse link */}
-                <section className="seo-section">
-                    <p className="seo-section__kicker">Prefer to browse?</p>
-                    <h2>See the full task idea library</h2>
-                    <p>
-                        The generator draws from a curated library of 100+ tasks. If you want to
-                        hand-pick tasks for your game, browse the full collection in the{' '}
-                        <a href="/among-us-irl-task-ideas" style={{ color: '#a5b4fc' }}>
-                            Among Us IRL task ideas guide
-                        </a>
-                        , organised by venue type.
-                    </p>
+                <section className="seo-section" id="generator-output" aria-labelledby="task-list-title">
+                    <div className="seo-output__meta">
+                        <span className="seo-output__badge">{options.playerCount} players</span>
+                        <span className="seo-output__badge">{result.rooms.length} areas</span>
+                        <span className="seo-output__badge">{result.tasks.length} tasks</span>
+                    </div>
+                    <h2 id="task-list-title">Your {result.tasks.length} tasks</h2>
+                    <p>Provide paper and pencils. Cross out any task that does not fit your space before the round.</p>
+                    {!ready && <p role="alert">Select at least two areas before you use this list in a game.</p>}
+                    <div className="seo-output__actions">
+                        {ready && <a href="/play?setup=generated" onClick={useTasks} className="seo-btn--primary">Use these tasks in a new game →</a>}
+                        <button className="seo-btn--secondary" onClick={() => copy(taskText)}>Copy tasks</button>
+                        <button className="seo-btn--secondary" onClick={() => { setShuffle(value => value + 1); setStatus(''); }}>Shuffle tasks</button>
+                        <button className="seo-btn--secondary" onClick={shareSetup}>Copy setup link</button>
+                    </div>
+                    <p role="status" aria-live="polite">{status}</p>
+                    <ol className="seo-output__tasks seo-generated-list">
+                        {result.tasks.map((task, index) => <li className="seo-output__task" key={`${task.location}:${task.task}`}>
+                            <span className="seo-output__loc">{index + 1}. {task.location}</span><span className="seo-output__text">{task.task}</span>
+                        </li>)}
+                    </ol>
+                    <details className="seo-faq__item"><summary>Plain text for print or manual copy</summary>
+                        <textarea className="seo-task-copy" readOnly value={taskText} rows="10" aria-label="Task list as plain text" />
+                    </details>
                 </section>
-
-                {/* Internal links */}
-                <nav className="seo-links" aria-label="Related pages">
-                    <p className="seo-links__title">More Among Us IRL resources</p>
-                    <ul className="seo-links__list">
-                        <li>
-                            <a href="/among-us-irl">Among Us IRL overview and setup guide</a>
-                        </li>
-                        <li>
-                            <a href="/how-to-play-among-us-irl">Full rules guide</a>
-                        </li>
-                        <li>
-                            <a href="/among-us-irl-task-ideas">Browse 100+ task ideas by venue</a>
-                        </li>
-                        <li>
-                            <a href="/faq">Sus Party FAQ</a>
-                        </li>
-                    </ul>
+                <section className="seo-section" id="use-the-list">
+                    <h2>From this task pack to your first round</h2>
+                    <ol className="seo-checklist">
+                        <li>Check each area and task with the host.</li>
+                        <li>Select “Use these tasks in a new game.”</li>
+                        <li>Create a room, then select “Import generated tasks” in host setup.</li>
+                        <li>Review the saved list, apply it, and open the room for your friends.</li>
+                    </ol>
+                    <p>Task entries are spread across your selected areas. The app adds “Other” as a catch-all location.</p>
+                    <p>For a first round, try {result.recommendations.intruderCount || 1} intruder(s), 90-second meetings, and five tasks per crewmate.</p>
+                    <p>The host can adjust these settings before the room opens. The task goal reveals intruders rather than ending the game.</p>
+                    <p>Keep this browser session open as you create the room so host setup can find your saved pack. Friends join from their own phone browsers with your room code.</p>
+                </section>
+                <section className="seo-section">
+                    <h2>Sabotage stays inside the game</h2>
+                    <p>Sus Party supplies sabotage cards. No physical locks, hidden household items, or blocked paths are required.</p>
+                    <ul className="seo-checklist">{result.sabotages.map(idea => <li key={idea}>{idea}</li>)}</ul>
+                </section>
+                <nav className="seo-links" aria-label="Next steps">
+                    <a href="/among-us-irl-task-ideas">Choose tasks and plan your space →</a>
+                    <a href="/how-to-play-among-us-irl">Read the rules and meeting flow →</a>
+                    <a href="/among-us-irl">Plan your first game →</a>
+                    <a href="/social-deduction-games">Compare games for your group →</a>
+                    <a href="/among-us-birthday-party">Plan a birthday round →</a>
                 </nav>
-
-                {/* CTA */}
-                <div className="seo-cta-box">
-                    <h2>Load tasks into Sus Party</h2>
-                    <p>
-                        Sus Party handles role assignment, task tracking, voting, and meetings
-                        automatically. Free — no account, no install.
-                    </p>
-                    <a href="/play" className="seo-btn--primary">
-                        Start an Among Us IRL game →
-                    </a>
-                </div>
-            </div>
+            </main>
         </SeoPageLayout>
     );
 }

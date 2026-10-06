@@ -24,6 +24,7 @@ export function ButtonLink({ href, variant = 'secondary', compact = false, class
 export function JumpLinks({ links }) {
   return (
     <nav className="htp-jump-links" aria-label="Page sections">
+      <p className="htp-jump-links__title">In this guide</p>
       {links.map((link) => (
         <a key={link.href} href={link.href}>
           {link.label}
@@ -33,12 +34,11 @@ export function JumpLinks({ links }) {
   );
 }
 
-export function Section({ id, kicker, title, intro, children }) {
+export function Section({ id, title, intro, children }) {
   return (
     <section className="htp-section" id={id}>
       <div className="htp-section__header">
         <div>
-          <p className="htp-kicker">{kicker}</p>
           <h2>{title}</h2>
         </div>
         {intro ? <p className="htp-section__intro">{intro}</p> : null}
@@ -52,14 +52,9 @@ export function CardGrid({ columns = 2, className = '', children }) {
   return <div className={joinClasses('htp-grid', `htp-grid--${columns}`, className)}>{children}</div>;
 }
 
-export function InfoCard({ tone = 'neutral', icon: Icon, eyebrow, title, description, items }) {
+export function InfoCard({ tone = 'neutral', eyebrow, title, description, items }) {
   return (
     <article className={joinClasses('htp-card', `htp-card--${tone}`)}>
-      {Icon ? (
-        <div className="htp-card__icon" aria-hidden="true">
-          <Icon size={20} strokeWidth={2} />
-        </div>
-      ) : null}
       {eyebrow ? <p className="htp-card__eyebrow">{eyebrow}</p> : null}
       <h3>{title}</h3>
       {description ? <p>{description}</p> : null}
@@ -74,16 +69,11 @@ export function InfoCard({ tone = 'neutral', icon: Icon, eyebrow, title, descrip
   );
 }
 
-export function RoleCard({ tone, label, icon: Icon, title, description, items }) {
+export function RoleCard({ tone, label, title, description, items }) {
   return (
     <article className={joinClasses('htp-card', 'htp-card--role', `htp-card--${tone}`)}>
       <div className="htp-role-card__header">
         <span className="htp-role-card__label">{label}</span>
-        {Icon ? (
-          <div className="htp-card__icon" aria-hidden="true">
-            <Icon size={20} strokeWidth={2} />
-          </div>
-        ) : null}
       </div>
       <h3>{title}</h3>
       <p>{description}</p>

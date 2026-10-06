@@ -10,8 +10,10 @@
  * - When timer expires or all vote, results are calculated
  */
 import React from 'react';
-import { renderWithContext, screen, fireEvent, waitFor, mockPlayers, mockMeetingStateVoting } from '../../test-utils';
+import { renderWithContext, screen, fireEvent, waitFor, act, mockPlayers, mockMeetingStateVoting } from '../../test-utils';
 import VotingPage from '../../pages/VotingPage';
+import { DataContext } from '../../GameContext';
+import { createControlledSocket } from '../../testing/gameFlowHarness';
 
 describe('VotingPage', () => {
     const votingContext = {
@@ -26,6 +28,109 @@ describe('VotingPage', () => {
             alive: true,
         },
     };
+
+    describe('Death reports during voting', () => {
+        afterEach(() => {
+            jest.useRealTimers();
+            jest.restoreAllMocks();
+        });
+
+        it('keeps the death control available after a vote and sends current phase identity once', async () => {
+            jest.spyOn(window, 'confirm').mockReturnValue(true);
+            const socket = createControlledSocket();
+            renderWithContext(<VotingPage />, { ...votingContext, socket });
+            fireEvent.click(screen.getByText('Bob').closest('div[class*="cursor-pointer"]'));
+            fireEvent.click(screen.getByRole('button', { name: /Vote for Bob/i }));
+            const deathButton = screen.getByRole('button', { name: /I've Been Killed/i });
+            fireEvent.click(deathButton);
+            fireEvent.click(deathButton);
+
+            expect(socket.emits('player_dead')).toHaveLength(1);
+            expect(socket.lastEmit('player_dead')[1]).toEqual({
+                player_id: 'player1', round_id: 'round-1', meeting_id: 'meeting-1',
+            });
+            expect(deathButton).toBeDisabled();
+            expect(screen.getByRole('button', { name: /Vote for Bob/i })).toBeDisabled();
+            expect(screen.getByRole('button', { name: /Veto Meeting/i })).toBeDisabled();
+            await act(async () => socket.ack(0, { ok: true }));
+            expect(deathButton).toBeDisabled();
+        });
+
+        it('does not send a death report when the player cancels confirmation', () => {
+            jest.spyOn(window, 'confirm').mockReturnValue(false);
+            const socket = createControlledSocket();
+            renderWithContext(<VotingPage />, { ...votingContext, socket });
+            fireEvent.click(screen.getByRole('button', { name: /I've Been Killed/i }));
+            expect(socket.emits('player_dead')).toHaveLength(0);
+        });
+
+        it('shows a rejected death report and permits a new attempt', async () => {
+            jest.spyOn(window, 'confirm').mockReturnValue(true);
+            const socket = createControlledSocket();
+            const { contextValue } = renderWithContext(<VotingPage />, { ...votingContext, socket });
+            fireEvent.click(screen.getByRole('button', { name: /I've Been Killed/i }));
+            await act(async () => socket.ack(0, { ok: false, error: 'The meeting ended.' }));
+            expect(contextValue.setMessage).toHaveBeenCalledWith({ text: 'The meeting ended.', status: 'error' });
+            expect(screen.getByRole('button', { name: /I've Been Killed/i })).toBeEnabled();
+        });
+
+        it('blocks death reports while offline', () => {
+            const socket = createControlledSocket();
+            socket.connected = false;
+            renderWithContext(<VotingPage />, { ...votingContext, socket, connected: false });
+            expect(screen.getByRole('button', { name: /I've Been Killed/i })).toBeDisabled();
+        });
+
+        it('releases the control after a lost acknowledgment without an automatic duplicate report', async () => {
+            jest.useFakeTimers();
+            jest.spyOn(window, 'confirm').mockReturnValue(true);
+            const socket = createControlledSocket();
+            const { contextValue } = renderWithContext(<VotingPage />, { ...votingContext, socket });
+            fireEvent.click(screen.getByRole('button', { name: /I've Been Killed/i }));
+            await act(async () => jest.advanceTimersByTime(5000));
+            expect(screen.getByRole('button', { name: /I've Been Killed/i })).toBeEnabled();
+            expect(socket.emits('player_dead')).toHaveLength(1);
+            expect(contextValue.setMessage).toHaveBeenCalledWith(expect.objectContaining({ status: 'error' }));
+        });
+
+        it('does not show a false failure after the roster moves the player off the voting screen', async () => {
+            jest.useFakeTimers();
+            jest.spyOn(window, 'confirm').mockReturnValue(true);
+            const socket = createControlledSocket();
+            const { unmount, contextValue } = renderWithContext(<VotingPage />, { ...votingContext, socket });
+            fireEvent.click(screen.getByRole('button', { name: /I've Been Killed/i }));
+            unmount();
+            await act(async () => jest.advanceTimersByTime(5000));
+            expect(contextValue.setMessage).not.toHaveBeenCalled();
+        });
+
+        it('clears a vote confirmation when the target reports death', () => {
+            const { rerender, contextValue } = renderWithContext(<VotingPage />, votingContext);
+            fireEvent.click(screen.getByText('Bob').closest('div[class*="cursor-pointer"]'));
+            fireEvent.click(screen.getByRole('button', { name: /Vote for Bob/i }));
+            expect(screen.getByText(/Voted for Bob/i)).toBeInTheDocument();
+            rerender(
+                <DataContext.Provider value={{
+                    ...contextValue,
+                    players: mockPlayers.map(player => player.player_id === 'player2' ? { ...player, alive: false } : player),
+                }}>
+                    <VotingPage />
+                </DataContext.Provider>
+            );
+            expect(screen.queryByText(/Voted for Bob/i)).not.toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /Select a Player/i })).toBeDisabled();
+        });
+
+        it('hides the death control for dead players and tutorial screens', () => {
+            const first = renderWithContext(<VotingPage />, {
+                ...votingContext, playerState: { ...votingContext.playerState, alive: false },
+            });
+            expect(screen.queryByRole('button', { name: /I've Been Killed/i })).not.toBeInTheDocument();
+            first.unmount();
+            renderWithContext(<VotingPage tutorialMode />, votingContext);
+            expect(screen.queryByRole('button', { name: /I've Been Killed/i })).not.toBeInTheDocument();
+        });
+    });
 
     describe('Rendering', () => {
         it('renders the voting page with title', () => {
@@ -100,7 +205,10 @@ describe('VotingPage', () => {
             fireEvent.click(voteButton);
             
             expect(contextValue.socket.emit).toHaveBeenCalledWith('vote', expect.objectContaining({
+                player_id: expect.any(String),
                 votedFor: expect.any(String),
+                round_id: 'round-1',
+                meeting_id: 'meeting-1',
             }));
         });
 
@@ -117,7 +225,11 @@ describe('VotingPage', () => {
             const vetoButton = screen.getByRole('button', { name: /Veto Meeting/i });
             fireEvent.click(vetoButton);
             
-            expect(contextValue.socket.emit).toHaveBeenCalledWith('veto', expect.any(Object));
+            expect(contextValue.socket.emit).toHaveBeenCalledWith('veto', expect.objectContaining({
+                player_id: expect.any(String),
+                round_id: 'round-1',
+                meeting_id: 'meeting-1',
+            }));
         });
     });
 

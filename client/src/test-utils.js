@@ -61,12 +61,16 @@ export const mockPlayers = [
 // Mock task for crewmates
 export const mockTask = {
     id: 'task1',
+    assignment_id: 'assignment-1',
+    round_id: 'round-1',
     task: 'Make a sandwich',  // The actual task name
     location: 'Kitchen',
 };
 
 // Mock meeting state for voting
 export const mockMeetingStateVoting = {
+    id: 'meeting-1',
+    round_id: 'round-1',
     stage: 'voting',
     time_left: 60,
     caller: 'player1',
@@ -75,6 +79,8 @@ export const mockMeetingStateVoting = {
 
 // Mock meeting state for results
 export const mockMeetingStateResults = {
+    id: 'meeting-1',
+    round_id: 'round-1',
     stage: 'over',
     time_left: 0,
     caller: 'player1',
@@ -129,6 +135,7 @@ export const createMockContextValue = (overrides = {}) => {
     return {
         // Connection state
         connected: true,
+        roundId: 'round-1',
         socket: mockSocket,
         
         // Room state
@@ -148,9 +155,13 @@ export const createMockContextValue = (overrides = {}) => {
         
         // Task state
         task: null,
+        completeTask: jest.fn().mockResolvedValue(true),
+        taskCompletionPending: false,
+        taskCompletionError: null,
         crewScore: 0,
         taskGoal: 10,
         taskLocations: mockTaskLocations,
+        lobbyState: null,
         setTask: jest.fn(),
         setTaskEntry: jest.fn(),
         

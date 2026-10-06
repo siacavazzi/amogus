@@ -14,6 +14,7 @@ import {
 import { PrimaryButton } from '../components/ui';
 import { Card } from '../components/ui';
 import { dismissTutorialPrompt, shouldRecommendTutorial } from '../tutorial/tutorialStorage';
+import { getAcquisition } from '../seo/discovery';
 
 // Feature badge component
 const FeatureBadge = ({ icon: Icon, text, delay }) => (
@@ -90,7 +91,7 @@ function LobbyPage() {
     const handleCreateGame = () => {
         setIsCreating(true);
         setError('');
-        socket.emit('create_game');
+        socket.emit('create_game', { acquisition: getAcquisition() });
         
         setTimeout(() => {
             setIsCreating(false);

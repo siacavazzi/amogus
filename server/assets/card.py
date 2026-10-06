@@ -113,14 +113,36 @@ class Card:
         return f"{self.id}, {self.action}, {self.location}, {self.sound}, {self.duration}"
     
     def _handle_card_countdown(self):
-        while self.time_left > 0:
+        round_id = getattr(self, '_active_round_id', self.game.round_id)
+        while True:
+            with self.game.state_lock:
+                if (round_id != self.game.round_id
+                        or self.game.card_deck is not self.card_deck
+                        or self not in self.card_deck.active_cards):
+                    return
+                if self.time_left <= 0:
+                    if self.action == 'Area Denial' and self.game.denied_location == self.location:
+                        self.game.denied_location = None
+                    self.card_deck.active_cards.remove(self)
+                    self.game.revision += 1
+                    self.card_deck.emit_active_cards()
+                    return
+
             time.sleep(1)
-            self.time_left -= 1
-        if self.action == 'Area Denial':
-            self.game.denied_location = None
-        if self in self.card_deck.active_cards:
-            self.card_deck.active_cards.remove(self)
-            self.card_deck.emit_active_cards()
+
+            with self.game.state_lock:
+                if (round_id != self.game.round_id
+                        or self.game.card_deck is not self.card_deck
+                        or self not in self.card_deck.active_cards):
+                    return
+                self.time_left -= 1
+                self.game.revision += 1
+                if self.time_left <= 0:
+                    if self.action == 'Area Denial' and self.game.denied_location == self.location:
+                        self.game.denied_location = None
+                    self.card_deck.active_cards.remove(self)
+                    self.card_deck.emit_active_cards()
+                    return
     
     def notify_intruders(self, player):
         for other_player in self.game.players:
@@ -129,8 +151,12 @@ class Card:
 
 
     def play_card(self, player, extra_data=None):
+        with self.game.state_lock:
+            return self._play_card_locked(player, extra_data)
+
+    def _play_card_locked(self, player, extra_data=None):
         """
-        Play the card. 
+        Play the card while the room lock is held.
         extra_data: Optional dict with additional data for cards that require input (e.g., fake task details)
         """
         remove_card = True
@@ -139,9 +165,9 @@ class Card:
         self.game.stats['cards_played'] += 1
         
         if self.action == 'EMP':
-            self.game.start_hack(self.duration)
+            remove_card = self.game.start_hack(self.duration)
         elif self.action == 'Self Report':
-            self.game.start_meeting(player)
+            remove_card = self.game.start_meeting(player)
         elif self.action == 'Taunt':
             self.game.speaker.play_sound(self.sound)
         elif self.action == 'Remote Sabotage':
@@ -242,6 +268,7 @@ class Card:
             self.game.meltdown_time_mod += self.duration
         
         if self.countdown:
+            self._active_round_id = self.game.round_id
             Thread(target=self._handle_card_countdown, args=()).start()
         if remove_card:
             player.remove_card(self)
@@ -393,5 +420,4 @@ class CardDeck:
             output.append(card.export())
         print(output)
         self.game.emit_to_room('active_cards', output)
-
 

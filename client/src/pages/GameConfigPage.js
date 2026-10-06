@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect, useRef, useMemo } from 'react';
 import { DataContext } from '../GameContext';
 import { Users, Play, ChevronDown, ChevronUp, List, Download, Trash2, Check, LogOut, MapPin, Settings, ArrowRight, ArrowLeft, X, Zap, Copy, Sparkles, Minus, Plus } from 'lucide-react';
+import { readGameDraft, clearGameDraft } from './seo/gameDraft';
 
 const DEFAULT_CARD_DECK_COUNTS = {
     self_report: 4,
@@ -121,6 +122,12 @@ function GameConfigPage() {
     const [currentTaskList, setCurrentTaskList] = useState(null);
     const [taskListLoading, setTaskListLoading] = useState(false);
     const [taskListApplied, setTaskListApplied] = useState(false);
+    const [generatedDraft, setGeneratedDraft] = useState(() =>
+        new URLSearchParams(window.location.search).get('setup') === 'generated' ? readGameDraft() : null);
+    const [generatedImportError, setGeneratedImportError] = useState('');
+    const generatedImportRef = useRef(false);
+    const generatedSettingsRef = useRef(null);
+    const generatedSettingsReadyRef = useRef(false);
     
     // Use device ID instead of player ID for task list ownership
     const deviceId = useRef(getDeviceId()).current;
@@ -148,6 +155,11 @@ function GameConfigPage() {
 
         const handleConfig = (data) => {
             console.log('Received game config:', data);
+            const generatedSettings = generatedSettingsReadyRef.current ? generatedSettingsRef.current : null;
+            if (generatedSettings) {
+                generatedSettingsRef.current = null;
+                generatedSettingsReadyRef.current = false;
+            }
             setConfig((prev) => ({
                 ...prev,
                 ...data,
@@ -157,6 +169,11 @@ function GameConfigPage() {
                     ...(prev.card_deck_counts || {}),
                     ...(data.card_deck_counts || {}),
                 },
+                ...(generatedSettings ? {
+                    num_intruders: generatedSettings.intruderCount,
+                    vote_time: generatedSettings.meetingSeconds,
+                    task_ratio: generatedSettings.taskGoalPerCrewmate,
+                } : {}),
             }));
 
             if (pendingRoomOpenRef.current) {
@@ -192,6 +209,18 @@ function GameConfigPage() {
             console.log('Task list created:', data);
             setCurrentTaskList(data.task_list);
             setTaskListLoading(false);
+            if (generatedImportRef.current) {
+                generatedImportRef.current = false;
+                const settings = generatedDraft?.recommendations;
+                if (settings) {
+                    generatedSettingsRef.current = settings;
+                }
+                clearGameDraft();
+                setGeneratedDraft(null);
+                const url = new URL(window.location.href);
+                url.searchParams.delete('setup');
+                window.history.replaceState(null, '', url.pathname + url.search + url.hash);
+            }
             socket.emit('get_my_task_lists', { player_id: deviceId });
         };
 
@@ -206,6 +235,7 @@ function GameConfigPage() {
             console.log('Task list applied to game:', data);
             setTaskListLoading(false);
             setTaskListApplied(true);
+            generatedSettingsReadyRef.current = Boolean(generatedSettingsRef.current);
 
             if (pendingSettingsStepRef.current) {
                 pendingSettingsStepRef.current = false;
@@ -225,6 +255,10 @@ function GameConfigPage() {
             setIsSaving(false);
             pendingSettingsStepRef.current = false;
             pendingRoomOpenRef.current = false;
+            if (generatedImportRef.current) {
+                generatedImportRef.current = false;
+                setGeneratedImportError(data.message || 'Task import failed. Try again.');
+            }
         };
 
         socket.on('my_task_lists', handleMyTaskLists);
@@ -244,7 +278,7 @@ function GameConfigPage() {
             socket.off('task_list_deleted', handleTaskListDeleted);
             socket.off('error', handleError);
         };
-    }, [socket, deviceId]);
+    }, [socket, deviceId, generatedDraft]);
 
     const updateConfig = (key, value) => {
         setConfig(prev => ({ ...prev, [key]: value }));
@@ -274,6 +308,20 @@ function GameConfigPage() {
     };
 
     // Task list handlers
+    const importGeneratedTasks = () => {
+        if (!socket || !generatedDraft || taskListLoading) return;
+        generatedImportRef.current = true;
+        setGeneratedImportError('');
+        setTaskListLoading(true);
+        setTaskListApplied(false);
+        socket.emit('create_task_list', {
+            player_id: deviceId,
+            name: generatedDraft.name,
+            tasks: generatedDraft.tasks.map(({ task, location }) => ({ task, location })),
+            locations: generatedDraft.locations,
+        });
+    };
+
     const loadTaskListByCode = () => {
         if (!loadTaskListCode.trim()) return;
         setTaskListLoading(true);
@@ -444,7 +492,20 @@ function GameConfigPage() {
                 </p>
             </div>
 
-            {showStarterTemplatePromo && (
+            {generatedDraft && (
+                <div className="border border-cyan-500/30 bg-cyan-500/10 rounded-xl p-4 mb-4">
+                    <h2 className="text-white font-semibold">Your generated task pack</h2>
+                    <p className="text-gray-300 text-sm mt-2">{generatedDraft.tasks.length} tasks across {generatedDraft.locations.length} areas for {generatedDraft.playerCount} players.</p>
+                    <p className="text-gray-400 text-sm mt-2">Import the list, review its tasks, then apply it to this room.</p>
+                    <button onClick={importGeneratedTasks} disabled={taskListLoading}
+                        className="mt-3 px-4 py-2 bg-cyan-600 text-white rounded-lg disabled:opacity-50">
+                        {taskListLoading ? 'Import in progress…' : 'Import generated tasks'}
+                    </button>
+                    {generatedImportError && <p role="alert" className="text-red-300 mt-2">{generatedImportError}</p>}
+                </div>
+            )}
+
+            {showStarterTemplatePromo && !generatedDraft && (
                 <div className="bg-gradient-to-r from-indigo-500/10 via-gray-900/80 to-cyan-500/10 backdrop-blur-xl border border-indigo-500/20 rounded-xl p-3 mb-4 shadow-lg shadow-indigo-950/20">
                     <div className="flex items-start gap-3">
                         <div className="p-2 bg-indigo-500/15 rounded-xl border border-indigo-500/20 shrink-0">

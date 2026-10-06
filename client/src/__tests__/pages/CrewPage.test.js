@@ -9,16 +9,16 @@
  * - Progress bar shows overall crew task completion
  */
 import React from 'react';
-import { renderWithContext, screen, fireEvent, mockTask } from '../../test-utils';
+import { act, renderWithContext, screen, fireEvent, waitFor, mockTask } from '../../test-utils';
 import CrewmemberPage from '../../pages/CrewPage';
 
 // Mock the slider component
 jest.mock('../../components/swiper', () => {
-    return function MockSlider({ text, onSuccess }) {
+    return function MockSlider({ text, onSuccess, disabled = false, pending = false }) {
         return (
             <div data-testid="task-slider">
                 <span>{text}</span>
-                <button onClick={onSuccess} data-testid="slider-trigger">Complete</button>
+                <button onClick={onSuccess} disabled={disabled || pending} data-testid="slider-trigger">Complete</button>
             </div>
         );
     };
@@ -93,7 +93,7 @@ describe('CrewPage', () => {
             expect(screen.getByTestId('task-slider')).toBeInTheDocument();
         });
 
-        it('emits complete_task when slider is used', () => {
+        it('uses the acknowledged task completion action when slider is used', async () => {
             const { contextValue } = renderWithContext(
                 <CrewmemberPage setShowSusPage={mockSetShowSusPage} />,
                 crewmateContext
@@ -102,7 +102,64 @@ describe('CrewPage', () => {
             const sliderTrigger = screen.getByTestId('slider-trigger');
             fireEvent.click(sliderTrigger);
             
-            expect(contextValue.socket.emit).toHaveBeenCalledWith('complete_task', expect.any(Object));
+            expect(contextValue.completeTask).toHaveBeenCalledWith(mockTask);
+            await waitFor(() => {
+                expect(contextValue.setAudio).toHaveBeenCalledWith('complete_task');
+                expect(contextValue.setShowAnimation).toHaveBeenCalledWith(true);
+            });
+        });
+
+        it('waits for an accepted completion before playing success feedback', async () => {
+            let resolveCompletion;
+            const completeTask = jest.fn(() => new Promise((resolve) => { resolveCompletion = resolve; }));
+            const { contextValue } = renderWithContext(
+                <CrewmemberPage setShowSusPage={mockSetShowSusPage} />,
+                { ...crewmateContext, completeTask }
+            );
+
+            fireEvent.click(screen.getByTestId('slider-trigger'));
+
+            expect(completeTask).toHaveBeenCalledWith(mockTask);
+            expect(contextValue.setAudio).not.toHaveBeenCalledWith('complete_task');
+            expect(contextValue.setShowAnimation).not.toHaveBeenCalledWith(true);
+
+            await act(async () => { resolveCompletion(true); });
+            await waitFor(() => {
+                expect(contextValue.setAudio).toHaveBeenCalledWith('complete_task');
+                expect(contextValue.setShowAnimation).toHaveBeenCalledWith(true);
+            });
+        });
+
+        it('blocks task completion while disconnected or another completion is pending', () => {
+            const disconnected = renderWithContext(
+                <CrewmemberPage setShowSusPage={mockSetShowSusPage} />,
+                { ...crewmateContext, connected: false }
+            );
+            expect(screen.getByTestId('slider-trigger')).toBeDisabled();
+            expect(disconnected.contextValue.completeTask).not.toHaveBeenCalled();
+            disconnected.unmount();
+
+            const pending = renderWithContext(
+                <CrewmemberPage setShowSusPage={mockSetShowSusPage} />,
+                { ...crewmateContext, taskCompletionPending: true }
+            );
+            expect(screen.getByTestId('slider-trigger')).toBeDisabled();
+            expect(pending.contextValue.completeTask).not.toHaveBeenCalled();
+        });
+
+        it('shows the task completion error without success feedback after rejection', async () => {
+            const { contextValue } = renderWithContext(
+                <CrewmemberPage setShowSusPage={mockSetShowSusPage} />,
+                { ...crewmateContext, completeTask: jest.fn().mockResolvedValue(false), taskCompletionError: 'Task not recorded. Reconnect and try again.' }
+            );
+
+            fireEvent.click(screen.getByTestId('slider-trigger'));
+
+            await waitFor(() => {
+                expect(screen.getByRole('alert')).toHaveTextContent(/Task not recorded/i);
+            });
+            expect(contextValue.setAudio).not.toHaveBeenCalledWith('complete_task');
+            expect(contextValue.setShowAnimation).not.toHaveBeenCalledWith(true);
         });
 
         it('shows active status when no cooldown', () => {

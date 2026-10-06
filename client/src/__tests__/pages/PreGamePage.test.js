@@ -184,6 +184,94 @@ describe('PreGamePage', () => {
                 expect(within(screen.getByRole('region', { name: 'Other tasks' })).getByText('2 tasks')).toBeInTheDocument();
             });
         });
+
+        it('uses the newest lobby task snapshot and lets the server lower the roster minimum', async () => {
+            const players = [
+                { player_id: 'player1', username: 'Alice', sus: false, alive: true, ready: false, pic: 1 },
+                { player_id: 'player2', username: 'Bob', sus: false, alive: true, ready: false, pic: 2 },
+            ];
+            const tasks = [
+                ...Array.from({ length: 8 }, (_, index) => ({ task: `Kitchen ${index}`, location: 'Kitchen' })),
+                ...Array.from({ length: 2 }, (_, index) => ({ task: `Yard ${index}`, location: 'Yard' })),
+            ];
+            const { contextValue } = renderWithContext(<PreGamePage />, {
+                ...defaultContext,
+                players,
+                taskLocations: ['Kitchen', 'Yard', 'Other'],
+                isRoomCreator: true,
+            });
+
+            fireEvent.click(screen.getByRole('button', { name: /^Tasks/i }));
+            act(() => simulateSocketEvent(contextValue.socket, 'lobby_state', {
+                room_code: 'TEST1', revision: 2, round_id: 'round-1',
+                locations: ['Kitchen', 'Yard', 'Other'], tasks, min_tasks: 12,
+                task_list_code: null, task_list_name: null, collaborative_mode: false,
+                can_start: false, start_error: 'Need 2 more tasks total.',
+            }));
+
+            expect(screen.queryByRole('button', { name: /start game/i })).not.toBeInTheDocument();
+            expect(screen.getByText(/Need 2 more tasks total/i)).toBeInTheDocument();
+            expect(screen.getByText('Kitchen 0')).toBeInTheDocument();
+
+            act(() => simulateSocketEvent(contextValue.socket, 'lobby_state', {
+                room_code: 'TEST1', revision: 3, round_id: 'round-1',
+                locations: ['Kitchen', 'Yard', 'Other'], tasks: [{ task: 'Latest kitchen task', location: 'Kitchen' }],
+                min_tasks: 10, task_list_code: null, task_list_name: null, collaborative_mode: false,
+                can_start: true, start_error: null,
+            }));
+
+            expect(screen.getByRole('button', { name: /start game/i })).toBeInTheDocument();
+            expect(screen.getByText('Latest kitchen task')).toBeInTheDocument();
+            expect(screen.queryByText('Kitchen 0')).not.toBeInTheDocument();
+        });
+
+        it('ignores lobby snapshots for a different room', () => {
+            const { contextValue } = renderWithContext(<PreGamePage />, {
+                ...defaultContext,
+                isRoomCreator: true,
+                taskLocations: ['Kitchen', 'Yard', 'Other'],
+            });
+            fireEvent.click(screen.getByRole('button', { name: /^Tasks/i }));
+            act(() => simulateSocketEvent(contextValue.socket, 'lobby_state', {
+                room_code: 'OTHER', revision: 10, round_id: 'other-round',
+                locations: ['Kitchen', 'Yard', 'Other'], tasks: [{ task: 'Other room task', location: 'Kitchen' }],
+                min_tasks: 10, collaborative_mode: false, can_start: false,
+            }));
+
+            expect(screen.queryByText('Other room task')).not.toBeInTheDocument();
+        });
+
+        it('replaces tasks from lobby state without changing task-list ownership', async () => {
+            const { contextValue } = renderWithContext(<PreGamePage />, {
+                ...defaultContext,
+                isRoomCreator: true,
+                taskLocations: ['Kitchen', 'Yard', 'Other'],
+            });
+            fireEvent.click(screen.getByRole('button', { name: /^Tasks/i }));
+            await waitFor(() => {
+                expect(contextValue.socket.on).toHaveBeenCalledWith('collaborative_tasks', expect.any(Function));
+            });
+
+            act(() => simulateSocketEvent(contextValue.socket, 'collaborative_tasks', {
+                tasks: [{ task: 'Old task', location: 'Kitchen' }],
+                min_tasks: 10,
+                task_list_code: 'LIST1',
+                task_list_name: 'Shared list',
+                is_owner: false,
+            }));
+            act(() => simulateSocketEvent(contextValue.socket, 'lobby_state', {
+                room_code: 'TEST1', revision: 2, round_id: 'round-1',
+                locations: ['Kitchen', 'Yard', 'Other'],
+                tasks: [{ task_id: 'task-1', task: 'Replacement task', location: 'Yard' }],
+                min_tasks: 10, task_list_code: 'LIST1', task_list_name: 'Shared list',
+                collaborative_mode: false, can_start: false, start_error: 'Need more tasks.',
+            }));
+
+            expect(screen.getByText('Replacement task')).toBeInTheDocument();
+            expect(screen.queryByText('Old task')).not.toBeInTheDocument();
+            expect(screen.getByText('copy')).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /save copy/i })).toBeInTheDocument();
+        });
     });
 
     describe('Task Creation (Host)', () => {
@@ -221,14 +309,14 @@ describe('PreGamePage', () => {
                 task: expect.objectContaining({ task: 'Do ten jumping jacks', location: 'Other' }),
             }));
             act(() => simulateSocketEvent(contextValue.socket, 'collaborative_task_added', {
-                task: { task: 'Do ten jumping jacks', location: 'Other' }, total_tasks: 2,
+                task: { task_id: 'task-2', task: 'Do ten jumping jacks', location: 'Other' }, total_tasks: 2,
             }));
 
             expect(within(otherSection).getByText('Do ten jumping jacks')).toBeInTheDocument();
             expect(within(otherSection).getByText('1 task')).toBeInTheDocument();
             fireEvent.click(within(otherSection).getByTitle('Remove task'));
             expect(contextValue.socket.emit).toHaveBeenCalledWith('remove_collaborative_task', expect.objectContaining({
-                room_code: 'TEST1', task_index: 1,
+                room_code: 'TEST1', task_index: 1, task_id: 'task-2',
             }));
             act(() => simulateSocketEvent(contextValue.socket, 'collaborative_task_removed', { index: 1 }));
             expect(within(otherSection).queryByText('Do ten jumping jacks')).not.toBeInTheDocument();

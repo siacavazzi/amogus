@@ -15,6 +15,8 @@ const MUECustomSlider = ({
   text = "Slide to unlock",
   sus = false,
   backgroundColor = "transparent",
+  disabled = false,
+  pending = false,
 }) => {
   const sliderRef = useRef(null);
   const containerRef = useRef(null);
@@ -23,6 +25,7 @@ const MUECustomSlider = ({
   const [progressPercent, setProgressPercent] = useState(0);
   const [sliderPos, setSliderPos] = useState(0);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isRequestPending, setIsRequestPending] = useState(false);
   const [ripples, setRipples] = useState([]);
   const [shimmerPos, setShimmerPos] = useState(-100);
 
@@ -30,6 +33,8 @@ const MUECustomSlider = ({
   const containerWidth = useRef(0);
   const isDragging = useRef(false);
   const startX = useRef(0);
+  const requestPending = useRef(false);
+  const isDisabled = disabled || pending || isRequestPending || isSuccess;
 
   // Shimmer animation
   useEffect(() => {
@@ -94,26 +99,32 @@ const MUECustomSlider = ({
     }
   }, [onReset, updateSliderTransform, sliderPos]);
 
-  const handleSuccess = useCallback(() => {
+  const handleSuccess = useCallback(async () => {
+    if (disabled || pending || requestPending.current || isSuccess) return;
+    requestPending.current = true;
+    setIsRequestPending(true);
+
+    let accepted = true;
+    try {
+      accepted = (await onSuccess?.()) !== false;
+    } catch (error) {
+      accepted = false;
+    }
+
+    requestPending.current = false;
+    setIsRequestPending(false);
+    if (!accepted) {
+      resetSlider(false);
+      return;
+    }
+
     setIsSuccess(true);
-    
-    // Add success ripple effect
     const newRipple = { id: Date.now(), x: containerWidth.current };
     setRipples(prev => [...prev, newRipple]);
-    setTimeout(() => {
-      setRipples(prev => prev.filter(r => r.id !== newRipple.id));
-    }, 600);
-    
-    // Haptic feedback if available
-    if (navigator.vibrate) {
-      navigator.vibrate([50, 30, 50]);
-    }
-    
-    setTimeout(() => {
-      onSuccess && onSuccess();
-      resetSlider(true);
-    }, 400);
-  }, [onSuccess, resetSlider]);
+    setTimeout(() => setRipples(prev => prev.filter(r => r.id !== newRipple.id)), 600);
+    if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
+    setTimeout(() => resetSlider(true), 400);
+  }, [disabled, isSuccess, onSuccess, pending, resetSlider]);
 
   useEffect(() => {
     const calculateContainerWidth = () => {
@@ -194,6 +205,7 @@ const MUECustomSlider = ({
   }, [handlePointerMove, handlePointerUp]);
 
   const handlePointerDown = (e) => {
+    if (isDisabled) return;
     isDragging.current = true;
     const clientX = e.clientX || (e.touches && e.touches[0].clientX);
     startX.current = clientX - sliderPos;
@@ -203,7 +215,7 @@ const MUECustomSlider = ({
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter" || e.key === " ") {
+    if (!isDisabled && (e.key === "Enter" || e.key === " ")) {
       e.preventDefault();
       handleSuccess();
     }
@@ -308,13 +320,15 @@ const MUECustomSlider = ({
             onPointerDown={handlePointerDown}
             onTouchStart={handlePointerDown}
             onKeyDown={handleKeyDown}
-            tabIndex={0}
+            tabIndex={isDisabled ? -1 : 0}
             role="slider"
+            aria-disabled={isDisabled}
+            aria-busy={isRequestPending || pending}
             aria-valuemin={0}
             aria-valuemax={containerWidth.current}
             aria-valuenow={sliderPos}
             aria-label="Slide to unlock"
-            className="absolute flex items-center justify-center cursor-grab active:cursor-grabbing focus:outline-none z-10"
+            className={`absolute flex items-center justify-center ${isDisabled ? 'cursor-not-allowed' : 'cursor-grab active:cursor-grabbing'} focus:outline-none z-10`}
             style={{
               top: '50%',
               left: '4px',

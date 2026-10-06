@@ -70,8 +70,8 @@ const TASKS = {
         { task: 'Open and close the wardrobe door twice', location: 'Bedroom', movement: 'normal' },
         { task: 'Count the number of drawers in the room', location: 'Bedroom', movement: 'normal' },
         { task: 'Find a pair of shoes and place them neatly by the door', location: 'Bedroom', movement: 'normal' },
-        { task: 'Check under the bed and describe one thing you find', location: 'Bedroom', movement: 'normal' },
-        { task: 'Find and plug in any unplugged device charger', location: 'Bedroom', movement: 'normal' },
+        { task: 'Describe one object visible beside the bed', location: 'Bedroom', movement: 'normal' },
+        { task: 'Count the device chargers visible in the room', location: 'Bedroom', movement: 'normal' },
         { task: 'Count how many outlets are in the bedroom', location: 'Bedroom', movement: 'normal' },
     ],
 
@@ -82,11 +82,11 @@ const TASKS = {
         { task: 'Knock on the bathroom door once and wait for a response', location: 'Hallway', movement: 'normal' },
         { task: 'Count all the doors in the hallway', location: 'Hallway', movement: 'normal' },
         { task: 'Locate the nearest fire extinguisher and write down its colour', location: 'Hallway', movement: 'normal' },
-        { task: 'Find the light switch at the end of the hallway and flick it off and on', location: 'Hallway', movement: 'active' },
+        { task: 'Count the light switches visible in the hallway', location: 'Hallway', movement: 'active' },
         { task: 'Count every framed item hanging on any hallway wall', location: 'Hallway', movement: 'normal' },
-        { task: 'Walk to the furthest point in the building and back', location: 'Hallway', movement: 'active' },
+        { task: 'Walk to the agreed hallway marker and back', location: 'Hallway', movement: 'active' },
         { task: "Find the welcome mat and describe what's on it", location: 'Hallway', movement: 'normal' },
-        { task: 'Check that the front door is locked', location: 'Hallway', movement: 'normal' },
+        { task: 'Count the hinges visible on the front door', location: 'Hallway', movement: 'normal' },
     ],
 
     // ── Dorm-specific ────────────────────────────────────────────────────────
@@ -119,7 +119,7 @@ const TASKS = {
         { task: "Find a sticky note on someone's monitor — count them all", location: 'Office', movement: 'normal' },
         { task: 'Tidy the cable tray or cable mess under one desk', location: 'Office', movement: 'normal' },
         { task: 'Count how many monitors are currently showing a screensaver', location: 'Office', movement: 'normal' },
-        { task: 'Find the printer and collect any paper left in the output tray', location: 'Office', movement: 'normal' },
+        { task: 'Count the buttons visible on the printer', location: 'Office', movement: 'normal' },
         { task: 'Count the plants in the office', location: 'Office', movement: 'active' },
         { task: 'Find the break room and count the chairs', location: 'Office', movement: 'normal' },
     ],
@@ -142,12 +142,12 @@ const TASKS = {
     funny: [
         { task: 'Make eye contact with another player and hold it for 3 seconds without smiling', location: 'Anywhere', movement: 'low', funny: true },
         { task: 'Tell the nearest player an unprompted fact about cheese', location: 'Anywhere', movement: 'low', funny: true },
-        { task: 'Do a silent, dramatic spin before completing your next task', location: 'Anywhere', movement: 'low', funny: true },
+        { task: 'Draw a dramatic spiral on your task paper', location: 'Anywhere', movement: 'low', funny: true },
         { task: 'High-five yourself as loudly as possible', location: 'Anywhere', movement: 'low', funny: true },
         { task: 'Pretend a random object is a phone and mime a call for 10 seconds', location: 'Anywhere', movement: 'low', funny: true },
-        { task: 'Moonwalk exactly 3 steps', location: 'Anywhere', movement: 'low', funny: true },
-        { task: 'Ask someone to confirm the weather — outside, right now', location: 'Anywhere', movement: 'low', funny: true },
-        { task: 'Silently mime filling a bucket with water near the kitchen', location: 'Kitchen', movement: 'low', funny: true },
+        { task: 'Mime a tiny moonwalk with two fingers on your paper', location: 'Anywhere', movement: 'low', funny: true },
+        { task: 'Write a weather forecast for an imaginary planet', location: 'Anywhere', movement: 'low', funny: true },
+        { task: 'Mime filling a tiny bucket from your seat', location: 'Kitchen', movement: 'low', funny: true },
         { task: 'Count something in the room by pointing at each one out loud', location: 'Anywhere', movement: 'low', funny: true },
         { task: 'Name every country you can think of in 30 seconds — write your total', location: 'Anywhere', movement: 'low', funny: true },
     ],
@@ -181,139 +181,82 @@ const VENUE_ROOMS = {
     other: ['Room A', 'Room B', 'Room C', 'Hallway', 'Outdoor'],
 };
 
-/**
- * Sabotage ideas per venue type.
- * The generator picks one from each tier (setup, mid-game, social).
- */
+/** Sabotage cards available in Sus Party. */
 const SABOTAGE_IDEAS = {
-    apartment: [
-        'Before the game starts, hide the dish soap somewhere unexpected in the kitchen.',
-        'Turn off the living room lights at the start of the second round.',
-        'Whisper to another player that you "saw something suspicious" in the bedroom.',
-    ],
-    house: [
-        'Move one item from its usual spot in the kitchen before the game starts.',
-        "When no one's watching, swap two items that belong in different rooms.",
-        "Tell a crewmate that the garden tasks have been changed — they haven't.",
-    ],
-    dorm: [
-        "Quietly prop a common-room door open when it's usually closed.",
-        'Put a random object in front of the vending machine to block the path.',
-        "Mention casually that the RA is doing a check — they aren't.",
-    ],
-    office: [
-        'Before the game, move the office stapler to a completely different desk.',
-        'Pretend to be on a work call and block the kitchen doorway mid-game.',
-        "Claim a meeting room is \"booked\" so players can't complete tasks there.",
-    ],
-    airbnb: [
-        'Hide a task-related object (a mug, a coaster) in an unusual room before the game.',
-        'Turn off the outdoor lights before the garden task round.',
-        "Tell someone the \"living room tasks have been reset\" — they haven't.",
-    ],
-    school: [
-        'Move the projector remote before the game begins.',
-        'Quietly lock one classroom door (if you have a key) mid-game.',
-        "Claim a hallway is \"off limits\" due to a teacher — it isn't.",
-    ],
     other: [
-        "Hide one task-related object in a place that's hard to find before the game.",
-        'At the start of round 2, move a prop from its original position.',
-        "Tell a crewmate that one of their tasks has changed — it hasn't.",
+        'Fake Task: send a decoy task through your intruder cards. Fake completions do not help the crew.',
+        'EMP: use the card to disable phones briefly. Plan your next move before the timer ends.',
+        'Area Denial: use the card to block a game location temporarily. Physical exits stay open.',
     ],
 };
 
-/**
- * Returns a shuffled copy of an array.
- */
-function shuffle(arr) {
-    const a = [...arr];
-    for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-}
+// Observation tasks need no private cupboards or venue-specific equipment.
+const OBSERVATION_TASKS = [
+    ...['chairs', 'tables', 'doors', 'windows', 'lights', 'books', 'cups', 'pens',
+        'cushions', 'plants', 'clocks', 'screens', 'pictures', 'shelves', 'bags'].map(
+        item => `Count the ${item} visible from your spot. Write the total, or zero.`
+    ),
+    ...['chair', 'table', 'door', 'book', 'cup', 'bag', 'pen', 'picture', 'plant', 'clock'].map(
+        item => `Write the color of one visible ${item}, or write "none".`
+    ),
+    'Draw a square and mark each of its four corners.',
+    'Write the alphabet backward from Z to T.',
+    'Write three words that rhyme with light.',
+    'Draw a clock face with its hands at three o’clock.',
+    'Write the numbers from one to ten in reverse order.',
+    'Draw a triangle inside a circle.',
+    'Write five words that start with the letter S.',
+    'Write four animals in alphabetical order.',
+    'Draw a star with five points.',
+    'Write the current time shown on your phone.',
+].map(task => ({ task, movement: 'low' }));
 
-/**
- * Generates a task list based on user preferences.
- *
- * @param {object} opts
- * @param {string}   opts.venue         - venue type key
- * @param {number}   opts.playerCount
- * @param {string[]} opts.selectedRooms - room labels selected by the user
- * @param {string}   opts.movement      - 'low' | 'normal' | 'active'
- * @param {string}   opts.taskStyle     - 'standard' | 'funny' | 'sneaky' | 'mix'
- * @returns {{ tasks: Array, sabotages: string[], recommendations: object }}
- */
-function generateTasks({ venue, playerCount, movement, taskStyle }) {
-    // Build the pool
-    const venueRoomMap = {
-        apartment: ['kitchen', 'living_room', 'bedroom', 'hallway'],
-        house: ['kitchen', 'living_room', 'bedroom', 'hallway', 'outdoor'],
-        dorm: ['dorm', 'hallway', 'bedroom'],
-        office: ['office', 'hallway'],
-        airbnb: ['kitchen', 'living_room', 'bedroom', 'hallway', 'outdoor'],
-        school: ['hallway', 'office'],
-        other: ['any'],
+function generateTasks({ venue = 'apartment', playerCount = 8, movement = 'normal', taskStyle = 'standard', selectedRooms, random = Math.random }) {
+    const players = Math.max(5, Math.min(15, Number(playerCount) || 8));
+    const rooms = [...new Set((selectedRooms || VENUE_ROOMS[venue] || VENUE_ROOMS.other)
+        .map(room => room.trim()).filter(Boolean))];
+    if (!rooms.length) return { tasks: [], rooms: [], sabotages: [], recommendations: {} };
+    const roomKeys = {
+        Kitchen: 'kitchen', 'Kitchen / Break Room': 'kitchen', 'Living Room': 'living_room',
+        Bedroom: 'bedroom', Hallway: 'hallway', Dorm: 'dorm',
+        'Garden / Outdoor': 'outdoor', Outdoor: 'outdoor', Outdoors: 'outdoor',
+        'Open Plan': 'office', 'Meeting Room': 'office',
     };
-
-    const roomKeys = venueRoomMap[venue] || ['any'];
-    let pool = [...(TASKS.any || [])];
-    roomKeys.forEach((key) => {
-        if (TASKS[key]) pool = pool.concat(TASKS[key]);
+    const shuffleWithRandom = values => {
+        const result = [...values];
+        for (let index = result.length - 1; index > 0; index--) {
+            const other = Math.floor(random() * (index + 1));
+            [result[index], result[other]] = [result[other], result[index]];
+        }
+        return result;
+    };
+    const pools = rooms.map(location => {
+        const specific = TASKS[roomKeys[location]] || [];
+        const humor = taskStyle === 'funny' || taskStyle === 'mix' ? TASKS.funny : [];
+        const entries = [...specific, ...OBSERVATION_TASKS, ...humor].filter(task =>
+            movement === 'low' ? task.movement === 'low' : movement === 'active' || task.movement !== 'active'
+        );
+        const seen = new Set();
+        return shuffleWithRandom(entries.filter(({ task }) => {
+            if (seen.has(task)) return false;
+            seen.add(task);
+            return true;
+        }).map(task => ({ ...task, location })));
     });
-
-    // Add funny tasks if requested
-    if (taskStyle === 'funny' || taskStyle === 'mix') {
-        pool = pool.concat(TASKS.funny);
+    const tasks = [];
+    const count = Math.max(20, players * 3);
+    for (let index = 0; index < count; index++) {
+        const task = pools[index % rooms.length][Math.floor(index / rooms.length)];
+        if (task) tasks.push(task);
     }
-
-    // Add low-movement tasks if requested
-    if (movement === 'low') {
-        pool = pool.concat(TASKS.low_movement);
-    }
-
-    // Filter by movement level
-    if (movement === 'low') {
-        pool = pool.filter((t) => t.movement === 'low');
-    } else if (movement === 'normal') {
-        pool = pool.filter((t) => t.movement !== 'active');
-    }
-    // 'active' includes everything
-
-    // If sneaky style, prefer sneaky tasks (don't filter, just boost)
-    // For now, no filtering — all tasks can be used by intruders too
-
-    // Deduplicate
-    const seen = new Set();
-    pool = pool.filter((t) => {
-        if (seen.has(t.task)) return false;
-        seen.add(t.task);
-        return true;
-    });
-
-    // Shuffle and take up to 20
-    const selected = shuffle(pool).slice(0, 20);
-
-    // Sabotages
-    const sabVenue = SABOTAGE_IDEAS[venue] || SABOTAGE_IDEAS.other;
-    const sabotages = shuffle(sabVenue).slice(0, 3);
-
-    // Recommendations
-    const intruderCount = Math.max(1, Math.floor(playerCount / 4));
-    const durationMin = playerCount * 3;
-    const durationMax = playerCount * 4;
-    const meltdown = playerCount >= 8;
-
     return {
-        tasks: selected,
-        sabotages,
+        tasks,
+        rooms,
+        sabotages: SABOTAGE_IDEAS.other,
         recommendations: {
-            intruderCount,
-            durationMin,
-            durationMax,
-            meltdown,
+            intruderCount: players >= 10 ? 2 : 1,
+            meetingSeconds: 90,
+            taskGoalPerCrewmate: 5,
         },
     };
 }

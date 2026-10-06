@@ -40,7 +40,9 @@ describe('LobbyPage', () => {
             const createButton = screen.getByText(/Create New Game/i);
             fireEvent.click(createButton);
             
-            expect(contextValue.socket.emit).toHaveBeenCalledWith('create_game');
+            expect(contextValue.socket.emit).toHaveBeenCalledWith('create_game', {
+                acquisition: expect.objectContaining({ source: expect.any(String), landing_page: expect.any(String) }),
+            });
         });
 
         it('shows loading state while creating', async () => {

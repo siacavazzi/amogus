@@ -9,7 +9,7 @@ class PlayInterruptionTests(SocketGameTestCase):
             'starting_cards': 0, 'card_draw_probability': 0, 'meltdown_time': 1,
         })
 
-    def test_disconnect_does_not_block_ready_players_and_rejoin_keeps_role(self):
+    def test_disconnect_blocks_meeting_until_rejoin_and_ready_and_keeps_role(self):
         for disconnect_first in (True, False):
             with self.subTest(disconnect_first=disconnect_first):
                 clients, room, ids, game = self.start_round()
@@ -23,14 +23,16 @@ class PlayInterruptionTests(SocketGameTestCase):
                 if not disconnect_first:
                     self.assertEqual('waiting', game.meeting.stage)
                     clients[-1].disconnect()
-                self.assertEqual('voting', game.meeting.stage)
+                self.assertEqual('waiting', game.meeting.stage)
                 self.assertTrue(absent.alive)
                 replacement = self.make_client()
                 replacement.emit('rejoin', {'player_id': absent.player_id})
                 self.assertTrue(absent.active)
                 self.assertEqual(role, absent.sus)
                 meeting = self.first_event(self.drain(replacement), 'meeting')
-                self.assertEqual('voting', self.parse_json_payload(meeting)['stage'])
+                self.assertEqual('waiting', self.parse_json_payload(meeting)['stage'])
+                replacement.emit('ready', {'player_id': absent.player_id})
+                self.assertEqual('voting', game.meeting.stage)
 
     def start_manual_meltdown(self, client, pid, game):
         # Drive the real countdown synchronously with a controlled sleep boundary.

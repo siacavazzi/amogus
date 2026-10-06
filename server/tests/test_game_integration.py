@@ -107,9 +107,10 @@ class GameIntegrationTests(SocketGameTestCase):
 
         self.assertEqual({"room_code": room_code, "is_creator": crew_player.player_id == game.creator_player_id}, self.first_event(rejoin_events, "game_joined"))
         self.assertTrue(self.has_event(rejoin_events, "game_start"))
-        self.assertEqual({"score": 1}, self.first_event(rejoin_events, "crew_score"))
+        self.assertEqual(1, self.first_event(rejoin_events, "crew_score")["score"])
+        self.assertEqual(game.round_id, self.first_event(rejoin_events, "crew_score")["round_id"])
         self.assertEqual(game.taskGoal, self.first_event(rejoin_events, "task_goal"))
-        self.assertEqual({"task": crew_player.task}, self.first_event(rejoin_events, "task"))
+        self.assertEqual(crew_player.task, self.first_event(rejoin_events, "task")["task"])
 
     def test_task_completion_reveals_intruders_at_goal_without_ending_game(self):
         clients, room_code, player_ids, game = self.setup_started_game(
@@ -328,9 +329,10 @@ class GameIntegrationTests(SocketGameTestCase):
         self.assertEqual("voting", meeting["stage"])
         self.assertEqual(1, sum(vote_update["votes"].values()))
         self.assertTrue(self.has_event(rejoin_events, "game_start"))
-        self.assertEqual({"score": 0}, self.first_event(rejoin_events, "crew_score"))
+        self.assertEqual(0, self.first_event(rejoin_events, "crew_score")["score"])
+        self.assertEqual(game.round_id, self.first_event(rejoin_events, "crew_score")["round_id"])
         self.assertEqual(game.taskGoal, self.first_event(rejoin_events, "task_goal"))
-        self.assertEqual({"task": rejoining_player.task}, self.first_event(rejoin_events, "task"))
+        self.assertEqual(rejoining_player.task, self.first_event(rejoin_events, "task")["task"])
 
     def test_self_report_card_starts_meeting_and_consumes_card(self):
         clients, room_code, player_ids, game = self.setup_started_game(

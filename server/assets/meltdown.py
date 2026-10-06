@@ -1,5 +1,8 @@
 import random
+from contextlib import nullcontext
+
 import eventlet
+
 
 class Meltdown:
     def __init__(self, players, time, socketio, speaker, code_percent):
@@ -13,99 +16,126 @@ class Meltdown:
         self.codes_entered = 0
         self.meltdown_active = True
         self.game = None  # Set after creation
+        self.round_id = None
         self.speaker = speaker
 
+    def _state_lock(self):
+        return self.game.state_lock if self.game else nullcontext()
+
+    def _is_current_locked(self):
+        return self.meltdown_active and (
+            self.game is None
+            or (
+                self.game.active_meltdown is self
+                and self.game.round_id == self.round_id
+                and self.game.game_running
+                and not self.game.end_state
+            )
+        )
+
     def emit_to_room(self, event, data=None):
-        """Emit to the game's room if available, otherwise broadcast."""
-        if self.game and self.game.room_code:
-            if data is not None:
-                self.socketio.emit(event, data, room=self.game.room_code)
-            else:
-                self.socketio.emit(event, room=self.game.room_code)
+        """Emit through the owning game when this meltdown belongs to a room."""
+        if self.game:
+            self.game.emit_to_room(event, data)
+        elif data is not None:
+            self.socketio.emit(event, data)
         else:
-            if data is not None:
-                self.socketio.emit(event, data)
-            else:
-                self.socketio.emit(event)
+            self.socketio.emit(event)
 
     def start_countdown(self):
-        """Starts the countdown timer in a background greenlet."""
-        # Spawn the actual countdown in a background greenlet so it doesn't block
+        """Start the countdown in a background greenlet."""
         eventlet.spawn(self._countdown_loop)
-    
-    def _countdown_loop(self):
-        """The actual countdown logic running in a background greenlet."""
-        if not self.meltdown_active:
-            return
-        print(f"Meltdown initiated! {self.time_left} seconds remaining.")
-        self.emit_to_room("codes_needed", self.codes_needed)
-        self.distribute_codes()
-        while self.meltdown_active and self.time_left > 0:
-            if self.codes_entered >= self.codes_needed:
-                self.end_meltdown(success=True)
-                return
-            eventlet.sleep(1)  # Asynchronous delay
-            if not self.meltdown_active:
-                return
-            self.time_left -= 1
-            self.emit_to_room('meltdown_update', self.time_left)
 
-        # If the countdown reaches 0 and the meltdown is still active
-        if self.meltdown_active:
-            self.end_meltdown(success=self.codes_entered >= self.codes_needed)
+    def _countdown_loop(self):
+        """Update the countdown without holding the room lock during sleeps."""
+        with self._state_lock():
+            if not self._is_current_locked():
+                return
+            print(f"Meltdown initiated! {self.time_left} seconds remaining.")
+            self.emit_to_room("codes_needed", self.codes_needed)
+            self.distribute_codes()
+
+        while True:
+            with self._state_lock():
+                if not self._is_current_locked():
+                    return
+                if self.codes_entered >= self.codes_needed:
+                    self.end_meltdown(success=True)
+                    return
+                if self.time_left <= 0:
+                    self.end_meltdown(success=False)
+                    return
+
+            eventlet.sleep(1)
+
+            with self._state_lock():
+                if not self._is_current_locked():
+                    return
+                if self.codes_entered >= self.codes_needed:
+                    self.end_meltdown(success=True)
+                    return
+                self.time_left -= 1
+                if self.game:
+                    self.game.revision += 1
+                self.emit_to_room('meltdown_update', self.time_left)
+                if self.time_left <= 0:
+                    self.end_meltdown(success=self.codes_entered >= self.codes_needed)
+                    return
 
     def distribute_codes(self):
-        for i in range(0, self.num_players):
-            self.living_players[i - 1].meltdown_code = self.valid_pins[i - 1]
-            self.socketio.emit("meltdown_code", self.valid_pins[i - 1], to=self.living_players[i - 1].sid)
-            print(f"sending code {self.valid_pins[i - 1]} to {self.living_players[i - 1].sid}")
-
+        with self._state_lock():
+            if not self._is_current_locked():
+                return
+            for index, player in enumerate(self.living_players):
+                player.meltdown_code = self.valid_pins[index]
+                self.socketio.emit("meltdown_code", self.valid_pins[index], to=player.sid)
+                print(f"sending code {self.valid_pins[index]} to {player.sid}")
+            if self.game:
+                self.game.revision += 1
 
     def check_pin(self, input_pin):
-        if not self.meltdown_active:
-            return False
-        print(f"Input PIN: {input_pin} (type: {type(input_pin)})")
-        print(f"Valid PINs: {self.valid_pins} (types: {[type(pin) for pin in self.valid_pins]})")
-    
-        """Validates a PIN and increments codes entered if successful."""
-        try:
-            # Convert input_pin to integer if it's not already
-            input_pin = int(input_pin)
-        except ValueError:
-            # Handle the case where conversion fails
-            print("Invalid PIN format. PIN should be a number.")
-            self.emit_to_room("code_incorrect")
-            return False
-    
-        if input_pin in self.valid_pins:
-            print("Valid PIN entered!")
+        """Validate a PIN once while this meltdown still owns the room."""
+        with self._state_lock():
+            if not self._is_current_locked():
+                return False
+            try:
+                input_pin = int(input_pin)
+            except (TypeError, ValueError):
+                print("Invalid PIN format. PIN should be a number.")
+                self.emit_to_room("code_incorrect")
+                return False
+
+            if input_pin not in self.valid_pins:
+                self.emit_to_room("code_incorrect")
+                return False
+
             self.valid_pins.remove(input_pin)
             self.codes_entered += 1
+            if self.game:
+                self.game.revision += 1
+            print("Valid PIN entered!")
             self.emit_to_room("code_correct", self.codes_needed - self.codes_entered)
             if self.codes_entered >= self.codes_needed:
                 self.end_meltdown(success=True)
             return True
-    
-        print("Invalid PIN")
-        self.emit_to_room("code_incorrect")
-        return False
-
 
     def end_meltdown(self, success):
-        """Ends the meltdown and emits the result."""
-        if not self.meltdown_active:
-            return
-        self.meltdown_active = False
-        # Stop the looping meltdown alarm first
-        self.speaker.stop()
-        if success:
+        """End this meltdown only while it still owns the active round."""
+        with self._state_lock():
+            if not self._is_current_locked():
+                return False
+            self.meltdown_active = False
             if self.game:
-                self.game.active_meltdown = None
-            self.speaker.play_sound("meltdown_over")
-            self.emit_to_room('meltdown_end')
-        else:
-            print("Meltdown failed!")
-            self.speaker.play_sound("meltdown_fail")
-            if self.game:
-                self.game.meltdown()
-
+                self.game.revision += 1
+            self.speaker.stop()
+            if success:
+                if self.game:
+                    self.game.active_meltdown = None
+                self.speaker.play_sound("meltdown_over")
+                self.emit_to_room('meltdown_end')
+            else:
+                print("Meltdown failed!")
+                self.speaker.play_sound("meltdown_fail")
+                if self.game:
+                    self.game.meltdown(meltdown=self)
+            return True

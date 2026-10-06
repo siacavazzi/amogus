@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './LandingPage.css';
 import PhoneShowcase from './PhoneShowcase';
 import { usePageMeta } from '../../seo/usePageMeta';
+import { SiteNav, SiteFooter } from '../../components/SiteChrome';
 
 const TAGLINE_WORDS = ['Gaslight.', 'Sneak.', 'Vote.', 'Repeat.'];
 
@@ -14,7 +15,7 @@ const STEPS = [
     {
         n: '02',
         title: 'Customize tasks for your venue',
-        body: '\u201CSwap the dish towel.\u201D \u201CCheck the basement light.\u201D Make the task list match your house, dorm, or office.',
+        body: 'Generate a task pack for your rooms, then review it in host setup. Count coasters, read a book title, or sort cards. Use places your group can share.',
     },
     {
         n: '03',
@@ -27,7 +28,7 @@ const FEATURES = [
     {
         emoji: '\uD83C\uDFE0',
         title: 'Custom tasks for your venue',
-        body: 'Write tasks tailored to your space. Every game feels personal.',
+        body: 'Generate a pack for your rooms or write your own tasks. Review the list, import it, and open the room for friends.',
     },
     {
         emoji: '\uD83D\uDD0A',
@@ -49,17 +50,17 @@ const FEATURES = [
 const FAQS = [
     { q: 'Can you play Among Us in real life?', a: 'Yes. Sus Party brings the social deduction setup into your house: secret roles, real tasks, sabotage, meetings, and votes. Everyone plays together in person, with a phone as their controller.' },
     { q: 'Is there a free Among Us IRL app?', a: 'Sus Party is a free browser app for an Among Us-inspired party game. Open it on iPhone, Android, or a laptop. No install or account required.' },
-    { q: 'What are good Among Us IRL tasks at home?', a: 'Count the forks in the kitchen, stack three pillows in the living room, or find the TV remote. Use short tasks in different rooms so players have reasons to split up.' },
+    { q: 'What are good Among Us IRL tasks at home?', a: 'Count coasters at the dining table, read a title from a shared shelf, or sort host-provided cards. Use short tasks in different areas so players have reasons to split up.' },
     { q: 'How do Among Us IRL room codes work?', a: 'The host creates a Sus Party game and shares its four-character room code. Friends open susparty.com/play and enter that code to join the same game.' },
     { q: 'Can we play online from different homes?', a: 'Sus Party connects your phones online, but the group plays together in the same physical space. The tasks, secret eliminations, and meetings happen in real life.' },
-    { q: 'How many players?', a: 'Best with 5\u201315. Works in a pinch with 4. Gets wild past 10.' },
+    { q: 'How many players?', a: 'The task generator prepares groups of 5–15. The game requires at least two crew members per intruder and has no fixed 15-player cap.' },
     { q: 'Does it cost anything?', a: 'No. It\u2019s free, open source, and ad-free.' },
-    { q: 'Where do we play?', a: 'Anywhere with multiple rooms: a house, apartment, dorm, office after hours, big Airbnb. Wi-Fi helps.' },
+    { q: 'Where do we play?', a: 'Use shared areas in a house, apartment, dorm, office, or vacation rental. The low-movement preset uses two task stations in one room. Each phone needs internet.' },
 ];
 
 function LandingPage() {
     usePageMeta({
-        title: 'Sus Party | Among us IRL',
+        title: 'Sus Party | Free Among us IRL Party Game',
         description: 'Play Among Us in real life with Sus Party, a free browser party game. Use your phones for tasks, secret roles, sabotage, meetings, and votes. No downloads.',
         canonical: 'https://susparty.com/',
     });
@@ -71,15 +72,8 @@ function LandingPage() {
     }, []);
 
     return (
-        <div className="lp-shell">
-            {/* Animated warping color field behind the hero */}
-            <div className="lp-aurora" aria-hidden="true">
-                <div className="lp-aurora__blob lp-aurora__blob--a" />
-                <div className="lp-aurora__blob lp-aurora__blob--b" />
-                <div className="lp-aurora__blob lp-aurora__blob--c" />
-                <div className="lp-aurora__blob lp-aurora__blob--d" />
-            </div>
-            <div className="lp-grain" aria-hidden="true" />
+        <div className="site-page lp-shell">
+            <SiteNav />
 
             {/* Hero text + sticky phone live inside the same scroll story.
                 Phone follows you down through every panel. */}
@@ -137,7 +131,7 @@ function LandingPage() {
                             </ul>
                         </div>
 
-                        <p className="lp-footnote">Best with 5–15 players · One host phone runs the room</p>
+                        <p className="lp-footnote">Task packs for 5–15 players · One host phone runs the room</p>
 
                         <a href="#showcase" className="lp-scroll-cue" aria-label="Scroll to game previews">
                             <span>Scroll for the breakdown</span>
@@ -204,7 +198,7 @@ function LandingPage() {
             <section className="lp-seo" aria-labelledby="lp-seo-heading">
                 <div className="lp-seo__inner">
                     <h2 id="lp-seo-heading" className="lp-seo__heading">
-                        Your house. Your tasks. Your Among Us IRL party.
+                        Choose the game for your group.
                     </h2>
                     <p className="lp-seo__lead">
                         Sus Party is a free browser app for an Among Us-inspired party game in real life. Open
@@ -212,6 +206,23 @@ function LandingPage() {
                         turn your house into the board. Players move room to room, complete real tasks,
                         survive sabotage, call meetings, and vote out the secret saboteur. No app to install,
                         no signup, no ads.
+                    </p>
+                    <p className="lp-seo__lead">
+                        Want a game night built around bluffing and accusations? Compare
+                        {' '}<a href="/social-deduction-games">social deduction games to play in person</a>,
+                        plan an <a href="/among-us-birthday-party">Among Us birthday game</a>,
+                        or choose <a href="/party-games-for-10-people">party games for ten friends</a>.
+                        When you pick Sus Party, the task generator carries your setup into a new room.
+                    </p>
+
+                    <p className="lp-seo__cta">
+                        <a href="/party-games-for-adults" className="lp-seo__link">Play at your next house party →</a>
+                        {' · '}
+                        <a href="/murder-mystery-party-game" className="lp-seo__link">Make your friends the murder suspects →</a>
+                        {' · '}
+                        <a href="/birthday-party-games-for-adults" className="lp-seo__link">Give birthday guests secret roles →</a>
+                        {' · '}
+                        <a href="/game-night-ideas" className="lp-seo__link">Host a Sus Party game night →</a>
                     </p>
 
                     <p className="lp-seo__cta">
@@ -227,38 +238,15 @@ function LandingPage() {
             </section>
 
             {/* FOOTER */}
-            <footer className="lp-footer">
+            <section className="lp-footer" aria-label="Play Sus Party">
                 <div className="lp-footer__inner">
                     <div className="lp-footer__cta">
                         <h2 className="lp-footer__heading">Ready to find the saboteur?</h2>
-                        <a href="/play" className="lp-button lp-button--primary lp-footer__btn">
-                            Start a game
-                        </a>
-                    </div>
-                    <div className="lp-footer__meta">
-                        <p className="lp-footer__line">
-                            Open source on{' '}
-                            <a className="lp-link" href="https://github.com/siacavazzi/amogus" target="_blank" rel="noreferrer noopener">
-                                GitHub
-                            </a>
-                            . PRs welcome.
-                        </p>
-                        <p className="lp-footer__line lp-footer__line--muted">
-                            Made by Sam Yakovasi ·{' '}
-                            <a className="lp-link" href="https://github.com/siacavazzi" target="_blank" rel="noreferrer noopener">
-                                @siacavazzi
-                            </a>
-                        </p>
-                        <p className="lp-footer__line lp-footer__line--muted" style={{ fontSize: '0.75rem', marginTop: 8 }}>
-                            Sus Party at susparty.com is a browser game, separate from the SusParty mobile app and susparty.info.{' '}
-                            <a className="lp-link" href="/faq">App and support clarification</a>.
-                        </p>
-                        <p className="lp-footer__line lp-footer__line--muted" style={{ fontSize: '0.75rem', marginTop: 8 }}>
-                            Sus Party is an independent social deduction party game and is not affiliated with, endorsed by, or sponsored by Innersloth or Among Us.
-                        </p>
+                        <a href="/play" className="lp-button lp-button--primary lp-footer__btn">Play now →</a>
                     </div>
                 </div>
-            </footer>
+            </section>
+            <SiteFooter />
         </div>
     );
 }

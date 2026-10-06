@@ -1,13 +1,14 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import PlayerCard from "../components/PlayerCard";
 import { DataContext } from "../GameContext";
 import LeaveGameButton from "../components/LeaveGameButton";
-import { CheckCircle, XCircle, Vote, Timer, Users, AlertTriangle, Gavel } from "lucide-react";
+import { CheckCircle, XCircle, Vote, Timer, Users, AlertTriangle, Gavel, Skull } from "lucide-react";
 import { GridOverlay } from "../components/ui";
 import { PrimaryButton, SecondaryButton, StatusBadge } from "../components/ui";
+import { emitVolatileWithAck } from "../utils/socketCommand";
 
 export default function VotingPage({ tutorialMode = false, tutorialHighlightTarget = null }) {
-  const { players, socket, setMessage, meetingState, vetoVotes, votes, playerState } = useContext(DataContext);
+  const { players, socket, setMessage, meetingState, vetoVotes, votes, playerState, roundId, connected } = useContext(DataContext);
   const highlightPlayers = tutorialMode && (tutorialHighlightTarget === 'players' || tutorialHighlightTarget === 'vote-flow');
   const highlightActions = tutorialMode && (tutorialHighlightTarget === 'actions' || tutorialHighlightTarget === 'vote-flow');
 
@@ -15,11 +16,29 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
   const [timeLeft, setTimeLeft] = useState(meetingState.time_left);
   const [hasVoted, setHasVoted] = useState(false);
   const [votedFor, setVotedFor] = useState(null);
+  const [deathPending, setDeathPending] = useState(false);
+  const deathPendingRef = useRef(false);
+  const mountedRef = useRef(true);
+  const playerId = playerState?.player_id || playerState?.playerId || localStorage.getItem('player_id');
+  const canVote = connected && playerState?.alive !== false && !deathPending && meetingState.stage === 'voting';
+  const showDeathReport = !tutorialMode && playerState?.alive !== false && meetingState.stage === 'voting';
 
   useEffect(() => {
-    for (const player of players) {
-      player.ready = false;
+    mountedRef.current = true;
+    return () => { mountedRef.current = false; };
+  }, []);
+
+  useEffect(() => {
+    if (selectedPlayer && !players.some(p => p.player_id === selectedPlayer.player_id && p.alive)) {
+      setSelectedPlayer(null);
     }
+    if (votedFor && votedFor !== 'veto' && !players.some(p => p.player_id === votedFor.player_id && p.alive)) {
+      setHasVoted(false);
+      setVotedFor(null);
+    }
+  }, [players, selectedPlayer, votedFor]);
+
+  useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
@@ -29,8 +48,14 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
   }, []);
 
   const handleVote = () => {
+    if (!canVote || deathPendingRef.current) return;
     if (selectedPlayer) {
-      socket.emit("vote", { player_id: localStorage.getItem('player_id'), votedFor: selectedPlayer.player_id });
+      socket.emit("vote", {
+        player_id: playerId,
+        votedFor: selectedPlayer.player_id,
+        round_id: meetingState?.round_id || roundId,
+        meeting_id: meetingState?.id || meetingState?.meeting_id,
+      });
       setMessage({ text: `You voted for ${selectedPlayer.username}`, status: "success" });
       setHasVoted(true);
       setVotedFor(selectedPlayer);
@@ -40,11 +65,36 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
   };
 
   const handleVeto = () => {
-    socket.emit("veto", { player_id: localStorage.getItem('player_id') });
+    if (!canVote || deathPendingRef.current) return;
+    socket.emit("veto", {
+      player_id: playerId,
+      round_id: meetingState?.round_id || roundId,
+      meeting_id: meetingState?.id || meetingState?.meeting_id,
+    });
     setMessage({ text: "You voted to veto.", status: "info" });
     setSelectedPlayer(null);
     setHasVoted(true);
     setVotedFor('veto');
+  };
+
+  const handleImDead = async () => {
+    if (!canVote || deathPendingRef.current || tutorialMode) return;
+    if (!window.confirm('Are you sure you want to mark yourself as dead?')) return;
+    deathPendingRef.current = true;
+    setDeathPending(true);
+    try {
+      const result = await emitVolatileWithAck(socket, 'player_dead', {
+        player_id: playerId,
+        round_id: meetingState?.round_id || roundId,
+        meeting_id: meetingState?.id || meetingState?.meeting_id,
+      });
+      if (!result?.ok) throw new Error(result?.error || 'The death report failed. Try again.');
+    } catch (error) {
+      if (!mountedRef.current) return;
+      deathPendingRef.current = false;
+      setDeathPending(false);
+      setMessage({ text: error.message, status: 'error' });
+    }
   };
 
   const totalTime = meetingState.time_left;
@@ -64,7 +114,7 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
       {!tutorialMode && <LeaveGameButton className="fixed top-4 right-4 z-50" />}
 
       {/* Header Section */}
-      <div className="relative z-10 pt-4 px-4">
+      <div className={`relative z-10 ${tutorialMode ? 'pt-4' : 'pt-12'} px-4`}>
         {/* Title */}
         <div className="flex items-center justify-center gap-3 mb-4">
           <Gavel className="text-purple-400" size={28} />
@@ -126,14 +176,14 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
       </div>
 
       {/* Scrollable Players Grid */}
-      <div className="flex-1 overflow-y-auto px-4 pb-44 relative z-10">
+      <div className={`flex-1 overflow-y-auto px-4 ${showDeathReport ? 'pb-64' : 'pb-44'} relative z-10`}>
         <div
           className={`max-w-2xl mx-auto ${highlightPlayers ? 'animate-pulse' : ''}`}
           style={highlightPlayers ? { borderRadius: '2rem', outline: '3px solid rgba(192,132,252,0.85)', outlineOffset: '4px', boxShadow: '0 0 30px rgba(192,132,252,0.4)' } : {}}
         >
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
             {players.map((player) => {
-              const isMe = playerState?.player_id === player.player_id;
+              const isMe = playerId === player.player_id;
               const isDead = !player.alive;
 
               return (
@@ -169,7 +219,7 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
             {/* Main vote button */}
             <PrimaryButton
               onClick={handleVote}
-              disabled={!selectedPlayer}
+              disabled={!selectedPlayer || !canVote}
               variant="purple"
             >
               <Vote size={22} />
@@ -177,11 +227,17 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
             </PrimaryButton>
 
             {/* Veto button */}
-            <SecondaryButton onClick={handleVeto} variant="orange">
+            <SecondaryButton onClick={handleVeto} variant="orange" disabled={!canVote}>
               <XCircle size={18} />
               <span>Veto Meeting</span>
               <span className="px-2 py-0.5 bg-orange-500/20 rounded-full text-xs">{vetoVotes}</span>
             </SecondaryButton>
+            {showDeathReport && (
+              <SecondaryButton onClick={handleImDead} variant="red" disabled={!canVote}>
+                <Skull size={18} />
+                {deathPending ? 'Confirm death...' : "I've Been Killed"}
+              </SecondaryButton>
+            )}
           </div>
         </div>
       </div>

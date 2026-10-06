@@ -5,7 +5,7 @@ import LeaveGameButton from '../components/LeaveGameButton';
 import { AlertTriangle, Users, CheckCircle2, Clock, Skull } from 'lucide-react';
 
 const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = null }) => {
-  const { playerState, players, meetingState, socket } = useContext(DataContext);
+  const { playerState, players, meetingState, socket, roundId, connected } = useContext(DataContext);
   const highlightReadySlider = tutorialMode && tutorialHighlightTarget === 'ready-slider';
 
   const [readyPlayers, setReadyPlayers] = useState(0);
@@ -17,7 +17,7 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
     const waiting = [];
     for (const player of players) {
       if (player.alive) {
-        if (player.ready) {
+        if (player.active !== false && player.ready) {
           ready++;
         } else {
           waiting.push(player);
@@ -38,11 +38,15 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
 
   const totalAlive = players.filter((player) => player.alive).length;
   const playersRemaining = totalAlive - readyPlayers;
-  const progressPercentage = (readyPlayers / totalAlive) * 100;
+  const progressPercentage = totalAlive > 0 ? (readyPlayers / totalAlive) * 100 : 0;
   const allReady = playersRemaining === 0;
 
   const handleReadyUp = () => {
-    socket.emit('ready', { player_id: localStorage.getItem('player_id') });
+    socket.emit('ready', {
+      player_id: playerState?.player_id || playerState?.playerId || localStorage.getItem('player_id'),
+      round_id: meetingState?.round_id || roundId,
+      meeting_id: meetingState?.id || meetingState?.meeting_id,
+    });
   };
 
   const handleImDead = () => {
@@ -50,7 +54,11 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
       return;
     }
     if (socket) {
-      socket.emit('player_dead', { player_id: localStorage.getItem('player_id') });
+      socket.emit('player_dead', {
+        player_id: playerState?.player_id || playerState?.playerId || localStorage.getItem('player_id'),
+        round_id: meetingState?.round_id || roundId,
+        meeting_id: meetingState?.id || meetingState?.meeting_id,
+      });
     }
   };
 
@@ -182,6 +190,7 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
                   >
                     <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                     {player.username}
+                    {player.active === false && <span className="ml-1 rounded bg-gray-700 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-gray-300">Offline</span>}
                   </span>
                 ))}
               </div>
@@ -190,7 +199,7 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
         )}
 
         {/* Ready Status Indicator */}
-        {playerState.ready && (
+        {playerState.ready && playerState.active !== false && (
           <div className="relative overflow-hidden rounded-2xl border border-green-500/30 bg-green-500/10 mb-6">
             <div className="p-4 flex items-center justify-center gap-3">
               <CheckCircle2 className="text-green-400" size={24} />
@@ -223,7 +232,7 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
             className={highlightReadySlider ? 'animate-pulse' : ''}
             style={highlightReadySlider ? { borderRadius: '1.5rem', outline: '3px solid rgba(252,211,77,0.85)', outlineOffset: '4px', boxShadow: '0 0 30px rgba(251,191,36,0.4)' } : {}}
           >
-            <MUECustomSlider text="Slide to ready up" onSuccess={handleReadyUp} />
+            <MUECustomSlider text="Slide to ready up" onSuccess={handleReadyUp} disabled={!connected} />
           </div>
         </div>
       )}

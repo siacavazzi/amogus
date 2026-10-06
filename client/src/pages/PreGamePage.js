@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useContext, useEffect, useRef, useCallback } from 'react';
 import { DataContext } from '../GameContext';
 import PlayerCard from '../components/PlayerCard';
 import { Plus, X, Check, Send, MapPin, Copy, Save, Play, LogOut, Users, ClipboardList, ToggleLeft, ToggleRight, Pencil, Zap, Wifi, Share2 } from 'lucide-react';
@@ -23,7 +23,7 @@ function getDeviceId() {
  * Pre-game page with tabs for Players and Task Creation
  */
 function PreGamePage() {
-    const { socket, roomCode, players, taskLocations, running, setTaskEntry, isRoomCreator } = useContext(DataContext);
+    const { socket, roomCode, players, taskLocations, running, setTaskEntry, isRoomCreator, lobbyState } = useContext(DataContext);
     const [activeTab, setActiveTab] = useState('players'); // 'players' or 'tasks'
     const [showContent, setShowContent] = useState(false);
     
@@ -38,6 +38,8 @@ function PreGamePage() {
     // Task creation state
     const [tasks, setTasks] = useState([]);
     const [serverMinTasks, setServerMinTasks] = useState(null);
+    const [serverLobbyState, setServerLobbyState] = useState(null);
+    const lobbyVersionRef = useRef({ roomCode, revision: -1 });
     const [newTaskText, setNewTaskText] = useState('');
     const [selectedLocation, setSelectedLocation] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -64,6 +66,46 @@ function PreGamePage() {
     
     // Collaborative mode - whether all players can add tasks
     const [collaborativeMode, setCollaborativeMode] = useState(false);
+
+    const replaceLobbyState = useCallback((data) => {
+        if (!data || typeof data !== 'object') return;
+        if (data.room_code && roomCode && data.room_code !== roomCode) return;
+
+        if (lobbyVersionRef.current.roomCode !== roomCode) {
+            lobbyVersionRef.current = { roomCode, revision: -1 };
+        }
+        const incomingRevision = Number(data.revision);
+        if (Number.isFinite(incomingRevision) && incomingRevision < lobbyVersionRef.current.revision) return;
+        if (Number.isFinite(incomingRevision)) {
+            lobbyVersionRef.current = { roomCode, revision: incomingRevision };
+        }
+
+        setServerLobbyState(data);
+        if (Array.isArray(data.tasks)) {
+            setTasks((previous) => (
+                JSON.stringify(previous) === JSON.stringify(data.tasks) ? previous : data.tasks
+            ));
+        }
+        setServerMinTasks(typeof data.min_tasks === 'number' && Number.isFinite(data.min_tasks) ? data.min_tasks : null);
+        if (Object.prototype.hasOwnProperty.call(data, 'task_list_code')) setTaskListCode(data.task_list_code || null);
+        if (Object.prototype.hasOwnProperty.call(data, 'task_list_name')) setTaskListName(data.task_list_name || '');
+        if (data.collaborative_mode !== undefined) setCollaborativeMode(data.collaborative_mode);
+    }, [roomCode]);
+
+    useEffect(() => {
+        lobbyVersionRef.current = { roomCode, revision: -1 };
+        setServerLobbyState(null);
+        setServerMinTasks(null);
+        setTasks([]);
+        setTaskListCode(null);
+        setTaskListName('');
+        setCollaborativeMode(false);
+        setIsTaskListOwner(true);
+    }, [roomCode]);
+
+    useEffect(() => {
+        if (lobbyState) replaceLobbyState(lobbyState);
+    }, [lobbyState, roomCode, replaceLobbyState]);
     
     // Permissions: host can always add tasks, others only if collaborative mode is on
     const canAddTasks = isRoomCreator || collaborativeMode;
@@ -187,18 +229,12 @@ function PreGamePage() {
         const handleTasksUpdate = (data) => {
             console.log('Collaborative tasks updated:', data);
             console.log('My device_id:', deviceId, 'is_owner from server:', data.is_owner);
-            setTasks(data.tasks || []);
-            if (data.min_tasks !== undefined) {
-                setServerMinTasks(data.min_tasks);
-            }
-            if (data.task_list_code) {
-                setTaskListCode(data.task_list_code);
-            }
-            if (data.task_list_name) {
-                setTaskListName(data.task_list_name);
-            }
-            if (data.collaborative_mode !== undefined) {
-                setCollaborativeMode(data.collaborative_mode);
+            if (lobbyVersionRef.current.revision < 0) {
+                setTasks(data.tasks || []);
+                if (data.min_tasks !== undefined) setServerMinTasks(data.min_tasks);
+                if (Object.prototype.hasOwnProperty.call(data, 'task_list_code')) setTaskListCode(data.task_list_code || null);
+                if (Object.prototype.hasOwnProperty.call(data, 'task_list_name')) setTaskListName(data.task_list_name || '');
+                if (data.collaborative_mode !== undefined) setCollaborativeMode(data.collaborative_mode);
             }
             // Track ownership
             if (data.is_owner !== undefined) {
@@ -208,17 +244,21 @@ function PreGamePage() {
 
         const handleTaskAdded = (data) => {
             console.log('Task added:', data);
-            setTasks(prev => [...prev, data.task]);
-            if (data.min_tasks !== undefined) {
-                setServerMinTasks(data.min_tasks);
+            if (lobbyVersionRef.current.revision < 0) {
+                setTasks(prev => [...prev, data.task]);
+                if (data.min_tasks !== undefined) setServerMinTasks(data.min_tasks);
             }
             setIsSubmitting(false);
         };
 
         const handleTaskRemoved = (data) => {
             console.log('Task removed:', data);
-            setTasks(prev => prev.filter((_, i) => i !== data.index));
+            if (lobbyVersionRef.current.revision < 0) {
+                setTasks(prev => prev.filter((task, i) => data.task_id ? task.task_id !== data.task_id : i !== data.index));
+            }
         };
+
+        const handleLobbyState = (data) => replaceLobbyState(data);
 
         const handleTasksSaved = (data) => {
             console.log('Collaborative tasks saved:', data);
@@ -242,6 +282,7 @@ function PreGamePage() {
         };
 
         socket.on('collaborative_tasks', handleTasksUpdate);
+        socket.on('lobby_state', handleLobbyState);
         socket.on('collaborative_task_added', handleTaskAdded);
         socket.on('collaborative_task_removed', handleTaskRemoved);
         socket.on('collaborative_tasks_saved', handleTasksSaved);
@@ -253,12 +294,13 @@ function PreGamePage() {
 
         return () => {
             socket.off('collaborative_tasks', handleTasksUpdate);
+            socket.off('lobby_state', handleLobbyState);
             socket.off('collaborative_task_added', handleTaskAdded);
             socket.off('collaborative_task_removed', handleTaskRemoved);
             socket.off('collaborative_tasks_saved', handleTasksSaved);
             socket.off('collaborative_mode_changed', handleCollaborativeModeChanged);
         };
-    }, [socket, roomCode]);
+    }, [socket, roomCode, deviceId, replaceLobbyState]);
 
     // Location management functions
     const addLocation = () => {
@@ -329,10 +371,12 @@ function PreGamePage() {
     };
 
     const handleRemoveTask = (index) => {
+        const task = tasks[index];
         socket.emit('remove_collaborative_task', {
             room_code: roomCode,
             player_id: playerId,
-            task_index: index
+            task_index: index,
+            ...(task?.task_id ? { task_id: task.task_id } : {}),
         });
     };
 
@@ -447,31 +491,25 @@ function PreGamePage() {
         return acc;
     }, {});
 
-    // Check if we have at least 5 tasks per real location
+    // Show per-location counts as advice. The server checks the start rules.
     const MIN_TASKS_PER_LOCATION = 5;
-    const requiredTotalTasks = Math.max(serverMinTasks || 0, players.length * 3, 10);
+    const requiredTotalTasks = serverMinTasks ?? Math.max(players.length * 3, 10);
     const missingTotalTasks = Math.max(0, requiredTotalTasks - tasks.length);
-    const locationsWithEnoughTasks = realLocations.filter(loc => 
-        (tasksByLocation[loc]?.length || 0) >= MIN_TASKS_PER_LOCATION
-    );
-    const hasEnoughTasks = realLocations.length >= 2 && 
-        locationsWithEnoughTasks.length === realLocations.length;
     const hasEnoughTotalTasks = missingTotalTasks === 0;
-    
-    // Only host can start game, and only when there are enough tasks
-    const canStartGame = isHost && hasEnoughTasks && hasEnoughTotalTasks;
+
+    const fallbackCanStartGame = players.length >= 3 && realLocations.length >= 2 && hasEnoughTotalTasks;
+    const canStartGame = isHost && (serverLobbyState?.can_start ?? fallbackCanStartGame);
     
     // Calculate what's missing
     const getTasksNeededMessage = () => {
+        if (serverLobbyState?.start_error) return serverLobbyState.start_error;
         if (realLocations.length < 2) {
             return `Add at least ${2 - realLocations.length} more location${2 - realLocations.length !== 1 ? 's' : ''} first`;
-        }
-        if (!hasEnoughTasks) {
-            return `Need ${MIN_TASKS_PER_LOCATION} tasks per location`;
         }
         if (!hasEnoughTotalTasks) {
             return `Need ${missingTotalTasks} more task${missingTotalTasks !== 1 ? 's' : ''} total`;
         }
+        if (players.length < 3) return 'Need at least 3 players for one intruder.';
         return '';
     };
 
@@ -878,7 +916,7 @@ function PreGamePage() {
                                     )}
                                 </div>
                                 <p className="text-gray-400 text-xs mb-3">
-                                    Add at least 2 locations where tasks happen (e.g., "Kitchen", "Backyard"). You'll need {MIN_TASKS_PER_LOCATION} tasks per location.
+                                    Add at least 2 locations where tasks happen (for example, "Kitchen" and "Backyard"). Recommended: {MIN_TASKS_PER_LOCATION} tasks per location.
                                 </p>
 
                                 {realLocations.length > 0 && (

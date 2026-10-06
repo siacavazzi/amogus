@@ -25,6 +25,8 @@ class StatsTracker:
             'total_games_completed': 0,
             'unique_player_ids': [],     # persisted as list, used as set
             'completed_games': [],       # list of game records
+            'acquisition': {},
+            'acquisition_since': time.time(),
         }
         self._load()
 
@@ -55,9 +57,48 @@ class StatsTracker:
 
     # ---- recording ----
 
-    def record_game_created(self, room_code):
+    @staticmethod
+    def normalize_acquisition(value):
+        value = value if isinstance(value, dict) else {}
+        sources = {'direct', 'google', 'bing', 'chatgpt', 'facebook', 'instagram',
+                   'snapchat', 'reddit', 'youtube', 'shared-link', 'other', 'unknown'}
+        pages = {'/', '/play', '/among-us-irl', '/how-to-play-among-us-irl',
+                 '/among-us-irl-task-ideas', '/among-us-irl-task-generator',
+                 '/social-deduction-games', '/among-us-birthday-party', '/party-games-for-10-people',
+                 '/party-games-for-adults', '/murder-mystery-party-game',
+                 '/birthday-party-games-for-adults', '/game-night-ideas',
+                 '/how-to-play', '/faq', '/about'}
+        source = value.get('source')
+        page = value.get('landing_page')
+        return {
+            'source': source if isinstance(source, str) and source in sources else 'unknown',
+            'landing_page': page if isinstance(page, str) and page in pages else '/play',
+        }
+
+    def _acquisition_bucket(self, acquisition):
+        acquisition = self.normalize_acquisition(acquisition)
+        key = acquisition['source'] + '|' + acquisition['landing_page']
+        return self.data['acquisition'].setdefault(key, {
+            **acquisition, 'rooms_created': 0, 'rooms_started': 0,
+            'rounds_started': 0, 'rounds_completed': 0,
+        })
+
+    def record_game_created(self, room_code, acquisition=None):
         with self.lock:
             self.data['total_games_created'] += 1
+            self._acquisition_bucket(acquisition)['rooms_created'] += 1
+            self._save_locked()
+
+    def record_game_started(self, game):
+        with self.lock:
+            if len(game.players) < 3 or getattr(game, '_stats_start_recorded', False):
+                return
+            game._stats_start_recorded = True
+            bucket = self._acquisition_bucket(getattr(game, 'acquisition', None))
+            bucket['rounds_started'] += 1
+            if not getattr(game, '_acquisition_room_started', False):
+                bucket['rooms_started'] += 1
+                game._acquisition_room_started = True
             self._save_locked()
 
     def record_player_seen(self, player_id):
@@ -107,6 +148,8 @@ class StatsTracker:
             }
 
             self.data['total_games_completed'] += 1
+            if getattr(game, '_stats_start_recorded', False):
+                self._acquisition_bucket(getattr(game, 'acquisition', None))['rounds_completed'] += 1
             self.data['completed_games'].append(record)
             # Trim so the file doesn't grow forever
             if len(self.data['completed_games']) > 1000:
@@ -124,4 +167,6 @@ class StatsTracker:
                 'total_games_completed': self.data['total_games_completed'],
                 'unique_player_ids_count': len(self.data['unique_player_ids']),
                 'completed_games': list(self.data['completed_games']),
+                'acquisition': [row.copy() for row in self.data['acquisition'].values()],
+                'acquisition_since': self.data['acquisition_since'],
             }

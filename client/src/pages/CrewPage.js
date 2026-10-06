@@ -27,6 +27,10 @@ const CrewmemberPage = ({
     setKillCooldown,
     killCooldownMax = 15,
     intrudersRevealed,
+    connected,
+    completeTask,
+    taskCompletionPending,
+    taskCompletionError,
   } = useContext(DataContext);
 
   // Check if intruders have been revealed (tasks 100%)
@@ -56,14 +60,14 @@ const CrewmemberPage = ({
     }
   };
 
-  const handleCompleteTask = () => {
+  const handleCompleteTask = async () => {
     if (onTutorialCompleteTask) {
       onTutorialCompleteTask({
         isIntruder: !!playerState?.sus,
         hasTask: !!task,
         killCooldown,
       });
-      return;
+      return true;
     }
 
     if (playerState?.sus) {
@@ -71,16 +75,16 @@ const CrewmemberPage = ({
       setAudio("dead");
       socket.emit("kill_player", { player_id: localStorage.getItem("player_id") }); // doesnt do anything yet...
       setKillCooldown(15); 
-      return;
+      return true;
     }
 
-    setAudio("complete_task");
-    if (task) {
-      socket.emit("complete_task", { player_id: localStorage.getItem("player_id") });
+    if (!task) return false;
+    const accepted = await completeTask(task);
+    if (accepted) {
+      setAudio("complete_task");
       setShowAnimation(true);
-    } else {
-      alert("No task to complete.");
     }
+    return accepted;
   };
 
   const handleAnimationComplete = () => {
@@ -252,14 +256,23 @@ const CrewmemberPage = ({
                   ? killCooldown > 0
                     ? "Cooldown active"
                     : "Slide to eliminate"
-                  : task 
+                  : taskCompletionPending
+                    ? "Confirming task…"
+                    : task
                     ? "Slide to complete task"
                     : "No task assigned"
               }
               onSuccess={handleCompleteTask}
+              disabled={playerState?.sus ? killCooldown > 0 : !connected || taskCompletionPending || !task}
+              pending={!playerState?.sus && taskCompletionPending}
               sus={playerState?.sus}
             />
           </div>
+          {!playerState?.sus && taskCompletionError && (
+            <p role="alert" className="max-w-xl mx-auto mt-2 text-center text-sm text-red-300">
+              {taskCompletionError}
+            </p>
+          )}
         </div>
       )}
 
@@ -271,6 +284,8 @@ const CrewmemberPage = ({
 
 CrewmemberPage.propTypes = {
   task: PropTypes.shape({
+    assignment_id: PropTypes.string,
+    round_id: PropTypes.string,
     task: PropTypes.string,
     location: PropTypes.string,
   }),

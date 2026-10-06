@@ -1,36 +1,41 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
+import SeoPageLayout from '../seo/SeoPageLayout';
 import './InfoPage.css';
 
 function AboutPage() {
     usePageMeta({
-        title: 'About Sus Party | Independent Real-Life Party Game',
-        description: 'Meet Sus Party, a free, open-source party game inspired by Among Us. Learn about the browser app, real-life play, and its independent creator.',
+        title: 'About Sus Party | Free In-Person Social Deduction Game',
+        description: 'Sus Party turns your rooms into a social deduction game with real tasks, secret roles, and phone-guided meetings. Free, open source, and independent.',
         canonical: 'https://susparty.com/about',
     });
 
     return (
-        <div className="info-shell">
-            <div className="info-orb info-orb--indigo" aria-hidden="true" />
-            <div className="info-orb info-orb--purple" aria-hidden="true" />
+        <SeoPageLayout className="info-shell">
+
 
             <main className="info-page">
-                <nav className="info-nav">
-                    <a href="/" className="info-nav__back">← Back to Sus Party</a>
-                </nav>
 
                 <header className="info-header">
                     <p className="info-eyebrow">About</p>
                     <h1 className="info-title">About Sus Party</h1>
                     <p className="info-lead">
-                        Sus Party is a free, phone-guided social deduction game for house parties. Built because party games where you actually move around the house are more fun than party games on the couch.
+                        Your living room becomes the meeting point. The hallway becomes a place for an alibi.
+                        Sus Party is a free social deduction game that uses your real space, with phone browsers to keep the round together.
                     </p>
                 </header>
 
                 <section className="info-body info-prose">
-                    <h2>The idea</h2>
+                    <h2>The rooms give you something to suspect</h2>
                     <p>
-                        Most digital party games keep everyone glued to a screen. Classic social deduction games get people talking, but they usually happen around one table. Sus Party tries to do something more spatial: phones-as-controllers, physical roaming from room to room, secret roles, tasks, sabotage, and meetings that pull everyone back together.
+                        A task sends a player to a particular room. An intruder needs a reason to be there too.
+                        At the next meeting, the group compares what it saw with what each person claims.
+                        Tasks, movement, and in-person observations give the accusations somewhere to start.
+                    </p>
+                    <p>
+                        Each phone keeps the role private, displays tasks, and accepts votes. Sabotage cards add pressure.
+                        You choose the areas and materials, then decide together who to trust.
+                        Use it for a house party, a group rental, or an <a href="/among-us-birthday-party">Among Us-inspired birthday game</a>.
                     </p>
 
                     <h2>How it's built</h2>
@@ -44,7 +49,10 @@ function AboutPage() {
 
                     <h2>Why it's free</h2>
                     <p>
-                        There's no business model. Sus Party exists because party games should be free, and because hosting a Flask server costs basically nothing. No accounts, no ads, no analytics on you, no data collection.
+                        Sus Party is free, with no accounts or ads. The server stores task lists, game records, and player IDs that support the game.
+                    </p>
+                    <p>
+                        The host browser supplies a source category and an entry page when it creates a room. Aggregate counters show which pages lead to playable games. These counters exclude raw referrer URLs, search terms, and third-party analytics scripts.
                     </p>
 
                     <h2>Not affiliated with Innersloth</h2>
@@ -61,11 +69,12 @@ function AboutPage() {
 
                 <footer className="info-footer">
                     <p>
-                        Ready to play? <a href="/">Start a game →</a>
+                            Start with a <a href="/among-us-irl-task-generator?venue=house&players=8&movement=normal">task pack for your house</a>
+                            {' '}or <a href="/play">create or join a room →</a>
                     </p>
                 </footer>
             </main>
-        </div>
+        </SeoPageLayout>
     );
 }
 

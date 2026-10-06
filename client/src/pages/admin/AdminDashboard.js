@@ -166,11 +166,29 @@ function AdminDashboard() {
         <Stat label="Active games right now" value={live.active_games} />
         <Stat label="Players in active games" value={live.players_in_games} />
         <Stat label="Games completed today" value={today.games_completed} />
-        <Stat label="Games created (all time)" value={totals.games_created} />
-        <Stat label="Games completed (all time)" value={totals.games_completed} />
-        <Stat label="Unique players (all time)" value={totals.unique_players} />
+        <Stat label="Games created (retained stats)" value={totals.games_created} />
+        <Stat label="Games completed (retained stats)" value={totals.games_completed} />
+        <Stat label="Player IDs recorded" value={totals.unique_players} />
         <Stat label="Avg game duration" value={formatDuration(averages.game_duration_seconds)} />
         <Stat label="Saved task lists" value={totals.saved_task_lists} />
+      </section>
+
+      <section className="adm-card">
+        <h2>Discovery → playable games</h2>
+        <p className="adm-empty">Source counts start {formatTime(stats.acquisition_since)}. Round counts include rounds that start with at least three players.</p>
+        <p className="adm-empty">Sources describe host sessions. They do not identify people or prove search queries.</p>
+        {(stats.acquisition || []).length === 0 ? <p className="adm-empty">No source data yet.</p> : (
+          <div style={{ overflowX: 'auto' }}>
+            <table className="adm-table">
+              <thead><tr><th>Source</th><th>Entry page</th><th>Rooms created</th><th>Rooms that start</th><th>Start rate</th><th>Rounds started</th><th>Rounds completed</th></tr></thead>
+              <tbody>{stats.acquisition.map(row => <tr key={`${row.source}:${row.landing_page}`}>
+                <td>{row.source === 'direct' ? 'No referrer' : row.source}</td><td>{row.landing_page}</td><td>{row.rooms_created}</td><td>{row.rooms_started}</td>
+                <td>{row.rooms_created ? `${Math.round(row.rooms_started / row.rooms_created * 100)}%` : '—'}</td>
+                <td>{row.rounds_started}</td><td>{row.rounds_completed}</td>
+              </tr>)}</tbody>
+            </table>
+          </div>
+        )}
       </section>
 
       <section className="adm-card">

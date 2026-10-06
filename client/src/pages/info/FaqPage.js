@@ -1,11 +1,13 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
+import SeoPageLayout from '../seo/SeoPageLayout';
 import './InfoPage.css';
 
 const FAQS = [
     {
         q: 'Is Sus Party free?',
-        a: 'Yes. Sus Party is completely free with no signup, no ads, and no data collection. Just open susparty.com and play.',
+        a: 'Yes. Sus Party is free, with no account, ads, or app-store purchase. Open it in your browser, prepare a task pack, and invite friends with your room code.',
+        href: '/among-us-irl-task-generator', linkLabel: 'Prepare your first task pack',
     },
     {
         q: 'Do I need to install an app?',
@@ -17,7 +19,8 @@ const FAQS = [
     },
     {
         q: 'How many players can play?',
-        a: 'Sus Party works best with 5–15 players. The host can adjust the number of imposters based on group size. You can play with as few as 4 in a pinch.',
+        a: 'The game requires at least two crew members per intruder. One intruder needs at least three players. The task generator prepares groups of five to fifteen, but the game has no fixed fifteen-player cap. Adjust the intruder count to suit your group.',
+        href: '/how-to-play-among-us-irl#before-play', linkLabel: 'Choose a first-round setup',
     },
     {
         q: 'Can I play a social deduction game around the house?',
@@ -25,15 +28,17 @@ const FAQS = [
     },
     {
         q: 'What are good tasks for Among Us in real life?',
-        a: 'Good tasks are short physical actions tied to a specific room: open the fridge, water a plant, find a hidden card, count books on a shelf. Sus Party ships with an example task list you can use or edit. The best tasks scatter players across the house so imposters have opportunities to strike.',
+        a: 'Choose short jobs with a clear location and finish: count coasters at the dining table, arrange host-provided cards, or read a title on a shared shelf. Spread the list across your areas so players have a reason to split up. The generator supplies a pack that you can review and edit.',
+        href: '/among-us-irl-task-ideas', linkLabel: 'Browse task ideas by room',
     },
     {
         q: 'How do you set up Among Us in real life?',
-        a: 'On a laptop, TV, or tablet, open susparty.com. That device becomes the shared "Reactor" screen. Everyone else joins on their phone with the 4-character room code. The host configures rooms in your house as locations, picks a task list, and starts the game. Setup takes about 5 minutes.',
+        a: 'Generate a task pack for your rooms, select “Use these tasks in a new game,” and create the room. Select “Import generated tasks” in host setup, review the list and settings, then share the four-letter code. Friends join on their phones. A larger device can join as the optional Reactor display.',
+        href: '/how-to-play-among-us-irl', linkLabel: 'Follow the setup and sample round',
     },
     {
         q: 'Do you need an app to play Among Us in real life?',
-        a: 'Not with Sus Party. The whole game runs in your browser: both the shared Reactor screen and each player’s phone controller. No App Store, no Play Store, no installs.',
+        a: 'You can run a paper version with roles, task lists, and someone to manage votes. Sus Party runs those shared game functions in browser tabs. Each player needs internet and a phone browser, but nobody needs to install a native app.',
     },
     {
         q: 'Is there a free Among Us party game?',
@@ -41,7 +46,7 @@ const FAQS = [
     },
     {
         q: 'What is the reactor / meltdown?',
-        a: 'The reactor is a Sus Party–unique mechanic. Imposters can trigger a meltdown that forces players to drop everything and enter codes from around the house to stop it. If they fail, the imposters win. It adds a recurring crisis the whole group has to coordinate around.',
+        a: 'The optional Reactor display adds a shared meltdown mini-game. Intruders can trigger a countdown that sends the crew to the Reactor with codes. If the countdown reaches zero, the intruders win. Use a larger device as the display and keep a clear route to it.',
     },
     {
         q: 'Does Sus Party work with Sonos speakers?',
@@ -49,19 +54,22 @@ const FAQS = [
     },
     {
         q: 'Can I play remotely / over video chat?',
-        a: 'No. Sus Party is built for in-person play. Moving between rooms is the whole point. For remote social deduction, original Among Us or browser games like Werewords are better fits.',
+        a: 'No. Players share a physical space. The phones connect online, but tasks, observations, and meetings happen in person. The low-movement preset can place two task stations in one room.',
+        href: '/among-us-irl-task-generator?venue=other&players=8&movement=low', linkLabel: 'Prepare a two-station round',
     },
     {
-        q: 'Can you play Among Us in real life?',
-        a: "Yes. A room-to-room social deduction game means running tasks, secret intruders, emergency meetings, and voting in a physical space like a house, apartment, dorm, or office. Sus Party handles the coordination automatically from each player's phone.",
+        q: 'Do we need a TV or laptop?',
+        a: 'No. A phone-only game works. Larger devices act as the Reactor display rather than as players. Add one if you want the shared meltdown mini-game; each player still uses a phone.',
     },
     {
-        q: 'How many people do you need for Among Us IRL?',
-        a: 'Minimum five players, but eight to twelve is the sweet spot. With fewer than five the game is too predictable; above fifteen it can be hard to manage meetings. Sus Party supports five to fifteen players.',
+        q: 'Does completing tasks win the game?',
+        a: 'Task completion reveals the names of living intruders. The crew still needs to vote out every intruder. Intruders win when they reach parity with the living crew or a Reactor meltdown reaches zero.',
+        href: '/how-to-play-among-us-irl#win-conditions', linkLabel: 'Read the win conditions',
     },
     {
-        q: 'What are good Among Us IRL tasks?',
-        a: 'Good tasks are short physical actions tied to a specific room — things like "count the forks in the drawer", "fill a glass of water", or "find the item with the earliest expiry in the fridge". The best tasks scatter players across the space so intruders have opportunities to strike. See our full task ideas guide for 100+ examples.',
+        q: 'Is Sus Party the imposter word game?',
+        a: 'No. Sus Party uses physical tasks, sabotage, meetings, and votes. It does not use the shared-secret-word format. Both are social deduction formats, but they create different clues and need different setups.',
+        href: '/social-deduction-games', linkLabel: 'Compare social deduction formats',
     },
     {
         q: 'Is Sus Party affiliated with Innersloth or Among Us?',
@@ -71,8 +79,8 @@ const FAQS = [
 
 function FaqPage() {
     usePageMeta({
-        title: 'Among Us IRL FAQ | Sus Party',
-        description: 'Answers about playing Among Us in real life with Sus Party: player counts, tasks at home, phones, setup, pricing, and how the free browser game works.',
+        title: 'Sus Party FAQ | Free Social Deduction Game in Real Life',
+        description: 'Prepare your first Sus Party game with phones, real tasks, and friends in the same place. Get answers about setup, player counts, votes, and optional screens.',
         canonical: 'https://susparty.com/faq',
     });
     const jsonLd = {
@@ -87,20 +95,17 @@ function FaqPage() {
 
     return (
         <>
-            <div className="info-shell">
-                <div className="info-orb info-orb--indigo" aria-hidden="true" />
-                <div className="info-orb info-orb--purple" aria-hidden="true" />
+            <SeoPageLayout className="info-shell">
+
 
                 <main className="info-page">
-                    <nav className="info-nav">
-                        <a href="/" className="info-nav__back">← Back to Sus Party</a>
-                    </nav>
 
                     <header className="info-header">
                         <p className="info-eyebrow">Frequently Asked Questions</p>
-                        <h1 className="info-title">Among Us IRL FAQ</h1>
+                        <h1 className="info-title">Before your first Sus Party game</h1>
                         <p className="info-lead">
-                            Quick answers about Sus Party, the free room-to-room social deduction game you can play in your house.
+                            Get the group into one room, prepare the task map, and give everyone a secret role.
+                            These answers explain what you need before you share the code.
                         </p>
                     </header>
 
@@ -109,19 +114,17 @@ function FaqPage() {
                             <article key={i} className="info-faq">
                                 <h2 className="info-faq__q">{f.q}</h2>
                                 <p className="info-faq__a">{f.a}</p>
+                                {f.href && <p><a href={f.href}>{f.linkLabel} →</a></p>}
                             </article>
                         ))}
                     </section>
 
                     <footer className="info-footer">
                         <p>
-                            Still curious? Read the{' '}
+                            Ready to host? <a href="/among-us-irl-task-generator?venue=house&players=8&movement=normal">Build a house task pack</a>, read the{' '}
                             <a href="/how-to-play">Sus Party host guide</a>,{' '}
                             <a href="/how-to-play-among-us-irl">full Among Us IRL rules</a>, or{' '}
-                            <a href="/">start a game</a>.
-                        </p>
-                        <p style={{ marginTop: 12, fontSize: '0.8rem', color: '#4b5563' }}>
-                            Sus Party is an independent social deduction party game and is not affiliated with, endorsed by, or sponsored by Innersloth or Among Us.
+                            <a href="/play">create or join a room</a>.
                         </p>
                     </footer>
                 </main>
@@ -130,7 +133,7 @@ function FaqPage() {
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
                 />
-            </div>
+            </SeoPageLayout>
         </>
     );
 }

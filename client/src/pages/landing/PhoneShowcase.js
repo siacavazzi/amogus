@@ -788,6 +788,7 @@ export default function PhoneShowcase({ heroSlot }) {
                             return (
                                 <article
                                     key={p.id}
+                                    id={i === 0 ? 'showcase' : undefined}
                                     ref={(el) => {
                                         panelRefs.current[i] = el;
                                     }}

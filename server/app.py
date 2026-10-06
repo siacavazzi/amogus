@@ -2,6 +2,11 @@ import eventlet
 eventlet.monkey_patch()
 import os
 import base64
+import copy
+import time
+from functools import wraps
+from uuid import uuid4
+from assets.room_protocol import metadata, minimum_tasks, start_error, lobby_state, room_state
 from flask import Flask, request, send_from_directory
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask_cors import CORS
@@ -68,35 +73,73 @@ def get_game_and_player(player_id):
     return None, None, None
 
 
+def broadcast_lobby(game):
+    if not game.game_running:
+        socketio.emit('lobby_state', lobby_state(game), room=game.room_code)
+
+
 def sendPlayerList(game, room_code, action='player_list'):
-    """Send player list to all clients in a game room."""
-    logger.info(f"Sending player list to room {room_code}")
-    player_list = [player.to_json() for player in game.players]
-    logger.debug(f"Player List: {player_list}")
-    socketio.emit('game_data', {'action': action, 'list': player_list}, room=room_code)
+    game.emit_to_room('game_data', {'action': action, 'list': [p.to_json() for p in game.players]})
+    broadcast_lobby(game)
 
 
 def get_min_tasks_needed(game):
-    """Return the server-side minimum task count for starting a game."""
-    return max(len(game.players) * 3, 10)
+    return minimum_tasks(game)
 
 
-def get_role_start_error(game):
-    """Return a player-facing error when the selected roles cannot support a fair round."""
-    player_count = len(game.players)
-    intruder_count = game.numIntruders
+def command_error(message, game=None, player=None):
+    emit('error', {'message': message})
+    result = {'ok': False, 'error': message}
+    if game and (player or game.reactor_sid == request.sid or game.creator_sid == request.sid):
+        result['state'] = room_state(game, player, request.sid)
+    return result
 
-    if intruder_count < 1:
-        return 'At least 1 intruder is required.'
 
-    minimum_players = intruder_count * 2 + 1
-    if player_count < minimum_players:
-        return (
-            f'Need at least {minimum_players} players for {intruder_count} '
-            f'intruder{"s" if intruder_count != 1 else ""}.'
-        )
+def room_event(mutate=True, reconnect=False):
+    """Serialize a room command and reject commands from an obsolete socket."""
+    def decorate(handler):
+        @wraps(handler)
+        def wrapped(data=None, *args):
+            payload = data if isinstance(data, dict) else {}
+            player_id = payload.get('player_id')
+            game, player, room = get_game_and_player(player_id) if player_id else (None, None, None)
+            requested_room = payload.get('room_code', '').upper()
+            if not game and requested_room:
+                game, room = game_manager.get_game(requested_room), requested_room
+            if not game:
+                game, room = game_manager.get_game_by_sid(request.sid)
+            if not game:
+                return handler(data, *args) if data is not None else handler(*args)
+            with game.state_lock:
+                if game_manager.get_game(room) is not game:
+                    return command_error('The room no longer exists.')
+                if requested_room and requested_room != room:
+                    return command_error('The command belongs to another room.')
+                if not reconnect:
+                    if player_id and (not player or player.sid != request.sid or not player.active):
+                        return command_error('Reconnect before you send this command.')
+                    if not is_sid_connected_to_room(request.sid, room):
+                        return command_error('Join the room before you send this command.')
+                if mutate:
+                    game.revision += 1
+                    game.last_activity = time.time()
+                result = handler(data, *args) if data is not None else handler(*args)
+                if mutate and game_manager.get_game(room) is game:
+                    broadcast_lobby(game)
+                return result
+        return wrapped
+    return decorate
 
-    return None
+
+@socketio.on('get_room_state')
+@room_event(mutate=False)
+def handle_room_state(data):
+    game, player, room = get_game_and_player(data.get('player_id'))
+    if not game:
+        game, room = game_manager.get_game_by_sid(request.sid)
+    if not game:
+        return command_error('Game session not found.')
+    return {'ok': True, 'state': room_state(game, player, request.sid)}
 
 
 def get_connected_player_ids(game, room_code):
@@ -191,10 +234,11 @@ def serve_client(path):
 # ============ ROOM MANAGEMENT ============
 
 @socketio.on('create_game')
-def handle_create_game():
+def handle_create_game(data=None):
     """Create a new game room and return the room code."""
     sid = request.sid
-    room_code, game = game_manager.create_game(sid)
+    acquisition = data.get('acquisition') if isinstance(data, dict) else None
+    room_code, game = game_manager.create_game(sid, acquisition)
     game.creator_sid = sid  # Track room creator
     join_room(room_code)
     
@@ -204,6 +248,7 @@ def handle_create_game():
 
 
 @socketio.on('get_game_config')
+@room_event(mutate=False)
 def handle_get_game_config(data):
     """Get the current game configuration."""
     room_code = data.get('room_code', '').upper() if data else None
@@ -217,6 +262,7 @@ def handle_get_game_config(data):
 
 
 @socketio.on('update_game_config')
+@room_event()
 def handle_update_game_config(data):
     """Update game configuration (only room creator can do this)."""
     sid = request.sid
@@ -243,6 +289,7 @@ def handle_update_game_config(data):
 
 
 @socketio.on('open_room')
+@room_event()
 def handle_open_room(data):
     """Open the room for other players to join."""
     sid = request.sid
@@ -264,6 +311,7 @@ def handle_open_room(data):
 
 
 @socketio.on('join_game')
+@room_event(reconnect=True)
 def handle_join_game(data):
     """Join an existing game room by room code."""
     sid = request.sid
@@ -333,6 +381,7 @@ def handle_sonos_join(data):
 
 
 @socketio.on('register_reactor')
+@room_event(reconnect=True)
 def handle_register_reactor(data):
     """Register a desktop client as the reactor for a game room."""
     sid = request.sid
@@ -374,12 +423,12 @@ def handle_register_reactor(data):
         'is_creator': game.creator_sid == sid,
     })
     emit('task_locations', game.locations)
-    emit('game_data', {'action': 'rejoin', 'list': [player.to_json() for player in game.players]})
+    emit('game_data', {**metadata(game), 'action': 'rejoin', 'list': [player.to_json() for player in game.players]})
     
     # If game is running, send current game state to reactor
     if game.game_running:
         emit("game_start")
-        emit("crew_score", {"score": game.crew_score})
+        emit("crew_score", {**metadata(game), "score": game.crew_score})
         emit("task_goal", game.taskGoal)
         if game.end_state:
             emit('end_game', {'result': game.end_state, 'stats': game.stats})
@@ -404,6 +453,7 @@ def handle_register_reactor(data):
         if game.active_meltdown:
             emit("meltdown_update", game.active_meltdown.time_left)
             emit('codes_needed', max(game.active_meltdown.codes_needed - game.active_meltdown.codes_entered, 0))
+    emit('room_state', room_state(game, sid=sid))
 
 
 # ============ CONNECTION HANDLING ============
@@ -415,6 +465,7 @@ def handle_connect():
 
 
 @socketio.on('rejoin')
+@room_event(reconnect=True)
 def handleRejoin(data):
     """Handle player reconnection to their game."""
     player_id = data.get('player_id')
@@ -447,7 +498,7 @@ def handleRejoin(data):
     
     if game.game_running:
         emit("game_start")
-        emit("crew_score", {"score": game.crew_score})
+        emit("crew_score", {**metadata(game), "score": game.crew_score})
         emit("task_goal", game.taskGoal)
         
         if game.end_state:
@@ -486,11 +537,15 @@ def handleRejoin(data):
         
         if player.get_task():
             logger.info("Sending task to player")
-            emit("task", {"task": player.get_task()}, to=player.sid)
+            emit("task", {**metadata(game), "task": player.get_task()}, to=player.sid)
+
+    emit('room_state', room_state(game, player, request.sid))
+    return {'ok': True, 'state': room_state(game, player, request.sid)}
 
 
 @socketio.on('disconnect')
-def handle_disconnect():
+@room_event()
+def handle_disconnect(reason=None):
     sid = request.sid
     logger.info(f"Client disconnected: {sid}")
     game, room_code = game_manager.get_game_by_sid(sid)
@@ -509,6 +564,7 @@ def handle_disconnect():
 # ============ PLAYER MANAGEMENT ============
 
 @socketio.on('join')
+@room_event(reconnect=True)
 def handle_join(data):
     """Handle player joining/creating within a game room."""
     player_id = data.get('player_id')
@@ -599,86 +655,53 @@ def handle_join(data):
     
     # Also send directly to the joining player to avoid race condition
     player_list = [p.to_json() for p in game.players]
-    emit('game_data', {'action': 'player_list', 'list': player_list}, to=sid)
+    emit('game_data', {**metadata(game), 'action': 'player_list', 'list': player_list}, to=sid)
 
 
 # ============ GAME FLOW ============
 
-@socketio.on('start_game')
-def handle_start(data):
-    """Start the game in a room."""
-    player_id = data.get('player_id')
-    game, player, room_code = get_game_and_player(player_id)
-    
-    if not game:
-        emit('error', {'message': 'Game not found'})
-        return
-
-    if game.game_running:
-        logger.warning("Start game attempted but game is already running")
-        return
-
-    role_error = get_role_start_error(game)
-    if role_error:
-        emit('error', {'message': role_error})
-        logger.warning(f"Start game rejected for room {room_code}: {role_error}")
-        return
-
-    # Calculate minimum tasks needed
-    min_tasks = get_min_tasks_needed(game)
-    
-    # Log current state for debugging
-    logger.info(f"Start game check - task_list_applied={game.task_list_applied}, task_handler.tasks={len(game.task_handler.tasks)}, collaborative_tasks={len(game.collaborative_tasks)}, min_tasks={min_tasks}")
-    
-    # Check if we have collaborative tasks that can be used
-    if len(game.collaborative_tasks) > 0:
-        # Apply collaborative tasks to the task handler
-        game.task_handler.tasks = [task.copy() for task in game.collaborative_tasks]
-        logger.info(f"Applied {len(game.collaborative_tasks)} collaborative tasks to game {room_code}")
-    
-    # Now check if we have enough tasks to start
-    if len(game.task_handler.tasks) < min_tasks:
-        # Not enough tasks - need more
-        if not game.task_list_applied and len(game.collaborative_tasks) == 0:
-            # No task list and no collaborative tasks - reset locations
-            game.locations = ['Other']
-            game.task_handler.locations = ['Other']
-        
-        socketio.emit('enter_task_creation', {
-            'min_tasks': min_tasks,
-            'current_tasks': len(game.collaborative_tasks),
-            'tasks': game.collaborative_tasks,
-            'locations': game.locations,
-            'task_list_code': game.collaborative_task_list_code
-        }, room=room_code)
-        logger.info(f"Game {room_code} needs more tasks (have {len(game.task_handler.tasks)}, need {min_tasks})")
-        return
-
-    # We have enough tasks - start the game
-    logger.info(f"Starting game {room_code} with {len(game.task_handler.tasks)} tasks")
-    
-    # Rebuild card deck with current locations to ensure location-based cards are correct
+def start_room(game):
+    if game.creator_sid != request.sid:
+        return command_error('Only the host can start the game.')
+    error = start_error(game)
+    if error:
+        if len(game.collaborative_tasks) < minimum_tasks(game):
+            socketio.emit('enter_task_creation', {**lobby_state(game), 'current_tasks': len(game.collaborative_tasks)}, room=game.room_code)
+        return command_error(error)
     from assets.card import CardDeck
+    game.begin_round()
+    game.task_handler.tasks = [task.copy() for task in game.collaborative_tasks]
+    game.task_creation_mode = False
     game.card_deck = CardDeck(game.locations, game.socket, game)
-    logger.info(f"Card deck rebuilt with locations: {game.locations}")
-    
-    game.speaker.play_sound("theme")
     game.game_running = True
     game.assignRoles()
-    sendPlayerList(game, room_code, 'start_game')
-    socketio.emit("game_start", room=room_code)
-    socketio.emit("task_goal", game.taskGoal, room=room_code)
-    logger.info(f"Game started in room {room_code}")
+    game_manager.stats_tracker.record_game_started(game)
+    for player in game.players:
+        if not player.sus:
+            game.assign_task(player)
+    sendPlayerList(game, game.room_code, 'start_game')
+    game.emit_to_room('game_start', metadata(game))
+    socketio.emit('task_goal', game.taskGoal, room=game.room_code)
+    for player in game.players:
+        if player.sid:
+            socketio.emit('room_state', room_state(game, player, player.sid), to=player.sid)
+            if player.task:
+                socketio.emit('task', {**metadata(game), 'task': player.task}, to=player.sid)
+    game.speaker.play_sound('theme')
+    return {'ok': True}
 
-    # Send a different task to each crewmate
-    for p in game.players:
-        if not p.sus and len(game.task_handler.tasks) > 0:
-            p.task = game.getTask()
-            socketio.emit("task", {"task": p.task}, to=p.sid)
-            logger.debug(f"Assigned task to player {p.player_id}: {p.task}")
+
+@socketio.on('start_game')
+@room_event()
+def handle_start(data):
+    game, player, room = get_game_and_player(data.get('player_id'))
+    if not game:
+        return command_error('Game not found.')
+    return start_room(game)
 
 
 @socketio.on('reset')
+@room_event()
 def reset_game(data):
     """Vote to reset a game - when all players vote, game resets to lobby."""
     sid = request.sid
@@ -706,6 +729,8 @@ def reset_game(data):
         return
     
     # If force reset (from reactor/host), reset immediately
+    if force and sid not in (game.creator_sid, game.reactor_sid):
+        return command_error('Only the host or reactor can reset the game.')
     if force:
         for p in game.players:
             p.reset()
@@ -748,6 +773,7 @@ def reset_game(data):
 
 
 @socketio.on('disband_room')
+@room_event()
 def disband_room(data):
     """Disband a room completely - all players return to main lobby."""
     sid = request.sid
@@ -771,6 +797,9 @@ def disband_room(data):
     if not game:
         return
     
+    if sid not in (game.creator_sid, game.reactor_sid):
+        return command_error('Only the host or reactor can close the room.')
+
     # Notify all clients to leave and go back to lobby
     socketio.emit('room_disbanded', {'message': 'Room has been closed'}, room=room_code)
     
@@ -780,6 +809,7 @@ def disband_room(data):
 
 
 @socketio.on('leave_room')
+@room_event()
 def leave_room_handler(data):
     """Handle a player or reactor leaving the room."""
     sid = request.sid
@@ -868,6 +898,7 @@ def leave_room_handler(data):
 # ============ TASK HANDLING ============
 
 @socketio.on('add_task')
+@room_event()
 def addTask(data):
     """Add a task (should probably use API instead)."""
     player_id = data.get('player_id')
@@ -879,117 +910,65 @@ def addTask(data):
 
 
 @socketio.on("complete_task")
+@room_event()
 def handleTaskComplete(data):
-    """Handle task completion."""
-    player_id = data.get('player_id')
-    game, player, room_code = get_game_and_player(player_id)
-    
+    game, player, room = get_game_and_player(data.get('player_id'))
     if not game or not player:
-        return
-    
-    # Determine what task the player was actually working on
-    # If they had a fake task that was PREVIOUSLY shown (not just queued), they completed that
-    # Otherwise they completed their real task
-    # 
-    # The key insight: when a fake task is queued, it becomes the "next" task.
-    # But the player is still working on their current real task.
-    # Once they complete their real task, we THEN show them the fake task.
-    # So on completion:
-    # - If fake_task is set AND player.task has is_fake=True, they completed the fake task
-    # - If fake_task is set AND player.task does NOT have is_fake, they completed real task, show fake next
-    # - If no fake_task, they completed real task, show real next
-    
-    # Check if the player's REAL task (player.task) was a fake one they were shown previously
-    was_fake_task = player.task and player.task.get('is_fake', False)
-    
-    logger.debug(f"Task completion - player.task: {player.task}, player.fake_task: {player.fake_task}, was_fake: {was_fake_task}")
-    
-    # If task pool is empty, rebuild it from the original collaborative tasks
-    if len(game.task_handler.tasks) == 0:
-        if len(game.collaborative_tasks) > 0:
-            # Rebuild from collaborative tasks and shuffle
-            import random
-            game.task_handler.tasks = [task.copy() for task in game.collaborative_tasks]
-            random.shuffle(game.task_handler.tasks)
-            logger.info(f"Task pool rebuilt and reshuffled in room {room_code}: {len(game.task_handler.tasks)} tasks")
-        else:
-            # Fallback to reloading from tasks.json
-            game.task_handler.reset()
-            logger.info(f"Task pool reset from tasks.json in room {room_code}")
-    
-    if len(game.task_handler.tasks) > 0:
-        # Only increment score for real tasks, not fake ones
-        if not was_fake_task:
-            # Track task completion in stats
-            game.stats['tasks_completed'] += 1
-            
-            # Track previous percentage before incrementing
-            prev_percentage = (game.crew_score / game.taskGoal * 100) if game.taskGoal else 0
-            
-            game.crew_score += 1
-            socketio.emit("crew_score", {"score": game.crew_score}, room=room_code)
-            logger.info(f"Player {player.player_id} completed a task. Crew score: {game.crew_score}")
-            
-            # Calculate new percentage and play milestone sounds
-            if game.taskGoal:
-                new_percentage = game.crew_score / game.taskGoal * 100
-                
-                # Play sound when crossing milestone thresholds
-                if prev_percentage < 20 <= new_percentage:
-                    game.speaker.play_sound("20_percent_tasks")
-                    logger.info(f"Milestone reached: 20% tasks complete in room {room_code}")
-                elif prev_percentage < 50 <= new_percentage:
-                    game.speaker.play_sound("50_percent_tasks")
-                    logger.info(f"Milestone reached: 50% tasks complete in room {room_code}")
-                elif prev_percentage < 80 <= new_percentage:
-                    game.speaker.play_sound("80_percent_tasks")
-                    logger.info(f"Milestone reached: 80% tasks complete in room {room_code}")
-                elif prev_percentage < 95 <= new_percentage:
-                    game.speaker.play_sound("95_percent_tasks")
-                    logger.info(f"Milestone reached: 95% tasks complete in room {room_code}")
-                
-                # Check if tasks are 100% complete - reveal intruders!
-                if new_percentage >= 100 and not game.intruders_revealed:
-                    game.reveal_intruders()
-                    logger.info(f"Tasks 100% complete in room {room_code} - INTRUDERS REVEALED!")
-        else:
-            # Track fake task completion in stats
-            game.stats['fake_tasks_completed'].append({
-                'player_name': player.username,
-                'task_text': player.task.get('task', 'Unknown task') if player.task else 'Unknown task'
-            })
-            logger.info(f"Player {player.player_id} completed a FAKE task (no score)")
-            
-            # Notify the player they completed a fake task
-            emit("fake_task_completed", {
-                "task": player.task.get('task', 'Unknown task') if player.task else 'Unknown task',
-                "location": player.task.get('location', 'Unknown') if player.task else 'Unknown'
-            }, to=player.sid)
-        
-        # Assign next task - check if there's a queued fake task first
-        if player.fake_task:
-            # There's a fake task queued - move it to player.task and send it
-            player.task = player.fake_task
-            player.fake_task = None  # Clear the queue
-            emit("task", {"task": player.task}, to=player.sid)
-            logger.info(f"Sent FAKE task to player {player.player_id}: {player.task}")
-        else:
-            # Get a real task
-            player.task = game.getTask()
-            emit("task", {"task": player.task}, to=player.sid)
-            logger.debug(f"Assigned new task to player {player.player_id}: {player.task}")
+        return command_error('Game session not found.')
+    request_id, assignment_id, round_id = (data.get(key) for key in ('request_id', 'assignment_id', 'round_id'))
+    if not all(isinstance(value, str) and 0 < len(value) <= 128 for value in (request_id, assignment_id, round_id)):
+        return command_error('Reload the page to restore the task command.', game, player)
+    if round_id != game.round_id:
+        return command_error('This command belongs to an earlier round.', game, player)
+    key = (player.player_id, request_id)
+    cached = game.command_results.get(key)
+    if cached:
+        if cached['assignment_id'] != assignment_id:
+            return command_error('The request ID belongs to another task.', game, player)
+        return copy.deepcopy(cached['response'])
+    if not game.game_running or game.end_state or not player.alive or player.sus:
+        return command_error('This player cannot complete a task now.', game, player)
+    if game.meeting or game.active_hack > 0 or game.active_meltdown:
+        return command_error('Wait until the current event ends before you complete the task.', game, player)
+    if not player.task or player.task.get('assignment_id') != assignment_id:
+        return command_error('This task already changed. Use the current task.', game, player)
+    if player.task.get('is_fake'):
+        game.stats['fake_tasks_completed'].append({'player_name': player.username, 'task_text': player.task.get('task', '')})
+        emit('fake_task_completed', {**metadata(game), 'task': player.task.get('task'), 'location': player.task.get('location')})
+    else:
+        previous = game.crew_score / game.taskGoal * 100 if game.taskGoal else 0
+        game.crew_score += 1
+        game.stats['tasks_completed'] += 1
+        game.emit_to_room('crew_score', {'score': game.crew_score})
+        percentage = game.crew_score / game.taskGoal * 100 if game.taskGoal else 0
+        for threshold in (20, 50, 80, 95):
+            if previous < threshold <= percentage:
+                game.speaker.play_sound(f'{threshold}_percent_tasks')
+                break
+        if percentage >= 100 and not game.intruders_revealed:
+            game.reveal_intruders()
+    queued_task = player.fake_task
+    player.fake_task = None
+    game.assign_task(player, queued_task)
+    emit('task', {**metadata(game), 'task': player.task})
+    response = {'ok': True, 'request_id': request_id, 'state': room_state(game, player, request.sid)}
+    game.command_results[key] = {'assignment_id': assignment_id, 'response': copy.deepcopy(response)}
+    while len(game.command_results) > 256:
+        game.command_results.popitem(last=False)
+    return response
 
 
 # ============ CARD HANDLING ============
 
 @socketio.on("play_card")
+@room_event()
 def playCard(data):
     """Handle card being played."""
     player_id = data.get('player_id')
     game, player, room_code = get_game_and_player(player_id)
     
-    if not player:
-        return
+    if not game or not player or not game.game_running or game.end_state or not player.alive or not player.sus or game.meeting:
+        return command_error('This player cannot play a card now.')
     
     card = player.get_card(data.get('card_id'))
     if card:
@@ -1001,78 +980,73 @@ def playCard(data):
 
 # ============ MEETING HANDLING ============
 
+def current_phase_player(data, stage=None):
+    game, player, room = get_game_and_player(data.get('player_id'))
+    if not game or not player or not game.game_running or game.end_state or not player.alive:
+        return None, None
+    if data.get('round_id') != game.round_id:
+        return None, None
+    if stage and (not game.meeting or game.meeting.stage != stage or data.get('meeting_id') != game.meeting.id):
+        return None, None
+    return game, player
+
+
 @socketio.on("meeting")
+@room_event()
 def handleMeeting(data):
-    """Start an emergency meeting."""
-    player_id = data.get('player_id')
-    game, player, room_code = get_game_and_player(player_id)
-    
-    if not game or not player:
-        return
-    
-    if not game.meeting:
-        game.start_meeting(player)
-        logger.info(f"Meeting started in room {room_code}")
+    game, player = current_phase_player(data)
+    if not game or not game.start_meeting(player):
+        return command_error('A meeting cannot start now.')
+    return {'ok': True}
 
 
 @socketio.on("ready")
+@room_event()
 def handleReady(data):
-    """Handle player ready status during meeting."""
-    player_id = data.get('player_id')
-    game, player, room_code = get_game_and_player(player_id)
-    
-    if not game or not player:
-        return
-    
+    game, player = current_phase_player(data, 'waiting')
+    if not game:
+        return command_error('This meeting is no longer in the ready phase.')
     player.ready = True
-    sendPlayerList(game, room_code)
+    sendPlayerList(game, game.room_code)
     game.try_start_voting()
+    return {'ok': True}
 
 
 @socketio.on("vote")
+@room_event()
 def handleVote(data):
-    """Handle vote during meeting."""
-    player_id = data.get('player_id')
-    game, voting_player, room_code = get_game_and_player(player_id)
-    
-    if not game or not voting_player or not game.meeting:
-        return
-    
-    voted_for = game.getPlayerById(data.get('votedFor'))
-    if voted_for:
-        game.meeting.register_vote(voting_player, voted_for)
+    game, player = current_phase_player(data, 'voting')
+    voted_for = game.getPlayerById(data.get('votedFor')) if game else None
+    if not game or not voted_for or not voted_for.alive:
+        return command_error('This vote is no longer valid.')
+    game.meeting.register_vote(player, voted_for)
+    return {'ok': True}
 
 
 @socketio.on("veto")
+@room_event()
 def handleVeto(data):
-    """Handle veto vote during meeting."""
-    player_id = data.get('player_id')
-    game, voting_player, room_code = get_game_and_player(player_id)
-    
-    if not game or not voting_player or not game.meeting:
-        return
-    
-    game.meeting.register_vote(voting_player, veto=True)
+    game, player = current_phase_player(data, 'voting')
+    if not game:
+        return command_error('This vote is no longer valid.')
+    game.meeting.register_vote(player, veto=True)
+    return {'ok': True}
 
 
 @socketio.on('end_meeting')
+@room_event()
 def handleEndMeeting(data=None):
-    """Manually end a meeting."""
-    if data:
-        player_id = data.get('player_id')
-        game, player, room_code = get_game_and_player(player_id)
-    else:
-        return
-    
-    if game and game.meeting:
-        socketio.emit("end_meeting", room=room_code)
-        game.meeting = False
-        logger.info(f"Meeting ended in room {room_code}")
+    game, player = current_phase_player(data or {})
+    if not game or game.creator_sid != request.sid or not game.meeting or data.get('meeting_id') != game.meeting.id:
+        return command_error('Only the host can end the current meeting.')
+    game.meeting.end_meeting()
+    return {'ok': True}
 
 
 # ============ MELTDOWN HANDLING ============
 
 @socketio.on('meltdown')
+@room_event()
 def handleMeltdown(data=None):
     """Start a meltdown event."""
     sid = request.sid
@@ -1105,6 +1079,7 @@ def handleMeltdown(data=None):
 
 
 @socketio.on("pin_entry")
+@room_event()
 def handlePinEntry(data):
     """Handle meltdown PIN entry."""
     player_id = data.get('player_id')
@@ -1144,16 +1119,19 @@ def handlePinEntry(data):
 # ============ PLAYER STATUS ============
 
 @socketio.on('player_dead')
+@room_event()
 def handleDeath(data):
     """Handle player reporting their own death (I'm Dead button)."""
-    player_id = data.get('player_id')
-    game, player, room_code = get_game_and_player(player_id)
-    
-    if game and player:
-        # Get the task they were working on for a personalized death message
-        current_task = player.get_task()
-        task_name = current_task.get('task') if current_task else None
-        game.kill_player(player_id, death_cause='murdered_during_task', task_name=task_name)
+    game, player = current_phase_player(data)
+    if not game:
+        return command_error('This death report belongs to an inactive player or round.')
+    meeting_id = data.get('meeting_id')
+    if meeting_id and (not game.meeting or game.meeting.id != meeting_id):
+        return command_error('This death report belongs to an earlier meeting.')
+    current_task = player.get_task()
+    task_name = current_task.get('task') if current_task else None
+    game.kill_player(player.player_id, death_cause='murdered_during_task', task_name=task_name)
+    return {'ok': True}
 
 
 # ============ TASK LIST MANAGEMENT ============
@@ -1337,6 +1315,7 @@ def handle_duplicate_task_list(data):
 
 
 @socketio.on('apply_task_list_to_game')
+@room_event()
 def handle_apply_task_list_to_game(data):
     """Apply a saved task list to the current game."""
     room_code = data.get('room_code', '').upper()
@@ -1372,7 +1351,7 @@ def handle_apply_task_list_to_game(data):
     game.task_list_applied = True  # Mark that a task list was explicitly applied
     
     # Also populate collaborative tasks so they show in the task editor
-    game.collaborative_tasks = [task.copy() for task in task_list['tasks']]
+    game.collaborative_tasks = [dict(task, task_id=str(uuid4())) for task in task_list['tasks']]
     game.collaborative_task_list_code = task_list_code  # Track the code
     game.collaborative_task_list_name = task_list['name']  # Track the name
     
@@ -1398,6 +1377,7 @@ def handle_apply_task_list_to_game(data):
 # ============ COLLABORATIVE TASK CREATION ============
 
 @socketio.on('toggle_task_creation_mode')
+@room_event()
 def handle_toggle_task_creation_mode(data):
     """Toggle task creation mode on/off from the lobby - only affects requesting client."""
     room_code = data.get('room_code', '').upper()
@@ -1432,6 +1412,7 @@ def handle_toggle_task_creation_mode(data):
 
 
 @socketio.on('get_collaborative_tasks')
+@room_event(mutate=False)
 def handle_get_collaborative_tasks(data):
     """Get current collaborative tasks for a room."""
     room_code = data.get('room_code', '').upper()
@@ -1467,6 +1448,7 @@ def handle_get_collaborative_tasks(data):
 
 
 @socketio.on('toggle_collaborative_mode')
+@room_event()
 def handle_toggle_collaborative_mode(data):
     """Toggle whether all players can add tasks or just the host."""
     room_code = data.get('room_code', '').upper()
@@ -1494,6 +1476,7 @@ def handle_toggle_collaborative_mode(data):
 
 
 @socketio.on('add_collaborative_task')
+@room_event()
 def handle_add_collaborative_task(data):
     """Add a task during collaborative creation phase."""
     room_code = data.get('room_code', '').upper()
@@ -1528,6 +1511,7 @@ def handle_add_collaborative_task(data):
     # Set defaults
     task.setdefault('location', 'Other')
     task.pop('difficulty', None)
+    task['task_id'] = str(uuid4())
     
     # Add to collaborative tasks
     game.collaborative_tasks.append(task)
@@ -1544,6 +1528,7 @@ def handle_add_collaborative_task(data):
 
 
 @socketio.on('remove_collaborative_task')
+@room_event()
 def handle_remove_collaborative_task(data):
     """Remove a task during collaborative creation phase."""
     room_code = data.get('room_code', '').upper()
@@ -1562,8 +1547,15 @@ def handle_remove_collaborative_task(data):
     if not game.is_open:
         emit('error', {'message': 'Room is not open yet'})
         return
+
+    if request.sid != game.creator_sid and not game.collaborative_mode:
+        return command_error('Only the host can remove tasks.')
+
+    if data.get('task_id'):
+        task_index = next((index for index, task in enumerate(game.collaborative_tasks)
+                           if task.get('task_id') == data['task_id']), None)
     
-    if task_index is None or task_index < 0 or task_index >= len(game.collaborative_tasks):
+    if not isinstance(task_index, int) or task_index < 0 or task_index >= len(game.collaborative_tasks):
         emit('error', {'message': 'Invalid task index'})
         return
     
@@ -1579,6 +1571,7 @@ def handle_remove_collaborative_task(data):
 
 
 @socketio.on('update_game_locations')
+@room_event()
 def handle_update_game_locations(data):
     """Update game locations during task creation mode. Only the host can do this."""
     room_code = data.get('room_code', '').upper()
@@ -1616,56 +1609,16 @@ def handle_update_game_locations(data):
 
 
 @socketio.on('finalize_collaborative_tasks')
+@room_event()
 def handle_finalize_collaborative_tasks(data):
-    """Finalize collaborative tasks and start the game."""
-    room_code = data.get('room_code', '').upper()
-    player_id = data.get('player_id')
-    
-    game = game_manager.get_game(room_code)
+    game = game_manager.get_game(data.get('room_code', '').upper())
     if not game:
-        emit('error', {'message': 'Game not found'})
-        return
-    
-    # Allow finalization when room is open and game hasn't started
-    if game.game_running:
-        emit('error', {'message': 'Game already running'})
-        return
-    
-    if not game.is_open:
-        emit('error', {'message': 'Room is not open yet'})
-        return
-    
-    if len(game.collaborative_tasks) == 0:
-        emit('error', {'message': 'No tasks to start with'})
-        return
-    
-    # Apply the collaborative tasks to the task handler
-    game.task_handler.tasks = [task.copy() for task in game.collaborative_tasks]
-    game.task_creation_mode = False
-    
-    # Rebuild card deck with current locations to ensure location-based cards are correct
-    from assets.card import CardDeck
-    game.card_deck = CardDeck(game.locations, game.socket, game)
-    logger.info(f"Card deck rebuilt with locations: {game.locations}")
-    
-    # Now actually start the game
-    game.speaker.play_sound("theme")
-    game.game_running = True
-    game.assignRoles()
-    sendPlayerList(game, room_code, 'start_game')
-    socketio.emit("game_start", room=room_code)  # Signal clients to exit task creation mode
-    socketio.emit("task_goal", game.taskGoal, room=room_code)
-    logger.info(f"Game started in room {room_code} with {len(game.task_handler.tasks)} collaborative tasks")
-
-    # Send a different task to each crewmate
-    for p in game.players:
-        if not p.sus and len(game.task_handler.tasks) > 0:
-            p.task = game.getTask()
-            socketio.emit("task", {"task": p.task}, to=p.sid)
-            logger.debug(f"Assigned task to player {p.player_id}: {p.task}")
+        return command_error('Game not found.')
+    return start_room(game)
 
 
 @socketio.on('save_collaborative_tasks')
+@room_event()
 def handle_save_collaborative_tasks(data):
     """Save the current collaborative tasks as a new or updated task list."""
     room_code = data.get('room_code', '').upper()

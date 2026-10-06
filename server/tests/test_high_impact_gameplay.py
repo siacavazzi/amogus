@@ -8,10 +8,14 @@ if str(SERVER_DIR) not in sys.path:
     sys.path.insert(0, str(SERVER_DIR))
 
 import app as server_app  # noqa: E402
+from server.tests.integration_helpers import protocol_client
 
 
 class NoopStatsTracker:
-    def record_game_created(self, room_code):
+    def record_game_created(self, room_code, acquisition=None):
+        pass
+
+    def record_game_started(self, game):
         pass
 
     def record_player_seen(self, player_id):
@@ -31,7 +35,7 @@ class HighImpactGameplayTests(unittest.TestCase):
         server_app.game_manager.stats_tracker = NoopStatsTracker()
 
     def make_client(self):
-        return self.socketio.test_client(self.flask_app)
+        return protocol_client(self.socketio.test_client(self.flask_app))
 
     def drain(self, client):
         return client.get_received()

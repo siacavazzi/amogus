@@ -35,6 +35,55 @@
     "prerender": true
   },
   {
+    "path": "/social-deduction-games",
+    "canonical": "https://susparty.com/social-deduction-games",
+    "priority": "0.9",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
+    "path": "/among-us-birthday-party",
+    "canonical": "https://susparty.com/among-us-birthday-party",
+    "priority": "0.8",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
+    "path": "/party-games-for-10-people",
+    "canonical": "https://susparty.com/party-games-for-10-people",
+    "priority": "0.8",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
+    "path": "/party-games-for-adults",
+    "canonical": "https://susparty.com/party-games-for-adults",
+    "priority": "0.8",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
+    "path": "/murder-mystery-party-game",
+    "canonical": "https://susparty.com/murder-mystery-party-game",
+    "priority": "0.8",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
+    "path": "/birthday-party-games-for-adults",
+    "canonical": "https://susparty.com/birthday-party-games-for-adults",
+    "priority": "0.8",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
+    "path": "/game-night-ideas",
+    "canonical": "https://susparty.com/game-night-ideas",
+    "priority": "0.8",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
     "path": "/how-to-play",
     "canonical": "https://susparty.com/how-to-play",
     "priority": "0.8",

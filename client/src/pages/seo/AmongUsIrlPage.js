@@ -1,6 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
+import GameSetupCta from './GameSetupCta';
 
 const SCHEMA = {
     '@context': 'https://schema.org',
@@ -9,99 +10,35 @@ const SCHEMA = {
     applicationCategory: 'Game',
     operatingSystem: 'Any (browser-based)',
     description:
-        'Sus Party is a free browser-based app for playing Among Us-style social deduction in real life with friends. No install required.',
+        'Sus Party is a free browser game for in-person social deduction with private roles, task lists, meetings, and votes.',
     url: 'https://susparty.com',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
 };
 
-const EXAMPLE_TASKS = [
-    { task: 'Count every fork in the kitchen drawer', location: 'Kitchen' },
-    { task: 'Find the item with the earliest expiry date in the fridge', location: 'Kitchen' },
-    { task: 'Stack three throw pillows neatly on the sofa', location: 'Living Room' },
-    { task: 'Write down the title of one book on the shelf', location: 'Living Room' },
-    { task: 'Make the bed (or straighten the pillows)', location: 'Bedroom' },
-    { task: 'Count every door in the hallway', location: 'Hallway' },
-    { task: 'Locate the nearest fire extinguisher and note its colour', location: 'Hallway' },
-    { task: 'Find a mug with a brand logo in the kitchen', location: 'Kitchen' },
-    { task: 'Count the outdoor lights you can see from the back door', location: 'Outdoor' },
-    { task: 'Wipe down one kitchen surface with a cloth', location: 'Kitchen' },
-    { task: 'Stack the clean bowls neatly (at least three)', location: 'Kitchen' },
-    { task: 'Find the TV remote and place it on the sofa', location: 'Living Room' },
-];
-
-const COMPARISON = [
-    {
-        problem: 'Assigning roles secretly',
-        diy: 'Fold slips of paper or use a second device app',
-        sus: 'Automatic — players join with a room code and get their role on screen',
-    },
-    {
-        problem: 'Tracking who completed tasks',
-        diy: 'Manual whiteboard or trust-system check-off',
-        sus: 'Real-time task list on each phone; 100% completion is detected automatically',
-    },
-    {
-        problem: 'Running the meeting timer',
-        diy: 'Someone has to watch a clock and call time',
-        sus: 'Timed meetings built in; voting locks when time is up',
-    },
-    {
-        problem: 'Managing votes and ejection',
-        diy: 'Count raised hands, argue about ties, track the threshold manually',
-        sus: 'Anonymous votes tallied instantly; threshold and veto rules enforced automatically',
-    },
-    {
-        problem: 'Meltdown / sabotage mechanic',
-        diy: 'Very difficult to run without software',
-        sus: 'Built-in reactor meltdown with disarm code shared on-screen',
-    },
-    {
-        problem: 'Dead players during meetings',
-        diy: 'Dead players on the honour system not to speak',
-        sus: `Dead players tap "I'm Dead" and see a ghost view — they can't accidentally reveal info`,
-    },
-];
-
 const FAQS = [
     {
-        q: 'What app can I use to play Among Us in real life?',
-        a: 'Sus Party is a free browser app for an Among Us-inspired game at home. Each player uses a phone for their role, tasks, sabotage cards, meetings, and votes. No app download or account is required.',
+        q: 'What is Among Us IRL?',
+        a: 'It is an Among Us-inspired game in a real space. Your house becomes the map: crew members complete physical tasks, intruders try to stay hidden, and the group meets to discuss and vote. Sus Party runs the roles, task lists, and votes in phone browsers.',
     },
     {
-        q: 'Where do I get an Among Us IRL room code?',
-        a: 'Open susparty.com/play and create a game. Share its four-character room code with your friends so they can join from their own phones. Each host creates a separate room for their group.',
+        q: 'How many players do we need?',
+        a: 'The game requires at least two crew members per intruder, so one intruder needs at least three players. For a first game, four to six players with one intruder is an option. The task generator prepares groups of five to fifteen. That is a generator range, not a cap on the game.',
     },
     {
-        q: 'Can you play Among Us IRL online?',
-        a: 'Sus Party connects your phones online, but everyone plays together in the same house, apartment, dorm, or office. The tasks, eliminations, and meetings happen in person.',
+        q: 'Can we play without an app?',
+        a: 'Yes. Use paper roles, a task list, a timer, and a clear vote method. Sus Party uses each phone to track roles, tasks, meetings, and votes.',
     },
     {
-        q: 'Can you play Among Us IRL without any app?',
-        a: 'Yes — all you need is a way to assign roles (paper slips work) and an agreed task list. Sus Party is optional but it handles all the coordination automatically, which makes the game run much smoother.',
-    },
-    {
-        q: 'How many players do you need for Among Us IRL?',
-        a: 'Minimum five, though eight to twelve is the sweet spot. With fewer than five the game is too predictable; above fifteen it can be hard to manage meetings. Sus Party supports five to fifteen players.',
-    },
-    {
-        q: 'What kind of space do you need?',
-        a: 'You want at least two or three distinct rooms so players can genuinely split up. A typical apartment, house, dorm floor, or office works perfectly. Bigger spaces with more rooms make for a better game.',
-    },
-    {
-        q: 'How long does a game take?',
-        a: 'About twenty to fifty minutes depending on player count and how quickly people find the intruders. Shorter with experienced players, longer with first-timers who are chatty in meetings.',
-    },
-    {
-        q: 'Is Sus Party officially licensed by Among Us or Innersloth?',
-        a: 'No. Sus Party is an independent fan-made party game. It is not affiliated with, endorsed by, or sponsored by Innersloth or Among Us.',
+        q: 'Is Sus Party an official Among Us product?',
+        a: 'No. Sus Party is an independent fan game. It is not affiliated with or endorsed by Innersloth.',
     },
 ];
 
 function AmongUsIrlPage() {
     usePageMeta({
-        title: 'Free Among Us IRL App — Play in Real Life | Sus Party',
+        title: 'Free Among Us IRL App | Sus Party',
         description:
-            'A free browser app for an Among Us-inspired game in real life. Play at home with friends, room codes, custom tasks, secret roles, meetings, and votes.',
+            'Play Among Us in real life with Sus Party. Turn your rooms into a map, use real tasks and secret roles, and run meetings from phone browsers. Free, no install.',
         canonical: 'https://susparty.com/among-us-irl',
         ogImage: 'https://susparty.com/og-image.jpg',
         schema: SCHEMA,
@@ -109,303 +46,191 @@ function AmongUsIrlPage() {
 
     return (
         <SeoPageLayout>
-            {/* ── Hero ──────────────────────────────────────────────────── */}
             <div className="seo-hero">
-                <p className="seo-eyebrow">Sus Party — Free · No Install · Browser-Based</p>
-                <h1 className="seo-h1">A free Among Us IRL app</h1>
+                <p className="seo-eyebrow">Sus Party · Free browser game</p>
+                <h1 className="seo-h1">Play Among Us in real life with Sus Party</h1>
                 <p className="seo-lead">
-                    Play Among Us in real life with Sus Party, a free browser app for your house,
-                    dorm, or office. Players physically move between rooms completing tasks while secret
-                    intruders blend in, eliminate crewmates, and try to survive the vote. Sus Party
-                    handles all the coordination — for free, with no install.
+                    Someone heads to the kitchen for a task. Someone follows them a little too closely.
+                    A meeting starts, and suddenly everyone has an alibi. Sus Party is the free Among Us IRL app
+                    that turns your rooms into the map and your friends into the suspects.
                 </p>
                 <div className="seo-actions">
-                    <a href="/play" className="seo-btn--primary">
-                        Start an Among Us IRL game →
+                    <a href="/among-us-irl-task-generator?venue=house&players=8&movement=normal" className="seo-btn--primary">
+                        Build your first game →
                     </a>
-                    <a href="/how-to-play-among-us-irl" className="seo-btn--secondary">
-                        Read the full rules
+                    <a href="/play" className="seo-btn--secondary">
+                        Create or join a room
                     </a>
                 </div>
             </div>
 
-            {/* ── Content ───────────────────────────────────────────────── */}
             <div className="seo-content">
-                {/* What is it */}
-                <section className="seo-section">
-                    <p className="seo-section__kicker">Overview</p>
-                    <h2>What is Among Us IRL?</h2>
-                    <p>
-                        Among Us IRL is a version of the popular social deduction game played
-                        physically, using your home, apartment, dorm, or office as the game board.
-                        Instead of a digital spaceship, players roam real rooms completing short
-                        physical tasks. One to three secret intruders blend in with the crew, quietly
-                        eliminating players when no one's watching.
-                    </p>
-                    <p>
-                        When someone finds a body — or gets suspicious enough — they can call an
-                        emergency meeting. Everyone gathers, discusses, accuses, and votes. If the
-                        vote reaches the threshold, the most-suspected player is ejected. Then the
-                        game continues until the crew completes all their tasks or votes out every
-                        intruder, or until the intruders equal the remaining crew.
-                    </p>
-                    <p>
-                        The digital game gave everyone the template. Among Us IRL is what happens when
-                        you actually walk the halls.
-                    </p>
-                </section>
+                <nav className="seo-links" aria-label="Jump to a setup guide">
+                    <p className="seo-links__title">Choose a venue guide</p>
+                    <ul className="seo-links__list">
+                        <li><a href="#classroom-setup">Classroom setup</a></li>
+                        <li><a href="#vacation-house-setup">Vacation-house setup</a></li>
+                        <li><a href="#other-venues">Apartment, dorm, or office</a></li>
+                    </ul>
+                </nav>
 
-                {/* What you need */}
-                <section className="seo-section">
-                    <p className="seo-section__kicker">Requirements</p>
-                    <h2>What you need to play</h2>
-                    <div className="seo-cards seo-cards--3">
-                        <div className="seo-card">
-                            <h3>Players</h3>
-                            <p>
-                                5–15 players. Eight to twelve is the sweet spot — enough to make the
-                                deduction interesting without meetings becoming unmanageable.
-                            </p>
-                        </div>
-                        <div className="seo-card">
-                            <h3>Space</h3>
-                            <p>
-                                Multiple rooms or areas so players can genuinely split up. A house,
-                                apartment, dorm floor, office, or large Airbnb all work well.
-                            </p>
-                        </div>
-                        <div className="seo-card">
-                            <h3>Devices</h3>
-                            <p>
-                                One phone per player with a browser (no app download). Wi-Fi or mobile
-                                data. Optionally, a laptop or TV for the shared reactor display.
-                            </p>
-                        </div>
-                    </div>
-                </section>
-
-                {/* How the game works */}
-                <section className="seo-section">
-                    <p className="seo-section__kicker">Gameplay loop</p>
-                    <h2>How an Among Us IRL game works</h2>
+                <section className="seo-section" id="quick-start">
+                    <p className="seo-section__kicker">Quick start</p>
+                    <h2>Your house is the spaceship. Phones run the game.</h2>
                     <p>
-                        Each round follows a four-phase loop that repeats until one side wins:
+                        Everyone opens a phone browser in the same place. Sus Party supplies private roles,
+                        task lists, sabotage cards, and votes. You supply the rooms and the conversation.
+                        No account, download, or dedicated game board is required. Each device needs internet.
                     </p>
-                    <ol className="seo-steps" aria-label="Game phases">
+                    <ol className="seo-steps" aria-label="Quick setup steps">
                         <li className="seo-step">
                             <span className="seo-step__num" aria-hidden="true">1</span>
                             <div>
-                                <h3>Spread out and do tasks</h3>
-                                <p>
-                                    Crewmates check their task list and head to different rooms to
-                                    complete short physical actions — counting things, moving items,
-                                    finding objects. Intruders move around pretending to do the same.
-                                </p>
+                                <h3>Make your map</h3>
+                                <p>Use the living room, dining area, and other shared spaces. Choose one place to meet and keep private rooms out of play.</p>
                             </div>
                         </li>
                         <li className="seo-step">
                             <span className="seo-step__num" aria-hidden="true">2</span>
                             <div>
-                                <h3>Intruders strike</h3>
-                                <p>
-                                    When an intruder is alone with a crewmate and no one else is
-                                    watching, they can eliminate them. The victim is out of the round
-                                    but stays in the game silently.
-                                </p>
+                                <h3>Pick a task pack</h3>
+                                <p>Open the generator, select your rooms, and review the tasks. Change any item that does not fit your space.</p>
                             </div>
                         </li>
                         <li className="seo-step">
                             <span className="seo-step__num" aria-hidden="true">3</span>
                             <div>
-                                <h3>Call a meeting</h3>
-                                <p>
-                                    Anyone can call an emergency meeting at any time — when they find a
-                                    body, spot suspicious behaviour, or just have enough information to
-                                    make a case. Everyone meets in one place.
-                                </p>
+                                <h3>Take it into Sus Party</h3>
+                                <p>Select “Use these tasks in a new game.” Create a room, then select “Import generated tasks” in host setup.</p>
                             </div>
                         </li>
                         <li className="seo-step">
                             <span className="seo-step__num" aria-hidden="true">4</span>
                             <div>
-                                <h3>Discuss and vote</h3>
-                                <p>
-                                    Players argue, accuse, and defend themselves during a timed
-                                    discussion. Then everyone votes simultaneously. If the top
-                                    vote-getter clears the threshold, they're ejected. Otherwise no
-                                    ejection — and the game continues.
-                                </p>
+                                <h3>Share the code and deal the roles</h3>
+                                <p>Friends join with the four-letter code. Explain the meeting point and round rules, then start the game.</p>
                             </div>
                         </li>
                     </ol>
-                </section>
-
-                {/* Example tasks */}
-                <section className="seo-section">
-                    <p className="seo-section__kicker">Sample tasks</p>
-                    <h2>Among Us tasks in real life at home</h2>
-                    <p>
-                        Good tasks are short, obvious to verify, and spread across multiple rooms. Here
-                        are twelve from the Sus Party default set:
-                    </p>
-                    <div className="seo-task-grid" style={{ marginTop: '20px' }}>
-                        {EXAMPLE_TASKS.map((t) => (
-                            <div className="seo-task-item" key={t.task}>
-                                <span
-                                    style={{
-                                        display: 'block',
-                                        fontSize: '0.7rem',
-                                        fontWeight: 700,
-                                        color: '#6b7280',
-                                        textTransform: 'uppercase',
-                                        letterSpacing: '0.08em',
-                                        marginBottom: 4,
-                                    }}
-                                >
-                                    {t.location}
-                                </span>
-                                {t.task}
-                            </div>
-                        ))}
-                    </div>
-                    <p style={{ marginTop: '20px' }}>
-                        Need ideas for your space?{' '}
-                        <a href="/among-us-irl-task-ideas" style={{ color: '#a5b4fc' }}>
-                            Browse 100+ Among Us IRL task ideas
-                        </a>{' '}
-                        or{' '}
-                        <a href="/among-us-irl-task-generator" style={{ color: '#a5b4fc' }}>
-                            generate a custom task list for your venue
-                        </a>
-                        .
-                    </p>
-                </section>
-
-                {/* Best places */}
-                <section className="seo-section">
-                    <p className="seo-section__kicker">Venues</p>
-                    <h2>Best places to play Among Us IRL</h2>
-                    <div className="seo-cards seo-cards--2">
-                        <div className="seo-card">
-                            <h3>House or apartment</h3>
-                            <p>
-                                The classic setup. Kitchen, living room, bedrooms, and bathrooms give
-                                you four or five distinct task zones. Works with as few as five people.
-                            </p>
-                        </div>
-                        <div className="seo-card">
-                            <h3>Dorm or student halls</h3>
-                            <p>
-                                Common rooms, hallways, kitchen, and laundry areas make great task
-                                locations. Easy to coordinate in a building everyone already knows.
-                            </p>
-                        </div>
-                        <div className="seo-card">
-                            <h3>Office (after hours)</h3>
-                            <p>
-                                Meeting rooms, break kitchen, open-plan floor, and hallways cover lots
-                                of ground. Best on a Friday evening or team social day.
-                            </p>
-                        </div>
-                        <div className="seo-card">
-                            <h3>Large Airbnb or holiday rental</h3>
-                            <p>
-                                Multiple floors and lots of rooms make these ideal. A weekend group
-                                trip is a perfect time for a proper Among Us IRL session.
-                            </p>
-                        </div>
-                    </div>
-                </section>
-
-                {/* DIY vs Sus Party */}
-                <section className="seo-section">
-                    <p className="seo-section__kicker">Comparison</p>
-                    <h2>Running Among Us IRL manually vs. using Sus Party</h2>
-                    <p>
-                        You can absolutely run Among Us IRL with paper role cards and a whiteboard
-                        for tasks. Here's how the two approaches compare:
-                    </p>
-                    <div className="seo-table-wrap">
-                        <table className="seo-table">
-                            <thead>
-                                <tr>
-                                    <th>What you need to handle</th>
-                                    <th>DIY / manual</th>
-                                    <th>With Sus Party</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {COMPARISON.map((row) => (
-                                    <tr key={row.problem}>
-                                        <td>{row.problem}</td>
-                                        <td style={{ color: '#9ca3af' }}>{row.diy}</td>
-                                        <td>{row.sus}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
                     <div className="seo-highlight">
                         <p>
-                            Sus Party is free to host. No account, no install — players join by typing a
-                            four-character room code in any phone browser.
+                            Try the <a href="/tutorial">crew tutorial</a> before your first round.
+                            A phone-only game works. A larger screen can also join as the optional Reactor.
                         </p>
                     </div>
                 </section>
 
-                {/* FAQ */}
+                <section className="seo-section">
+                    <p className="seo-section__kicker">What the app handles</p>
+                    <h2>What happens on your phone</h2>
+                    <div className="seo-cards seo-cards--3">
+                        <div className="seo-card">
+                            <h3>Roles and tasks</h3>
+                            <p>Your role stays on your own screen. Crew members see a task and its location, do it in the room, then slide to complete it.</p>
+                        </div>
+                        <div className="seo-card">
+                            <h3>Meetings and votes</h3>
+                            <p>A living player calls a meeting. Everyone gathers to compare stories, then votes on their phone. The app displays live vote totals.</p>
+                        </div>
+                        <div className="seo-card">
+                            <h3>Sabotage and the reveal</h3>
+                            <p>Intruders use cards to disrupt the crew. At the task goal, the app reveals living intruders. The crew still has to vote them out.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <GameSetupCta title="See the task pack before you invite anyone"
+                    href="/among-us-irl-task-generator?venue=house&players=8&movement=normal" label="Preview an eight-player house game">
+                    A sample list is ready in the generator. Change the rooms and player count, review the tasks, then carry the pack into a new game.
+                </GameSetupCta>
+
+                <section className="seo-section" id="classroom-setup">
+                    <p className="seo-section__kicker">Classroom guide</p>
+                    <h2>Set up Among Us IRL in a classroom</h2>
+                    <p>
+                        Turn the supply table, board, and desks into task stations. The school preset supplies a starting list;
+                        the host chooses which tasks fit the group. Confirm permission to use phones and the space before the round.
+                    </p>
+                    <ul className="seo-list">
+                        <li>Set tasks at the supply table, board, or desks.</li>
+                        <li>Prepare shared materials such as markers, index cards, and task slips.</li>
+                        <li>Keep play inside approved rooms and use a step-free route.</li>
+                    </ul>
+                    <p>
+                        For example, count markers in the classroom supply cup.
+                        Browse <a href="/among-us-irl-task-ideas#classroom-tasks">classroom task examples</a>
+                        {' '}or <a href="/among-us-irl-task-generator?venue=school&players=8&movement=normal">build an eight-player classroom task list</a>.
+                    </p>
+                </section>
+
+                <section className="seo-section" id="vacation-house-setup">
+                    <p className="seo-section__kicker">Vacation-house guide</p>
+                    <h2>Set up a vacation-house game</h2>
+                    <p>
+                        The shared living room becomes one location, the dining table another.
+                        Use the vacation-house preset to build a task list around the space you actually have.
+                        Put out cards, coasters, and paper before the round so guests know what belongs to the game.
+                    </p>
+                    <ul className="seo-list">
+                        <li>Keep private rooms and host-excluded areas outside the play boundary.</li>
+                        <li>Use visible shared items, then return each item to its place.</li>
+                        <li>Choose low movement if the group needs a seated or short-distance round.</li>
+                    </ul>
+                    <p>
+                        For example, count the cushions on the shared living-room sofa.
+                        See <a href="/among-us-irl-task-ideas#vacation-house-tasks">vacation-house task examples</a>
+                        {' '}or <a href="/among-us-irl-task-generator?venue=airbnb&players=8&movement=normal">build an eight-player vacation-rental task list</a>.
+                    </p>
+                </section>
+
+                <section className="seo-section" id="other-venues">
+                    <p className="seo-section__kicker">Other venues</p>
+                    <h2>Choose a task preset for your space</h2>
+                    <p>Use a preset as a draft. Remove any task that does not fit your actual room or access rules.</p>
+                    <div className="seo-cards seo-cards--2">
+                        <div className="seo-card">
+                            <h3>House or apartment</h3>
+                            <p>Use shared rooms such as a living room, dining area, and approved hallway.</p>
+                            <a href="/among-us-irl-task-generator?venue=house&players=8&movement=normal">Generate house tasks →</a>
+                            {' · '}
+                            <a href="/among-us-irl-task-generator?venue=apartment&players=8&movement=normal">Apartment tasks →</a>
+                        </div>
+                        <div className="seo-card">
+                            <h3>Dorm or office</h3>
+                            <p>Choose common rooms and exclude private rooms, work areas, and restricted spaces.</p>
+                            <a href="/among-us-irl-task-generator?venue=dorm&players=8&movement=normal">Generate dorm tasks →</a>
+                            {' · '}
+                            <a href="/among-us-irl-task-generator?venue=office&players=8&movement=normal">Office tasks →</a>
+                        </div>
+                    </div>
+                    <p style={{ marginTop: 16 }}>
+                        Need a different layout? <a href="/among-us-irl-task-generator?venue=other&players=8&movement=normal">Generate tasks for another venue</a>.
+                    </p>
+                </section>
+
                 <section className="seo-section">
                     <p className="seo-section__kicker">FAQ</p>
-                    <h2>Frequently asked questions</h2>
+                    <h2>Among Us IRL questions</h2>
                     <div className="seo-faq">
-                        {FAQS.map((f) => (
-                            <div className="seo-faq__item" key={f.q}>
-                                <p className="seo-faq__q">{f.q}</p>
-                                <p className="seo-faq__a">{f.a}</p>
+                        {FAQS.map((faq) => (
+                            <div className="seo-faq__item" key={faq.q}>
+                                <p className="seo-faq__q">{faq.q}</p>
+                                <p>{faq.a}</p>
                             </div>
                         ))}
                     </div>
                 </section>
 
-                {/* Internal links */}
-                <nav className="seo-links" aria-label="Related guides">
-                    <p className="seo-links__title">Everything you need for Among Us IRL</p>
+                <nav className="seo-links" aria-label="Related Among Us IRL guides">
+                    <p className="seo-links__title">Continue with a guide</p>
                     <ul className="seo-links__list">
-                        <li>
-                            <a href="/how-to-play-among-us-irl">
-                                How to play Among Us IRL — full rules
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/among-us-irl-task-ideas">
-                                100+ Among Us IRL task ideas by venue
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/among-us-irl-task-generator">
-                                Generate a custom task list for your space
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/how-to-play">Sus Party host guide</a>
-                        </li>
-                        <li>
-                            <a href="/faq">Frequently asked questions</a>
-                        </li>
+                        <li><a href="/how-to-play-among-us-irl">How to play: rules and sample round</a></li>
+                        <li><a href="/among-us-irl-task-ideas">Task ideas by venue and movement</a></li>
+                        <li><a href="/among-us-irl-task-generator?venue=house&players=8&movement=normal">Make a task list for your space</a></li>
+                        <li><a href="/among-us-birthday-party">Make it the main birthday activity</a></li>
+                        <li><a href="/social-deduction-games">Compare social deduction games for your group</a></li>
                     </ul>
                 </nav>
-
-                {/* CTA */}
-                <div className="seo-cta-box">
-                    <h2>Ready to play Among Us IRL?</h2>
-                    <p>
-                        Host a free game in under two minutes. No download, no account — just a link
-                        your friends open on their phones.
-                    </p>
-                    <a href="/play" className="seo-btn--primary">
-                        Start an Among Us IRL game →
-                    </a>
-                </div>
             </div>
         </SeoPageLayout>
     );

@@ -1,6 +1,7 @@
 import json
 import sys
 import unittest
+from uuid import uuid4
 from pathlib import Path
 
 
@@ -13,7 +14,10 @@ from assets.card import Card  # noqa: E402
 
 
 class NoopStatsTracker:
-    def record_game_created(self, room_code):
+    def record_game_created(self, room_code, acquisition=None):
+        pass
+
+    def record_game_started(self, game):
         pass
 
     def record_player_seen(self, player_id):
@@ -21,6 +25,28 @@ class NoopStatsTracker:
 
     def record_game_ended(self, game):
         pass
+
+
+def protocol_client(client):
+    """Add current protocol fields to the legacy gameplay test fixtures."""
+    client.raw_emit = client.emit
+
+    def emit_current(event, data=None, *args, **kwargs):
+        if isinstance(data, dict) and event in {'complete_task', 'meeting', 'ready', 'vote', 'veto', 'player_dead', 'end_meeting'}:
+            data = data.copy()
+            game, room = server_app.game_manager.get_game_by_player_id(data.get('player_id'))
+            if game:
+                data.setdefault('round_id', game.round_id)
+                if game.meeting:
+                    data.setdefault('meeting_id', game.meeting.id)
+                if event == 'complete_task':
+                    player = game.getPlayerById(data.get('player_id'))
+                    data.setdefault('request_id', str(uuid4()))
+                    data.setdefault('assignment_id', (player.task or {}).get('assignment_id'))
+        return client.raw_emit(event, data, *args, **kwargs)
+
+    client.emit = emit_current
+    return client
 
 
 class SocketGameTestCase(unittest.TestCase):
@@ -33,7 +59,7 @@ class SocketGameTestCase(unittest.TestCase):
         server_app.game_manager.stats_tracker = NoopStatsTracker()
 
     def make_client(self):
-        return self.socketio.test_client(self.flask_app)
+        return protocol_client(self.socketio.test_client(self.flask_app))
 
     def drain(self, client):
         return client.get_received()

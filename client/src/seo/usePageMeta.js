@@ -73,6 +73,8 @@ export function usePageMeta({ title, description, canonical, ogImage, schema, do
         html.classList.add(documentClass);
         body.classList.add(documentClass);
 
+        // Replace the snapshot schema when the browser mounts the same page.
+        document.querySelectorAll('script#page-schema').forEach(script => script.remove());
         let schemaScript = null;
         if (schema) {
             schemaScript = document.createElement('script');
