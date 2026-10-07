@@ -1,5 +1,6 @@
 import random
 import json
+import logging
 from collections import OrderedDict
 from uuid import uuid4
 from assets.player import Player
@@ -19,6 +20,8 @@ class Game:
         self.state_lock = RLock()
         self.revision = 0
         self.round_id = str(uuid4())
+        self.room_session_id = str(uuid4())
+        self.round_number = 0
         self.command_results = OrderedDict()
         self.players = []
         self.task_handler = task_handler
@@ -56,12 +59,21 @@ class Game:
         # Multi-game support
         self.room_code = room_code
         self.created_at = time.time()
+        self.lobby_started_at = self.created_at
+        self.lobby_started_monotonic = time.monotonic()
+        self.room_opened_at = None
+        self.round_started_at = None
+        self.round_started_monotonic = None
+        self.round_ended_monotonic = None
+        self.last_gameplay_at = None
+        self._round_metrics = {}
         self.last_activity = time.time()
         self.end_time = None
 
         # Optional callback fired the first time end_game is emitted
         # (used by GameManager to record usage stats)
         self.on_end_callback = None
+        self.on_abort_callback = None
         self._stats_start_recorded = False
         self._stats_recorded = False
         self.is_open = False  # Room not open until creator configures it
@@ -176,7 +188,7 @@ class Game:
                     try:
                         self.on_end_callback(self)
                     except Exception:
-                        self._stats_recorded = True
+                        logging.getLogger('app_logger').exception('Round stats callback failed')
                 else:
                     self._stats_recorded = True
 
@@ -220,6 +232,22 @@ class Game:
             self.command_results.clear()
             self.revision += 1
             return self.round_id
+
+    def _record_abandoned_round(self, reason):
+        if self.on_abort_callback and self.round_started_at is not None and not self._stats_recorded:
+            try:
+                self.on_abort_callback(self, reason)
+            except Exception:
+                logging.getLogger('app_logger').exception('Interrupted round stats callback failed')
+
+    def _reset_round_clock(self):
+        self.lobby_started_at = time.time()
+        self.lobby_started_monotonic = time.monotonic()
+        self.round_started_at = None
+        self.round_started_monotonic = None
+        self.round_ended_monotonic = None
+        self.last_gameplay_at = None
+        self._round_metrics = {}
 
     def start_meltdown(self):
         with self.state_lock:
@@ -274,6 +302,7 @@ class Game:
             self.revision += 1
             self.end_state = "meltdown_fail"
             self.end_time = time.time()
+            self.round_ended_monotonic = time.monotonic()
             # Emit player list BEFORE end_game so clients have updated death info
             self.emit_player_list()
             self.emit_to_room("end_game", {'result': self.end_state, 'stats': self.stats})
@@ -448,6 +477,7 @@ class Game:
     
     def reset(self):
         with self.state_lock:
+            self._record_abandoned_round('full_reset')
             self.cancel_meltdown()
             self.begin_round()
             self._reset_locked()
@@ -468,6 +498,7 @@ class Game:
         self.backgrounds = list(range(0, 16 + 1))  
         self.end_state = None
         self.end_time = None
+        self._reset_round_clock()
         self.denied_location = None
         self.meltdown_time_mod = 0
         self.active_cards = []
@@ -478,8 +509,9 @@ class Game:
         self._stats_start_recorded = False
         self._stats_recorded = False
 
-    def reset_game_state(self):
+    def reset_game_state(self, reason='lobby_reset'):
         with self.state_lock:
+            self._record_abandoned_round(reason)
             self.cancel_meltdown()
             self.begin_round()
             self._reset_game_state_locked()
@@ -496,6 +528,7 @@ class Game:
         self.completed_tasks = 0
         self.end_state = None
         self.end_time = None
+        self._reset_round_clock()
         self.denied_location = None
         self.meltdown_time_mod = 0
         self.active_cards = []  # Clear active cards (Area Denial, etc.)
@@ -604,6 +637,7 @@ class Game:
             if self.numIntruders > 0 and self.numCrew <= self.numIntruders:
                 self.end_state = 'sus_victory'
                 self.end_time = time.time()
+                self.round_ended_monotonic = time.monotonic()
                 self.cancel_meltdown()
                 self.speaker.play_sound('sus_victory')
                 if self.meeting:
@@ -619,6 +653,7 @@ class Game:
             if self.numIntruders <= 0:
                 self.end_state = 'victory'
                 self.end_time = time.time()
+                self.round_ended_monotonic = time.monotonic()
                 self.cancel_meltdown()
                 self.speaker.play_sound('crew_victory')
                 if self.meeting:

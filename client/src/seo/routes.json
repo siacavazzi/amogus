@@ -84,6 +84,41 @@
     "prerender": true
   },
   {
+    "path": "/make-cleaning-fun-for-kids",
+    "canonical": "https://susparty.com/make-cleaning-fun-for-kids",
+    "priority": "0.8",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
+    "path": "/traitors-at-home",
+    "canonical": "https://susparty.com/traitors-at-home",
+    "priority": "0.8",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
+    "path": "/party-games-on-your-phone",
+    "canonical": "https://susparty.com/party-games-on-your-phone",
+    "priority": "0.8",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
+    "path": "/sleepover-games-for-teens",
+    "canonical": "https://susparty.com/sleepover-games-for-teens",
+    "priority": "0.8",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
+    "path": "/indoor-family-reunion-games",
+    "canonical": "https://susparty.com/indoor-family-reunion-games",
+    "priority": "0.8",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
     "path": "/how-to-play",
     "canonical": "https://susparty.com/how-to-play",
     "priority": "0.8",

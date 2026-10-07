@@ -1,7 +1,9 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import { ChevronLeft, Camera, User, Sparkles, ArrowRight } from 'lucide-react';
 import { DataContext } from '../GameContext';
 import CameraCapture from '../components/CameraCapture';
+import RoomEntryNotice from '../components/RoomEntryNotice';
+import { clearRoomCodeFromUrl } from '../utils/inviteLinks';
 import LeaveGameButton from '../components/LeaveGameButton';
 import { 
     useFloatingParticles, 
@@ -16,7 +18,21 @@ function LoginPage() {
     const [username, setUsername] = useState('');
     const [step, setStep] = useState('username'); // 'username', 'camera', 'joining'
     const [showContent, setShowContent] = useState(false);
-    const { setPlayerState, socket, setTaskEntry, roomCode } = useContext(DataContext);
+    const lastSelfie = useRef(null);
+    const { setPlayerState, socket, setTaskEntry, roomCode, roomEntryStatus, setRoomEntryStatus } = useContext(DataContext);
+
+    useEffect(() => {
+        if (roomEntryStatus) setStep('username');
+    }, [roomEntryStatus]);
+
+    useEffect(() => {
+        if (step !== 'joining') return;
+        const timeout = setTimeout(() => {
+            setRoomEntryStatus({ code: 'connection_timeout', room_code: roomCode,
+                message: 'The room did not respond. Check your internet connection, then try again.' });
+        }, 10000);
+        return () => clearTimeout(timeout);
+    }, [step, roomCode, setRoomEntryStatus]);
 
     // Use shared floating particles
     const particles = useFloatingParticles(15, 'default');
@@ -43,6 +59,8 @@ function LoginPage() {
     };
 
     const joinGame = (selfie) => {
+        lastSelfie.current = selfie;
+        setRoomEntryStatus(null);
         setStep('joining');
         setPlayerState(prevState => ({ ...prevState, username: username }));
         let playerId = localStorage.getItem('player_id');
@@ -55,7 +73,7 @@ function LoginPage() {
     };
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-950 overflow-hidden">
+        <div className="fixed inset-0 flex items-start justify-center bg-gray-950 overflow-y-auto py-20">
             {/* Animated background */}
             <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-indigo-950/20 to-gray-950" />
             
@@ -90,6 +108,15 @@ function LoginPage() {
 
             {/* Main content */}
             <div className={`relative z-10 w-full max-w-sm mx-4 transition-all duration-700 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+                <RoomEntryNotice status={roomEntryStatus} busy={step === 'joining'}
+                    onRetry={() => joinGame(lastSelfie.current)}
+                    onChangeCode={() => {
+                        clearRoomCodeFromUrl();
+                        localStorage.removeItem('player_id');
+                        localStorage.removeItem('room_code');
+                        sessionStorage.removeItem('is_room_creator');
+                        window.location.reload();
+                    }} />
                 {/* Step 1: Username Entry */}
                 {step === 'username' && (
                     <>

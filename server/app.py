@@ -6,7 +6,7 @@ import copy
 import time
 from functools import wraps
 from uuid import uuid4
-from assets.room_protocol import metadata, minimum_tasks, start_error, lobby_state, room_state
+from assets.room_protocol import metadata, minimum_tasks, start_error_detail, lobby_state, room_state
 from flask import Flask, request, send_from_directory
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask_cors import CORS
@@ -55,6 +55,7 @@ task_list_manager = TaskListManager()
 # Directory for storing selfie images
 SELFIES_DIR = os.path.join(os.path.dirname(__file__), 'selfies')
 os.makedirs(SELFIES_DIR, exist_ok=True)
+client_metrics_by_sid = {}
 
 
 # Flask route to serve selfie images
@@ -87,12 +88,45 @@ def get_min_tasks_needed(game):
     return minimum_tasks(game)
 
 
-def command_error(message, game=None, player=None):
+def record_usage(event, game=None, player_id=None, resolve_game=True, **fields):
+    """Record allowlisted metadata without a gameplay dependency on stats writes."""
+    try:
+        if game is None and resolve_game:
+            game, _ = game_manager.get_game_by_sid(request.sid)
+        game_manager.stats_tracker.record_event(
+            event, game, player_id, connection_id=request.sid,
+            phase='ended' if game and game.end_state else 'round' if game and game.game_running else 'lobby',
+            **client_metrics_by_sid.get(request.sid, {}), **fields)
+    except Exception:
+        logger.exception('Usage event write failed')
+
+
+def record_reconnect(game, player):
+    disconnected_at = getattr(player, 'disconnected_at', None)
+    record_usage('player_reconnected' if not player.active else 'session_resumed', game, player.player_id,
+                 was_disconnected=not player.active,
+                 recovery_seconds=round(max(0, time.time() - disconnected_at), 3) if disconnected_at else None)
+    player.disconnected_at = None
+
+
+def command_error(message, game=None, player=None, reason='condition_not_met'):
+    record_usage('command_rejected', game, player.player_id if player else None,
+                 command=(getattr(request, 'event', {}) or {}).get('message'), reason=reason)
     emit('error', {'message': message})
     result = {'ok': False, 'error': message}
     if game and (player or game.reactor_sid == request.sid or game.creator_sid == request.sid):
         result['state'] = room_state(game, player, request.sid)
     return result
+
+
+def room_entry_error(code, room_code, message):
+    record_usage('join_rejected', game_manager.get_game(room_code),
+                 resolve_game=False, room_code=room_code, reason=code,
+                 command=(getattr(request, 'event', {}) or {}).get('message'))
+    emit('error', {
+        'scope': 'room_entry', 'code': code,
+        'room_code': room_code, 'message': message,
+    })
 
 
 def room_event(mutate=True, reconnect=False):
@@ -112,14 +146,14 @@ def room_event(mutate=True, reconnect=False):
                 return handler(data, *args) if data is not None else handler(*args)
             with game.state_lock:
                 if game_manager.get_game(room) is not game:
-                    return command_error('The room no longer exists.')
+                    return command_error('The room no longer exists.', reason='room_removed')
                 if requested_room and requested_room != room:
-                    return command_error('The command belongs to another room.')
+                    return command_error('The command belongs to another room.', reason='wrong_room')
                 if not reconnect:
                     if player_id and (not player or player.sid != request.sid or not player.active):
-                        return command_error('Reconnect before you send this command.')
+                        return command_error('Reconnect before you send this command.', game, player, reason='obsolete_session')
                     if not is_sid_connected_to_room(request.sid, room):
-                        return command_error('Join the room before you send this command.')
+                        return command_error('Join the room before you send this command.', game, player, reason='not_in_room')
                 if mutate:
                     game.revision += 1
                     game.last_activity = time.time()
@@ -240,6 +274,7 @@ def handle_create_game(data=None):
     acquisition = data.get('acquisition') if isinstance(data, dict) else None
     room_code, game = game_manager.create_game(sid, acquisition)
     game.creator_sid = sid  # Track room creator
+    record_usage('host_entered', game, flush=True)
     join_room(room_code)
     
     logger.info(f"Game created with room code: {room_code}")
@@ -304,6 +339,10 @@ def handle_open_room(data):
         emit('error', {'message': 'Only the room creator can open the room'})
         return
     
+    if not game.is_open:
+        game.room_opened_at = time.time()
+        record_usage('room_opened', game, flush=True,
+                     setup_seconds=round(max(0, time.monotonic() - game.lobby_started_monotonic), 3))
     game.is_open = True
     logger.info(f"Room {room_code} is now open for players")
     emit('room_opened', {'room_code': room_code})
@@ -320,17 +359,20 @@ def handle_join_game(data):
     
     game = game_manager.get_game(room_code)
     if not game:
-        emit('error', {'message': 'Game not found. Check the room code.'})
+        room_entry_error('room_not_found', room_code,
+                         'We cannot find this room. Check the code, or ask the host for a new invite.')
         logger.warning(f"Join attempt for non-existent room: {room_code}")
         return
     
     if not game.is_open:
-        emit('error', {'message': 'This room is not open yet. The host is still configuring.'})
+        room_entry_error('room_not_open', room_code,
+                         'This room is not open yet. Ask the host to open it, then try again.')
         logger.warning(f"Join attempt for not-yet-open room: {room_code}")
         return
     
     if game.game_running:
-        emit('error', {'message': 'Game already in progress. Cannot join.'})
+        room_entry_error('round_in_progress', room_code,
+                         'This round already started. New players can join when the host returns to the lobby.')
         logger.warning(f"Join attempt for running game: {room_code}")
         return
     
@@ -352,6 +394,7 @@ def handle_join_game(data):
     
     emit('game_joined', {'room_code': room_code, 'is_creator': is_creator})
     emit('task_locations', game.locations)
+    record_usage('room_entered', game, is_creator=is_creator)
     logger.info(f"Client {sid} joined room {room_code}, is_creator={is_creator}")
 
 
@@ -459,9 +502,28 @@ def handle_register_reactor(data):
 # ============ CONNECTION HANDLING ============
 
 @socketio.on('connect')
-def handle_connect():
+def handle_connect(auth=None):
+    user_agent = request.headers.get('User-Agent', '').lower()
+    device = ('tablet' if 'ipad' in user_agent or ('android' in user_agent and 'mobile' not in user_agent)
+              else 'mobile' if any(value in user_agent for value in ('mobile', 'iphone', 'ipod'))
+              else 'desktop' if user_agent else 'unknown')
+    offset = auth.get('utc_offset_minutes') if isinstance(auth, dict) else None
+    client_metrics_by_sid[request.sid] = {
+        'device_class': device,
+        'utc_offset_minutes': offset if type(offset) is int and -840 <= offset <= 840 else None,
+    }
+    record_usage('connection_opened')
     logger.info(f'Client connected: {request.sid}')
     # Don't auto-join any room on connect - client must create or join
+
+
+@socketio.on_error_default
+def handle_socket_error(error):
+    logger.exception('Socket handler failed')
+    event = (getattr(request, 'event', {}) or {}).get('message')
+    record_usage('socket_error', command=event, reason=type(error).__name__, flush=True)
+    emit('error', {'message': 'The action failed. Try again, or reconnect to the room.'})
+    return {'ok': False, 'error': 'The action failed.'}
 
 
 @socketio.on('rejoin')
@@ -474,10 +536,12 @@ def handleRejoin(data):
     
     game, player, room_code = get_game_and_player(player_id)
     if not game or not player:
-        emit('rejoin_failed', {'message': 'Game session not found'})
+        record_usage('reconnect_failed', reason='session_not_found')
+        emit('rejoin_failed', {'message': 'Your previous session is no longer available. Ask the host for a new invite.'})
         return
     
     logger.info(f"Player {player_id} rejoining room {room_code}, creator_player_id={game.creator_player_id}")
+    record_reconnect(game, player)
     player.sid = request.sid
     player.active = True
     game_manager.update_sid(player_id, request.sid)
@@ -544,16 +608,24 @@ def handleRejoin(data):
 
 
 @socketio.on('disconnect')
-@room_event()
+@room_event(reconnect=True)
 def handle_disconnect(reason=None):
     sid = request.sid
     logger.info(f"Client disconnected: {sid}")
     game, room_code = game_manager.get_game_by_sid(sid)
+    player = game.getPlayerBySid(sid) if game else None
+    disconnect_reason = reason if reason in {
+        'transport close', 'transport error', 'ping timeout', 'client disconnect',
+        'server disconnect', 'client namespace disconnect', 'server namespace disconnect',
+    } else 'unknown'
+    record_usage('connection_closed', game, player.player_id if player else None, reason=disconnect_reason)
+    client_metrics_by_sid.pop(sid, None)
     game_manager.unregister_sid(sid)
     if game and game.reactor_sid == sid:
         game.reactor_sid = None
     player = game.getPlayerBySid(sid) if game else None
     if player:
+        player.disconnected_at = time.time()
         player.disconnect()
         player.ready = False
         if game.meeting and not game.end_state:
@@ -574,6 +646,7 @@ def handle_join(data):
     sid = request.sid
 
     if not username:
+        record_usage('join_rejected', resolve_game=False, reason='username_required', room_code=room_code, command='join')
         emit('error', {'message': 'Username is required'}, to=sid)
         logger.warning(f"Join attempt without username from SID: {sid}")
         return
@@ -582,6 +655,7 @@ def handle_join(data):
     if player_id:
         game, player, existing_room = get_game_and_player(player_id)
         if player:
+            record_reconnect(game, player)
             player.sid = sid
             player.active = True
             player.username = username
@@ -602,11 +676,18 @@ def handle_join(data):
     # New player joining a room
     game = game_manager.get_game(room_code)
     if not game:
-        emit('error', {'message': 'Game not found'}, to=sid)
+        room_entry_error('room_not_found', room_code,
+                         'We cannot find this room. Check the code, or ask the host for a new invite.')
+        return
+
+    if not game.is_open and sid != game.creator_sid:
+        room_entry_error('room_not_open', room_code,
+                         'This room is not open yet. Ask the host to open it, then try again.')
         return
 
     if game.game_running:
-        emit('error', {'message': 'Game already in progress'}, to=sid)
+        room_entry_error('round_in_progress', room_code,
+                         'This round already started. New players can join when the host returns to the lobby.')
         logger.warning(f"Join attempt while game running: {username}")
         return
 
@@ -646,6 +727,8 @@ def handle_join(data):
     
     # Check if this player is the creator
     is_creator = (player.player_id == game.creator_player_id)
+    record_usage('player_joined', game, player.player_id, is_creator=is_creator,
+                 player_count=len(game.players), flush=True)
     
     emit('player_id', {'player_id': player.player_id, 'pic': player.pic, 'is_creator': is_creator}, to=sid)
     logger.info(f"New player {username} joined room {room_code} with ID {player.player_id}, is_creator={is_creator}")
@@ -662,9 +745,12 @@ def handle_join(data):
 
 def start_room(game):
     if game.creator_sid != request.sid:
+        record_usage('start_rejected', game, reason='not_host')
         return command_error('Only the host can start the game.')
-    error = start_error(game)
+    reason, error = start_error_detail(game)
     if error:
+        record_usage('start_rejected', game, reason=reason, player_count=len(game.players),
+                     task_count=len(game.collaborative_tasks), min_tasks=minimum_tasks(game))
         if len(game.collaborative_tasks) < minimum_tasks(game):
             socketio.emit('enter_task_creation', {**lobby_state(game), 'current_tasks': len(game.collaborative_tasks)}, room=game.room_code)
         return command_error(error)
@@ -676,6 +762,7 @@ def start_room(game):
     game.game_running = True
     game.assignRoles()
     game_manager.stats_tracker.record_game_started(game)
+    record_usage('round_host_started', game, game.creator_player_id)
     for player in game.players:
         if not player.sus:
             game.assign_task(player)
@@ -732,9 +819,11 @@ def reset_game(data):
     if force and sid not in (game.creator_sid, game.reactor_sid):
         return command_error('Only the host or reactor can reset the game.')
     if force:
+        game._record_abandoned_round('host_reset')
+        record_usage('round_reset', game, player_id, reason='host_reset', flush=True)
         for p in game.players:
             p.reset()
-        game.reset_game_state()
+        game.reset_game_state(reason='host_reset')
         socketio.emit('game_reset', {'room_code': room_code}, room=room_code)
         sendPlayerList(game, room_code)
         logger.info(f"Game {room_code} has been force reset to lobby")
@@ -764,9 +853,11 @@ def reset_game(data):
     
     # If all players have voted, reset the game
     if votes_needed > 0 and current_votes >= votes_needed:
+        game._record_abandoned_round('unanimous_reset')
+        record_usage('round_reset', game, player_id, reason='unanimous_reset', flush=True)
         for p in game.players:
             p.reset()
-        game.reset_game_state()
+        game.reset_game_state(reason='unanimous_reset')
         socketio.emit('game_reset', {'room_code': room_code}, room=room_code)
         sendPlayerList(game, room_code)
         logger.info(f"Game {room_code} has been reset to lobby (all players voted)")
@@ -804,7 +895,7 @@ def disband_room(data):
     socketio.emit('room_disbanded', {'message': 'Room has been closed'}, room=room_code)
     
     # Clean up the game
-    game_manager.remove_game(room_code)
+    game_manager.remove_game(room_code, reason='host_disband')
     logger.info(f"Room {room_code} has been disbanded")
 
 
@@ -842,6 +933,9 @@ def leave_room_handler(data):
     is_creator_socket = (game.creator_sid == sid)
     
     was_creator_player = bool(player and player.player_id == game.creator_player_id)
+    record_usage('player_left' if player else 'room_exited', game, player_id,
+                 is_creator=was_creator_player or is_creator_socket, is_reactor=is_reactor,
+                 player_count=len(game.players), flush=True)
 
     if player:
         # During an active round, leaving counts as dying. After the round ends,
@@ -888,7 +982,7 @@ def leave_room_handler(data):
     if should_delete:
         # Notify any remaining clients
         socketio.emit('room_disbanded', {'message': 'Room has been closed'}, room=room_code)
-        game_manager.remove_game(room_code)
+        game_manager.remove_game(room_code, reason='host_left_setup' if is_creator_socket and not game.is_open else 'no_players')
         logger.info(f"Room {room_code} deleted")
     elif player:
         # Notify remaining players
@@ -917,22 +1011,23 @@ def handleTaskComplete(data):
         return command_error('Game session not found.')
     request_id, assignment_id, round_id = (data.get(key) for key in ('request_id', 'assignment_id', 'round_id'))
     if not all(isinstance(value, str) and 0 < len(value) <= 128 for value in (request_id, assignment_id, round_id)):
-        return command_error('Reload the page to restore the task command.', game, player)
+        return command_error('Reload the page to restore the task command.', game, player, reason='invalid_task_command')
     if round_id != game.round_id:
-        return command_error('This command belongs to an earlier round.', game, player)
+        return command_error('This command belongs to an earlier round.', game, player, reason='stale_round')
     key = (player.player_id, request_id)
     cached = game.command_results.get(key)
     if cached:
         if cached['assignment_id'] != assignment_id:
-            return command_error('The request ID belongs to another task.', game, player)
+            return command_error('The request ID belongs to another task.', game, player, reason='request_id_conflict')
         return copy.deepcopy(cached['response'])
     if not game.game_running or game.end_state or not player.alive or player.sus:
-        return command_error('This player cannot complete a task now.', game, player)
+        return command_error('This player cannot complete a task now.', game, player, reason='inactive_task_player')
     if game.meeting or game.active_hack > 0 or game.active_meltdown:
-        return command_error('Wait until the current event ends before you complete the task.', game, player)
+        return command_error('Wait until the current event ends before you complete the task.', game, player, reason='task_blocked_by_event')
     if not player.task or player.task.get('assignment_id') != assignment_id:
-        return command_error('This task already changed. Use the current task.', game, player)
-    if player.task.get('is_fake'):
+        return command_error('This task already changed. Use the current task.', game, player, reason='stale_assignment')
+    is_fake = bool(player.task.get('is_fake'))
+    if is_fake:
         game.stats['fake_tasks_completed'].append({'player_name': player.username, 'task_text': player.task.get('task', '')})
         emit('fake_task_completed', {**metadata(game), 'task': player.task.get('task'), 'location': player.task.get('location')})
     else:
@@ -955,6 +1050,8 @@ def handleTaskComplete(data):
     game.command_results[key] = {'assignment_id': assignment_id, 'response': copy.deepcopy(response)}
     while len(game.command_results) > 256:
         game.command_results.popitem(last=False)
+    record_usage('task_completed', game, player.player_id, is_fake=is_fake, crew_score=game.crew_score,
+                 task_goal=game.taskGoal)
     return response
 
 
@@ -974,8 +1071,17 @@ def playCard(data):
     if card:
         # Pass extra_data for cards that require additional input (e.g., Fake Task)
         extra_data = data.get('extra_data')
-        card.play_card(player, extra_data)
+        had_meeting, had_meltdown = bool(game.meeting), bool(game.active_meltdown)
+        accepted = card.play_card(player, extra_data)
+        record_usage('card_played' if accepted else 'card_rejected', game, player_id,
+                     card_action=card.action, **({} if accepted else {'reason': 'effect_unavailable'}))
+        if not had_meeting and game.meeting:
+            record_usage('meeting_started', game, player_id, trigger='card')
+        if not had_meltdown and game.active_meltdown:
+            record_usage('meltdown_started', game, player_id, trigger='card')
         print(data)
+    else:
+        record_usage('card_rejected', game, player_id, reason='card_not_in_hand')
 
 
 # ============ MEETING HANDLING ============
@@ -997,6 +1103,7 @@ def handleMeeting(data):
     game, player = current_phase_player(data)
     if not game or not game.start_meeting(player):
         return command_error('A meeting cannot start now.')
+    record_usage('meeting_started', game, player.player_id)
     return {'ok': True}
 
 
@@ -1071,6 +1178,7 @@ def handleMeltdown(data=None):
         # Verify this is either a reactor or a player in the game
         if game.reactor_sid == sid or (data and data.get('player_id')):
             if game.start_meltdown():
+                record_usage('meltdown_started', game, data.get('player_id') if data else None)
                 logger.warning(f"Meltdown started in room {room_code} (triggered by sid: {sid})")
         else:
             logger.warning(f"Meltdown rejected - unauthorized sid: {sid}")

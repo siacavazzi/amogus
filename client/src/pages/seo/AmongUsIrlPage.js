@@ -1,6 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
+import GameplayScreenshots from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const SCHEMA = {
@@ -138,6 +139,8 @@ function AmongUsIrlPage() {
                         </div>
                     </div>
                 </section>
+
+                <GameplayScreenshots screens={['crew-task', 'intruder-cards']} />
 
                 <GameSetupCta title="See the task pack before you invite anyone"
                     href="/among-us-irl-task-generator?venue=house&players=8&movement=normal" label="Preview an eight-player house game">

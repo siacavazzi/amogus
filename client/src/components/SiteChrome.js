@@ -31,10 +31,15 @@ export function SiteFooter() {
                     <a href="/murder-mystery-party-game">Murder mystery party</a>
                     <a href="/birthday-party-games-for-adults">Adult birthday game</a>
                     <a href="/among-us-birthday-party">Among Us birthday party</a>
+                    <a href="/make-cleaning-fun-for-kids">Family cleanup game</a>
                     <a href="/party-games-for-10-people">Games for 10 people</a>
                     <a href="/game-night-ideas">Game night</a>
+                    <a href="/traitors-at-home">Traitors-style party</a>
+                    <a href="/party-games-on-your-phone">Phone party game</a>
                 </div>
                 <div>
+                    <a href="/sleepover-games-for-teens">Sleepover game</a>
+                    <a href="/indoor-family-reunion-games">Family reunion game</a>
                     <a href="/social-deduction-games">Social deduction games</a>
                     <a href="/faq">FAQ</a>
                     <a href="/about">About</a>

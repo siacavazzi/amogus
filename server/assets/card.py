@@ -160,9 +160,7 @@ class Card:
         extra_data: Optional dict with additional data for cards that require input (e.g., fake task details)
         """
         remove_card = True
-        
-        # Track card play in game stats
-        self.game.stats['cards_played'] += 1
+        discarded = False
         
         if self.action == 'EMP':
             remove_card = self.game.start_hack(self.duration)
@@ -255,6 +253,7 @@ class Card:
         elif self.action == 'Discard and Draw':
             remove_card = False
             if len(player.cards) > 1:
+                discarded = True
                 player.remove_card(self)
                 player.cards.pop(0)
                 card= self.card_deck.draw_card()
@@ -272,8 +271,12 @@ class Card:
             Thread(target=self._handle_card_countdown, args=()).start()
         if remove_card:
             player.remove_card(self)
+        accepted = remove_card or discarded
+        if accepted:
+            self.game.stats['cards_played'] += 1
         self.card_deck.emit_active_cards()
         self.game.emit_player_list()
+        return accepted
 
     def export(self):
         return json.dumps({
@@ -420,4 +423,3 @@ class CardDeck:
             output.append(card.export())
         print(output)
         self.game.emit_to_room('active_cards', output)
-

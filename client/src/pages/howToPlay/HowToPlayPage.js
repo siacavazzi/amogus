@@ -26,6 +26,7 @@ import {
   Section,
 } from './HowToPlayComponents';
 import SeoPageLayout from '../seo/SeoPageLayout';
+import GameplayScreenshots from '../seo/GameplayScreenshots';
 import './HowToPlayPage.css';
 
 function HowToPlayPage() {
@@ -97,6 +98,7 @@ function HowToPlayPage() {
               <a href="/among-us-irl-task-generator?venue=house&players=8&movement=normal">Prepare a task pack for your rooms</a>,
               {' '}select “Use these tasks in a new game,” then create the room and select “Import generated tasks” in host setup.
             </p>
+            <GameplayScreenshots screens={['host-setup', 'task-list']} />
           </Section>
 
           <Section
@@ -110,6 +112,7 @@ function HowToPlayPage() {
                 <RoleCard key={card.label} {...card} />
               ))}
             </CardGrid>
+            <GameplayScreenshots screens={['crew-task', 'intruder-objective']} />
           </Section>
 
           <Section
@@ -142,6 +145,7 @@ function HowToPlayPage() {
             </CardGrid>
 
             <NotePanel title="Important">{pageCopy.vetoNote}</NotePanel>
+            <GameplayScreenshots screens={['meeting-ready', 'vote']} />
           </Section>
 
           <Section
@@ -157,6 +161,7 @@ function HowToPlayPage() {
             </CardGrid>
 
             <NotePanel title="Reactor rule">{pageCopy.reactorNote}</NotePanel>
+            <GameplayScreenshots screens={['reactor', 'reactor-meltdown']} />
           </Section>
 
           <Section
@@ -172,6 +177,7 @@ function HowToPlayPage() {
             </CardGrid>
 
             <NotePanel title="Late game gets sharper">{pageCopy.cardDrawNote}</NotePanel>
+            <GameplayScreenshots screens={['intruder-cards']} />
           </Section>
 
           <Section
@@ -185,6 +191,7 @@ function HowToPlayPage() {
                 <InfoCard key={card.title} {...card} />
               ))}
             </CardGrid>
+            <GameplayScreenshots screens={['crew-victory', 'round-stats']} />
           </Section>
 
           <Section

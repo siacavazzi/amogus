@@ -6,8 +6,9 @@ const STORAGE_KEY = 'sus_party_admin_pw';
 
 function formatDuration(seconds) {
   if (!seconds && seconds !== 0) return '-';
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
+  const rounded = Math.round(seconds);
+  const m = Math.floor(rounded / 60);
+  const s = rounded % 60;
   if (m === 0) return `${s}s`;
   return `${m}m ${s}s`;
 }
@@ -147,6 +148,10 @@ function AdminDashboard() {
   }
 
   const { totals, today, live, averages, recent_games: recentGames } = stats;
+  const metrics = stats.metrics || {};
+  const events = metrics.event_counts || {};
+  const outcomes = metrics.round_outcomes || {};
+  const failures = Object.entries(metrics.failure_reasons || {}).sort((a, b) => b[1] - a[1]);
 
   return (
     <div className="adm-shell">
@@ -169,8 +174,52 @@ function AdminDashboard() {
         <Stat label="Games created (retained stats)" value={totals.games_created} />
         <Stat label="Games completed (retained stats)" value={totals.games_completed} />
         <Stat label="Player IDs recorded" value={totals.unique_players} />
-        <Stat label="Avg game duration" value={formatDuration(averages.game_duration_seconds)} />
+        <Stat label="Avg completed round" value={formatDuration(averages.game_duration_seconds)} />
         <Stat label="Saved task lists" value={totals.saved_task_lists} />
+      </section>
+
+      <section className="adm-card">
+        <h2>Setup and recovery</h2>
+        <p className="adm-empty">Metrics start {formatTime(metrics.since)}. Round duration excludes setup and prior rounds.</p>
+        <p className="adm-empty">The average uses {averages.duration_sample_count || 0} completed rounds with a known start. Legacy durations remain separate.</p>
+        <div className="adm-grid">
+          <Stat label="Avg setup per round" value={formatDuration(averages.setup_seconds)} />
+          <Stat label="Rejected room entries" value={events.join_rejected || 0} />
+          <Stat label="Rejected starts" value={events.start_rejected || 0} />
+          <Stat label="Disconnects" value={events.connection_closed || 0} />
+          <Stat label="Reconnects" value={events.player_reconnected || 0} />
+          <Stat label="Failed reconnects" value={events.reconnect_failed || 0} />
+          <Stat label="Rounds closed without a result" value={outcomes.abandoned || 0} />
+          <Stat label="Rounds lost at restart" value={outcomes.interrupted || 0} />
+        </div>
+        {failures.length > 0 && <div style={{ overflowX: 'auto' }}>
+          <table className="adm-table">
+            <thead><tr><th>Failure reason</th><th>Attempts</th></tr></thead>
+            <tbody>{failures.map(([reason, count]) => <tr key={reason}><td>{reason.replace(/_/g, ' ')}</td><td>{count}</td></tr>)}</tbody>
+          </table>
+        </div>}
+      </section>
+
+      <section className="adm-card">
+        <h2>Recent rounds</h2>
+        <p className="adm-empty">Close time includes idle time for abandoned rooms. A restart cannot establish the round end time.</p>
+        {(metrics.recent_rounds || []).length === 0 ? <p className="adm-empty">No new round records yet.</p> : (
+          <div style={{ overflowX: 'auto' }}>
+            <table className="adm-table">
+              <thead><tr><th>Room / round</th><th>Status</th><th>Players at start</th><th>Tasks / areas</th><th>Setup</th><th>First task</th><th>Round / close time</th><th>Start</th></tr></thead>
+              <tbody>{metrics.recent_rounds.map(round => <tr key={`${round.room_session_id}:${round.round_id}`}>
+                <td className="adm-mono">{round.room_code} / {round.round_number}</td>
+                <td title={round.end_reason || ''}>{round.outcome.replace(/_/g, ' ')}</td>
+                <td>{round.player_count_at_start}</td>
+                <td>{round.task_count_at_start} / {round.used_location_count}</td>
+                <td>{formatDuration(round.setup_seconds)}</td>
+                <td>{formatDuration(round.first_task_seconds)}</td>
+                <td>{formatDuration(round.duration_seconds)}</td>
+                <td title={formatTime(round.started_at)}>{relativeTime(round.started_at)}</td>
+              </tr>)}</tbody>
+            </table>
+          </div>
+        )}
       </section>
 
       <section className="adm-card">
@@ -245,7 +294,7 @@ function AdminDashboard() {
                   <td className="adm-mono">{g.room_code || '-'}</td>
                   <td>{outcomeLabel(g.end_state)}</td>
                   <td>{g.player_count}</td>
-                  <td>{formatDuration(g.duration_seconds)}</td>
+                  <td>{formatDuration(g.duration_seconds)}{g.duration_basis !== 'round_start' ? ' (legacy / unknown)' : ''}</td>
                   <td>{g.meetings_called}</td>
                   <td>{g.tasks_completed}</td>
                   <td>{g.cards_played}</td>

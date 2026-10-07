@@ -1,8 +1,10 @@
 import React, { useMemo, useState } from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
+import GameplayScreenshots from './GameplayScreenshots';
 import { VENUE_ROOMS, generateTasks } from './taskPools';
 import { saveGameDraft } from './gameDraft';
+import { CLEANUP_ROOMS } from './cleanupTasks';
 
 const VENUES = {
     apartment: 'Apartment', house: 'House', dorm: 'Dorm', office: 'Office',
@@ -11,14 +13,15 @@ const VENUES = {
 
 function initialOptions() {
     const params = new URLSearchParams(window.location.search);
-    const venue = Object.hasOwn(VENUES, params.get('venue')) ? params.get('venue') : 'apartment';
-    const movement = ['low', 'normal', 'active'].includes(params.get('movement')) ? params.get('movement') : 'normal';
-    const playerCount = Math.max(5, Math.min(15, Math.floor(Number(params.get('players')) || 8)));
+    const preset = params.get('preset') === 'cleanup' ? 'cleanup' : 'standard';
+    const venue = preset === 'cleanup' ? 'house' : Object.hasOwn(VENUES, params.get('venue')) ? params.get('venue') : 'apartment';
+    const movement = preset === 'cleanup' ? 'normal' : ['low', 'normal', 'active'].includes(params.get('movement')) ? params.get('movement') : 'normal';
+    const playerCount = Math.max(3, Math.min(15, Math.floor(Number(params.get('players')) || (preset === 'cleanup' ? 4 : 8))));
     const requestedRooms = params.getAll('room').map(room => room.trim()).filter(room => room && room.length <= 60).slice(0, 12);
     return {
-        venue, movement, playerCount,
-        taskStyle: ['standard', 'funny', 'mix'].includes(params.get('style')) ? params.get('style') : 'standard',
-        selectedRooms: requestedRooms.length >= 2 ? [...new Set(requestedRooms)] : defaultRooms(venue, movement),
+        venue, movement, playerCount, preset,
+        taskStyle: preset === 'cleanup' ? 'standard' : ['standard', 'funny', 'mix'].includes(params.get('style')) ? params.get('style') : 'standard',
+        selectedRooms: requestedRooms.length >= 2 ? [...new Set(requestedRooms)] : preset === 'cleanup' ? CLEANUP_ROOMS : defaultRooms(venue, movement),
     };
 }
 
@@ -38,6 +41,7 @@ function TaskGeneratorPage() {
     const [newRoom, setNewRoom] = useState('');
     const [status, setStatus] = useState('');
     const result = useMemo(() => generateTasks({ ...options, random: shuffle === 0 ? () => 0.42 : Math.random }), [options, shuffle]);
+    const isCleanup = options.preset === 'cleanup';
     const availableRooms = [...new Set([
         ...(options.movement === 'low' ? ['Station A', 'Station B'] : VENUE_ROOMS[options.venue]),
         ...options.selectedRooms,
@@ -49,6 +53,9 @@ function TaskGeneratorPage() {
     const update = (key, value) => {
         setStatus('');
         setOptions(previous => ({ ...previous, [key]: value,
+            ...(key === 'preset' ? { venue: value === 'cleanup' ? 'house' : 'apartment',
+                movement: 'normal', taskStyle: 'standard', playerCount: value === 'cleanup' ? 4 : 8,
+                selectedRooms: value === 'cleanup' ? CLEANUP_ROOMS : defaultRooms('apartment', 'normal') } : {}),
             ...(['venue', 'movement'].includes(key) ? {
                 selectedRooms: defaultRooms(key === 'venue' ? value : previous.venue, key === 'movement' ? value : previous.movement),
             } : {}),
@@ -71,6 +78,7 @@ function TaskGeneratorPage() {
     };
     const shareSetup = () => {
         const url = new URL('/among-us-irl-task-generator', window.location.origin);
+        if (isCleanup) url.searchParams.set('preset', 'cleanup');
         url.searchParams.set('venue', options.venue);
         url.searchParams.set('players', options.playerCount);
         url.searchParams.set('movement', options.movement);
@@ -81,7 +89,7 @@ function TaskGeneratorPage() {
     };
     const useTasks = event => {
         const saved = saveGameDraft({
-            name: `${VENUES[options.venue]} task pack`, tasks: result.tasks,
+            name: isCleanup ? 'Family cleanup task pack' : `${VENUES[options.venue]} task pack`, tasks: result.tasks,
             locations: result.rooms, playerCount: options.playerCount, recommendations: result.recommendations,
         });
         if (!saved) {
@@ -99,8 +107,8 @@ function TaskGeneratorPage() {
         <SeoPageLayout>
             <header className="seo-hero">
                 <p className="seo-eyebrow"><a href="/among-us-irl">Among Us IRL</a> / Task generator</p>
-                <h1 className="seo-h1">Among Us IRL task generator</h1>
-                <p className="seo-lead">Your rooms, your friends, one playable task pack. Choose the areas below and review the list, then carry it into a new Sus Party game. No account or download.</p>
+                <h1 className="seo-h1">{isCleanup ? 'Family cleanup task template' : 'Among Us IRL task generator'}</h1>
+                <p className="seo-lead">{isCleanup ? 'Real chores, secret roles, and a reason to suspect the person beside the laundry basket. This template uses common areas in a home. Review the jobs, then take the pack into Sus Party.' : 'Your rooms, your friends, one playable task pack. Choose the areas below and review the list, then carry it into a new Sus Party game. No account or download.'}</p>
                 <div className="seo-actions">
                     <a href="#generator-output" className="seo-btn--primary">See your task pack →</a>
                     <a href="/how-to-play-among-us-irl" className="seo-btn--secondary">See how the game works</a>
@@ -109,9 +117,16 @@ function TaskGeneratorPage() {
             <main className="seo-content">
                 <section className="seo-section" id="build">
                     <h2>Your game setup</h2>
-                    <p>A sample list is ready. Choose only the areas your group can use, then adjust the count and task style. The generator prepares groups of five to fifteen; the game itself has no fixed fifteen-player cap.</p>
+                    <p>A sample list is ready. Choose only the areas your group can use, then adjust the count and task style. The generator prepares groups of three to fifteen; the game itself has no fixed fifteen-player cap.</p>
                     <div className="seo-generator">
                         <div className="seo-generator__field">
+                            <label htmlFor="gen-preset">Task pack</label>
+                            <select id="gen-preset" value={options.preset} onChange={event => update('preset', event.target.value)}>
+                                <option value="standard">Party tasks</option>
+                                <option value="cleanup">Family cleanup</option>
+                            </select>
+                        </div>
+                        <div className="seo-generator__field" hidden={isCleanup}>
                             <label htmlFor="gen-venue">Venue</label>
                             <select id="gen-venue" value={options.venue} onChange={event => update('venue', event.target.value)}>
                                 {Object.entries(VENUES).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
@@ -119,11 +134,11 @@ function TaskGeneratorPage() {
                         </div>
                         <div className="seo-generator__field">
                             <label htmlFor="gen-players">Players: {options.playerCount}</label>
-                            <input id="gen-players" type="range" min="5" max="15" step="1" value={options.playerCount}
+                            <input id="gen-players" type="range" min="3" max="15" step="1" value={options.playerCount}
                                 onChange={event => update('playerCount', Number(event.target.value))} />
                             <p>The app requires at least three task entries per player. This list contains {result.tasks.length}.</p>
                         </div>
-                        <div className="seo-generator__field">
+                        <div className="seo-generator__field" hidden={isCleanup}>
                             <label htmlFor="gen-movement">Movement</label>
                             <select id="gen-movement" value={options.movement} onChange={event => update('movement', event.target.value)}>
                                 <option value="low">Seated tasks at two stations</option>
@@ -131,7 +146,7 @@ function TaskGeneratorPage() {
                                 <option value="active">Include more movement</option>
                             </select>
                         </div>
-                        <div className="seo-generator__field">
+                        <div className="seo-generator__field" hidden={isCleanup}>
                             <label htmlFor="gen-style">Task style</label>
                             <select id="gen-style" value={options.taskStyle} onChange={event => update('taskStyle', event.target.value)}>
                                 <option value="standard">Standard</option><option value="funny">Include funny tasks</option><option value="mix">Mix</option>
@@ -164,8 +179,8 @@ function TaskGeneratorPage() {
                         <span className="seo-output__badge">{result.tasks.length} tasks</span>
                     </div>
                     <h2 id="task-list-title">Your {result.tasks.length} tasks</h2>
-                    <p>Provide paper and pencils. Cross out any task that does not fit your space before the round.</p>
-                    {!ready && <p role="alert">Select at least two areas before you use this list in a game.</p>}
+                    <p>{isCleanup ? 'Review the jobs before play. Remove jobs that are already done or do not fit your home in host setup. Use another small chore as a replacement.' : 'Provide paper and pencils. Cross out any task that does not fit your space before the round.'}</p>
+                    {!ready && <p role="alert">Choose at least two areas and enough tasks for your group. Add areas or reduce the player count.</p>}
                     <div className="seo-output__actions">
                         {ready && <a href="/play?setup=generated" onClick={useTasks} className="seo-btn--primary">Use these tasks in a new game →</a>}
                         <button className="seo-btn--secondary" onClick={() => copy(taskText)}>Copy tasks</button>
@@ -195,12 +210,15 @@ function TaskGeneratorPage() {
                     <p>The host can adjust these settings before the room opens. The task goal reveals intruders rather than ending the game.</p>
                     <p>Keep this browser session open as you create the room so host setup can find your saved pack. Friends join from their own phone browsers with your room code.</p>
                 </section>
+                <GameplayScreenshots screens={['task-list', 'crew-task']} />
+
                 <section className="seo-section">
                     <h2>Sabotage stays inside the game</h2>
                     <p>Sus Party supplies sabotage cards. No physical locks, hidden household items, or blocked paths are required.</p>
                     <ul className="seo-checklist">{result.sabotages.map(idea => <li key={idea}>{idea}</li>)}</ul>
                 </section>
                 <nav className="seo-links" aria-label="Next steps">
+                    <a href="/make-cleaning-fun-for-kids">Play a family cleanup game →</a>
                     <a href="/among-us-irl-task-ideas">Choose tasks and plan your space →</a>
                     <a href="/how-to-play-among-us-irl">Read the rules and meeting flow →</a>
                     <a href="/among-us-irl">Plan your first game →</a>

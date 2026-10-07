@@ -1,6 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
+import GameplayScreenshots from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const SCHEMA = {
@@ -76,6 +77,8 @@ function SocialDeductionPage() {
                         the crew still has to vote them out. Read the <a href="/how-to-play-among-us-irl">round and vote rules</a> before your first game.
                     </p>
                 </section>
+                <GameplayScreenshots screens={['intruder-cards', 'vote']} />
+
                 <GameSetupCta title="Turn the rooms you already have into a game"
                     href="/among-us-irl-task-generator?venue=house&players=8&movement=normal" label="Build an eight-player house setup">
                     Choose your areas, review a task pack, then select “Use these tasks in a new game.” Create the room and select “Import generated tasks” in host setup.

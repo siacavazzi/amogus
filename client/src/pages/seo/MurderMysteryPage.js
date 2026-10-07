@@ -1,6 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
+import GameplayScreenshots from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const SETUP_URL = '/among-us-irl-task-generator?venue=house&players=10&movement=normal&style=standard';
@@ -49,6 +50,8 @@ function MurderMysteryPage() {
                         Every accusation comes from your round. The crew must vote out every intruder to win.
                     </p>
                 </section>
+                <GameplayScreenshots screens={['eliminated-player', 'vote']} />
+
                 <section className="seo-section">
                     <h2>Make your home the scene of the crime</h2>
                     <p>

@@ -3,7 +3,8 @@ const PAGES = new Set(['/', '/play', '/among-us-irl', '/how-to-play-among-us-irl
     '/among-us-irl-task-ideas', '/among-us-irl-task-generator', '/social-deduction-games',
     '/among-us-birthday-party', '/party-games-for-10-people', '/party-games-for-adults',
     '/murder-mystery-party-game', '/birthday-party-games-for-adults', '/game-night-ideas',
-    '/how-to-play', '/faq', '/about']);
+    '/make-cleaning-fun-for-kids', '/traitors-at-home', '/party-games-on-your-phone',
+    '/sleepover-games-for-teens', '/indoor-family-reunion-games', '/how-to-play', '/faq', '/about']);
 const SOURCES = new Set(['direct', 'google', 'bing', 'chatgpt', 'facebook', 'instagram',
     'snapchat', 'reddit', 'youtube', 'shared-link', 'other', 'unknown']);
 

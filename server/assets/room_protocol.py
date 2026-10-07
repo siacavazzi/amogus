@@ -11,22 +11,26 @@ def minimum_tasks(game):
     return max(len(game.players) * 3, 10)
 
 
-def start_error(game):
+def start_error_detail(game):
     if game.game_running:
-        return 'The game already started.'
+        return 'already_started', 'The game already started.'
     if not game.is_open:
-        return 'Open the room before you start the game.'
+        return 'room_not_open', 'Open the room before you start the game.'
     if game.numIntruders < 1:
-        return 'At least 1 intruder is required.'
+        return 'no_intruders', 'At least 1 intruder is required.'
     minimum_players = game.numIntruders * 2 + 1
     if len(game.players) < minimum_players:
-        return f'Need at least {minimum_players} players for {game.numIntruders} intruder(s).'
+        return 'too_few_players', f'Need at least {minimum_players} players for {game.numIntruders} intruder(s).'
     if len({loc for loc in game.locations if loc and loc.lower() != 'other'}) < 2:
-        return 'Add at least 2 locations before you start the game.'
+        return 'too_few_locations', 'Add at least 2 locations before you start the game.'
     tasks = game.collaborative_tasks
     if len(tasks) < minimum_tasks(game):
-        return f'Need at least {minimum_tasks(game)} tasks. The room has {len(tasks)}.'
-    return None
+        return 'too_few_tasks', f'Need at least {minimum_tasks(game)} tasks. The room has {len(tasks)}.'
+    return None, None
+
+
+def start_error(game):
+    return start_error_detail(game)[1]
 
 
 def lobby_state(game):

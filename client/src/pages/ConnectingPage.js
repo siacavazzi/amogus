@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useContext } from 'react';
+import { DataContext } from '../GameContext';
 import { Wifi, Radio, Zap, Signal, Activity } from 'lucide-react';
 
 // Floating particle component
@@ -60,6 +61,7 @@ const DataStream = ({ left, delay }) => (
 );
 
 function ConnectingPage() {
+  const { roomCode } = useContext(DataContext);
   const [progress, setProgress] = useState(0);
   const [showContent, setShowContent] = useState(false);
   const [statusText, setStatusText] = useState('Initializing...');
@@ -297,10 +299,10 @@ function ConnectingPage() {
         {/* Status text */}
         <div className="text-center">
           <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 mb-2">
-            Connecting
+            {roomCode ? 'Reconnect to your room' : 'Connect to Sus Party'}
           </h2>
           <p className={`text-sm transition-all duration-300 ${isExtended ? 'text-amber-400' : 'text-gray-400'}`}>
-            {statusText}
+            {roomCode ? 'Connection lost. We will try to reconnect you.' : statusText}
           </p>
         </div>
 

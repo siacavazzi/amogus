@@ -10,7 +10,7 @@ import IntrudersRevealedDisplay from './components/IntrudersRevealedDisplay';
 import TauntNotification from './components/TauntNotification';
 import { markHasPlayedGame } from './tutorial/tutorialStorage';
 import { isMobile as isMobileDevice } from 'react-device-detect';
-import { getRoomCodeFromSearch } from './utils/inviteLinks';
+import { getRoomCodeFromSearch, clearRoomCodeFromUrl } from './utils/inviteLinks';
 import { createRequestId, emitVolatileWithAck, SOCKET_COMMAND_TIMEOUT_MS } from './utils/socketCommand';
 
 // Allow URL param override for testing: ?mobile=true or ?mobile=false
@@ -38,6 +38,7 @@ export default function GameContext({ children }) {
     const [roomRevision, setRoomRevision] = useState(-1);
     const [roundId, setRoundId] = useState(null);
     const [lobbyState, setLobbyState] = useState(null);
+    const [roomEntryStatus, setRoomEntryStatus] = useState(null);
 
     // united states
     const [gameState, setGameState] = useState({}); // <--- USE this PLEASE we need to refactor this shit
@@ -91,6 +92,7 @@ export default function GameContext({ children }) {
 
     // Reset all state to initial values (keeps connection)
     const resetGameState = () => {
+        setRoomEntryStatus(null);
         setGameState({})
         setPlayers([])
         setPlayerState({
@@ -412,6 +414,7 @@ export default function GameContext({ children }) {
 
     useEffect(() => {
         socketRef.current = io(ENDPOINT, {
+            auth: (callback) => callback({ utc_offset_minutes: -new Date().getTimezoneOffset() }),
             reconnection: true,
             reconnectionAttempts: 10,
             reconnectionDelay: 2000,
@@ -444,9 +447,6 @@ export default function GameContext({ children }) {
 
             if (inviteRoomCode && !playerId && autoJoinInviteRef.current !== inviteRoomCode) {
                 autoJoinInviteRef.current = inviteRoomCode;
-                // Remove the invite param immediately so reloads don't re-trigger this
-                const cleanUrl = window.location.pathname + window.location.hash;
-                window.history.replaceState(null, '', cleanUrl);
                 socketRef.current.emit('join_game', {
                     room_code: inviteRoomCode,
                     player_id: undefined,
@@ -465,6 +465,9 @@ export default function GameContext({ children }) {
 
         // Room management events
         socketRef.current.on('game_created', (data) => {
+            setRoomEntryStatus(null);
+            autoJoinInviteRef.current = null;
+            clearRoomCodeFromUrl();
             console.log('Game created:', data);
             if (data.room_code && data.room_code !== roomVersionRef.current.roomCode) {
                 roomVersionRef.current = { roomCode: data.room_code, revision: -1, roundId: null };
@@ -493,6 +496,8 @@ export default function GameContext({ children }) {
         });
 
         socketRef.current.on('game_joined', (data) => {
+            setRoomEntryStatus(null);
+            clearRoomCodeFromUrl();
             console.log('Joined game:', data, 'is_creator:', data.is_creator);
             if (data.room_code && data.room_code !== roomVersionRef.current.roomCode) {
                 roomVersionRef.current = { roomCode: data.room_code, revision: -1, roundId: null };
@@ -536,30 +541,35 @@ export default function GameContext({ children }) {
 
         socketRef.current.on('rejoin_failed', (data) => {
             console.log('Rejoin failed:', data);
+            const previousRoomCode = localStorage.getItem('room_code');
             // Clear stale session data
             localStorage.removeItem('player_id');
             localStorage.removeItem('room_code');
             sessionStorage.removeItem('is_room_creator');
             resetGameState();
+            setRoomEntryStatus({ code: 'session_not_found', room_code: previousRoomCode,
+                message: data.message || 'Your previous session is no longer available. Ask the host for a new invite.' });
         });
 
         socketRef.current.on('error', (data) => {
             console.error('Socket error:', data);
             const inviteRoomCode = autoJoinInviteRef.current;
+            if (data.scope === 'room_entry') {
+                setRoomEntryStatus({ ...data, room_code: data.room_code || inviteRoomCode });
+                return;
+            }
             // Check if this is a "game/room not found" error - clear stale data
             const msg = (data.message || '').toLowerCase();
-            if (inviteRoomCode || msg.includes('game not found') || msg.includes('not in a game room')) {
+            if (msg.includes('game not found') || msg.includes('not in a game room')) {
+                const previousRoomCode = roomVersionRef.current.roomCode;
                 localStorage.removeItem('player_id');
                 localStorage.removeItem('room_code');
                 sessionStorage.removeItem('is_room_creator');
                 resetGameState();
-            }
-            if (inviteRoomCode) {
-                autoJoinInviteRef.current = null;
-                // Ensure the param is gone even if the replaceState on attempt didn't fire
-                const cleanUrl = window.location.pathname + window.location.hash;
-                window.history.replaceState(null, '', cleanUrl);
-                isMobile && setDialog({ title: "Room Unavailable", body: data.message || "That room link is no longer available." });
+                if (previousRoomCode) {
+                    setRoomEntryStatus({ code: 'room_not_found', room_code: previousRoomCode,
+                        message: 'Your room is no longer available. Ask the host for a new invite.' });
+                }
             }
             // Only show the error dialog if we're actually still in a room.
             // Suppresses spurious "Game not found" errors that fire after the
@@ -831,6 +841,7 @@ export default function GameContext({ children }) {
 
         // Handle 'player_id' event
         socketRef.current.on('player_id', (data) => {
+            setRoomEntryStatus(null);
             console.log('Received player_id:', data);
             if (data && data.player_id) {
                 localStorage.setItem('player_id', data.player_id);
@@ -984,6 +995,8 @@ export default function GameContext({ children }) {
         roomRevision,
         roundId,
         lobbyState,
+        roomEntryStatus,
+        setRoomEntryStatus,
         resetState,
         completeTask,
         taskCompletionPending,
@@ -1030,6 +1043,7 @@ export default function GameContext({ children }) {
         roomRevision,
         roundId,
         lobbyState,
+        roomEntryStatus,
         taskCreationMode,
         resetVotes,
         intrudersRevealed,

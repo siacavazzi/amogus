@@ -102,7 +102,7 @@ const PageController = () => {
         //     return;
         // }
 
-        if ((!playerState || !playerState?.username) && !running) {
+        if ((!playerState?.username || !(playerState?.playerId || playerState?.player_id)) && !running) {
             setCurrentPage("login");
             return;
         }

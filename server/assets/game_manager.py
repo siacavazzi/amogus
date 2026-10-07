@@ -1,4 +1,5 @@
 import os
+import logging
 import random
 import string
 import time
@@ -78,13 +79,14 @@ class GameManager:
             
             # Hook end-of-game reporting via Game's optional callback
             game.on_end_callback = self.stats_tracker.record_game_ended
+            game.on_abort_callback = self.stats_tracker.record_round_abandoned
             game.acquisition = StatsTracker.normalize_acquisition(acquisition)
 
             self.games[room_code] = game
             self.sid_to_game[sid] = room_code
 
         # Record outside the lock (StatsTracker has its own lock)
-        self.stats_tracker.record_game_created(room_code, game.acquisition)
+        self.stats_tracker.record_game_created(room_code, game.acquisition, game)
         return room_code, game
 
     def get_game(self, room_code):
@@ -132,11 +134,11 @@ class GameManager:
             if player_id in self.player_to_game:
                 del self.player_to_game[player_id]
 
-    def remove_game(self, room_code):
+    def remove_game(self, room_code, reason='room_removed'):
         """Remove a game (alias for delete_game)."""
-        self.delete_game(room_code)
+        self.delete_game(room_code, reason)
 
-    def delete_game(self, room_code):
+    def delete_game(self, room_code, reason='room_removed'):
         """Delete a game and clean up all references."""
         with self.lock:
             if room_code not in self.games:
@@ -163,6 +165,11 @@ class GameManager:
             # Delete the game
             del self.games[room_code]
             print(f"Game {room_code} deleted")
+        with game.state_lock:
+            try:
+                self.stats_tracker.record_room_closed(game, reason)
+            except Exception:
+                logging.getLogger('app_logger').exception('Room close stats write failed')
 
     def get_all_games(self):
         """Get info about all active games."""
@@ -184,8 +191,10 @@ class GameManager:
         completed = snapshot['completed_games']
         completed_today = [g for g in completed if g.get('ended_at') and now - g['ended_at'] <= day_seconds]
 
-        durations = [g['duration_seconds'] for g in completed if g.get('duration_seconds')]
-        avg_duration = int(sum(durations) / len(durations)) if durations else 0
+        durations = [g['duration_seconds'] for g in completed
+                     if g.get('duration_basis') == 'round_start' and g.get('duration_seconds') is not None]
+        avg_duration = int(sum(durations) / len(durations)) if durations else None
+        setup_times = [g['setup_seconds'] for g in snapshot['round_history'] if g.get('setup_seconds') is not None]
 
         # Live games right now
         live_games = []
@@ -221,10 +230,18 @@ class GameManager:
             },
             'averages': {
                 'game_duration_seconds': avg_duration,
+                'duration_sample_count': len(durations),
+                'setup_seconds': int(sum(setup_times) / len(setup_times)) if setup_times else None,
             },
             'recent_games': list(reversed(completed[-25:])),
             'acquisition': sorted(snapshot['acquisition'], key=lambda row: row['rooms_created'], reverse=True),
             'acquisition_since': snapshot['acquisition_since'],
+            'metrics': {
+                'schema_version': snapshot['metrics_schema_version'], 'since': snapshot['metrics_since'],
+                'event_counts': snapshot['event_counts'], 'failure_reasons': snapshot['failure_reasons'],
+                'round_outcomes': snapshot['round_outcomes'],
+                'recent_rounds': list(reversed(snapshot['round_history'][-25:])),
+            },
         }
 
     def _start_cleanup_thread(self):
@@ -256,4 +273,4 @@ class GameManager:
                 self.socketio.emit('room_disbanded', {
                     'message': 'Room closed due to inactivity'
                 }, room=room_code)
-                self.delete_game(room_code)
+                self.delete_game(room_code, reason='inactivity')

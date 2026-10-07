@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import { isMobile as isMobileDevice } from 'react-device-detect';
 import { DataContext } from '../GameContext';
 import { Users, Plus, ArrowRight, HelpCircle, Zap, Shield, Skull, Wifi, Monitor, Radio, Speaker, Smartphone, AlertTriangle, ChevronRight, Sparkles, GraduationCap } from 'lucide-react';
@@ -15,6 +15,8 @@ import { PrimaryButton } from '../components/ui';
 import { Card } from '../components/ui';
 import { dismissTutorialPrompt, shouldRecommendTutorial } from '../tutorial/tutorialStorage';
 import { getAcquisition } from '../seo/discovery';
+import RoomEntryNotice from '../components/RoomEntryNotice';
+import { getRoomCodeFromSearch, clearRoomCodeFromUrl } from '../utils/inviteLinks';
 
 // Feature badge component
 const FeatureBadge = ({ icon: Icon, text, delay }) => (
@@ -28,13 +30,18 @@ const FeatureBadge = ({ icon: Icon, text, delay }) => (
 );
 
 function LobbyPage() {
-    const [inputRoomCode, setInputRoomCode] = useState('');
+    const [inputRoomCode, setInputRoomCode] = useState(getRoomCodeFromSearch);
+    const entryTimeout = useRef(null);
     const [isCreating, setIsCreating] = useState(false);
     const [isJoining, setIsJoining] = useState(false);
     const [error, setError] = useState('');
     const [showContent, setShowContent] = useState(false);
     const [showTutorialPrompt, setShowTutorialPrompt] = useState(false);
-    const { socket } = useContext(DataContext);
+    const { socket, roomEntryStatus, setRoomEntryStatus } = useContext(DataContext);
+
+    useEffect(() => {
+        if (roomEntryStatus?.room_code) setInputRoomCode(roomEntryStatus.room_code);
+    }, [roomEntryStatus]);
 
     // Resolve effective device mode (matches GameContext / PageController logic)
     const mobileOverride = new URLSearchParams(window.location.search).get('mobile');
@@ -58,20 +65,22 @@ function LobbyPage() {
     }, []);
 
     useEffect(() => {
-        setShowTutorialPrompt(isMobile && shouldRecommendTutorial());
-    }, [isMobile]);
+        setShowTutorialPrompt(isMobile && !getRoomCodeFromSearch() && !roomEntryStatus && shouldRecommendTutorial());
+    }, [isMobile, roomEntryStatus]);
 
     // Listen for errors and success to reset the button states
     useEffect(() => {
         if (!socket) return;
 
         const handleError = (data) => {
-            setError(data.message || 'An error occurred');
+            clearTimeout(entryTimeout.current);
+            setError(data.scope === 'room_entry' ? '' : data.message || 'An error occurred');
             setIsJoining(false);
             setIsCreating(false);
         };
 
         const handleSuccess = () => {
+            clearTimeout(entryTimeout.current);
             setIsJoining(false);
             setIsCreating(false);
             setError('');
@@ -80,15 +89,20 @@ function LobbyPage() {
         socket.on('error', handleError);
         socket.on('game_created', handleSuccess);
         socket.on('game_joined', handleSuccess);
+        socket.on('rejoin_failed', handleSuccess);
 
         return () => {
             socket.off('error', handleError);
             socket.off('game_created', handleSuccess);
             socket.off('game_joined', handleSuccess);
+            socket.off('rejoin_failed', handleSuccess);
+            clearTimeout(entryTimeout.current);
         };
     }, [socket]);
 
     const handleCreateGame = () => {
+        setRoomEntryStatus(null);
+        clearRoomCodeFromUrl();
         setIsCreating(true);
         setError('');
         socket.emit('create_game', { acquisition: getAcquisition() });
@@ -99,22 +113,40 @@ function LobbyPage() {
     };
 
     const handleJoinGame = (e) => {
-        e.preventDefault();
+        e?.preventDefault();
         if (inputRoomCode.length !== 4) {
             setError('Room code must be 4 letters');
             return;
         }
         setIsJoining(true);
         setError('');
+        setRoomEntryStatus(null);
         const playerId = localStorage.getItem('player_id');
-        socket.emit('join_game', { 
-            room_code: inputRoomCode.toUpperCase(),
-            player_id: playerId || undefined
-        });
-        
-        setTimeout(() => {
+        if (playerId && localStorage.getItem('room_code') === inputRoomCode) {
+            socket.emit('rejoin', { player_id: playerId });
+        } else {
+            socket.emit('join_game', { room_code: inputRoomCode });
+        }
+        clearTimeout(entryTimeout.current);
+        entryTimeout.current = setTimeout(() => {
             setIsJoining(false);
+            setRoomEntryStatus({ code: 'connection_timeout', room_code: inputRoomCode,
+                message: 'The room did not respond. Check your internet connection, then try again.' });
         }, 10000);
+    };
+
+    const changeCode = () => {
+        setRoomEntryStatus(null);
+        setError('');
+        clearRoomCodeFromUrl();
+        document.getElementById('game-entry-code')?.select();
+    };
+
+    const updateCode = event => {
+        setInputRoomCode(event.target.value.toUpperCase().replace(/[^A-Za-z]/g, '').slice(0, 4));
+        setRoomEntryStatus(null);
+        setError('');
+        clearRoomCodeFromUrl();
     };
 
     const handleSkipTutorialPrompt = () => {
@@ -123,7 +155,7 @@ function LobbyPage() {
     };
 
     return (
-        <div className={`fixed inset-0 flex ${isReactorDevice ? 'items-start justify-center overflow-y-auto py-8' : 'items-center justify-center overflow-hidden'} bg-gray-950`}>
+        <div className="fixed inset-0 flex items-start justify-center overflow-y-auto py-8 bg-gray-950">
             {showTutorialPrompt && (
                 <div className="fixed inset-0 z-40 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
                     <div className="w-full max-w-lg rounded-3xl border border-indigo-500/30 bg-gray-950/95 shadow-2xl shadow-indigo-900/30 overflow-hidden">
@@ -251,7 +283,9 @@ function LobbyPage() {
                         {/* Left column: join card */}
                         <div>
                             <Card variant="default" padding="default">
-                                {error && (
+                                <RoomEntryNotice status={roomEntryStatus} busy={isJoining} onRetry={() => handleJoinGame()}
+                        onChangeCode={changeCode} />
+                    {error && (
                                     <div className="mb-5 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-center text-sm flex items-center justify-center gap-2 animate-fadeIn">
                                         <Skull size={16} />
                                         {error}
@@ -282,10 +316,7 @@ function LobbyPage() {
                                                 type="text"
                                                 id="game-entry-code"
                                                 value={inputRoomCode}
-                                                onChange={(e) => {
-                                                    const value = e.target.value.toUpperCase().replace(/[^A-Za-z]/g, '').slice(0, 4);
-                                                    setInputRoomCode(value);
-                                                }}
+                                                onChange={updateCode}
                                                 className="w-full px-6 py-4 bg-gray-800/80 border-2 border-gray-700/80 rounded-2xl text-white text-center text-3xl font-mono tracking-[0.5em] uppercase focus:outline-none focus:border-emerald-500/50 focus:bg-gray-800 transition-all placeholder:text-gray-600 placeholder:tracking-[0.3em]"
                                                 placeholder="XXXX"
                                                 maxLength={4}
@@ -409,7 +440,9 @@ function LobbyPage() {
                 ) : (
                 <Card variant="default" padding="default">
                     {/* Error message */}
-                    {error && (
+                    <RoomEntryNotice status={roomEntryStatus} busy={isJoining} onRetry={() => handleJoinGame()}
+                                    onChangeCode={changeCode} />
+                                {error && (
                         <div className="mb-5 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-center text-sm flex items-center justify-center gap-2 animate-fadeIn">
                             <Skull size={16} />
                             {error}
@@ -445,10 +478,7 @@ function LobbyPage() {
                                     type="text"
                                     id="game-entry-code"
                                     value={inputRoomCode}
-                                    onChange={(e) => {
-                                        const value = e.target.value.toUpperCase().replace(/[^A-Za-z]/g, '').slice(0, 4);
-                                        setInputRoomCode(value);
-                                    }}
+                                    onChange={updateCode}
                                     className="w-full px-6 py-4 bg-gray-800/80 border-2 border-gray-700/80 rounded-2xl text-white text-center text-3xl font-mono tracking-[0.5em] uppercase focus:outline-none focus:border-emerald-500/50 focus:bg-gray-800 transition-all placeholder:text-gray-600 placeholder:tracking-[0.3em]"
                                     placeholder="XXXX"
                                     maxLength={4}

@@ -9,6 +9,8 @@
  *   active – involves more walking / quick movement
  */
 
+import { CLEANUP_TASKS } from './cleanupTasks';
+
 const TASKS = {
     // ── Any venue / universal ───────────────────────────────────────────────
     any: [
@@ -211,8 +213,8 @@ const OBSERVATION_TASKS = [
     'Write the current time shown on your phone.',
 ].map(task => ({ task, movement: 'low' }));
 
-function generateTasks({ venue = 'apartment', playerCount = 8, movement = 'normal', taskStyle = 'standard', selectedRooms, random = Math.random }) {
-    const players = Math.max(5, Math.min(15, Number(playerCount) || 8));
+function generateTasks({ venue = 'apartment', playerCount = 8, movement = 'normal', taskStyle = 'standard', preset = 'standard', selectedRooms, random = Math.random }) {
+    const players = Math.max(3, Math.min(15, Number(playerCount) || 8));
     const rooms = [...new Set((selectedRooms || VENUE_ROOMS[venue] || VENUE_ROOMS.other)
         .map(room => room.trim()).filter(Boolean))];
     if (!rooms.length) return { tasks: [], rooms: [], sabotages: [], recommendations: {} };
@@ -233,8 +235,12 @@ function generateTasks({ venue = 'apartment', playerCount = 8, movement = 'norma
     const pools = rooms.map(location => {
         const specific = TASKS[roomKeys[location]] || [];
         const humor = taskStyle === 'funny' || taskStyle === 'mix' ? TASKS.funny : [];
-        const entries = [...specific, ...OBSERVATION_TASKS, ...humor].filter(task =>
+        const entries = (preset === 'cleanup'
+            ? [...(CLEANUP_TASKS[location] || []), ...CLEANUP_TASKS.any].map(task => ({ task, movement: 'normal' }))
+            : [...specific, ...OBSERVATION_TASKS, ...humor]).filter(task =>
+            preset === 'cleanup' || (
             movement === 'low' ? task.movement === 'low' : movement === 'active' || task.movement !== 'active'
+            )
         );
         const seen = new Set();
         return shuffleWithRandom(entries.filter(({ task }) => {
@@ -244,7 +250,7 @@ function generateTasks({ venue = 'apartment', playerCount = 8, movement = 'norma
         }).map(task => ({ ...task, location })));
     });
     const tasks = [];
-    const count = Math.max(20, players * 3);
+    const count = Math.max(preset === 'cleanup' ? 24 : 20, players * 3);
     for (let index = 0; index < count; index++) {
         const task = pools[index % rooms.length][Math.floor(index / rooms.length)];
         if (task) tasks.push(task);
@@ -256,7 +262,7 @@ function generateTasks({ venue = 'apartment', playerCount = 8, movement = 'norma
         recommendations: {
             intruderCount: players >= 10 ? 2 : 1,
             meetingSeconds: 90,
-            taskGoalPerCrewmate: 5,
+            taskGoalPerCrewmate: preset === 'cleanup' ? 2 : 5,
         },
     };
 }

@@ -1,5 +1,20 @@
 /* Article layouts and the task generator use the shared site tokens. */
 .seo-shell { position: relative; }
+.seo-gameplay { margin: 28px 0; }
+.seo-gameplay__screens { display: grid; grid-template-columns: repeat(2, minmax(0, 280px)); gap: 24px; align-items: start; }
+.seo-gameplay__screens--single { grid-template-columns: minmax(0, 280px); }
+.seo-gameplay__screens--wide { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.seo-gameplay__figure { min-width: 0; margin: 0; }
+.seo-gameplay__figure a { display: block; border: 1px solid var(--site-line); border-radius: 8px; overflow: hidden; }
+.seo-gameplay__figure a:focus-visible { outline: 2px solid var(--site-link); outline-offset: 4px; }
+.seo-gameplay__figure img { display: block; width: 100%; height: auto; }
+.seo-gameplay__figure figcaption { color: var(--site-body); font-size: .86rem; line-height: 1.5; margin-top: 12px; }
+.seo-gameplay .seo-gameplay__note { color: var(--site-muted); margin: 12px 0 0; font-size: .75rem; line-height: 1.5; }
+@media (max-width: 640px) {
+    .seo-gameplay__screens { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 12px; }
+    .seo-gameplay__figure { flex: 0 0 min(260px, calc(100% - 24px)); scroll-snap-align: start; }
+    .seo-gameplay__screens--single .seo-gameplay__figure { flex-basis: min(280px, 100%); }
+}
 .seo-hero, .seo-content { width: calc(100% - 80px); max-width: var(--site-measure); margin: 0 auto; }
 .seo-hero { padding: 52px 0 28px; }
 .seo-eyebrow { color: var(--site-muted); font-size: .83rem; margin: 0 0 22px; letter-spacing: 0; line-height: 1.5; }

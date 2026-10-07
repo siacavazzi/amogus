@@ -5,7 +5,7 @@ function validDraft(draft) {
     return draft && draft.version === 1 && Number.isFinite(draft.createdAt) &&
         Date.now() - draft.createdAt <= MAX_AGE_MS && draft.createdAt <= Date.now() &&
         typeof draft.name === 'string' && draft.name.length <= 100 &&
-        Number.isInteger(draft.playerCount) && draft.playerCount >= 5 && draft.playerCount <= 15 &&
+        Number.isInteger(draft.playerCount) && draft.playerCount >= 3 && draft.playerCount <= 15 &&
         Array.isArray(draft.locations) && draft.locations.length >= 2 && draft.locations.length <= 12 &&
         draft.locations.every(room => typeof room === 'string' && room.trim() && room.length <= 60) &&
         Array.isArray(draft.tasks) && draft.tasks.length >= draft.playerCount * 3 && draft.tasks.length <= 120 &&

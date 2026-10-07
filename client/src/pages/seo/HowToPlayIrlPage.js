@@ -1,6 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
+import GameplayScreenshots from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const SCHEMA = {
@@ -150,6 +151,8 @@ function HowToPlayIrlPage() {
                     </p>
                 </section>
 
+                <GameplayScreenshots screens={['host-setup', 'party-lobby']} />
+
                 <section className="seo-section" id="roles">
                     <p className="seo-section__kicker">Roles</p>
                     <h2>What each side does</h2>
@@ -175,6 +178,8 @@ function HowToPlayIrlPage() {
                         Keep sabotage inside the app. Use shared, host-approved materials for physical tasks.
                     </p>
                 </section>
+
+                <GameplayScreenshots screens={['crew-task', 'intruder-objective']} />
 
                 <section className="seo-section" id="sample-round">
                     <p className="seo-section__kicker">Sample round</p>
@@ -241,6 +246,8 @@ function HowToPlayIrlPage() {
                         <li>Eliminated players do not vote in later meetings.</li>
                     </ul>
                 </section>
+
+                <GameplayScreenshots screens={['meeting-ready', 'vote']} />
 
                 <section className="seo-section" id="win-conditions">
                     <p className="seo-section__kicker">Win conditions</p>

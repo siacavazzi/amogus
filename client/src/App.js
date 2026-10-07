@@ -18,6 +18,11 @@ import AdultPartyPage from './pages/seo/AdultPartyPage';
 import MurderMysteryPage from './pages/seo/MurderMysteryPage';
 import AdultBirthdayPage from './pages/seo/AdultBirthdayPage';
 import GameNightPage from './pages/seo/GameNightPage';
+import FamilyCleanupPage from './pages/seo/FamilyCleanupPage';
+import TraitorsAtHomePage from './pages/seo/TraitorsAtHomePage';
+import PhonePartyPage from './pages/seo/PhonePartyPage';
+import SleepoverPage from './pages/seo/SleepoverPage';
+import FamilyReunionPage from './pages/seo/FamilyReunionPage';
 import { getRoomCodeFromSearch } from './utils/inviteLinks';
 import { captureAcquisition } from './seo/discovery';
 
@@ -26,6 +31,10 @@ const StylePreview = lazy(() => import('./preview/StylePreview'));
 function getRoute() {
   const roomCode = getRoomCodeFromSearch();
   const normalizedPath = window.location.pathname.replace(/\/+$/, '') || '/';
+
+  if (normalizedPath === '/make-cleaning-fun-for-kids' || normalizedPath.startsWith('/make-cleaning-fun-for-kids/')) {
+    return 'family-cleanup';
+  }
 
   if (
     normalizedPath === '/play' ||
@@ -99,6 +108,22 @@ function getRoute() {
     return 'game-night';
   }
 
+  if (normalizedPath === '/traitors-at-home' || normalizedPath.startsWith('/traitors-at-home/')) {
+    return 'traitors-at-home';
+  }
+
+  if (normalizedPath === '/party-games-on-your-phone' || normalizedPath.startsWith('/party-games-on-your-phone/')) {
+    return 'phone-party';
+  }
+
+  if (normalizedPath === '/sleepover-games-for-teens' || normalizedPath.startsWith('/sleepover-games-for-teens/')) {
+    return 'sleepover';
+  }
+
+  if (normalizedPath === '/indoor-family-reunion-games' || normalizedPath.startsWith('/indoor-family-reunion-games/')) {
+    return 'family-reunion';
+  }
+
   return 'landing';
 }
 
@@ -161,6 +186,11 @@ function App() {
   if (route === 'murder-mystery') return <MurderMysteryPage />;
   if (route === 'adult-birthday') return <AdultBirthdayPage />;
   if (route === 'game-night') return <GameNightPage />;
+  if (route === 'family-cleanup') return <FamilyCleanupPage />;
+  if (route === 'traitors-at-home') return <TraitorsAtHomePage />;
+  if (route === 'phone-party') return <PhonePartyPage />;
+  if (route === 'sleepover') return <SleepoverPage />;
+  if (route === 'family-reunion') return <FamilyReunionPage />;
 
   return <LandingPage />;
 }

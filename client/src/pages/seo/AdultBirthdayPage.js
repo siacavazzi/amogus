@@ -1,6 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
+import GameplayScreenshots from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const SETUP_URL = '/among-us-irl-task-generator?venue=house&players=10&movement=normal&style=mix';
@@ -49,6 +50,8 @@ function AdultBirthdayPage() {
                         table something to talk about, including the friends who just met.
                     </p>
                 </section>
+                <GameplayScreenshots screens={['party-lobby', 'vote']} />
+
                 <section className="seo-section">
                     <h2>Prepare before the doorbell rings</h2>
                     <ul className="seo-list">

@@ -14,7 +14,7 @@ from assets.card import Card  # noqa: E402
 
 
 class NoopStatsTracker:
-    def record_game_created(self, room_code, acquisition=None):
+    def record_game_created(self, room_code, acquisition=None, game=None):
         pass
 
     def record_game_started(self, game):
@@ -24,6 +24,15 @@ class NoopStatsTracker:
         pass
 
     def record_game_ended(self, game):
+        pass
+
+    def record_event(self, *args, **kwargs):
+        pass
+
+    def record_round_abandoned(self, game, reason):
+        pass
+
+    def record_room_closed(self, game, reason):
         pass
 
 

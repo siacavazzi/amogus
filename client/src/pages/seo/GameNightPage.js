@@ -1,6 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
+import GameplayScreenshots from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const SETUP_URL = '/among-us-irl-task-generator?venue=apartment&players=8&movement=normal&style=mix';
@@ -14,8 +15,8 @@ const SCHEMA = {
 
 function GameNightPage() {
     usePageMeta({
-        title: 'Game Night Idea: Play Sus Party at Home',
-        description: 'Host a game night with secret roles, real tasks, and suspicious friends. Sus Party handles roles and votes so the host can play too. Free in your phone browser.',
+        title: 'Sus Party | Game Night with No Dedicated Moderator',
+        description: 'Want a game like Mafia or Werewolf without a dedicated moderator? Play Sus Party with secret roles, real tasks, and app-counted votes. The host plays too.',
         canonical: 'https://susparty.com/game-night-ideas', schema: SCHEMA,
     });
 
@@ -36,6 +37,21 @@ function GameNightPage() {
                 </div>
             </header>
             <main className="seo-content">
+                <section className="seo-section">
+                    <h2>A game like Mafia or Werewolf without a dedicated moderator</h2>
+                    <p>
+                        If your group likes hidden roles but nobody wants to sit out as the narrator,
+                        try Sus Party. The app assigns private roles, tracks task progress, and counts
+                        votes. You prepare the room and explain the rules, then take a role alongside your friends.
+                    </p>
+                    <p>
+                        Sus Party has its own rules and a physical task map. Crew members have jobs
+                        to complete; intruders use those jobs as cover. What people do between meetings
+                        gives the group something to question when it is time to vote.
+                    </p>
+                </section>
+                <GameplayScreenshots screens={['crew-task', 'vote']} />
+
                 <section className="seo-section">
                     <h2>Set up the spaces before friends arrive</h2>
                     <p>

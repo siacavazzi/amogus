@@ -8550,3 +8550,58 @@
 2026-10-06 16:07:35,486 - app_logger - INFO -  * DEV MODE: SSL disabled
 2026-10-06 16:07:35,486 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.59:5001
 2026-10-06 16:44:01,926 - app_logger - INFO - Client connected: m6jwRJGkp3HGi2fEAAAB
+2026-10-06 16:44:46,953 - app_logger - INFO - Client disconnected: m6jwRJGkp3HGi2fEAAAB
+2026-10-06 20:12:38,253 - app_logger - INFO - Starting server...
+2026-10-06 20:12:38,253 - app_logger - INFO -  * DEV MODE: SSL disabled
+2026-10-06 20:12:38,253 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.59:5001
+2026-10-06 21:22:18,503 - app_logger - INFO - Client connected: 0tjKpmo-zdx0c261AAAC
+2026-10-06 21:22:20,366 - app_logger - INFO - Game created with room code: BLVR
+2026-10-06 21:22:20,381 - app_logger - INFO - Reactor registered for room BLVR (sid: 0tjKpmo-zdx0c261AAAC)
+2026-10-06 21:22:24,742 - app_logger - INFO - Task list created: 8JZYBX by player device_542u9w3g6muxfac0s
+2026-10-06 21:22:42,555 - app_logger - INFO - Applied task list 8JZYBX to game BLVR: 24 tasks loaded, task_list_applied=True
+2026-10-06 21:22:42,556 - app_logger - INFO - Task handler now has 24 tasks
+2026-10-06 21:22:51,422 - app_logger - INFO - Game BLVR config updated: {'locations': ['Living Room', 'Kitchen', 'Bedroom', 'Hallway'], 'vote_time': 90, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_intruders': 1, 'card_draw_probability': 1, 'starting_cards': 2, 'task_ratio': 2, 'card_deck_preset': 'default', 'card_deck_counts': {'self_report': 4, 'emp': 4, 'fake_task': 6, 'taunt_message': 6, 'remote_sabotage': 3, 'shorten_meltdown': 3, 'area_denial_per_location': 2}, 'card_deck_count_keys': ['self_report', 'emp', 'fake_task', 'taunt_message', 'remote_sabotage', 'shorten_meltdown', 'area_denial_per_location'], 'card_deck_presets': ['default', 'fake_task_chaos', 'sabotage_heavy', 'no_reactor_cards', 'custom']}
+2026-10-06 21:22:51,428 - app_logger - INFO - Room BLVR is now open for players
+2026-10-06 21:22:53,323 - app_logger - INFO - Reactor left room BLVR
+2026-10-06 21:22:53,323 - app_logger - INFO - Room BLVR deleted
+2026-10-06 21:36:48,754 - app_logger - INFO - Client disconnected: 0tjKpmo-zdx0c261AAAC
+2026-10-06 21:37:26,352 - app_logger - INFO - Client connected: ZvWFCTWuQHEo8axrAAAO
+2026-10-06 21:39:19,232 - app_logger - INFO - Client disconnected: ZvWFCTWuQHEo8axrAAAO
+2026-10-06 21:39:22,116 - app_logger - INFO - Client connected: zxdV6x9XOIWwmsC0AAAR
+2026-10-06 21:40:33,738 - app_logger - INFO - Starting server...
+2026-10-06 21:40:33,739 - app_logger - INFO -  * DEV MODE: SSL disabled
+2026-10-06 21:40:33,739 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.59:5001
+2026-10-06 21:40:35,867 - app_logger - INFO - Client connected: fXLyKJKgmGlntAaDAAAB
+2026-10-06 21:41:37,961 - app_logger - INFO - Client disconnected: fXLyKJKgmGlntAaDAAAB
+2026-10-06 21:41:42,890 - app_logger - INFO - Starting server...
+2026-10-06 21:41:42,890 - app_logger - INFO -  * DEV MODE: SSL disabled
+2026-10-06 21:41:42,890 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.59:5001
+2026-10-06 21:41:44,641 - app_logger - INFO - Client connected: pRu2R_oE8566XMbuAAAC
+2026-10-06 22:13:51,431 - app_logger - INFO - Client disconnected: pRu2R_oE8566XMbuAAAC
+2026-10-06 22:13:53,686 - app_logger - INFO - Client connected: _tBFSyPjK800XMMyAAAF
+2026-10-06 22:15:15,104 - app_logger - INFO - Client disconnected: _tBFSyPjK800XMMyAAAF
+2026-10-06 22:15:18,015 - app_logger - INFO - Client connected: GGiJdY-ftdznwxPlAAAI
+2026-10-06 22:16:34,515 - app_logger - INFO - Starting server...
+2026-10-06 22:16:34,515 - app_logger - INFO -  * DEV MODE: SSL disabled
+2026-10-06 22:16:34,516 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.59:5001
+2026-10-06 22:16:35,350 - app_logger - INFO - Client connected: DgAu_kDq0FPJHRf9AAAB
+2026-10-06 22:40:52,236 - app_logger - INFO - Client disconnected: DgAu_kDq0FPJHRf9AAAB
+2026-10-06 22:40:55,304 - app_logger - INFO - Client connected: TSeaiy-nZJuJHw6MAAAE
+2026-10-06 22:40:56,655 - app_logger - INFO - Client disconnected: TSeaiy-nZJuJHw6MAAAE
+2026-10-06 22:40:57,272 - app_logger - INFO - Client connected: pVJjQ-O8NUMvZJX7AAAG
+2026-10-06 22:40:57,767 - app_logger - INFO - Client disconnected: pVJjQ-O8NUMvZJX7AAAG
+2026-10-06 22:40:59,272 - app_logger - INFO - Client connected: 7M9HpPfJpePP4QhoAAAJ
+2026-10-06 22:41:00,386 - app_logger - INFO - Client disconnected: 7M9HpPfJpePP4QhoAAAJ
+2026-10-06 22:41:00,817 - app_logger - INFO - Client connected: rRvjmSbCVdUe3WZxAAAM
+2026-10-06 22:41:02,954 - app_logger - INFO - Client disconnected: rRvjmSbCVdUe3WZxAAAM
+2026-10-06 22:41:03,247 - app_logger - INFO - Client connected: RWI_24231vRV7m2GAAAP
+2026-10-06 22:41:04,685 - app_logger - INFO - Client disconnected: RWI_24231vRV7m2GAAAP
+2026-10-06 22:41:05,900 - app_logger - INFO - Client connected: GRpUprwCfhSU6-fWAAAS
+2026-10-06 22:41:09,147 - app_logger - INFO - Client disconnected: GRpUprwCfhSU6-fWAAAS
+2026-10-06 22:41:09,842 - app_logger - INFO - Client connected: 5r5NP6V8sbUe7CwFAAAV
+2026-10-06 22:41:10,164 - app_logger - INFO - Client disconnected: 5r5NP6V8sbUe7CwFAAAV
+2026-10-06 22:41:10,519 - app_logger - INFO - Client connected: W6hzBLktmjSAv67dAAAY
+2026-10-06 22:41:13,286 - app_logger - INFO - Client disconnected: W6hzBLktmjSAv67dAAAY
+2026-10-06 22:41:13,698 - app_logger - INFO - Client connected: Z0RdUWYLdqPxITirAAAb
+2026-10-06 22:43:38,865 - app_logger - INFO - Client disconnected: Z0RdUWYLdqPxITirAAAb
+2026-10-06 22:43:41,346 - app_logger - INFO - Client connected: F_7WqyLMiuDhAfPJAAAd

@@ -1,6 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
+import GameplayScreenshots from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const SETUP_URL = '/among-us-irl-task-generator?venue=house&players=8&movement=normal&style=mix';
@@ -48,6 +49,8 @@ function AdultPartyPage() {
                         when every intruder gets voted out.
                     </p>
                 </section>
+                <GameplayScreenshots screens={['crew-task', 'intruder-objective']} />
+
                 <section className="seo-section">
                     <h2>Use the home you already have</h2>
                     <p>

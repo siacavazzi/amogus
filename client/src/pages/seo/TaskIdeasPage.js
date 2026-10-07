@@ -1,6 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
+import GameplayScreenshots from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const TASK_SECTIONS = [
@@ -265,6 +266,8 @@ function TaskIdeasPage() {
                         ))}
                     </ul>
                 </nav>
+
+                <GameplayScreenshots screens={['task-list', 'next-task']} />
 
                 <GameSetupCta title="Turn the ideas into everyone’s task lists"
                     href="/among-us-irl-task-generator?venue=house&players=8&movement=normal" label="Generate a house task pack">

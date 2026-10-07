@@ -1,6 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
+import GameplayScreenshots from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const SCHEMA = {
@@ -46,6 +47,8 @@ function BirthdayPartyPage() {
                         Keep one meeting point. A laptop or TV can supply the optional Reactor display, but a phone-only game works too.
                     </p>
                 </section>
+                <GameplayScreenshots screens={['family-lobby', 'crew-task']} />
+
                 <section className="seo-section" id="host-plan">
                     <h2>Prepare the game, then bring out the cake</h2>
                     <ol className="seo-steps">

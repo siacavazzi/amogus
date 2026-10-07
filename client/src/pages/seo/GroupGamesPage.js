@@ -1,6 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
+import GameplayScreenshots from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const SCHEMA = {
@@ -63,6 +64,8 @@ function GroupGamesPage() {
                     </p>
                     <p>Read the <a href="/how-to-play-among-us-irl">Sus Party round rules</a> before you start. Task completion reveals intruders; the crew still needs to vote them out.</p>
                 </section>
+                <GameplayScreenshots screens={['party-lobby', 'vote']} />
+
                 <section className="seo-section" id="charades">
                     <h2>Charades: start before anyone opens a phone</h2>
                     <p>
