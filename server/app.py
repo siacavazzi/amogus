@@ -1,13 +1,13 @@
 import eventlet
 eventlet.monkey_patch()
 import os
-import base64
+import secrets
 import copy
 import time
 from functools import wraps
 from uuid import uuid4
 from assets.room_protocol import metadata, minimum_tasks, start_error_detail, lobby_state, room_state
-from flask import Flask, request, send_from_directory
+from flask import Flask, request, send_from_directory, abort
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask_cors import CORS
 from assets.game_manager import GameManager
@@ -15,6 +15,7 @@ from assets.sonosHandler import SonosController
 from assets.utils import *
 from assets.taskHandler import *
 from assets.task_list_manager import TaskListManager
+from assets.selfie_store import SelfieStore
 from config import (
     LOCATIONS, VOTE_TIME, VOTE_THRESHOLD, MELTDOWN_TIME, CODE_PERCENT,
     NUMBER_OF_INTRUDERS, CARD_DRAW_PROBABILITY, STARTING_CARDS, TASK_RATIO,
@@ -46,23 +47,54 @@ game_config = {
 # Shared speaker controller (disabled for hosted multi-game mode typically)
 speaker = SonosController(enabled=SONOS_ENABLED, default_volume=SPEAKER_VOLUME, ignore_bedroom_speakers=IGNORE_BEDROOM_SPEAKERS)
 
+# Photos expire independently of room activity, including after a restart.
+SELFIES_DIR = os.path.join(os.path.dirname(__file__), 'selfies')
+selfie_store = SelfieStore(SELFIES_DIR)
+selfie_store.cleanup_expired()
+
 # Game manager handles multiple concurrent games
-game_manager = GameManager(socketio, speaker, game_config)
+game_manager = GameManager(socketio, speaker, game_config, selfie_store=selfie_store)
 
 # Task list manager for persistent task lists
 task_list_manager = TaskListManager()
 
-# Directory for storing selfie images
-SELFIES_DIR = os.path.join(os.path.dirname(__file__), 'selfies')
-os.makedirs(SELFIES_DIR, exist_ok=True)
 client_metrics_by_sid = {}
+selfie_tokens_by_sid = {}
 
 
 # Flask route to serve selfie images
 @app.route('/selfies/<filename>')
 def serve_selfie(filename):
-    """Serve selfie images from the selfies directory."""
-    return send_from_directory(SELFIES_DIR, filename)
+    """Serve a current room photo with a connection-specific access token."""
+    sid = request.args.get('sid', '')
+    provided = request.args.get('token', '')
+    expected = selfie_tokens_by_sid.get(sid)
+    if not expected or not secrets.compare_digest(provided.encode(), expected.encode()):
+        abort(404)
+    game, room_code = game_manager.get_game_by_sid(sid)
+    if not game:
+        abort(404)
+    with game.state_lock:
+        viewer = (sid in (game.creator_sid, game.reactor_sid)
+                  or any(player.sid == sid and player.active for player in game.players))
+        if (game_manager.get_game(room_code) is not game or not viewer
+                or not any(player.selfie == filename for player in game.players)):
+            abort(404)
+        if selfie_store.expired(filename):
+            selfie_store.delete(filename)
+            abort(404)
+        return send_from_directory(SELFIES_DIR, filename, mimetype='image/jpeg',
+                                   conditional=False, etag=False, max_age=0)
+
+
+@app.after_request
+def protect_photo_response(response):
+    if request.path.startswith('/selfies/'):
+        response.headers['Cache-Control'] = 'private, no-store, max-age=0'
+        response.headers['Referrer-Policy'] = 'no-referrer'
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        response.headers['X-Robots-Tag'] = 'noindex, noimageindex'
+    return response
 
 
 def get_game_and_player(player_id):
@@ -217,13 +249,28 @@ def reassign_room_creator(game, room_code):
     return None
 
 
+def admin_required(handler):
+    @wraps(handler)
+    def protected(*args, **kwargs):
+        expected = os.environ.get('ADMIN_PASSWORD')
+        if not expected:
+            return {'error': 'admin endpoint disabled (set ADMIN_PASSWORD env var)'}, 503
+        provided = request.headers.get('X-Admin-Password') or request.args.get('password', '')
+        if not secrets.compare_digest(provided.encode(), expected.encode()):
+            return {'error': 'unauthorized'}, 401
+        return handler(*args, **kwargs)
+    return protected
+
+
 @app.route('/api/games')
+@admin_required
 def list_games():
     """API endpoint to list all active games (for debugging/admin)."""
     return game_manager.get_all_games()
 
 
 @app.route('/api/admin/stats')
+@admin_required
 def admin_stats():
     """Password-protected usage stats for the hidden /dashboard page.
 
@@ -231,14 +278,6 @@ def admin_stats():
     query param). Set the `ADMIN_PASSWORD` env var on the server to enable.
     If `ADMIN_PASSWORD` is unset the endpoint stays disabled.
     """
-    expected = os.environ.get('ADMIN_PASSWORD')
-    if not expected:
-        return {'error': 'admin endpoint disabled (set ADMIN_PASSWORD env var)'}, 503
-
-    provided = request.headers.get('X-Admin-Password') or request.args.get('password')
-    if not provided or provided != expected:
-        return {'error': 'unauthorized'}, 401
-
     try:
         task_list_count = len(task_list_manager.index.get('code_to_name', {}))
     except Exception:
@@ -394,6 +433,8 @@ def handle_join_game(data):
     
     emit('game_joined', {'room_code': room_code, 'is_creator': is_creator})
     emit('task_locations', game.locations)
+    # Lets the avatar picker show which avatars are taken before this socket joins as a player.
+    emit('game_data', {**metadata(game), 'action': 'player_list', 'list': [p.to_json() for p in game.players]})
     record_usage('room_entered', game, is_creator=is_creator)
     logger.info(f"Client {sid} joined room {room_code}, is_creator={is_creator}")
 
@@ -503,6 +544,9 @@ def handle_register_reactor(data):
 
 @socketio.on('connect')
 def handle_connect(auth=None):
+    token = secrets.token_urlsafe(32)
+    selfie_tokens_by_sid[request.sid] = token
+    emit('selfie_access', {'sid': request.sid, 'token': token})
     user_agent = request.headers.get('User-Agent', '').lower()
     device = ('tablet' if 'ipad' in user_agent or ('android' in user_agent and 'mobile' not in user_agent)
               else 'mobile' if any(value in user_agent for value in ('mobile', 'iphone', 'ipod'))
@@ -620,6 +664,7 @@ def handle_disconnect(reason=None):
     } else 'unknown'
     record_usage('connection_closed', game, player.player_id if player else None, reason=disconnect_reason)
     client_metrics_by_sid.pop(sid, None)
+    selfie_tokens_by_sid.pop(sid, None)
     game_manager.unregister_sid(sid)
     if game and game.reactor_sid == sid:
         game.reactor_sid = None
@@ -643,6 +688,7 @@ def handle_join(data):
     username = data.get('username')
     room_code = data.get('room_code', '').upper()
     selfie_data = data.get('selfie')  # Base64 encoded image data
+    pic = data.get('pic')  # Chosen avatar index; the server assigns a free one if missing or taken
     sid = request.sid
 
     if not username:
@@ -695,25 +741,11 @@ def handle_join(data):
     selfie_filename = None
     if selfie_data:
         try:
-            # Remove data URL prefix if present (e.g., "data:image/jpeg;base64,")
-            if ',' in selfie_data:
-                selfie_data = selfie_data.split(',')[1]
-            
-            # Generate unique filename
-            import uuid
-            selfie_filename = f"{uuid.uuid4().hex}.jpg"
-            selfie_path = os.path.join(SELFIES_DIR, selfie_filename)
-            
-            # Decode and save
-            with open(selfie_path, 'wb') as f:
-                f.write(base64.b64decode(selfie_data))
-            
-            logger.info(f"Saved selfie for {username}: {selfie_filename}")
-        except Exception as e:
-            logger.error(f"Failed to save selfie for {username}: {e}")
-            selfie_filename = None
+            selfie_filename = selfie_store.save(selfie_data)
+        except (ValueError, OSError):
+            logger.warning('Photo upload failed. The player will use a default avatar.')
 
-    player = game.addPlayer(sid, username, selfie_filename)
+    player = game.addPlayer(sid, username, selfie_filename, pic=pic)
     game_manager.register_player(player.player_id, room_code, sid)
     join_room(room_code)
     
@@ -938,6 +970,8 @@ def leave_room_handler(data):
                  player_count=len(game.players), flush=True)
 
     if player:
+        selfie_store.delete(player.selfie)
+        player.selfie = None
         # During an active round, leaving counts as dying. After the round ends,
         # remove the player so reset votes only wait on people still in the room.
         if game.game_running and not game.end_state and player.alive:

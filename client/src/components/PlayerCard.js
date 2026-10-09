@@ -1,6 +1,21 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import { ENDPOINT } from "../ENDPOINT";
+import { DataContext } from '../GameContext';
+import Avatar, { getAvatar } from './Avatar';
 import { Skull, Vote, Radiation, DoorOpen, UserX, Shield } from 'lucide-react';
+
+function getSelfieUrl(filename, access) {
+  if (!filename || !access?.sid || !access?.token) return null;
+  const query = new URLSearchParams({ sid: access.sid, token: access.token });
+  return `${ENDPOINT}/selfies/${encodeURIComponent(filename)}?${query}`;
+}
+
+// Show the selfie until it fails to load (e.g. expired), then fall back to the avatar.
+function useSelfieFallback(selfieUrl) {
+  const [failedUrl, setFailedUrl] = useState(null);
+  const shownUrl = selfieUrl && selfieUrl !== failedUrl ? selfieUrl : null;
+  return [shownUrl, () => setFailedUrl(selfieUrl)];
+}
 
 // Map death causes to icons and colors
 export const getDeathInfo = (cause) => {
@@ -59,6 +74,7 @@ export const ProfilePicture = ({
   deathCause = null,
   ringColor = "ring-indigo-500/50"
 }) => {
+  const { selfieAccess } = useContext(DataContext) || {};
   // Size variants
   const sizeMap = {
     large: "w-24 h-24 sm:w-28 sm:h-28",
@@ -73,9 +89,8 @@ export const ProfilePicture = ({
   const DeathIcon = deathInfo?.icon;
   const actualRingColor = deathInfo ? deathInfo.ring : ringColor;
   
-  // Build the selfie URL
-  const selfieUrl = selfie ? `${ENDPOINT}/selfies/${selfie}` : null;
-  
+  const [selfieUrl, onSelfieError] = useSelfieFallback(getSelfieUrl(selfie, selfieAccess));
+
   // Icon overlay size based on profile size
   const iconSizes = {
     large: { container: "w-8 h-8", icon: 16 },
@@ -90,22 +105,15 @@ export const ProfilePicture = ({
       {selfieUrl ? (
         <img
           src={selfieUrl}
+          referrerPolicy="no-referrer"
           alt="Player"
           className={`${sizeClasses} rounded-full object-cover ring-4 ${actualRingColor} shadow-lg ${isDead ? 'grayscale opacity-70' : ''}`}
-          onError={(e) => {
-            // Fallback to GIF if selfie fails to load
-            e.target.onerror = null;
-            if (imageCode) {
-              e.target.src = require(`../imgs/${imageCode}.gif`);
-            }
-          }}
+          onError={onSelfieError}
         />
-      ) : imageCode ? (
-        <img
-          src={require(`../imgs/${imageCode}.gif`)}
-          alt={`Profile ${imageCode}`}
-          className={`${sizeClasses} rounded-full ring-4 ${actualRingColor} shadow-lg ${isDead ? 'grayscale opacity-70' : ''}`}
-        />
+      ) : getAvatar(imageCode) ? (
+        <div className={`${sizeClasses} rounded-full overflow-hidden ring-4 ${actualRingColor} shadow-lg ${isDead ? 'grayscale opacity-70' : ''}`}>
+          <Avatar id={imageCode} className="w-full h-full" />
+        </div>
       ) : (
         <div className={`${sizeClasses} rounded-full ring-4 ${actualRingColor} shadow-lg bg-gray-700 flex items-center justify-center ${isDead ? 'opacity-70' : ''}`}>
           <Shield size={size === 'large' ? 32 : size === 'medium' ? 24 : 16} className="text-gray-500" />
@@ -217,6 +225,7 @@ const PlayerCard = ({
   isMe = false,
   isClickable = true,
 }) => {
+  const { selfieAccess } = useContext(DataContext) || {};
   const isDead = !player.alive;
   const deathInfo = isDead && player.death_cause ? getDeathInfo(player.death_cause) : null;
   const DeathIcon = deathInfo?.icon;
@@ -238,7 +247,7 @@ const PlayerCard = ({
     ? 'border-indigo-500/50'
     : 'border-gray-700/60';
 
-  const selfieUrl = player.selfie ? `${require('../ENDPOINT').ENDPOINT}/selfies/${player.selfie}` : null;
+  const [selfieUrl, onSelfieError] = useSelfieFallback(getSelfieUrl(player.selfie, selfieAccess));
 
   return (
     <div
@@ -259,21 +268,16 @@ const PlayerCard = ({
         {selfieUrl ? (
           <img
             src={selfieUrl}
+            referrerPolicy="no-referrer"
             alt={player.username}
             className={`absolute inset-0 w-full h-full object-cover ${isDead ? 'grayscale opacity-60' : ''}`}
-            onError={(e) => {
-              e.target.onerror = null;
-              if (player.pic) {
-                e.target.src = require(`../imgs/${player.pic}.gif`);
-                e.target.className = `absolute inset-0 w-full h-full object-cover object-center ${isDead ? 'grayscale opacity-60' : ''}`;
-              }
-            }}
+            onError={onSelfieError}
           />
-        ) : player.pic ? (
-          <img
-            src={require(`../imgs/${player.pic}.gif`)}
-            alt={player.username}
-            className={`absolute inset-0 w-full h-full object-cover object-center ${isDead ? 'grayscale opacity-60' : ''}`}
+        ) : getAvatar(player.pic) ? (
+          <Avatar
+            id={player.pic}
+            label={player.username}
+            className={`absolute inset-0 w-full h-full ${isDead ? 'grayscale opacity-60' : ''}`}
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-800">

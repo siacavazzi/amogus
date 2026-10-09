@@ -34,6 +34,9 @@
     ],
     "device_542u9w3g6muxfac0s": [
       "8JZYBX"
+    ],
+    "device_bu1z9zjqsmuxnfc3y": [
+      "98D8CN"
     ]
   },
   "code_to_name": {
@@ -48,6 +51,7 @@
     "YM6SYF": "other test",
     "J4A7XQ": "Example List",
     "R5UJJJ": "Example List",
-    "8JZYBX": "Family cleanup task pack"
+    "8JZYBX": "Family cleanup task pack",
+    "98D8CN": "Example List"
   }
 }

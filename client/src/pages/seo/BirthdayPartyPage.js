@@ -92,7 +92,7 @@ function BirthdayPartyPage() {
                     <ul className="seo-list">
                         <li>Explain that eliminated players stay quiet about clues. Choose a separate place for them to watch the round.</li>
                         <li>Keep decorations clear of task surfaces. Save food handling for the party break.</li>
-                        <li>Use the <a href="/among-us-irl-task-generator?venue=house&players=10&movement=low">two-station setup</a> if a guest needs seated tasks.</li>
+                        <li>Choose <a href="/among-us-irl-task-generator?venue=house&players=10&style=mix">nearby task locations</a> and edit the tasks for your guests.</li>
                         <li>Keep sabotage in the app. Nobody needs to hide someone’s phone, block a door, or touch a real alarm.</li>
                     </ul>
                     <h3>Can we do it with printable cards instead?</h3>

@@ -140,6 +140,8 @@ export const createMockContextValue = (overrides = {}) => {
         
         // Room state
         roomCode: 'TEST1',
+        roomEntryStatus: null,
+        setRoomEntryStatus: jest.fn(),
         inRoom: true,
         isRoomCreator: false,
         roomOpen: true,

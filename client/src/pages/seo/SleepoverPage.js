@@ -61,7 +61,7 @@ export default function SleepoverPage() {
                         Change the player count to match your group.
                     </p>
                     <p>
-                        Choose “Use these tasks in a new game,” create a room, and select “Import generated
+                        Choose “Use this pack,” create a room, and select “Import generated
                         tasks” in host setup. Open the room and share the four-letter code. Each friend
                         needs a phone browser and internet. Pick the sofa or a table as your meeting spot.
                     </p>

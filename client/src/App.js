@@ -36,6 +36,10 @@ function getRoute() {
     return 'family-cleanup';
   }
 
+  if (normalizedPath === '/among-us-irl-task-generator' || normalizedPath.startsWith('/among-us-irl-task-generator/')) {
+    return 'task-generator';
+  }
+
   if (
     normalizedPath === '/play' ||
     normalizedPath.startsWith('/play/') ||
@@ -70,10 +74,6 @@ function getRoute() {
 
   if (normalizedPath === '/among-us-irl-task-ideas' || normalizedPath.startsWith('/among-us-irl-task-ideas/')) {
     return 'task-ideas';
-  }
-
-  if (normalizedPath === '/among-us-irl-task-generator' || normalizedPath.startsWith('/among-us-irl-task-generator/')) {
-    return 'task-generator';
   }
 
   if (normalizedPath === '/dashboard' || normalizedPath.startsWith('/dashboard/')) {

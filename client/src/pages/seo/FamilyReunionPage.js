@@ -5,7 +5,7 @@ import GameplayScreenshots from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const SETUP_URL = '/among-us-irl-task-generator?venue=house&players=10&movement=normal&style=standard&room=Living+Room&room=Kitchen&room=Hallway';
-const LOW_MOVEMENT_URL = '/among-us-irl-task-generator?venue=house&players=10&movement=low&style=standard';
+const NEARBY_LOCATIONS_URL = '/among-us-irl-task-generator?venue=house&players=10&style=standard&room=Living+Room&room=Kitchen';
 const DESCRIPTION = 'Turn your relatives into suspects with Sus Party, an indoor family reunion game. Use simple tasks, private roles, and face-to-face votes. Free in your phone browsers.';
 const SCHEMA = {
     '@context': 'https://schema.org', '@type': 'Article',
@@ -32,7 +32,7 @@ export default function FamilyReunionPage() {
                 </p>
                 <div className="seo-actions">
                     <a href={SETUP_URL} className="seo-btn--primary">Prepare your family game →</a>
-                    <a href={LOW_MOVEMENT_URL} className="seo-btn--secondary">Use two nearby task stations</a>
+                    <a href={NEARBY_LOCATIONS_URL} className="seo-btn--secondary">Use two nearby locations</a>
                 </div>
             </header>
             <main className="seo-content">
@@ -60,11 +60,11 @@ export default function FamilyReunionPage() {
                         The generator covers three to fifteen players; adjust the head count to match your group.
                         It starts with the living room, kitchen, and hallway. Review the tasks and
                         set out their materials. If your group wants less movement, use
-                        {' '}<a href={LOW_MOVEMENT_URL}>two nearby task stations</a> with observation and paper tasks.
+                        {' '}<a href={NEARBY_LOCATIONS_URL}>two nearby locations</a> and edit the tasks for your group.
                         Keep a comfortable shared spot for meetings.
                     </p>
                     <p>
-                        Select “Use these tasks in a new game,” create your room, then select “Import
+                        Select “Use this pack,” create your room, then select “Import
                         generated tasks” in host setup. Open the room and share the four-letter code.
                         Each player needs a phone browser and internet. Teach the
                         {' '}<a href="/tutorial">player actions</a> together and explain that eliminated

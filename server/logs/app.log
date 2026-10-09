@@ -8605,3 +8605,42 @@
 2026-10-06 22:41:13,698 - app_logger - INFO - Client connected: Z0RdUWYLdqPxITirAAAb
 2026-10-06 22:43:38,865 - app_logger - INFO - Client disconnected: Z0RdUWYLdqPxITirAAAb
 2026-10-06 22:43:41,346 - app_logger - INFO - Client connected: F_7WqyLMiuDhAfPJAAAd
+2026-10-07 01:01:21,308 - app_logger - INFO - Client disconnected: F_7WqyLMiuDhAfPJAAAd
+2026-10-07 01:01:21,363 - app_logger - INFO - Client connected: Vk4UDmDZTvJ28f28AAAg
+2026-10-07 01:03:21,009 - app_logger - INFO - Client disconnected: Vk4UDmDZTvJ28f28AAAg
+2026-10-07 01:03:25,871 - app_logger - INFO - Client connected: qKVFXrbijw_UsRNnAAAj
+2026-10-07 01:04:49,079 - app_logger - INFO - Starting server...
+2026-10-07 01:04:49,079 - app_logger - INFO -  * DEV MODE: SSL disabled
+2026-10-07 01:04:49,079 - app_logger - INFO -  * Running with HTTP at: http://192.168.68.59:5001
+2026-10-07 01:04:51,235 - app_logger - INFO - Client connected: 6kw1A9sqoR8zVETGAAAB
+2026-10-07 01:08:39,016 - app_logger - INFO - Client disconnected: 6kw1A9sqoR8zVETGAAAB
+2026-10-07 01:08:44,378 - app_logger - INFO - Client connected: eeALJBbmLg_RcHNQAAAE
+2026-10-07 01:13:48,014 - app_logger - INFO - Client connected: JQYNIL3JHHVko9RvAAAH
+2026-10-07 01:13:49,820 - app_logger - INFO - Game created with room code: TJPO
+2026-10-07 01:13:49,831 - app_logger - INFO - Reactor registered for room TJPO (sid: JQYNIL3JHHVko9RvAAAH)
+2026-10-07 01:13:52,057 - app_logger - INFO - Task list created: 98D8CN by player device_bu1z9zjqsmuxnfc3y
+2026-10-07 01:13:53,448 - app_logger - INFO - Applied task list 98D8CN to game TJPO: 34 tasks loaded, task_list_applied=True
+2026-10-07 01:13:53,448 - app_logger - INFO - Task handler now has 34 tasks
+2026-10-07 01:13:54,933 - app_logger - INFO - Game TJPO config updated: {'locations': ['Kitchen', 'Living Room', 'Bedroom'], 'vote_time': 180, 'vote_threshold': 0.66, 'meltdown_time': 60, 'code_percent': 0.6, 'num_intruders': 1, 'card_draw_probability': 1, 'starting_cards': 2, 'task_ratio': 10, 'card_deck_preset': 'default', 'card_deck_counts': {'self_report': 4, 'emp': 4, 'fake_task': 6, 'taunt_message': 6, 'remote_sabotage': 3, 'shorten_meltdown': 3, 'area_denial_per_location': 2}, 'card_deck_count_keys': ['self_report', 'emp', 'fake_task', 'taunt_message', 'remote_sabotage', 'shorten_meltdown', 'area_denial_per_location'], 'card_deck_presets': ['default', 'fake_task_chaos', 'sabotage_heavy', 'no_reactor_cards', 'custom']}
+2026-10-07 01:13:54,941 - app_logger - INFO - Room TJPO is now open for players
+2026-10-07 01:13:59,648 - app_logger - INFO - Reactor left room TJPO
+2026-10-07 01:13:59,660 - app_logger - INFO - Room TJPO deleted
+2026-10-07 01:14:03,996 - app_logger - INFO - Client disconnected: JQYNIL3JHHVko9RvAAAH
+2026-10-07 01:15:45,431 - app_logger - INFO - Client connected: XDDB4Iji-pIEOvtsAAAK
+2026-10-07 01:17:57,720 - app_logger - INFO - Client disconnected: XDDB4Iji-pIEOvtsAAAK
+2026-10-07 01:17:58,550 - app_logger - INFO - Client disconnected: eeALJBbmLg_RcHNQAAAE
+2026-10-07 01:18:05,079 - app_logger - INFO - Client connected: -YvbhEu19luFx-4YAAAN
+2026-10-07 01:18:08,253 - app_logger - INFO - Client connected: 478Igd4B48jOW-s-AAAQ
+2026-10-07 01:30:41,216 - app_logger - INFO - Client disconnected: -YvbhEu19luFx-4YAAAN
+2026-10-07 01:30:41,512 - app_logger - INFO - Client disconnected: 478Igd4B48jOW-s-AAAQ
+2026-10-07 01:30:44,506 - app_logger - INFO - Client connected: Z_Z1XfRL3xkkXJ6jAAAS
+2026-10-07 01:30:45,579 - app_logger - INFO - Client connected: aMgNskBD17zwLk5DAAAV
+2026-10-07 01:31:38,183 - app_logger - INFO - Client connected: WcvTe7bqnf8g2VudAAAX
+2026-10-07 01:31:38,362 - app_logger - INFO - Client disconnected: WcvTe7bqnf8g2VudAAAX
+2026-10-07 01:31:39,847 - app_logger - INFO - Client connected: 2cvgSa6BfscZazyqAAAZ
+2026-10-07 01:31:39,994 - app_logger - INFO - Client disconnected: 2cvgSa6BfscZazyqAAAZ
+2026-10-07 01:32:26,320 - app_logger - INFO - Client disconnected: Z_Z1XfRL3xkkXJ6jAAAS
+2026-10-07 01:32:26,394 - app_logger - INFO - Client disconnected: aMgNskBD17zwLk5DAAAV
+2026-10-07 01:32:26,907 - app_logger - INFO - Client connected: VrQbsA97DzEY7pw3AAAb
+2026-10-07 01:32:29,270 - app_logger - INFO - Client connected: Iur55_-jdL3qGZkpAAAe
+2026-10-07 13:15:31,313 - app_logger - INFO - Client disconnected: Iur55_-jdL3qGZkpAAAe

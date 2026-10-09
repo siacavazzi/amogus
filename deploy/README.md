@@ -225,7 +225,7 @@ systemctl restart amogus
 2. **SSL/TLS**: Always use HTTPS in production
 3. **Firewall**: Only expose necessary ports (22, 80, 443)
 4. **Systemd hardening**: The service file includes security restrictions
-5. **Regular backups**: Back up the selfies and data directories if needed
+5. **Regular backups**: Back up persistent game data. Exclude `server/selfies/` from backups to preserve the photo retention limit.
 
 ## Scaling
 

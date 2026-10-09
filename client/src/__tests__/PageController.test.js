@@ -92,7 +92,7 @@ describe('PageController', () => {
                 inRoom: true,
                 roomOpen: true,
                 running: false,
-                playerState: { username: 'TestPlayer', alive: true },
+                playerState: { player_id: 'player1', username: 'TestPlayer', alive: true },
             });
             
             expect(screen.getByTestId('pregame-page')).toBeInTheDocument();

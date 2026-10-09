@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { DataContext } from '../GameContext';
 import PreGamePage from '../pages/PreGamePage';
+import LoginPage from '../pages/Login';
 import CrewPage from '../pages/CrewPage';
 import ReactorPage from '../pages/ReactorPage';
 import './style-preview.css';
@@ -44,6 +45,7 @@ function makePreviewSocket(notify, nextTask) {
       } else if (event === 'meltdown') notify('Sabotage triggered. This is a visual preview only.');
       else if (event === 'start_game') notify('Ready to start. This is a visual preview only.');
       else if (event === 'leave_room') notify('Preview only — no live room to leave.');
+      else if (event === 'join') notify(`Joining as avatar ${data.pic}${data.selfie ? ' with a selfie' : ''}. This is a visual preview only.`);
     },
   };
 }
@@ -64,7 +66,8 @@ function PreviewScreen({ screen, proposed }) {
   }, [notice]);
   const context = {
     socket, players, roomCode: 'LUNA', taskLocations: locations,
-    playerState: players[0], isRoomCreator: true, running: screen !== 'pregame',
+    playerState: players[0], isRoomCreator: true, running: screen !== 'pregame' && screen !== 'login',
+    setPlayerState: noop, roomEntryStatus: null, setRoomEntryStatus: noop,
     task: sampleTasks[taskIndex % sampleTasks.length], setTaskEntry: noop,
     setShowAnimation: noop, showAnimation: false, setAudio: noop,
     killCooldown: 0, setKillCooldown: noop, intrudersRevealed: null,
@@ -72,7 +75,7 @@ function PreviewScreen({ screen, proposed }) {
     handleCallMeeting: () => setNotice('Meeting called. This is a visual preview only.'),
   };
   return <DataContext.Provider value={context}>
-    {screen === 'pregame' ? <PreGamePage /> : screen === 'reactor' ? <ReactorPage /> : <CrewPage setShowSusPage={noop} />}
+    {screen === 'pregame' ? <PreGamePage /> : screen === 'login' ? <LoginPage /> : screen === 'reactor' ? <ReactorPage /> : <CrewPage setShowSusPage={noop} />}
     {notice && <div className="preview-notice" role="status">{notice}</div>}
   </DataContext.Provider>;
 }
@@ -91,9 +94,9 @@ export default function StylePreview() {
     </header>
     <div className="preview-controls">
       <div className="preview-group" aria-label="Page">
-        {['pregame', 'crew', 'reactor'].map((page, i) => <button key={page} aria-pressed={screen === page}
+        {['login', 'pregame', 'crew', 'reactor'].map((page, i) => <button key={page} aria-pressed={screen === page}
           onClick={() => { setScreen(page); setSize(page === 'reactor' ? 'desktop' : 'phone'); }}>
-          {['01 Pregame', '02 Crew task', '03 Reactor'][i]}</button>)}
+          {['00 Join', '01 Pregame', '02 Crew task', '03 Reactor'][i]}</button>)}
       </div>
       <div className="preview-group" aria-label="Style">
         <button aria-pressed={!proposed} onClick={() => setProposed(false)}>Current</button>
@@ -105,7 +108,7 @@ export default function StylePreview() {
       </div>
     </div>
     <div className="preview-caption"><span>{proposed ? 'PROPOSED' : 'CURRENT'} / {screen.toUpperCase()}</span>
-      <span>{screen === 'pregame' ? 'Try the Players and Tasks tabs.' : screen === 'crew' ? 'Try the task slider and meeting button.' : 'Try the sabotage button.'}</span></div>
+      <span>{screen === 'login' ? 'Enter a name, then pick an avatar or a selfie.' : screen === 'pregame' ? 'Try the Players and Tasks tabs.' : screen === 'crew' ? 'Try the task slider and meeting button.' : 'Try the sabotage button.'}</span></div>
     <div className={`preview-stage preview-stage--${size}`}>
       <iframe title={`${screen} — ${proposed ? 'proposed' : 'current'} style`} key={`${screen}-${proposed}`}
         src={`/style-preview?screen=${screen}&style=${proposed ? 'proposed' : 'current'}`} />

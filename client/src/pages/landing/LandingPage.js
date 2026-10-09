@@ -55,7 +55,7 @@ const FAQS = [
     { q: 'Can we play online from different homes?', a: 'Sus Party connects your phones online, but the group plays together in the same physical space. The tasks, secret eliminations, and meetings happen in real life.' },
     { q: 'How many players?', a: 'The task generator prepares groups of 5–15. The game requires at least two crew members per intruder and has no fixed 15-player cap.' },
     { q: 'Does it cost anything?', a: 'No. It\u2019s free, open source, and ad-free.' },
-    { q: 'Where do we play?', a: 'Use shared areas in a house, apartment, dorm, office, or vacation rental. The low-movement preset uses two task stations in one room. Each phone needs internet.' },
+    { q: 'Where do we play?', a: 'Use shared areas in a house, apartment, dorm, office, or vacation rental. Choose at least two task locations so players have a route. Each phone needs internet.' },
 ];
 
 function LandingPage() {

@@ -9,7 +9,7 @@ const TASK_SECTIONS = [
         id: 'shared-room-tasks',
         label: 'Shared rooms at home',
         intro: 'Use a living room, dining area, or approved hallway. Set out paper, cards, or coasters before roles.',
-        generatorHref: '/among-us-irl-task-generator?venue=house&players=8&movement=normal',
+        generatorHref: '/among-us-irl-task-generator?venue=house&players=8',
         tasks: [
             {
                 task: 'Count the chairs around the dining table.',
@@ -42,7 +42,7 @@ const TASK_SECTIONS = [
         id: 'kitchen-tasks',
         label: 'Kitchen and dining area',
         intro: 'Use visible shared items and a card with a short symbol sequence. Put the game materials on a separate table before the round.',
-        generatorHref: '/among-us-irl-task-generator?venue=apartment&players=8&movement=normal',
+        generatorHref: '/among-us-irl-task-generator?venue=apartment&players=8',
         tasks: [
             {
                 task: 'Count the mugs on the open shelf.',
@@ -75,7 +75,7 @@ const TASK_SECTIONS = [
         id: 'classroom-tasks',
         label: 'Classroom task examples',
         intro: 'Use a teacher-approved room and shared materials. Set out markers, index cards, and a symbol-to-letter key before roles.',
-        generatorHref: '/among-us-irl-task-generator?venue=school&players=8&movement=normal',
+        generatorHref: '/among-us-irl-task-generator?venue=school&players=8',
         setupHref: '/among-us-irl#classroom-setup',
         tasks: [
             {
@@ -114,7 +114,7 @@ const TASK_SECTIONS = [
         id: 'vacation-house-tasks',
         label: 'Vacation-house task examples',
         intro: 'Use an approved living room or dining area. Set out a small tray with cards and coasters before roles.',
-        generatorHref: '/among-us-irl-task-generator?venue=airbnb&players=8&movement=normal',
+        generatorHref: '/among-us-irl-task-generator?venue=airbnb&players=8',
         setupHref: '/among-us-irl#vacation-house-setup',
         tasks: [
             {
@@ -150,36 +150,16 @@ const TASK_SECTIONS = [
         ],
     },
     {
-        id: 'low-movement-tasks',
-        label: 'Low-movement tasks',
-        intro: 'Use tasks at one seated table. Keep items within reach and accept a spoken, typed, or pointing answer.',
-        generatorHref: '/among-us-irl-task-generator?venue=other&players=8&movement=low',
+        id: 'playful-tasks',
+        label: 'Playful tasks with somewhere to go',
+        intro: 'Give players an excuse for suspicious behavior. Assign each job to a separate location.',
+        generatorHref: '/among-us-irl-task-generator?venue=house&players=8&style=100',
         tasks: [
-            {
-                task: 'Find two matching symbols among the host-provided cards.',
-                place: 'Table beside the player',
-                done: 'Name or point to the matching pair. Leave the cards within reach.',
-            },
-            {
-                task: 'Count three host-provided objects on the table.',
-                place: 'Table beside the player',
-                done: 'Record the count in your task notes.',
-            },
-            {
-                task: 'Choose one of two cards labeled A or B.',
-                place: 'Table beside the player',
-                done: 'Record the chosen letter in your task notes.',
-            },
-            {
-                task: 'Sort three large host-provided cards by number.',
-                place: 'Table beside the player',
-                done: 'Check that the three numbers form an ascending sequence.',
-            },
-            {
-                task: 'Name one object on the table and describe its shape.',
-                place: 'Table beside the player',
-                done: 'Record the answer by speech, text, or pointing.',
-            },
+            { task: 'Patrol the hallway like a robot for ten seconds.', place: 'Hallway', done: 'Walk the patrol route for ten seconds.' },
+            { task: 'Inspect a cushion like a detective for ten seconds.', place: 'Living room', done: 'Inspect the cushion, then return it to its place.' },
+            { task: 'Salute the fridge and announce, “All systems operational.”', place: 'Kitchen', done: 'Stand beside the fridge, salute, and make the announcement.' },
+            { task: 'Pretend to scan two objects with an invisible scanner.', place: 'Living room', done: 'Visit each object and scan it.' },
+            { task: 'Give a dramatic weather report from the doorway.', place: 'Hallway', done: 'Reach the doorway and give a ten-second report.' },
         ],
     },
 ];
@@ -189,7 +169,7 @@ const SCHEMA = {
     '@type': 'ItemList',
     name: 'Among Us IRL Task Ideas by Venue',
     description:
-        'Original task examples with a place and a clear completion check for homes, classrooms, vacation houses, and low-movement games.',
+        'Original task examples with a place and a clear completion check for homes, classrooms, vacation houses, and playful party rounds.',
     url: 'https://susparty.com/among-us-irl-task-ideas',
     itemListElement: TASK_SECTIONS.map((section, index) => ({
         '@type': 'ListItem',
@@ -212,16 +192,16 @@ const TIPS = [
         body: 'Set out shared materials before roles. Keep appliances and anything the venue marks private out of play.',
     },
     {
-        title: 'Offer more than one format',
-        body: 'Let players speak, type, or point to an answer. Remove movement or sensory requirements that a player cannot use.',
+        title: 'Give players a route',
+        body: 'Spread tasks across at least two locations. Use nearby areas and edit each job for your group.',
     },
 ];
 
 function TaskIdeasPage() {
     usePageMeta({
-        title: 'Among Us in Real Life Task Ideas by Room | Sus Party',
+        title: 'Sus Party | Among Us in Real Life Task Ideas by Room',
         description:
-            'Find Among Us IRL task ideas with a room and a clear finish. Choose home, classroom, or seated tasks, then generate a pack to import into a Sus Party game.',
+            'Find Among Us IRL task ideas with a room and a clear finish. Choose practical or playful tasks for your locations, then generate a pack to import into a Sus Party game.',
         canonical: 'https://susparty.com/among-us-irl-task-ideas',
         ogImage: 'https://susparty.com/og-image.jpg',
         schema: SCHEMA,
@@ -243,7 +223,7 @@ function TaskIdeasPage() {
                     Each example below names the room and the result that counts as complete.
                 </p>
                 <div className="seo-actions">
-                    <a href="/among-us-irl-task-generator?venue=house&players=8&movement=normal" className="seo-btn--primary">
+                    <a href="/among-us-irl-task-generator?venue=house&players=8" className="seo-btn--primary">
                         Make a house task list →
                     </a>
                     <a href="/how-to-play-among-us-irl" className="seo-btn--secondary">
@@ -270,8 +250,8 @@ function TaskIdeasPage() {
                 <GameplayScreenshots screens={['task-list', 'next-task']} />
 
                 <GameSetupCta title="Turn the ideas into everyone’s task lists"
-                    href="/among-us-irl-task-generator?venue=house&players=8&movement=normal" label="Generate a house task pack">
-                    Choose your areas and player count. Review the generated pack, select “Use these tasks in a new game,” and import it in host setup. You can edit the list there.
+                    href="/among-us-irl-task-generator?venue=house&players=8" label="Generate a house task pack">
+                    Choose your areas and player count. Review the generated pack, select “Use this pack,” and import it in host setup. You can edit the list there.
                 </GameSetupCta>
 
                 {TASK_SECTIONS.map((section) => (
@@ -312,13 +292,13 @@ function TaskIdeasPage() {
                     </div>
                     <p style={{ marginTop: 16 }}>
                         The task generator has presets for{' '}
-                        <a href="/among-us-irl-task-generator?venue=house&players=8&movement=normal">houses</a>,{' '}
-                        <a href="/among-us-irl-task-generator?venue=apartment&players=8&movement=normal">apartments</a>,{' '}
-                        <a href="/among-us-irl-task-generator?venue=school&players=8&movement=normal">schools</a>,{' '}
-                        <a href="/among-us-irl-task-generator?venue=airbnb&players=8&movement=normal">vacation rentals</a>,{' '}
-                        <a href="/among-us-irl-task-generator?venue=dorm&players=8&movement=normal">dorms</a>,{' '}
-                        <a href="/among-us-irl-task-generator?venue=office&players=8&movement=normal">offices</a>, and{' '}
-                        <a href="/among-us-irl-task-generator?venue=other&players=8&movement=normal">other spaces</a>.
+                        <a href="/among-us-irl-task-generator?venue=house&players=8">houses</a>,{' '}
+                        <a href="/among-us-irl-task-generator?venue=apartment&players=8">apartments</a>,{' '}
+                        <a href="/among-us-irl-task-generator?venue=school&players=8">schools</a>,{' '}
+                        <a href="/among-us-irl-task-generator?venue=airbnb&players=8">vacation rentals</a>,{' '}
+                        <a href="/among-us-irl-task-generator?venue=dorm&players=8">dorms</a>,{' '}
+                        <a href="/among-us-irl-task-generator?venue=office&players=8">offices</a>, and{' '}
+                        <a href="/among-us-irl-task-generator?venue=other&players=8">other spaces</a>.
                     </p>
                 </section>
 

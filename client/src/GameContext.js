@@ -43,6 +43,7 @@ export default function GameContext({ children }) {
     // united states
     const [gameState, setGameState] = useState({}); // <--- USE this PLEASE we need to refactor this shit
     const [connected, setConnected] = useState(false);
+    const [selfieAccess, setSelfieAccess] = useState(null);
     const [players, setPlayers] = useState([]);
     const [message, setMessage] = useState(undefined)
     const [dialog, setDialog] = useState(undefined)
@@ -593,7 +594,14 @@ export default function GameContext({ children }) {
             if (Array.isArray(data.locations)) setTaskLocations(data.locations);
         });
 
+        socketRef.current.on('selfie_access', (data) => {
+            if (data?.sid === socketRef.current.id && typeof data.token === 'string') {
+                setSelfieAccess(data);
+            }
+        });
+
         socketRef.current.on('disconnect', () => {
+            setSelfieAccess(null);
             // Only mark as disconnected, don't clear state
             // Socket.io will auto-reconnect and we'll rejoin with our player_id
             setConnected(false);
@@ -937,6 +945,7 @@ export default function GameContext({ children }) {
         setGameState,
         socket: socketRef.current,
         connected,
+        selfieAccess,
         players,
         message,
         setMessage,
@@ -1017,6 +1026,7 @@ export default function GameContext({ children }) {
         playerState,
         gameState,
         connected,
+        selfieAccess,
         players,
         message,
         dialog,

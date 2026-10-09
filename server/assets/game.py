@@ -13,6 +13,13 @@ from threading import RLock, Thread
 from flask_socketio import emit
 from assets.utils import *
 
+# Number of built-in player avatars (client/src/components/Avatar.js); Player.pic is an index into them.
+AVATAR_COUNT = 18
+
+
+def is_avatar_id(pic):
+    return isinstance(pic, int) and not isinstance(pic, bool) and 0 <= pic < AVATAR_COUNT
+
 
 class Game:
 
@@ -37,7 +44,7 @@ class Game:
         self.numCrew = None
         self.taskGoal = None
         self.completed_tasks = 0
-        self.backgrounds = list(range(0, 16 + 1))  
+        self.backgrounds = list(range(AVATAR_COUNT))
         self.socket = socket
         self.end_state = None
         self.speaker = speaker
@@ -355,18 +362,21 @@ class Game:
                     self.hack_id = None
 
 
-    def addPlayer(self, sid, username, selfie_filename=None):
+    def addPlayer(self, sid, username, selfie_filename=None, pic=None):
         player_id = str(uuid4())
-        random_number = 1
 
-        if not self.backgrounds:
-            random_number = random.randint(0, 16)
+        # Honor the player's chosen avatar while it's free. Once every avatar is
+        # taken, duplicates are allowed, so the chosen one is still honored.
+        if is_avatar_id(pic) and (pic in self.backgrounds or not self.backgrounds):
+            avatar = pic
+        elif self.backgrounds:
+            avatar = random.choice(self.backgrounds)
         else:
-            random_number = random.choice(self.backgrounds)
-            print(random_number)
-            self.backgrounds.remove(random_number)
+            avatar = random.randint(0, AVATAR_COUNT - 1)
+        if avatar in self.backgrounds:
+            self.backgrounds.remove(avatar)
 
-        new_player = Player(sid=sid, player_id=player_id, username=username, pic=random_number, selfie=selfie_filename)
+        new_player = Player(sid=sid, player_id=player_id, username=username, pic=avatar, selfie=selfie_filename)
         self.players.append(new_player)
 
         return new_player
@@ -495,7 +505,7 @@ class Game:
         self.numCrew = None
         self.taskGoal = None
         self.completed_tasks = 0
-        self.backgrounds = list(range(0, 16 + 1))  
+        self.backgrounds = list(range(AVATAR_COUNT))
         self.end_state = None
         self.end_time = None
         self._reset_round_clock()
@@ -564,7 +574,7 @@ class Game:
         self.last_activity = time.time()
         
         # Reset backgrounds for new profile pics
-        self.backgrounds = list(range(0, 16 + 1))
+        self.backgrounds = list(range(AVATAR_COUNT))
         # Remove used backgrounds from available pool
         for player in self.players:
             if player.pic in self.backgrounds:

@@ -60,7 +60,7 @@ function GameNightPage() {
                         materials it needs. Choose a meeting spot where the group can gather and talk.
                     </p>
                     <p>
-                        Select “Use these tasks in a new game,” create your room, then choose “Import generated
+                        Select “Use this pack,” create your room, then choose “Import generated
                         tasks” in host setup. Keep that browser open. Guests need their own phone browsers and
                         internet; nobody needs an account or an install.
                     </p>

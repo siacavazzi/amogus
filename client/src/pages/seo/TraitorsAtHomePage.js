@@ -58,7 +58,7 @@ export default function TraitorsAtHomePage() {
                         list and replace anything that does not fit your rooms.
                     </p>
                     <p>
-                        Choose “Use these tasks in a new game,” create a room, then select “Import generated tasks”
+                        Choose “Use this pack,” create a room, then select “Import generated tasks”
                         in host setup. Open the room and share its four-letter code. Each player needs their own
                         phone browser and internet. Read the <a href="/how-to-play">host guide</a> together before the first round.
                     </p>

@@ -138,7 +138,7 @@ function HowToPlayIrlPage() {
                             <span className="seo-step__num" aria-hidden="true">5</span>
                             <div>
                                 <h3>Create the room and invite friends</h3>
-                                <p>Select “Use these tasks in a new game,” create a room, and select “Import generated tasks.” Review the settings and share the code.</p>
+                                <p>Select “Use this pack,” create a room, and select “Import generated tasks.” Review the settings and share the code.</p>
                             </div>
                         </li>
                     </ol>
@@ -279,16 +279,16 @@ function HowToPlayIrlPage() {
 
                 <section className="seo-section" id="access-options">
                     <p className="seo-section__kicker">Access options</p>
-                    <h2>Offer a low-movement round</h2>
+                    <h2>Choose a route for your group</h2>
                     <p>
                         Ask each player what movement and task formats work for them before role assignment.
-                        Keep every task within a seated area or a short, step-free route.
+                        Keep every task on a short, step-free route.
                     </p>
                     <ul className="seo-list">
                         <li>Remove stairs, timed movement, and tasks that need a reach or grip.</li>
                         <li>Offer a spoken, typed, or pointing answer when a task allows it.</li>
                         <li>Do not use clues that depend only on color, sound, or small print.</li>
-                        <li>Use the <a href="/among-us-irl-task-generator?venue=other&players=8&movement=low">low-movement task preset</a> as a draft.</li>
+                        <li>Choose nearby locations in the <a href="/among-us-irl-task-generator?venue=other&players=8">task generator</a> and edit each task for your group.</li>
                     </ul>
                 </section>
 

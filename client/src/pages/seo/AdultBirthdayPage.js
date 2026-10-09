@@ -56,7 +56,7 @@ function AdultBirthdayPage() {
                     <h2>Prepare before the doorbell rings</h2>
                     <ul className="seo-list">
                         <li>Open the <a href={SETUP_URL}>ten-player house task pack</a>. Change the guest count and rooms. Review the tasks and supply their materials.</li>
-                        <li>Choose “Use these tasks in a new game,” create a room, then select “Import generated tasks” in host setup.</li>
+                        <li>Choose “Use this pack,” create a room, then select “Import generated tasks” in host setup.</li>
                         <li>When everyone arrives, share the four-letter code. Each guest needs a phone browser and internet. Explain eliminations and the meeting spot before the round.</li>
                     </ul>
                     <p>

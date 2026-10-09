@@ -1,7 +1,9 @@
-import React, { useState, useContext, useEffect, useRef } from 'react';
-import { ChevronLeft, Camera, User, Sparkles, ArrowRight } from 'lucide-react';
+import React, { useState, useContext, useEffect, useRef, useMemo } from 'react';
+import { ChevronLeft, Camera, User, Sparkles, ArrowRight, Shuffle } from 'lucide-react';
 import { DataContext } from '../GameContext';
 import CameraCapture from '../components/CameraCapture';
+import Avatar, { getAvatar } from '../components/Avatar';
+import AvatarPicker, { takenAvatars, isAvatarLocked, randomFreeAvatar } from '../components/AvatarPicker';
 import RoomEntryNotice from '../components/RoomEntryNotice';
 import { clearRoomCodeFromUrl } from '../utils/inviteLinks';
 import LeaveGameButton from '../components/LeaveGameButton';
@@ -11,15 +13,26 @@ import {
     GlowingOrb, 
     GridOverlay 
 } from '../components/ui';
-import { PrimaryButton } from '../components/ui';
+import { PrimaryButton, SecondaryButton } from '../components/ui';
 import { Card } from '../components/ui';
 
 function LoginPage() {
     const [username, setUsername] = useState('');
-    const [step, setStep] = useState('username'); // 'username', 'camera', 'joining'
+    const [step, setStep] = useState('username'); // 'username', 'avatar', 'camera', 'joining'
     const [showContent, setShowContent] = useState(false);
     const lastSelfie = useRef(null);
-    const { setPlayerState, socket, setTaskEntry, roomCode, roomEntryStatus, setRoomEntryStatus } = useContext(DataContext);
+    const scrollRef = useRef(null);
+    const { setPlayerState, socket, setTaskEntry, roomCode, roomEntryStatus, setRoomEntryStatus, players } = useContext(DataContext);
+
+    // Avatars other players in the room already have. The camera only opens if
+    // the player explicitly chooses a selfie instead.
+    const takenBy = useMemo(() => takenAvatars(players || [], localStorage.getItem('player_id')), [players]);
+    const [pic, setPic] = useState(() => randomFreeAvatar(takenBy));
+    const avatar = getAvatar(pic);
+
+    useEffect(() => {
+        if (isAvatarLocked(pic, takenBy)) setPic(randomFreeAvatar(takenBy));
+    }, [pic, takenBy]);
 
     useEffect(() => {
         if (roomEntryStatus) setStep('username');
@@ -42,20 +55,23 @@ function LoginPage() {
         const timer = setTimeout(() => setShowContent(true), 100);
         return () => clearTimeout(timer);
     }, []);
-    
+
+    // Each step starts at the top; the avatar step can be scrolled on small phones.
+    useEffect(() => {
+        if (!scrollRef.current) return;
+        scrollRef.current.scrollTop = 0;
+        scrollRef.current.scrollLeft = 0;
+    }, [step]);
+
     const handleUsernameSubmit = (e) => {
         e.preventDefault();
         if (username.trim()) {
-            setStep('camera');
+            setStep('avatar');
         }
     };
 
     const handleCameraCapture = (imageData) => {
         joinGame(imageData);
-    };
-
-    const handleCameraSkip = () => {
-        joinGame(null);
     };
 
     const joinGame = (selfie) => {
@@ -65,7 +81,8 @@ function LoginPage() {
         setPlayerState(prevState => ({ ...prevState, username: username }));
         let playerId = localStorage.getItem('player_id');
         const storedRoomCode = roomCode || localStorage.getItem('room_code');
-        socket.emit('join', { player_id: playerId, username: username, selfie: selfie, room_code: storedRoomCode });
+        // The avatar also stands in for a selfie that fails to load.
+        socket.emit('join', { player_id: playerId, username: username, selfie: selfie, pic: pic, room_code: storedRoomCode });
     };
 
     const handleEnterTasks = () => {
@@ -73,7 +90,7 @@ function LoginPage() {
     };
 
     return (
-        <div className="fixed inset-0 flex items-start justify-center bg-gray-950 overflow-y-auto py-20">
+        <div ref={scrollRef} className="fixed inset-0 flex items-start justify-center bg-gray-950 overflow-y-auto overflow-x-hidden py-20">
             {/* Animated background */}
             <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-indigo-950/20 to-gray-950" />
             
@@ -87,11 +104,11 @@ function LoginPage() {
             {/* Floating particles */}
             <FloatingParticles particles={particles} />
             
-            {/* Back Button (camera step only) */}
-            {step === 'camera' && (
+            {/* Back Button (avatar and camera steps) */}
+            {(step === 'avatar' || step === 'camera') && (
                 <button
                     type="button"
-                    onClick={() => setStep('username')}
+                    onClick={() => setStep(step === 'camera' ? 'avatar' : 'username')}
                     className="fixed top-6 left-6 z-50 flex items-center gap-2 px-3 py-2 bg-gray-800/80 hover:bg-gray-700/80 border border-gray-700/50 rounded-xl text-gray-400 hover:text-white transition-all backdrop-blur-sm"
                 >
                     <ChevronLeft size={18} />
@@ -99,8 +116,8 @@ function LoginPage() {
                 </button>
             )}
 
-            {/* Leave button — always visible on username + camera steps */}
-            {(step === 'username' || step === 'camera') && (
+            {/* Leave button — always visible before joining */}
+            {step !== 'joining' && (
                 <div className="fixed top-6 right-6 z-50">
                     <LeaveGameButton />
                 </div>
@@ -158,8 +175,7 @@ function LoginPage() {
                                     disabled={!username.trim()}
                                     variant="indigo"
                                 >
-                                    <Camera size={20} />
-                                    <span className="font-bold">Next: Take Selfie</span>
+                                    <span className="font-bold">Next: Choose Avatar</span>
                                     <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                                 </PrimaryButton>
                             </form>
@@ -169,7 +185,61 @@ function LoginPage() {
                     </>
                 )}
 
-                {/* Step 2: Camera Capture */}
+                {/* Step 2: Avatar (selfie is opt-in from here) */}
+                {step === 'avatar' && (
+                    <Card variant="default" padding="default">
+                        <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-700/50">
+                            <div className="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center flex-shrink-0">
+                                <User size={20} className="text-indigo-400" />
+                            </div>
+                            <div className="min-w-0">
+                                <p className="text-base font-bold text-white truncate">{username}</p>
+                                <p className="text-[11px] text-gray-500 font-mono uppercase tracking-widest">Crew ID · {roomCode}</p>
+                            </div>
+                            <div className="ml-auto flex items-center gap-1 px-2 py-1 bg-indigo-500/20 border border-indigo-500/30 rounded-full flex-shrink-0">
+                                <Sparkles size={11} className="text-indigo-400" />
+                                <span className="text-indigo-400 text-[10px] font-semibold uppercase tracking-widest">Draft</span>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col items-center mb-5">
+                            <div className="w-24 h-24 rounded-full overflow-hidden ring-4 ring-indigo-500/50 shadow-lg">
+                                <Avatar id={pic} className="w-full h-full" />
+                            </div>
+                            <p className="mt-3 text-lg font-bold text-white leading-tight">{avatar?.name}</p>
+                            <p className="text-xs text-gray-500 capitalize">{avatar && `${avatar.color} ${avatar.kind}`}</p>
+                        </div>
+
+                        <AvatarPicker selected={pic} onSelect={setPic} takenBy={takenBy} />
+
+                        <div className="flex gap-2 mt-6">
+                            <SecondaryButton
+                                onClick={() => setPic(randomFreeAvatar(takenBy, pic))}
+                                fullWidth={false}
+                                className="px-4"
+                                aria-label="Pick a random avatar"
+                                title="Pick a random avatar"
+                            >
+                                <Shuffle size={18} />
+                            </SecondaryButton>
+                            <PrimaryButton onClick={() => joinGame(null)} variant="indigo" className="flex-1">
+                                <span className="font-bold">Join Game</span>
+                                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                            </PrimaryButton>
+                        </div>
+
+                        <button
+                            type="button"
+                            onClick={() => setStep('camera')}
+                            className="mt-3 w-full flex items-center justify-center gap-2 py-2 rounded-xl text-sm text-gray-400 hover:text-white hover:bg-gray-800/60 transition-colors"
+                        >
+                            <Camera size={16} />
+                            <span>Take a selfie instead</span>
+                        </button>
+                    </Card>
+                )}
+
+                {/* Step 2b: Camera Capture (only after the player asks for it) */}
                 {step === 'camera' && (
                     <Card variant="default" padding="default">
                         {/* ID card issuing header */}
@@ -186,9 +256,9 @@ function LoginPage() {
                                 <span className="text-indigo-400 text-[10px] font-semibold uppercase tracking-widest">Draft</span>
                             </div>
                         </div>
-                        <CameraCapture 
+                        <CameraCapture
                             onCapture={handleCameraCapture}
-                            onCancel={handleCameraSkip}
+                            onCancel={() => setStep('avatar')}
                         />
                     </Card>
                 )}

@@ -60,7 +60,7 @@ function GroupGamesPage() {
                     <p>
                         For ten players, start with the <a href="/among-us-irl-task-generator?venue=house&players=10&movement=normal">ten-player house task pack</a>.
                         It suggests two intruders. Review the rooms and tasks, import the pack into a new room, then share the code.
-                        The app needs everyone in the same place with internet. For seated play, use two task stations in one room.
+                        The app needs everyone in the same place with internet. Use at least two locations so players have a route.
                     </p>
                     <p>Read the <a href="/how-to-play-among-us-irl">Sus Party round rules</a> before you start. Task completion reveals intruders; the crew still needs to vote them out.</p>
                 </section>
@@ -118,7 +118,7 @@ function GroupGamesPage() {
                     <ul className="seo-links__list">
                         <li><a href="/among-us-birthday-party">Plan a birthday party game</a></li>
                         <li><a href="/among-us-irl-task-ideas#vacation-house-tasks">Choose tasks for a vacation house</a></li>
-                        <li><a href="/among-us-irl-task-generator?venue=apartment&players=10&movement=low">Prepare a seated apartment setup</a></li>
+                        <li><a href="/among-us-irl-task-generator?venue=apartment&players=10">Prepare a room-to-room apartment setup</a></li>
                     </ul>
                 </nav>
             </main>

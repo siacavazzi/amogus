@@ -5,6 +5,10 @@ import './InfoPage.css';
 
 const FAQS = [
     {
+        q: 'What happens to my selfie?',
+        a: 'Your selfie is optional. A current room connection is required to view it. Photos expire after 24 hours. The server deletes expired photos at startup and during its five-minute cleanup cycle. It also deletes your photo when you leave the room or when the room closes. A temporary disconnect keeps your photo available for your return, within the same 24-hour limit.',
+    },
+    {
         q: 'Is Sus Party free?',
         a: 'Yes. Sus Party is free, with no account, ads, or app-store purchase. Open it in your browser, prepare a task pack, and invite friends with your room code.',
         href: '/among-us-irl-task-generator', linkLabel: 'Prepare your first task pack',
@@ -54,8 +58,8 @@ const FAQS = [
     },
     {
         q: 'Can I play remotely / over video chat?',
-        a: 'No. Players share a physical space. The phones connect online, but tasks, observations, and meetings happen in person. The low-movement preset can place two task stations in one room.',
-        href: '/among-us-irl-task-generator?venue=other&players=8&movement=low', linkLabel: 'Prepare a two-station round',
+        a: 'No. Players share a physical space. The phones connect online, but tasks, observations, and meetings happen in person. Choose two or more distinct task locations so players have a route.',
+        href: '/among-us-irl-task-generator?venue=other&players=8', linkLabel: 'Choose your task locations',
     },
     {
         q: 'Do we need a TV or laptop?',

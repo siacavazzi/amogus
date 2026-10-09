@@ -1,6 +1,8 @@
+import json
 from unittest.mock import patch
 
 from server.tests.integration_helpers import SocketGameTestCase, server_app
+from assets.game import AVATAR_COUNT
 
 
 class WeekendReadinessTests(SocketGameTestCase):
@@ -9,15 +11,20 @@ class WeekendReadinessTests(SocketGameTestCase):
             'starting_cards': 0, 'card_draw_probability': 0,
         })
 
+    def join_with_avatar(self, room, username, pic):
+        client = self.make_client()
+        client.emit('join', {'room_code': room, 'username': username, 'pic': pic})
+        return self.first_event(self.drain(client), 'player_id')
+
     def test_large_lobby_reuses_valid_avatars_after_unique_pool_is_empty(self):
-        clients, room, ids, game = self.setup_lobby(25)
+        clients, room, ids, game = self.setup_lobby(AVATAR_COUNT + 7)
         pictures = [player.pic for player in game.players]
-        self.assertEqual(25, len(pictures))
-        self.assertEqual(17, len(set(pictures[:17])))
-        self.assertTrue(all(0 <= picture <= 16 for picture in pictures))
+        self.assertEqual(AVATAR_COUNT + 7, len(pictures))
+        self.assertEqual(AVATAR_COUNT, len(set(pictures[:AVATAR_COUNT])))
+        self.assertTrue(all(0 <= picture < AVATAR_COUNT for picture in pictures))
 
     def test_lobby_departure_returns_an_unused_avatar_to_the_pool(self):
-        clients, room, ids, game = self.setup_lobby(17)
+        clients, room, ids, game = self.setup_lobby(AVATAR_COUNT)
         picture = game.getPlayerById(ids[-1]).pic
         clients[-1].emit('leave_room', {'player_id': ids[-1], 'room_code': room})
         self.assertEqual([picture], game.backgrounds)
@@ -25,8 +32,45 @@ class WeekendReadinessTests(SocketGameTestCase):
         pid = self.join_player(newcomer, room, 'New player')
         self.assertEqual(picture, game.getPlayerById(pid).pic)
 
+    def test_join_uses_the_chosen_avatar_when_it_is_free(self):
+        clients, room, ids, game = self.setup_lobby(2)
+        free = next(pic for pic in range(AVATAR_COUNT) if pic in game.backgrounds)
+        joined = self.join_with_avatar(room, 'Picker', free)
+        self.assertEqual(free, joined['pic'])
+        self.assertNotIn(free, game.backgrounds)
+
+    def test_join_assigns_a_free_avatar_when_the_chosen_one_is_taken(self):
+        clients, room, ids, game = self.setup_lobby(2)
+        taken = game.getPlayerById(ids[0]).pic
+        joined = self.join_with_avatar(room, 'Late picker', taken)
+        self.assertNotEqual(taken, joined['pic'])
+        self.assertEqual(AVATAR_COUNT, len({player.pic for player in game.players}) + len(game.backgrounds))
+
+    def test_join_ignores_an_invalid_avatar_choice(self):
+        clients, room, ids, game = self.setup_lobby(1)
+        for index, pic in enumerate([AVATAR_COUNT, -1, '3', True, None, 2.0]):
+            joined = self.join_with_avatar(room, f'Invalid {index}', pic)
+            self.assertIsInstance(joined['pic'], int)
+            self.assertTrue(0 <= joined['pic'] < AVATAR_COUNT)
+        self.assertEqual(7, len({player.pic for player in game.players}))
+
+    def test_join_honors_the_chosen_avatar_once_every_avatar_is_taken(self):
+        clients, room, ids, game = self.setup_lobby(AVATAR_COUNT)
+        self.assertEqual([], game.backgrounds)
+        joined = self.join_with_avatar(room, 'Duplicate', 5)
+        self.assertEqual(5, joined['pic'])
+
+    def test_entering_a_room_sends_the_current_players_for_the_avatar_picker(self):
+        clients, room, ids, game = self.setup_lobby(2)
+        visitor = self.make_client()
+        visitor.emit('join_game', {'room_code': room})
+        player_lists = [event['args'][0] for event in self.drain(visitor)
+                        if event['name'] == 'game_data' and event['args'][0].get('action') == 'player_list']
+        self.assertEqual(1, len(player_lists))
+        self.assertEqual({p.pic for p in game.players}, {json.loads(p)['pic'] for p in player_lists[0]['list']})
+
     def test_departure_does_not_release_an_avatar_that_another_player_uses(self):
-        clients, room, ids, game = self.setup_lobby(18)
+        clients, room, ids, game = self.setup_lobby(AVATAR_COUNT + 1)
         player = game.players[-1]
         self.assertTrue(any(other.pic == player.pic for other in game.players[:-1]))
         clients[-1].emit('leave_room', {'player_id': player.player_id, 'room_code': room})

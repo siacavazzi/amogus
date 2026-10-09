@@ -19,7 +19,7 @@ class GameManager:
     Each game is identified by a unique room code.
     """
 
-    def __init__(self, socketio, speaker, config, stats_path=None):
+    def __init__(self, socketio, speaker, config, stats_path=None, selfie_store=None):
         self.socketio = socketio
         self.speaker = speaker
         self.config = config
@@ -27,6 +27,7 @@ class GameManager:
         self.player_to_game = {}  # {player_id: room_code}
         self.sid_to_game = {}  # {socket_sid: room_code}
         self.lock = Lock()
+        self.selfie_store = selfie_store
 
         # Persistent usage stats
         if stats_path is None:
@@ -166,6 +167,10 @@ class GameManager:
             del self.games[room_code]
             print(f"Game {room_code} deleted")
         with game.state_lock:
+            if self.selfie_store:
+                for player in game.players:
+                    self.selfie_store.delete(player.selfie)
+                    player.selfie = None
             try:
                 self.stats_tracker.record_room_closed(game, reason)
             except Exception:
@@ -250,6 +255,8 @@ class GameManager:
             while True:
                 time.sleep(300)  # Check every 5 minutes
                 self._cleanup_inactive_games()
+                if self.selfie_store:
+                    self.selfie_store.cleanup_expired()
         
         thread = Thread(target=cleanup_loop, daemon=True)
         thread.start()

@@ -81,7 +81,7 @@ function SocialDeductionPage() {
 
                 <GameSetupCta title="Turn the rooms you already have into a game"
                     href="/among-us-irl-task-generator?venue=house&players=8&movement=normal" label="Build an eight-player house setup">
-                    Choose your areas, review a task pack, then select “Use these tasks in a new game.” Create the room and select “Import generated tasks” in host setup.
+                    Choose your areas, review a task pack, then select “Use this pack.” Create the room and select “Import generated tasks” in host setup.
                 </GameSetupCta>
                 <section className="seo-section">
                     <h2>Can we play without a board or a paid app?</h2>
@@ -92,7 +92,7 @@ function SocialDeductionPage() {
                     </p>
                     <h3>What if we only have one room?</h3>
                     <p>
-                        Choose a seated card game, or use Sus Party’s <a href="/among-us-irl-task-generator?venue=other&players=8&movement=low">two-station task preset</a>.
+                        Choose a seated card game if everyone wants to stay in one place. For Sus Party, choose at least two locations in the <a href="/among-us-irl-task-generator?venue=other&players=8">task generator</a>.
                         Two table stations can share one room. Review the tasks with the group and keep the meeting point nearby.
                     </p>
                     <h3>Is this the imposter word game?</h3>

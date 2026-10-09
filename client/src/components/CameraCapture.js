@@ -156,6 +156,10 @@ function CameraCapture({ onCapture, onCancel }) {
 
     return (
         <div className="flex flex-col items-center">
+            <p className="text-gray-400 text-xs text-center mb-3">
+                Photos are optional. Room participants can view them during play. Photos expire after 24 hours
+                and are deleted when you leave or the host closes the room.
+            </p>
             {/* Hidden canvas for capturing */}
             <canvas ref={canvasRef} className="hidden" />
 

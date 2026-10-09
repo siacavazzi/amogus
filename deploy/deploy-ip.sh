@@ -116,6 +116,11 @@ server {
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
+        access_log off;
+        proxy_cache off;
+        expires off;
+        proxy_hide_header Cache-Control;
+        add_header Cache-Control "private, no-store, max-age=0" always;
     }
 
     location /socket.io/ {

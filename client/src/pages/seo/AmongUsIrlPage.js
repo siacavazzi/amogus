@@ -102,7 +102,7 @@ function AmongUsIrlPage() {
                             <span className="seo-step__num" aria-hidden="true">3</span>
                             <div>
                                 <h3>Take it into Sus Party</h3>
-                                <p>Select “Use these tasks in a new game.” Create a room, then select “Import generated tasks” in host setup.</p>
+                                <p>Select “Use this pack.” Create a room, then select “Import generated tasks” in host setup.</p>
                             </div>
                         </li>
                         <li className="seo-step">
@@ -177,7 +177,7 @@ function AmongUsIrlPage() {
                     <ul className="seo-list">
                         <li>Keep private rooms and host-excluded areas outside the play boundary.</li>
                         <li>Use visible shared items, then return each item to its place.</li>
-                        <li>Choose low movement if the group needs a seated or short-distance round.</li>
+                        <li>Choose nearby locations for a short, step-free route.</li>
                     </ul>
                     <p>
                         For example, count the cushions on the shared living-room sofa.

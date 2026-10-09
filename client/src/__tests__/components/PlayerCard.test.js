@@ -9,8 +9,11 @@
  * - Dead players shown with grayscale and death cause indicator
  */
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { renderWithContext } from '../../test-utils';
 import PlayerCard, { ProfilePicture, getDeathInfo } from '../../components/PlayerCard';
+
+const selfieAccess = { sid: 'sid-1', token: 'token-1' };
 
 describe('getDeathInfo', () => {
     it('returns correct info for voted_out', () => {
@@ -86,19 +89,41 @@ describe('ProfilePicture', () => {
         });
     });
 
-    describe('Selfie Loading', () => {
-        it('attempts to load selfie when provided', () => {
-            render(<ProfilePicture selfie="test-selfie.jpg" />);
-            
-            const img = screen.getByRole('img');
-            expect(img).toHaveAttribute('src', expect.stringContaining('test-selfie.jpg'));
+    describe('Avatar', () => {
+        it('renders the chosen avatar', () => {
+            render(<ProfilePicture imageCode={7} />);
+
+            expect(screen.getByRole('img', { name: /Hopper/ })).toBeInTheDocument();
         });
 
-        it('has fallback for failed selfie load', () => {
-            render(<ProfilePicture selfie="invalid.jpg" imageCode={1} />);
-            
+        it('renders avatar 0 rather than treating it as missing', () => {
+            render(<ProfilePicture imageCode={0} />);
+
+            expect(screen.getByRole('img', { name: /Astro/ })).toBeInTheDocument();
+        });
+    });
+
+    describe('Selfie Loading', () => {
+        it('attempts to load selfie when provided', () => {
+            renderWithContext(<ProfilePicture selfie="test-selfie.jpg" imageCode={1} />, { selfieAccess });
+
             const img = screen.getByRole('img');
-            // onError handler should trigger fallback
+            expect(img).toHaveAttribute('src', expect.stringContaining('test-selfie.jpg'));
+            expect(img).toHaveAttribute('src', expect.stringContaining('token=token-1'));
+        });
+
+        it('falls back to the avatar when the selfie fails to load', () => {
+            renderWithContext(<ProfilePicture selfie="expired.jpg" imageCode={1} />, { selfieAccess });
+
+            fireEvent.error(screen.getByRole('img'));
+
+            expect(screen.getByRole('img', { name: /Bolt/ })).toBeInTheDocument();
+        });
+
+        it('shows the avatar while photo access is not available', () => {
+            render(<ProfilePicture selfie="test-selfie.jpg" imageCode={1} />);
+
+            expect(screen.getByRole('img', { name: /Bolt/ })).toBeInTheDocument();
         });
     });
 });
