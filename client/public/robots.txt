@@ -1,9 +1,7 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Allow: /
-Disallow: /play
-Disallow: /play/
 Disallow: /dashboard
 Disallow: /dashboard/
+Allow: /
 
 Sitemap: https://susparty.com/sitemap.xml

@@ -144,6 +144,28 @@ systemctl status amogus
 nginx -t && systemctl reload nginx
 ```
 
+The deployment workflow installs the Nginx configuration and restores the previous file if validation fails.
+Nginx serves each page snapshot at its canonical URL without a slash redirect.
+Slash variants remain available for browsers that cached the previous redirects.
+The `www` host redirects to `https://susparty.com`.
+
+After the build, check all public pages:
+
+```bash
+cd client
+node scripts/check-seo.js
+```
+
+After deployment, check the live pages:
+
+```bash
+node scripts/check-seo.js https://susparty.com
+```
+
+The checks cover HTTP status, canonical tags, titles, descriptions, rendered content, internal links, robots.txt, and the sitemap.
+Search Console can retain older results until Google crawls the pages again.
+Submit the sitemap and request indexing for the canonical URLs after deployment.
+
 ## Updating the Application
 
 ```bash

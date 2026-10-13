@@ -1,0 +1,93 @@
+#!/usr/bin/env python3
+"""Check public routes with the deployment configuration and an isolated Nginx server."""
+import json
+import os
+from pathlib import Path
+import re
+import shutil
+import socket
+import subprocess
+import tempfile
+import time
+
+repo = Path(__file__).resolve().parents[2]
+nginx = shutil.which('nginx')
+if not nginx:
+    raise SystemExit('Install Nginx before this check.')
+routes = json.loads((repo / 'client/src/seo/routes.json').read_text())
+
+
+def free_port():
+    with socket.socket() as server:
+        server.bind(('127.0.0.1', 0))
+        return server.getsockname()[1]
+
+
+with tempfile.TemporaryDirectory(prefix='sus-party-seo-nginx-') as directory:
+    root = Path(directory)
+    (root / 'logs').mkdir()
+    http_port, https_port = free_port(), free_port()
+    certificate, key = root / 'cert.pem', root / 'key.pem'
+    subprocess.run([
+        'openssl', 'req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-days', '1',
+        '-subj', '/CN=susparty.com', '-addext', 'subjectAltName=DNS:susparty.com,DNS:www.susparty.com',
+        '-keyout', str(key), '-out', str(certificate),
+    ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    config = (repo / 'deploy/nginx-amogus.conf').read_text()
+    config = re.sub(r'^\s*listen \[::\].*;\s*$', '', config, flags=re.M)
+    config = config.replace('listen 80;', f'listen 127.0.0.1:{http_port};')
+    config = config.replace('listen 443 ssl http2;', f'listen 127.0.0.1:{https_port} ssl http2;')
+    config = config.replace('/etc/letsencrypt/live/susparty.com/fullchain.pem', str(certificate))
+    config = config.replace('/etc/letsencrypt/live/susparty.com/privkey.pem', str(key))
+    config = config.replace('/opt/amogus/client/build', str(repo / 'client/build'))
+    config = config.replace('/var/log/nginx/amogus_', str(root / 'amogus_'))
+    (root / 'site.conf').write_text(config)
+    user = 'user root;\n' if os.geteuid() == 0 else ''
+    (root / 'nginx.conf').write_text(user + 'events {}\nhttp { types { text/html html; text/plain txt; application/xml xml; } include site.conf; }\n')
+    command = [nginx, '-p', str(root) + '/', '-c', 'nginx.conf']
+    subprocess.run(command + ['-t'], check=True)
+    with (root / 'process.log').open('w') as output:
+        process = subprocess.Popen(command + ['-g', 'daemon off;'], stdout=output, stderr=output)
+        try:
+            for _ in range(50):
+                if process.poll() is not None:
+                    raise RuntimeError((root / 'process.log').read_text())
+                try:
+                    with socket.create_connection(('127.0.0.1', https_port), timeout=0.1):
+                        break
+                except OSError:
+                    time.sleep(0.1)
+
+            def request(path, host='susparty.com', scheme='https'):
+                port = https_port if scheme == 'https' else http_port
+                subprocess.run([
+                    'curl', '--silent', '--show-error', '--fail', '--max-time', '10', '--noproxy', '*',
+                    '--cacert', str(certificate), '--resolve', f'{host}:{port}:127.0.0.1',
+                    '--dump-header', str(root / 'headers'), '--output', str(root / 'body'),
+                    f'{scheme}://{host}:{port}{path}',
+                ], check=True)
+                return (root / 'headers').read_text(), (root / 'body').read_text()
+
+            for route in routes:
+                if route.get('prerender') is False:
+                    continue
+                for suffix in ['', '?utm_source=seo-check'] + (['/'] if route['path'] != '/' else []):
+                    headers, body = request(route['path'] + suffix)
+                    assert re.match(r'HTTP/\S+ 200', headers), (route['path'], headers)
+                    assert 'location:' not in headers.lower(), (route['path'], headers)
+                    assert f'href="{route["canonical"]}"' in body, route['path']
+                    assert re.search(r'content-type:\s*text/html', headers, re.I), headers
+
+            for scheme, host in [('https', 'www.susparty.com'), ('http', 'www.susparty.com'), ('http', 'susparty.com')]:
+                headers, _ = request('/among-us-irl-task-generator?room=Desk&room=Yard', host, scheme)
+                assert re.match(r'HTTP/\S+ 301', headers), headers
+                location = re.search(r'^location:\s*(.+)$', headers, re.I | re.M).group(1).strip()
+                assert location == 'https://susparty.com/among-us-irl-task-generator?room=Desk&room=Yard', headers
+            headers, robots = request('/robots.txt')
+            assert re.match(r'HTTP/\S+ 200', headers), headers
+            exclusions = re.findall(r'^Disallow:\s*(\S+)\s*$', robots, re.I | re.M)
+            assert sorted(exclusions) == ['/dashboard', '/dashboard/'], robots
+            print(f'PASS {len(routes)} routes on Nginx: direct 200 responses, slash and query variants, canonical tags, crawl access, and host redirects.')
+        finally:
+            process.terminate()
+            process.wait(timeout=10)

@@ -34,6 +34,16 @@ jobs:
         working-directory: ./client
         run: node scripts/check-built-app.js
 
+      - name: Check crawl access and page metadata
+        working-directory: ./client
+        run: node scripts/check-seo.js
+
+      - name: Check Nginx page routing
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y nginx
+          python3 deploy/tests/check-seo-nginx.py
+
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
@@ -63,6 +73,23 @@ jobs:
           rsync -avz \
             ./deploy/ root@${{ secrets.DROPLET_IP }}:/opt/amogus/deploy/
 
+      - name: Apply Nginx configuration
+        run: |
+          ssh root@${{ secrets.DROPLET_IP }} 'bash -s' << 'EOF'
+            set -e
+            config=/etc/nginx/sites-available/amogus
+            backup=$(mktemp)
+            cp -p "$config" "$backup"
+            if cp /opt/amogus/deploy/nginx-amogus.conf "$config" && nginx -t && systemctl reload nginx; then
+              rm -f "$backup"
+            else
+              cp -p "$backup" "$config"
+              nginx -t && systemctl reload nginx
+              rm -f "$backup"
+              exit 1
+            fi
+          EOF
+
       - name: Restart application
         env:
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
@@ -86,4 +113,8 @@ jobs:
       - name: Health check
         run: |
           sleep 5
-          curl -f https://amogus-party.duckdns.org/health || echo "Health check failed but deployment completed"
+          curl --fail --retry 3 https://susparty.com/health
+
+      - name: Check live crawl access and canonical URLs
+        working-directory: ./client
+        run: node scripts/check-seo.js https://susparty.com

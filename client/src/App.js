@@ -25,6 +25,7 @@ import SleepoverPage from './pages/seo/SleepoverPage';
 import FamilyReunionPage from './pages/seo/FamilyReunionPage';
 import { getRoomCodeFromSearch } from './utils/inviteLinks';
 import { captureAcquisition } from './seo/discovery';
+import { usePageMeta } from './seo/usePageMeta';
 
 const StylePreview = lazy(() => import('./preview/StylePreview'));
 
@@ -127,6 +128,16 @@ function getRoute() {
   return 'landing';
 }
 
+function GamePage() {
+  usePageMeta({
+    title: 'Sus Party | Host or Join a Game',
+    description: 'Host a free Sus Party game or join friends with a room code. Play Among Us in real life with tasks, secret roles, sabotage, and votes.',
+    canonical: 'https://susparty.com/play',
+    documentClass: 'game-document',
+  });
+  return <GameContext><PageController /></GameContext>;
+}
+
 function App() {
     const route = getRoute();
     useEffect(() => { captureAcquisition(); }, []);
@@ -136,11 +147,7 @@ function App() {
   }
 
   if (route === 'game') {
-    return (
-      <GameContext>
-        <PageController />
-      </GameContext>
-    );
+    return <GamePage />;
   }
 
   if (route === 'how-to-play') {

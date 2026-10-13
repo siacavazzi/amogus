@@ -171,7 +171,7 @@ server {
     }
     
     location / {
-        return 301 https://\$server_name\$request_uri;
+        return 301 https://$DOMAIN\$request_uri;
     }
 }
 
@@ -180,6 +180,10 @@ server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
     server_name $DOMAIN www.$DOMAIN;
+
+    if (\$host = www.$DOMAIN) {
+        return 301 https://$DOMAIN\$request_uri;
+    }
 
     ssl_certificate /etc/letsencrypt/live/$DOMAIN/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/$DOMAIN/privkey.pem;
@@ -200,7 +204,7 @@ server {
     index index.html;
 
     location / {
-        try_files \$uri \$uri/ /index.html;
+        try_files \$uri/index.html \$uri /index.html;
     }
 
     location /api/ {

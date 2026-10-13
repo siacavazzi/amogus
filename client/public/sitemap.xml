@@ -6,6 +6,11 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://susparty.com/play</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://susparty.com/among-us-irl</loc>
     <changefreq>monthly</changefreq>
     <priority>0.95</priority>

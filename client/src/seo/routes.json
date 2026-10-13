@@ -7,6 +7,13 @@
     "prerender": true
   },
   {
+    "path": "/play",
+    "canonical": "https://susparty.com/play",
+    "priority": "0.7",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
     "path": "/among-us-irl",
     "canonical": "https://susparty.com/among-us-irl",
     "priority": "0.95",
