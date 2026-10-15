@@ -43,8 +43,21 @@ with tempfile.TemporaryDirectory(prefix='sus-party-seo-nginx-') as directory:
     config = config.replace('/var/log/nginx/amogus_', str(root / 'amogus_'))
     (root / 'site.conf').write_text(config)
     user = 'user root;\n' if os.geteuid() == 0 else ''
-    (root / 'nginx.conf').write_text(user + 'events {}\nhttp { types { text/html html; text/plain txt; application/xml xml; } include site.conf; }\n')
-    command = [nginx, '-p', str(root) + '/', '-c', 'nginx.conf']
+    # Override package defaults so the check needs no system directory access.
+    (root / 'nginx.conf').write_text(user + '''pid logs/nginx.pid;
+events {}
+http {
+    access_log logs/access.log;
+    client_body_temp_path client_body_temp;
+    proxy_temp_path proxy_temp;
+    fastcgi_temp_path fastcgi_temp;
+    uwsgi_temp_path uwsgi_temp;
+    scgi_temp_path scgi_temp;
+    types { text/html html; text/plain txt; application/xml xml; }
+    include site.conf;
+}
+''')
+    command = [nginx, '-p', str(root) + '/', '-c', 'nginx.conf', '-e', 'stderr']
     subprocess.run(command + ['-t'], check=True)
     with (root / 'process.log').open('w') as output:
         process = subprocess.Popen(command + ['-g', 'daemon off;'], stdout=output, stderr=output)
