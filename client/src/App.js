@@ -23,6 +23,14 @@ import TraitorsAtHomePage from './pages/seo/TraitorsAtHomePage';
 import PhonePartyPage from './pages/seo/PhonePartyPage';
 import SleepoverPage from './pages/seo/SleepoverPage';
 import FamilyReunionPage from './pages/seo/FamilyReunionPage';
+import RoleGeneratorPage from './pages/seo/RoleGeneratorPage';
+import AmongUsChoresPage from './pages/seo/AmongUsChoresPage';
+import ChoreGamesPage from './pages/seo/ChoreGamesPage';
+import FamilyCleaningRoutinePage from './pages/seo/FamilyCleaningRoutinePage';
+import KidsPartyPage from './pages/seo/KidsPartyPage';
+import YouthGroupsPage from './pages/seo/YouthGroupsPage';
+import PrintableTaskCardsPage from './pages/seo/PrintableTaskCardsPage';
+import HolidayPartyPage from './pages/seo/HolidayPartyPage';
 import { getRoomCodeFromSearch } from './utils/inviteLinks';
 import { captureAcquisition } from './seo/discovery';
 import { usePageMeta } from './seo/usePageMeta';
@@ -125,6 +133,38 @@ function getRoute() {
     return 'family-reunion';
   }
 
+  if (normalizedPath === '/among-us-role-generator' || normalizedPath.startsWith('/among-us-role-generator/')) {
+    return 'role-generator';
+  }
+
+  if (normalizedPath === '/among-us-chores' || normalizedPath.startsWith('/among-us-chores/')) {
+    return 'among-us-chores';
+  }
+
+  if (normalizedPath === '/chore-games-for-kids' || normalizedPath.startsWith('/chore-games-for-kids/')) {
+    return 'chore-games';
+  }
+
+  if (normalizedPath === '/family-cleaning-routine' || normalizedPath.startsWith('/family-cleaning-routine/')) {
+    return 'cleaning-routine';
+  }
+
+  if (normalizedPath === '/among-us-party-for-kids' || normalizedPath.startsWith('/among-us-party-for-kids/')) {
+    return 'kids-party';
+  }
+
+  if (normalizedPath === '/among-us-irl-for-youth-groups' || normalizedPath.startsWith('/among-us-irl-for-youth-groups/')) {
+    return 'youth-groups';
+  }
+
+  if (normalizedPath === '/among-us-task-cards-printable' || normalizedPath.startsWith('/among-us-task-cards-printable/')) {
+    return 'printable-cards';
+  }
+
+  if (normalizedPath === '/holiday-party-games-for-adults' || normalizedPath.startsWith('/holiday-party-games-for-adults/')) {
+    return 'holiday-party';
+  }
+
   return 'landing';
 }
 
@@ -198,6 +238,14 @@ function App() {
   if (route === 'phone-party') return <PhonePartyPage />;
   if (route === 'sleepover') return <SleepoverPage />;
   if (route === 'family-reunion') return <FamilyReunionPage />;
+  if (route === 'role-generator') return <RoleGeneratorPage />;
+  if (route === 'among-us-chores') return <AmongUsChoresPage />;
+  if (route === 'chore-games') return <ChoreGamesPage />;
+  if (route === 'cleaning-routine') return <FamilyCleaningRoutinePage />;
+  if (route === 'kids-party') return <KidsPartyPage />;
+  if (route === 'youth-groups') return <YouthGroupsPage />;
+  if (route === 'printable-cards') return <PrintableTaskCardsPage />;
+  if (route === 'holiday-party') return <HolidayPartyPage />;
 
   return <LandingPage />;
 }

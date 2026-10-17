@@ -15,7 +15,7 @@ const SCHEMA = {
 
 export default function PhonePartyPage() {
     usePageMeta({
-        title: 'Sus Party | A Phone Party Game to Play Together',
+        title: 'Party Games on Your Phone to Play Together | Sus Party',
         description: DESCRIPTION, canonical: 'https://susparty.com/party-games-on-your-phone', schema: SCHEMA,
     });
     return (

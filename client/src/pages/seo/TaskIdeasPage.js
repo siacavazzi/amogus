@@ -199,9 +199,9 @@ const TIPS = [
 
 function TaskIdeasPage() {
     usePageMeta({
-        title: 'Sus Party | Free Among Us IRL Task Ideas at Home',
+        title: 'Among Us Tasks in Real Life: Free Ideas at Home | Sus Party',
         description:
-            'Free Among Us in real life task ideas for your kitchen, living room, and hallway. Build a house task pack, then play together on your phones with Sus Party.',
+            'Among Us tasks to do in real life at home: easy ideas for every room, for kids and adults. Copy the free list or build a task pack in one click.',
         canonical: 'https://susparty.com/among-us-irl-task-ideas',
         ogImage: 'https://susparty.com/og-image.jpg',
         schema: SCHEMA,

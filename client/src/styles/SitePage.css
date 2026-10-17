@@ -134,7 +134,7 @@
     position: relative;
     z-index: 1;
 }
-.site-footer__links { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+.site-footer__links { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
 .site-footer__links > div { display: flex; flex-direction: column; gap: 8px; }
 .site-footer__links a { color: var(--site-body); font-size: .83rem; text-decoration: none; width: fit-content; }
 .site-footer__links a:hover { color: var(--site-ink); text-decoration: underline; }

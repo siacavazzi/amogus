@@ -50,7 +50,7 @@ function RoomIcon({ room }) {
 
 export default function TaskGeneratorPage() {
     usePageMeta({
-        title: 'Sus Party | Among Us IRL Task Generator',
+        title: 'Free Among Us IRL Task Generator | Sus Party',
         description: 'Build a room-to-room Among Us IRL task pack. Choose your locations, tune the practical-to-playful mix, edit any task, then use your pack in Sus Party.',
         canonical: 'https://susparty.com/among-us-irl-task-generator',
     });

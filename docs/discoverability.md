@@ -57,7 +57,7 @@ It shares settings, rather than a private saved task list or live room.
 
 Keep public guides in prerendered HTML.
 Make sure that each page contains one H1, an accurate title, a canonical URL, and useful internal links.
-Keep /play and /dashboard excluded in robots.txt.
+Keep /dashboard excluded in robots.txt. /play stays crawlable and in the sitemap as the public game entry.
 Run npm run build from client, then run node scripts/check-built-app.js.
 Read the generated page HTML before a release.
 

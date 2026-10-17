@@ -1,0 +1,25 @@
+/* Role generator: setup form and pass-the-phone reveal. */
+.role-gen { border: 1px solid var(--site-line); border-radius: 8px; padding: 24px; max-width: 520px; }
+.role-gen__field { margin: 0 0 18px; padding: 0; border: 0; min-width: 0; }
+.role-gen__field > label, .role-gen__field legend { display: block; margin: 0 0 8px; color: var(--site-ink); font-weight: 550; font-size: .9rem; }
+.role-gen textarea, .role-gen input[type="number"] {
+    width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1px solid var(--site-line); border-radius: 6px;
+    background: rgba(255, 255, 255, .04); color: var(--site-ink); font: inherit; font-size: 1rem;
+}
+.role-gen input[type="number"] { max-width: 120px; }
+.role-gen__check { display: inline-flex; align-items: center; gap: 8px; margin-right: 20px; color: var(--site-body); }
+.role-gen__summary { color: var(--site-muted); font-size: .88rem; margin: 0 0 18px; }
+.role-gen--deal { text-align: center; padding: 36px 24px; }
+.role-gen__step { color: var(--site-muted); font-size: .82rem; margin: 0 0 12px; }
+.role-gen__name { color: var(--site-ink); font-size: 1.2rem; font-weight: 600; margin: 0 0 12px; }
+.role-gen__role { font-size: 2.4rem; font-weight: 700; margin: 0 0 12px; color: var(--site-ink); }
+.role-gen__role--intruder { color: #ff6b6b; }
+.role-gen__role--crew { color: #6bd4ff; }
+.role-gen__role--sheriff, .role-gen__role--jester { color: #ffd166; }
+.role-gen__hint { color: var(--site-body); margin: 0 auto 22px; max-width: 380px; line-height: 1.6; }
+.role-gen__buttons { display: flex; flex-wrap: wrap; gap: 12px 20px; justify-content: center; align-items: center; }
+.role-gen__plain { background: none; border: 0; color: var(--site-link); font: inherit; cursor: pointer; padding: 6px 0; }
+.role-gen__all { list-style: none; padding: 0; margin: 22px auto 0; max-width: 320px; text-align: left; }
+.role-gen__all li { display: flex; justify-content: space-between; border-top: 1px solid var(--site-line); padding: 8px 0; color: var(--site-body); }
+.role-gen__all span { color: var(--site-ink); }
+@media (max-width: 640px) { .role-gen { padding: 18px; } }
