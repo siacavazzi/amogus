@@ -38,6 +38,8 @@ def load_version_info():
     info = _from_file() or _from_git() or {'version': 'dev'}
     info.setdefault('commit', None)
     info.setdefault('built_at', None)
+    # "beta" for the copy that main deploys to, "prod" otherwise
+    info['channel'] = os.environ.get('AMOGUS_CHANNEL', 'prod')
     return info
 
 

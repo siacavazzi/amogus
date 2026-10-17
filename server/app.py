@@ -24,7 +24,7 @@ from config import (
 )
 
 logger = setup_logging()
-logger.info(f"Starting Sus Party server version {VERSION} (commit {VERSION_INFO['commit']}, built {VERSION_INFO['built_at']})")
+logger.info(f"Starting Sus Party {VERSION_INFO['channel']} server version {VERSION} (commit {VERSION_INFO['commit']}, built {VERSION_INFO['built_at']})")
 
 # Serve React build files
 CLIENT_BUILD_DIR = os.path.join(os.path.dirname(__file__), '..', 'client', 'build')

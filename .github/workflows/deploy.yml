@@ -1,9 +1,17 @@
-name: Deploy to DigitalOcean
+name: Deploy to beta
+
+# Pushes to main go to the beta copy of the app (/opt/amogus-beta, port 5002).
+# Open https://susparty.com/?beta=1 to use it, ?beta=0 to go back to prod.
+# The "Promote beta to prod" workflow copies what is on beta into prod.
 
 on:
   push:
     branches: [main]
   workflow_dispatch:  # Allow manual trigger
+
+concurrency:
+  group: droplet
+  cancel-in-progress: false
 
 jobs:
   build-and-deploy:
@@ -67,8 +75,10 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.DROPLET_IP }} >> ~/.ssh/known_hosts
 
-      - name: Deploy to Droplet
+      - name: Deploy to beta on the Droplet
         run: |
+          ssh root@${{ secrets.DROPLET_IP }} 'mkdir -p /opt/amogus-beta/server/selfies /opt/amogus-beta/server/data /opt/amogus-beta/server/task_lists /opt/amogus-beta/server/logs /opt/amogus-beta/client/build'
+
           # Upload server files
           rsync -avz --delete \
             --exclude '__pycache__' \
@@ -76,19 +86,22 @@ jobs:
             --exclude 'stats.json*' \
             --exclude 'selfies/*' \
             --exclude 'task_lists/*' \
+            --exclude 'data/*' \
             --exclude 'logs/*' \
             --exclude 'cert.pem' \
             --exclude 'key.pem' \
-            ./server/ root@${{ secrets.DROPLET_IP }}:/opt/amogus/server/
+            ./server/ root@${{ secrets.DROPLET_IP }}:/opt/amogus-beta/server/
 
           # Upload built React app
           rsync -avz --delete \
-            ./client/build/ root@${{ secrets.DROPLET_IP }}:/opt/amogus/client/build/
+            ./client/build/ root@${{ secrets.DROPLET_IP }}:/opt/amogus-beta/client/build/
 
           # Upload deploy scripts (in case they changed)
           rsync -avz \
             ./deploy/ root@${{ secrets.DROPLET_IP }}:/opt/amogus/deploy/
 
+      # Nginx is shared by prod and beta (it routes each browser by cookie), so
+      # config changes apply to both as soon as they reach main.
       - name: Apply Nginx configuration
         run: |
           ssh root@${{ secrets.DROPLET_IP }} 'bash -s' << 'EOF'
@@ -106,32 +119,49 @@ jobs:
             fi
           EOF
 
-      - name: Restart application
+      - name: Restart beta
         env:
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
         run: |
           ADMIN_PASSWORD_B64="$(printf '%s' "$ADMIN_PASSWORD" | base64 -w 0)"
           ssh root@${{ secrets.DROPLET_IP }} "ADMIN_PASSWORD_B64='$ADMIN_PASSWORD_B64' bash -s" << 'EOF'
             set -e
+            # The beta service is a copy of the prod unit pointed at /opt/amogus-beta
+            # and port 5002. It shares prod's Python virtualenv.
+            prod_unit="$(systemctl show -p FragmentPath --value amogus)"
+            sed -e 's#/opt/amogus/server#/opt/amogus-beta/server#g' \
+                -e 's#5001#5002#g' \
+                -e 's#^Description=.*#Description=Sus Party Game Server (beta)#' \
+                -e 's#/var/log/amogus/stdout.log#/var/log/amogus/stdout-beta.log#' \
+                -e 's#/var/log/amogus/stderr.log#/var/log/amogus/stderr-beta.log#' \
+                "$prod_unit" > /etc/systemd/system/amogus-beta.service
+            install -d -m 0755 /etc/systemd/system/amogus-beta.service.d
+            printf '[Service]\nEnvironment="AMOGUS_CHANNEL=beta"\n' > /etc/systemd/system/amogus-beta.service.d/channel.conf
             if [ -n "${ADMIN_PASSWORD_B64:-}" ]; then
-              install -d -m 0755 /etc/systemd/system/amogus.service.d
               ADMIN_PASSWORD="$(printf '%s' "$ADMIN_PASSWORD_B64" | base64 -d)"
-              printf '[Service]\nEnvironment="ADMIN_PASSWORD=%s"\n' "$ADMIN_PASSWORD" > /etc/systemd/system/amogus.service.d/admin-password.conf
-              systemctl daemon-reload
+              for unit in amogus amogus-beta; do
+                install -d -m 0755 /etc/systemd/system/$unit.service.d
+                printf '[Service]\nEnvironment="ADMIN_PASSWORD=%s"\n' "$ADMIN_PASSWORD" > /etc/systemd/system/$unit.service.d/admin-password.conf
+              done
             fi
+            # Match the prod unit's run-as user, if it has one
+            owner="$(sed -n 's/^User=//p' "$prod_unit" | head -1)"
+            if [ -n "$owner" ] && [ "$owner" != root ]; then
+              chown -R "$owner" /opt/amogus-beta/server/selfies /opt/amogus-beta/server/data /opt/amogus-beta/server/task_lists /opt/amogus-beta/server/logs
+            fi
+            systemctl daemon-reload
+            systemctl enable amogus-beta
             # Ensure all Python dependencies are installed
             /opt/amogus/venv/bin/pip install -q flask flask-socketio flask-cors eventlet gunicorn soco
-            systemctl restart amogus
+            systemctl restart amogus-beta
             sleep 3
-            systemctl status amogus --no-pager || true
+            systemctl status amogus-beta --no-pager || true
           EOF
 
       - name: Health check
         run: |
           sleep 5
-          curl --fail --retry 3 https://susparty.com/health
-          echo "Live version: $(curl -s https://susparty.com/api/version)"
-
-      - name: Check live crawl access and canonical URLs
-        working-directory: ./client
-        run: node scripts/check-seo.js https://susparty.com
+          curl --fail --retry 3 --cookie 'sus_channel=beta' https://susparty.com/health
+          echo
+          echo "Beta version: $(curl -s --cookie 'sus_channel=beta' https://susparty.com/api/version)"
+          echo "Prod version: $(curl -s https://susparty.com/api/version)"

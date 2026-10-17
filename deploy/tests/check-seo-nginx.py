@@ -40,6 +40,7 @@ with tempfile.TemporaryDirectory(prefix='sus-party-seo-nginx-') as directory:
     config = config.replace('/etc/letsencrypt/live/susparty.com/fullchain.pem', str(certificate))
     config = config.replace('/etc/letsencrypt/live/susparty.com/privkey.pem', str(key))
     config = config.replace('/opt/amogus/client/build', str(repo / 'client/build'))
+    config = config.replace('/opt/amogus-beta/client/build', str(repo / 'client/build'))
     config = config.replace('/var/log/nginx/amogus_', str(root / 'amogus_'))
     (root / 'site.conf').write_text(config)
     user = 'user root;\n' if os.geteuid() == 0 else ''
@@ -71,12 +72,13 @@ http {
                 except OSError:
                     time.sleep(0.1)
 
-            def request(path, host='susparty.com', scheme='https'):
+            def request(path, host='susparty.com', scheme='https', cookie=None):
                 port = https_port if scheme == 'https' else http_port
                 subprocess.run([
                     'curl', '--silent', '--show-error', '--fail', '--max-time', '10', '--noproxy', '*',
                     '--cacert', str(certificate), '--resolve', f'{host}:{port}:127.0.0.1',
                     '--dump-header', str(root / 'headers'), '--output', str(root / 'body'),
+                    *(['--cookie', cookie] if cookie else []),
                     f'{scheme}://{host}:{port}{path}',
                 ], check=True)
                 return (root / 'headers').read_text(), (root / 'body').read_text()
@@ -100,6 +102,22 @@ http {
             assert re.match(r'HTTP/\S+ 200', headers), headers
             exclusions = re.findall(r'^Disallow:\s*(\S+)\s*$', robots, re.I | re.M)
             assert sorted(exclusions) == ['/dashboard', '/dashboard/'], robots
+
+            # Beta channel: ?beta=1 opts in, the cookie keeps it, ?beta=0 opts out.
+            # Prod responses carry neither the cookie nor a noindex header.
+            headers, _ = request('/')
+            assert not re.search(r'^(set-cookie|x-robots-tag):', headers, re.I | re.M), headers
+            headers, _ = request('/play?beta=1')
+            assert re.search(r'^set-cookie:\s*sus_channel=beta;', headers, re.I | re.M), headers
+            assert re.search(r'^x-robots-tag:\s*noindex', headers, re.I | re.M), headers
+            headers, _ = request('/play', cookie='sus_channel=beta')
+            assert re.search(r'^x-robots-tag:\s*noindex', headers, re.I | re.M), headers
+            # Pages without a prerendered snapshot fall back to /index.html internally
+            headers, _ = request('/version?utm_source=x&beta=1')
+            assert re.search(r'^set-cookie:\s*sus_channel=beta;', headers, re.I | re.M), headers
+            headers, _ = request('/play?beta=0', cookie='sus_channel=beta')
+            assert re.search(r'^set-cookie:\s*sus_channel=;.*Max-Age=0', headers, re.I | re.M), headers
+            assert not re.search(r'^x-robots-tag:', headers, re.I | re.M), headers
             print(f'PASS {len(routes)} routes on Nginx: direct 200 responses, slash and query variants, canonical tags, crawl access, and host redirects.')
         finally:
             process.terminate()

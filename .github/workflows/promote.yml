@@ -1,0 +1,87 @@
+name: Promote beta to prod
+
+# Run from the Actions tab once beta (https://susparty.com/?beta=1) looks good.
+# Copies exactly what beta is running into prod and restarts prod. Player data
+# (selfies, task lists, stats, logs) stays separate for each.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: droplet
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DROPLET_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.DROPLET_IP }} >> ~/.ssh/known_hosts
+
+      - name: Show what will be promoted
+        run: |
+          echo "Beta (promoting): $(curl -s --cookie 'sus_channel=beta' https://susparty.com/api/version)"
+          echo "Prod (replacing): $(curl -s https://susparty.com/api/version)"
+
+      # Run the live checks below against the same commit beta was built from
+      - name: Check out the beta commit
+        run: |
+          commit="$(curl -s --cookie 'sus_channel=beta' https://susparty.com/api/version | jq -r '.commit // empty')"
+          if [ -n "$commit" ]; then git checkout "$commit"; fi
+
+      - name: Copy beta into prod and restart
+        run: |
+          ssh root@${{ secrets.DROPLET_IP }} 'bash -s' << 'EOF'
+            set -e
+            if [ ! -f /opt/amogus-beta/server/version.json ] || [ ! -f /opt/amogus-beta/client/build/index.html ]; then
+              echo "Nothing on beta to promote yet. Push to main first." >&2
+              exit 1
+            fi
+            excludes=(
+              --exclude '__pycache__' --exclude '*.pyc' --exclude 'stats.json*'
+              --exclude 'selfies/*' --exclude 'task_lists/*' --exclude 'data/*'
+              --exclude 'logs/*' --exclude 'cert.pem' --exclude 'key.pem'
+            )
+            # Keep the current prod release next to it in case it needs restoring by hand
+            mkdir -p /opt/amogus-previous/server /opt/amogus-previous/client/build
+            rsync -a --delete "${excludes[@]}" /opt/amogus/server/ /opt/amogus-previous/server/
+            rsync -a --delete /opt/amogus/client/build/ /opt/amogus-previous/client/build/
+
+            rsync -a --delete "${excludes[@]}" /opt/amogus-beta/server/ /opt/amogus/server/
+            rsync -a --delete /opt/amogus-beta/client/build/ /opt/amogus/client/build/
+            systemctl restart amogus
+            sleep 3
+            systemctl status amogus --no-pager || true
+          EOF
+
+      - name: Health check
+        run: |
+          sleep 5
+          curl --fail --retry 3 https://susparty.com/health
+          echo
+          echo "Prod version: $(curl -s https://susparty.com/api/version)"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./client
+        run: npm ci --legacy-peer-deps
+
+      - name: Check live crawl access and canonical URLs
+        working-directory: ./client
+        run: node scripts/check-seo.js https://susparty.com

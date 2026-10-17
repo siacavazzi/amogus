@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ENDPOINT } from '../../ENDPOINT';
 import { CLIENT_VERSION } from '../../version';
+import { isBetaChannel } from '../../components/BetaBadge';
 import '../admin/AdminDashboard.css';
 
 const REPO_URL = 'https://github.com/siacavazzi/amogus';
@@ -55,7 +56,8 @@ function VersionPage() {
   const mismatch = server && !server.error && server.version !== CLIENT_VERSION.version;
 
   return (
-    <main className="adm-shell" style={{ padding: '2rem 1rem', maxWidth: 720, margin: '0 auto' }}>
+    <main className="adm-shell version-page" style={{ padding: '2rem 1rem', maxWidth: 720, margin: '0 auto' }}>
+      <style>{'.version-page a { text-decoration: underline; }'}</style>
       <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem' }}>Sus Party version</h1>
       <table style={{ width: '100%', textAlign: 'left', borderSpacing: '0 0.5rem' }}>
         <thead>
@@ -66,6 +68,11 @@ function VersionPage() {
           <VersionRow label="This page" info={CLIENT_VERSION} />
         </tbody>
       </table>
+      <p>
+        {isBetaChannel()
+          ? <>You are on <strong>beta</strong>. <a href="/version?beta=0">Switch to prod</a></>
+          : <>You are on <strong>prod</strong>. <a href="/version?beta=1">Switch to beta</a></>}
+      </p>
       {mismatch && (
         <p>
           The page and server versions differ. Your browser may have an older copy cached;

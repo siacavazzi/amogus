@@ -1,6 +1,11 @@
 # GitHub Actions Deployment Setup
 
-This project uses GitHub Actions to automatically deploy to DigitalOcean when you push to the `main` branch.
+This project uses GitHub Actions to deploy to DigitalOcean in two steps:
+
+1. **Push to `main`** runs *Deploy to beta*. It builds the app and deploys it to a beta copy on the droplet (`/opt/amogus-beta`, systemd unit `amogus-beta`, port 5002). Prod is not touched, except that the shared Nginx config is applied.
+2. **Actions → Promote beta to prod → Run workflow** copies exactly what beta is running into prod (`/opt/amogus`) and restarts it. The previous prod release is kept in `/opt/amogus-previous`.
+
+To use beta, open any page with `?beta=1` (for example `https://susparty.com/?beta=1`). A cookie keeps that browser on beta and an orange BETA badge shows in the corner. `?beta=0` or the badge's *leave* link goes back to prod. `https://susparty.com/version` shows which version the server and page are running. Beta keeps its own selfies, task lists, stats and logs.
 
 ## Setup Instructions
 
