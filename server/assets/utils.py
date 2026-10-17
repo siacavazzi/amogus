@@ -2,6 +2,7 @@ import socket
 import logging
 from logging.handlers import RotatingFileHandler
 import os
+from .version import VERSION
 
 def get_local_ip():
     try:
@@ -34,9 +35,9 @@ def setup_logging():
     logger = logging.getLogger('app_logger')
     logger.setLevel(logging.DEBUG)  # Set the base logging level
 
-    # Formatter for log messages
+    # Formatter for log messages; every line carries the running version
     formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        '%(asctime)s - %(name)s - ' + VERSION.replace('%', '%%') + ' - %(levelname)s - %(message)s'
     )
 
     # Console Handler

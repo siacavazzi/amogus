@@ -16,6 +16,7 @@ from assets.utils import *
 from assets.taskHandler import *
 from assets.task_list_manager import TaskListManager
 from assets.selfie_store import SelfieStore
+from assets.version import VERSION, VERSION_INFO
 from config import (
     LOCATIONS, VOTE_TIME, VOTE_THRESHOLD, MELTDOWN_TIME, CODE_PERCENT,
     NUMBER_OF_INTRUDERS, CARD_DRAW_PROBABILITY, STARTING_CARDS, TASK_RATIO,
@@ -23,6 +24,7 @@ from config import (
 )
 
 logger = setup_logging()
+logger.info(f"Starting Sus Party server version {VERSION} (commit {VERSION_INFO['commit']}, built {VERSION_INFO['built_at']})")
 
 # Serve React build files
 CLIENT_BUILD_DIR = os.path.join(os.path.dirname(__file__), '..', 'client', 'build')
@@ -289,7 +291,13 @@ def admin_stats():
 @app.route('/health')
 def health_check():
     """Health check endpoint for load balancers and monitoring."""
-    return {'status': 'healthy', 'games': len(game_manager.games)}, 200
+    return {'status': 'healthy', 'games': len(game_manager.games), 'version': VERSION}, 200
+
+
+@app.route('/api/version')
+def version_info():
+    """Which build of the server is running (shown on the /version page)."""
+    return VERSION_INFO
 
 
 # Catch-all route for React client - serves index.html for client-side routing

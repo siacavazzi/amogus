@@ -5,6 +5,7 @@ import HowToPlayPage from './pages/howToPlay/HowToPlayPage';
 import LandingPage from './pages/landing/LandingPage';
 import TutorialPage from './pages/tutorial/TutorialPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import VersionPage from './pages/version/VersionPage';
 import FaqPage from './pages/info/FaqPage';
 import AboutPage from './pages/info/AboutPage';
 import AmongUsIrlPage from './pages/seo/AmongUsIrlPage';
@@ -79,6 +80,10 @@ function getRoute() {
 
   if (normalizedPath === '/dashboard' || normalizedPath.startsWith('/dashboard/')) {
     return 'dashboard';
+  }
+
+  if (normalizedPath === '/version' || normalizedPath.startsWith('/version/')) {
+    return 'version';
   }
 
   if (normalizedPath === '/social-deduction-games' || normalizedPath.startsWith('/social-deduction-games/')) {
@@ -184,6 +189,10 @@ function App() {
 
   if (route === 'dashboard') {
     return <AdminDashboard />;
+  }
+
+  if (route === 'version') {
+    return <VersionPage />;
   }
 
   if (route === 'social-deduction-games') return <SocialDeductionPage />;

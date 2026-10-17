@@ -2,6 +2,9 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App';
+import { CLIENT_VERSION } from './version';
+
+console.info(`Sus Party ${CLIENT_VERSION.version}${CLIENT_VERSION.commit ? ` (${CLIENT_VERSION.commit})` : ''}`);
 
 const rootElement = document.getElementById('root');
 const tree = (

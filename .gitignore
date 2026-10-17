@@ -51,3 +51,6 @@ server/logs/
 server/stats.json
 /task_lists/
 /droplet_exports
+
+# Written by the deploy workflow
+server/version.json

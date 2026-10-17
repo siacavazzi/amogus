@@ -1,11 +1,12 @@
 import time
 import logging
 from threading import Thread, Lock
+from .version import VERSION
 
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    format='%(asctime)s - %(name)s - ' + VERSION.replace('%', '%%') + ' - %(levelname)s - %(message)s',
     handlers=[
         logging.StreamHandler()
     ]

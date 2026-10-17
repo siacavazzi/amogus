@@ -13,6 +13,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Each deploy gets a version like 2026.10.17.42 (UTC build date + workflow
+      # run number). The client build embeds it and the server reads version.json.
+      - name: Stamp version
+        run: |
+          BUILT_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          VERSION="$(date -u +%Y.%m.%d).${{ github.run_number }}"
+          COMMIT="$(git rev-parse --short HEAD)"
+          printf '{"version": "%s", "commit": "%s", "built_at": "%s", "run_number": %s}\n' \
+            "$VERSION" "$COMMIT" "$BUILT_AT" "${{ github.run_number }}" > server/version.json
+          cat server/version.json
+          {
+            echo "REACT_APP_VERSION=$VERSION"
+            echo "REACT_APP_COMMIT=$COMMIT"
+            echo "REACT_APP_BUILT_AT=$BUILT_AT"
+          } >> "$GITHUB_ENV"
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -114,6 +130,7 @@ jobs:
         run: |
           sleep 5
           curl --fail --retry 3 https://susparty.com/health
+          echo "Live version: $(curl -s https://susparty.com/api/version)"
 
       - name: Check live crawl access and canonical URLs
         working-directory: ./client
