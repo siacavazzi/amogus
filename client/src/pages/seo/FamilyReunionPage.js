@@ -16,7 +16,7 @@ const SCHEMA = {
 
 export default function FamilyReunionPage() {
     usePageMeta({
-        title: 'Sus Party | An Indoor Family Reunion Game',
+        title: 'Indoor Family Reunion Game for All Ages | Sus Party',
         description: DESCRIPTION, canonical: 'https://susparty.com/indoor-family-reunion-games', schema: SCHEMA,
     });
     return (

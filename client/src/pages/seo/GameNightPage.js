@@ -15,7 +15,7 @@ const SCHEMA = {
 
 function GameNightPage() {
     usePageMeta({
-        title: 'Sus Party | Game Night with No Dedicated Moderator',
+        title: 'Game Night Ideas with No Moderator | Sus Party',
         description: 'Want a game like Mafia or Werewolf without a dedicated moderator? Play Sus Party with secret roles, real tasks, and app-counted votes. The host plays too.',
         canonical: 'https://susparty.com/game-night-ideas', schema: SCHEMA,
     });

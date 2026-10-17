@@ -60,7 +60,7 @@ const FAQS = [
 
 function LandingPage() {
     usePageMeta({
-        title: 'Sus Party | Free Among us IRL Party Game',
+        title: 'Sus Party | Free Among Us IRL Party Game',
         description: 'Play Among Us in real life with Sus Party, a free browser party game. Use your phones for tasks, secret roles, sabotage, meetings, and votes. No downloads.',
         canonical: 'https://susparty.com/',
     });

@@ -15,7 +15,7 @@ const SCHEMA = {
 
 export default function SleepoverPage() {
     usePageMeta({
-        title: 'Sus Party | An Indoor Sleepover Game for Teens',
+        title: 'Sleepover Games for Teens: An Indoor Mystery | Sus Party',
         description: DESCRIPTION, canonical: 'https://susparty.com/sleepover-games-for-teens', schema: SCHEMA,
     });
     return (

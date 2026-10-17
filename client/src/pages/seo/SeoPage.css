@@ -541,3 +541,7 @@
     .seo-table :is(th, td) { padding: 12px 10px; }
     .seo-output__task { flex-wrap: wrap; }
 }
+
+/* Plain tables and numbered lists for reference content. */
+.seo-table--plain td:last-child { color: var(--site-body); }
+ol.seo-list { list-style: decimal; }

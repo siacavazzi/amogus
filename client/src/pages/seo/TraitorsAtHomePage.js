@@ -15,7 +15,7 @@ const SCHEMA = {
 
 export default function TraitorsAtHomePage() {
     usePageMeta({
-        title: 'Sus Party | A Traitors-Style Game at Home',
+        title: 'Traitors at Home: A Traitors-Style Party Game | Sus Party',
         description: DESCRIPTION, canonical: 'https://susparty.com/traitors-at-home', schema: SCHEMA,
     });
     return (
