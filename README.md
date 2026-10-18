@@ -65,6 +65,8 @@ It's free because it should be. There's no business model. Run it once at a part
 
 Source: this repo. Sonos connector: [amogus-sonos-connector](https://github.com/siacavazzi/amogus-sonos-connector).
 
+Tests: `python -m pytest server/tests` and `npm test` in `client/`. `node client/scripts/e2e-live.js <url>` plays a whole round with five scripted phones against any running server (add `--beta` for the beta copy). Every push to main runs it on beta, and promoting to prod runs it again first.
+
 ---
 
 ## Self-hosting

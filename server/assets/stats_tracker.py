@@ -146,6 +146,8 @@ class StatsTracker:
                     break
 
     def record_event(self, event, game=None, player_id=None, connection_id=None, flush=False, **fields):
+        if getattr(game, 'synthetic', False):
+            return
         with self.lock:
             self._event_locked(event, game, player_id, connection_id, **fields)
             # JSONL events flush on each write. Aggregate counters checkpoint every ten seconds.
@@ -153,6 +155,8 @@ class StatsTracker:
                 self._save_locked()
 
     def record_game_created(self, room_code, acquisition=None, game=None):
+        if getattr(game, 'synthetic', False):
+            return
         with self.lock:
             self.data['total_games_created'] += 1
             self._acquisition_bucket(acquisition)['rooms_created'] += 1
@@ -162,7 +166,8 @@ class StatsTracker:
 
     def record_game_started(self, game):
         with self.lock:
-            if len(game.players) < 3 or getattr(game, 'test_mode', False) or getattr(game, '_stats_start_recorded', False):
+            if (len(game.players) < 3 or getattr(game, 'test_mode', False) or getattr(game, 'synthetic', False)
+                    or getattr(game, '_stats_start_recorded', False)):
                 return
             game.round_started_at = time.time()
             game.round_started_monotonic = time.monotonic()
@@ -225,7 +230,7 @@ class StatsTracker:
             return
         with self.lock:
             # Avoid double-recording if multiple end paths fire. Test games stay out of stats.
-            if getattr(game, '_stats_recorded', False) or getattr(game, 'test_mode', False):
+            if getattr(game, '_stats_recorded', False) or getattr(game, 'test_mode', False) or getattr(game, 'synthetic', False):
                 return
             started_at = getattr(game, 'round_started_at', None)
             ended_at = getattr(game, 'end_time', None) or time.time()

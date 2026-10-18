@@ -38,6 +38,23 @@ jobs:
         run: |
           commit="$(curl -s --cookie 'sus_channel=beta' https://susparty.com/api/version | jq -r '.commit // empty')"
           if [ -n "$commit" ]; then git checkout "$commit"; fi
+          echo "BETA_COMMIT=$commit" >> "$GITHUB_ENV"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./client
+        run: npm ci --legacy-peer-deps
+
+      # Prod only gets a build that just played a whole game on beta
+      - name: Play a full game on beta
+        working-directory: ./client
+        run: node scripts/e2e-live.js https://susparty.com --beta --browser --expect-commit "$BETA_COMMIT"
 
       - name: Copy beta into prod and restart
         run: |
@@ -70,17 +87,6 @@ jobs:
           curl --fail --retry 3 https://susparty.com/health
           echo
           echo "Prod version: $(curl -s https://susparty.com/api/version)"
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-          cache-dependency-path: client/package-lock.json
-
-      - name: Install dependencies
-        working-directory: ./client
-        run: npm ci --legacy-peer-deps
 
       - name: Check live crawl access and canonical URLs
         working-directory: ./client
