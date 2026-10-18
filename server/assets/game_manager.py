@@ -44,7 +44,7 @@ class GameManager:
             if code not in self.games:
                 return code
 
-    def create_game(self, sid, acquisition=None):
+    def create_game(self, sid, acquisition=None, synthetic=False):
         """Create a new game and return the room code."""
         with self.lock:
             room_code = self._generate_room_code()
@@ -82,6 +82,7 @@ class GameManager:
             game.on_end_callback = self.stats_tracker.record_game_ended
             game.on_abort_callback = self.stats_tracker.record_round_abandoned
             game.acquisition = StatsTracker.normalize_acquisition(acquisition)
+            game.synthetic = synthetic
 
             self.games[room_code] = game
             self.sid_to_game[sid] = room_code
@@ -114,7 +115,8 @@ class GameManager:
             self.player_to_game[player_id] = room_code
             self.sid_to_game[sid] = room_code
         # Track unique players across all games
-        self.stats_tracker.record_player_seen(player_id)
+        if not getattr(self.games.get(room_code), 'synthetic', False):
+            self.stats_tracker.record_player_seen(player_id)
 
     def unregister_sid(self, sid):
         """Remove a socket ID mapping (on disconnect)."""

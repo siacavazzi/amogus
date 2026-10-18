@@ -61,6 +61,8 @@ game_manager = GameManager(socketio, speaker, game_config, selfie_store=selfie_s
 task_list_manager = TaskListManager()
 
 client_metrics_by_sid = {}
+# Sockets from the automated end-to-end run. Their rooms stay out of usage stats.
+synthetic_sids = set()
 selfie_tokens_by_sid = {}
 
 
@@ -127,6 +129,8 @@ def record_usage(event, game=None, player_id=None, resolve_game=True, **fields):
     try:
         if game is None and resolve_game:
             game, _ = game_manager.get_game_by_sid(request.sid)
+        if request.sid in synthetic_sids or getattr(game, 'synthetic', False):
+            return
         game_manager.stats_tracker.record_event(
             event, game, player_id, connection_id=request.sid,
             phase='ended' if game and game.end_state else 'round' if game and game.game_running else 'lobby',
@@ -319,7 +323,7 @@ def handle_create_game(data=None):
     """Create a new game room and return the room code."""
     sid = request.sid
     acquisition = data.get('acquisition') if isinstance(data, dict) else None
-    room_code, game = game_manager.create_game(sid, acquisition)
+    room_code, game = game_manager.create_game(sid, acquisition, synthetic=sid in synthetic_sids)
     game.creator_sid = sid  # Track room creator
     record_usage('host_entered', game, flush=True)
     join_room(room_code)
@@ -560,6 +564,8 @@ def handle_connect(auth=None):
               else 'mobile' if any(value in user_agent for value in ('mobile', 'iphone', 'ipod'))
               else 'desktop' if user_agent else 'unknown')
     offset = auth.get('utc_offset_minutes') if isinstance(auth, dict) else None
+    if isinstance(auth, dict) and auth.get('synthetic') is True:
+        synthetic_sids.add(request.sid)
     client_metrics_by_sid[request.sid] = {
         'device_class': device,
         'utc_offset_minutes': offset if type(offset) is int and -840 <= offset <= 840 else None,
@@ -672,6 +678,7 @@ def handle_disconnect(reason=None):
     } else 'unknown'
     record_usage('connection_closed', game, player.player_id if player else None, reason=disconnect_reason)
     client_metrics_by_sid.pop(sid, None)
+    synthetic_sids.discard(sid)
     selfie_tokens_by_sid.pop(sid, None)
     game_manager.unregister_sid(sid)
     if game and game.reactor_sid == sid:

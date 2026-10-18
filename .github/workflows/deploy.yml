@@ -37,6 +37,16 @@ jobs:
             echo "REACT_APP_BUILT_AT=$BUILT_AT"
           } >> "$GITHUB_ENV"
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run server tests
+        run: |
+          pip install -q -r server/requirements.txt pytest
+          python -m pytest server/tests -q
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -47,6 +57,12 @@ jobs:
       - name: Install dependencies
         working-directory: ./client
         run: npm ci --legacy-peer-deps
+
+      - name: Run client tests
+        working-directory: ./client
+        run: npm test -- --watchAll=false
+        env:
+          CI: true
 
       - name: Build React app
         working-directory: ./client
@@ -165,3 +181,10 @@ jobs:
           echo
           echo "Beta version: $(curl -s --cookie 'sus_channel=beta' https://susparty.com/api/version)"
           echo "Prod version: $(curl -s https://susparty.com/api/version)"
+
+      # Five scripted phones play a whole round on beta over the real WebSocket:
+      # join, tasks, both intruder cards, a reconnect, a meeting and vote, the win.
+      # Their rooms are marked synthetic, so they stay out of usage stats.
+      - name: Play a full game on beta
+        working-directory: ./client
+        run: node scripts/e2e-live.js https://susparty.com --beta --browser --expect-commit "$REACT_APP_COMMIT"

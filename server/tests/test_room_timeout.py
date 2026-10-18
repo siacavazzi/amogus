@@ -22,6 +22,8 @@ class RoomTimeoutTests(unittest.TestCase):
         self.manager.games = {}
         self.manager.player_to_game = {}
         self.manager.sid_to_game = {}
+        self.manager.selfie_store = None
+        self.manager.stats_tracker = Mock()
         self.now = 1_000_000
 
     def add_room(self, code, age, ended=False):
