@@ -479,8 +479,19 @@ function PreGamePage() {
         }
     };
 
+    const [showTestConfirm, setShowTestConfirm] = useState(false);
+
     const handleStartGame = () => {
+        if (canStartTestGame) {
+            setShowTestConfirm(true);
+            return;
+        }
         socket.emit('start_game', { player_id: playerId });
+    };
+
+    const handleStartTestGame = () => {
+        setShowTestConfirm(false);
+        socket.emit('start_game', { player_id: playerId, test_mode: true });
     };
 
     // Calculate tasks per location requirement
@@ -498,7 +509,11 @@ function PreGamePage() {
     const hasEnoughTotalTasks = missingTotalTasks === 0;
 
     const fallbackCanStartGame = players.length >= 3 && realLocations.length >= 2 && hasEnoughTotalTasks;
-    const canStartGame = isHost && (serverLobbyState?.can_start ?? fallbackCanStartGame);
+    const fullGameReady = isHost && (serverLobbyState?.can_start ?? fallbackCanStartGame);
+    // One or two players can start a test game to try it out. The server decides.
+    const fallbackCanStartTest = players.length >= 1 && players.length < 3 && realLocations.length >= 2 && hasEnoughTotalTasks;
+    const canStartTestGame = isHost && !fullGameReady && (serverLobbyState?.can_start_test ?? fallbackCanStartTest);
+    const canStartGame = fullGameReady || canStartTestGame;
     
     // Calculate what's missing
     const getTasksNeededMessage = () => {
@@ -1171,6 +1186,7 @@ function PreGamePage() {
                     <div className="bg-gradient-to-t from-gray-950 via-gray-950/95 to-transparent pt-8 pb-6 px-4">
                         <div className="max-w-md mx-auto">
                             {canStartGame ? (
+                                <>
                                 <button
                                     onClick={handleStartGame}
                                     className="w-full relative group"
@@ -1182,6 +1198,12 @@ function PreGamePage() {
                                         <Zap size={18} className="opacity-60" />
                                     </div>
                                 </button>
+                                {canStartTestGame && (
+                                    <p className="mt-2 text-center text-xs text-amber-300/80">
+                                        Only {players.length} player{players.length !== 1 ? 's' : ''} so far. Starting now runs a test game.
+                                    </p>
+                                )}
+                                </>
                             ) : isHost ? (
                                 <div className="text-center py-4 bg-gray-900/80 backdrop-blur-xl border border-gray-800/80 rounded-2xl">
                                     <p className="text-gray-400 text-sm">
@@ -1196,6 +1218,35 @@ function PreGamePage() {
                                     </div>
                                 </div>
                             )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Test game confirmation for one or two players */}
+            {showTestConfirm && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" role="dialog" aria-modal="true" aria-labelledby="test-game-title">
+                    <div className="w-full max-w-sm rounded-2xl border border-amber-500/30 bg-gray-900 p-6 shadow-2xl">
+                        <h2 id="test-game-title" className="text-lg font-bold text-white mb-2">Not enough players for a real game</h2>
+                        <p className="text-sm text-gray-300 mb-3">
+                            Sus Party needs at least 3 players. We'll start a test game anyway so you can see how it plays.
+                        </p>
+                        <p className="text-sm text-gray-400 mb-5">
+                            In a test game anyone can switch between crewmate and intruder from the top of their screen. Test games don't count toward stats.
+                        </p>
+                        <div className="flex flex-col gap-2">
+                            <button
+                                onClick={handleStartTestGame}
+                                className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold hover:from-amber-400 hover:to-orange-400 transition-colors"
+                            >
+                                Start test game
+                            </button>
+                            <button
+                                onClick={() => setShowTestConfirm(false)}
+                                className="w-full py-3 rounded-xl bg-gray-800 text-gray-300 font-medium hover:bg-gray-700 transition-colors"
+                            >
+                                Wait for more players
+                            </button>
                         </div>
                     </div>
                 </div>

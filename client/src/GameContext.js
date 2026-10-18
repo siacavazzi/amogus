@@ -77,6 +77,7 @@ export default function GameContext({ children }) {
     const [resetVotes, setResetVotes] = useState({ current: 0, needed: 0, voters: [] })
     const [fakeTaskReveal, setFakeTaskReveal] = useState(null) // { task, location } when showing fake task animation
     const [intrudersRevealed, setIntrudersRevealed] = useState(null) // { intruder_names, intruder_ids, message } when tasks 100%
+    const [testMode, setTestMode] = useState(false) // One or two players trying the game
     let otherIntruders = [];
     // const [meetineTimeLeft, setMee]
 
@@ -135,6 +136,7 @@ export default function GameContext({ children }) {
         setKillCooldown(0)
         setResetVotes({ current: 0, needed: 0, voters: [] })
         setIntrudersRevealed(null)
+        setTestMode(false)
     }
 
     const resetState = () => {
@@ -270,6 +272,7 @@ export default function GameContext({ children }) {
         setEndState(snapshot.end_state || undefined);
         setGameStats(snapshot.stats || undefined);
         setTaskCreationMode(!!snapshot.task_creation_mode);
+        setTestMode(!!snapshot.test_mode);
         setTaskLocations(Array.isArray(snapshot.locations) ? snapshot.locations : []);
         setHackTime(snapshot.active_hack ?? 0);
         setDeniedLocation(snapshot.denied_location || undefined);
@@ -690,6 +693,7 @@ export default function GameContext({ children }) {
             setTaskCreationMode(false);
             setResetVotes({ current: 0, needed: 0, voters: [] });
             setIntrudersRevealed(null);
+            setTestMode(false);
             // Clear any open modals/dialogs
             setModalOpen(false);
             setDialog(undefined);
@@ -938,6 +942,17 @@ export default function GameContext({ children }) {
     }
 
 
+    const switchTestRole = useCallback(() => {
+        const socket = socketRef.current;
+        if (!socket) return;
+        const playerId = playerState?.player_id || playerState?.playerId || localStorage.getItem('player_id');
+        socket.emit('test_switch_role', { player_id: playerId }, (response) => {
+            if (!response?.ok) return;
+            setShowSusPage(false);
+            isMobile && setDialog({ title: "Role Switched", body: <PlayerRole sus={response.sus} otherIntruders={[]}/> });
+        });
+    }, [playerState]);
+
     const contextValue = useMemo(() => ({
         playerState,
         setPlayerState,
@@ -1014,6 +1029,9 @@ export default function GameContext({ children }) {
         resetVotes,
         // Intruder reveal (tasks 100%)
         intrudersRevealed,
+        // Test game for one or two players
+        testMode,
+        switchTestRole,
     }), [
         endState,
         gameStats,
@@ -1060,6 +1078,8 @@ export default function GameContext({ children }) {
         completeTask,
         taskCompletionPending,
         taskCompletionError,
+        testMode,
+        switchTestRole,
     ]);
 
     return (

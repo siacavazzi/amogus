@@ -11,7 +11,15 @@ def minimum_tasks(game):
     return max(len(game.players) * 3, 10)
 
 
-def start_error_detail(game):
+TEST_MODE_MAX_PLAYERS = 2
+
+
+def can_test_with_players(game):
+    """A test game lets one or two people try the game before a real group joins."""
+    return 1 <= len(game.players) <= TEST_MODE_MAX_PLAYERS
+
+
+def start_error_detail(game, test_mode=False):
     if game.game_running:
         return 'already_started', 'The game already started.'
     if not game.is_open:
@@ -19,7 +27,7 @@ def start_error_detail(game):
     if game.numIntruders < 1:
         return 'no_intruders', 'At least 1 intruder is required.'
     minimum_players = game.numIntruders * 2 + 1
-    if len(game.players) < minimum_players:
+    if len(game.players) < minimum_players and not (test_mode and can_test_with_players(game)):
         return 'too_few_players', f'Need at least {minimum_players} players for {game.numIntruders} intruder(s).'
     if len({loc for loc in game.locations if loc and loc.lower() != 'other'}) < 2:
         return 'too_few_locations', 'Add at least 2 locations before you start the game.'
@@ -33,6 +41,11 @@ def start_error(game):
     return start_error_detail(game)[1]
 
 
+def can_start_test(game):
+    """True when the room can only start as a test game because too few players joined."""
+    return start_error_detail(game)[0] == 'too_few_players' and start_error_detail(game, test_mode=True)[0] is None
+
+
 def lobby_state(game):
     error = start_error(game)
     return copy.deepcopy({
@@ -40,7 +53,7 @@ def lobby_state(game):
         'min_tasks': minimum_tasks(game), 'task_list_code': game.collaborative_task_list_code,
         'task_list_name': game.collaborative_task_list_name,
         'collaborative_mode': game.collaborative_mode, 'can_start': error is None,
-        'start_error': error,
+        'can_start_test': can_start_test(game), 'start_error': error,
     })
 
 
@@ -60,6 +73,7 @@ def room_state(game, player=None, sid=None):
         'votes': game.meeting.compute_vote_counts() if game.meeting else {},
         'veto_votes': len(game.meeting.veto_votes) if game.meeting else 0,
         'end_state': game.end_state, 'stats': game.stats, 'task_creation_mode': game.task_creation_mode,
+        'test_mode': game.test_mode,
         'locations': game.locations, 'config': game.get_config(),
         'collaborative_tasks': lobby_state(game), 'active_hack': game.active_hack,
         'denied_location': game.denied_location, 'intruders_revealed': revealed,

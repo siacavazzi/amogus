@@ -104,6 +104,9 @@ class Game:
         
         # Intruder reveal - when tasks are 100% complete, identities are revealed
         self.intruders_revealed = False
+
+        # Test game - one or two players trying the game, kept out of stats
+        self.test_mode = False
         
         # Game statistics tracking
         self.stats = {
@@ -410,12 +413,14 @@ class Game:
         """
         if self.intruders_revealed:
             return  # Already revealed
-        
-        self.intruders_revealed = True
-        
+
         # Get list of intruder names
         intruder_names = [p.username for p in self.players if p.sus and p.alive]
         intruder_ids = [p.player_id for p in self.players if p.sus and p.alive]
+        if not intruder_names:
+            return  # Only a crew-only test game gets here; there is no one to reveal
+
+        self.intruders_revealed = True
         
         # Play a dramatic sound
         self.speaker.play_sound('intruders_revealed')
@@ -454,6 +459,10 @@ class Game:
         if self.numIntruders > len(self.players):
             self.numIntruders = len(self.players)
     
+        if self.test_mode:
+            # One tester starts as crew so they get tasks. Two testers get one of each role.
+            self.numIntruders = min(self.numIntruders, len(self.players) - 1)
+
         self.numCrew = len(self.players) - self.numIntruders
         random.shuffle(self.players)
         for i in range(0, self.numIntruders):
@@ -469,9 +478,32 @@ class Game:
 
         numCrew = len(self.players) - self.numIntruders
         
-        self.taskGoal = numCrew * self.task_ratio
+        self.taskGoal = max(numCrew, 1) * self.task_ratio if self.test_mode else numCrew * self.task_ratio
 
         print(f"{numCrew} crew and {self.numIntruders} intruders (reactor: {self.has_reactor})")
+
+    def switch_test_role(self, player):
+        """Flip a tester between crewmate and intruder so they can see both sides."""
+        with self.state_lock:
+            if not self.test_mode or not self.game_running or self.end_state or self.meeting:
+                return False
+            if player not in self.players or not player.alive:
+                return False
+            player.sus = not player.sus
+            if player.sus:
+                player.task = None
+                if not player.cards:
+                    for _ in range(0, self.starting_cards):
+                        card = self.card_deck.draw_card()
+                        if card:
+                            player.cards.append(card)
+            else:
+                self.assign_task(player)
+            living = [p for p in self.players if p.alive]
+            self.numIntruders = sum(1 for p in living if p.sus)
+            self.numCrew = len(living) - self.numIntruders
+            self.revision += 1
+            return True
 
     def getPlayerBySid(self, sid):
         for player in self.players:
@@ -513,6 +545,7 @@ class Game:
         self.meltdown_time_mod = 0
         self.active_cards = []
         self.intruders_revealed = False
+        self.test_mode = False
         self.card_deck = CardDeck(self.locations, self.socket, self)
         self.task_handler.reset()
         self.last_activity = time.time()
@@ -545,6 +578,7 @@ class Game:
         self.numIntruders = self.initial_numIntruders  # Restore initial intruder count
         self.numCrew = None  # Will be recalculated on game start
         self.intruders_revealed = False
+        self.test_mode = False
         self.card_deck = CardDeck(self.locations, self.socket, self)
         self.reset_votes = set()  # Clear reset votes
         self._stats_start_recorded = False
