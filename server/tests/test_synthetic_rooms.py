@@ -1,5 +1,8 @@
+import io
+import sys
 import tempfile
 from pathlib import Path
+from unittest.mock import patch
 
 from server.tests.integration_helpers import SocketGameTestCase, protocol_client, server_app
 from assets.stats_tracker import StatsTracker
@@ -46,6 +49,30 @@ class SyntheticRoomTests(SocketGameTestCase):
         for key in ('total_games_created', 'total_games_completed', 'unique_player_ids_count',
                     'event_counts', 'round_history', 'acquisition'):
             self.assertEqual(self.baseline[key], after[key], key)
+
+    def test_synthetic_round_writes_no_routine_logs_or_prints(self):
+        printed = io.StringIO()
+        # The server wraps stdout at startup; pytest swaps its own stream in per test.
+        with patch.object(sys, 'stdout', server_app.SyntheticQuietStream(printed)):
+            with self.assertNoLogs(level='INFO'):
+                self.play_round(self.make_synthetic_client)
+        self.assertEqual('', printed.getvalue())
+
+    def test_regular_round_still_prints(self):
+        printed = io.StringIO()
+        with patch.object(sys, 'stdout', server_app.SyntheticQuietStream(printed)):
+            self.play_round(self.make_client)
+        self.assertNotEqual('', printed.getvalue())
+
+    def test_synthetic_warnings_stay_and_are_tagged(self):
+        client = self.make_synthetic_client()
+        with self.assertLogs('app_logger', level='WARNING') as logs:
+            client.emit('join_game', {'room_code': 'ZZZZ'})
+        self.assertTrue(all(line.split(':', 2)[2].startswith('[e2e] ') for line in logs.output), logs.output)
+
+    def test_regular_round_still_logs(self):
+        with self.assertLogs('app_logger', level='INFO'):
+            self.play_round(self.make_client)
 
     def test_regular_round_is_still_counted(self):
         self.play_round(self.make_client)

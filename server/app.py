@@ -1,13 +1,15 @@
 import eventlet
 eventlet.monkey_patch()
+import logging
 import os
 import secrets
+import sys
 import copy
 import time
 from functools import wraps
 from uuid import uuid4
 from assets.room_protocol import metadata, minimum_tasks, start_error_detail, can_start_test, lobby_state, room_state
-from flask import Flask, request, send_from_directory, abort
+from flask import Flask, request, send_from_directory, abort, has_request_context
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask_cors import CORS
 from assets.game_manager import GameManager
@@ -61,8 +63,53 @@ game_manager = GameManager(socketio, speaker, game_config, selfie_store=selfie_s
 task_list_manager = TaskListManager()
 
 client_metrics_by_sid = {}
-# Sockets from the automated end-to-end run. Their rooms stay out of usage stats.
+# Sockets from the automated end-to-end run. Their rooms stay out of usage stats and logs.
 synthetic_sids = set()
+
+
+def in_synthetic_request():
+    """True while handling a socket event from the end-to-end run or a room it created."""
+    try:
+        if not has_request_context():
+            return False
+        sid = getattr(request, 'sid', None)
+        if sid is None:
+            return False
+        game, _ = game_manager.get_game_by_sid(sid)
+        return sid in synthetic_sids or getattr(game, 'synthetic', False)
+    except Exception:
+        return False
+
+
+class SyntheticLogFilter(logging.Filter):
+    """Drop routine log lines from the end-to-end run. Warnings and errors stay, tagged [e2e]."""
+
+    def filter(self, record):
+        if not in_synthetic_request():
+            return True
+        if record.levelno < logging.WARNING:
+            return False
+        if not getattr(record, 'e2e_tagged', False):
+            record.msg, record.e2e_tagged = f'[e2e] {record.msg}', True
+        return True
+
+
+class SyntheticQuietStream:
+    """Stdout that skips the gameplay debug prints made while handling the end-to-end run."""
+
+    def __init__(self, stream):
+        self.stream = stream
+
+    def write(self, text):
+        return len(text) if in_synthetic_request() else self.stream.write(text)
+
+    def __getattr__(self, name):
+        return getattr(self.stream, name)
+
+
+for name in ('app_logger', 'assets.sonosHandler'):
+    logging.getLogger(name).addFilter(SyntheticLogFilter())
+sys.stdout = SyntheticQuietStream(sys.stdout)
 selfie_tokens_by_sid = {}
 
 
@@ -678,7 +725,6 @@ def handle_disconnect(reason=None):
     } else 'unknown'
     record_usage('connection_closed', game, player.player_id if player else None, reason=disconnect_reason)
     client_metrics_by_sid.pop(sid, None)
-    synthetic_sids.discard(sid)
     selfie_tokens_by_sid.pop(sid, None)
     game_manager.unregister_sid(sid)
     if game and game.reactor_sid == sid:
@@ -691,6 +737,8 @@ def handle_disconnect(reason=None):
         if game.meeting and not game.end_state:
             game.try_start_voting()
         sendPlayerList(game, room_code)
+    # Last, so the cleanup above is still recognised as end-to-end traffic
+    synthetic_sids.discard(sid)
 
 
 # ============ PLAYER MANAGEMENT ============
