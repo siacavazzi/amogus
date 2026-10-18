@@ -39,6 +39,16 @@ describe('PreGamePage', () => {
             expect(screen.getByText(/TEST1/)).toBeInTheDocument();
         });
 
+        it('notes last-stand rules when exactly 3 players are in the lobby', () => {
+            renderWithContext(<PreGamePage />, { ...defaultContext, players: mockPlayers.slice(0, 3) });
+            expect(screen.getByTestId('small-group-note')).toHaveTextContent(/Best with 4 or more players/);
+        });
+
+        it('hides the small-group note with 4 players', () => {
+            renderWithContext(<PreGamePage />, defaultContext);
+            expect(screen.queryByTestId('small-group-note')).not.toBeInTheDocument();
+        });
+
         it('displays all joined players', () => {
             renderWithContext(<PreGamePage />, defaultContext);
             

@@ -107,6 +107,9 @@ class Game:
 
         # Test game - one or two players trying the game, kept out of stats
         self.test_mode = False
+        # 'last_stand' for 3-player, 1-intruder rounds (see assignRoles); set per round.
+        self.ruleset = 'standard'
+        self.last_stand = False  # True once it's down to 1 intruder vs 1 crew
         
         # Game statistics tracking
         self.stats = {
@@ -118,6 +121,7 @@ class Game:
             'fake_tasks_sent': [],  # List of {sender_name, target_name, task_text, task_location}
             'fake_tasks_completed': [],  # List of {player_name, task_text}
             'taunts_sent': [],  # List of {sender_name, target_name, message}
+            'win_condition': None,
         }
         
         # Create card deck after has_reactor is set
@@ -311,6 +315,7 @@ class Game:
 
             self.revision += 1
             self.end_state = "meltdown_fail"
+            self.stats['win_condition'] = 'meltdown'
             self.end_time = time.time()
             self.round_ended_monotonic = time.monotonic()
             # Emit player list BEFORE end_game so clients have updated death info
@@ -464,6 +469,8 @@ class Game:
             self.numIntruders = min(self.numIntruders, len(self.players) - 1)
 
         self.numCrew = len(self.players) - self.numIntruders
+        self.ruleset = 'last_stand' if len(self.players) == 3 and self.numIntruders == 1 else 'standard'
+        self.last_stand = False
         random.shuffle(self.players)
         for i in range(0, self.numIntruders):
             self.players[i].sus = True
@@ -546,6 +553,8 @@ class Game:
         self.active_cards = []
         self.intruders_revealed = False
         self.test_mode = False
+        self.ruleset = 'standard'
+        self.last_stand = False
         self.card_deck = CardDeck(self.locations, self.socket, self)
         self.task_handler.reset()
         self.last_activity = time.time()
@@ -579,6 +588,8 @@ class Game:
         self.numCrew = None  # Will be recalculated on game start
         self.intruders_revealed = False
         self.test_mode = False
+        self.ruleset = 'standard'
+        self.last_stand = False
         self.card_deck = CardDeck(self.locations, self.socket, self)
         self.reset_votes = set()  # Clear reset votes
         self._stats_start_recorded = False
@@ -594,6 +605,7 @@ class Game:
             'fake_tasks_sent': [],
             'fake_tasks_completed': [],
             'taunts_sent': [],
+            'win_condition': None,
         }
         
         # Keep the full room task pool for replay, even when no saved list exists.
@@ -620,6 +632,8 @@ class Game:
                 return False
             if player_who_started_it not in self.players or not player_who_started_it.alive:
                 return False
+            if self.last_stand:
+                return False  # Both players know who the intruder is; a 1-1 vote can't resolve.
             for player in self.players:
                 player.ready = not player.alive
             self.meeting = Meeting(self.vote_time, self.socket, player_who_started_it, self)
@@ -650,6 +664,51 @@ class Game:
             return started
 
 
+    def _begin_last_stand_locked(self):
+        """3-player rounds: at 1 intruder vs 1 crew the game goes on.
+
+        The intruder must eliminate the last crewmate; the crewmate wins by
+        finishing every task. Meetings are off since both know who's who.
+        """
+        self.last_stand = True
+        self.revision += 1
+        self.emit_player_list()
+        if self.meeting and self.meeting.stage == 'over':
+            return  # A vote just ended; Meeting.end_meeting sends the notice after the results.
+        if self.meeting:
+            # A meeting can't resolve 1-1, so close it without a vote or card draw.
+            self.meeting.stage = 'over'
+            self.meeting.reason = 'last_stand'
+            self.emit_to_room('meeting', self.meeting.to_json())
+            self.meeting = None
+        self.send_last_stand_notice()
+
+    def send_last_stand_notice(self):
+        self.emit_to_room('last_stand', {
+            'title': 'Last stand',
+            'message': 'One crewmate left. Crew wins by finishing every task. The intruder wins by eliminating them. No more meetings: if you get eliminated, tap I was eliminated.',
+            'crew_score': self.crew_score,
+            'task_goal': self.taskGoal,
+        })
+
+    def on_tasks_complete(self):
+        """Crew hit the task goal. In last-stand rounds that wins; otherwise reveal intruders."""
+        with self.state_lock:
+            if self.end_state:
+                return
+            if self.ruleset != 'last_stand':
+                self.reveal_intruders()
+                return
+            self.end_state = 'victory'
+            self.stats['win_condition'] = 'tasks'
+            self.end_time = time.time()
+            self.round_ended_monotonic = time.monotonic()
+            self.revision += 1
+            self.cancel_meltdown()
+            self.speaker.play_sound('crew_victory')
+            self.emit_player_list()
+            self.emit_to_room('end_game', {'result': self.end_state, 'stats': self.stats})
+
     def kill_player(self, player_id, death_cause='unknown', task_name=None):
         with self.state_lock:
             return self._kill_player_locked(player_id, death_cause, task_name)
@@ -678,8 +737,13 @@ class Game:
 
         if not player.sus:
             self.numCrew -= 1
+            if (self.ruleset == 'last_stand' and not self.last_stand
+                    and self.numCrew == 1 and self.numIntruders == 1):
+                self._begin_last_stand_locked()
+                return
             if self.numIntruders > 0 and self.numCrew <= self.numIntruders:
                 self.end_state = 'sus_victory'
+                self.stats['win_condition'] = 'last_stand_kill' if self.last_stand else 'crew_outnumbered'
                 self.end_time = time.time()
                 self.round_ended_monotonic = time.monotonic()
                 self.cancel_meltdown()
@@ -696,6 +760,7 @@ class Game:
             self.numIntruders -= 1
             if self.numIntruders <= 0:
                 self.end_state = 'victory'
+                self.stats['win_condition'] = 'intruders_voted_out' if death_cause == 'voted_out_intruder' else 'intruders_eliminated'
                 self.end_time = time.time()
                 self.round_ended_monotonic = time.monotonic()
                 self.cancel_meltdown()

@@ -177,6 +177,8 @@ class Meeting:
                 self.game.emit_to_room("meeting", self.to_json())
 
             self.game.drawCards(probability=self.game.card_draw_probability)
+            if self.game.last_stand and not self.game.end_state:
+                self.game.send_last_stand_notice()
             print(f"Final Votes: {self.votes}, Veto Votes: {len(self.veto_votes)}")
             self.game.meeting = None
             self.game.revision += 1

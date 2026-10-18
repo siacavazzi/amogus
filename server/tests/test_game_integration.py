@@ -113,15 +113,16 @@ class GameIntegrationTests(SocketGameTestCase):
         self.assertEqual(crew_player.task, self.first_event(rejoin_events, "task")["task"])
 
     def test_task_completion_reveals_intruders_at_goal_without_ending_game(self):
+        # 4 players: 3-player rounds use last-stand rules, where finishing tasks wins outright.
         clients, room_code, player_ids, game = self.setup_started_game(
-            3,
+            4,
             config={
                 "num_intruders": 1,
                 "starting_cards": 0,
                 "task_ratio": 1,
             },
         )
-        self.assertEqual(2, game.taskGoal)
+        self.assertEqual(3, game.taskGoal)
 
         for player in self.crew(game):
             self.client_for_player(clients, player_ids, player).emit(
@@ -130,7 +131,7 @@ class GameIntegrationTests(SocketGameTestCase):
             )
         completion_events = self.drain_all(clients)
 
-        self.assertEqual(2, game.crew_score)
+        self.assertEqual(3, game.crew_score)
         self.assertTrue(game.intruders_revealed)
         self.assertIsNone(game.end_state)
         for events in completion_events.values():

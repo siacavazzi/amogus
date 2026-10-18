@@ -78,6 +78,7 @@ export default function GameContext({ children }) {
     const [fakeTaskReveal, setFakeTaskReveal] = useState(null) // { task, location } when showing fake task animation
     const [intrudersRevealed, setIntrudersRevealed] = useState(null) // { intruder_names, intruder_ids, message } when tasks 100%
     const [testMode, setTestMode] = useState(false) // One or two players trying the game
+    const [lastStand, setLastStand] = useState(false) // 3-player rounds at 1 intruder vs 1 crew: no meetings
     let otherIntruders = [];
     // const [meetineTimeLeft, setMee]
 
@@ -137,6 +138,7 @@ export default function GameContext({ children }) {
         setResetVotes({ current: 0, needed: 0, voters: [] })
         setIntrudersRevealed(null)
         setTestMode(false)
+        setLastStand(false)
     }
 
     const resetState = () => {
@@ -280,6 +282,7 @@ export default function GameContext({ children }) {
             ? (typeof snapshot.intruders_revealed === 'object' ? snapshot.intruders_revealed : true)
             : null);
         setActiveCards(Array.isArray(snapshot.active_cards) ? snapshot.active_cards : []);
+        setLastStand(!!snapshot.last_stand);
         setMeltdownTimer(snapshot.meltdown?.time_left ?? undefined);
         setCodesNeeded(snapshot.meltdown?.codes_needed ?? undefined);
         setMeltdownCode(snapshot.meltdown_code || undefined);
@@ -624,9 +627,18 @@ export default function GameContext({ children }) {
             });
         });
 
+        // 3-player rounds: down to 1 intruder vs 1 crew, the game goes on.
+        socketRef.current.on('last_stand', (data) => {
+            if (!acceptRoomData(data)) return;
+            setLastStand(true);
+            isMobile && setDialog({ title: data?.title || "Last stand", body: data?.message || "", lastStand: true });
+        });
+
         socketRef.current.on('end_game', (data) => {
             if (data && typeof data === 'object' && !acceptRoomData(data)) return;
             // Handle both old format (string) and new format (object with result and stats)
+            // Don't leave the last-stand pop-up sitting over the results.
+            setDialog((current) => (current?.lastStand ? undefined : current));
             if (typeof data === 'string') {
                 setEndState(data);
             } else {
@@ -694,6 +706,7 @@ export default function GameContext({ children }) {
             setResetVotes({ current: 0, needed: 0, voters: [] });
             setIntrudersRevealed(null);
             setTestMode(false);
+            setLastStand(false);
             // Clear any open modals/dialogs
             setModalOpen(false);
             setDialog(undefined);
@@ -1032,6 +1045,7 @@ export default function GameContext({ children }) {
         // Test game for one or two players
         testMode,
         switchTestRole,
+        lastStand,
     }), [
         endState,
         gameStats,
@@ -1075,6 +1089,7 @@ export default function GameContext({ children }) {
         taskCreationMode,
         resetVotes,
         intrudersRevealed,
+        lastStand,
         completeTask,
         taskCompletionPending,
         taskCompletionError,
