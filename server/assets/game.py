@@ -15,6 +15,7 @@ from assets.utils import *
 
 # Number of built-in player avatars (client/src/components/Avatar.js); Player.pic is an index into them.
 AVATAR_COUNT = 18
+LAST_STAND_TASKS = 3  # Tasks the last crewmate needs to finish to win a last stand
 
 
 def is_avatar_id(pic):
@@ -668,9 +669,13 @@ class Game:
         """3-player rounds: at 1 intruder vs 1 crew the game goes on.
 
         The intruder must eliminate the last crewmate; the crewmate wins by
-        finishing every task. Meetings are off since both know who's who.
+        finishing LAST_STAND_TASKS more tasks (fewer if fewer remain).
+        Meetings are off since both know who's who.
         """
         self.last_stand = True
+        # Shorten the goal so one crewmate being chased can realistically win.
+        self.taskGoal = min(self.taskGoal, self.crew_score + LAST_STAND_TASKS)
+        self.emit_to_room('task_goal', self.taskGoal)
         self.revision += 1
         self.emit_player_list()
         if self.meeting and self.meeting.stage == 'over':
@@ -684,9 +689,12 @@ class Game:
         self.send_last_stand_notice()
 
     def send_last_stand_notice(self):
+        tasks_left = max(self.taskGoal - self.crew_score, 0)
+        tasks = '1 more task' if tasks_left == 1 else f'{tasks_left} more tasks'
         self.emit_to_room('last_stand', {
             'title': 'Last stand',
-            'message': 'One crewmate left. Crew wins by finishing every task. The intruder wins by eliminating them. No more meetings: if you get eliminated, tap I was eliminated.',
+            'message': f'One crewmate left. Crew wins by finishing {tasks}. The intruder wins by eliminating them. No more meetings: if you get eliminated, tap I was eliminated.',
+            'tasks_left': tasks_left,
             'crew_score': self.crew_score,
             'task_goal': self.taskGoal,
         })

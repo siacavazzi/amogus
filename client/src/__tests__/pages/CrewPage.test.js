@@ -91,6 +91,15 @@ describe('CrewPage', () => {
                 expect(contextValue.socket.emit).toHaveBeenCalledWith('player_dead', expect.objectContaining({ round_id: 'round-1' }));
             });
 
+            it('shows how many tasks are left to win', () => {
+                renderWithContext(
+                    <CrewmemberPage setShowSusPage={mockSetShowSusPage} />,
+                    { ...lastStandContext, crewScore: 4, taskGoal: 6 }
+                );
+
+                expect(screen.getByTestId('last-stand-tasks-left')).toHaveTextContent('2 tasks to win');
+            });
+
             it('does nothing if the player cancels', () => {
                 confirmSpy = jest.spyOn(window, 'confirm').mockReturnValue(false);
                 const { contextValue } = renderWithContext(

@@ -30,6 +30,8 @@ const CrewmemberPage = ({
     intrudersRevealed,
     lastStand,
     roundId,
+    crewScore = 0,
+    taskGoal = 0,
     connected,
     completeTask,
     taskCompletionPending,
@@ -41,6 +43,7 @@ const CrewmemberPage = ({
   // Last stand (3-player rounds at 1v1): both players know who's who, so meetings are off.
   // Kills normally get reported at a meeting, so the crewmate reports their own here.
   const meetingsOff = !!lastStand && !playerState?.sus;
+  const lastStandTasksLeft = Math.max(taskGoal - crewScore, 0);
   const highlightTopAction = tutorialMode && tutorialHighlightTarget === 'top-action';
   const highlightSlider = tutorialMode && tutorialHighlightTarget === 'slider';
 
@@ -163,6 +166,11 @@ const CrewmemberPage = ({
             </span>
           )}
         </button>
+        {meetingsOff && (
+          <p data-testid="last-stand-tasks-left" className="mt-3 text-center text-sm font-semibold text-amber-300">
+            Last stand: {lastStandTasksLeft} {lastStandTasksLeft === 1 ? 'task' : 'tasks'} to win
+          </p>
+        )}
       </div>
 
       {/* Main Task/Objective Card */}

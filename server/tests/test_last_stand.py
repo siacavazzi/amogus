@@ -80,6 +80,26 @@ class LastStandTests(SocketGameTestCase):
             self.assertTrue(self.has_event(events, 'end_game'))
             self.assertFalse(self.has_event(events, 'intruders_revealed'))
 
+    def test_last_stand_needs_three_more_tasks(self):
+        clients, _, ids, game = self.start(config={'task_ratio': 4})
+        self.assertEqual(8, game.taskGoal)
+        self.die(clients, ids, self.crew(game)[0])
+
+        self.assertEqual(3, game.taskGoal)
+        for events in self.drain_all(clients).values():
+            self.assertEqual(3, self.first_event(events, 'task_goal'))
+            self.assertEqual(3, self.first_event(events, 'last_stand')['tasks_left'])
+            self.assertIn('3 more tasks', self.first_event(events, 'last_stand')['message'])
+
+    def test_last_stand_goal_is_never_above_what_is_left(self):
+        clients, _, ids, game = self.start(config={'task_ratio': 4})
+        game.crew_score = 7
+        self.die(clients, ids, self.crew(game)[0])
+
+        self.assertEqual(8, game.taskGoal)
+        for events in self.drain_all(clients).values():
+            self.assertIn('1 more task.', self.first_event(events, 'last_stand')['message'])
+
     def test_finishing_tasks_wins_in_three_player_rounds_before_last_stand(self):
         clients, _, ids, game = self.start()
         self.finish_tasks(clients, ids, game)

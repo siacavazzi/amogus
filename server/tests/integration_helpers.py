@@ -62,6 +62,10 @@ class SocketGameTestCase(unittest.TestCase):
     def setUp(self):
         self.socketio = server_app.socketio
         self.flask_app = server_app.app
+        # Stop vote countdowns left running by earlier tests so they can't print into this one.
+        for game in list(server_app.game_manager.games.values()):
+            with game.state_lock:
+                game.meeting = None
         server_app.game_manager.games.clear()
         server_app.game_manager.player_to_game.clear()
         server_app.game_manager.sid_to_game.clear()

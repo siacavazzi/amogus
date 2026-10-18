@@ -23,6 +23,13 @@ describe('last stand pop-up', () => {
         expect(game.getContext().dialog).toEqual(expect.objectContaining({ title: 'Last stand', body: 'One crewmate left.' }));
     });
 
+    it('skips the results screen when last stand closes an open meeting', async () => {
+        game = renderWithLiveGameContext(<div>Phone</div>);
+        await game.serverEmit('meeting', { room_code: 'ROOM', revision: 5, stage: 'waiting', reason: null });
+        await game.serverEmit('meeting', { room_code: 'ROOM', revision: 6, stage: 'over', reason: 'last_stand' });
+        expect(game.getContext().meetingState).toBeUndefined();
+    });
+
     it('closes when the game ends so it does not cover the results', async () => {
         game = renderWithLiveGameContext(<div>Phone</div>);
         await game.serverEmit('last_stand', { room_code: 'ROOM', revision: 5, title: 'Last stand', message: 'One crewmate left.' });

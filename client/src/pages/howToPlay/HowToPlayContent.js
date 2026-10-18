@@ -233,7 +233,7 @@ export const winningCards = [
     title: 'Intruders win by numbers or meltdown',
     items: [
       'Intruders win when the number of living crewmates is equal to or lower than the number of living intruders.',
-      'In 3-player games it is a last stand instead: at one crewmate against the intruder, meetings stop and the intruder has to eliminate the last crewmate.',
+      'In 3-player games it is a last stand instead: at one crewmate against the intruder, meetings stop. The intruder has to eliminate the last crewmate before they finish 3 more tasks.',
       'Intruders also win if meltdown succeeds.',
       'Example: if 2 intruders are alive and only 2 crewmates remain, the intruders have already won.',
     ],

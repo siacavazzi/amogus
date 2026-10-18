@@ -799,6 +799,13 @@ export default function GameContext({ children }) {
             try {
                 const meetingData = typeof data === 'string' ? JSON.parse(data) : data;
                 if (!acceptRoomData(meetingData)) return;
+
+                // Last stand closed this meeting without a vote: skip the results screen.
+                if (meetingData.reason === 'last_stand') {
+                    setMeetingState(undefined);
+                    setDialog(undefined);
+                    return;
+                }
                 
                 setMeetingState(meetingData);
                 setShowSusPage(false)

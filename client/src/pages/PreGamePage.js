@@ -696,7 +696,7 @@ function PreGamePage() {
                                 <p className="font-semibold text-amber-300">Best with 4 or more players</p>
                                 <p className="mt-1 text-gray-400">
                                     With 3, it&rsquo;s a last stand: once it&rsquo;s down to one crewmate and the intruder, there are no more meetings.
-                                    The crewmate wins by finishing every task. The intruder wins by eliminating them.
+                                    The crewmate wins by finishing 3 more tasks. The intruder wins by eliminating them.
                                 </p>
                             </div>
                         )}
