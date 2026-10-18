@@ -674,6 +674,17 @@ function PreGamePage() {
                                 </div>
                             </div>
                         )}
+
+                        {/* 3-player rounds use last-stand rules (server: Game.assignRoles) */}
+                        {players.length === 3 && (
+                            <div data-testid="small-group-note" className="mt-4 mx-auto max-w-md bg-gray-900/60 border border-amber-500/30 rounded-xl px-4 py-3 text-sm text-gray-300">
+                                <p className="font-semibold text-amber-300">Best with 4 or more players</p>
+                                <p className="mt-1 text-gray-400">
+                                    With 3, it&rsquo;s a last stand: once it&rsquo;s down to one crewmate and the intruder, there are no more meetings.
+                                    The crewmate wins by finishing every task. The intruder wins by eliminating them.
+                                </p>
+                            </div>
+                        )}
                     </>
                 )}
 

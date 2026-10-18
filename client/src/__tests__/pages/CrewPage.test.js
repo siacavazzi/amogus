@@ -72,6 +72,37 @@ describe('CrewPage', () => {
             expect(screen.getByText(/CALL MEETING/i)).toBeInTheDocument();
         });
 
+        describe('during a last stand', () => {
+            const lastStandContext = { ...crewmateContext, lastStand: true, roundId: 'round-1' };
+            let confirmSpy;
+            afterEach(() => confirmSpy?.mockRestore());
+
+            it('swaps the meeting button for a self-report after confirming', () => {
+                confirmSpy = jest.spyOn(window, 'confirm').mockReturnValue(true);
+                const { contextValue } = renderWithContext(
+                    <CrewmemberPage setShowSusPage={mockSetShowSusPage} />,
+                    lastStandContext
+                );
+
+                expect(screen.queryByText(/CALL MEETING/i)).not.toBeInTheDocument();
+                fireEvent.click(screen.getByText(/I WAS ELIMINATED/i).closest('button'));
+
+                expect(contextValue.handleCallMeeting).not.toHaveBeenCalled();
+                expect(contextValue.socket.emit).toHaveBeenCalledWith('player_dead', expect.objectContaining({ round_id: 'round-1' }));
+            });
+
+            it('does nothing if the player cancels', () => {
+                confirmSpy = jest.spyOn(window, 'confirm').mockReturnValue(false);
+                const { contextValue } = renderWithContext(
+                    <CrewmemberPage setShowSusPage={mockSetShowSusPage} />,
+                    lastStandContext
+                );
+
+                fireEvent.click(screen.getByText(/I WAS ELIMINATED/i).closest('button'));
+                expect(contextValue.socket.emit).not.toHaveBeenCalledWith('player_dead', expect.anything());
+            });
+        });
+
         it('calls handleCallMeeting when meeting button clicked', () => {
             const { contextValue } = renderWithContext(
                 <CrewmemberPage setShowSusPage={mockSetShowSusPage} />,

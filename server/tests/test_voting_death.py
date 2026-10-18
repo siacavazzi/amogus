@@ -96,6 +96,7 @@ class VotingDeathTests(SocketGameTestCase):
 
     def test_game_ending_death_clears_ballot_without_extra_ejection(self):
         clients, ids, game, meeting = self.start_vote(3)
+        game.ruleset = 'standard'  # Last-stand rounds keep going at 1v1; test the game-ending death.
         dead = self.crew(game)[0]
         intruder = self.intruders(game)[0]
         client = self.client_for_player(clients, ids, dead)

@@ -27,6 +27,8 @@ const CrewmemberPage = ({
     setKillCooldown,
     killCooldownMax = 15,
     intrudersRevealed,
+    lastStand,
+    roundId,
     connected,
     completeTask,
     taskCompletionPending,
@@ -35,6 +37,9 @@ const CrewmemberPage = ({
 
   // Check if intruders have been revealed (tasks 100%)
   const tasksComplete = !!intrudersRevealed;
+  // Last stand (3-player rounds at 1v1): both players know who's who, so meetings are off.
+  // Kills normally get reported at a meeting, so the crewmate reports their own here.
+  const meetingsOff = !!lastStand && !playerState?.sus;
   const highlightTopAction = tutorialMode && tutorialHighlightTarget === 'top-action';
   const highlightSlider = tutorialMode && tutorialHighlightTarget === 'slider';
 
@@ -52,8 +57,18 @@ const CrewmemberPage = ({
     return () => clearInterval(interval);
   }, []);
 
+  const reportEliminated = () => {
+    if (!window.confirm('Did the intruder get you? This ends the game.')) return;
+    socket?.emit('player_dead', {
+      player_id: playerState?.player_id || localStorage.getItem('player_id'),
+      round_id: roundId,
+    });
+  };
+
   const handleClickButton = () => {
-    if (!playerState?.sus) {
+    if (meetingsOff) {
+      reportEliminated();
+    } else if (!playerState?.sus) {
       handleCallMeeting();
     } else {
       setShowSusPage(true);
@@ -132,13 +147,15 @@ const CrewmemberPage = ({
       >
         <button
           onClick={handleClickButton}
-          className="group relative flex items-center justify-center px-8 py-4 rounded-2xl shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-orange-500 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500 transform hover:scale-105 hover:shadow-[0_0_30px_rgba(249,115,22,0.4)]"
+          className={`group relative flex items-center justify-center px-8 py-4 rounded-2xl shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-orange-500 ${meetingsOff ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' : 'bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500 transform hover:scale-105 hover:shadow-[0_0_30px_rgba(249,115,22,0.4)]'}`}
         >
-          <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-orange-400 to-red-400 opacity-0 group-hover:opacity-20 blur-xl transition-opacity"></div>
+          {!meetingsOff && (
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-orange-400 to-red-400 opacity-0 group-hover:opacity-20 blur-xl transition-opacity"></div>
+          )}
           <AlertTriangle className="mr-3" size={22} />
           {!(tasksComplete && playerState?.sus) && (
             <span className="font-bold text-lg tracking-wide">
-              {playerState?.sus ? "ENTER VENT" : "CALL MEETING"}
+              {playerState?.sus ? "ENTER VENT" : meetingsOff ? "I WAS ELIMINATED" : "CALL MEETING"}
             </span>
           )}
         </button>

@@ -1075,7 +1075,7 @@ def handleTaskComplete(data):
                 game.speaker.play_sound(f'{threshold}_percent_tasks')
                 break
         if percentage >= 100 and not game.intruders_revealed:
-            game.reveal_intruders()
+            game.on_tasks_complete()
     queued_task = player.fake_task
     player.fake_task = None
     game.assign_task(player, queued_task)

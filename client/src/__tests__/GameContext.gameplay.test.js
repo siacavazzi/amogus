@@ -63,6 +63,15 @@ describe('shared gameplay state', () => {
         expect(game.getContext().hackTime).toBe(9);
     });
 
+    it('turns on last stand from the server event and clears it on reset', async () => {
+        game = renderWithLiveGameContext(<div>Phone</div>);
+        expect(game.getContext().lastStand).toBe(false);
+        await game.serverEmit('last_stand', { room_code: 'ROOM', revision: 5, title: 'Last stand', message: 'One crewmate left.' });
+        expect(game.getContext().lastStand).toBe(true);
+        await game.serverEmit('game_reset', { room_code: 'ROOM' });
+        expect(game.getContext().lastStand).toBe(false);
+    });
+
     it('restores reactor lobby access from the server registration snapshot', async () => {
         game = renderWithLiveGameContext(<div>Reactor</div>);
         await game.serverEmit('reactor_registered', { room_code: 'ROOM', is_open: true, is_creator: true });
