@@ -4,6 +4,7 @@ import { DataContext } from "../GameContext";
 import AnimationOverlay from "../components/AnimationOverlay";
 import MUECustomSlider from "../components/swiper";
 import LeaveGameButton from "../components/LeaveGameButton";
+import TestModeBar from "../components/TestModeBar";
 import { AlertTriangle, MapPin, Target, Clock, Crosshair, Radio, Skull } from "lucide-react";
 import { RotatingRing, GridOverlay } from "../components/ui";
 import { StatusBadge, PrimaryButton } from "../components/ui";
@@ -124,6 +125,9 @@ const CrewmemberPage = ({
           {killCooldown > 0 ? 'STANDBY' : 'ACTIVE'}
         </StatusBadge>
       </div>
+
+      {/* Test game role switch */}
+      <TestModeBar />
 
       {/* Emergency Button */}
       <div

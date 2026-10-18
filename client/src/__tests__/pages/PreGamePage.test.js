@@ -225,6 +225,32 @@ describe('PreGamePage', () => {
             expect(screen.queryByText('Kitchen 0')).not.toBeInTheDocument();
         });
 
+        it('asks before starting a test game with too few players', () => {
+            const players = mockPlayers.slice(0, 2);
+            const tasks = Array.from({ length: 10 }, (_, index) => ({ task: `Task ${index}`, location: index % 2 ? 'Yard' : 'Kitchen' }));
+            const { contextValue } = renderWithContext(<PreGamePage />, {
+                ...defaultContext,
+                players,
+                taskLocations: ['Kitchen', 'Yard', 'Other'],
+                isRoomCreator: true,
+            });
+            act(() => simulateSocketEvent(contextValue.socket, 'lobby_state', {
+                room_code: 'TEST1', revision: 2, round_id: 'round-1',
+                locations: ['Kitchen', 'Yard', 'Other'], tasks, min_tasks: 10,
+                task_list_code: null, task_list_name: null, collaborative_mode: false,
+                can_start: false, can_start_test: true, start_error: 'Need at least 3 players for 1 intruder(s).',
+            }));
+
+            expect(screen.getByText(/Starting now runs a test game/i)).toBeInTheDocument();
+            fireEvent.click(screen.getByRole('button', { name: /start game/i }));
+            expect(contextValue.socket.emit).not.toHaveBeenCalledWith('start_game', expect.anything());
+            expect(screen.getByRole('dialog')).toHaveTextContent(/Not enough players/i);
+
+            fireEvent.click(screen.getByRole('button', { name: /start test game/i }));
+            expect(contextValue.socket.emit).toHaveBeenCalledWith('start_game', expect.objectContaining({ test_mode: true }));
+            expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        });
+
         it('ignores lobby snapshots for a different room', () => {
             const { contextValue } = renderWithContext(<PreGamePage />, {
                 ...defaultContext,

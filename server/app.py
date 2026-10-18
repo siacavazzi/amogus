@@ -6,7 +6,7 @@ import copy
 import time
 from functools import wraps
 from uuid import uuid4
-from assets.room_protocol import metadata, minimum_tasks, start_error_detail, lobby_state, room_state
+from assets.room_protocol import metadata, minimum_tasks, start_error_detail, can_start_test, lobby_state, room_state
 from flask import Flask, request, send_from_directory, abort
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask_cors import CORS
@@ -783,11 +783,13 @@ def handle_join(data):
 
 # ============ GAME FLOW ============
 
-def start_room(game):
+def start_room(game, test_mode=False):
     if game.creator_sid != request.sid:
         record_usage('start_rejected', game, reason='not_host')
         return command_error('Only the host can start the game.')
-    reason, error = start_error_detail(game)
+    # A test game is only for rooms that are short on players. A full room starts normally.
+    test_mode = bool(test_mode) and can_start_test(game)
+    reason, error = start_error_detail(game, test_mode=test_mode)
     if error:
         record_usage('start_rejected', game, reason=reason, player_count=len(game.players),
                      task_count=len(game.collaborative_tasks), min_tasks=minimum_tasks(game))
@@ -800,9 +802,10 @@ def start_room(game):
     game.task_creation_mode = False
     game.card_deck = CardDeck(game.locations, game.socket, game)
     game.game_running = True
+    game.test_mode = test_mode
     game.assignRoles()
     game_manager.stats_tracker.record_game_started(game)
-    record_usage('round_host_started', game, game.creator_player_id)
+    record_usage('round_host_started', game, game.creator_player_id, test_mode=test_mode)
     for player in game.players:
         if not player.sus:
             game.assign_task(player)
@@ -824,7 +827,23 @@ def handle_start(data):
     game, player, room = get_game_and_player(data.get('player_id'))
     if not game:
         return command_error('Game not found.')
-    return start_room(game)
+    return start_room(game, test_mode=data.get('test_mode'))
+
+
+@socketio.on('test_switch_role')
+@room_event()
+def handle_test_switch_role(data):
+    game, player, room = get_game_and_player(data.get('player_id'))
+    if not game or not player:
+        return command_error('Game not found.')
+    if not game.switch_test_role(player):
+        return command_error('You can only switch roles during a test game.', game, player)
+    record_usage('test_role_switched', game, player.player_id, role='intruder' if player.sus else 'crew')
+    sendPlayerList(game, game.room_code)
+    socketio.emit('room_state', room_state(game, player, player.sid), to=player.sid)
+    if player.task:
+        socketio.emit('task', {**metadata(game), 'task': player.task}, to=player.sid)
+    return {'ok': True, 'sus': player.sus}
 
 
 @socketio.on('reset')
@@ -1764,7 +1783,7 @@ def handle_finalize_collaborative_tasks(data):
     game = game_manager.get_game(data.get('room_code', '').upper())
     if not game:
         return command_error('Game not found.')
-    return start_room(game)
+    return start_room(game, test_mode=data.get('test_mode'))
 
 
 @socketio.on('save_collaborative_tasks')

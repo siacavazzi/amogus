@@ -174,6 +174,84 @@ class HighImpactGameplayTests(unittest.TestCase):
             events.extend(self.drain(client))
         self.assertEqual([], [event for event in events if event["name"] == "game_start"])
 
+    def setup_lobby(self, player_count, task_count=10):
+        clients = [self.make_client() for _ in range(player_count)]
+        room_code = self.create_open_room(clients[0])
+        player_ids = []
+        for index, client in enumerate(clients):
+            player_ids.append(self.join_player(client, room_code, f"P{index}"))
+            for other in clients:
+                if other is not client:
+                    self.drain(other)
+        self.add_tasks(clients[0], room_code, player_ids[0], task_count)
+        for client in clients:
+            self.drain(client)
+        return clients, room_code, player_ids, server_app.game_manager.get_game(room_code)
+
+    def test_small_room_offers_test_game_but_normal_start_still_refuses(self):
+        from assets.room_protocol import lobby_state
+        clients, room_code, player_ids, game = self.setup_lobby(2)
+
+        state = lobby_state(game)
+        self.assertFalse(state["can_start"])
+        self.assertTrue(state["can_start_test"])
+        self.start_game(clients[0], player_ids[0], clients)
+        self.assertFalse(game.game_running)
+
+    def test_one_player_test_game_starts_as_crew_and_skips_stats(self):
+        clients, room_code, player_ids, game = self.setup_lobby(1)
+        tracker = []
+        server_app.game_manager.stats_tracker.record_game_started = lambda g: tracker.append(g.test_mode)
+        clients[0].emit("start_game", {"player_id": player_ids[0], "test_mode": True})
+        self.drain(clients[0])
+
+        self.assertTrue(game.game_running)
+        self.assertTrue(game.test_mode)
+        self.assertEqual([True], tracker)
+        player = game.players[0]
+        self.assertFalse(player.sus)
+        self.assertIsNotNone(player.task)
+        self.assertGreater(game.taskGoal, 0)
+
+    def test_test_game_player_can_switch_roles(self):
+        clients, room_code, player_ids, game = self.setup_lobby(2)
+        clients[0].emit("start_game", {"player_id": player_ids[0], "test_mode": True})
+        for client in clients:
+            self.drain(client)
+        self.assertEqual(1, game.numIntruders)
+
+        crew = next(p for p in game.players if not p.sus)
+        crew_client = clients[player_ids.index(crew.player_id)]
+        crew_client.emit("test_switch_role", {"player_id": crew.player_id})
+        self.drain(crew_client)
+        self.assertTrue(crew.sus)
+        self.assertIsNone(crew.task)
+        self.assertEqual((2, 0), (game.numIntruders, game.numCrew))
+
+        crew_client.emit("test_switch_role", {"player_id": crew.player_id})
+        events = self.drain(crew_client)
+        self.assertFalse(crew.sus)
+        self.assertIsNotNone(crew.task)
+        self.assertTrue(self.first_event(events, "room_state")["test_mode"])
+
+        clients[0].emit("reset", {"player_id": player_ids[0], "force": True})
+        self.drain(clients[0])
+        self.assertFalse(game.test_mode)
+
+    def test_full_room_ignores_test_flag_and_cannot_switch_roles(self):
+        clients, room_code, player_ids, game = self.setup_lobby(3)
+        clients[0].emit("start_game", {"player_id": player_ids[0], "test_mode": True})
+        for client in clients:
+            self.drain(client)
+        self.assertTrue(game.game_running)
+        self.assertFalse(game.test_mode)
+
+        player = game.getPlayerById(player_ids[1])
+        was_sus = player.sus
+        clients[1].emit("test_switch_role", {"player_id": player_ids[1]})
+        self.drain(clients[1])
+        self.assertEqual(was_sus, player.sus)
+
     def test_default_four_player_room_can_start(self):
         clients, room_code, player_ids, game = self.setup_started_game(4, task_count=12)
 

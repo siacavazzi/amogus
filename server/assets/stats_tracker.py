@@ -162,7 +162,7 @@ class StatsTracker:
 
     def record_game_started(self, game):
         with self.lock:
-            if len(game.players) < 3 or getattr(game, '_stats_start_recorded', False):
+            if len(game.players) < 3 or getattr(game, 'test_mode', False) or getattr(game, '_stats_start_recorded', False):
                 return
             game.round_started_at = time.time()
             game.round_started_monotonic = time.monotonic()
@@ -224,8 +224,8 @@ class StatsTracker:
         if game is None:
             return
         with self.lock:
-            # Avoid double-recording if multiple end paths fire
-            if getattr(game, '_stats_recorded', False):
+            # Avoid double-recording if multiple end paths fire. Test games stay out of stats.
+            if getattr(game, '_stats_recorded', False) or getattr(game, 'test_mode', False):
                 return
             started_at = getattr(game, 'round_started_at', None)
             ended_at = getattr(game, 'end_time', None) or time.time()
