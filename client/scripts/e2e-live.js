@@ -1,4 +1,5 @@
-// Play one full game against a running server over its WebSocket, like a room of phones would.
+// Play full games against a running server over its WebSocket, like a room of phones would:
+// one standard game, then two 3-player last stand games (the crew wins one, the intruder the other).
 //   node scripts/e2e-live.js https://susparty.com --beta     the beta copy (sends the beta cookie)
 //   node scripts/e2e-live.js http://127.0.0.1:5001           a local server
 // Options: --players N (default 5), --expect-commit SHA (fail unless the server runs that build),
@@ -108,79 +109,97 @@ async function checkVersion() {
     }
 }
 
+const NO_CARDS = {
+    self_report: 0, emp: 0, fake_task: 0, taunt_message: 0,
+    remote_sabotage: 0, shorten_meltdown: 0, area_denial_per_location: 0,
+};
+
+// Host sets up a room with a small, known deck, everyone joins, and the round starts.
+async function openRound(phones, cardCounts = {}) {
+    const [host] = phones;
+    host.socket.emit('create_game', {});
+    const { room_code: roomCode } = await host.waitFor('game_created');
+    host.socket.emit('update_game_config', {
+        room_code: roomCode,
+        config: {
+            num_intruders: 1, starting_cards: Object.values(cardCounts).reduce((sum, count) => sum + count, 0), task_ratio: 3, vote_time: 30, vote_threshold: 0.5,
+            card_draw_probability: 0, card_deck_preset: 'custom',
+            card_deck_counts: { ...NO_CARDS, ...cardCounts },
+        },
+    });
+    await host.waitFor('game_config', config => config.card_deck_preset === 'custom');
+    host.socket.emit('open_room', { room_code: roomCode });
+    await host.waitFor('room_opened');
+    log(`Room ${roomCode} open`);
+
+    // Everyone joins, the host first
+    const ids = new Map();
+    for (const phone of phones) {
+        if (phone !== host) {
+            phone.socket.emit('join_game', { room_code: roomCode });
+            await phone.waitFor('game_joined');
+        }
+        phone.socket.emit('join', { room_code: roomCode, username: `E2E ${phone.name}` });
+        const { player_id: playerId } = await phone.waitFor('player_id');
+        ids.set(phone, playerId);
+    }
+    // since 0: the last join's roster can arrive before this wait starts
+    await host.waitFor('game_data', data => data.list?.length === phones.length, { since: 0 });
+    log(`${phones.length} players in the lobby`);
+
+    const locations = ['Kitchen', 'Living Room', 'Garage'];
+    const taskCount = phones.length * 3 + 3;
+    for (let index = 0; index < taskCount; index++) {
+        host.socket.emit('add_collaborative_task', {
+            room_code: roomCode,
+            task: { task: `E2E task ${index + 1}`, location: locations[index % locations.length] },
+        });
+    }
+    await host.waitFor('collaborative_task_added', data => data.task?.task === `E2E task ${taskCount}`);
+
+    // Start the round
+    const startMarks = new Map(phones.map(phone => [phone, phone.mark()]));
+    await host.command('start_game', { player_id: ids.get(host) });
+    await Promise.all(phones.map(phone => phone.waitFor('game_start', undefined, { since: startMarks.get(phone) })));
+    const players = (await host.waitFor('game_data', data => data.action === 'start_game', { since: startMarks.get(host) })).list.map(parse);
+    const byId = new Map(players.map(player => [player.player_id, player]));
+    const phoneOf = playerId => phones.find(phone => ids.get(phone) === playerId);
+    const intruder = phoneOf(players.find(player => player.sus).player_id);
+    const crew = phones.filter(phone => !byId.get(ids.get(phone)).sus);
+    assert.equal(crew.length, phones.length - 1, 'One intruder');
+    const roundId = (await crew[0].waitFor('task', undefined, { since: startMarks.get(crew[0]) })).round_id;
+    log(`Round started: ${intruder.name} is the intruder`);
+
+    const currentTask = async phone => (await phone.waitFor('task', data => data.task?.round_id === roundId, { since: 0 })) && phone.latest('task').task;
+    const completeTask = async phone => {
+        const task = await currentTask(phone);
+        const mark = phone.mark();
+        await phone.command('complete_task', {
+            player_id: ids.get(phone), round_id: roundId, assignment_id: task.assignment_id, request_id: randomUUID(),
+        });
+        await phone.waitFor('task', data => data.task?.assignment_id !== task.assignment_id, { since: mark });
+        return task;
+    };
+
+    return { host, roomCode, ids, players, byId, phoneOf, intruder, crew, roundId, currentTask, completeTask };
+}
+
+async function closeRoom({ host, ids, roomCode }, phones) {
+    // Host closes the room
+    const closed = phones.filter(phone => phone !== host).map(phone => phone.waitFor('room_disbanded'));
+    host.socket.emit('disband_room', { player_id: ids.get(host) });
+    await Promise.all(closed);
+    log(`Room ${roomCode} closed`);
+}
+
 async function playGame() {
     const phones = Array.from({ length: PLAYER_COUNT }, (_, index) => new Phone(index === 0 ? 'Host' : `Player ${index}`));
     try {
         await Promise.all(phones.map(phone => phone.connected()));
         log(`${phones.length} phones connected`);
-        const [host] = phones;
-
-        // Host sets up a room with a small, known deck: one taunt and one fake task for the intruder
-        host.socket.emit('create_game', {});
-        const { room_code: roomCode } = await host.waitFor('game_created');
-        host.socket.emit('update_game_config', {
-            room_code: roomCode,
-            config: {
-                num_intruders: 1, starting_cards: 2, task_ratio: 3, vote_time: 30, vote_threshold: 0.5,
-                card_draw_probability: 0, card_deck_preset: 'custom',
-                card_deck_counts: {
-                    self_report: 0, emp: 0, fake_task: 1, taunt_message: 1,
-                    remote_sabotage: 0, shorten_meltdown: 0, area_denial_per_location: 0,
-                },
-            },
-        });
-        await host.waitFor('game_config', config => config.card_deck_preset === 'custom');
-        host.socket.emit('open_room', { room_code: roomCode });
-        await host.waitFor('room_opened');
-        log(`Room ${roomCode} open`);
-
-        // Everyone joins, the host first
-        const ids = new Map();
-        for (const phone of phones) {
-            if (phone !== host) {
-                phone.socket.emit('join_game', { room_code: roomCode });
-                await phone.waitFor('game_joined');
-            }
-            phone.socket.emit('join', { room_code: roomCode, username: `E2E ${phone.name}` });
-            const { player_id: playerId } = await phone.waitFor('player_id');
-            ids.set(phone, playerId);
-        }
-        await host.waitFor('game_data', data => data.list?.length === phones.length);
-        log(`${phones.length} players in the lobby`);
-
-        const locations = ['Kitchen', 'Living Room', 'Garage'];
-        const taskCount = phones.length * 3 + 3;
-        for (let index = 0; index < taskCount; index++) {
-            host.socket.emit('add_collaborative_task', {
-                room_code: roomCode,
-                task: { task: `E2E task ${index + 1}`, location: locations[index % locations.length] },
-            });
-        }
-        await host.waitFor('collaborative_task_added', data => data.task?.task === `E2E task ${taskCount}`);
-
-        // Start the round
-        const startMarks = new Map(phones.map(phone => [phone, phone.mark()]));
-        await host.command('start_game', { player_id: ids.get(host) });
-        await Promise.all(phones.map(phone => phone.waitFor('game_start', undefined, { since: startMarks.get(phone) })));
-        const players = (await host.waitFor('game_data', data => data.action === 'start_game', { since: startMarks.get(host) })).list.map(parse);
-        const byId = new Map(players.map(player => [player.player_id, player]));
-        const phoneOf = playerId => phones.find(phone => ids.get(phone) === playerId);
-        const intruder = phoneOf(players.find(player => player.sus).player_id);
-        const crew = phones.filter(phone => !byId.get(ids.get(phone)).sus);
-        assert.equal(crew.length, phones.length - 1, 'One intruder');
-        const roundId = (await crew[0].waitFor('task', undefined, { since: startMarks.get(crew[0]) })).round_id;
-        log(`Round started: ${intruder.name} is the intruder`);
-
-        const currentTask = async phone => (await phone.waitFor('task', data => data.task?.round_id === roundId, { since: 0 })) && phone.latest('task').task;
-        const completeTask = async phone => {
-            const task = await currentTask(phone);
-            const mark = phone.mark();
-            await phone.command('complete_task', {
-                player_id: ids.get(phone), round_id: roundId, assignment_id: task.assignment_id, request_id: randomUUID(),
-            });
-            await phone.waitFor('task', data => data.task?.assignment_id !== task.assignment_id, { since: mark });
-            return task;
-        };
+        // One taunt and one fake task for the intruder
+        const round = await openRound(phones, { fake_task: 1, taunt_message: 1 });
+        const { host, ids, byId, intruder, crew, roundId, currentTask, completeTask } = round;
 
         // Every crewmate does a task, and the score reaches everyone
         for (const phone of crew) await completeTask(phone);
@@ -245,11 +264,48 @@ async function playGame() {
         assert.equal(finalRoster.find(player => player.player_id === ids.get(intruder)).alive, false, 'Intruder is out');
         log('Intruder voted out, every phone shows the crew victory');
 
-        // Host closes the room
-        const closed = phones.filter(phone => phone !== host).map(phone => phone.waitFor('room_disbanded'));
-        host.socket.emit('disband_room', { player_id: ids.get(host) });
-        await Promise.all(closed);
-        log(`Room ${roomCode} closed`);
+        await closeRoom(round, phones);
+    } finally {
+        phones.forEach(phone => phone.close());
+    }
+}
+
+// 3 players: once it's 1 intruder vs 1 crewmate the round goes on as a last stand.
+// The last crewmate wins with 3 more tasks; with elimination the intruder wins.
+async function playLastStand(crewWins) {
+    const phones = ['Host', 'Player 1', 'Player 2'].map(name => new Phone(`${name} (last stand)`));
+    try {
+        await Promise.all(phones.map(phone => phone.connected()));
+        const round = await openRound(phones);
+        const { ids, intruder, crew, roundId, completeTask } = round;
+        const [first, last] = crew;
+
+        await completeTask(last);
+        const marks = new Map(phones.map(phone => [phone, phone.mark()]));
+        await first.command('player_dead', { player_id: ids.get(first), round_id: roundId });
+        const notices = await Promise.all(phones.map(phone => phone.waitFor('last_stand', undefined, { since: marks.get(phone) })));
+        notices.forEach(notice => assert.equal(notice.tasks_left, 3, 'Last stand needs 3 more tasks'));
+        await Promise.all(phones.map(phone => phone.waitFor('task_goal', goal => goal === 4, { since: marks.get(phone) })));
+        log(`${first.name} eliminated: last stand, ${last.name} needs 3 more tasks`);
+
+        const meeting = await last.socket.timeout(STEP_TIMEOUT_MS).emitWithAck('meeting', { player_id: ids.get(last), round_id: roundId });
+        assert.equal(meeting?.ok, false, 'No meetings during a last stand');
+
+        const endMarks = new Map(phones.map(phone => [phone, phone.mark()]));
+        if (crewWins) {
+            for (let done = 0; done < 3; done++) await completeTask(last);
+        } else {
+            await completeTask(last);
+            await last.command('player_dead', { player_id: ids.get(last), round_id: roundId });
+        }
+        const expected = crewWins ? 'victory' : 'sus_victory';
+        const results = await Promise.all(phones.map(phone => phone.waitFor('end_game', undefined, { since: endMarks.get(phone) })));
+        results.forEach(result => assert.equal(result.result, expected, `Last stand ends in ${expected}`));
+        log(crewWins
+            ? `${last.name} finished 3 tasks and the crew won the last stand`
+            : `${intruder.name} eliminated ${last.name} and won the last stand`);
+
+        await closeRoom(round, phones);
     } finally {
         phones.forEach(phone => phone.close());
     }
@@ -286,8 +342,10 @@ async function checkBrowser() {
 (async () => {
     await checkVersion();
     await playGame();
+    await playLastStand(true);
+    await playLastStand(false);
     if (args.includes('--browser')) await checkBrowser();
-    log('PASS: full game played end to end');
+    log('PASS: full game and both last stand endings played end to end');
 })().catch(error => {
     console.error(`FAIL: ${error.message}`);
     process.exitCode = 1;
