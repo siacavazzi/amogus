@@ -1,108 +1,57 @@
 import React from 'react';
-import { AlertTriangle, Skull, Target, ShieldAlert } from '../signal/icons';
+import { Skull, ShieldAlert } from '../signal/icons';
+import { Face, Words } from '../signal';
+import '../signal/reactor.css';
 
 /**
- * IntrudersRevealedDisplay - Shown to crewmates when tasks reach 100%
- * Reveals who the intruders are
+ * IntrudersRevealedDisplay - the red moment when tasks reach 100% and the intruders are named.
+ * On the reactor it fills the screen; pass `players` so the names get their faces.
  */
-const IntrudersRevealedDisplay = ({ intruderNames = [], isIntruder = false }) => {
+const IntrudersRevealedDisplay = ({ intruderNames = [], isIntruder = false, players = [], children }) => {
   if (isIntruder) {
     // Special display for intruders - they've been exposed!
     return (
-      <div className="relative overflow-hidden rounded-2xl border-2 border-red-500 bg-gradient-to-r from-gray-900 via-red-950/50 to-gray-900 shadow-lg my-4">
-        {/* Animated warning pulse */}
-        <div className="absolute inset-0 bg-red-500/20 animate-pulse" />
-        
-        {/* Scan line effect */}
-        <div 
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,0,0,0.03) 2px, rgba(255,0,0,0.03) 4px)',
-          }}
-        />
-        
-        <div className="relative flex flex-col items-center gap-3 p-6">
-          {/* Icon */}
-          <div className="w-16 h-16 rounded-full bg-red-500/30 border-2 border-red-500 flex items-center justify-center animate-pulse">
-            <ShieldAlert size={32} className="text-red-400" />
-          </div>
-
-          {/* Title */}
-          <h2 className="text-2xl font-black text-red-500 tracking-wider text-center">
-            LOCKED OUT
-          </h2>
-          
-          {/* Message */}
-          <p className="text-red-300 text-center text-sm font-medium">
-            All systems compromised. Eliminate remaining crew immediately!
-          </p>
-          
-          {/* Warning badges */}
-          <div className="flex flex-wrap justify-center gap-2 mt-2">
-            <span className="px-3 py-1 bg-red-500/20 border border-red-500/50 rounded-full text-red-400 text-xs font-bold">
-              VENTS DISABLED
-            </span>
-            <span className="px-3 py-1 bg-red-500/20 border border-red-500/50 rounded-full text-red-400 text-xs font-bold">
-              IDENTITY EXPOSED
-            </span>
+      <div className="sg sg-screen sg-out sg-rx sg-flood" role="status">
+        <div className="sg-rx__main">
+          <ShieldAlert size={120} className="sg-a sg-pop" style={{ animationDelay: '300ms' }} />
+          <h1 className="sg-rx__meet"><Words text="LOCKED OUT" delay={400} /></h1>
+          <p className="sg-rx__lede">All systems compromised. Eliminate remaining crew immediately!</p>
+          <div className="sg-row">
+            <span className="sg-pill">VENTS DISABLED</span>
+            <span className="sg-pill">IDENTITY EXPOSED</span>
           </div>
         </div>
-        
-        {/* Bottom accent line */}
-        <div className="h-1 bg-gradient-to-r from-transparent via-red-500 to-transparent" />
+        {children && <div className="sg-rx__foot">{children}</div>}
       </div>
     );
   }
 
-  // Display for crewmates - shows who the intruders are
-  return (
-    <div className="relative overflow-hidden rounded-2xl border-2 border-emerald-500 bg-gradient-to-r from-gray-900 via-emerald-950/30 to-gray-900 shadow-lg my-4">
-      {/* Animated background pulse */}
-      <div className="absolute inset-0 bg-emerald-500/10 animate-pulse" />
-      
-      <div className="relative flex flex-col items-center gap-4 p-6">
-        {/* Icon */}
-        <div className="w-16 h-16 rounded-full bg-emerald-500/30 border-2 border-emerald-500 flex items-center justify-center">
-          <Target size={32} className="text-emerald-400" />
-        </div>
+  const faces = intruderNames.map((name) => players.find((p) => p.username === name) || { username: name });
 
-        {/* Title */}
-        <div className="text-center">
-          <h2 className="text-xl font-black text-emerald-400 tracking-wider mb-1">
-            TASKS COMPLETE!
-          </h2>
-          <p className="text-emerald-300/70 text-sm">Intruder identities revealed</p>
+  return (
+    <div className="sg sg-screen sg-out sg-rx sg-flood" role="status">
+      <div className="sg-rx__main">
+        <p className="sg-rx__label sg-a sg-rise" style={{ animationDelay: '250ms' }}>Tasks complete</p>
+        <h1 className="sg-rx__meet sg-rx__reveal-title">
+          <Words text={intruderNames.length > 1 ? 'THE INTRUDERS ARE' : 'THE INTRUDER IS'} delay={380} />
+        </h1>
+        <div className="sg-rx__names" style={{ marginTop: 'clamp(6px, 2vh, 24px)' }}>
+          {faces.map((player, index) => (
+            <div key={player.username || index} className="sg-rx__name sg-a sg-pop" style={{ animationDelay: `${900 + index * 160}ms` }}>
+              {player.pic !== undefined || player.selfie ? (
+                <Face player={player} size={168} style={{ boxShadow: '0 0 0 6px #fff' }} />
+              ) : (
+                <Skull size={96} />
+              )}
+              <b>{player.username}</b>
+            </div>
+          ))}
         </div>
-        
-        {/* Intruder names */}
-        <div className="flex flex-col items-center gap-2 w-full">
-          <div className="flex items-center gap-2 text-amber-400 text-xs uppercase tracking-wider">
-            <AlertTriangle size={14} />
-            <span>The {intruderNames.length > 1 ? 'intruders are' : 'intruder is'}</span>
-            <AlertTriangle size={14} />
-          </div>
-          
-          <div className="flex flex-wrap justify-center gap-2">
-            {intruderNames.map((name, index) => (
-              <div 
-                key={index}
-                className="flex items-center gap-2 px-4 py-2 bg-red-500/20 border border-red-500/50 rounded-xl"
-              >
-                <Skull size={16} className="text-red-400" />
-                <span className="text-red-300 font-bold">{name}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        
-        {/* Call to action */}
-        <p className="text-gray-400 text-sm text-center mt-2">
+        <p className="sg-rx__lede sg-a sg-rise" style={{ animationDelay: '1300ms' }}>
           Find them and vote them out!
         </p>
       </div>
-      
-      {/* Bottom accent line */}
-      <div className="h-1 bg-gradient-to-r from-transparent via-emerald-500 to-transparent" />
+      {children && <div className="sg-rx__foot">{children}</div>}
     </div>
   );
 };

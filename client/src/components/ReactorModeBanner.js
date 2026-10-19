@@ -1,6 +1,7 @@
 import React from 'react';
 import { isMobile as isMobileDevice } from 'react-device-detect';
-import { Monitor, Speaker, Radio, Smartphone, AlertTriangle } from '../signal/icons';
+import { Monitor, Speaker, Smartphone, ChevronRight } from '../signal/icons';
+import '../signal/reactor.css';
 
 /**
  * Resolve whether the current device is acting as a mobile player or as the reactor.
@@ -20,26 +21,23 @@ export function getSwitchToMobileHref() {
 }
 
 /**
- * Side-by-side reactor + Sonos info, for desktop/reactor-mode setup screens.
+ * What the reactor is, and the optional Sonos setup, as plain text for the big screen.
  *
- * variant="full"    -> two big info cards + switch-to-mobile link below.
- * variant="compact" -> single slim strip, suitable for in-progress setup pages.
+ * variant="full"    -> the reactor and Sonos notes stacked (with a "how it works" fold).
+ * variant="compact" -> one line, suitable for in-progress setup pages.
  */
 export function ReactorModeBanner({ variant = 'full', className = '', showSwitchLink = true }) {
     if (variant === 'compact') {
         return (
-            <div className={`flex items-center gap-3 px-4 py-2.5 bg-indigo-500/10 border border-indigo-500/25 rounded-xl ${className}`}>
-                <Monitor size={16} className="text-indigo-300 shrink-0" />
-                <p className="text-gray-300 text-sm leading-snug">
-                    <span className="text-white font-semibold">This device is the Reactor</span>
-                    <span className="text-gray-500"> (shared display for meltdown and meetings, not a player).</span>
+            <div className={`sg-rx-strip ${className}`} style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', fontFamily: 'var(--sg-font)', fontWeight: 700, fontSize: 14 }}>
+                <Monitor size={18} />
+                <p style={{ margin: 0 }}>
+                    <b style={{ fontWeight: 900 }}>This device is the Reactor</b>
+                    <span style={{ opacity: 0.75 }}> (shared display for meltdown and meetings, not a player).</span>
                 </p>
                 {showSwitchLink && (
-                    <a
-                        href={getSwitchToMobileHref()}
-                        className="ml-auto text-amber-300 hover:text-amber-200 text-xs font-medium whitespace-nowrap inline-flex items-center gap-1.5"
-                    >
-                        <Smartphone size={12} />
+                    <a href={getSwitchToMobileHref()} style={{ marginLeft: 'auto', color: 'inherit', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}>
+                        <Smartphone size={14} />
                         Switch to player
                     </a>
                 )}
@@ -48,63 +46,58 @@ export function ReactorModeBanner({ variant = 'full', className = '', showSwitch
     }
 
     return (
-        <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${className}`}>
-            <div className="p-5 bg-gradient-to-br from-indigo-500/10 via-gray-900/70 to-cyan-500/10 border border-indigo-500/25 rounded-xl">
-                <div className="flex items-start gap-3">
-                    <div className="p-2 bg-indigo-500/15 rounded-lg border border-indigo-500/20 shrink-0">
-                        <Monitor size={18} className="text-indigo-300" />
-                    </div>
-                    <div className="min-w-0">
-                        <p className="text-indigo-300/80 text-[11px] font-semibold uppercase tracking-[0.22em] mb-1">This device = Reactor</p>
-                        <p className="text-gray-300 text-sm leading-snug">
-                            Larger screens act as the <span className="text-white font-semibold">Reactor</span>: a shared display for the meltdown code-entry mini-game and meeting status. It is not a player.
-                        </p>
-                        <p className="text-gray-500 text-xs mt-2">
-                            Set it down somewhere central. Players use their phones. <a href="/how-to-play#meltdown" className="text-indigo-400 hover:text-indigo-300 underline underline-offset-2">More about the reactor</a>.
-                        </p>
-                    </div>
-                </div>
+        <div className={`sg-rx-lobby__info ${className}`}>
+            <div>
+                <h2><Monitor size={22} /> This device = Reactor</h2>
+                <p>
+                    Larger screens act as the <b>Reactor</b>: a shared display for the meltdown code-entry mini-game and meeting status. It is not a player.
+                </p>
+                <p style={{ marginTop: 6 }}>
+                    Set it down somewhere central. Players use their phones. <a href="/how-to-play#meltdown">More about the reactor</a>.
+                </p>
             </div>
 
-            <div className="p-5 bg-gray-900/60 border border-gray-800/80 rounded-xl">
-                <div className="flex items-start gap-3">
-                    <div className="p-2 bg-purple-500/15 rounded-lg border border-purple-500/20 shrink-0">
-                        <Speaker size={18} className="text-purple-300" />
-                    </div>
-                    <div className="min-w-0">
-                        <p className="text-purple-300/80 text-[11px] font-semibold uppercase tracking-[0.22em] mb-1">Sonos integration</p>
-                        <p className="text-gray-300 text-sm leading-snug">
-                            Optional. Pipe meeting calls, meltdown alarms, and round audio through a Sonos speaker for in-room ambience.
+            <div>
+                <h2><Speaker size={22} /> Sonos integration</h2>
+                <p>
+                    Optional. Pipe meeting calls, meltdown alarms, and round audio through a Sonos speaker for in-room ambience.
+                    Configure it on the Reactor screen after creating a game.
+                </p>
+                <details>
+                    <summary><ChevronRight size={14} /> How does it work?</summary>
+                    <div>
+                        <p>
+                            Sus Party can connect to a Sonos speaker on your local network and play sound effects through it instead of (or in addition to) the Reactor's own speakers.
                         </p>
-                        <p className="text-gray-500 text-xs mt-2 flex items-center gap-1.5">
-                            <Radio size={12} className="text-purple-400" />
-                            Configure it on the Reactor screen after creating a game.
+                        <ul>
+                            <li>Meeting calls and meltdown alarms become room-filling.</li>
+                            <li>Players hear cues even when their phone is silent.</li>
+                            <li>Setup happens on the Reactor screen. Pick a speaker from the dropdown.</li>
+                        </ul>
+                        <p>
+                            Requires the Reactor device and the Sonos speaker on the same Wi-Fi network. Skip it if you don't have one. The game runs fine without it.
+                        </p>
+                        <p>
+                            <a href="https://github.com/siacavazzi/amogus-sonos-connector" target="_blank" rel="noopener noreferrer">
+                                Sonos connector source on GitHub
+                            </a>
                         </p>
                     </div>
-                </div>
+                </details>
             </div>
+
+            {showSwitchLink && <SwitchToMobileLink />}
         </div>
     );
 }
 
 export function SwitchToMobileLink({ className = '' }) {
     return (
-        <a
-            href={getSwitchToMobileHref()}
-            className={`flex items-start gap-3 p-3 bg-gray-900/40 border border-gray-800/60 hover:border-amber-500/40 rounded-xl transition-colors group ${className}`}
-        >
-            <div className="p-1.5 bg-amber-500/10 rounded-lg border border-amber-500/20 shrink-0">
-                <Smartphone size={14} className="text-amber-300" />
-            </div>
-            <div className="min-w-0 flex-1">
-                <p className="text-gray-300 text-sm font-medium group-hover:text-white transition-colors">
-                    Use this device as a player instead
-                </p>
-                <p className="text-gray-500 text-xs mt-0.5 flex items-start gap-1.5">
-                    <AlertTriangle size={11} className="text-amber-400/80 mt-0.5 shrink-0" />
-                    Not recommended &mdash; the game involves moving around the house.
-                </p>
-            </div>
+        <a href={getSwitchToMobileHref()} className={`sg-rx-lobby__switch ${className}`}>
+            <b><Smartphone size={18} /> Use this device as a player instead</b>
+            <span>
+                Not recommended. Players need a phone they can carry around the house: the game involves walking between rooms to do tasks, find bodies, and reach the meeting area. A laptop or desktop won&rsquo;t work mid-game.
+            </span>
         </a>
     );
 }
