@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import { isMobile as isMobileDevice } from 'react-device-detect';
 import { DataContext } from '../GameContext';
-import { Users, Plus, ArrowRight, HelpCircle, Zap, Shield, Skull, Wifi, Monitor, Radio, Speaker, Smartphone, AlertTriangle, ChevronRight, Sparkles, GraduationCap } from '../signal/icons';
+import { Users, Plus, ArrowRight, HelpCircle, Zap, Shield, Skull, Wifi, WifiOff, Monitor, Radio, Speaker, Smartphone, AlertTriangle, ChevronRight, Sparkles, GraduationCap, Megaphone } from '../signal/icons';
 import { 
     useFloatingParticles, 
     FloatingParticles, 
@@ -153,68 +153,84 @@ function LobbyPage() {
         setShowTutorialPrompt(false);
     };
 
-    return (
-        <div className="fixed inset-0 flex items-start justify-center overflow-y-auto py-8 bg-gray-950">
-            {showTutorialPrompt && (
-                <div className="fixed inset-0 z-40 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-                    <div className="w-full max-w-lg rounded-3xl border border-indigo-500/30 bg-gray-950/95 shadow-2xl shadow-indigo-900/30 overflow-hidden">
-                        <div className="border-b border-indigo-500/20 bg-gradient-to-r from-indigo-500/15 via-cyan-500/10 to-transparent px-6 py-5">
-                            <div className="inline-flex items-center gap-2 rounded-full border border-indigo-400/20 bg-indigo-500/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-indigo-200">
-                                <Sparkles size={14} />
-                                First game recommendation
-                            </div>
-                            <h2 className="mt-4 text-2xl font-black tracking-tight text-white">Try the tutorial first</h2>
-                            <p className="mt-2 text-sm leading-relaxed text-gray-300">
-                                Sus Party moves quickly once the round starts. A short tutorial can walk players through tasks, meetings, and the basic gestures before anyone joins a real room.
+    const connectedLine = (
+        <p className="sg-small" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, opacity: 0.7 }}>
+            {socket?.connected ? <Wifi size={14} /> : <WifiOff size={14} />}
+            {socket?.connected ? 'Connected to server' : 'Connecting...'}
+        </p>
+    );
+
+    if (!isReactorDevice) {
+        return (
+            <div className="sg-screen sg-round sg-home">
+                <div className="sg-home__top sg-a sg-rise">
+                    <h1 className="sg-big sg-home__mark">Sus Party</h1>
+                    <p className="sg-lede">The real-life social deduction game</p>
+                    <p className="sg-small" style={{ marginTop: 6 }}>4–16+ players · Real-time · Physical Tasks</p>
+                </div>
+
+                <div className="sg-home__body sg-a sg-rise" style={{ animationDelay: '120ms' }}>
+                    <RoomEntryNotice status={roomEntryStatus} busy={isJoining} onRetry={() => handleJoinGame()} onChangeCode={changeCode} />
+                    {error && (
+                        <p className="sg-home__error" role="alert"><AlertTriangle size={18} /> {error}</p>
+                    )}
+
+                    <form onSubmit={handleJoinGame} className="sg-home__join">
+                        <label htmlFor="game-entry-code" className="sg-lede">Room code</label>
+                        <input
+                            type="text"
+                            id="game-entry-code"
+                            value={inputRoomCode}
+                            onChange={updateCode}
+                            className="sg-home__code sg-num"
+                            placeholder="XXXX"
+                            maxLength={4}
+                            autoComplete="one-time-code"
+                            autoCapitalize="characters"
+                            spellCheck="false"
+                        />
+                        <button type="submit" className="sg-btn sg-btn-white" disabled={inputRoomCode.length !== 4 || isJoining}>
+                            {isJoining ? 'Joining...' : <>Join Game <ArrowRight size={22} /></>}
+                        </button>
+                    </form>
+
+                    <p className="sg-small sg-home__or">or start one</p>
+                    <button type="button" className="sg-btn sg-btn-ink" onClick={handleCreateGame} disabled={isCreating}>
+                        {isCreating ? 'Creating Room...' : <><Plus size={22} /> Create New Game</>}
+                    </button>
+                </div>
+
+                <div className="sg-home__foot">
+                    <p style={{ display: 'flex', justifyContent: 'center', gap: 22 }}>
+                        <a href="/how-to-play" className="sg-link">How to Play</a>
+                        <a href={tutorialHref} className="sg-link">Tutorial</a>
+                    </p>
+                    {connectedLine}
+                </div>
+
+                {showTutorialPrompt && (
+                    <div className="sg-home__scrim" role="dialog" aria-modal="true" aria-labelledby="tutorial-prompt-title">
+                        <div className="sg-home__sheet sg-a sg-rise">
+                            <p className="sg-pill" style={{ background: 'var(--sg-meet)', color: 'var(--sg-ink)' }}>First game?</p>
+                            <h2 id="tutorial-prompt-title" className="sg-big sg-h2" style={{ margin: '12px 0 8px' }}>Try the tutorial first</h2>
+                            <p className="sg-small" style={{ opacity: 0.75 }}>
+                                Sus Party moves quickly once the round starts. A short tutorial walks you through it before anyone joins a real room.
                             </p>
-                        </div>
-
-                        <div className="px-6 py-5">
-                            <div className="grid gap-3 sm:grid-cols-3">
-                                <div className="rounded-2xl border border-gray-800/80 bg-gray-900/70 p-4">
-                                    <div className="mb-2 inline-flex rounded-xl border border-cyan-400/20 bg-cyan-500/10 p-2 text-cyan-300">
-                                        <GraduationCap size={18} />
-                                    </div>
-                                    <p className="text-sm font-semibold text-white">Crew basics</p>
-                                    <p className="mt-1 text-xs leading-relaxed text-gray-400">Learn how tasks and swipe-to-complete work.</p>
-                                </div>
-                                <div className="rounded-2xl border border-gray-800/80 bg-gray-900/70 p-4">
-                                    <div className="mb-2 inline-flex rounded-xl border border-amber-400/20 bg-amber-500/10 p-2 text-amber-300">
-                                        <Users size={18} />
-                                    </div>
-                                    <p className="text-sm font-semibold text-white">Meetings</p>
-                                    <p className="mt-1 text-xs leading-relaxed text-gray-400">See when to call a meeting and how voting works.</p>
-                                </div>
-                                <div className="rounded-2xl border border-gray-800/80 bg-gray-900/70 p-4">
-                                    <div className="mb-2 inline-flex rounded-xl border border-rose-400/20 bg-rose-500/10 p-2 text-rose-300">
-                                        <Skull size={18} />
-                                    </div>
-                                    <p className="text-sm font-semibold text-white">Intruder tools</p>
-                                    <p className="mt-1 text-xs leading-relaxed text-gray-400">Log a kill, open the vent and play your cards.</p>
-                                </div>
-                            </div>
-
-                            <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-                                <a
-                                    href={tutorialHref}
-                                    className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border border-indigo-400/30 bg-indigo-500/20 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-500/30"
-                                >
-                                    <Sparkles size={16} />
-                                    <span>Start tutorial</span>
-                                </a>
-                                <button
-                                    type="button"
-                                    onClick={handleSkipTutorialPrompt}
-                                    className="inline-flex flex-1 items-center justify-center rounded-2xl border border-gray-700/80 bg-gray-900/80 px-4 py-3 text-sm font-semibold text-gray-300 transition-colors hover:border-gray-600 hover:text-white"
-                                >
-                                    Skip for now
-                                </button>
-                            </div>
+                            <ul className="sg-home__learn">
+                                <li><GraduationCap size={22} /> <span><b>Crew basics</b> Tasks and slide-to-complete</span></li>
+                                <li><Megaphone size={22} /> <span><b>Meetings</b> When to call one and how voting works</span></li>
+                                <li><Zap size={22} /> <span><b>Intruder tools</b> Log a kill, open the vent and play your cards</span></li>
+                            </ul>
+                            <a href={tutorialHref} className="sg-btn sg-btn-blue">Start tutorial</a>
+                            <button type="button" className="sg-btn sg-btn-flat" onClick={handleSkipTutorialPrompt}>Skip for now</button>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
+            </div>
+        );
+    }
 
+    return (        <div className="fixed inset-0 flex items-start justify-center overflow-y-auto py-8 bg-gray-950">
             {/* Animated background layers */}
             <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-indigo-950/20 to-gray-950" />
             
@@ -413,83 +429,7 @@ function LobbyPage() {
                             </a>
                         </div>
                     </div>
-                ) : (
-                <Card variant="default" padding="default">
-                    {/* Error message */}
-                    <RoomEntryNotice status={roomEntryStatus} busy={isJoining} onRetry={() => handleJoinGame()}
-                                    onChangeCode={changeCode} />
-                                {error && (
-                        <div className="mb-5 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-center text-sm flex items-center justify-center gap-2 animate-fadeIn">
-                            <Skull size={16} />
-                            {error}
-                        </div>
-                    )}
-
-                    {/* Create Game Button */}
-                    <PrimaryButton
-                        onClick={handleCreateGame}
-                        loading={isCreating}
-                        loadingText="Creating Room..."
-                        variant="indigo"
-                    >
-                        <Plus size={22} strokeWidth={2.5} />
-                        <span className="text-lg font-bold">Create New Game</span>
-                    </PrimaryButton>
-
-                    {/* Divider */}
-                    <div className="flex items-center my-6">
-                        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent" />
-                        <span className="px-4 text-gray-600 text-xs uppercase tracking-wider">or join existing</span>
-                        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent" />
-                    </div>
-
-                    {/* Join Game Form */}
-                    <form onSubmit={handleJoinGame}>
-                        <div className="mb-4">
-                            <label htmlFor="game-entry-code" className="block text-gray-400 text-sm mb-2 ml-1">
-                                Enter Room Code
-                            </label>
-                            <div className="relative">
-                                <input
-                                    type="text"
-                                    id="game-entry-code"
-                                    value={inputRoomCode}
-                                    onChange={updateCode}
-                                    className="w-full px-6 py-4 bg-gray-800/80 border-2 border-gray-700/80 rounded-2xl text-white text-center text-3xl font-mono tracking-[0.5em] uppercase focus:outline-none focus:border-emerald-500/50 focus:bg-gray-800 transition-all placeholder:text-gray-600 placeholder:tracking-[0.3em]"
-                                    placeholder="XXXX"
-                                    maxLength={4}
-                                    autoComplete="one-time-code"
-                                    autoCapitalize="characters"
-                                    spellCheck="false"
-                                />
-                                {/* Character indicators */}
-                                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-3">
-                                    {[0, 1, 2, 3].map(i => (
-                                        <div 
-                                            key={i} 
-                                            className={`w-6 h-0.5 rounded-full transition-colors ${
-                                                inputRoomCode.length > i ? 'bg-emerald-500' : 'bg-gray-700'
-                                            }`} 
-                                        />
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <PrimaryButton
-                            type="submit"
-                            disabled={inputRoomCode.length !== 4}
-                            loading={isJoining}
-                            loadingText="Joining..."
-                            variant="emerald"
-                        >
-                            <Users size={18} />
-                            <span className="font-bold">Join Game</span>
-                            <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                        </PrimaryButton>
-                    </form>
-                </Card>
-                )}
+                ) : null}
 
                 {/* Footer */}
                 <div className="mt-6 flex items-center justify-center gap-2 text-center">

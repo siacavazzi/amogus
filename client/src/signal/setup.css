@@ -81,3 +81,4 @@
 .sg-setup .fixed.inset-0[class*="z-"][class*="bg-black"] { background-color: rgba(0, 0, 0, 0.6) !important; }
 .sg-setup .fixed[class*="z-"] [class*="bg-gray-9"], .sg-setup .fixed[class*="z-"] [class*="bg-gray-8"],
 .sg-setup .fixed[class*="z-"] [class*="bg-slate-9"] { background-color: var(--sg-round-d) !important; }
+.sg-setup .sg-home__sheet h2 { color: var(--sg-ink) !important; }
