@@ -1,6 +1,8 @@
 import React, { useState, useContext } from 'react';
 import { DataContext } from '../GameContext';
 import { ChevronLeft } from '../signal/icons';
+import '../signal/signal.css';
+import '../signal/host.css';
 
 function TaskEntryPage() {
     const [task, setTask] = useState('');
@@ -19,74 +21,50 @@ function TaskEntryPage() {
     };
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-tr from-gray-800 to-gray-900 p-6">
-            <button
-                type="button"
-                onClick={() => setTaskEntry(false)}
-                className="fixed top-6 left-6 flex items-center text-gray-300 hover:text-white transition-colors z-50"
-            >
-                <ChevronLeft className="mr-1" />
-                <span className="text-sm">Back</span>
-            </button>
-            <div className="relative bg-gray-700 bg-opacity-90 backdrop-blur-md p-8 rounded-lg shadow-lg max-w-sm w-full">
-                {/* Header Section */}
-                <div className="flex flex-col items-center mb-6">
-                    <h2 className="text-2xl font-bold mb-2 text-gray-100">Enter a Task</h2>
-                    <p className="text-sm text-gray-300">Add a new task to amongus</p>
+        <div className="sg-screen sg-round hs">
+            <div className="hs-wrap sg-a sg-rise">
+                <div className="hs-bar">
+                    <button type="button" onClick={() => setTaskEntry(false)} className="sg-btn sg-btn-ghost sg-join__back">
+                        <ChevronLeft size={20} /> Back
+                    </button>
+                </div>
+                <div style={{ display: 'grid', gap: 8 }}>
+                    <h1 className="sg-big sg-h1">Enter a task</h1>
+                    <p className="sg-lede hs-muted">Add a new task to the game</p>
                 </div>
 
-                {/* Task Entry Form */}
-                <form onSubmit={handleSubmit}>
-                    {/* Task Input */}
-                    <div className="mb-4">
-                        <label htmlFor="task" className="block text-gray-300 mb-2">
-                            Task Description
-                        </label>
-                        <input
-                            type="text"
-                            id="task"
-                            value={task}
-                            onChange={(e) => setTask(e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-500 rounded-lg bg-gray-600 text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-colors"
-                            placeholder="Enter your task"
-                            required
-                        />
-                    </div>
-
-                    {/* Task Location Dropdown */}
-                    <div className="mb-4">
-                        <label htmlFor="taskLocation" className="block text-gray-300 mb-2">
-                            Task Location
-                        </label>
-                        <select
-                            id="taskLocation"
-                            value={location}
-                            onChange={(e) => setLocation(e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-500 rounded-lg bg-gray-600 text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-colors"
-                            required
-                        >
-                            <option value="">Select Task Location</option>
-                            {taskLocations.map((loc) => (
-                                <option key={loc} value={loc}>{loc}</option>
-                            ))}
-                        </select>
-                    </div>
-
-                    {/* Submit Button */}
-                    <button
-                        type="submit"
-                        className="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400 transform hover:scale-105"
+                <form onSubmit={handleSubmit} className="hs-panel">
+                    <label htmlFor="task" className="hs-label">Task description</label>
+                    <input
+                        type="text"
+                        id="task"
+                        value={task}
+                        onChange={(e) => setTask(e.target.value)}
+                        className="hs-input"
+                        placeholder="Enter your task"
+                        required
+                    />
+                    <label htmlFor="taskLocation" className="hs-label">Task location</label>
+                    <select
+                        id="taskLocation"
+                        value={location}
+                        onChange={(e) => setLocation(e.target.value)}
+                        className="hs-select"
+                        style={{ maxWidth: 'none', width: '100%' }}
+                        required
                     >
+                        <option value="">Select Task Location</option>
+                        {taskLocations.map((loc) => (
+                            <option key={loc} value={loc}>{loc}</option>
+                        ))}
+                    </select>
+                    <button type="submit" className="sg-btn sg-btn-white" style={{ marginTop: 6 }}>
                         Add Task
                     </button>
+                    {confirmationMessage && (
+                        <p className="hs-hint sg-a sg-pop" role="status">Task added successfully!</p>
+                    )}
                 </form>
-
-                {/* Confirmation Message */}
-                {confirmationMessage && (
-                    <div className="mt-4 text-green-500 text-center">
-                        Task added successfully!
-                    </div>
-                )}
             </div>
         </div>
     );

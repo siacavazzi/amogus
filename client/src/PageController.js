@@ -27,8 +27,10 @@ import VotingPage from "./pages/VotingPage";
 import MeetingResultPage from "./pages/MeetingResultsPage";
 import GameConfigPage from "./pages/GameConfigPage";
 
-// Screens before the game starts get the Signal setup layer (see signal/setup.css).
-const SETUP_PAGES = new Set(["connecting", "lobby", "gameConfig", "login", "players", "taskEntry"]);
+// Screens that still lean on the Signal setup flatten layer (see signal/setup.css): the
+// reactor's desktop home and the selfie camera on the join screen. The other setup screens
+// (connecting, game config, lobby, task entry) are drawn in Signal markup directly.
+const SETUP_PAGES = new Set(["lobby", "login"]);
 
 // Allow URL param override for testing: ?mobile=true or ?mobile=false
 const urlParams = new URLSearchParams(window.location.search);
