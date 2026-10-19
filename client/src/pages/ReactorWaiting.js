@@ -1,7 +1,11 @@
 import React, { useContext, useState } from 'react';
 import { DataContext } from '../GameContext';
-import { Copy, Check, Users, Monitor, Speaker, ExternalLink, Github, Volume2, LogOut, Radiation } from '../signal/icons';
+import { Copy, Check, Speaker, ExternalLink, Volume2, LogOut } from '../signal/icons';
+import { Face } from '../signal';
+import '../signal/reactor.css';
 
+// The room's big screen before the game: the code huge enough to read from across the room,
+// and the faces of everyone who has joined. The blinking dot is the one thing that moves.
 function ReactorWaiting() {
   const { roomCode, players, socket } = useContext(DataContext);
   const [copied, setCopied] = useState(false);
@@ -26,7 +30,6 @@ function ReactorWaiting() {
     }
   };
 
-  // Placeholder - replace with your actual repo URL
   const SONOS_CONNECTOR_URL = "https://github.com/siacavazzi/amogus-sonos-connector";
 
   const handleLeaveRoom = () => {
@@ -37,143 +40,81 @@ function ReactorWaiting() {
     socket.emit('leave_room', { room_code: roomCode });
   };
 
+  const joined = players || [];
+  const joinAt = typeof window !== 'undefined' ? `${window.location.host}/play` : '';
+
   return (
-    <div className="fixed inset-0 flex flex-col items-center bg-gradient-to-b from-gray-900 via-gray-800 to-blue-900 text-white p-8 pt-12 pb-20 overflow-y-auto">
-      {/* Leave Room Button - Fixed Position */}
-      <button
-        onClick={handleLeaveRoom}
-        className="fixed top-4 right-4 z-50 flex items-center gap-2 px-3 py-2 bg-gray-800/80 hover:bg-red-600/80 border border-gray-600 hover:border-red-500 rounded-lg text-gray-400 hover:text-white transition-all text-sm backdrop-blur-sm"
-        title="Leave Room"
-      >
-        <LogOut size={16} />
-        <span className="hidden md:inline">Leave Room</span>
-      </button>
-      {/* Reactor Background Animation */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+    <div className="sg sg-screen sg-round sg-rx">
+      <div className="sg-rx__bar">
+        <p className="sg-rx__brand">Sus Party</p>
+        <button type="button" onClick={handleLeaveRoom} className="sg-rx__leave" title="Leave Room">
+          <LogOut size={18} />
+          <span>Leave Room</span>
+        </button>
       </div>
 
-      <div className="relative z-10 flex flex-col items-center max-w-4xl w-full flex-1 justify-center">
-        {/* Reactor Icon */}
-        <div className="mb-6">
-          <Radiation size="1em" className="text-cyan-400 text-7xl animate-pulse" />
-        </div>
-
-        {/* Room Code Display */}
+      <div className="sg-rx__main">
         {roomCode && (
-          <div className="bg-gray-800/80 backdrop-blur-sm p-8 rounded-2xl shadow-2xl mb-8 text-center border border-cyan-500/30">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Monitor size={24} className="text-cyan-400" />
-              <p className="text-cyan-300 text-lg font-medium">Core Control Station</p>
-            </div>
-            
-            <p className="text-gray-400 text-sm mb-2">Room Code</p>
-            <div className="flex items-center justify-center gap-4 mb-4">
-              <span className="text-6xl font-mono font-bold text-cyan-400 tracking-widest drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]">
-                {roomCode}
-              </span>
-              <button
-                onClick={copyRoomCode}
-                className="p-3 hover:bg-gray-700 rounded-lg transition-colors"
-                title="Copy room code"
-              >
-                {copied ? (
-                  <Check className="text-green-400" size={28} />
-                ) : (
-                  <Copy className="text-gray-400" size={28} />
-                )}
+          <>
+            <p className="sg-rx__label sg-a sg-rise">Room code</p>
+            <div className="sg-rx__codebox">
+              <h1 className="sg-rx__code sg-a sg-slam" aria-label={`Room code ${roomCode}`}>{roomCode}</h1>
+              <button type="button" onClick={copyRoomCode} className="sg-rx__copy" title="Copy room code" aria-label="Copy room code">
+                {copied ? <Check size={28} strokeWidth={3} /> : <Copy size={26} />}
               </button>
             </div>
-            <p className="text-gray-500 text-sm">
-              Share this code with players to join
+            <p className="sg-rx__lede sg-a sg-rise" style={{ animationDelay: '200ms' }}>
+              Join on your phone at <span style={{ whiteSpace: 'nowrap' }}>{joinAt}</span>
             </p>
-          </div>
+          </>
         )}
 
-        {/* Players Count */}
-        {players && players.length > 0 && (
-          <div className="bg-gray-800/60 backdrop-blur-sm px-6 py-4 rounded-xl mb-8 flex items-center gap-3 border border-green-500/30">
-            <Users size={24} className="text-green-400" />
-            <span className="text-xl">
-              <span className="font-bold text-green-400">{players.length}</span>
-              <span className="text-gray-300"> player{players.length !== 1 ? 's' : ''} connected</span>
-            </span>
-          </div>
+        <div className="sg-rx__faces" style={{ marginTop: 'clamp(8px, 2vh, 24px)' }}>
+          {joined.length > 0 ? (
+            joined.map((player) => (
+              <div key={player.player_id || player.id || player.username} className="sg-rx__face sg-a sg-pop">
+                <Face player={player} size={88} className="sg-rx__face-ring" />
+                <span>{player.username}</span>
+              </div>
+            ))
+          ) : (
+            [0, 1, 2, 3].map((i) => <div key={i} className="sg-rx__empty" aria-hidden="true" />)
+          )}
+        </div>
+        {joined.length > 0 && (
+          <p className="sg-rx__note sg-num">
+            {joined.length} player{joined.length !== 1 ? 's' : ''} connected
+          </p>
         )}
 
-        {/* Waiting Message */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="w-3 h-3 bg-cyan-500 rounded-full animate-pulse"></div>
-            <div className="w-3 h-3 bg-cyan-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-            <div className="w-3 h-3 bg-cyan-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
-          </div>
-          <p className="text-2xl text-gray-300">Waiting for game to start...</p>
-          <p className="text-gray-500 mt-2">A player will start the game from their phone</p>
+        <p className="sg-rx__lede sg-rx__wait">
+          <span className="sg-rx__blink" aria-hidden="true" />
+          Waiting for the host to start
+        </p>
+      </div>
+
+      <div className="sg-rx__help">
+        <div>
+          <h2>This screen is the reactor</h2>
+          <p>
+            Leave it somewhere everyone can see. It shows the room's task progress and meetings, and
+            it is where the crew stops a meltdown. Players use their phones.
+          </p>
         </div>
-
-        {/* Info Cards Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl">
-          {/* Reactor Info */}
-          <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-red-500/30">
-            <div className="flex items-center gap-2 mb-3">
-              <Radiation size="1em" className="text-red-400 text-xl" />
-              <h3 className="text-lg font-semibold text-red-400">Core Control</h3>
-            </div>
-            <p className="text-gray-400 text-sm">
-              Once the game starts, this screen becomes the <span className="text-red-400 font-medium">Sabotage Panel</span>. 
-              Intruders can trigger core meltdowns that crewmates must stop!
-            </p>
-          </div>
-
-          {/* Sonos Integration Info */}
-          <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-purple-500/30">
-            <div className="flex items-center gap-2 mb-3">
-              <Speaker className="text-purple-400" size={20} />
-              <h3 className="text-lg font-semibold text-purple-400">Sonos Integration</h3>
-            </div>
-            <p className="text-gray-400 text-sm mb-3">
-              Want game sounds on your Sonos speakers? Run our open-source connector app on any computer connected to your Sonos network.
-            </p>
-            <a 
-              href={SONOS_CONNECTOR_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm text-purple-400 hover:text-purple-300 transition-colors"
-            >
-              <Github size={16} />
-              <span>Get the Sonos Connector</span>
-              <ExternalLink size={14} />
-            </a>
-          </div>
+        <div>
+          <h2><Speaker size={18} /> Sonos</h2>
+          <p>Want game sounds on your Sonos speakers? Run the open-source connector on any computer on your Sonos network.</p>
+          <a href={SONOS_CONNECTOR_URL} target="_blank" rel="noopener noreferrer">
+            Get the Sonos Connector <ExternalLink size={14} />
+          </a>
         </div>
-
-        {/* Audio Tips Box */}
-        <div className="mt-6 w-full max-w-3xl">
-          <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-cyan-500/30">
-            <div className="flex items-center gap-2 mb-3">
-              <Volume2 className="text-cyan-400" size={20} />
-              <h3 className="text-lg font-semibold text-cyan-400">Audio Setup Tips</h3>
-            </div>
-            <p className="text-gray-400 text-sm">
-              <span className="text-cyan-300 font-medium">Don't have Sonos?</span> No problem! For the best experience:
-            </p>
-            <ul className="mt-2 text-gray-400 text-sm space-y-1">
-              <li className="flex items-center gap-2">
-                <span className="text-cyan-400">•</span>
-                Pair a Bluetooth speaker to this computer for room-filling sound
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="text-cyan-400">•</span>
-                Max out the volume on your laptop speakers
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="text-cyan-400">•</span>
-                Keep this tab in the foreground for uninterrupted audio
-              </li>
-            </ul>
-          </div>
+        <div>
+          <h2><Volume2 size={18} /> No Sonos?</h2>
+          <ul>
+            <li>Pair a Bluetooth speaker to this computer</li>
+            <li>Turn the laptop volume all the way up</li>
+            <li>Keep this tab in front so the sound keeps playing</li>
+          </ul>
         </div>
       </div>
     </div>

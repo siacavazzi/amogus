@@ -1,29 +1,37 @@
 import React from 'react';
 import { ShieldCheck } from '../signal/icons';
+import { Words } from '../signal';
+import '../signal/reactor.css';
+
+// The meltdown handoff: once the last code lands, the reactor floods white for a moment of
+// relief, then settles back to the round's blue. ReactorPage shows it right after a meltdown
+// that MeltdownPage saw end in success.
+let avertedAt = 0;
+export function markMeltdownAverted() {
+  avertedAt = Date.now();
+}
+// Non-destructive so a double-run state initialiser (React StrictMode) still sees it.
+export function wasMeltdownJustAverted(withinMs = 6000) {
+  return !!avertedAt && Date.now() - avertedAt < withinMs;
+}
+export function clearMeltdownAverted() {
+  avertedAt = 0;
+}
 
 const MeltdownAvertedDisplay = ({ message = "Meltdown Averted!" }) => {
-    return (
-        <div className="relative overflow-hidden rounded-2xl border border-emerald-500/50 bg-gradient-to-r from-gray-900 via-emerald-950/30 to-gray-900 shadow-lg my-4">
-            {/* Animated background pulse */}
-            <div className="absolute inset-0 bg-emerald-500/10 animate-pulse" />
-            
-            <div className="relative flex items-center gap-4 p-5">
-                {/* Icon */}
-                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
-                    <ShieldCheck size={24} className="text-emerald-400" />
-                </div>
-
-                {/* Message */}
-                <div className="flex-1">
-                    <p className="text-lg font-bold text-white">{message}</p>
-                    <p className="text-sm text-emerald-300/70">Crisis has been contained</p>
-                </div>
-            </div>
-            
-            {/* Bottom accent line */}
-            <div className="h-1 bg-gradient-to-r from-transparent via-emerald-500 to-transparent" />
-        </div>
-    );
+  return (
+    <div className="sg sg-screen sg-rx sg-rx--relief sg-flood" role="status" style={{ zIndex: 70 }}>
+      <div className="sg-rx__main">
+        <ShieldCheck size={140} className="sg-a sg-pop" style={{ animationDelay: '300ms' }} />
+        <h1 className="sg-rx__meet">
+          <Words text={message.replace(/!$/, '').toUpperCase()} delay={420} />
+        </h1>
+        <p className="sg-rx__lede sg-a sg-rise" style={{ animationDelay: '800ms' }}>
+          The reactor is safe. Back to your tasks.
+        </p>
+      </div>
+    </div>
+  );
 };
 
 export default MeltdownAvertedDisplay;
