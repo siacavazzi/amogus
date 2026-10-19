@@ -813,10 +813,12 @@ def handle_join(data):
     join_room(room_code)
     
     # Bind the persistent creator player to the creator socket. If the original
-    # creator socket is gone before a player exists, let the room recover by
-    # making the next joining player the host.
+    # creator socket is gone before a player exists, or the room was created on
+    # the reactor (which never joins as a player), the next joining player hosts.
     if game.creator_player_id is None and (
-        sid == game.creator_sid or not is_sid_connected_to_room(game.creator_sid, room_code)
+        sid == game.creator_sid
+        or not is_sid_connected_to_room(game.creator_sid, room_code)
+        or (game.reactor_sid is not None and game.creator_sid == game.reactor_sid)
     ):
         set_room_creator(game, room_code, player)
     

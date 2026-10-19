@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from server.tests.integration_helpers import SocketGameTestCase
+from server.tests.integration_helpers import SocketGameTestCase, server_app
 
 
 class PlayInterruptionTests(SocketGameTestCase):
@@ -69,6 +69,21 @@ class PlayInterruptionTests(SocketGameTestCase):
         self.assertIsNone(game.active_meltdown)
         self.assertEqual(1, len(self.event_payloads(events, 'meltdown_end')))
         self.assertFalse(self.has_event(events, 'end_game'))
+
+    def test_room_created_on_the_reactor_gets_a_phone_host(self):
+        reactor = self.make_client()
+        room = self.create_open_room(reactor)
+        reactor.emit('register_reactor', {'room_code': room})
+        self.drain(reactor)
+        phones = [self.make_client() for _ in range(3)]
+        ids = [self.join_player(phone, room, f'P{i}', use_join_game=True) for i, phone in enumerate(phones)]
+        game = server_app.game_manager.get_game(room)
+        self.assertEqual(ids[0], game.creator_player_id)
+        self.assertEqual(game.getPlayerById(ids[0]).sid, game.creator_sid)
+        self.add_tasks(phones[0], room, 10)
+        self.drain_all(phones + [reactor])
+        self.start_game(phones[0], ids[0], phones)
+        self.assertTrue(game.game_running)
 
     def test_rescued_meltdown_clears_every_code(self):
         from assets.room_protocol import room_state
