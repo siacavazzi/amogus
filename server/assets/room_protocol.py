@@ -81,6 +81,6 @@ def room_state(game, player=None, sid=None):
         'meltdown': {'time_left': game.active_meltdown.time_left,
                      'codes_needed': max(game.active_meltdown.codes_needed - game.active_meltdown.codes_entered, 0)}
                     if game.active_meltdown else None,
-        'meltdown_code': player.meltdown_code if player else None,
+        'meltdown_code': player.meltdown_code if player and game.active_meltdown else None,
         'ruleset': game.ruleset, 'last_stand': game.last_stand,
     })

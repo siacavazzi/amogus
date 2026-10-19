@@ -125,6 +125,9 @@ class Meltdown:
             if not self._is_current_locked():
                 return False
             self.meltdown_active = False
+            # The codes die with the meltdown; a later room_state must not bring the code screen back.
+            for player in self.living_players:
+                player.meltdown_code = None
             if self.game:
                 self.game.revision += 1
             self.speaker.stop()

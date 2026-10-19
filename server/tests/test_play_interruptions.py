@@ -70,6 +70,19 @@ class PlayInterruptionTests(SocketGameTestCase):
         self.assertEqual(1, len(self.event_payloads(events, 'meltdown_end')))
         self.assertFalse(self.has_event(events, 'end_game'))
 
+    def test_rescued_meltdown_clears_every_code(self):
+        from assets.room_protocol import room_state
+        clients, room, ids, game = self.start_round()
+        meltdown = self.start_manual_meltdown(clients[0], ids[0], game)
+        meltdown.distribute_codes()
+        self.assertTrue(any(p.meltdown_code for p in game.players))
+        for pin in list(meltdown.valid_pins[:meltdown.codes_needed]):
+            clients[0].emit('pin_entry', {'player_id': ids[0], 'pin': pin})
+        self.assertIsNone(game.active_meltdown)
+        for player in game.players:
+            self.assertIsNone(player.meltdown_code)
+            self.assertIsNone(room_state(game, player)['meltdown_code'])
+
     def test_missing_codes_still_lose_at_deadline(self):
         clients, room, ids, game = self.start_round()
         meltdown = self.start_manual_meltdown(clients[0], ids[0], game)
