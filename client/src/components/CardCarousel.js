@@ -44,85 +44,24 @@ const TAP_HINT_COUNT = 2;            // accidental taps before showing hint
 const TAP_HINT_WINDOW_MS = 3500;     // taps inside this window count
 const HINT_VISIBLE_MS = 2800;
 
-// ----- Action -> theme map -----
-// Keys match the `action` strings used in server/assets/card.py.
-// All cards share a muted dark-steel base; the action color is used
-// only as an accent (border, icon halo, dot, button gradient) so the
-// hand reads as a cohesive set rather than a clown bag of skittles.
+// ----- Action -> colour -----
+// Keys match the `action` strings used in server/assets/card.py. Each card is one solid
+// Signal colour so the hand reads at a glance: what a card does is its colour and its icon.
+const SG = { blue: '#1b4fd8', yellow: '#ffc21a', red: '#e0263a', hazard: '#ff7a1a', ink: '#1a1400', white: '#ffffff' };
 const CARD_THEMES = {
-    'EMP': {
-        active: 'from-slate-800 via-slate-900 to-slate-950 border-cyan-400/70 shadow-cyan-900/40',
-        peek:   'from-slate-800 via-slate-900 to-slate-950 border-cyan-500/25',
-        icon:   'bg-cyan-400/15 ring-1 ring-cyan-300/30',
-        dot:    'bg-cyan-400',
-        button: 'from-cyan-700 to-cyan-900 border-cyan-400/60 shadow-cyan-900/40',
-    },
-    'Fake Task': {
-        active: 'from-slate-800 via-slate-900 to-slate-950 border-pink-400/70 shadow-pink-900/40',
-        peek:   'from-slate-800 via-slate-900 to-slate-950 border-pink-500/25',
-        icon:   'bg-pink-400/15 ring-1 ring-pink-300/30',
-        dot:    'bg-pink-400',
-        button: 'from-pink-700 to-pink-900 border-pink-400/60 shadow-pink-900/40',
-    },
-    'Remote Sabotage': {
-        active: 'from-slate-800 via-slate-900 to-slate-950 border-rose-400/70 shadow-rose-900/40',
-        peek:   'from-slate-800 via-slate-900 to-slate-950 border-rose-500/25',
-        icon:   'bg-rose-400/15 ring-1 ring-rose-300/30',
-        dot:    'bg-rose-400',
-        button: 'from-rose-700 to-rose-900 border-rose-400/60 shadow-rose-900/40',
-    },
-    'Self Report': {
-        active: 'from-slate-800 via-slate-900 to-slate-950 border-amber-400/70 shadow-amber-900/40',
-        peek:   'from-slate-800 via-slate-900 to-slate-950 border-amber-500/25',
-        icon:   'bg-amber-400/15 ring-1 ring-amber-300/30',
-        dot:    'bg-amber-400',
-        button: 'from-amber-700 to-amber-900 border-amber-400/60 shadow-amber-900/40',
-    },
-    'Taunt': {
-        active: 'from-slate-800 via-slate-900 to-slate-950 border-orange-400/70 shadow-orange-900/40',
-        peek:   'from-slate-800 via-slate-900 to-slate-950 border-orange-500/25',
-        icon:   'bg-orange-400/15 ring-1 ring-orange-300/30',
-        dot:    'bg-orange-400',
-        button: 'from-orange-700 to-orange-900 border-orange-400/60 shadow-orange-900/40',
-    },
-    'Taunt Message': {
-        active: 'from-slate-800 via-slate-900 to-slate-950 border-fuchsia-400/70 shadow-fuchsia-900/40',
-        peek:   'from-slate-800 via-slate-900 to-slate-950 border-fuchsia-500/25',
-        icon:   'bg-fuchsia-400/15 ring-1 ring-fuchsia-300/30',
-        dot:    'bg-fuchsia-400',
-        button: 'from-fuchsia-700 to-fuchsia-900 border-fuchsia-400/60 shadow-fuchsia-900/40',
-    },
-    'Area Denial': {
-        active: 'from-slate-800 via-slate-900 to-slate-950 border-violet-400/70 shadow-violet-900/40',
-        peek:   'from-slate-800 via-slate-900 to-slate-950 border-violet-500/25',
-        icon:   'bg-violet-400/15 ring-1 ring-violet-300/30',
-        dot:    'bg-violet-400',
-        button: 'from-violet-700 to-violet-900 border-violet-400/60 shadow-violet-900/40',
-    },
-    'Discard and Draw': {
-        active: 'from-slate-800 via-slate-900 to-slate-950 border-emerald-400/70 shadow-emerald-900/40',
-        peek:   'from-slate-800 via-slate-900 to-slate-950 border-emerald-500/25',
-        icon:   'bg-emerald-400/15 ring-1 ring-emerald-300/30',
-        dot:    'bg-emerald-400',
-        button: 'from-emerald-700 to-emerald-900 border-emerald-400/60 shadow-emerald-900/40',
-    },
-    'Shorten Meltdown': {
-        active: 'from-slate-800 via-slate-900 to-slate-950 border-indigo-400/70 shadow-indigo-900/40',
-        peek:   'from-slate-800 via-slate-900 to-slate-950 border-indigo-500/25',
-        icon:   'bg-indigo-400/15 ring-1 ring-indigo-300/30',
-        dot:    'bg-indigo-400',
-        button: 'from-indigo-700 to-indigo-900 border-indigo-400/60 shadow-indigo-900/40',
-    },
+    'EMP':              { bg: SG.blue,   fg: SG.white },
+    'Fake Task':        { bg: SG.yellow, fg: SG.ink },
+    'Remote Sabotage':  { bg: SG.hazard, fg: SG.ink },
+    'Self Report':      { bg: SG.white,  fg: SG.ink },
+    'Taunt':            { bg: SG.red,    fg: SG.white },
+    'Taunt Message':    { bg: SG.red,    fg: SG.white },
+    'Area Denial':      { bg: SG.white,  fg: SG.red },
+    'Discard and Draw': { bg: SG.yellow, fg: SG.ink },
+    'Shorten Meltdown': { bg: SG.hazard, fg: SG.ink },
 };
-const DEFAULT_THEME = {
-    active: 'from-slate-800 via-slate-900 to-slate-950 border-red-400/70 shadow-red-900/40',
-    peek:   'from-slate-800 via-slate-900 to-slate-950 border-red-500/25',
-    icon:   'bg-red-400/15 ring-1 ring-red-300/30',
-    dot:    'bg-red-400',
-    button: 'from-red-700 to-red-900 border-red-400/60 shadow-red-900/40',
-};
+const DEFAULT_THEME = { bg: SG.red, fg: SG.white };
 
-function themeFor(action) {
+export function themeFor(action) {
     return CARD_THEMES[action] || DEFAULT_THEME;
 }
 
@@ -177,65 +116,31 @@ function CarouselCard({
 
     return (
         <div
-            className={`absolute top-1/2 left-1/2 w-[76%] max-w-[320px] h-[94%] max-h-[560px] select-none cursor-pointer
-                rounded-2xl border-2 shadow-2xl bg-gradient-to-br flex flex-col
-                ${compact ? 'p-3' : 'p-5'}
-                ${isActive ? theme.active : theme.peek}
-            `}
-            style={style}
+            className={`absolute top-1/2 left-1/2 w-[76%] max-w-[320px] h-[94%] max-h-[560px] select-none cursor-pointer flex flex-col sg-card ${compact ? 'sg-card--compact' : ''}`}
+            style={{ ...style, background: theme.bg, color: theme.fg }}
             onClick={(e) => { e.stopPropagation(); onTap && onTap(); }}
             aria-hidden={!isActive}
         >
-            <div className={`flex items-center gap-2 ${compact ? 'mb-2' : 'mb-3'}`}>
-                <div className={`p-1.5 rounded-xl ${theme.icon}`}>
-                    <Zap size={compact ? 16 : 20} className="text-white" />
-                </div>
-                <h3 className={`font-extrabold capitalize tracking-tight text-white ${compact ? 'text-base' : 'text-xl'}`}>
-                    {formattedAction}
-                </h3>
-            </div>
+            <h3 className="sg-card__title">{formattedAction}</h3>
+            <p className="sg-card__text">{text}</p>
 
-            <p className={`leading-relaxed text-white/90 overflow-hidden ${compact ? 'text-xs mb-2' : 'text-sm mb-4'}`}>
-                {text}
-            </p>
-
-            {/* Big action illustration filling the dead space between
-                the body text and the metadata chips. Sized via flex-1
-                so it scales naturally with whatever room is left. */}
-            <div className="flex-1 min-h-0 flex items-center justify-center my-1">
+            {/* The action's icon fills whatever room is left */}
+            <div className="flex-1 min-h-0 flex items-center justify-center">
                 <ActionIcon
-                    className="text-white/35"
-                    strokeWidth={1.5}
-                    style={{ width: '60%', height: '100%', maxHeight: compact ? 96 : 180, maxWidth: 180 }}
+                    strokeWidth={2.5}
+                    style={{ width: '62%', height: '100%', maxHeight: compact ? 90 : 170, maxWidth: 170 }}
                     aria-hidden="true"
                 />
             </div>
 
-            <div className="flex flex-wrap gap-2">
-                {location && (
-                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-black/30 text-xs">
-                        <MapPin size={12} className="text-white/80" />
-                        <span className="text-white/90">{location}</span>
-                    </div>
-                )}
-                {duration && (
-                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-black/30 text-xs">
-                        <Clock size={12} className="text-white/80" />
-                        <span className="text-white/90">{duration}s</span>
-                    </div>
-                )}
+            <div className="sg-card__chips">
+                {location && <span><MapPin size={14} /> {location}</span>}
+                {duration && <span><Clock size={14} /> {duration}s</span>}
             </div>
 
-            {/* Hold-to-play progress bar. Sweeps left→right while the
-                user presses on the active card; releasing before it
-                completes cancels. */}
+            {/* Hold-to-play: the card fills from the bottom while pressed */}
             {isActive && holdProgress > 0 && (
-                <div className="absolute left-3 right-3 bottom-2 h-1.5 rounded-full bg-white/15 overflow-hidden">
-                    <div
-                        className="h-full bg-white/90 rounded-full"
-                        style={{ width: `${Math.min(100, holdProgress * 100)}%`, transition: 'width 60ms linear' }}
-                    />
-                </div>
+                <div className="sg-card__fill" style={{ height: `${Math.min(100, holdProgress * 100)}%` }} />
             )}
         </div>
     );
@@ -496,15 +401,14 @@ export default function CardCarousel({ cards, onPlayCard, compact = false, onAct
                 the layout. */}
             <div
                 className={`pointer-events-none absolute left-1/2 -translate-x-1/2 -top-2 z-30
-                    flex items-center gap-2 px-3 py-2 rounded-full
-                    bg-black/85 border border-white/20 shadow-xl
-                    text-white text-xs font-semibold whitespace-nowrap
+                    flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap
                     transition-all duration-200
                     ${hintVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}`}
+                style={{ background: '#fff', color: '#1a1400', fontWeight: 800, fontSize: 14 }}
                 role="status"
                 aria-live="polite"
             >
-                <Hand size={14} className="text-amber-300" />
+                <Hand size={16} />
                 <span>Press and hold the card to play it</span>
             </div>
 
@@ -512,14 +416,9 @@ export default function CardCarousel({ cards, onPlayCard, compact = false, onAct
                 space on small screens. The dot pager already shows the
                 same info. */}
             {!compact && (
-                <div className="flex items-center justify-between mb-3 px-1">
-                    <div className="flex items-center gap-2 text-red-300/80 text-xs uppercase tracking-wider font-bold">
-                        <span className="inline-block w-2 h-2 bg-red-400 rounded-full animate-pulse" />
-                        Hand
-                    </div>
-                    <div className="text-red-200 text-sm font-mono">
-                        {activeIndex + 1} / {cards.length}
-                    </div>
+                <div className="flex items-center justify-between mb-2 px-1" style={{ fontWeight: 800 }}>
+                    <span>Your cards</span>
+                    <span className="sg-num">{activeIndex + 1} / {cards.length}</span>
                 </div>
             )}
 
@@ -562,19 +461,16 @@ export default function CardCarousel({ cards, onPlayCard, compact = false, onAct
                             type="button"
                             onClick={() => settleTo(i)}
                             aria-label={`Go to card ${i + 1}`}
-                            className={`h-1.5 rounded-full transition-all ${
-                                i === activeIndex
-                                    ? `w-6 ${activeTheme.dot}`
-                                    : 'w-1.5 bg-white/20 hover:bg-white/40'
-                            }`}
+                            className={`h-2 rounded-full transition-all ${i === activeIndex ? 'w-7' : 'w-2'}`}
+                            style={{ background: i === activeIndex ? activeTheme.bg : 'rgba(255,255,255,0.3)' }}
                         />
                     ))}
                 </div>
             )}
 
             {!compact && (
-                <p className="text-center text-white/60 text-xs mt-3 flex items-center justify-center gap-1.5">
-                    <Hand size={12} className="text-white/60" />
+                <p className="text-center mt-2 flex items-center justify-center gap-1.5" style={{ fontWeight: 700, fontSize: 14, opacity: 0.7 }}>
+                    <Hand size={16} />
                     {cards.length > 1 ? 'Swipe to browse · Press & hold to play' : 'Press & hold to play'}
                 </p>
             )}

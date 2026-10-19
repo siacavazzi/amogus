@@ -2,9 +2,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { DataContext } from '../GameContext';
 import LeaveGameButton from '../components/LeaveGameButton';
-import { LogOut, Zap, Clock, MapPin, AlertTriangle, Eye, X, Send, Users, FileText, MessageSquare } from '../signal/icons';
-import { StatusBadge, PrimaryButton } from '../components/ui';
-import { Card } from '../components/ui';
+import { LogOut, Zap, MapPin, AlertTriangle, Eye, X, Send, FileText, MessageSquare } from '../signal/icons';
 import CardCarousel from '../components/CardCarousel';
 
 // ActionCard component defined OUTSIDE to prevent re-creation on every render
@@ -22,58 +20,55 @@ function ActionCard({ action, text, location, duration, id, time_left, active = 
   })();
 
   return (
-    <button 
-      onClick={() => onPlay(id, requires_input, action)}
-      type="button"
-      className={`relative w-full text-left rounded-2xl p-6 flex flex-col border-2 ${
-        active 
-          ? 'bg-emerald-900/80 border-emerald-400' 
-          : 'bg-gray-800/90 border-red-500'
-      }`}
-    >
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-3">
-        <div className={`p-2 rounded-xl ${active ? 'bg-emerald-500/30' : 'bg-red-500/30'}`}>
-          <Zap size={20} className={active ? 'text-emerald-300' : 'text-red-300'} />
-        </div>
-        <h3 className={`text-xl font-bold capitalize ${active ? 'text-emerald-200' : 'text-white'}`}>
-          {formattedAction}
-        </h3>
-        {active && (
-          <div className="ml-auto flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/30">
-            <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
-            <span className="text-emerald-300 text-sm font-medium">Active</span>
-          </div>
-        )}
-      </div>
-
-      {/* Description */}
-      <p className="text-gray-200 text-base mb-4 leading-relaxed">{text}</p>
-
-      {/* Footer info */}
-      <div className="flex flex-wrap gap-3">
-        {location && (
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/30 text-sm">
-            <MapPin size={14} className="text-gray-300" />
-            <span className="text-gray-200">{location}</span>
-          </div>
-        )}
-
-        {durationLabel && (
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-black/30 text-sm">
-            <Clock size={14} className="text-gray-300" />
-            <span className="text-gray-200">{durationLabel}</span>
-          </div>
-        )}
-      </div>
-
-      {/* Tap indicator for non-active cards */}
-      {!active && (
-        <div className="absolute bottom-3 right-3 text-red-300 text-xs font-bold uppercase">
-          Tap to use
-        </div>
-      )}
+    <button onClick={() => onPlay(id, requires_input, action)} type="button" className="sg-effect">
+      <span className="sg-effect__row">
+        <span className="sg-effect__name">{formattedAction}</span>
+        {active && <span className="sg-pill" style={{ background: 'var(--sg-ink)', color: '#fff', padding: '2px 10px' }}>Active</span>}
+        {durationLabel && <span className="sg-effect__time">{durationLabel}</span>}
+      </span>
+      <span className="sg-effect__text">{text}</span>
+      {location && <span className="sg-effect__text" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><MapPin size={14} /> {location}</span>}
     </button>
+  );
+}
+
+// A white sheet from the bottom for cards that need a target or some words.
+function CardSheet({ title, icon: Icon, onClose, children, actionLabel, onSend, canSend }) {
+  return (
+    <div className="sg-sheet-scrim" role="dialog" aria-modal="true" aria-label={title}>
+      <div className="sg-sheet sg-a sg-rise">
+        <div className="sg-sheet__top">
+          <h3 className="sg-big sg-sheet__title">
+            <Icon size={26} /> {title}
+          </h3>
+          <button type="button" className="sg-sheet__close" onClick={onClose} aria-label="Close">
+            <X size={20} />
+          </button>
+        </div>
+        {children}
+        <div className="sg-sheet__actions">
+          <button type="button" className="sg-btn sg-btn-soft" style={{ width: 'auto', flex: 'none', padding: '18px 22px' }} onClick={onClose}>Cancel</button>
+          <button type="button" className="sg-btn sg-btn-red" style={{ flex: 1, whiteSpace: 'nowrap' }} onClick={onSend} disabled={!canSend}>
+            <Send size={20} /> {actionLabel}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TargetField({ value, onChange, crewmates }) {
+  return (
+    <label className="sg-field">
+      Who gets it
+      <select value={value} onChange={(e) => onChange(e.target.value)}>
+        <option value="">Choose a crewmate...</option>
+        {crewmates.map((player) => (
+          <option key={player.player_id} value={player.player_id}>{player.username}</option>
+        ))}
+      </select>
+      {crewmates.length === 0 && <span style={{ color: 'var(--sg-out)' }}>No alive crewmates to target!</span>}
+    </label>
   );
 }
 
@@ -186,321 +181,137 @@ const IntruderPage = ({
 
   const activeCardsList = activeCards.filter((card) => card.time_left === undefined || card.time_left === null || card.time_left > 0);
 
+  const cards = (playerState.cards || [])
+    .map((cardJson) => {
+      try { return JSON.parse(cardJson); }
+      catch (e) { console.error('Error parsing game action card:', e); return null; }
+    })
+    .filter(Boolean);
+
   return (
-    <div className="fixed inset-0 flex flex-col items-center p-3 pt-10 pb-24 bg-gradient-to-b from-red-700 via-red-900 to-red-950 text-white overflow-hidden">
-      {/* Leave Game Button - Fixed Position */}
-      {!tutorialMode && <LeaveGameButton className="fixed top-8 right-4 z-50" />}
+    <div className={`sg-screen ${isCompromised ? 'sg-out' : 'sg-dark'} sg-vent`}>
+      {!tutorialMode && <LeaveGameButton className="sg-corner" />}
 
-      {/* Fake Task Modal */}
       {showFakeTaskModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80">
-          <div className="w-full max-w-md bg-gray-800 rounded-2xl border-2 border-red-500 overflow-hidden">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between p-4 bg-red-900/50 border-b border-red-500/50">
-              <div className="flex items-center gap-2">
-                <FileText size={20} className="text-red-300" />
-                <h3 className="text-lg font-bold text-white">Send Fake Task</h3>
-              </div>
-              <button
-                onClick={() => setShowFakeTaskModal(false)}
-                className="p-2 rounded-lg hover:bg-red-800/50 transition-colors"
-              >
-                <X size={20} className="text-gray-400" />
-              </button>
-            </div>
-
-            {/* Modal Body */}
-            <div className="p-4 space-y-4">
-              {/* Target Selection */}
-              <div>
-                <label className="flex items-center gap-2 text-sm text-gray-300 mb-2">
-                  <Users size={16} />
-                  Select Target Crewmate
-                </label>
-                <select
-                  value={targetPlayerId}
-                  onChange={(e) => setTargetPlayerId(e.target.value)}
-                  className="w-full p-3 bg-gray-700 border border-gray-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-red-500"
-                >
-                  <option value="">Choose a crewmate...</option>
-                  {aliveCrewmates.map((player) => (
-                    <option key={player.player_id} value={player.player_id}>
-                      {player.username}
-                    </option>
-                  ))}
-                </select>
-                {aliveCrewmates.length === 0 && (
-                  <p className="text-red-400 text-sm mt-1">No alive crewmates to target!</p>
-                )}
-              </div>
-
-              {/* Task Text Input */}
-              <div>
-                <label className="flex items-center gap-2 text-sm text-gray-300 mb-2">
-                  <FileText size={16} />
-                  Fake Task Description
-                </label>
-                <textarea
-                  value={fakeTaskText}
-                  onChange={(e) => setFakeTaskText(e.target.value)}
-                  placeholder="e.g., Go stand in the corner and count to 100..."
-                  className="w-full p-3 bg-gray-700 border border-gray-600 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
-                  rows={3}
-                  maxLength={200}
-                />
-                <p className="text-gray-500 text-xs mt-1 text-right">{fakeTaskText.length}/200</p>
-              </div>
-
-              {/* Location Selection */}
-              <div>
-                <label className="flex items-center gap-2 text-sm text-gray-300 mb-2">
-                  <MapPin size={16} />
-                  Location
-                </label>
-                <select
-                  value={fakeTaskLocation}
-                  onChange={(e) => setFakeTaskLocation(e.target.value)}
-                  className="w-full p-3 bg-gray-700 border border-gray-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-red-500"
-                >
-                  {availableLocations.map((loc) => (
-                    <option key={loc} value={loc}>
-                      {loc}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Modal Footer */}
-            <div className="p-4 bg-gray-900/50 border-t border-gray-700 flex gap-3">
-              <button
-                onClick={() => setShowFakeTaskModal(false)}
-                className="flex-1 py-3 px-4 bg-gray-700 text-white rounded-xl font-medium hover:bg-gray-600 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={sendFakeTask}
-                disabled={!targetPlayerId || !fakeTaskText.trim()}
-                className="flex-1 py-3 px-4 bg-red-600 text-white rounded-xl font-bold hover:bg-red-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                <Send size={18} />
-                Send Task
-              </button>
-            </div>
-          </div>
-        </div>
+        <CardSheet
+          title="Send Fake Task"
+          icon={FileText}
+          onClose={() => setShowFakeTaskModal(false)}
+          actionLabel="Send Task"
+          onSend={sendFakeTask}
+          canSend={!!targetPlayerId && !!fakeTaskText.trim()}
+        >
+          <TargetField value={targetPlayerId} onChange={setTargetPlayerId} crewmates={aliveCrewmates} />
+          <label className="sg-field">
+            The fake task
+            <textarea
+              value={fakeTaskText}
+              onChange={(e) => setFakeTaskText(e.target.value)}
+              placeholder="e.g., Go stand in the corner and count to 100..."
+              rows={3}
+              maxLength={200}
+            />
+            <small>{fakeTaskText.length}/200</small>
+          </label>
+          <label className="sg-field">
+            Where
+            <select value={fakeTaskLocation} onChange={(e) => setFakeTaskLocation(e.target.value)}>
+              {availableLocations.map((loc) => (
+                <option key={loc} value={loc}>{loc}</option>
+              ))}
+            </select>
+          </label>
+        </CardSheet>
       )}
 
-      {/* Taunt Modal */}
       {showTauntModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80">
-          <div className="w-full max-w-md bg-gray-800 rounded-2xl border-2 border-orange-500 overflow-hidden">
-            <div className="flex items-center justify-between p-4 bg-orange-900/50 border-b border-orange-500/50">
-              <div className="flex items-center gap-2">
-                <MessageSquare size={20} className="text-orange-300" />
-                <h3 className="text-lg font-bold text-white">Send Taunt</h3>
-              </div>
-              <button
-                onClick={() => setShowTauntModal(false)}
-                className="p-2 rounded-lg hover:bg-orange-800/50 transition-colors"
-              >
-                <X size={20} className="text-gray-400" />
-              </button>
-            </div>
-
-            <div className="p-4 space-y-4">
-              <div>
-                <label className="flex items-center gap-2 text-sm text-gray-300 mb-2">
-                  <Users size={16} />
-                  Select Target Crewmate
-                </label>
-                <select
-                  value={targetPlayerId}
-                  onChange={(e) => setTargetPlayerId(e.target.value)}
-                  className="w-full p-3 bg-gray-700 border border-gray-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
-                >
-                  <option value="">Choose a crewmate...</option>
-                  {aliveCrewmates.map((player) => (
-                    <option key={player.player_id} value={player.player_id}>
-                      {player.username}
-                    </option>
-                  ))}
-                </select>
-                {aliveCrewmates.length === 0 && (
-                  <p className="text-orange-400 text-sm mt-1">No alive crewmates to target!</p>
-                )}
-              </div>
-
-              <div>
-                <label className="flex items-center gap-2 text-sm text-gray-300 mb-2">
-                  <MessageSquare size={16} />
-                  Taunt Message
-                </label>
-                <textarea
-                  value={tauntMessage}
-                  onChange={(e) => setTauntMessage(e.target.value)}
-                  placeholder="e.g., You walked right past me."
-                  className="w-full p-3 bg-gray-700 border border-gray-600 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
-                  rows={3}
-                  maxLength={200}
-                />
-                <p className="text-gray-500 text-xs mt-1 text-right">{tauntMessage.length}/200</p>
-              </div>
-            </div>
-
-            <div className="p-4 bg-gray-900/50 border-t border-gray-700 flex gap-3">
-              <button
-                onClick={() => setShowTauntModal(false)}
-                className="flex-1 py-3 px-4 bg-gray-700 text-white rounded-xl font-medium hover:bg-gray-600 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={sendTaunt}
-                disabled={!targetPlayerId || !tauntMessage.trim()}
-                className="flex-1 py-3 px-4 bg-orange-600 text-white rounded-xl font-bold hover:bg-orange-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                <Send size={18} />
-                Send Taunt
-              </button>
-            </div>
-          </div>
-        </div>
+        <CardSheet
+          title="Send Taunt"
+          icon={MessageSquare}
+          onClose={() => setShowTauntModal(false)}
+          actionLabel="Send Taunt"
+          onSend={sendTaunt}
+          canSend={!!targetPlayerId && !!tauntMessage.trim()}
+        >
+          <TargetField value={targetPlayerId} onChange={setTargetPlayerId} crewmates={aliveCrewmates} />
+          <label className="sg-field">
+            Your message
+            <textarea
+              value={tauntMessage}
+              onChange={(e) => setTauntMessage(e.target.value)}
+              placeholder="e.g., You walked right past me."
+              rows={3}
+              maxLength={200}
+            />
+            <small>{tauntMessage.length}/200</small>
+          </label>
+        </CardSheet>
       )}
 
-      {/* DANGER Background Effects - Very visible from distance */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {/* Pulsing red glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] rounded-full blur-3xl bg-red-500/45 animate-pulse"></div>
-        {/* Secondary deeper glow for layered red intensity */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full blur-3xl bg-red-700/40"></div>
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full blur-3xl bg-red-800/40"></div>
-
-        {/* Warning stripes at top and bottom */}
-        <div className="absolute top-0 left-0 right-0 h-3 bg-gradient-to-r from-yellow-500 via-red-600 to-yellow-500"></div>
-        <div className="absolute bottom-0 left-0 right-0 h-3 bg-gradient-to-r from-yellow-500 via-red-600 to-yellow-500"></div>
-
-        {/* Diagonal warning stripes overlay */}
-        <div className="absolute inset-0 opacity-[0.05]" style={{
-          backgroundImage: 'repeating-linear-gradient(45deg, #fbbf24 0, #fbbf24 10px, transparent 10px, transparent 20px)',
-        }}></div>
-      </div>
-
-      {/* DANGER Header. flex-shrink-0 so it never gets crushed, but
-          margin tightens when active effects are present so the
-          carousel + PLAY button fit on short screens. */}
-      <div className={`relative z-10 flex flex-col items-center gap-2 flex-shrink-0 ${activeCardsList.length > 0 ? 'mb-2' : 'mb-6'}`}>
+      <div className="sg-vent__head">
         {isCompromised ? (
           <>
-            {/* COMPROMISED state - big red warning */}
-            <div className="flex items-center gap-2 px-6 py-3 rounded-full bg-red-600/40 border-2 border-red-500 animate-pulse">
-              <AlertTriangle size={24} className="text-red-300" />
-              <span className="font-black text-red-200 text-lg tracking-wider">POSITION COMPROMISED</span>
-              <AlertTriangle size={24} className="text-red-300" />
-            </div>
-            
-            {/* Locked out message */}
-            <div className="bg-red-500/20 border border-red-500/50 rounded-xl px-4 py-3 max-w-sm">
-              <p className="text-red-300 text-center text-sm font-bold">
-                LOCKED OUT OF ALL SYSTEMS
-              </p>
-              <p className="text-red-400/80 text-center text-xs mt-1">
-                Eliminate remaining crew immediately!
-              </p>
-            </div>
-            
-            {/* Disabled badges */}
-            <div className="flex flex-wrap justify-center gap-2">
-              <span className="px-3 py-1 bg-gray-800/80 border border-red-500/30 rounded-full text-red-400/60 text-xs font-bold line-through">
-                VENTS DISABLED
-              </span>
-              <span className="px-3 py-1 bg-gray-800/80 border border-red-500/30 rounded-full text-red-400/60 text-xs font-bold">
-                IDENTITY EXPOSED
-              </span>
-            </div>
+            <p className="sg-pill" style={{ justifySelf: 'start', background: '#fff', color: 'var(--sg-out)' }}>
+              <AlertTriangle size={16} /> Position compromised
+            </p>
+            <h1 className="sg-big sg-h1" style={{ margin: '8px 0 0' }}>You've been found out</h1>
+            <p className="sg-lede">Vents are locked. Everyone knows. Take out the rest of the crew.</p>
           </>
         ) : (
           <>
-            {/* Normal state - vent network active */}
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/30 border-2 border-red-500">
-              <AlertTriangle size={20} className="text-red-300" />
-              <span className="font-bold text-red-200 text-sm tracking-wider">VENT NETWORK ACTIVE</span>
-              <AlertTriangle size={20} className="text-red-300" />
-            </div>
-            
-            {/* Exposure warning */}
-            <div className="flex items-center gap-2 text-yellow-400/80 text-sm">
-              <Eye size={16} />
-              <span>You are exposed - find safety!</span>
-            </div>
-            {/* The round screen hides the kill cooldown so it looks like a crewmate's; it lives here. */}
-            <p data-testid="kill-cooldown" className="text-sm font-bold text-white/90">
-              {killCooldown > 0 ? `Next kill in ${killCooldown}s` : 'Kill ready'}
+            <p className="sg-pill" style={{ justifySelf: 'start', background: 'var(--sg-out)', color: '#fff' }}>
+              <span className="sg-vent__dot" /> Vent network active
+            </p>
+            <p data-testid="kill-cooldown" className={`sg-vent__kill sg-num ${killCooldown > 0 ? '' : 'sg-vent__kill--ready'}`}>
+              {killCooldown > 0
+                ? <>{killCooldown}s <span className="sg-vent__killnote">until your next kill</span></>
+                : 'Kill ready'}
+            </p>
+            <p className="sg-small" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <Eye size={16} /> You are exposed - find safety!
             </p>
           </>
         )}
       </div>
 
-      {/* Active Cards Section. Capped tightly and scrollable so it
-          can never push the sabotage carousel + PLAY button below the
-          fold on short / squat screens (e.g. iPhone SE). */}
       {activeCardsList.length > 0 && (
-        <div className="relative z-10 w-full max-w-2xl mb-3 flex-shrink-0 max-h-[26vh] overflow-y-auto">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-3 h-3 bg-emerald-400 rounded-full"></div>
-            <h2 className="text-base font-bold text-emerald-300">Active Effects</h2>
-          </div>
-          <div className="grid gap-4">
-            {activeCardsList.map((card) => {
-              const { action, text, location, duration, id, time_left, countdown, requires_input } = card;
-              return (
-                <ActionCard
-                  key={id}
-                  id={id}
-                  action={action}
-                  text={text}
-                  location={location}
-                  duration={duration}
-                  time_left={time_left}
-                  countdown={countdown}
-                  requires_input={requires_input}
-                  active
-                  onPlay={playCard}
-                />
-              );
-            })}
-          </div>
+        <div className="sg-vent__effects">
+          <p className="sg-small" style={{ opacity: 1 }}>Active Effects</p>
+          {activeCardsList.map((card) => {
+            const { action, text, location, duration, id, time_left, countdown, requires_input } = card;
+            return (
+              <ActionCard
+                key={id}
+                id={id}
+                action={action}
+                text={text}
+                location={location}
+                duration={duration}
+                time_left={time_left}
+                countdown={countdown}
+                requires_input={requires_input}
+                active
+                onPlay={playCard}
+              />
+            );
+          })}
         </div>
       )}
 
-      {/* Available Cards Section — swipeable carousel. flex-1 so the
-          deck fills whatever space is left under the header / active
-          effects, no page scroll required. */}
-      <div className="relative z-10 w-full max-w-2xl flex-1 min-h-0 flex flex-col">
-        <div className="flex items-center gap-2 mb-3">
-          <Zap size={20} className="text-red-400" />
-          <h2 className="text-lg font-bold text-red-200">Sabotage Cards</h2>
-        </div>
-
-        {(!playerState.cards || playerState.cards.length === 0) ? (
-          <div className="bg-gray-900/50 rounded-2xl p-8 border-2 border-dashed border-red-500/30 text-center">
-            <Zap size={32} className="text-red-500/40 mx-auto mb-3" />
-            <p className="text-gray-400">No cards available</p>
-            <p className="text-gray-500 text-sm mt-2">Complete tasks to draw cards</p>
+      <div className="sg-vent__deck">
+        {cards.length === 0 ? (
+          <div className="sg-vent__empty">
+            <Zap size={40} style={{ justifySelf: 'center', opacity: 0.5 }} />
+            <p className="sg-lede">No cards available</p>
+            <p className="sg-small">Complete tasks to draw cards</p>
           </div>
         ) : (
           <div
             className={`flex-1 min-h-0 flex flex-col ${highlightCards ? 'animate-pulse' : ''}`}
-            style={highlightCards ? { borderRadius: '2rem', outline: '3px solid rgba(251,113,133,0.85)', outlineOffset: '4px', boxShadow: '0 0 30px rgba(251,113,133,0.4)' } : {}}
+            style={highlightCards ? { borderRadius: '2rem', outline: '4px solid var(--sg-meet)', outlineOffset: '4px' } : {}}
           >
             <CardCarousel
-              cards={(playerState.cards || [])
-                .map((cardJson) => {
-                  try { return JSON.parse(cardJson); }
-                  catch (e) { console.error('Error parsing game action card:', e); return null; }
-                })
-                .filter(Boolean)}
+              cards={cards}
               onPlayCard={(card) => playCard(card.id, card.requires_input, card.action)}
               compact={activeCardsList.length > 0}
               onActiveIndexChange={onTutorialCardFocusChange}
@@ -509,26 +320,18 @@ const IntruderPage = ({
         )}
       </div>
 
-      {/* Exit Vent Button - Fixed at Bottom */}
-      <div className="fixed bottom-0 left-0 right-0 z-20 p-4 pb-6 bg-gradient-to-t from-gray-900 via-gray-900/98 to-transparent">
+      <div className="sg-vent__exit">
         {isCompromised ? (
-          // Compromised state - can't use vents anymore
-          <div className="w-full max-w-2xl mx-auto flex items-center justify-center gap-4 px-8 py-5 bg-gray-800 text-gray-500 rounded-2xl text-xl font-bold border-2 border-red-500/30">
-            <AlertTriangle size={26} className="text-red-500/50" />
-            <span className="line-through">VENTS LOCKED</span>
+          <div className="sg-btn sg-btn-ghost" style={{ cursor: 'default' }}>
+            <AlertTriangle size={22} /> <span style={{ textDecoration: 'line-through' }}>Vents locked</span>
           </div>
         ) : (
           <div
-            className={`w-full max-w-2xl mx-auto ${highlightExit ? 'animate-pulse' : ''}`}
-            style={highlightExit ? { borderRadius: '2rem', outline: '3px solid rgba(110,231,183,0.85)', outlineOffset: '4px', boxShadow: '0 0 30px rgba(110,231,183,0.4)' } : {}}
+            className={highlightExit ? 'animate-pulse' : ''}
+            style={highlightExit ? { borderRadius: 22, outline: '4px solid var(--sg-meet)', outlineOffset: '4px' } : {}}
           >
-            <button
-              onClick={() => setShowSusPage(false)}
-              type="button"
-              className="w-full flex items-center justify-center gap-4 px-8 py-5 bg-green-600 text-white rounded-2xl text-xl font-bold"
-            >
-              <LogOut size={26} />
-              <span>EXIT TO SAFETY</span>
+            <button onClick={() => setShowSusPage(false)} type="button" className="sg-btn sg-btn-white" style={{ color: 'var(--sg-ink)' }}>
+              <LogOut size={24} /> Exit to safety
             </button>
           </div>
         )}
