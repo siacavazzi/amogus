@@ -8,7 +8,6 @@ import {
     GlowingOrb, 
     GridOverlay, 
     ScanLine,
-    RotatingRing,
     Vignette 
 } from '../components/ui';
 import { PrimaryButton } from '../components/ui';
@@ -191,7 +190,7 @@ function LobbyPage() {
                                         <Skull size={18} />
                                     </div>
                                     <p className="text-sm font-semibold text-white">Intruder tools</p>
-                                    <p className="mt-1 text-xs leading-relaxed text-gray-400">Cards and cooldown training are being scaffolded next.</p>
+                                    <p className="mt-1 text-xs leading-relaxed text-gray-400">Log a kill, open the vent and play your cards.</p>
                                 </div>
                             </div>
 
@@ -240,34 +239,11 @@ function LobbyPage() {
             <div className={`relative z-10 w-full ${isReactorDevice ? 'max-w-4xl' : 'max-w-md'} mx-4 transition-all duration-700 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                 {/* Logo and Title Section */}
                 <div className="text-center mb-8">
-                    {/* Animated logo container */}
-                    <div className="relative inline-block mb-6">
-                        {/* Rotating rings */}
-                        <RotatingRing size="calc(7rem + 32px)" borderColor="border-indigo-500/20" borderWidth="border-2" duration={20} />
-                        <RotatingRing size="calc(7rem + 64px)" borderColor="border-purple-500/10" duration={30} reverse />
-                        
-                        {/* Glow behind logo */}
-                        <div className="absolute inset-0 bg-indigo-500/20 blur-2xl rounded-full scale-150" />
-                        
-                        {/* Logo */}
-                        <img 
-                            src="https://i1.sndcdn.com/artworks-Uii8SMJvNPxy8ePA-romBoQ-t1080x1080.jpg" 
-                            alt="Sus Party"
-                            className="relative w-28 h-28 rounded-full shadow-2xl shadow-indigo-500/30 border-2 border-indigo-500/30"
-                        />
-                        
-                        {/* Online indicator */}
-                        <div className="absolute -bottom-1 -right-1 flex items-center gap-1 px-2 py-1 bg-emerald-500/20 border border-emerald-500/50 rounded-full">
-                            <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                            <span className="text-[10px] text-emerald-400 font-medium">LIVE</span>
-                        </div>
-                    </div>
-                    
-                    {/* Title */}
-                    <h1 className="text-4xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 mb-2 tracking-tight">
+                    {/* Wordmark */}
+                    <h1 className="sg-big text-white" style={{ fontSize: 'clamp(56px, 18vw, 84px)', marginBottom: 8 }}>
                         Sus Party
                     </h1>
-                    <p className="text-gray-500 text-sm">Real-life social deduction game</p>
+                    <p className="text-gray-300" style={{ fontWeight: 700, fontSize: 17 }}>The real-life social deduction game</p>
                     
                     {/* Feature badges */}
                     <div className="flex flex-wrap items-center justify-center gap-2 mt-4">

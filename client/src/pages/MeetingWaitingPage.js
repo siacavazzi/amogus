@@ -46,6 +46,9 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
   const meReady = playerState.ready && playerState.active !== false;
 
   return (
+    <>
+    {/* The round's blue stays underneath while the yellow floods out over it */}
+    <div className="sg-screen sg-round" aria-hidden="true" />
     <div
       className="sg-screen sg-meet sg-flood"
       style={{ '--fx': origin.fx, '--fy': origin.fy, paddingBottom: meReady ? 24 : 130 }}
@@ -121,6 +124,7 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
         </div>
       )}
     </div>
+    </>
   );
 };
 

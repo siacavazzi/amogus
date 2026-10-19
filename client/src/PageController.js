@@ -9,6 +9,7 @@ import Modal from "./components/Modal";
 import IntruderPage from "./pages/IntruderPage";
 import CrewmemberPage from "./pages/CrewPage";
 import ProgressBar from "./components/ProgressBar";
+import "./signal/setup.css";
 import MeetingWaitingPage from "./pages/MeetingWaitingPage";
 import DeadPage from "./pages/DeadPage";
 import HackedPage from "./pages/HackedPage";
@@ -25,6 +26,9 @@ import TaskEntryPage from "./pages/TaskEntryPage";
 import VotingPage from "./pages/VotingPage";
 import MeetingResultPage from "./pages/MeetingResultsPage";
 import GameConfigPage from "./pages/GameConfigPage";
+
+// Screens before the game starts get the Signal setup layer (see signal/setup.css).
+const SETUP_PAGES = new Set(["connecting", "lobby", "gameConfig", "login", "players", "taskEntry"]);
 
 // Allow URL param override for testing: ?mobile=true or ?mobile=false
 const urlParams = new URLSearchParams(window.location.search);
@@ -214,7 +218,9 @@ const PageController = () => {
                     sus={playerState?.sus}
                 />
             )}
-            {pages[currentPage]}
+            {SETUP_PAGES.has(currentPage)
+                ? <div className="sg-setup">{pages[currentPage]}</div>
+                : pages[currentPage]}
         </div>
     );
 };

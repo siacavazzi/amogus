@@ -25,19 +25,29 @@ export function Words({ text, delay = 0, step = 140, className = 'sg-a sg-slam' 
   ));
 }
 
-// Letters type in one by one; slower for sad news.
+// Letters type in one by one; slower for sad news. Words never break mid-word.
 export function Letters({ text = '', delay = 0, step = 28 }) {
+  let n = 0;
   return (
     <span aria-label={text}>
-      {[...text].map((c, i) => (
-        <span
-          key={i}
-          aria-hidden="true"
-          className="sg-a sg-rise"
-          style={{ display: 'inline-block', whiteSpace: 'pre', animationDuration: '260ms', animationDelay: `${delay + i * step}ms` }}
-        >
-          {c}
-        </span>
+      {text.split(' ').map((word, w) => (
+        <React.Fragment key={w}>
+          {w > 0 && ' '}
+          <span aria-hidden="true" style={{ display: 'inline-block', whiteSpace: 'nowrap' }}>
+            {[...word].map((c, i) => {
+              const at = n++;
+              return (
+                <span
+                  key={i}
+                  className="sg-a sg-rise"
+                  style={{ display: 'inline-block', animationDuration: '260ms', animationDelay: `${delay + at * step}ms` }}
+                >
+                  {c}
+                </span>
+              );
+            })}
+          </span>
+        </React.Fragment>
       ))}
     </span>
   );

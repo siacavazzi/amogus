@@ -1,0 +1,83 @@
+/* Signal for the setup screens (home, join, lobby, game setup). These screens were built with
+   dark panels, gradients and glows; this layer flattens them onto the round's blue, swaps the
+   type to Archivo and drops the decoration, without rewriting each screen. Scoped to .sg-setup. */
+
+.sg-setup, .sg-setup * { font-family: var(--sg-font); }
+.sg-setup *, .sg-setup *::before, .sg-setup *::after {
+  text-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Decoration: glows, orbs, rings, grids, particles, scan lines */
+.sg-setup .blur-3xl, .sg-setup .blur-2xl, .sg-setup .blur-xl, .sg-setup .blur-lg, .sg-setup .blur,
+.sg-setup .fixed.inset-0.pointer-events-none, .sg-setup .fixed.inset-0.overflow-hidden.pointer-events-none,
+.sg-setup .absolute.inset-0.pointer-events-none:not(.flex):not(.grid),
+.sg-setup .animate-ping, .sg-setup [style*="floatUp"],
+.sg-setup button > .absolute.inset-0 { display: none !important; }
+.sg-setup [class*="drop-shadow"] { filter: none !important; }
+.sg-setup .animate-pulse, .sg-setup .animate-spin, .sg-setup [class*="animate-glitch"], .sg-setup [class*="animate-flicker"] { animation: none !important; }
+.sg-setup [class*="shadow"] { box-shadow: none !important; }
+.sg-setup button:hover { transform: none !important; }
+
+/* Surfaces: blue screen, translucent panels */
+.sg-setup .fixed.inset-0:not([class*="z-"]):not(.sg):not([class*="bg-black"]), .sg-setup .min-h-screen { background: var(--sg-round) !important; }
+.sg-setup [class*="bg-gradient"]:not(button) { background-image: none !important; }
+.sg-setup [class*="bg-gray-"], .sg-setup [class*="bg-slate-"] { background-color: rgba(0, 0, 0, 0.18) !important; }
+.sg-setup [class*="bg-black"] { background-color: rgba(0, 0, 0, 0.5) !important; }
+.sg-setup .fixed.inset-0[class*="bg-gray-"]:not([class*="z-"]) { background-color: var(--sg-round) !important; }
+.sg-setup [class*="bg-indigo-"], .sg-setup [class*="bg-purple-"], .sg-setup [class*="bg-cyan-"], .sg-setup [class*="bg-blue-"],
+.sg-setup [class*="bg-violet-"], .sg-setup [class*="bg-emerald-"], .sg-setup [class*="bg-green-"], .sg-setup [class*="bg-teal-"],
+.sg-setup [class*="bg-pink-"], .sg-setup [class*="bg-fuchsia-"], .sg-setup [class*="bg-rose-"] { background-color: rgba(255, 255, 255, 0.12) !important; }
+.sg-setup [class*="bg-amber-"], .sg-setup [class*="bg-orange-"], .sg-setup [class*="bg-yellow-"] { background-color: rgba(255, 194, 26, 0.2) !important; }
+.sg-setup [class*="bg-red-"] { background-color: rgba(224, 38, 58, 0.35) !important; }
+.sg-setup [class*="border"] { border-color: rgba(255, 255, 255, 0.18) !important; }
+.sg-setup [class*="rounded-xl"], .sg-setup [class*="rounded-2xl"], .sg-setup [class*="rounded-3xl"] { border-radius: 18px !important; }
+
+/* Type: white, bold, no gradient text */
+.sg-setup { color: #fff; }
+.sg-setup .bg-clip-text { -webkit-text-fill-color: currentColor !important; background: none !important; }
+.sg-setup .text-transparent { color: #fff !important; }
+.sg-setup h1, .sg-setup h2 { font-weight: 900 !important; letter-spacing: -0.035em !important; color: #fff !important; }
+.sg-setup h3 { font-weight: 800 !important; color: #fff !important; }
+.sg-setup .tracking-widest, .sg-setup .tracking-wider, .sg-setup [class*="tracking-[0."] { letter-spacing: 0.02em !important; }
+.sg-setup .uppercase { text-transform: none !important; }
+.sg-setup [class*="text-gray-"], .sg-setup [class*="text-slate-"], .sg-setup .text-white { color: #fff !important; }
+.sg-setup [class*="text-gray-4"], .sg-setup [class*="text-gray-5"], .sg-setup [class*="text-gray-6"] { color: rgba(255, 255, 255, 0.75) !important; }
+.sg-setup [class*="text-indigo"], .sg-setup [class*="text-purple"], .sg-setup [class*="text-violet"], .sg-setup [class*="text-cyan"],
+.sg-setup [class*="text-blue"], .sg-setup [class*="text-teal"], .sg-setup [class*="text-pink"], .sg-setup [class*="text-fuchsia"],
+.sg-setup [class*="text-emerald"], .sg-setup [class*="text-green"] { color: #fff !important; }
+.sg-setup [class*="text-amber"], .sg-setup [class*="text-orange"], .sg-setup [class*="text-yellow"] { color: var(--sg-meet) !important; }
+.sg-setup [class*="text-red"], .sg-setup [class*="text-rose"] { color: #ffd0d6 !important; }
+
+/* Inputs */
+.sg-setup input, .sg-setup textarea, .sg-setup select {
+  background: #fff !important;
+  color: var(--sg-ink) !important;
+  border: 0 !important;
+  font-weight: 700;
+}
+.sg-setup input::placeholder, .sg-setup textarea::placeholder { color: rgba(26, 20, 0, 0.45) !important; }
+.sg-setup input:focus, .sg-setup textarea:focus, .sg-setup select:focus { outline: 3px solid var(--sg-meet) !important; outline-offset: 2px; box-shadow: none !important; }
+
+/* Buttons: one solid primary (white on blue), everything else translucent */
+.sg-setup button, .sg-setup a[class*="rounded"] { font-weight: 800; }
+.sg-setup button[class*="bg-gradient"], .sg-setup a[class*="bg-gradient"],
+.sg-setup button > div.relative[class*="bg-gradient"] {
+  background: #fff !important;
+  color: var(--sg-round) !important;
+  border: 0 !important;
+}
+.sg-setup button[class*="bg-gradient"] *, .sg-setup a[class*="bg-gradient"] *, .sg-setup button > div.relative[class*="bg-gradient"] * { color: var(--sg-round) !important; }
+.sg-setup button[class*="from-red"], .sg-setup button[class*="from-rose"] { background: var(--sg-out) !important; color: #fff !important; }
+.sg-setup button[class*="from-red"] *, .sg-setup button[class*="from-rose"] * { color: #fff !important; }
+.sg-setup button:disabled { opacity: 0.45 !important; }
+.sg-setup [role=slider] { background: #fff !important; color: var(--sg-round) !important; }
+
+/* Selected states that used coloured rings */
+.sg-setup .ring-2, .sg-setup .ring-4 { box-shadow: none !important; outline: 3px solid #fff !important; outline-offset: 2px; }
+
+/* Pop-ups inside setup screens: solid panels so the page behind doesn't show through */
+.sg-setup .fixed.inset-0[class*="z-"][class*="bg-black"] { background-color: rgba(0, 0, 0, 0.6) !important; }
+.sg-setup .fixed[class*="z-"] [class*="bg-gray-9"], .sg-setup .fixed[class*="z-"] [class*="bg-gray-8"],
+.sg-setup .fixed[class*="z-"] [class*="bg-slate-9"] { background-color: var(--sg-round-d) !important; }
