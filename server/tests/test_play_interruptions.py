@@ -85,6 +85,36 @@ class PlayInterruptionTests(SocketGameTestCase):
         self.start_game(phones[0], ids[0], phones)
         self.assertTrue(game.game_running)
 
+    def test_reactor_play_again_returns_the_room_to_the_lobby(self):
+        reactor = self.make_client()
+        room = self.create_open_room(reactor)
+        reactor.emit('register_reactor', {'room_code': room})
+        phones = [self.make_client() for _ in range(3)]
+        ids = [self.join_player(phone, room, f'P{i}', use_join_game=True) for i, phone in enumerate(phones)]
+        game = server_app.game_manager.get_game(room)
+        self.add_tasks(phones[0], room, 10)
+        self.start_game(phones[0], ids[0], phones)
+        game.kill_player(self.intruders(game)[0].player_id)
+        self.assertEqual('victory', game.end_state)
+        self.drain_all(phones + [reactor])
+        reactor.emit('reset', {'room_code': room, 'force': True})
+        self.assertIsNone(game.end_state)
+        self.assertFalse(game.game_running)
+        self.assertTrue(self.has_event(self.drain(phones[1]), 'game_reset'))
+
+    def test_late_play_again_taps_do_not_reset_the_next_round(self):
+        clients, room, ids, game = self.start_round()
+        game.kill_player(self.intruders(game)[0].player_id)
+        for client, pid in zip(clients, ids):
+            client.emit('reset', {'player_id': pid, 'room_code': room})
+        self.start_game(clients[0], ids[0], clients)
+        self.assertTrue(game.game_running)
+        # A phone that stalled flushes the taps it queued on the game-over screen.
+        for _ in range(3):
+            clients[1].emit('reset', {'player_id': ids[1], 'room_code': room})
+        self.assertTrue(game.game_running)
+        self.assertEqual(set(), game.reset_votes)
+
     def test_rescued_meltdown_clears_every_code(self):
         from assets.room_protocol import room_state
         clients, room, ids, game = self.start_round()

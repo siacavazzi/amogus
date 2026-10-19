@@ -1036,6 +1036,8 @@ export default function GameContext({ children }) {
         taskCompletionError,
         // Reset votes for play again
         resetVotes,
+        // Phone or reactor screen (same ?mobile= override as everywhere else)
+        isMobile,
         // Intruder reveal (tasks 100%)
         intrudersRevealed,
         // Test game for one or two players

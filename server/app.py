@@ -945,6 +945,11 @@ def reset_game(data):
         logger.info(f"Game {room_code} has been force reset to lobby")
         return
     
+    # Votes only mean "play again" on the game-over screen. A tap that arrives late (a phone
+    # flushing queued taps after a stall) must not reset the lobby or the next round.
+    if not game.end_state:
+        return {'ok': False, 'error': 'The round has not ended.'}
+
     connected_player_ids = get_connected_player_ids(game, room_code)
     game.reset_votes.intersection_update(connected_player_ids)
 
