@@ -1,25 +1,24 @@
 /* Printable task card sheet for /among-us-task-cards-printable. */
-.ptc-sheet { padding: 32px 0; }
+.ptc-sheet { padding: 40px 0; }
 .ptc-sheet__head { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: center; justify-content: space-between; margin: 0 0 18px; }
-.ptc-sheet__head h2 { color: var(--site-ink); font-size: var(--site-subheading); font-weight: 650; letter-spacing: -.025em; line-height: 1.2; margin: 0; }
-.ptc-sheet__note { color: var(--site-muted); font-size: .86rem; line-height: 1.6; margin: 0 0 20px; }
+.ptc-sheet__head h2 { color: var(--site-ink); font-size: var(--site-subheading); font-weight: 900; letter-spacing: -.035em; line-height: 1; margin: 0; }
+.ptc-sheet__note { color: var(--site-body); font-size: 1rem; line-height: 1.55; margin: 0 0 20px; }
 .ptc-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; }
-.ptc-card { display: flex; flex-direction: column; gap: 10px; min-height: 150px; padding: 14px; border: 1px solid var(--site-line); border-radius: 8px; background: rgba(255, 255, 255, .03); break-inside: avoid; page-break-inside: avoid; }
+.ptc-card { display: flex; flex-direction: column; gap: 10px; min-height: 160px; padding: 16px; border: 3px solid var(--sg-ink); border-radius: 16px; background: #fff; break-inside: avoid; page-break-inside: avoid; }
 .ptc-card__top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-.ptc-card__room { color: #a5b4fc; font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; line-height: 1.4; }
-.ptc-card__num { color: var(--site-muted); font-size: .72rem; font-variant-numeric: tabular-nums; }
-.ptc-card__text { color: var(--site-ink); font-size: .92rem; line-height: 1.5; margin: 0; flex: 1; }
-.ptc-card__done { display: flex; align-items: center; gap: 8px; color: var(--site-muted); font-size: .76rem; }
-.ptc-box { flex-shrink: 0; width: 16px; height: 16px; border: 2px solid currentColor; border-radius: 2px; }
-.ptc-card--role, .ptc-card--meeting { border-width: 2px; }
-.ptc-card--crew { border-color: var(--site-crew); }
-.ptc-card--intruder { border-color: var(--site-intruder); }
-.ptc-card--meeting { border-color: #fbbf24; }
-.ptc-card__title { color: var(--site-ink); font-size: 1.3rem; font-weight: 800; letter-spacing: .02em; margin: 0; }
-.ptc-card--crew .ptc-card__room { color: var(--site-crew); }
-.ptc-card--intruder .ptc-card__room { color: var(--site-intruder); }
-.ptc-card--meeting .ptc-card__room { color: #fbbf24; }
-.ptc-sheet__label { color: var(--site-muted); font-size: .8rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; margin: 28px 0 12px; }
+.ptc-card__room { display: inline-block; align-self: flex-start; background: var(--sg-ink); color: #fff; border-radius: 999px; padding: 2px 10px; font-size: .75rem; font-weight: 800; letter-spacing: .02em; line-height: 1.4; }
+.ptc-card__num { color: var(--site-muted); font-size: .8rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.ptc-card__text { color: var(--sg-ink); font-size: 1.05rem; font-weight: 700; letter-spacing: -.01em; line-height: 1.35; margin: 0; flex: 1; }
+.ptc-card__done { display: flex; align-items: center; gap: 8px; color: var(--site-muted); font-size: .82rem; font-weight: 700; }
+.ptc-box { flex-shrink: 0; width: 18px; height: 18px; border: 2px solid currentColor; border-radius: 4px; }
+.ptc-card--crew { border-color: var(--sg-round); }
+.ptc-card--intruder { border-color: var(--sg-out); }
+.ptc-card--meeting { border-color: var(--sg-meet); background: var(--sg-meet); }
+.ptc-card__title { color: var(--sg-ink); font-size: 1.7rem; font-weight: 900; letter-spacing: -.035em; line-height: 1; margin: 0; }
+.ptc-card--crew .ptc-card__room { background: var(--sg-round); }
+.ptc-card--intruder .ptc-card__room { background: var(--sg-out); }
+.ptc-card--meeting .ptc-card__done, .ptc-card--meeting .ptc-card__num { color: var(--sg-ink); }
+.ptc-sheet__label { color: var(--sg-ink); font-size: 1.05rem; font-weight: 900; letter-spacing: -.01em; margin: 32px 0 12px; }
 
 @media (max-width: 720px) {
     .ptc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -42,6 +41,7 @@
     .ptc-grid { grid-template-columns: repeat(3, 1fr); gap: 6mm; }
     .ptc-card { min-height: 42mm; background: #fff !important; border: 1.5pt solid #000 !important; border-radius: 3mm; color: #000; break-inside: avoid; page-break-inside: avoid; }
     .ptc-card--role, .ptc-card--meeting { border-width: 3pt !important; }
+    .ptc-card__room, .ptc-card--crew .ptc-card__room, .ptc-card--intruder .ptc-card__room { background: none !important; padding: 0; border-radius: 0; text-transform: uppercase; letter-spacing: .08em; }
     .ptc-card__room, .ptc-card__num, .ptc-card__text, .ptc-card__done, .ptc-card__title,
     .ptc-card--crew .ptc-card__room, .ptc-card--intruder .ptc-card__room, .ptc-card--meeting .ptc-card__room { color: #000 !important; }
     .ptc-card__text { font-size: 11pt; }

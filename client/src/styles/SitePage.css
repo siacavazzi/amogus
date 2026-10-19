@@ -1,172 +1,189 @@
-/* Shared visual system for the public pages. */
+/* Shared Signal chrome for the public pages: tokens, nav, buttons, headings, footer.
+   Flat colour, heavy Archivo type, solid ink buttons. The home page (.sl) recolours
+   the nav and footer in Landing.css; article pages add their bands in SeoPage.css. */
 .site-page {
-    --site-background: #030712;
-    --site-ink: #f3f4f6;
-    --site-body: #b7becb;
-    --site-muted: #969faf;
-    --site-line: #253041;
-    --site-accent: #7161e8;
-    --site-link: #b5adff;
-    --site-crew: #34d399;
-    --site-intruder: #f87171;
-    --site-radius: 5px;
-    --site-heading: clamp(2.1rem, 4.8vw, 3.25rem);
-    --site-subheading: clamp(1.4rem, 2.8vw, 1.9rem);
+    --sg-round: #1b4fd8;
+    --sg-round-d: #1440b3;
+    --sg-meet: #ffc21a;
+    --sg-ink: #1a1400;
+    --sg-out: #e0263a;
+    --sg-dark: #101317;
+    --site-background: #fff;
+    --site-ink: var(--sg-ink);
+    --site-body: #2c2716;
+    --site-muted: #5f5a48;
+    --site-line: rgba(26, 20, 0, 0.16);
+    --site-rule: var(--sg-ink);
+    --site-soft: #f4f2ec;
+    --site-accent: var(--sg-round);
+    --site-link: var(--sg-round-d);
+    --site-crew: var(--sg-round);
+    --site-intruder: var(--sg-out);
+    --site-radius: 16px;
+    --site-heading: clamp(2.6rem, 8vw, 4.6rem);
+    --site-subheading: clamp(1.85rem, 4.6vw, 2.7rem);
     --site-measure: 780px;
     background: var(--site-background);
     color: var(--site-ink);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-    font-size: 17px;
-    line-height: 1.65;
+    font-family: 'Archivo', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.6;
     min-height: 100dvh;
+    overflow-x: clip;
     -webkit-font-smoothing: antialiased;
 }
 
 .site-page *, .site-page *::before, .site-page *::after { box-sizing: border-box; }
-.site-page a { text-underline-offset: 4px; }
+.site-page a { text-underline-offset: 4px; text-decoration-thickness: 2px; }
 .site-page :is(a, button, input, select, textarea, summary):focus-visible {
-    outline: 2px solid var(--site-link);
-    outline-offset: 5px;
+    outline: 3px solid currentColor;
+    outline-offset: 4px;
 }
 
+/* ---------- nav ---------- */
 .site-nav {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 24px;
-    width: calc(100% - 80px);
-    max-width: 1080px;
+    width: 100%;
+    max-width: 1160px;
     margin: 0 auto;
-    padding: 20px 0;
-    border-bottom: 1px solid var(--site-line);
+    padding: 18px 20px;
     position: relative;
     z-index: 2;
 }
 .site-brand {
     color: var(--site-ink);
-    font-size: 1.45rem;
-    font-weight: 750;
-    letter-spacing: -.035em;
+    font-size: 1.35rem;
+    font-weight: 900;
+    letter-spacing: -0.03em;
     text-decoration: none;
     white-space: nowrap;
 }
 .site-nav__links { display: flex; align-items: center; gap: 28px; }
 .site-nav__links > a:not(.site-button) {
-    color: var(--site-body);
-    font-size: .88rem;
+    color: var(--site-ink);
+    font-size: .95rem;
+    font-weight: 700;
     text-decoration: none;
 }
-.site-nav__links > a:not(.site-button):hover { color: var(--site-ink); }
+.site-nav__links > a:not(.site-button):hover { text-decoration: underline; }
 
-.site-page :is(.site-button, .seo-btn--primary, .htp-button--primary, .lp-button--primary) {
+/* ---------- buttons ---------- */
+.site-page :is(.site-button, .seo-btn--primary, .htp-button--primary) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 12px 22px;
-    background: var(--site-accent);
-    color: #fff;
-    border: 1px solid transparent;
+    padding: 16px 24px;
+    background: var(--sg-ink);
+    color: var(--sg-meet);
+    border: 0;
     border-radius: var(--site-radius);
     font-family: inherit;
-    font-size: .94rem;
-    font-weight: 600;
-    line-height: 1.45;
-    letter-spacing: 0;
+    font-size: 1.05rem;
+    font-weight: 900;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    text-align: center;
     text-decoration: none;
     box-shadow: none;
     cursor: pointer;
-    transform: none;
-    transition: background .15s ease;
+    transition: transform .12s ease;
 }
-.site-page :is(.site-button, .seo-btn--primary, .htp-button--primary, .lp-button--primary):hover {
-    background: #8172ef;
-    color: #fff;
-    box-shadow: none;
-    transform: none;
-}
-.site-page :is(.seo-btn--secondary, .htp-button--secondary, .lp-button--secondary) {
+.site-page :is(.site-button, .seo-btn--primary, .htp-button--primary):hover { background: #000; color: var(--sg-meet); }
+.site-page :is(.site-button, .seo-btn--primary, .htp-button--primary, .seo-btn--secondary, .htp-button--secondary):active { transform: scale(.97); }
+.site-nav .site-button { padding: 12px 20px; border-radius: 999px; font-size: .95rem; }
+
+.site-page :is(.seo-btn--secondary, .htp-button--secondary) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 12px 4px;
-    color: var(--site-ink);
+    padding: 16px 24px;
+    color: var(--sg-ink);
     background: transparent;
-    border: 1px solid transparent;
+    border: 0;
     border-radius: var(--site-radius);
+    box-shadow: inset 0 0 0 3px currentColor;
     font-family: inherit;
-    font-size: .94rem;
-    font-weight: 500;
-    line-height: 1.45;
-    text-decoration: underline;
-    box-shadow: none;
-    backdrop-filter: none;
-    transform: none;
+    font-size: 1.05rem;
+    font-weight: 900;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform .12s ease;
 }
-.site-page :is(.seo-btn--secondary, .htp-button--secondary, .lp-button--secondary):hover {
-    color: var(--site-link);
-    background: transparent;
-    border-color: transparent;
-}
-.site-page :is(.seo-h1, .info-title, .htp-hero h1) {
+.site-page :is(.seo-btn--secondary, .htp-button--secondary):hover { background: rgba(26, 20, 0, .08); color: var(--sg-ink); }
+
+/* ---------- headings ---------- */
+.site-page :is(.seo-h1, .info-title, .htp-hero h1, .task-builder__hero h1) {
     font-size: var(--site-heading);
-    font-weight: 700;
-    line-height: 1.09;
-    letter-spacing: -.035em;
-    background: none;
+    font-weight: 900;
+    line-height: .94;
+    letter-spacing: -0.045em;
     color: var(--site-ink);
+    background: none;
     margin: 0 0 22px;
+    text-wrap: balance;
 }
 .site-page :is(.seo-lead, .info-lead, .htp-hero__main > p) {
-    color: var(--site-body);
-    font-size: 1.08rem;
-    line-height: 1.65;
+    color: var(--site-ink);
+    font-size: clamp(1.12rem, 2.4vw, 1.3rem);
+    font-weight: 500;
+    line-height: 1.5;
+    max-width: 40em;
 }
-.site-page :is(.seo-section, .info-body, .htp-main) a:not(.htp-button):not([class*='btn']) { color: var(--site-link); }
+.site-page :is(.seo-section, .seo-content, .info-body, .info-footer, .htp-main) a:where(:not(.htp-button):not([class*='btn']):not([class*='task-builder__'])) {
+    color: var(--site-link);
+    font-weight: 700;
+}
 
+/* Pill tag, used for eyebrows and kickers. */
+.site-page :is(.seo-eyebrow, .info-eyebrow, .seo-section__kicker) {
+    display: inline-block;
+    border: 2px solid currentColor;
+    border-radius: 999px;
+    padding: 3px 12px;
+    color: var(--site-ink);
+    font-size: .85rem;
+    font-weight: 800;
+    letter-spacing: .02em;
+    line-height: 1.4;
+}
+
+/* ---------- footer (dark band) ---------- */
 .site-footer {
-    width: calc(100% - 80px);
-    max-width: 1080px;
+    width: 100%;
+    max-width: 1160px;
     margin: 0 auto;
-    padding: 32px 0 36px;
-    border-top: 1px solid var(--site-line);
+    padding: 48px 20px 40px;
     position: relative;
     z-index: 1;
+    color: #fff;
 }
 .site-footer__links { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
 .site-footer__links > div { display: flex; flex-direction: column; gap: 8px; }
-.site-footer__links a { color: var(--site-body); font-size: .83rem; text-decoration: none; width: fit-content; }
-.site-footer__links a:hover { color: var(--site-ink); text-decoration: underline; }
-.site-footer__note { margin: 26px 0 0; color: var(--site-muted); font-size: .76rem; line-height: 1.6; max-width: 78ch; }
-
-/* Home-page chrome uses the same system as the articles and guide. */
-.site-page .lp-title { font-weight: 750; }
-.site-page .lp-title__text { color: var(--site-ink); background: none; -webkit-text-fill-color: var(--site-ink); text-shadow: none; animation: none; }
-.site-page .lp-title__text::before, .site-page .lp-title__text::after { display: none; }
-.site-page :is(.lp-section-heading, .lp-footer__heading, .lp-seo__heading) { color: var(--site-ink); background: none; -webkit-text-fill-color: var(--site-ink); font-weight: 700; }
-.site-page :is(.lp-section-eyebrow, .lp-inspired__label) { color: var(--site-muted); letter-spacing: .04em; }
-.site-page :is(.lp-pill, .lp-feature, .lp-step) { background: none; border-radius: 0; box-shadow: none; border-color: var(--site-line); }
-.site-page .lp-feature { border: 0; border-top: 1px solid var(--site-line); padding: 24px 0; }
-.site-page .lp-feature__emoji { display: none; }
-.site-page .lp-step { border: 0; border-top: 1px solid var(--site-line); padding: 24px 0; }
-.site-page .lp-step__num { background: none; border: 0; color: var(--site-link); font-weight: 500; }
-.site-page :is(.lp-tagline, .lp-step__body, .lp-feature__body, .lp-faq__a, .lp-seo__lead) { color: var(--site-body); }
-.site-page :is(.lp-features, .lp-faq, .lp-seo, .lp-footer) { background: none; border-color: var(--site-line); }
-.site-page .lp-footer { padding-bottom: 36px; }
+.site-footer__links a { color: rgba(255, 255, 255, .72); font-size: .9rem; font-weight: 600; text-decoration: none; width: fit-content; }
+.site-footer__links a:hover { color: #fff; text-decoration: underline; }
+.site-footer__note { margin: 32px 0 0; color: rgba(255, 255, 255, .5); font-size: .8rem; line-height: 1.6; max-width: 78ch; }
 
 @media (max-width: 700px) {
-    .site-page { font-size: 16px; }
-    .site-nav, .site-footer { width: calc(100% - 44px); }
-    .site-nav { padding: 16px 0; gap: 16px; }
+    .site-page { font-size: 17px; }
+    .site-nav { padding: 14px 16px; gap: 16px; }
+    .site-footer { padding: 40px 16px 32px; }
     .site-brand { font-size: 1.25rem; }
     .site-nav__links { gap: 12px; }
     .site-nav__links > a:not(.site-button) { display: none; }
-    .site-nav .site-button { padding: 10px 15px; font-size: .85rem; }
+    .site-nav .site-button { padding: 10px 16px; font-size: .9rem; }
     .site-footer__links { grid-template-columns: 1fr 1fr; gap: 24px 16px; }
     .site-footer__links > div:last-child { grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; gap: 10px 20px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .site-page :is(.site-button, .seo-btn--primary, .htp-button, .lp-button) { transition: none; }
+    .site-page :is(.site-button, .seo-btn--primary, .seo-btn--secondary, .htp-button) { transition: none; }
 }

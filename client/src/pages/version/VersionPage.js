@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { ENDPOINT } from '../../ENDPOINT';
 import { CLIENT_VERSION } from '../../version';
 import { isBetaChannel } from '../../components/BetaBadge';
-import '../admin/AdminDashboard.css';
 
 const REPO_URL = 'https://github.com/siacavazzi/amogus';
 
@@ -13,17 +12,34 @@ function useVersionDocument() {
     robots.setAttribute('name', 'robots');
     robots.setAttribute('content', 'noindex');
     document.head.appendChild(robots);
-    document.documentElement.classList.add('adm-document');
-    document.body.classList.add('adm-document');
+    document.documentElement.classList.add('version-document');
+    document.body.classList.add('version-document');
     document.title = 'Version - Sus Party';
     return () => {
       robots.remove();
-      document.documentElement.classList.remove('adm-document');
-      document.body.classList.remove('adm-document');
+      document.documentElement.classList.remove('version-document');
+      document.body.classList.remove('version-document');
       document.title = previousTitle;
     };
   }, []);
 }
+
+// Flat Signal look: dark screen, heavy type. Self-contained so it needs no shared stylesheet.
+const VERSION_CSS = `
+html.version-document, body.version-document { background: #101317; }
+.version-page { min-height: 100dvh; max-width: 760px; margin: 0 auto; padding: 40px 20px; color: #fff;
+  font-family: 'Archivo', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 17px; font-weight: 500; line-height: 1.5; }
+.version-page h1 { font-size: clamp(2.4rem, 8vw, 3.6rem); font-weight: 900; letter-spacing: -0.045em; line-height: .95; margin: 0 0 28px; }
+.version-page table { width: 100%; text-align: left; border-collapse: collapse; margin: 0 0 24px; }
+.version-page th, .version-page td { padding: 12px 12px 12px 0; border-bottom: 1px solid rgba(255,255,255,.18); vertical-align: top; }
+.version-page td { overflow-wrap: anywhere; }
+.version-page thead th { white-space: nowrap; }
+.version-page thead th { font-size: .85rem; font-weight: 800; color: rgba(255,255,255,.65); border-bottom: 3px solid #fff; }
+.version-page tbody th { font-weight: 900; }
+.version-page td strong { font-size: 1.15rem; font-weight: 900; color: #ffc21a; }
+.version-page p { margin: 0 0 12px; }
+.version-page a { color: #fff; font-weight: 800; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+`;
 
 function VersionRow({ label, info }) {
   if (!info) return <tr><th>{label}</th><td colSpan={3}>Loading…</td></tr>;
@@ -56,10 +72,10 @@ function VersionPage() {
   const mismatch = server && !server.error && server.version !== CLIENT_VERSION.version;
 
   return (
-    <main className="adm-shell version-page" style={{ padding: '2rem 1rem', maxWidth: 720, margin: '0 auto' }}>
-      <style>{'.version-page a { text-decoration: underline; }'}</style>
-      <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem' }}>Sus Party version</h1>
-      <table style={{ width: '100%', textAlign: 'left', borderSpacing: '0 0.5rem' }}>
+    <main className="version-page">
+      <style>{VERSION_CSS}</style>
+      <h1>Sus Party version</h1>
+      <table>
         <thead>
           <tr><th /><th>Version</th><th>Commit</th><th>Built</th></tr>
         </thead>
