@@ -271,18 +271,20 @@ export const AudioHandler = () => {
   if (showSoundReminder) {
     return (
       <div className="fixed top-4 left-4 right-4 z-50 flex justify-center pointer-events-none">
-        <div 
-          className="bg-indigo-600 text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 pointer-events-auto animate-fade-in max-w-sm"
+        <div
+          className="sg-a sg-drop pointer-events-auto max-w-sm w-full flex items-center gap-3"
+          style={{ background: 'var(--sg-meet)', color: 'var(--sg-ink)', borderRadius: 20, padding: '12px 12px 12px 16px', fontFamily: 'var(--sg-font)', boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}
           role="alert"
         >
-          <Volume2 size={24} className="flex-shrink-0" />
+          <Volume2 size={28} className="flex-shrink-0" />
           <div className="flex-1">
-            <p className="font-medium text-sm">Turn off silent mode</p>
-            <p className="text-xs text-indigo-200">Unmute your device for the best experience</p>
+            <p style={{ fontWeight: 900, fontSize: 17, lineHeight: 1.1, margin: 0 }}>Turn off silent mode</p>
+            <p style={{ fontWeight: 700, fontSize: 13, opacity: 0.75, margin: '2px 0 0' }}>Unmute your device for the best experience</p>
           </div>
-          <button 
+          <button
             onClick={dismissReminder}
-            className="p-1 hover:bg-indigo-500 rounded-lg transition-colors flex-shrink-0"
+            className="flex-shrink-0"
+            style={{ width: 40, height: 40, borderRadius: 20, border: 0, background: 'rgba(0,0,0,0.1)', color: 'inherit', display: 'grid', placeItems: 'center', cursor: 'pointer' }}
             aria-label="Dismiss"
           >
             <X size={18} />
