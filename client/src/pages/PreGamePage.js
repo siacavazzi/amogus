@@ -1,8 +1,8 @@
 import React, { useState, useContext, useEffect, useRef, useCallback } from 'react';
 import { DataContext } from '../GameContext';
-import PlayerCard from '../components/PlayerCard';
-import { Plus, X, Check, Send, MapPin, Copy, Save, Play, LogOut, Users, ClipboardList, ToggleLeft, ToggleRight, Pencil, Zap, Wifi, Share2 } from '../signal/icons';
-import { FloatingParticles, useFloatingParticles, GlowingOrb, GridOverlay } from '../components/ui';
+import { Plus, X, Check, Send, MapPin, Copy, Save, Play, LogOut, ToggleLeft, ToggleRight, Pencil, Share2 } from '../signal/icons';
+import { Face } from '../signal';
+import '../signal/host.css';
 import { buildRoomInviteUrl } from '../utils/inviteLinks';
 
 function sameLocations(left, right) {
@@ -26,9 +26,6 @@ function PreGamePage() {
     const { socket, roomCode, players, taskLocations, running, setTaskEntry, isRoomCreator, lobbyState } = useContext(DataContext);
     const [activeTab, setActiveTab] = useState('players'); // 'players' or 'tasks'
     const [showContent, setShowContent] = useState(false);
-    
-    // Use shared floating particles hook
-    const particles = useFloatingParticles(15, 'default');
     
     // Debug logging for host status
     useEffect(() => {
@@ -530,171 +527,85 @@ function PreGamePage() {
 
     if (!players || players.length === 0) {
         return (
-            <div className="fixed inset-0 flex items-center justify-center bg-gray-950 p-6">
-                <div className="text-center text-gray-400">
-                    <div className="w-8 h-8 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className="text-lg">Waiting for players...</p>
+            <div className="sg-screen sg-round">
+                <div className="sg-center">
+                    <span className="hs-dot" style={{ width: 16, height: 16, background: '#fff' }} aria-hidden="true" />
+                    <p className="sg-big sg-h3">Waiting for players...</p>
                 </div>
             </div>
         );
     }
 
+    // Empty seats fill out the last row of the roll call so the grid reads as a room with space.
+    const openSeats = players.length < 9 ? (3 - (players.length % 3)) % 3 : 0;
+
     return (
-        <div className="fixed inset-0 bg-gray-950 overflow-hidden">
-            {/* Animated background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-indigo-950/50 via-gray-950 to-purple-950/30"></div>
-            
-            {/* Floating particles */}
-            <FloatingParticles particles={particles} />
-            
-            {/* Glowing orbs */}
-            <GlowingOrb top="80px" left="calc(100% - 296px)" size="256px" color="bg-indigo-600/10" delay={0} />
-            <GlowingOrb top="calc(100% - 352px)" left="40px" size="192px" color="bg-purple-600/10" delay={1} />
-            
-            {/* Grid overlay */}
-            <GridOverlay color="rgba(255,255,255,0.1)" size={50} opacity={0.03} />
+        <div className="sg-screen sg-round hs hs-lobby">
+            <div className={`hs-wrap hs-lobby__scroll ${showContent ? 'sg-a sg-rise' : ''}`}>
+                <div className="hs-bar">
+                    <span className="hs-live"><span className="hs-dot" aria-hidden="true" />Live</span>
+                    <button type="button" onClick={handleLeaveRoom} className="hs-round" title="Leave room" aria-label="Leave room">
+                        <LogOut size={20} />
+                    </button>
+                </div>
 
-            {/* Scrollable content */}
-            <div className="relative z-10 h-full overflow-y-auto pb-32">
-                <div className={`max-w-2xl mx-auto px-4 pt-4 transition-all duration-700 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-                    
-                {/* Room Code Display */}
+                {/* Room code: tap to copy, invite to share */}
                 {roomCode && (
-                    <div className="mb-4">
-                        {/* Code bar */}
-                        <div className="flex justify-center mb-3">
-                            <div className="bg-gray-900/80 backdrop-blur-xl border border-gray-800/80 rounded-2xl px-5 py-3 flex items-center gap-3">
-                                {/* Live indicator */}
-                                <div className="flex items-center gap-2">
-                                    <div className="relative">
-                                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                        <div className="absolute inset-0 w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
-                                    </div>
-                                    <span className="text-green-400 text-xs font-medium uppercase tracking-wider">Live</span>
-                                </div>
-                                
-                                <div className="w-px h-6 bg-gray-700"></div>
-                                
-                                {/* Room code */}
-                                <div className="flex items-center gap-2">
-                                    <span className="text-gray-500 text-sm">Room</span>
-                                    <span className="text-2xl font-mono font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent tracking-widest">
-                                        {roomCode}
-                                    </span>
-                                </div>
-                                
-                                <button
-                                    onClick={copyRoomCode}
-                                    className="p-1.5 hover:bg-gray-800 rounded-xl transition-all group"
-                                    title="Copy room code"
-                                    aria-label="Copy room code"
-                                >
-                                    {roomCodeCopied ? (
-                                        <Check className="text-green-400" size={16} />
-                                    ) : (
-                                        <Copy className="text-gray-500 group-hover:text-indigo-400 transition-colors" size={16} />
-                                    )}
-                                </button>
-
-                                <div className="w-px h-6 bg-gray-700"></div>
-                                
-                                <button
-                                    onClick={handleLeaveRoom}
-                                    className="p-1.5 hover:bg-red-500/10 rounded-xl transition-all group"
-                                    title="Leave room"
-                                >
-                                    <LogOut className="text-gray-500 group-hover:text-red-400 transition-colors" size={16} />
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Prominent invite button */}
-                        <button
-                            onClick={shareInviteLink}
-                            className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-2xl font-semibold transition-all text-sm
-                                bg-gradient-to-r from-indigo-600 to-purple-600 text-white
-                                hover:from-indigo-500 hover:to-purple-500
-                                active:scale-[0.98]
-                                shadow-lg shadow-indigo-900/40"
-                            aria-label="Invite players to room"
-                        >
-                            {inviteShared ? (
-                                <>
-                                    <Check size={18} />
-                                    Link copied!
-                                </>
-                            ) : (
-                                <>
-                                    <Share2 size={18} />
-                                    Invite Players
-                                </>
-                            )}
+                    <div style={{ display: 'grid', gap: 14 }}>
+                        <button type="button" onClick={copyRoomCode} className="hs-code" title="Copy room code" aria-label="Copy room code">
+                            <span className="hs-label">Room code</span>
+                            <span className="hs-code__value">{roomCode}</span>
+                            <span className="hs-code__tap" aria-live="polite">
+                                {roomCodeCopied ? <><Check size={16} /> Copied</> : <><Copy size={16} /> Tap to copy</>}
+                            </span>
+                        </button>
+                        <button type="button" onClick={shareInviteLink} className="sg-btn sg-btn-ghost" aria-label="Invite players to room">
+                            {inviteShared ? <><Check size={22} /> Link copied!</> : <><Share2 size={22} /> Invite Players</>}
                         </button>
                     </div>
                 )}
 
-                {/* Tab Navigation */}
-                <div className="flex justify-center mb-6">
-                    <div className="bg-gray-900/60 backdrop-blur-xl border border-gray-800/60 rounded-2xl p-1.5 flex gap-1.5">
-                        <button
-                            onClick={() => setActiveTab('players')}
-                            className={`px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all font-medium ${
-                                activeTab === 'players' 
-                                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg' 
-                                    : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
-                            }`}
-                        >
-                            <Users size={18} />
-                            <span>Players ({players.length})</span>
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('tasks')}
-                            className={`px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all font-medium ${
-                                activeTab === 'tasks' 
-                                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg' 
-                                    : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
-                            }`}
-                        >
-                            <ClipboardList size={18} />
-                            <span>Tasks ({tasks.length})</span>
-                        </button>
-                    </div>
+                <div className="hs-tabs" role="group" aria-label="Lobby view">
+                    <button type="button" className="hs-tab" aria-pressed={activeTab === 'players'} onClick={() => setActiveTab('players')}
+                        aria-label={`Players (${players.length})`}>
+                        <span className="hs-tab__label">Players</span>
+                        <span className="hs-tab__num">{players.length}</span>
+                    </button>
+                    <button type="button" className="hs-tab" aria-pressed={activeTab === 'tasks'} onClick={() => setActiveTab('tasks')}
+                        aria-label={`Tasks (${tasks.length})`}>
+                        <span className="hs-tab__label">Tasks</span>
+                        <span className="hs-tab__num">{tasks.length}</span>
+                    </button>
                 </div>
 
                 {/* ========== PLAYERS TAB ========== */}
                 {activeTab === 'players' && (
                     <>
-                        {/* Players Grid - 2 columns on mobile */}
-                        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3">
+                        <ul className="hs-roll" aria-label="Players in the room">
                             {players.map((player, index) => (
-                                <div 
-                                    key={player.player_id || player.id || index}
-                                    className="transition-all duration-500"
-                                    style={{ 
-                                        animationDelay: `${index * 50}ms`,
-                                        animation: showContent ? 'fadeInScale 0.5s ease-out forwards' : 'none'
-                                    }}
-                                >
-                                    <PlayerCard player={player} />
-                                </div>
+                                <li key={player.player_id || player.id || index} className="sg-a sg-pop" style={{ animationDelay: `${Math.min(index, 8) * 60}ms` }}>
+                                    <Face player={player} size={84} className="hs-roll__face" />
+                                    <span className="hs-roll__name">{player.username}</span>
+                                    {player.player_id === playerId && <span className="hs-roll__you">You</span>}
+                                </li>
                             ))}
-                        </div>
-                        
-                        {/* Waiting message */}
+                            {Array.from({ length: openSeats }, (_, i) => (
+                                <li key={`open-${i}`} aria-hidden="true">
+                                    <span className="hs-roll__empty"><Plus size={26} /></span>
+                                    <span className="hs-roll__emptyname">Open seat</span>
+                                </li>
+                            ))}
+                        </ul>
+
                         {players.length < 4 && (
-                            <div className="mt-6 text-center">
-                                <div className="inline-flex items-center gap-2 bg-gray-900/60 backdrop-blur-sm border border-gray-800/60 rounded-full px-4 py-2">
-                                    <Wifi className="text-indigo-400 animate-pulse" size={16} />
-                                    <span className="text-gray-400 text-sm">Waiting for more players to join...</span>
-                                </div>
-                            </div>
+                            <p className="hs-hint hs-muted">Waiting for more players to join...</p>
                         )}
 
                         {/* 3-player rounds use last-stand rules (server: Game.assignRoles) */}
                         {players.length === 3 && (
-                            <div data-testid="small-group-note" className="mt-4 mx-auto max-w-md bg-gray-900/60 border border-amber-500/30 rounded-xl px-4 py-3 text-sm text-gray-300">
-                                <p className="font-semibold text-amber-300">Best with 4 or more players</p>
-                                <p className="mt-1 text-gray-400">
+                            <div data-testid="small-group-note" className="hs-panel hs-panel--tight">
+                                <p className="hs-title" style={{ fontSize: 20 }}>Best with 4 or more players</p>
+                                <p className="sg-small" style={{ opacity: 0.85, fontWeight: 600, fontSize: 15, lineHeight: 1.35 }}>
                                     With 3, it&rsquo;s a last stand: once it&rsquo;s down to one crewmate and the intruder, there are no more meetings.
                                     The crewmate wins by finishing 3 more tasks. The intruder wins by eliminating them.
                                 </p>
@@ -706,269 +617,128 @@ function PreGamePage() {
                 {/* ========== TASKS TAB ========== */}
                 {activeTab === 'tasks' && (
                     <>
-                        {/* ----- Compact header card -----
-                            Combines: list name (editable), task list code,
-                            save controls, collaborative-mode toggle, and
-                            auto-save status — all in one bar so the page
-                            doesn't open with 3+ stacked controls. */}
-                        <div className="bg-gray-900/60 backdrop-blur-xl border border-gray-800/60 rounded-2xl p-3 mb-4">
-                            <div className="flex items-center gap-2 flex-wrap">
-                                <ClipboardList size={16} className="text-indigo-400 flex-shrink-0 ml-1" />
-
-                                {/* Name display / inline edit */}
+                        {/* List name, task list code, save controls and auto-save status */}
+                        <div className="hs-panel hs-panel--tight">
+                            <div className="hs-listhead">
                                 {!taskListCode && canSaveTaskList && (
-                                    <input
-                                        type="text"
-                                        value={taskListName}
-                                        onChange={(e) => setTaskListName(e.target.value)}
-                                        placeholder="Name your task list…"
-                                        className="flex-1 min-w-[140px] px-3 py-1.5 bg-gray-800/60 border border-gray-700/60 rounded-lg text-gray-100 text-sm focus:outline-none focus:border-indigo-500/60 transition-colors"
-                                    />
-                                )}
-                                {taskListCode && !isEditingName && (
-                                    <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                                        <span className="text-white text-sm font-medium truncate">
-                                            {taskListName || 'Untitled list'}
-                                        </span>
-                                        {canSaveTaskList && isTaskListOwner && (
-                                            <button
-                                                onClick={() => setIsEditingName(true)}
-                                                className="p-1 text-gray-500 hover:text-indigo-400 transition-colors flex-shrink-0"
-                                                title="Rename"
-                                            >
-                                                <Pencil size={11} />
-                                            </button>
-                                        )}
-                                        {!isTaskListOwner && (
-                                            <span className="text-[10px] uppercase tracking-wider text-gray-500 bg-gray-800/60 px-1.5 py-0.5 rounded">
-                                                copy
-                                            </span>
-                                        )}
+                                    <div className="hs-inline" style={{ width: '100%' }}>
+                                        <input
+                                            type="text"
+                                            value={taskListName}
+                                            onChange={(e) => setTaskListName(e.target.value)}
+                                            placeholder="Name your task list…"
+                                            aria-label="Task list name"
+                                            className="hs-input"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={handleSaveTaskList}
+                                            disabled={isSaving || !taskListName.trim() || tasks.length === 0}
+                                            className="sg-btn sg-btn-line hs-btn-sm"
+                                            title={tasks.length === 0 ? 'Add tasks first' : !taskListName.trim() ? 'Enter a name first' : 'Save and get a code'}
+                                        >
+                                            <Save size={18} />
+                                            <span>{isSaving ? '…' : 'Save'}</span>
+                                        </button>
                                     </div>
                                 )}
+                                {taskListCode && !isEditingName && (
+                                    <>
+                                        <span className="hs-listhead__name">{taskListName || 'Untitled list'}</span>
+                                        {canSaveTaskList && isTaskListOwner && (
+                                            <button type="button" onClick={() => setIsEditingName(true)} className="hs-round" style={{ width: 40, height: 40 }} title="Rename" aria-label="Rename task list">
+                                                <Pencil size={16} />
+                                            </button>
+                                        )}
+                                        {!isTaskListOwner && <span className="hs-tag">copy</span>}
+                                    </>
+                                )}
                                 {taskListCode && isEditingName && canSaveTaskList && (
-                                    <div className="flex items-center gap-1.5 flex-1 min-w-[140px]">
+                                    <div className="hs-inline" style={{ flex: 1, minWidth: 200 }}>
                                         <input
                                             type="text"
                                             value={taskListName}
                                             autoFocus
+                                            aria-label="Task list name"
                                             onChange={(e) => setTaskListName(e.target.value)}
                                             onKeyDown={(e) => {
                                                 if (e.key === 'Enter') { setIsEditingName(false); handleSaveTaskList(); }
                                                 if (e.key === 'Escape') setIsEditingName(false);
                                             }}
-                                            className="flex-1 min-w-0 px-3 py-1.5 bg-gray-800/60 border border-indigo-500/60 rounded-lg text-gray-100 text-sm focus:outline-none"
+                                            className="hs-input"
                                         />
-                                        <button
-                                            onClick={() => { setIsEditingName(false); handleSaveTaskList(); }}
-                                            className="flex items-center gap-1 px-2.5 py-1.5 bg-gradient-to-r from-indigo-600 to-indigo-700 rounded-lg text-xs font-medium hover:from-indigo-500 hover:to-indigo-600 transition-all flex-shrink-0"
-                                            title="Done"
-                                        >
-                                            <Check size={12} />
-                                            <span>Done</span>
+                                        <button type="button" onClick={() => { setIsEditingName(false); handleSaveTaskList(); }} className="sg-btn sg-btn-line hs-btn-sm" title="Done">
+                                            <Check size={18} /> <span>Done</span>
                                         </button>
                                     </div>
                                 )}
-
-                                {/* Code chip — click to copy */}
                                 {taskListCode && (
-                                    <button
-                                        onClick={copyTaskListCode}
-                                        className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-800/60 border border-gray-700/60 rounded-lg hover:border-indigo-500/50 transition-colors flex-shrink-0"
-                                        title="Copy task list code"
-                                    >
-                                        <span className="font-mono text-xs font-bold text-indigo-400">
-                                            {taskListCode}
-                                        </span>
-                                        {codeCopied ? (
-                                            <Check size={12} className="text-green-400" />
-                                        ) : (
-                                            <Copy size={12} className="text-gray-500" />
-                                        )}
-                                    </button>
-                                )}
-
-                                {/* Save / Save-as-new buttons */}
-                                {canSaveTaskList && !taskListCode && (
-                                    <button
-                                        onClick={handleSaveTaskList}
-                                        disabled={isSaving || !taskListName.trim() || tasks.length === 0}
-                                        className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-indigo-600 to-indigo-700 rounded-lg text-xs font-medium hover:from-indigo-500 hover:to-indigo-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex-shrink-0"
-                                        title={tasks.length === 0 ? 'Add tasks first' : !taskListName.trim() ? 'Enter a name first' : 'Save and get a code'}
-                                    >
-                                        <Save size={12} />
-                                        <span>{isSaving ? '…' : 'Save'}</span>
+                                    <button type="button" onClick={copyTaskListCode} className="hs-chipbtn" title="Copy task list code">
+                                        <span>{taskListCode}</span>
+                                        {codeCopied ? <Check size={16} /> : <Copy size={16} />}
                                     </button>
                                 )}
                                 {taskListCode && !isTaskListOwner && (
-                                    <button
-                                        onClick={handleSaveAsNew}
-                                        disabled={isSaving || tasks.length === 0}
-                                        className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg text-xs font-medium hover:from-green-500 hover:to-emerald-500 disabled:opacity-40 transition-all flex-shrink-0"
-                                        title="Save as your own copy"
-                                    >
-                                        <Save size={12} />
+                                    <button type="button" onClick={handleSaveAsNew} disabled={isSaving || tasks.length === 0} className="sg-btn sg-btn-line hs-btn-sm hs-btn-auto" title="Save as your own copy">
+                                        <Save size={18} />
                                         <span>{isSaving ? '…' : 'Save copy'}</span>
                                     </button>
                                 )}
                             </div>
-
-                            {/* Auto-save status (subtle, top-right of next row) */}
                             {taskListCode && isTaskListOwner && (
-                                <div className="flex justify-end pt-2">
-                                    <span className="text-[11px] text-gray-500 flex items-center gap-1">
-                                        {isSaving ? (
-                                            <>
-                                                <div className="w-2 h-2 border border-indigo-400 border-t-transparent rounded-full animate-spin" />
-                                                Saving…
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Check size={11} className="text-green-400" />
-                                                Auto-saved
-                                            </>
-                                        )}
-                                    </span>
-                                </div>
+                                <p className="sg-small" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                    {isSaving ? 'Saving…' : <><Check size={14} /> Auto-saved</>}
+                                </p>
                             )}
                         </div>
 
-                        {/* ----- Collaborative-mode toggle (host only) -----
-                            Big, prominent on/off button so the state is
-                            unmistakable. */}
+                        {/* Collaborative mode (host only) */}
                         {isHost && (
                             <button
+                                type="button"
                                 onClick={handleToggleCollaborativeMode}
-                                className={`w-full mb-4 flex items-center justify-between gap-3 px-4 py-3 rounded-2xl border-2 transition-all ${
-                                    collaborativeMode
-                                        ? 'bg-green-500/15 border-green-400/60 hover:bg-green-500/20'
-                                        : 'bg-gray-900/60 border-gray-700/60 hover:border-gray-600'
-                                }`}
+                                className="hs-switch"
+                                aria-pressed={collaborativeMode}
                                 title={collaborativeMode ? 'Tap to make host-only' : 'Tap to let everyone add tasks'}
                             >
-                                <div className="flex items-center gap-3 min-w-0">
-                                    <Users size={20} className={collaborativeMode ? 'text-green-300 flex-shrink-0' : 'text-gray-400 flex-shrink-0'} />
-                                    <div className="text-left min-w-0">
-                                        <div className="text-sm font-semibold text-white">Collaborative mode</div>
-                                        <div className="text-[11px] text-gray-400">
-                                            {collaborativeMode ? 'Everyone can add tasks' : 'Only the host can add tasks'}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider flex-shrink-0 ${
-                                    collaborativeMode
-                                        ? 'bg-green-500/30 text-green-200'
-                                        : 'bg-gray-800/80 text-gray-400'
-                                }`}>
-                                    {collaborativeMode ? (
-                                        <>
-                                            <ToggleRight size={16} />
-                                            On
-                                        </>
-                                    ) : (
-                                        <>
-                                            <ToggleLeft size={16} />
-                                            Off
-                                        </>
-                                    )}
-                                </div>
+                                <span className="hs-switch__text">
+                                    <b>Collaborative mode</b>
+                                    <span>{collaborativeMode ? 'Everyone can add tasks' : 'Only the host can add tasks'}</span>
+                                </span>
+                                <span className="hs-switch__state">
+                                    {collaborativeMode ? <><ToggleRight size={18} /> On</> : <><ToggleLeft size={18} /> Off</>}
+                                </span>
                             </button>
                         )}
 
-                        {/* ----- Locations chips bar -----
-                            Doubles as: (a) per-location progress display
-                            and (b) location picker for the next task.
-                            Tapping a chip selects that location below. */}
-                        {realLocations.length > 0 && !showLocationSetup && (
-                            <div className="mb-4">
-                                <div className="flex items-center gap-1.5 mb-2 px-1">
-                                    <MapPin size={11} className="text-gray-500" />
-                                    <span className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">Locations</span>
-                                    {canAddTasks && (
-                                        <span className="text-[10px] text-gray-600">· tap to pick for next task</span>
-                                    )}
-                                </div>
-                                <div className="flex flex-wrap gap-1.5">
-                                    {realLocations.map(loc => {
-                                        const count = tasksByLocation[loc]?.length || 0;
-                                        const enough = count >= MIN_TASKS_PER_LOCATION;
-                                        const selected = selectedLocation === loc;
-                                        return (
-                                            <button
-                                                key={loc}
-                                                onClick={() => canAddTasks && setSelectedLocation(loc)}
-                                                disabled={!canAddTasks}
-                                                className={`px-2.5 py-1.5 rounded-lg text-xs border flex items-center gap-1.5 transition-all ${
-                                                    selected
-                                                        ? 'bg-indigo-500/20 border-indigo-400/70 text-white ring-1 ring-indigo-400/40'
-                                                        : enough
-                                                            ? 'bg-green-500/10 border-green-500/30 text-green-300 hover:border-green-400/60'
-                                                            : 'bg-yellow-500/10 border-yellow-500/30 text-yellow-300 hover:border-yellow-400/60'
-                                                } ${!canAddTasks ? 'cursor-default opacity-70' : ''}`}
-                                            >
-                                                <MapPin size={11} />
-                                                <span className="font-medium">{loc}</span>
-                                                <span className={`font-mono text-[10px] ${enough ? 'text-green-400' : 'text-yellow-400/90'}`}>
-                                                    {count}/{MIN_TASKS_PER_LOCATION}
-                                                </span>
-                                                {enough && <Check size={10} />}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* ----- Inline location editor (host only) -----
-                            Replaces the old full-page overlay with a
-                            compact, dismissable card. */}
+                        {/* Location editor (host only) */}
                         {showLocationSetup && canEditLocations && (
-                            <div className="bg-gray-900/60 backdrop-blur-xl border border-indigo-500/40 rounded-2xl p-4 mb-4">
-                                <div className="flex items-center justify-between mb-2">
-                                    <div className="flex items-center gap-2">
-                                        <MapPin className="text-indigo-400" size={16} />
-                                        <h3 className="text-sm font-bold text-white">
-                                            {needsLocationSetup ? 'Set up locations' : 'Edit locations'}
-                                        </h3>
-                                    </div>
+                            <div className="hs-panel">
+                                <div className="hs-bar" style={{ minHeight: 0 }}>
+                                    <h3 className="hs-title">{needsLocationSetup ? 'Set up locations' : 'Edit locations'}</h3>
                                     {!needsLocationSetup && (
-                                        <button
-                                            onClick={() => setShowLocationSetup(false)}
-                                            className="p-1 text-gray-500 hover:text-white transition-colors"
-                                            title="Done"
-                                        >
-                                            <X size={14} />
+                                        <button type="button" onClick={() => setShowLocationSetup(false)} className="hs-round" title="Done" aria-label="Done">
+                                            <X size={18} />
                                         </button>
                                     )}
                                 </div>
-                                <p className="text-gray-400 text-xs mb-3">
+                                <p className="sg-small" style={{ opacity: 0.85, fontWeight: 600, fontSize: 15, lineHeight: 1.35 }}>
                                     Add at least 2 locations where tasks happen (for example, "Kitchen" and "Backyard"). Recommended: {MIN_TASKS_PER_LOCATION} tasks per location.
                                 </p>
 
                                 {realLocations.length > 0 && (
-                                    <div className="flex flex-wrap gap-1.5 mb-3">
+                                    <div className="hs-locs">
                                         {realLocations.map((loc) => {
                                             const taskCount = getTaskCountForLocation(loc);
                                             const removable = canRemoveLocation(loc);
                                             return (
-                                                <span
-                                                    key={loc}
-                                                    className="flex items-center gap-1 bg-indigo-500/20 border border-indigo-400/40 text-white px-2.5 py-1 rounded-lg text-xs"
-                                                    title={taskCount > 0 ? `${taskCount} tasks — remove tasks first to delete` : ''}
-                                                >
-                                                    <MapPin size={10} className="text-indigo-300" />
+                                                <span key={loc} title={taskCount > 0 ? `${taskCount} tasks — remove tasks first to delete` : ''}>
                                                     {loc}
-                                                    {taskCount > 0 && (
-                                                        <span className="text-indigo-300 text-[10px]">({taskCount})</span>
-                                                    )}
+                                                    {taskCount > 0 && <small style={{ opacity: 0.7 }}>({taskCount})</small>}
                                                     {realLocations.length > 2 && (
-                                                        <button
-                                                            onClick={() => removeLocation(loc)}
-                                                            disabled={!removable}
-                                                            className={`ml-0.5 ${removable ? 'text-indigo-200 hover:text-white' : 'text-gray-500 cursor-not-allowed opacity-50'}`}
-                                                            title={!removable && taskCount > 0 ? 'Remove tasks first' : 'Remove'}
-                                                        >
-                                                            <X size={11} />
+                                                        <button type="button" onClick={() => removeLocation(loc)} disabled={!removable}
+                                                            title={!removable && taskCount > 0 ? 'Remove tasks first' : 'Remove'} aria-label={`Remove ${loc}`}>
+                                                            <X size={14} />
                                                         </button>
                                                     )}
                                                 </span>
@@ -977,288 +747,203 @@ function PreGamePage() {
                                     </div>
                                 )}
 
-                                <div className="flex gap-2">
+                                <div className="hs-inline">
                                     <input
                                         type="text"
                                         value={newLocationInput}
                                         onChange={(e) => setNewLocationInput(e.target.value)}
                                         onKeyPress={(e) => e.key === 'Enter' && addLocation()}
                                         placeholder="Add a location…"
-                                        className="flex-1 px-3 py-2 bg-gray-800/60 border border-gray-700/60 rounded-lg text-gray-100 text-sm focus:outline-none focus:border-indigo-500/50 transition-colors"
+                                        aria-label="New location"
+                                        className="hs-input"
                                     />
-                                    <button
-                                        onClick={addLocation}
-                                        disabled={!newLocationInput.trim()}
-                                        className="px-3 py-2 bg-indigo-600 rounded-lg hover:bg-indigo-500 transition-colors disabled:opacity-40"
-                                        title="Add location"
-                                    >
-                                        <Plus size={16} className="text-white" />
+                                    <button type="button" onClick={addLocation} disabled={!newLocationInput.trim()} className="sg-btn sg-btn-line hs-btn-sm" title="Add location" aria-label="Add location">
+                                        <Plus size={20} />
                                     </button>
-                                    {realLocations.length >= 2 && needsLocationSetup && (
-                                        <button
-                                            onClick={confirmLocations}
-                                            className="px-3 py-2 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg text-xs font-medium flex items-center gap-1.5 hover:from-green-500 hover:to-emerald-500 transition-colors"
-                                        >
-                                            <Check size={14} />
-                                            Done
-                                        </button>
-                                    )}
                                 </div>
-
+                                {realLocations.length >= 2 && needsLocationSetup && (
+                                    <button type="button" onClick={confirmLocations} className="sg-btn sg-btn-white hs-btn-sm">
+                                        <Check size={20} /> Done
+                                    </button>
+                                )}
                                 {realLocations.length < 2 && (
-                                    <p className="text-yellow-400/80 text-xs mt-2 text-center">
+                                    <p className="hs-hint" style={{ color: 'var(--sg-meet)' }}>
                                         Add {2 - realLocations.length} more location{2 - realLocations.length !== 1 ? 's' : ''} to continue
                                     </p>
                                 )}
                             </div>
                         )}
 
-                        {/* Non-host waiting message while host sets up locations */}
                         {needsLocationSetup && !canEditLocations && (
-                            <div className="bg-gray-900/60 backdrop-blur-xl border border-gray-800/60 rounded-2xl p-5 mb-4 text-center">
-                                <MapPin className="text-indigo-400 mx-auto mb-2" size={28} />
-                                <p className="text-gray-300 text-sm">Waiting for host to set up locations…</p>
-                                <p className="text-gray-500 text-xs mt-1">
-                                    They need to add at least 2 locations before tasks can be created.
-                                </p>
+                            <div className="hs-panel" style={{ textAlign: 'center', justifyItems: 'center' }}>
+                                <MapPin size={30} />
+                                <p className="hs-title" style={{ fontSize: 20 }}>Waiting for host to set up locations…</p>
+                                <p className="sg-small">They need to add at least 2 locations before tasks can be created.</p>
                             </div>
                         )}
 
-                        {/* ----- Compact single-row add-task form -----
-                            Location pill (still a real <select> so all
-                            locations including 'Other' are reachable),
-                            then the input, then Send. */}
+                        {/* Add a task: location, text, send */}
                         {!showLocationSetup && canAddTasks && realLocations.length > 0 && (
-                            <div className="bg-gray-900/60 backdrop-blur-xl border border-gray-800/60 rounded-2xl p-2 mb-4">
-                                <div className="flex items-center gap-2">
-                                    <div className="flex items-center gap-1 pl-2.5 pr-1 py-1.5 bg-gray-800/60 rounded-xl flex-shrink-0 border border-gray-700/40">
-                                        <MapPin size={12} className="text-indigo-400" />
-                                        <select
-                                            value={selectedLocation}
-                                            onChange={(e) => setSelectedLocation(e.target.value)}
-                                            className="bg-transparent text-gray-100 text-sm focus:outline-none cursor-pointer pr-1 max-w-[110px]"
-                                            title="Choose a location for this task"
-                                        >
-                                            {locations.map(loc => (
-                                                <option key={loc} value={loc} className="bg-gray-800 text-gray-100">
-                                                    {loc}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                    <input
-                                        ref={inputRef}
-                                        type="text"
-                                        value={newTaskText}
-                                        onChange={(e) => setNewTaskText(e.target.value)}
-                                        onKeyPress={(e) => e.key === 'Enter' && handleAddTask()}
-                                        placeholder="Add a task… (e.g. 10 jumping jacks)"
-                                        className="flex-1 min-w-0 px-2 py-2 bg-transparent text-gray-100 focus:outline-none placeholder-gray-500 text-sm"
-                                        disabled={isSubmitting}
-                                    />
+                            <div className="hs-panel hs-panel--tight">
+                                <label className="hs-label" htmlFor="new-task-text">Add a task</label>
+                                <input
+                                    id="new-task-text"
+                                    ref={inputRef}
+                                    type="text"
+                                    value={newTaskText}
+                                    onChange={(e) => setNewTaskText(e.target.value)}
+                                    onKeyPress={(e) => e.key === 'Enter' && handleAddTask()}
+                                    placeholder="Add a task… (e.g. 10 jumping jacks)"
+                                    className="hs-input"
+                                    disabled={isSubmitting}
+                                />
+                                <div className="hs-inline">
+                                    <select
+                                        value={selectedLocation}
+                                        onChange={(e) => setSelectedLocation(e.target.value)}
+                                        className="hs-select"
+                                        style={{ flex: 1, maxWidth: 'none' }}
+                                        title="Choose a location for this task"
+                                        aria-label="Location for this task"
+                                    >
+                                        {locations.map(loc => (
+                                            <option key={loc} value={loc}>{loc}</option>
+                                        ))}
+                                    </select>
                                     <button
+                                        type="button"
                                         onClick={handleAddTask}
                                         disabled={!newTaskText.trim() || isSubmitting}
-                                        className="p-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 rounded-xl hover:from-indigo-500 hover:to-indigo-600 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
+                                        className="sg-btn sg-btn-line hs-btn-sm"
                                         title="Add task"
                                     >
-                                        <Send size={16} className="text-white" />
+                                        <Send size={18} /> Add
                                     </button>
                                 </div>
                             </div>
                         )}
 
-                        {/* Read-only message when collab mode is off and you're not the host */}
                         {!showLocationSetup && !canAddTasks && (
-                            <div className="bg-gray-900/60 backdrop-blur-xl border border-gray-800/60 rounded-2xl p-4 mb-4 text-center">
-                                <p className="text-gray-300 text-sm">👀 Only the host can add tasks right now</p>
-                                <p className="text-gray-500 text-xs mt-1">
-                                    Ask the host to enable collaborative mode if you want to help!
-                                </p>
+                            <div className="hs-panel hs-panel--tight" style={{ textAlign: 'center' }}>
+                                <p className="hs-title" style={{ fontSize: 19 }}>Only the host can add tasks right now</p>
+                                <p className="sg-small">Ask the host to turn on collaborative mode if you want to help.</p>
                             </div>
                         )}
 
-                        {/* Show all locations and the optional Other section. */}
-                        {!showLocationSetup && (
-                            <div className="space-y-3 mb-4">
-                                {locations.map((location) => {
-                                    const locationTasks = tasksByLocation[location] || [];
-                                    const isOther = location === 'Other';
-                                    const enough = !isOther && locationTasks.length >= MIN_TASKS_PER_LOCATION;
-                                    const canDelete = !isOther && canEditLocations && locationTasks.length === 0 && realLocations.length > 2;
-                                    const canShowRemove = isHost || collaborativeMode;
-                                    return (
-                                        <section key={location} aria-label={`${location} tasks`} className="bg-gray-900/60 backdrop-blur-xl border border-gray-800/60 rounded-2xl overflow-hidden">
-                                            <div className="bg-gray-800/40 px-4 py-2.5 flex justify-between items-center border-b border-gray-700/40">
-                                                <span className="font-medium text-white flex items-center gap-2 text-sm">
-                                                    <MapPin size={13} className="text-indigo-400" />
-                                                    {location}
-                                                </span>
-                                                <div className="flex items-center gap-2">
-                                                    <span className={`text-[11px] font-mono px-2 py-0.5 rounded-md flex items-center gap-1 ${
-                                                        isOther ? 'bg-gray-700/40 text-gray-300' : enough ? 'bg-green-500/15 text-green-400' : 'bg-yellow-500/15 text-yellow-400'
-                                                    }`}>
-                                                        {isOther
-                                                            ? `${locationTasks.length} task${locationTasks.length === 1 ? '' : 's'}`
-                                                            : `${locationTasks.length}/${MIN_TASKS_PER_LOCATION}`}
-                                                        {enough && <Check size={11} />}
-                                                    </span>
-                                                    {canDelete && (
-                                                        <button
-                                                            onClick={() => removeLocation(location)}
-                                                            className="flex items-center gap-1 px-2 py-1 text-[11px] font-medium text-red-300 bg-red-500/10 border border-red-500/30 rounded-md hover:bg-red-500/20 hover:text-red-200 transition-colors"
-                                                            title="Delete this location"
-                                                        >
-                                                            <X size={11} />
-                                                            Delete
+                        {/* Every location, plus the optional Other section */}
+                        {!showLocationSetup && locations.map((location) => {
+                            const locationTasks = tasksByLocation[location] || [];
+                            const isOther = location === 'Other';
+                            const enough = !isOther && locationTasks.length >= MIN_TASKS_PER_LOCATION;
+                            const canDelete = !isOther && canEditLocations && locationTasks.length === 0 && realLocations.length > 2;
+                            const canShowRemove = isHost || collaborativeMode;
+                            return (
+                                <section key={location} aria-label={`${location} tasks`} className="hs-loc">
+                                    <div className="hs-loc__head">
+                                        <span className="hs-loc__name">{location}</span>
+                                        <span className={`hs-loc__count ${!isOther && !enough ? 'hs-loc__count--short' : ''}`}>
+                                            {isOther
+                                                ? `${locationTasks.length} task${locationTasks.length === 1 ? '' : 's'}`
+                                                : `${locationTasks.length}/${MIN_TASKS_PER_LOCATION}`}
+                                            {enough && <Check size={16} />}
+                                        </span>
+                                        {canDelete && (
+                                            <button type="button" onClick={() => removeLocation(location)} className="hs-loc__del" title="Delete this location">
+                                                <X size={14} /> Delete
+                                            </button>
+                                        )}
+                                    </div>
+                                    {locationTasks.length > 0 ? (
+                                        <ul className="hs-tasks">
+                                            {locationTasks.map((task) => (
+                                                <li key={task.originalIndex} className="hs-task">
+                                                    <div className="hs-task__body">
+                                                        <p className="hs-task__text">{task.task}</p>
+                                                        {task.added_by && <p className="hs-task__by">Added by {task.added_by}</p>}
+                                                    </div>
+                                                    {canShowRemove && (
+                                                        <button type="button" onClick={() => handleRemoveTask(task.originalIndex)} className="hs-task__x" title="Remove task" aria-label="Remove task">
+                                                            <X size={18} />
                                                         </button>
                                                     )}
-                                                </div>
-                                            </div>
-                                            {locationTasks.length > 0 ? (
-                                                <div className="divide-y divide-gray-800/40">
-                                                    {locationTasks.map((task) => (
-                                                        <div
-                                                            key={task.originalIndex}
-                                                            className="px-4 py-2.5 flex items-center justify-between hover:bg-gray-800/30 transition-colors"
-                                                        >
-                                                            <div className="flex-1 min-w-0">
-                                                                <p className="text-gray-200 text-sm truncate">{task.task}</p>
-                                                                {task.added_by && (
-                                                                    <p className="text-gray-500 text-[11px]">
-                                                                        Added by {task.added_by}
-                                                                    </p>
-                                                                )}
-                                                            </div>
-                                                            {canShowRemove && (
-                                                                <button
-                                                                    onClick={() => handleRemoveTask(task.originalIndex)}
-                                                                    className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all flex-shrink-0"
-                                                                    title="Remove task"
-                                                                >
-                                                                    <X size={16} />
-                                                                </button>
-                                                            )}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            ) : (
-                                                <div className="px-4 py-3 text-center text-gray-500 text-xs">
-                                                    No tasks here yet
-                                                </div>
-                                            )}
-                                        </section>
-                                    );
-                                })}
-                            </div>
-                        )}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    ) : (
+                                        <p className="hs-empty">{isOther ? 'Optional. Tasks that fit anywhere.' : 'No tasks here yet'}</p>
+                                    )}
+                                </section>
+                            );
+                        })}
 
-                        {/* ----- Add new location (host only, at the bottom) -----
-                            Lives at the very end so it's out of the way
-                            during normal task entry but easy to find when
-                            you actually need a new location. */}
+                        {/* Add a new location (host only), at the end and out of the way */}
                         {!showLocationSetup && canEditLocations && realLocations.length > 0 && (
-                            <div className="bg-gray-900/40 backdrop-blur-xl border border-dashed border-gray-700/60 rounded-2xl p-3 mb-6">
-                                <div className="flex items-center gap-1.5 mb-2 px-1">
-                                    <Plus size={11} className="text-gray-500" />
-                                    <span className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">
-                                        Add new location
-                                    </span>
-                                </div>
-                                <div className="flex gap-2">
+                            <div className="hs-panel hs-panel--tight">
+                                <label className="hs-label" htmlFor="new-location">Add a new location</label>
+                                <div className="hs-inline">
                                     <input
+                                        id="new-location"
                                         type="text"
                                         value={newLocationInput}
                                         onChange={(e) => setNewLocationInput(e.target.value)}
                                         onKeyPress={(e) => e.key === 'Enter' && addLocation()}
                                         placeholder="e.g. Garage, Backyard…"
-                                        className="flex-1 min-w-0 px-3 py-2 bg-gray-800/60 border border-gray-700/60 rounded-lg text-gray-100 text-sm focus:outline-none focus:border-indigo-500/50 transition-colors"
+                                        className="hs-input"
                                     />
-                                    <button
-                                        onClick={addLocation}
-                                        disabled={!newLocationInput.trim()}
-                                        className="flex items-center gap-1 px-3 py-2 bg-indigo-600 rounded-lg hover:bg-indigo-500 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-sm font-medium"
-                                        title="Add location"
-                                    >
-                                        <Plus size={14} className="text-white" />
-                                        <span className="text-white">Add</span>
+                                    <button type="button" onClick={addLocation} disabled={!newLocationInput.trim()} className="sg-btn sg-btn-line hs-btn-sm" title="Add location">
+                                        <Plus size={18} /> Add
                                     </button>
                                 </div>
                             </div>
                         )}
                     </>
                 )}
-                </div>
             </div>
 
-            {/* Fixed bottom area for start game button */}
+            {/* Start game, pinned to the bottom */}
             {!running && (
-                <div className="fixed bottom-0 left-0 right-0 z-20">
-                    <div className="bg-gradient-to-t from-gray-950 via-gray-950/95 to-transparent pt-8 pb-6 px-4">
-                        <div className="max-w-md mx-auto">
-                            {canStartGame ? (
-                                <>
-                                <button
-                                    onClick={handleStartGame}
-                                    className="w-full relative group"
-                                >
-                                    <div className="absolute -inset-1 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl blur opacity-40 group-hover:opacity-60 transition-opacity"></div>
-                                    <div className="relative py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold text-lg rounded-xl shadow-lg transition-all flex items-center justify-center gap-3 group-hover:scale-[1.02]">
-                                        <Play size={24} fill="currentColor" />
-                                        <span>Start Game</span>
-                                        <Zap size={18} className="opacity-60" />
-                                    </div>
+                <div className="hs-dock">
+                    <div className="hs-dock__inner">
+                        {canStartGame ? (
+                            <>
+                                <button type="button" onClick={handleStartGame} className="sg-btn sg-btn-white hs-start">
+                                    <Play size={26} /> <span>Start Game</span>
                                 </button>
                                 {canStartTestGame && (
-                                    <p className="mt-2 text-center text-xs text-amber-300/80">
+                                    <p className="hs-hint">
                                         Only {players.length} player{players.length !== 1 ? 's' : ''} so far. Starting now runs a test game.
                                     </p>
                                 )}
-                                </>
-                            ) : isHost ? (
-                                <div className="text-center py-4 bg-gray-900/80 backdrop-blur-xl border border-gray-800/80 rounded-2xl">
-                                    <p className="text-gray-400 text-sm">
-                                        {getTasksNeededMessage()}
-                                    </p>
-                                </div>
-                            ) : (
-                                <div className="text-center py-4 bg-gray-900/80 backdrop-blur-xl border border-gray-800/80 rounded-2xl">
-                                    <div className="text-gray-400 text-sm flex items-center justify-center gap-2">
-                                        <span className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></span>
-                                        Waiting for host to start the game...
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                            </>
+                        ) : isHost ? (
+                            <p className="hs-notice" style={{ textAlign: 'center' }}>{getTasksNeededMessage()}</p>
+                        ) : (
+                            <p className="hs-notice hs-wait">
+                                <span className="hs-dot hs-dot--still" style={{ background: '#fff' }} aria-hidden="true" />
+                                Waiting for host to start the game...
+                            </p>
+                        )}
                     </div>
                 </div>
             )}
 
             {/* Test game confirmation for one or two players */}
             {showTestConfirm && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" role="dialog" aria-modal="true" aria-labelledby="test-game-title">
-                    <div className="w-full max-w-sm rounded-2xl border border-amber-500/30 bg-gray-900 p-6 shadow-2xl">
-                        <h2 id="test-game-title" className="text-lg font-bold text-white mb-2">Not enough players for a real game</h2>
-                        <p className="text-sm text-gray-300 mb-3">
+                <div className="sg-sheet-scrim" role="dialog" aria-modal="true" aria-labelledby="test-game-title">
+                    <div className="sg-sheet sg-a sg-rise">
+                        <h2 id="test-game-title" className="sg-big sg-h3">Not enough players for a real game</h2>
+                        <p style={{ margin: 0, fontWeight: 600, fontSize: 16, lineHeight: 1.4 }}>
                             Sus Party needs at least 3 players. We'll start a test game anyway so you can see how it plays.
                         </p>
-                        <p className="text-sm text-gray-400 mb-5">
+                        <p style={{ margin: 0, fontWeight: 600, fontSize: 15, lineHeight: 1.4, opacity: 0.7 }}>
                             In a test game anyone can switch between crewmate and intruder from the top of their screen. Test games don't count toward stats.
                         </p>
-                        <div className="flex flex-col gap-2">
-                            <button
-                                onClick={handleStartTestGame}
-                                className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold hover:from-amber-400 hover:to-orange-400 transition-colors"
-                            >
-                                Start test game
-                            </button>
-                            <button
-                                onClick={() => setShowTestConfirm(false)}
-                                className="w-full py-3 rounded-xl bg-gray-800 text-gray-300 font-medium hover:bg-gray-700 transition-colors"
-                            >
-                                Wait for more players
-                            </button>
-                        </div>
+                        <button type="button" onClick={handleStartTestGame} className="sg-btn sg-btn-blue">
+                            <Play size={22} /> Start test game
+                        </button>
+                        <button type="button" onClick={() => setShowTestConfirm(false)} className="sg-btn sg-btn-soft">
+                            Wait for more players
+                        </button>
                     </div>
                 </div>
             )}

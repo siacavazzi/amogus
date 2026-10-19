@@ -1,6 +1,8 @@
-/* Signal for the setup screens (home, join, lobby, game setup). These screens were built with
-   dark panels, gradients and glows; this layer flattens them onto the round's blue, swaps the
-   type to Archivo and drops the decoration, without rewriting each screen. Scoped to .sg-setup. */
+/* Signal flatten layer for the screens that still carry old Tailwind markup: the reactor's desktop
+   home (LobbyPage) and the selfie camera on the join screen (Login). It flattens dark panels,
+   gradients and glows onto the round's blue, swaps the type to Archivo and drops the decoration.
+   Scoped to .sg-setup (see SETUP_PAGES in PageController). Connecting, game config, the lobby and
+   task entry are drawn in Signal markup (signal/host.css) and no longer pass through it. */
 
 .sg-setup, .sg-setup * { font-family: var(--sg-font); }
 .sg-setup *, .sg-setup *::before, .sg-setup *::after {
@@ -81,4 +83,4 @@
 .sg-setup .fixed.inset-0[class*="z-"][class*="bg-black"] { background-color: rgba(0, 0, 0, 0.6) !important; }
 .sg-setup .fixed[class*="z-"] [class*="bg-gray-9"], .sg-setup .fixed[class*="z-"] [class*="bg-gray-8"],
 .sg-setup .fixed[class*="z-"] [class*="bg-slate-9"] { background-color: var(--sg-round-d) !important; }
-.sg-setup .sg-home__sheet h2 { color: var(--sg-ink) !important; }
+.sg-setup .sg-home__sheet h2, .sg-setup .hs-entry h2 { color: var(--sg-ink) !important; }

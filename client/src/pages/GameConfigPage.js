@@ -1,7 +1,8 @@
-import React, { useState, useContext, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import { DataContext } from '../GameContext';
 import { Users, Play, ChevronDown, ChevronUp, List, Download, Trash2, Check, LogOut, MapPin, Settings, ArrowRight, ArrowLeft, X, Zap, Copy, Sparkles, Minus, Plus } from '../signal/icons';
 import { readGameDraft, clearGameDraft } from './seo/gameDraft';
+import '../signal/host.css';
 
 const DEFAULT_CARD_DECK_COUNTS = {
     self_report: 4,
@@ -51,22 +52,6 @@ const CARD_COUNT_CONTROLS = [
     { key: 'area_denial_per_location', label: 'Area Denial / Location', description: 'Cards created for each enabled location.' },
 ];
 
-// Floating particle component
-const FloatingParticle = ({ delay, duration, size, left, color }) => (
-    <div
-        className={`absolute rounded-full ${color} pointer-events-none`}
-        style={{
-            width: size,
-            height: size,
-            left: `${left}%`,
-            bottom: '-20px',
-            animation: `floatUp ${duration}s ease-in-out infinite`,
-            animationDelay: `${delay}s`,
-            filter: 'blur(1px)',
-        }}
-    />
-);
-
 // Get or create a persistent device ID for task list ownership
 function getDeviceId() {
     let deviceId = localStorage.getItem('device_id');
@@ -85,18 +70,6 @@ function GameConfigPage() {
     const [showContent, setShowContent] = useState(false);
     const [copied, setCopied] = useState(false);
 
-    // Generate floating particles
-    const particles = useMemo(() => 
-        Array.from({ length: 12 }, (_, i) => ({
-            id: i,
-            delay: Math.random() * 8,
-            duration: 6 + Math.random() * 6,
-            size: 3 + Math.random() * 5,
-            left: Math.random() * 100,
-            color: i % 3 === 0 ? 'bg-indigo-500/30' : i % 3 === 1 ? 'bg-cyan-500/20' : 'bg-purple-500/20',
-        }))
-    , []);
-    
     const [config, setConfig] = useState({
         locations: ['Basement', '1st Floor', '2nd Floor', '3rd Floor'],
         vote_time: 180,
@@ -424,303 +397,217 @@ function GameConfigPage() {
         setStep('settings');
     };
 
-    const SliderInput = ({ label, value, onChange, min, max, step = 1, unit = '', description }) => (
-        <div className="mb-5">
-            <div className="flex justify-between items-center mb-2">
-                <label className="text-gray-300 text-sm font-medium">{label}</label>
-                <span className="text-indigo-400 font-mono font-bold bg-gray-800/50 px-2 py-1 rounded-lg">
-                    {typeof value === 'number' && value < 1 && value > 0 
-                        ? `${Math.round(value * 100)}%` 
-                        : `${value}${unit}`}
-                </span>
+    const SliderInput = ({ label, value, onChange, min, max, step = 1, unit = '', description }) => {
+        const id = `setting-${label.toLowerCase().replace(/[^a-z]+/g, '-')}`;
+        return (
+            <div className="hs-slider">
+                <div className="hs-slider__top">
+                    <label htmlFor={id}>{label}</label>
+                    <b>
+                        {typeof value === 'number' && value < 1 && value > 0
+                            ? `${Math.round(value * 100)}%`
+                            : `${value}${unit}`}
+                    </b>
+                </div>
+                <input
+                    id={id}
+                    type="range"
+                    min={min}
+                    max={max}
+                    step={step}
+                    value={value}
+                    onChange={(e) => onChange(parseFloat(e.target.value))}
+                    className="hs-range"
+                />
+                {description && <small>{description}</small>}
             </div>
-            <input
-                type="range"
-                min={min}
-                max={max}
-                step={step}
-                value={value}
-                onChange={(e) => onChange(parseFloat(e.target.value))}
-                className="w-full h-2 bg-gray-700/50 rounded-lg appearance-none cursor-pointer accent-indigo-500"
-            />
-            {description && (
-                <p className="text-gray-500 text-xs mt-1.5">{description}</p>
-            )}
+        );
+    };
+
+    const CountStepper = ({ label, description, value, onDecrease, onIncrease }) => (
+        <div className="hs-stepper">
+            <div className="hs-stepper__text">
+                <b>{label}</b>
+                <span>{description}</span>
+            </div>
+            <button type="button" onClick={onDecrease} aria-label={`Decrease ${label}`} className="hs-round">
+                <Minus size={18} />
+            </button>
+            <span className="hs-stepper__val">{value}</span>
+            <button type="button" onClick={onIncrease} aria-label={`Increase ${label}`} className="hs-round">
+                <Plus size={18} />
+            </button>
         </div>
     );
 
-    const CountStepper = ({ label, description, value, onDecrease, onIncrease }) => (
-        <div className="flex items-center justify-between gap-3 py-3 border-b border-gray-800/50 last:border-b-0">
-            <div className="min-w-0">
-                <div className="text-gray-300 text-sm font-medium">{label}</div>
-                <div className="text-gray-500 text-xs mt-0.5">{description}</div>
-            </div>
-            <div className="flex items-center gap-2 shrink-0">
-                <button
-                    type="button"
-                    onClick={onDecrease}
-                    aria-label={`Decrease ${label}`}
-                    className="w-9 h-9 rounded-lg bg-gray-800/80 border border-gray-700 text-gray-300 hover:bg-gray-700 flex items-center justify-center"
-                >
-                    <Minus size={16} />
-                </button>
-                <span className="w-10 text-center text-indigo-300 font-mono font-bold">{value}</span>
-                <button
-                    type="button"
-                    onClick={onIncrease}
-                    aria-label={`Increase ${label}`}
-                    className="w-9 h-9 rounded-lg bg-gray-800/80 border border-gray-700 text-gray-300 hover:bg-gray-700 flex items-center justify-center"
-                >
-                    <Plus size={16} />
-                </button>
-            </div>
-        </div>
-    );
+    const realLocationsOf = (list) => (list?.locations || []).filter((l) => l !== 'Other');
 
     // Step 1: Task List Selection
     const renderTaskListStep = () => (
         <>
-            <div className="text-center mb-8">
-                <div className="inline-flex items-center justify-center gap-3 mb-3">
-                    <div className="p-3 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-2xl border border-indigo-500/30">
-                        <List size={28} className="text-indigo-400" />
-                    </div>
-                </div>
-                <h1 className="text-2xl font-bold text-white mb-2">Task List</h1>
-                <p className="text-gray-400 text-sm">
-                    Load a saved task list, or skip to create tasks with your group
-                </p>
+            <div style={{ display: 'grid', gap: 10 }}>
+                <h1 className="sg-big sg-h1">Task list</h1>
+                <p className="sg-lede hs-muted">Load a saved task list, or skip to create tasks with your group</p>
             </div>
 
             {generatedDraft && (
-                <div className="border border-cyan-500/30 bg-cyan-500/10 rounded-xl p-4 mb-4">
-                    <h2 className="text-white font-semibold">Your generated task pack</h2>
-                    <p className="text-gray-300 text-sm mt-2">{generatedDraft.tasks.length} tasks across {generatedDraft.locations.length} areas for {generatedDraft.playerCount} players.</p>
-                    <p className="text-gray-400 text-sm mt-2">Import the list, review its tasks, then apply it to this room.</p>
-                    <button onClick={importGeneratedTasks} disabled={taskListLoading}
-                        className="mt-3 px-4 py-2 bg-cyan-600 text-white rounded-lg disabled:opacity-50">
+                <div className="hs-panel">
+                    <h2 className="hs-title">Your generated task pack</h2>
+                    <p className="sg-lede">{generatedDraft.tasks.length} tasks across {generatedDraft.locations.length} areas for {generatedDraft.playerCount} players.</p>
+                    <p className="sg-small">Import the list, review its tasks, then apply it to this room.</p>
+                    <button type="button" onClick={importGeneratedTasks} disabled={taskListLoading} className="sg-btn sg-btn-line">
                         {taskListLoading ? 'Import in progress…' : 'Import generated tasks'}
                     </button>
-                    {generatedImportError && <p role="alert" className="text-red-300 mt-2">{generatedImportError}</p>}
+                    {generatedImportError && <p role="alert" className="hs-error">{generatedImportError}</p>}
                 </div>
             )}
 
             {showStarterTemplatePromo && !generatedDraft && (
-                <div className="bg-gradient-to-r from-indigo-500/10 via-gray-900/80 to-cyan-500/10 backdrop-blur-xl border border-indigo-500/20 rounded-xl p-3 mb-4 shadow-lg shadow-indigo-950/20">
-                    <div className="flex items-start gap-3">
-                        <div className="p-2 bg-indigo-500/15 rounded-xl border border-indigo-500/20 shrink-0">
-                            <Sparkles size={16} className="text-indigo-300" />
+                <div className="hs-panel">
+                    <div className="hs-bar" style={{ minHeight: 0, alignItems: 'flex-start' }}>
+                        <div style={{ display: 'grid', gap: 4, minWidth: 0 }}>
+                            <h2 className="hs-title" style={{ fontSize: 28 }}>{starterTemplate.name}</h2>
+                            <p className="sg-lede">{starterTemplate.task_count} tasks · {starterLocationCount} locations</p>
                         </div>
-
-                        <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between gap-2">
-                                <div className="min-w-0">
-                                    <p className="text-indigo-300/80 text-[11px] font-semibold uppercase tracking-[0.22em] mb-1">Example List</p>
-                                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                                        <h2 className="text-white text-sm font-semibold">{starterTemplate.name}</h2>
-                                        <span className="text-gray-500 text-xs">
-                                            {starterTemplate.task_count} tasks • {starterLocationCount} locations
-                                        </span>
-                                    </div>
-                                    <p className="text-gray-400 text-xs mt-1">{starterTemplate.description}</p>
-                                </div>
-
-                                <button
-                                    onClick={() => setStarterTemplateDismissed(true)}
-                                    className="p-1.5 text-gray-500 hover:text-gray-300 hover:bg-gray-800/80 rounded-lg transition-all shrink-0"
-                                    title="Dismiss example list"
-                                    aria-label="Dismiss example list"
-                                >
-                                    <X size={14} />
-                                </button>
-                            </div>
-
-                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-3">
-                                <button
-                                    onClick={useStarterTaskList}
-                                    disabled={taskListLoading}
-                                    className="px-3.5 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg text-white text-sm font-semibold hover:from-indigo-500 hover:to-purple-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-                                >
-                                    Add Example List
-                                </button>
-                                <p className="text-gray-500 text-xs">
-                                    A starting point you can fully edit. Add, remove, or rewrite tasks to fit your space.
-                                </p>
-                            </div>
-                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setStarterTemplateDismissed(true)}
+                            className="hs-round"
+                            title="Dismiss example list"
+                            aria-label="Dismiss example list"
+                        >
+                            <X size={18} />
+                        </button>
                     </div>
+                    {starterTemplate.description && <p className="sg-small">{starterTemplate.description}</p>}
+                    <button type="button" onClick={useStarterTaskList} disabled={taskListLoading} className="sg-btn sg-btn-line">
+                        <Plus size={22} /> Add Example List
+                    </button>
+                    <p className="sg-small">A starting point you can fully edit. Add, remove, or rewrite tasks to fit your space.</p>
                 </div>
             )}
 
-            <div className="bg-gray-900/60 backdrop-blur-xl border border-gray-800/80 rounded-2xl p-5 mb-5">
-                {/* Load by code */}
-                <div className="mb-5">
-                    <label className="text-gray-300 text-sm block mb-2 font-medium">Load by Code</label>
-                    <div className="flex gap-2">
-                        <input
-                            type="text"
-                            value={loadTaskListCode}
-                            onChange={(e) => setLoadTaskListCode(e.target.value.toUpperCase())}
-                            onKeyPress={(e) => e.key === 'Enter' && loadTaskListByCode()}
-                            placeholder="Enter 6-letter code..."
-                            maxLength={6}
-                            className="flex-1 px-4 py-3 bg-gray-800/80 border-2 border-gray-700/80 rounded-xl text-gray-100 text-lg focus:outline-none focus:border-indigo-500/50 font-mono uppercase text-center tracking-widest transition-colors"
-                        />
-                        <button
-                            onClick={loadTaskListByCode}
-                            disabled={taskListLoading || loadTaskListCode.length < 6}
-                            className="px-4 py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 rounded-xl hover:from-indigo-500 hover:to-indigo-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            <Download size={20} className="text-white" />
-                        </button>
-                    </div>
+            {/* Load by code */}
+            <div className="hs-panel">
+                <label className="hs-label" htmlFor="task-list-code">Load by code</label>
+                <div className="hs-inline">
+                    <input
+                        id="task-list-code"
+                        type="text"
+                        value={loadTaskListCode}
+                        onChange={(e) => setLoadTaskListCode(e.target.value.toUpperCase())}
+                        onKeyPress={(e) => e.key === 'Enter' && loadTaskListByCode()}
+                        placeholder="6-letter code"
+                        maxLength={6}
+                        autoCapitalize="characters"
+                        spellCheck="false"
+                        className="hs-input hs-input--code"
+                    />
+                    <button
+                        type="button"
+                        onClick={loadTaskListByCode}
+                        disabled={taskListLoading || loadTaskListCode.length < 6}
+                        className="sg-btn sg-btn-line"
+                        style={{ width: 64, padding: 0 }}
+                        title="Load task list"
+                        aria-label="Load task list"
+                    >
+                        <Download size={24} />
+                    </button>
                 </div>
 
-                {/* My saved task lists */}
                 {myTaskLists.length > 0 && (
-                    <div className="mb-4">
-                        <label className="text-gray-300 text-sm block mb-2 font-medium">Your Saved Lists</label>
-                        <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
-                            {myTaskLists.map((list) => (
-                                <div 
-                                    key={list.code} 
-                                    className={`flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition-all ${
-                                        currentTaskList?.code === list.code 
-                                            ? 'bg-indigo-600/20 border-2 border-indigo-500/50' 
-                                            : 'bg-gray-800/60 border-2 border-transparent hover:border-gray-700/80'
-                                    }`}
-                                    onClick={() => {
-                                        setTaskListLoading(true);
-                                        setTaskListApplied(false);
-                                        socket.emit('load_task_list', { code: list.code });
-                                    }}
-                                >
-                                    <div className="flex-1 min-w-0">
-                                        <span className="text-gray-200 text-sm block truncate font-medium">{list.name}</span>
-                                        <span className="text-gray-500 text-xs">
-                                            {list.task_count} tasks • <span className="font-mono text-indigo-400/70">{list.code}</span>
-                                        </span>
-                                    </div>
-                                    <div className="flex gap-2 ml-2 items-center">
-                                        {currentTaskList?.code === list.code && (
-                                            <div className="w-5 h-5 bg-green-500/20 rounded-full flex items-center justify-center">
-                                                <Check size={14} className="text-green-400" />
-                                            </div>
-                                        )}
+                    <>
+                        <p className="hs-label" style={{ marginTop: 6 }}>Your saved lists</p>
+                        <div className="hs-lists">
+                            {myTaskLists.map((list) => {
+                                const selected = currentTaskList?.code === list.code;
+                                return (
+                                    <div
+                                        key={list.code}
+                                        role="button"
+                                        tabIndex={0}
+                                        aria-current={selected}
+                                        className="hs-listrow"
+                                        onClick={() => {
+                                            setTaskListLoading(true);
+                                            setTaskListApplied(false);
+                                            socket.emit('load_task_list', { code: list.code });
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' || e.key === ' ') {
+                                                e.preventDefault();
+                                                e.currentTarget.click();
+                                            }
+                                        }}
+                                    >
+                                        {selected && <Check size={22} />}
+                                        <div className="hs-listrow__body">
+                                            <span className="hs-listrow__name">{list.name}</span>
+                                            <span className="hs-listrow__meta">{list.task_count} tasks · {list.code}</span>
+                                        </div>
                                         <button
+                                            type="button"
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 deleteTaskList(list.code);
                                             }}
-                                            className="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
+                                            className="hs-round"
+                                            style={{ background: selected ? 'rgba(0,0,0,0.07)' : undefined, color: 'inherit' }}
                                             title="Delete"
+                                            aria-label={`Delete ${list.name}`}
                                         >
-                                            <Trash2 size={16} />
+                                            <Trash2 size={18} />
                                         </button>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
-                    </div>
-                )}
-
-                {/* Currently loaded task list preview */}
-                {currentTaskList && (
-                    <div className="border-t border-gray-700/50 pt-4 mt-4">
-                        <div className="flex items-center justify-between mb-3">
-                            <span className="text-white font-medium">{currentTaskList.name}</span>
-                            <div className="flex items-center gap-2">
-                                {taskListApplied && (
-                                    <span className="flex items-center gap-1 text-green-400 text-sm bg-green-500/10 px-2 py-1 rounded-lg">
-                                        <Check size={14} /> Applied
-                                    </span>
-                                )}
-                                <button
-                                    onClick={clearTaskListSelection}
-                                    className="p-1.5 text-gray-500 hover:text-gray-300 hover:bg-gray-700/50 rounded-lg transition-all"
-                                    title="Clear selection"
-                                >
-                                    <X size={16} />
-                                </button>
-                            </div>
-                        </div>
-                        <p className="text-gray-500 text-sm mb-3">
-                            {currentTaskList.tasks.length} tasks • 
-                            {(currentTaskList.locations || []).filter(l => l !== 'Other').length} locations
-                        </p>
-                        
-                        {/* Locations preview */}
-                        {currentTaskList.locations && currentTaskList.locations.filter(l => l !== 'Other').length > 0 && (
-                            <div className="flex flex-wrap gap-2 mb-3">
-                                {currentTaskList.locations.filter(l => l !== 'Other').map((loc) => (
-                                    <span
-                                        key={loc}
-                                        className="bg-gray-800/60 px-2.5 py-1 rounded-full text-gray-400 text-xs flex items-center gap-1 border border-gray-700/50"
-                                    >
-                                        <MapPin size={10} className="text-indigo-400" />
-                                        {loc}
-                                    </span>
-                                ))}
-                            </div>
-                        )}
-
-                        {/* Task preview */}
-                        <div className="max-h-32 overflow-y-auto space-y-1.5 text-sm">
-                            {currentTaskList.tasks.slice(0, 5).map((task, index) => (
-                                <div 
-                                    key={index}
-                                    className="bg-gray-800/60 px-3 py-2 rounded-lg text-gray-400 truncate border border-gray-700/30"
-                                >
-                                    {task.task}
-                                </div>
-                            ))}
-                            {currentTaskList.tasks.length > 5 && (
-                                <p className="text-gray-600 text-xs text-center py-1">
-                                    + {currentTaskList.tasks.length - 5} more
-                                </p>
-                            )}
-                        </div>
-                    </div>
+                    </>
                 )}
             </div>
 
-            {/* Action buttons */}
-            <div className="space-y-4">
-                <button
-                    onClick={proceedToSettings}
-                    disabled={taskListLoading}
-                    className="w-full relative group"
-                >
-                    <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl blur opacity-30 group-hover:opacity-50 transition-opacity"></div>
-                    <div className="relative bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 px-6 rounded-xl transition-all flex items-center justify-center gap-3 font-bold text-lg group-hover:scale-[1.02] disabled:scale-100">
-                        {currentTaskList ? (
-                            <>
-                                {taskListLoading ? (
-                                    <>
-                                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                        <span>Applying Task List...</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <span>Use This Task List</span>
-                                        <ArrowRight size={20} />
-                                    </>
-                                )}
-                            </>
-                        ) : (
-                            <>
-                                <span>Create Tasks with Group</span>
-                                <ArrowRight size={20} />
-                            </>
-                        )}
+            {/* The list that's loaded right now */}
+            {currentTaskList && (
+                <div className="hs-panel">
+                    <div className="hs-bar" style={{ minHeight: 0, alignItems: 'flex-start' }}>
+                        <div style={{ display: 'grid', gap: 4, minWidth: 0 }}>
+                            <h2 className="hs-title" style={{ fontSize: 28 }}>{currentTaskList.name}</h2>
+                            <p className="sg-lede">
+                                {currentTaskList.tasks.length} tasks · {realLocationsOf(currentTaskList).length} locations
+                                {taskListApplied && <> · <Check size={16} style={{ display: 'inline', verticalAlign: '-2px' }} /> Applied</>}
+                            </p>
+                        </div>
+                        <button type="button" onClick={clearTaskListSelection} className="hs-round" title="Clear selection" aria-label="Clear selection">
+                            <X size={18} />
+                        </button>
                     </div>
+                    {realLocationsOf(currentTaskList).length > 0 && (
+                        <p className="sg-small" style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', fontSize: 16, opacity: 0.9 }}>
+                            <MapPin size={16} /> {realLocationsOf(currentTaskList).join(' · ')}
+                        </p>
+                    )}
+                    <ul className="hs-preview">
+                        {currentTaskList.tasks.slice(0, 5).map((task, index) => (
+                            <li key={index}>{task.task}</li>
+                        ))}
+                    </ul>
+                    {currentTaskList.tasks.length > 5 && (
+                        <p className="sg-small" style={{ textAlign: 'center' }}>+ {currentTaskList.tasks.length - 5} more</p>
+                    )}
+                </div>
+            )}
+
+            <div style={{ display: 'grid', gap: 10 }}>
+                <button type="button" onClick={proceedToSettings} disabled={taskListLoading} className="sg-btn sg-btn-white" style={{ minHeight: 68, fontSize: 19 }}>
+                    {currentTaskList
+                        ? (taskListLoading ? <span>Applying Task List...</span> : <><span>Use This Task List</span><ArrowRight size={24} /></>)
+                        : <><span>Create Tasks with Group</span><ArrowRight size={24} /></>}
                 </button>
-                
-                <p className="text-center text-gray-600 text-xs">
-                    {currentTaskList 
-                        ? "You can still add more tasks after opening the room"
-                        : "All players can add tasks together after joining"
-                    }
+                <p className="hs-hint hs-muted">
+                    {currentTaskList
+                        ? 'You can still add more tasks after opening the room'
+                        : 'All players can add tasks together after joining'}
                 </p>
             </div>
         </>
@@ -729,257 +616,181 @@ function GameConfigPage() {
     // Step 2: Game Settings (Intruders + Advanced)
     const renderSettingsStep = () => (
         <>
-            <div className="text-center mb-6">
-                <div className="inline-flex items-center justify-center gap-3 mb-3">
-                    <div className="p-3 bg-gradient-to-br from-red-500/20 to-orange-500/20 rounded-2xl border border-red-500/30">
-                        <Users size={28} className="text-red-400" />
-                    </div>
-                </div>
-                <h1 className="text-2xl font-bold text-white mb-2">Game Settings</h1>
+            <div style={{ display: 'grid', gap: 10 }}>
+                <h1 className="sg-big sg-h1">Game settings</h1>
                 {currentTaskList && taskListApplied && (
-                    <p className="text-green-400 text-sm flex items-center justify-center gap-1 bg-green-500/10 rounded-full px-3 py-1 w-fit mx-auto">
-                        <Check size={16} />
-                        Using: {currentTaskList.name}
+                    <p className="sg-lede" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <Check size={20} /> Using: {currentTaskList.name}
                     </p>
                 )}
             </div>
 
-            {/* Number of Intruders - Primary Setting */}
-            <div className="bg-gray-900/60 backdrop-blur-xl border border-gray-800/80 rounded-2xl p-6 mb-5">
-                <div className="text-center mb-5">
-                    <h2 className="text-lg font-bold text-white mb-1">Number of Intruders</h2>
-                    <p className="text-gray-500 text-sm">Choose based on group size</p>
-                </div>
-                
-                <div className="flex justify-center gap-3 mb-4">
+            <div className="hs-panel">
+                <h2 className="hs-title">Number of Intruders</h2>
+                <div className="hs-num-row" role="group" aria-label="Number of Intruders">
                     {[1, 2, 3, 4].map((num) => (
                         <button
                             key={num}
+                            type="button"
                             onClick={() => updateConfig('num_intruders', num)}
-                            className={`w-16 h-16 rounded-xl text-2xl font-bold transition-all ${
-                                config.num_intruders === num
-                                    ? 'bg-gradient-to-br from-red-600 to-red-700 text-white scale-110 shadow-lg shadow-red-500/30 border-2 border-red-400/50'
-                                    : 'bg-gray-800/60 text-gray-400 hover:bg-gray-700/60 border-2 border-transparent hover:border-gray-600/50'
-                            }`}
+                            aria-pressed={config.num_intruders === num}
+                            className="hs-num"
                         >
                             {num}
                         </button>
                     ))}
                 </div>
-                
-                <p className="text-center text-gray-500 text-xs">
-                    {config.num_intruders === 1 && "Best for 4-6 players"}
-                    {config.num_intruders === 2 && "Best for 6-10 players"}
-                    {config.num_intruders === 3 && "Best for 10-15 players"}
-                    {config.num_intruders === 4 && "Best for 15+ players (chaos mode!)"}
+                <p className="sg-lede hs-muted">
+                    {config.num_intruders === 1 && 'Best for 4-6 players'}
+                    {config.num_intruders === 2 && 'Best for 6-10 players'}
+                    {config.num_intruders === 3 && 'Best for 10-15 players'}
+                    {config.num_intruders === 4 && 'Best for 15+ players (chaos mode!)'}
                 </p>
             </div>
 
             {/* Advanced Settings (collapsed by default) */}
-            <div className="bg-gray-900/60 backdrop-blur-xl border border-gray-800/80 rounded-2xl overflow-hidden mb-6">
-                <button
-                    onClick={() => setShowAdvanced(!showAdvanced)}
-                    className="w-full px-5 py-4 flex items-center justify-between hover:bg-gray-800/30 transition-colors"
-                >
-                    <div className="flex items-center gap-3">
-                        <Settings size={20} className="text-gray-500" />
-                        <span className="text-gray-300 font-medium">Advanced Settings</span>
-                    </div>
-                    {showAdvanced ? (
-                        <ChevronUp size={20} className="text-gray-500" />
-                    ) : (
-                        <ChevronDown size={20} className="text-gray-500" />
-                    )}
+            <div className="hs-panel">
+                <button type="button" onClick={() => setShowAdvanced(!showAdvanced)} className="hs-disclose" aria-expanded={showAdvanced}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}><Settings size={22} /> Advanced Settings</span>
+                    {showAdvanced ? <ChevronUp size={22} /> : <ChevronDown size={22} />}
                 </button>
-                
+
                 {showAdvanced && (
-                    <div className="px-5 pb-5 pt-2 border-t border-gray-800/50 space-y-6">
-                        {/* Intruder Cards */}
-                        <div>
-                            <h3 className="text-gray-300 font-medium mb-4 flex items-center gap-2">
-                                <Sparkles size={16} className="text-purple-400" />
-                                Intruder Cards
-                            </h3>
-
-                            <div className="mb-5">
-                                <div className="flex justify-between items-center mb-2">
-                                    <label className="text-gray-300 text-sm font-medium">Card Deck</label>
-                                    <span className="text-purple-400 text-xs font-bold uppercase tracking-wide">
-                                        {(config.card_deck_preset || 'default').replace(/_/g, ' ')}
-                                    </span>
-                                </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                    {CARD_DECK_PRESETS.map((preset) => {
-                                        const active = (config.card_deck_preset || 'default') === preset.key;
-                                        return (
-                                            <button
-                                                key={preset.key}
-                                                type="button"
-                                                onClick={() => selectCardDeckPreset(preset.key)}
-                                                className={`text-left p-3 rounded-lg border transition-all ${
-                                                    active
-                                                        ? 'bg-purple-500/15 border-purple-400/60 shadow-lg shadow-purple-900/20'
-                                                        : 'bg-gray-800/40 border-gray-700/60 hover:bg-gray-800/70 hover:border-gray-600'
-                                                }`}
-                                            >
-                                                <div className="text-sm font-bold text-gray-100">{preset.label}</div>
-                                                <div className="text-xs text-gray-500 mt-1 leading-snug">{preset.description}</div>
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                                <p className="text-gray-500 text-xs mt-2">
-                                    Default preserves the normal deck. Custom lets you set exact counts.
-                                </p>
+                    <div className="hs-section">
+                        <h3><Sparkles size={18} /> Intruder Cards</h3>
+                        <div style={{ display: 'grid', gap: 8 }}>
+                            <div className="hs-slider__top">
+                                <span style={{ fontWeight: 800, fontSize: 16 }}>Card Deck</span>
+                                <b style={{ fontSize: 16, textTransform: 'capitalize' }}>
+                                    {(config.card_deck_preset || 'default').replace(/_/g, ' ')}
+                                </b>
                             </div>
+                            <div className="hs-presets">
+                                {CARD_DECK_PRESETS.map((preset) => {
+                                    const active = (config.card_deck_preset || 'default') === preset.key;
+                                    return (
+                                        <button
+                                            key={preset.key}
+                                            type="button"
+                                            onClick={() => selectCardDeckPreset(preset.key)}
+                                            aria-pressed={active}
+                                            className="hs-preset"
+                                        >
+                                            <b>{preset.label}</b>
+                                            <span>{preset.description}</span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                            <p className="sg-small">Default preserves the normal deck. Custom lets you set exact counts.</p>
+                        </div>
 
-                            {(config.card_deck_preset || 'default') === 'custom' && (
-                                <div className="mb-5 bg-gray-950/40 border border-gray-800/80 rounded-lg p-3">
-                                    <div className="flex items-center justify-between mb-1">
-                                        <div className="text-gray-300 text-sm font-medium">Custom Card Counts</div>
-                                        <div className="text-gray-500 text-xs">0-30 each</div>
-                                    </div>
-                                    <p className="text-gray-500 text-xs mb-2">
-                                        Reactor cards are ignored when no reactor is connected. Area Denial count is per location.
-                                    </p>
-                                    {CARD_COUNT_CONTROLS.map((cardControl) => {
-                                        const counts = {
-                                            ...DEFAULT_CARD_DECK_COUNTS,
-                                            ...(config.card_deck_counts || {}),
-                                        };
-                                        return (
-                                            <CountStepper
-                                                key={cardControl.key}
-                                                label={cardControl.label}
-                                                description={cardControl.description}
-                                                value={counts[cardControl.key] || 0}
-                                                onDecrease={() => updateCardDeckCount(cardControl.key, -1)}
-                                                onIncrease={() => updateCardDeckCount(cardControl.key, 1)}
-                                            />
-                                        );
-                                    })}
+                        {(config.card_deck_preset || 'default') === 'custom' && (
+                            <div className="hs-panel hs-panel--tight" style={{ gap: 0 }}>
+                                <div className="hs-slider__top">
+                                    <span style={{ fontWeight: 900, fontSize: 17 }}>Custom Card Counts</span>
+                                    <span className="sg-small">0-30 each</span>
                                 </div>
-                            )}
+                                <p className="sg-small" style={{ margin: '4px 0 6px' }}>
+                                    Reactor cards are ignored when no reactor is connected. Area Denial count is per location.
+                                </p>
+                                {CARD_COUNT_CONTROLS.map((cardControl) => {
+                                    const counts = {
+                                        ...DEFAULT_CARD_DECK_COUNTS,
+                                        ...(config.card_deck_counts || {}),
+                                    };
+                                    return (
+                                        <CountStepper
+                                            key={cardControl.key}
+                                            label={cardControl.label}
+                                            description={cardControl.description}
+                                            value={counts[cardControl.key] || 0}
+                                            onDecrease={() => updateCardDeckCount(cardControl.key, -1)}
+                                            onIncrease={() => updateCardDeckCount(cardControl.key, 1)}
+                                        />
+                                    );
+                                })}
+                            </div>
+                        )}
 
-                            <SliderInput
-                                label="Starting Cards"
-                                value={config.starting_cards}
-                                onChange={(v) => updateConfig('starting_cards', v)}
-                                min={0}
-                                max={5}
-                                description="Cards each intruder starts with"
-                            />
-                            <SliderInput
-                                label="Card Draw Chance"
-                                value={config.card_draw_probability}
-                                onChange={(v) => updateConfig('card_draw_probability', v)}
-                                min={0}
-                                max={1}
-                                step={0.05}
-                                description="Chance to draw a card after task completion"
-                            />
-                        </div>
+                        <SliderInput
+                            label="Starting Cards"
+                            value={config.starting_cards}
+                            onChange={(v) => updateConfig('starting_cards', v)}
+                            min={0}
+                            max={5}
+                            description="Cards each intruder starts with"
+                        />
+                        <SliderInput
+                            label="Card Draw Chance"
+                            value={config.card_draw_probability}
+                            onChange={(v) => updateConfig('card_draw_probability', v)}
+                            min={0}
+                            max={1}
+                            step={0.05}
+                            description="Chance to draw a card after task completion"
+                        />
 
-                        {/* Meetings */}
-                        <div>
-                            <h3 className="text-gray-300 font-medium mb-4 flex items-center gap-2">
-                                <Users size={16} className="text-indigo-400" />
-                                Meetings & Voting
-                            </h3>
-                            <SliderInput
-                                label="Voting Time"
-                                value={config.vote_time}
-                                onChange={(v) => updateConfig('vote_time', v)}
-                                min={60}
-                                max={300}
-                                step={15}
-                                unit="s"
-                                description="Time allowed for voting"
-                            />
-                            <SliderInput
-                                label="Vote Threshold"
-                                value={config.vote_threshold}
-                                onChange={(v) => updateConfig('vote_threshold', v)}
-                                min={0.5}
-                                max={1}
-                                step={0.05}
-                                description="Votes needed to eject"
-                            />
-                        </div>
+                        <h3><Users size={18} /> Meetings & Voting</h3>
+                        <SliderInput
+                            label="Voting Time"
+                            value={config.vote_time}
+                            onChange={(v) => updateConfig('vote_time', v)}
+                            min={60}
+                            max={300}
+                            step={15}
+                            unit="s"
+                            description="Time allowed for voting"
+                        />
+                        <SliderInput
+                            label="Vote Threshold"
+                            value={config.vote_threshold}
+                            onChange={(v) => updateConfig('vote_threshold', v)}
+                            min={0.5}
+                            max={1}
+                            step={0.05}
+                            description="Votes needed to eject"
+                        />
 
-                        {/* Meltdown */}
-                        <div>
-                            <h3 className="text-gray-300 font-medium mb-4 flex items-center gap-2">
-                                <Zap size={16} className="text-orange-400" />
-                                Meltdown Sabotage
-                            </h3>
-                            <SliderInput
-                                label="Meltdown Time"
-                                value={config.meltdown_time}
-                                onChange={(v) => updateConfig('meltdown_time', v)}
-                                min={30}
-                                max={120}
-                                step={5}
-                                unit="s"
-                                description="Time to stop meltdown"
-                            />
-                            <SliderInput
-                                label="Codes Required"
-                                value={config.code_percent}
-                                onChange={(v) => updateConfig('code_percent', v)}
-                                min={0.3}
-                                max={1}
-                                step={0.05}
-                                description="% of players needed"
-                            />
-                        </div>
+                        <h3><Zap size={18} /> Meltdown Sabotage</h3>
+                        <SliderInput
+                            label="Meltdown Time"
+                            value={config.meltdown_time}
+                            onChange={(v) => updateConfig('meltdown_time', v)}
+                            min={30}
+                            max={120}
+                            step={5}
+                            unit="s"
+                            description="Time to stop meltdown"
+                        />
+                        <SliderInput
+                            label="Codes Required"
+                            value={config.code_percent}
+                            onChange={(v) => updateConfig('code_percent', v)}
+                            min={0.3}
+                            max={1}
+                            step={0.05}
+                            description="% of players needed"
+                        />
 
-                        {/* Tasks */}
-                        <div>
-                            <h3 className="text-gray-300 font-medium mb-4 flex items-center gap-2">
-                                <List size={16} className="text-cyan-400" />
-                                Tasks
-                            </h3>
-                            <SliderInput
-                                label="Tasks Per Player"
-                                value={config.task_ratio}
-                                onChange={(v) => updateConfig('task_ratio', v)}
-                                min={5}
-                                max={25}
-                                description="Tasks to complete for crew victory"
-                            />
-                        </div>
+                        <h3><List size={18} /> Tasks</h3>
+                        <SliderInput
+                            label="Tasks Per Player"
+                            value={config.task_ratio}
+                            onChange={(v) => updateConfig('task_ratio', v)}
+                            min={5}
+                            max={25}
+                            description="Tasks to complete for crew victory"
+                        />
                     </div>
                 )}
             </div>
 
-            {/* Action buttons */}
-            <div className="space-y-4">
-                <button
-                    onClick={handleOpenRoom}
-                    disabled={isSaving}
-                    className="w-full relative group disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    <div className="absolute -inset-1 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl blur opacity-40 group-hover:opacity-60 transition-opacity"></div>
-                    <div className="relative py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold text-lg rounded-xl shadow-lg transition-all flex items-center justify-center gap-3 group-hover:scale-[1.02]">
-                        {isSaving ? (
-                            <>
-                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                <span>Opening Room...</span>
-                            </>
-                        ) : (
-                            <>
-                                <Play size={24} fill="currentColor" />
-                                <span>Open Room</span>
-                            </>
-                        )}
-                    </div>
+            <div style={{ display: 'grid', gap: 4 }}>
+                <button type="button" onClick={handleOpenRoom} disabled={isSaving} className="sg-btn sg-btn-white" style={{ minHeight: 68, fontSize: 21 }}>
+                    {isSaving ? <span>Opening Room...</span> : <><Play size={24} /><span>Open Room</span></>}
                 </button>
-
-                <button
-                    onClick={() => setStep('tasklist')}
-                    className="w-full py-3 text-gray-500 hover:text-gray-300 transition-colors flex items-center justify-center gap-2"
-                >
+                <button type="button" onClick={() => setStep('tasklist')} className="sg-link" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
                     <ArrowLeft size={18} />
                     <span>Back to Task List</span>
                 </button>
@@ -988,76 +799,27 @@ function GameConfigPage() {
     );
 
     return (
-        <div className="fixed inset-0 bg-gray-950 overflow-hidden">
-            {/* Animated background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-indigo-950/50 via-gray-950 to-purple-950/30"></div>
-            
-            {/* Floating particles */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                {particles.map(p => (
-                    <FloatingParticle key={p.id} {...p} />
-                ))}
-            </div>
-            
-            {/* Glowing orbs */}
-            <div className="absolute top-20 right-10 w-64 h-64 bg-indigo-600/10 rounded-full blur-3xl animate-pulse"></div>
-            <div className="absolute bottom-40 left-10 w-48 h-48 bg-purple-600/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-            
-            {/* Grid overlay */}
-            <div 
-                className="absolute inset-0 opacity-[0.03]"
-                style={{
-                    backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
-                    backgroundSize: '50px 50px'
-                }}
-            ></div>
-            
-            {/* Scrollable content */}
-            <div className="relative z-10 h-full overflow-y-auto">
-                <div className={`max-w-lg mx-auto px-4 py-6 pb-8 transition-all duration-700 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-                    
-                    {/* Room code header */}
-                    <div className="flex justify-center mb-6">
-                        <div className="bg-gray-900/80 backdrop-blur-xl border border-gray-800/80 rounded-2xl px-5 py-3 flex items-center gap-4">
-                            <div className="flex items-center gap-2">
-                                <span className="text-gray-500 text-sm">Room</span>
-                                <span className="text-xl font-mono font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent tracking-widest">{roomCode}</span>
-                            </div>
-                            <button
-                                onClick={copyRoomCode}
-                                className="p-2 hover:bg-gray-800 rounded-xl transition-all"
-                                title="Copy room code"
-                            >
-                                {copied ? (
-                                    <Check className="text-green-400" size={16} />
-                                ) : (
-                                    <Copy className="text-gray-500 hover:text-indigo-400 transition-colors" size={16} />
-                                )}
-                            </button>
-                            <div className="w-px h-6 bg-gray-700"></div>
-                            <button
-                                onClick={handleLeaveRoom}
-                                className="p-2 hover:bg-red-500/10 rounded-xl transition-all group"
-                                title="Leave room"
-                            >
-                                <LogOut className="text-gray-500 group-hover:text-red-400 transition-colors" size={16} />
-                            </button>
-                        </div>
+        <div className="sg-screen sg-round hs">
+            <div className={`hs-wrap ${showContent ? 'sg-a sg-rise' : ''}`} key={step}>
+                <div className="hs-bar">
+                    <div className="hs-bar__left">
+                        <span className="hs-roompill">Room <b>{roomCode}</b></span>
+                        <button type="button" onClick={copyRoomCode} className="hs-round" title="Copy room code" aria-label="Copy room code">
+                            {copied ? <Check size={18} /> : <Copy size={18} />}
+                        </button>
                     </div>
-
-                    {/* Step indicator */}
-                    <div className="flex items-center justify-center gap-3 mb-8">
-                        <div className={`w-10 h-1.5 rounded-full transition-colors ${step === 'tasklist' ? 'bg-indigo-500' : 'bg-gray-700'}`}></div>
-                        <div className={`w-10 h-1.5 rounded-full transition-colors ${step === 'settings' ? 'bg-indigo-500' : 'bg-gray-700'}`}></div>
-                    </div>
-
-                    {/* Render current step */}
-                    {step === 'tasklist' ? renderTaskListStep() : renderSettingsStep()}
-
-                    <p className="text-center text-gray-600 text-sm mt-8">
-                        Share code <span className="text-indigo-400 font-mono font-medium">{roomCode}</span> to invite players
-                    </p>
+                    <button type="button" onClick={handleLeaveRoom} className="hs-round" title="Leave room" aria-label="Leave room">
+                        <LogOut size={20} />
+                    </button>
                 </div>
+
+                <p className="hs-steps">Step {step === 'tasklist' ? 1 : 2} of 2</p>
+
+                {step === 'tasklist' ? renderTaskListStep() : renderSettingsStep()}
+
+                <p className="hs-hint hs-muted" style={{ marginTop: 8 }}>
+                    Share code {roomCode} to invite players
+                </p>
             </div>
         </div>
     );
