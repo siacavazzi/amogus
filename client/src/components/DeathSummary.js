@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
 import { DataContext } from '../GameContext';
-import { Skull, Heart } from 'lucide-react';
 import { PlayerCardCompact, PlayerBadge } from './PlayerCard';
 
 const DeathSummary = ({ title = "Fallen Players", showSurvivors = false, theme = "default" }) => {
@@ -14,16 +13,11 @@ const DeathSummary = ({ title = "Fallen Players", showSurvivors = false, theme =
     }
 
     return (
-        <div className="w-full max-w-md mx-auto">
+        <div className="sg w-full max-w-md mx-auto text-left">
             {/* Dead Players */}
             {deadPlayers.length > 0 && (
                 <div className="mb-6">
-                    <div className="flex items-center justify-center gap-2 mb-4">
-                        <Skull size={18} className="text-gray-500" />
-                        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
-                            {title}
-                        </h3>
-                    </div>
+                    <h3 className="sg-big" style={{ fontSize: 26, marginBottom: 12 }}>{title}</h3>
                     <div className="space-y-2">
                         {deadPlayers.map((player) => (
                             <PlayerCardCompact 
@@ -40,13 +34,8 @@ const DeathSummary = ({ title = "Fallen Players", showSurvivors = false, theme =
             {/* Survivors */}
             {showSurvivors && survivors.length > 0 && (
                 <div>
-                    <div className="flex items-center justify-center gap-2 mb-4">
-                        <Heart size={18} className="text-green-500" />
-                        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
-                            Survivors
-                        </h3>
-                    </div>
-                    <div className="flex flex-wrap justify-center gap-2">
+                    <h3 className="sg-big" style={{ fontSize: 26, marginBottom: 12 }}>Survivors</h3>
+                    <div className="flex flex-wrap gap-2">
                         {survivors.map((player) => (
                             <PlayerBadge 
                                 key={player.player_id}

@@ -1,10 +1,7 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
-import PlayerCard from "../components/PlayerCard";
 import { DataContext } from "../GameContext";
 import LeaveGameButton from "../components/LeaveGameButton";
-import { CheckCircle, XCircle, Vote, Timer, Users, AlertTriangle, Gavel, Skull } from "lucide-react";
-import { GridOverlay } from "../components/ui";
-import { PrimaryButton, SecondaryButton, StatusBadge } from "../components/ui";
+import { Face } from "../signal";
 import { emitVolatileWithAck } from "../utils/socketCommand";
 
 export default function VotingPage({ tutorialMode = false, tutorialHighlightTarget = null }) {
@@ -98,147 +95,107 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
   };
 
   const totalTime = meetingState.time_left;
-  const progressPercentage = (timeLeft / totalTime) * 100;
+  const progressPercentage = totalTime > 0 ? (timeLeft / totalTime) * 100 : 0;
   const isLowTime = timeLeft <= 10;
   const alivePlayers = players.filter(p => p.alive);
+  const voteLabel = hasVoted
+    ? (votedFor === 'veto' ? 'You voted to VETO' : `Voted for ${votedFor?.username}`)
+    : 'Tap who you think it is';
 
   return (
-    <div className="fixed inset-0 bg-gray-900 flex flex-col overflow-hidden">
-      {/* Animated background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-purple-900/20 via-gray-900 to-gray-900" />
-      
-      {/* Grid overlay */}
-      <GridOverlay color="rgba(139, 92, 246, 0.3)" size={40} />
-      
-      {/* Leave Game Button */}
-      {!tutorialMode && <LeaveGameButton className="fixed top-4 right-4 z-50" />}
+    <div className="sg-screen sg-meet" style={{ padding: 0 }}>
+      {!tutorialMode && <LeaveGameButton className="sg-corner" />}
 
-      {/* Header Section */}
-      <div className={`relative z-10 ${tutorialMode ? 'pt-4' : 'pt-12'} px-4`}>
-        {/* Title */}
-        <div className="flex items-center justify-center gap-3 mb-4">
-          <Gavel className="text-purple-400" size={28} />
-          <h1 className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
-            Emergency Vote
-          </h1>
-        </div>
-        
-        {/* Timer Card */}
-        <div className={`max-w-md mx-auto mb-4 p-4 rounded-2xl border backdrop-blur-sm transition-all ${
-          isLowTime 
-            ? 'bg-red-900/30 border-red-500/50 animate-pulse' 
-            : 'bg-gray-800/60 border-purple-500/30'
-        }`}>
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <Timer size={18} className={isLowTime ? 'text-red-400' : 'text-purple-400'} />
-              <span className="text-gray-400 text-sm">Time Remaining</span>
-            </div>
-            <span className={`text-2xl font-mono font-bold ${isLowTime ? 'text-red-400' : 'text-white'}`}>
-              {timeLeft}s
-            </span>
-          </div>
-          <div className="w-full bg-gray-700/50 rounded-full h-2 overflow-hidden">
-            <div
-              className={`h-full transition-all duration-1000 ease-linear rounded-full ${
-                isLowTime ? 'bg-gradient-to-r from-red-500 to-orange-500' : 'bg-gradient-to-r from-purple-500 to-pink-500'
-              }`}
-              style={{ width: `${progressPercentage}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Vote Status Indicator */}
-        <div className="max-w-md mx-auto mb-4">
-          {hasVoted ? (
-            <StatusBadge 
-              icon={CheckCircle} 
-              variant={votedFor === 'veto' ? 'orange' : 'emerald'}
-              className="w-full justify-center py-3"
-            >
-              {votedFor === 'veto' 
-                ? "You voted to VETO" 
-                : `Voted for ${votedFor?.username}`}
-            </StatusBadge>
-          ) : (
-            <div className="p-3 rounded-xl border bg-yellow-900/20 border-yellow-500/40 text-yellow-300 flex items-center justify-center gap-2">
-              <AlertTriangle size={18} />
-              <span className="font-medium text-sm">Select a player to vote</span>
-            </div>
-          )}
-        </div>
-
-        {/* Player count */}
-        <div className="flex items-center justify-center gap-2 text-gray-500 text-sm mb-3">
-          <Users size={14} />
-          <span>{alivePlayers.length} players voting</span>
-        </div>
-      </div>
-
-      {/* Scrollable Players Grid */}
-      <div className={`flex-1 overflow-y-auto px-4 ${showDeathReport ? 'pb-64' : 'pb-44'} relative z-10`}>
-        <div
-          className={`max-w-2xl mx-auto ${highlightPlayers ? 'animate-pulse' : ''}`}
-          style={highlightPlayers ? { borderRadius: '2rem', outline: '3px solid rgba(192,132,252,0.85)', outlineOffset: '4px', boxShadow: '0 0 30px rgba(192,132,252,0.4)' } : {}}
-        >
-          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-            {players.map((player) => {
-              const isMe = playerId === player.player_id;
-              const isDead = !player.alive;
-
-              return (
-                <PlayerCard
-                  key={player.player_id}
-                  player={player}
-                  selected={selectedPlayer?.player_id === player.player_id}
-                  votes={(votes?.[player?.player_id] ?? 0)}
-                  onClick={
-                    isDead || isMe
-                      ? null
-                      : () => setSelectedPlayer(player)
-                  }
-                  isMe={isMe}
-                  isClickable={!isDead && !isMe}
-                />
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* Fixed Bottom Voting Buttons */}
-      <div className="fixed bottom-0 left-0 right-0 z-20">
-        {/* Gradient fade */}
-        <div className="h-8 bg-gradient-to-t from-gray-900 to-transparent" />
-        
-        <div className="bg-gray-900 border-t border-gray-800 px-4 pb-6 pt-2">
-          <div
-            className={`max-w-md mx-auto flex flex-col gap-3 ${highlightActions ? 'animate-pulse' : ''}`}
-            style={highlightActions ? { borderRadius: '2rem', outline: '3px solid rgba(192,132,252,0.85)', outlineOffset: '4px', boxShadow: '0 0 30px rgba(192,132,252,0.4)' } : {}}
+      {/* Header: the word, the clock, what you did */}
+      <div style={{ padding: 'calc(env(safe-area-inset-top, 0px) + 56px) 20px 10px' }}>
+        <div className="flex items-end justify-between gap-3">
+          <h1 className="sg-big sg-h1 sg-a sg-slam">VOTE</h1>
+          <span
+            key={isLowTime ? timeLeft : 'clock'}
+            className={`sg-big sg-num ${isLowTime ? 'sg-tick' : ''}`}
+            style={{ fontSize: 'clamp(40px, 12vw, 60px)', color: isLowTime ? 'var(--sg-out)' : 'inherit' }}
           >
-            {/* Main vote button */}
-            <PrimaryButton
-              onClick={handleVote}
-              disabled={!selectedPlayer || !canVote}
-              variant="purple"
-            >
-              <Vote size={22} />
-              {selectedPlayer ? `Vote for ${selectedPlayer.username}` : "Select a Player"}
-            </PrimaryButton>
+            {timeLeft}s
+          </span>
+        </div>
+        <div style={{ height: 8, borderRadius: 8, background: 'rgba(26,20,0,0.15)', marginTop: 12, overflow: 'hidden' }}>
+          <div style={{ height: '100%', width: `${progressPercentage}%`, background: isLowTime ? 'var(--sg-out)' : 'var(--sg-ink)', borderRadius: 8, transition: 'width 1s linear' }} />
+        </div>
+        <p className="sg-lede" style={{ marginTop: 14 }}>{voteLabel}</p>
+        <p className="sg-small" style={{ marginTop: 2 }}>{alivePlayers.length} players voting</p>
+      </div>
 
-            {/* Veto button */}
-            <SecondaryButton onClick={handleVeto} variant="orange" disabled={!canVote}>
-              <XCircle size={18} />
-              <span>Veto Meeting</span>
-              <span className="px-2 py-0.5 bg-orange-500/20 rounded-full text-xs">{vetoVotes}</span>
-            </SecondaryButton>
-            {showDeathReport && (
-              <SecondaryButton onClick={handleImDead} variant="red" disabled={!canVote}>
-                <Skull size={18} />
-                {deathPending ? 'Confirm death...' : "I've Been Killed"}
-              </SecondaryButton>
-            )}
-          </div>
+      {/* Players */}
+      <div className="flex-1" style={{ padding: `6px 20px ${showDeathReport ? 250 : 190}px` }}>
+        <div
+          className={`max-w-2xl mx-auto grid grid-cols-3 sm:grid-cols-4 gap-2.5 ${highlightPlayers ? 'animate-pulse' : ''}`}
+          style={highlightPlayers ? { borderRadius: 20, outline: '4px solid var(--sg-ink)', outlineOffset: 6 } : {}}
+        >
+          {players.map((player, i) => {
+            const isMe = playerId === player.player_id;
+            const isDead = !player.alive;
+            const clickable = !isDead && !isMe;
+            const selected = selectedPlayer?.player_id === player.player_id;
+            const count = votes?.[player?.player_id] ?? 0;
+            return (
+              <div
+                key={player.player_id}
+                role={clickable ? 'button' : undefined}
+                tabIndex={clickable ? 0 : undefined}
+                aria-pressed={clickable ? selected : undefined}
+                onClick={clickable ? () => setSelectedPlayer(player) : undefined}
+                onKeyDown={clickable ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedPlayer(player); } } : undefined}
+                className={`sg-a sg-pop relative flex flex-col items-center ${clickable ? 'cursor-pointer' : ''}`}
+                style={{
+                  animationDelay: `${i * 50}ms`,
+                  gap: 6,
+                  padding: '12px 6px 10px',
+                  borderRadius: 18,
+                  background: selected ? 'var(--sg-ink)' : 'rgba(255,255,255,0.55)',
+                  color: selected ? 'var(--sg-meet)' : 'var(--sg-ink)',
+                  opacity: isDead ? 0.4 : 1,
+                  transition: 'background .15s, color .15s, transform .15s',
+                  transform: selected ? 'scale(1.04)' : 'none',
+                }}
+              >
+                <Face player={player} size={64} dead={isDead} />
+                <span style={{ fontWeight: 900, fontSize: 15, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textDecoration: isDead ? 'line-through' : 'none' }}>
+                  {player.username}
+                </span>
+                {isMe && <span style={{ fontWeight: 700, fontSize: 11, opacity: 0.7, marginTop: -4 }}>You</span>}
+                {count > 0 && (
+                  <span
+                    key={count}
+                    className="sg-a sg-pop sg-num"
+                    style={{ position: 'absolute', top: 6, right: 6, minWidth: 24, height: 24, borderRadius: 12, padding: '0 6px', background: 'var(--sg-out)', color: '#fff', fontWeight: 900, fontSize: 13, display: 'grid', placeItems: 'center' }}
+                  >
+                    {count}
+                  </span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="fixed bottom-0 left-0 right-0 z-20" style={{ background: 'var(--sg-meet)', padding: '12px 20px calc(env(safe-area-inset-bottom, 0px) + 16px)' }}>
+        <div
+          className={`max-w-md mx-auto flex flex-col gap-2.5 ${highlightActions ? 'animate-pulse' : ''}`}
+          style={highlightActions ? { borderRadius: 22, outline: '4px solid var(--sg-ink)', outlineOffset: 6 } : {}}
+        >
+          <button type="button" className="sg-btn sg-btn-ink" onClick={handleVote} disabled={!selectedPlayer || !canVote}>
+            {selectedPlayer ? `Vote for ${selectedPlayer.username}` : "Select a Player"}
+          </button>
+          <button type="button" className="sg-btn sg-btn-line" onClick={handleVeto} disabled={!canVote} style={{ minHeight: 52, padding: '12px 18px' }}>
+            Veto Meeting
+            <span className="sg-num" style={{ background: 'var(--sg-ink)', color: 'var(--sg-meet)', borderRadius: 999, padding: '2px 9px', fontSize: 14 }}>{vetoVotes}</span>
+          </button>
+          {showDeathReport && (
+            <button type="button" className="sg-link" onClick={handleImDead} disabled={!canVote} style={{ alignSelf: 'center', padding: 6 }}>
+              {deathPending ? 'Confirm death...' : "I've Been Killed"}
+            </button>
+          )}
         </div>
       </div>
     </div>

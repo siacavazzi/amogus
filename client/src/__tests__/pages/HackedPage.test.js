@@ -37,8 +37,8 @@ describe('HackedPage', () => {
                 { hackTime: 15 }
             );
             
-            // Should show "SYSTEM RECOVERY IN" text
-            expect(screen.getByText(/SYSTEM RECOVERY IN/i)).toBeInTheDocument();
+            expect(screen.getByText(/Back in/i)).toBeInTheDocument();
+            expect(screen.getByText('00:15')).toBeInTheDocument();
         });
     });
 
@@ -59,7 +59,7 @@ describe('HackedPage', () => {
                 { hackTime: 5 }
             );
             
-            expect(screen.getByText(/ELECTROMAGNETIC PULSE ACTIVE/i)).toBeInTheDocument();
+            expect(screen.getByText(/An intruder played EMP/i)).toBeInTheDocument();
         });
     });
 

@@ -1,7 +1,11 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
+import React, { useState, useEffect, useContext, useRef, useCallback } from "react";
 import { DataContext } from "../GameContext";
 import { X, Volume2 } from "lucide-react";
+import { RoleReveal, RevealedMoment, TauntToast } from "../signal/Moments";
+import "../signal/signal.css";
 
+// Pop-ups during the game. Shared moments (role reveal, intruders revealed) take the whole
+// screen; a taunt drops in as a card; everything else is a plain white sheet.
 const Modal = () => {
   const { dialog, setAudio, setAudioEnabled, meetingState } = useContext(DataContext);
   const [open, setOpen] = useState(false);
@@ -33,6 +37,8 @@ const Modal = () => {
     }
   }, [open]);
 
+  const dismiss = useCallback(() => setOpen(false), []);
+
   function closeModal() {
     setAudio('select')
     setAudioEnabled(true)
@@ -41,20 +47,35 @@ const Modal = () => {
 
   if (!open) return null;
 
+  const frame = (children) => (
+    <div ref={modalRef} tabIndex="-1" role="dialog" aria-modal="true" aria-labelledby="modal-title" className="focus:outline-none">
+      {children}
+    </div>
+  );
+
+  if (dialog?.kind === 'role') {
+    return frame(<RoleReveal title={dialog.title} sus={dialog.sus} otherIntruders={dialog.otherIntruders} onClose={closeModal} />);
+  }
+  if (dialog?.kind === 'revealed') {
+    return frame(<RevealedMoment intruderNames={dialog.intruderNames} onClose={closeModal} />);
+  }
+  if (dialog?.kind === 'taunt') {
+    return frame(<TauntToast message={dialog.message} onClose={dismiss} />);
+  }
+
   const isAudioModal = dialog?.title === "Click to enable audio";
 
   return (
     <>
-      {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/70 backdrop-blur-md z-50"
+        className="fixed inset-0 z-50"
+        style={{ background: 'rgba(0,0,0,0.55)' }}
         onClick={() => !isAudioModal && setOpen(false)}
         aria-hidden="true"
       />
 
-      {/* Modal */}
       <div
-        className="fixed inset-0 flex items-center justify-center z-50 px-4 pointer-events-none"
+        className="sg fixed inset-0 flex items-end sm:items-center justify-center z-50 p-3 pointer-events-none"
         aria-modal="true"
         role="dialog"
         aria-labelledby="modal-title"
@@ -63,37 +84,24 @@ const Modal = () => {
         <div
           ref={modalRef}
           tabIndex="-1"
-          className="pointer-events-auto w-full max-w-md mx-auto overflow-hidden focus:outline-none rounded-3xl border border-white/10 bg-gray-950 shadow-2xl animate-fadeInScale"
-          style={{
-            boxShadow: '0 0 0 1px rgba(255,255,255,0.06), 0 24px 64px rgba(0,0,0,0.7), 0 0 80px rgba(99,102,241,0.12)',
-          }}
+          className="sg-a sg-rise pointer-events-auto w-full max-w-md mx-auto focus:outline-none"
+          style={{ background: '#fff', color: 'var(--sg-ink)', borderRadius: 26, padding: '22px 20px 18px', position: 'relative' }}
         >
-          {/* Top accent line */}
-          <div className="h-px bg-gradient-to-r from-transparent via-indigo-500/60 to-transparent" />
-
-          {/* Header */}
-          <div className="relative px-6 pt-5 pb-4">
-            <h2
-              id="modal-title"
-              className="text-base font-semibold text-white pr-8 leading-snug"
+          <h2 id="modal-title" className="sg-big" style={{ fontSize: 30, paddingRight: 36, lineHeight: 1 }}>
+            {dialog?.title || "Notification"}
+          </h2>
+          {!isAudioModal && (
+            <button
+              onClick={() => setOpen(false)}
+              aria-label="Close"
+              className="absolute"
+              style={{ right: 14, top: 14, width: 36, height: 36, borderRadius: 18, background: '#eceae4', display: 'grid', placeItems: 'center' }}
             >
-              {dialog?.title || "Notification"}
-            </h2>
-            {!isAudioModal && (
-              <button
-                onClick={() => setOpen(false)}
-                className="absolute right-4 top-4 p-1.5 rounded-xl text-gray-500 hover:text-white hover:bg-white/10 transition-colors"
-              >
-                <X size={18} />
-              </button>
-            )}
-          </div>
+              <X size={18} strokeWidth={3} />
+            </button>
+          )}
 
-          {/* Body */}
-          <div
-            id="modal-description"
-            className="px-6 pb-2 text-gray-300 text-sm leading-relaxed"
-          >
+          <div id="modal-description" style={{ fontWeight: 500, fontSize: 17, lineHeight: 1.4, marginTop: 12 }}>
             {typeof dialog?.body === "string" ? (
               <p>{dialog.body}</p>
             ) : (
@@ -101,21 +109,14 @@ const Modal = () => {
             )}
           </div>
 
-          {/* Footer */}
-          <div className="px-6 pt-4 pb-6">
+          <div style={{ marginTop: 18 }}>
             {isAudioModal ? (
-              <button
-                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-2xl font-semibold hover:from-indigo-500 hover:to-purple-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-950 transition-all"
-                onClick={() => closeModal()}
-              >
-                <Volume2 size={18} />
+              <button className="sg-btn" style={{ background: 'var(--sg-round)', color: '#fff' }} onClick={() => closeModal()}>
+                <Volume2 size={20} />
                 Enable Audio
               </button>
             ) : (
-              <button
-                className="w-full bg-white/8 hover:bg-white/12 border border-white/10 text-white py-3 rounded-2xl font-semibold focus:outline-none focus:ring-2 focus:ring-white/20 focus:ring-offset-2 focus:ring-offset-gray-950 transition-all"
-                onClick={() => closeModal()}
-              >
+              <button className="sg-btn" style={{ background: 'var(--sg-ink)', color: '#fff' }} onClick={() => closeModal()}>
                 Got it
               </button>
             )}

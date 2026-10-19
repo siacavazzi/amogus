@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Beforeunload } from 'react-beforeunload';
-import { ChevronRight, Check, Zap } from "lucide-react";
+import { ChevronRight, Check } from "lucide-react";
 
 // Dimensions and styling constants
 const SLIDER_HEIGHT = '4.5rem';
@@ -14,6 +14,7 @@ const MUECustomSlider = ({
   onReset,
   text = "Slide to unlock",
   sus = false,
+  tone = "round",
   backgroundColor = "transparent",
   disabled = false,
   pending = false,
@@ -26,8 +27,6 @@ const MUECustomSlider = ({
   const [sliderPos, setSliderPos] = useState(0);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isRequestPending, setIsRequestPending] = useState(false);
-  const [ripples, setRipples] = useState([]);
-  const [shimmerPos, setShimmerPos] = useState(-100);
 
   // Logic refs
   const containerWidth = useRef(0);
@@ -35,17 +34,6 @@ const MUECustomSlider = ({
   const startX = useRef(0);
   const requestPending = useRef(false);
   const isDisabled = disabled || pending || isRequestPending || isSuccess;
-
-  // Shimmer animation
-  useEffect(() => {
-    const shimmerInterval = setInterval(() => {
-      setShimmerPos(prev => {
-        if (prev > 200) return -100;
-        return prev + 3;
-      });
-    }, 30);
-    return () => clearInterval(shimmerInterval);
-  }, []);
 
   const updateSliderTransform = useCallback((position) => {
     if (sliderRef.current) {
@@ -119,9 +107,6 @@ const MUECustomSlider = ({
     }
 
     setIsSuccess(true);
-    const newRipple = { id: Date.now(), x: containerWidth.current };
-    setRipples(prev => [...prev, newRipple]);
-    setTimeout(() => setRipples(prev => prev.filter(r => r.id !== newRipple.id)), 600);
     if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
     setTimeout(() => resetSlider(true), 400);
   }, [disabled, isSuccess, onSuccess, pending, resetSlider]);
@@ -221,10 +206,12 @@ const MUECustomSlider = ({
     }
   };
 
-  // Dynamic colors based on sus prop and progress
-  const accentColor = sus ? 'rgb(239, 68, 68)' : 'rgb(34, 211, 238)';
-  const accentColorDim = sus ? 'rgba(239, 68, 68, 0.3)' : 'rgba(34, 211, 238, 0.3)';
-  const glowColor = sus ? 'rgba(239, 68, 68, 0.5)' : 'rgba(34, 211, 238, 0.5)';
+  // Signal: the slider looks the same for every role. Tone follows the screen colour.
+  const onYellow = tone === 'meet';
+  const knobBg = onYellow ? 'var(--sg-ink)' : '#fff';
+  const knobFg = onYellow ? 'var(--sg-meet)' : 'var(--sg-round)';
+  const trackBg = onYellow ? 'rgba(26, 20, 0, 0.14)' : 'rgba(0, 0, 0, 0.22)';
+  const fillBg = onYellow ? 'rgba(26, 20, 0, 0.16)' : 'rgba(255, 255, 255, 0.22)';
 
   return (
     <>
@@ -234,85 +221,32 @@ const MUECustomSlider = ({
           event.returnValue = '';
         }
       }} />
-      
-      <div 
-        className="fixed bottom-0 left-0 right-0 z-50 p-4 pb-6 bg-gradient-to-t from-gray-900 via-gray-900/95 to-transparent"
+
+      <div
+        className="sg fixed bottom-0 left-0 right-0 z-50 px-4"
         style={{
           userSelect: 'none',
           overscrollBehavior: 'none',
+          paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 20px)',
+          paddingTop: 12,
+          color: onYellow ? 'var(--sg-ink)' : '#fff',
         }}
       >
         <div className="max-w-xl mx-auto">
           <div
             ref={containerRef}
             className="relative flex items-center px-1 overflow-hidden rounded-full"
-            style={{
-              height: SLIDER_HEIGHT,
-              background: 'rgba(17, 24, 39, 0.9)',
-              border: `2px solid ${progressPercent > 50 ? accentColor : 'rgba(55, 65, 81, 0.8)'}`,
-              boxShadow: progressPercent > 0 ? `0 0 20px ${accentColorDim}, inset 0 0 20px ${accentColorDim}` : 'none',
-              transition: 'border-color 0.3s, box-shadow 0.3s',
-            }}
+            style={{ height: SLIDER_HEIGHT, background: trackBg, opacity: isDisabled && !isSuccess && !isRequestPending && !pending ? 0.6 : 1 }}
           >
-          {/* Shimmer effect on track */}
-          <div 
-            className="absolute inset-0 pointer-events-none overflow-hidden rounded-full"
-            style={{
-              background: `linear-gradient(90deg, transparent ${shimmerPos - 30}%, rgba(255,255,255,0.1) ${shimmerPos}%, transparent ${shimmerPos + 30}%)`,
-            }}
-          />
-
-          {/* Progress Fill with gradient */}
+          {/* Fill follows the knob */}
           <div
-            className="absolute left-0 top-0 h-full rounded-full transition-all duration-75"
+            className="absolute left-0 top-0 h-full rounded-full"
             style={{
-              width: `${Math.min(progressPercent + 5, 100)}%`,
-              background: sus 
-                ? 'linear-gradient(90deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.4))'
-                : 'linear-gradient(90deg, rgba(34, 211, 238, 0.2), rgba(34, 211, 238, 0.4))',
+              width: `calc(${Math.min(progressPercent, 100)}% + ${SLIDER_HANDLE_SIZE})`,
+              background: fillBg,
               opacity: progressPercent > 0 ? 1 : 0,
             }}
           />
-
-          {/* Particle trail effect */}
-          {progressPercent > 10 && (
-            <div 
-              className="absolute top-1/2 -translate-y-1/2 pointer-events-none"
-              style={{ left: `${Math.max(0, progressPercent - 15)}%` }}
-            >
-              {[...Array(3)].map((_, i) => (
-                <div
-                  key={i}
-                  className="absolute w-1 h-1 rounded-full animate-ping"
-                  style={{
-                    backgroundColor: accentColor,
-                    left: `${i * -10}px`,
-                    opacity: 0.6 - (i * 0.2),
-                    animationDelay: `${i * 100}ms`,
-                    animationDuration: '1s',
-                  }}
-                />
-              ))}
-            </div>
-          )}
-
-          {/* Success ripple effects */}
-          {ripples.map(ripple => (
-            <div
-              key={ripple.id}
-              className="absolute top-1/2 -translate-y-1/2 rounded-full pointer-events-none"
-              style={{
-                left: ripple.x,
-                width: '100px',
-                height: '100px',
-                marginLeft: '-50px',
-                marginTop: '-50px',
-                border: `2px solid ${accentColor}`,
-                animation: 'ping 0.6s ease-out forwards',
-                opacity: 0,
-              }}
-            />
-          ))}
 
           {/* Slider Handle */}
           <div
@@ -335,78 +269,29 @@ const MUECustomSlider = ({
               width: SLIDER_HANDLE_SIZE,
               height: SLIDER_HANDLE_SIZE,
               borderRadius: '50%',
-              background: isSuccess 
-                ? (sus ? 'rgb(239, 68, 68)' : 'rgb(34, 211, 238)')
-                : `linear-gradient(135deg, ${sus ? '#ef4444' : '#22d3ee'}, ${sus ? '#b91c1c' : '#0891b2'})`,
+              background: knobBg,
+              color: knobFg,
               transform: 'translateY(-50%)',
-              boxShadow: `0 0 ${progressPercent > 50 ? '25px' : '15px'} ${glowColor}, 0 4px 15px rgba(0,0,0,0.3)`,
-              transition: 'box-shadow 0.3s, background 0.3s',
+              touchAction: 'none',
             }}
           >
             {isSuccess ? (
-              <Check size={24} className="text-white" />
+              <Check size={28} strokeWidth={3.5} />
             ) : (
-              <div className="relative">
-                {/* Animated chevrons */}
-                <div className="flex items-center">
-                  <ChevronRight 
-                    size={20} 
-                    className="text-white"
-                    style={{ 
-                      opacity: 0.5,
-                      animation: 'pulse 1.5s ease-in-out infinite',
-                    }}
-                  />
-                  <ChevronRight 
-                    size={20} 
-                    className="text-white -ml-3"
-                    style={{ 
-                      opacity: 0.75,
-                      animation: 'pulse 1.5s ease-in-out infinite 0.2s',
-                    }}
-                  />
-                  <ChevronRight 
-                    size={20} 
-                    className="text-white -ml-3"
-                    style={{ 
-                      animation: 'pulse 1.5s ease-in-out infinite 0.4s',
-                    }}
-                  />
-                </div>
+              <div className="flex items-center">
+                <ChevronRight size={22} strokeWidth={3.5} />
+                <ChevronRight size={22} strokeWidth={3.5} className="-ml-3.5" />
               </div>
             )}
           </div>
 
-          {/* Text with fade effect */}
+          {/* Label fades as the knob travels */}
           <div
             className="absolute inset-0 flex items-center justify-center pointer-events-none"
-            style={{
-              opacity: Math.max(0, 1 - (progressPercent / 60)),
-            }}
+            style={{ opacity: Math.max(0, 1 - (progressPercent / 60)), paddingLeft: SLIDER_HANDLE_SIZE }}
           >
-            <div className="flex items-center gap-2">
-              {sus && <Zap size={18} className="text-red-400" />}
-              <span 
-                className="font-semibold tracking-wide text-sm"
-                style={{
-                  color: sus ? 'rgb(252, 165, 165)' : 'rgb(164, 211, 238)',
-                }}
-              >
-                {text}
-              </span>
-              {!sus && <Zap size={18} className="text-cyan-400" />}
-            </div>
+            <span style={{ fontWeight: 700, fontSize: 17 }}>{text}</span>
           </div>
-
-          {/* Edge glow at the end */}
-          <div 
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full pointer-events-none"
-            style={{
-              background: `radial-gradient(circle, ${accentColorDim} 0%, transparent 70%)`,
-              opacity: progressPercent > 70 ? (progressPercent - 70) / 30 : 0,
-              animation: progressPercent > 80 ? 'pulse 0.5s ease-in-out infinite' : 'none',
-            }}
-          />
         </div>
         </div>
       </div>

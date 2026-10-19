@@ -1,45 +1,26 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { DataContext } from '../GameContext';
 import MUECustomSlider from '../components/swiper';
 import LeaveGameButton from '../components/LeaveGameButton';
-import { AlertTriangle, Users, CheckCircle2, Clock, Skull } from 'lucide-react';
+import { Check } from 'lucide-react';
+import { Face, Words, takeOrigin, vibrate } from '../signal';
 
+// Every phone floods yellow at once: the meeting is the loudest moment in the game.
 const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = null }) => {
   const { playerState, players, meetingState, socket, roundId, connected } = useContext(DataContext);
   const highlightReadySlider = tutorialMode && tutorialHighlightTarget === 'ready-slider';
-
-  const [readyPlayers, setReadyPlayers] = useState(0);
-  const [waitingPlayers, setWaitingPlayers] = useState([]);
-  const [pulseIntensity, setPulseIntensity] = useState(0);
+  const [origin] = useState(() => takeOrigin());
 
   useEffect(() => {
-    let ready = 0;
-    const waiting = [];
-    for (const player of players) {
-      if (player.alive) {
-        if (player.active !== false && player.ready) {
-          ready++;
-        } else {
-          waiting.push(player);
-        }
-      }
-    }
-    setReadyPlayers(ready);
-    setWaitingPlayers(waiting);
-  }, [playerState, players]);
-
-  // Animated pulse effect
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setPulseIntensity((prev) => (prev + 1) % 360);
-    }, 50);
-    return () => clearInterval(interval);
+    vibrate([120, 60, 120]);
   }, []);
 
-  const totalAlive = players.filter((player) => player.alive).length;
-  const playersRemaining = totalAlive - readyPlayers;
-  const progressPercentage = totalAlive > 0 ? (readyPlayers / totalAlive) * 100 : 0;
-  const allReady = playersRemaining === 0;
+  const alive = useMemo(() => players.filter((p) => p.alive), [players]);
+  const isReady = (p) => p.active !== false && p.ready;
+  const readyCount = alive.filter(isReady).length;
+  const totalAlive = alive.length;
+  const allReady = totalAlive > 0 && readyCount === totalAlive;
+  const caller = players.find((p) => p.username === meetingState?.player_who_started_it);
 
   const handleReadyUp = () => {
     socket.emit('ready', {
@@ -62,177 +43,80 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
     }
   };
 
+  const meReady = playerState.ready && playerState.active !== false;
+
   return (
-    <div className="fixed inset-0 flex flex-col items-center bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white p-6 pt-12 pb-32 overflow-y-auto">
-      {/* Leave Game Button */}
-      {!tutorialMode && <LeaveGameButton className="fixed top-4 right-4 z-50" />}
+    <div
+      className="sg-screen sg-meet sg-flood"
+      style={{ '--fx': origin.fx, '--fy': origin.fy, paddingBottom: meReady ? 24 : 130 }}
+    >
+      <div className="sg-stripes" />
+      {!tutorialMode && <LeaveGameButton className="sg-corner" />}
 
-      {/* Animated Background Effects */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {/* Central glow */}
-        <div 
-          className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full blur-3xl"
-          style={{ 
-            background: `radial-gradient(circle, ${allReady ? 'rgba(34, 197, 94, 0.15)' : 'rgba(251, 146, 60, 0.15)'} 0%, transparent 70%)`,
-            opacity: 0.5 + (Math.sin(pulseIntensity * 0.05) * 0.2)
-          }}
-        />
-        
-        {/* Rotating ring */}
-        <div 
-          className={`absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] border ${allReady ? 'border-green-500/20' : 'border-orange-500/20'} rounded-full`}
-          style={{ transform: `translate(-50%, -50%) rotate(${pulseIntensity}deg)` }}
-        />
-        <div 
-          className={`absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] border ${allReady ? 'border-green-500/10' : 'border-orange-500/10'} rounded-full`}
-          style={{ transform: `translate(-50%, -50%) rotate(-${pulseIntensity * 0.5}deg)` }}
-        />
-
-        {/* Grid overlay */}
-        <div 
-          className="absolute inset-0 opacity-5"
-          style={{
-            backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-            backgroundSize: '50px 50px'
-          }}
-        />
-
-        {/* Corner accents */}
-        <div className="absolute top-0 left-0 w-32 h-32 border-l-2 border-t-2 border-orange-500/20" />
-        <div className="absolute top-0 right-0 w-32 h-32 border-r-2 border-t-2 border-orange-500/20" />
-        <div className="absolute bottom-0 left-0 w-32 h-32 border-l-2 border-b-2 border-orange-500/20" />
-        <div className="absolute bottom-0 right-0 w-32 h-32 border-r-2 border-b-2 border-orange-500/20" />
-      </div>
-
-      <div className="relative z-10 text-center max-w-lg w-full shrink-0 my-auto">
-        {/* Header Icon */}
-        <div className="flex justify-center mb-4">
-          <div className={`w-20 h-20 rounded-2xl ${allReady ? 'bg-green-500/20 border-green-500/30' : 'bg-orange-500/20 border-orange-500/30'} border flex items-center justify-center`}>
-            <AlertTriangle size={40} className={allReady ? 'text-green-400' : 'text-orange-400'} />
-          </div>
-        </div>
-
-        <h1 className={`text-3xl font-bold mb-2 ${allReady ? 'text-green-300' : 'text-orange-300'} tracking-wider uppercase`}>
-          Emergency Meeting
+      <div className="sg-shake sg-center" style={{ animationDelay: '700ms', gap: 16, paddingTop: 12 }}>
+        <h1 className="sg-big sg-h1">
+          <Words text="EMERGENCY" delay={420} />
+          <br />
+          <Words text="MEETING" delay={560} />
         </h1>
-        <p className="text-gray-400 mb-6">
-          Called by{' '}
-          <span className="font-semibold text-white">
-            {meetingState.player_who_started_it}
-          </span>
+
+        {caller ? (
+          <Face player={caller} size={104} className="sg-a sg-pop" style={{ animationDelay: '820ms' }} />
+        ) : null}
+        <p className="sg-lede sg-a sg-rise" style={{ animationDelay: '1000ms' }}>
+          {meetingState.player_who_started_it} called it
+        </p>
+        <p className="sg-small sg-a sg-rise" style={{ animationDelay: '1090ms' }}>
+          Go to the meeting spot, then slide ready
         </p>
 
-        {/* Status Card */}
-        <div className={`relative overflow-hidden rounded-2xl border ${allReady ? 'border-green-500/30' : 'border-orange-500/30'} bg-gray-800/50 backdrop-blur-sm mb-6`}>
-          {/* Progress bar as background */}
-          <div 
-            className={`absolute inset-y-0 left-0 ${allReady ? 'bg-green-500/10' : 'bg-orange-500/10'} transition-all duration-700 ease-out`}
-            style={{ width: `${progressPercentage}%` }}
-          />
-          
-          <div className="relative p-5">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Users size={18} className="text-gray-400" />
-                <span className="text-gray-400 text-sm">Crew Response</span>
-              </div>
-              <div className={`flex items-center gap-1.5 ${allReady ? 'text-green-400' : 'text-orange-400'}`}>
-                {allReady ? (
-                  <>
-                    <CheckCircle2 size={16} />
-                    <span className="text-sm font-medium">All Ready</span>
-                  </>
-                ) : (
-                  <>
-                    <Clock size={16} className="animate-pulse" />
-                    <span className="text-sm font-medium">Waiting...</span>
-                  </>
+        {/* Roll call: everyone alive, filling in as they get there */}
+        <div className="sg-row sg-a sg-fade" style={{ gap: 14, marginTop: 10, animationDelay: '1200ms' }}>
+          {alive.map((player) => {
+            const ready = isReady(player);
+            return (
+              <div key={player.player_id || player.id} className="flex flex-col items-center" style={{ width: 64, gap: 4 }}>
+                <div style={{ position: 'relative' }}>
+                  <Face player={player} size={52} style={{ opacity: ready ? 1 : 0.35, transition: 'opacity .3s' }} />
+                  {ready && (
+                    <span
+                      key="ok"
+                      className="sg-a sg-pop"
+                      style={{ position: 'absolute', right: -4, bottom: -4, width: 22, height: 22, borderRadius: 11, background: 'var(--sg-ink)', color: 'var(--sg-meet)', display: 'grid', placeItems: 'center' }}
+                    >
+                      <Check size={14} strokeWidth={4} />
+                    </span>
+                  )}
+                </div>
+                <span style={{ fontWeight: 700, fontSize: 13, maxWidth: 64, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', opacity: ready ? 1 : 0.6 }}>
+                  {player.username}
+                </span>
+                {player.active === false && (
+                  <span style={{ fontWeight: 700, fontSize: 11, opacity: 0.6 }}>Offline</span>
                 )}
               </div>
-            </div>
-
-            {/* Stats Row */}
-            <div className="flex justify-center gap-8">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-green-400">{readyPlayers}</div>
-                <div className="text-xs text-gray-500 uppercase tracking-wider">Ready</div>
-              </div>
-              <div className="w-px bg-gray-700" />
-              <div className="text-center">
-                <div className="text-3xl font-bold text-red-400">{playersRemaining}</div>
-                <div className="text-xs text-gray-500 uppercase tracking-wider">Waiting</div>
-              </div>
-              <div className="w-px bg-gray-700" />
-              <div className="text-center">
-                <div className="text-3xl font-bold text-gray-300">{totalAlive}</div>
-                <div className="text-xs text-gray-500 uppercase tracking-wider">Alive</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Gradient accent line */}
-          <div className={`h-1 w-full bg-gradient-to-r from-transparent ${allReady ? 'via-green-500' : 'via-orange-500'} to-transparent`} />
+            );
+          })}
         </div>
 
-        {/* Waiting Players List */}
-        {waitingPlayers.length > 0 && (
-          <div className="relative overflow-hidden rounded-2xl border border-red-500/30 bg-gray-800/50 backdrop-blur-sm mb-6">
-            <div className="p-4">
-              <div className="flex items-center justify-center gap-2 mb-3">
-                <Clock className="text-red-400 animate-pulse" size={18} />
-                <h3 className="text-sm font-semibold text-red-400 uppercase tracking-wider">Waiting For</h3>
-              </div>
-              <div className="flex flex-wrap justify-center gap-2">
-                {waitingPlayers.map((player) => (
-                  <span
-                    key={player.id || player.player_id}
-                    className="px-3 py-1.5 bg-red-500/10 border border-red-500/30 rounded-lg text-red-300 text-sm font-medium flex items-center gap-1.5"
-                  >
-                    <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                    {player.username}
-                    {player.active === false && <span className="ml-1 rounded bg-gray-700 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-gray-300">Offline</span>}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
+        <p data-testid="ready-count" className="sg-lede sg-num" style={{ marginTop: 4 }}>
+          {allReady ? 'Everyone is here. Voting opens.' : `${readyCount} of ${totalAlive} ready`}
+        </p>
 
-        {/* Ready Status Indicator */}
-        {playerState.ready && playerState.active !== false && (
-          <div className="relative overflow-hidden rounded-2xl border border-green-500/30 bg-green-500/10 mb-6">
-            <div className="p-4 flex items-center justify-center gap-3">
-              <CheckCircle2 className="text-green-400" size={24} />
-              <span className="text-green-300 font-medium">You're ready! Waiting for others...</span>
-            </div>
-          </div>
-        )}
+        {meReady && <p className="sg-small">You're ready</p>}
 
-        {/* Dead Button - Prominent for dead players */}
-        <div className="relative overflow-hidden rounded-2xl border-2 border-red-500/50 bg-red-950/30 mb-6">
-          <div className="absolute inset-0 bg-red-500/5 animate-pulse" />
-          <button
-            onClick={handleImDead}
-            className="relative w-full flex items-center justify-center gap-3 px-6 py-4 text-lg font-bold text-red-400 hover:text-red-300 hover:bg-red-500/20 transition-all"
-          >
-            <Skull size={24} className="animate-pulse" />
-            <span>I've Been Killed</span>
-            <Skull size={24} className="animate-pulse" />
-          </button>
-          <div className="text-center pb-3 text-red-400/60 text-xs">
-            Tap if you were eliminated before this meeting
-          </div>
-        </div>
+        <button type="button" className="sg-link" onClick={handleImDead}>
+          I've Been Killed
+        </button>
       </div>
 
-      {/* Slider fixed at bottom */}
       {!playerState.ready && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 pb-safe">
+        <div className="fixed bottom-0 left-0 right-0 z-50">
           <div
             className={highlightReadySlider ? 'animate-pulse' : ''}
-            style={highlightReadySlider ? { borderRadius: '1.5rem', outline: '3px solid rgba(252,211,77,0.85)', outlineOffset: '4px', boxShadow: '0 0 30px rgba(251,191,36,0.4)' } : {}}
+            style={highlightReadySlider ? { borderRadius: 999, outline: '4px solid var(--sg-ink)', outlineOffset: -8 } : {}}
           >
-            <MUECustomSlider text="Slide to ready up" onSuccess={handleReadyUp} disabled={!connected} />
+            <MUECustomSlider text="Slide when you're there" tone="meet" onSuccess={handleReadyUp} disabled={!connected} />
           </div>
         </div>
       )}

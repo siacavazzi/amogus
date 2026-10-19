@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
+import './signal/signal.css';
 import App from './App';
 import BetaBadge from './components/BetaBadge';
 import { CLIENT_VERSION } from './version';

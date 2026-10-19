@@ -1,10 +1,13 @@
 // src/components/ProgressBar.jsx
-import React from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
-import { Target, Skull } from 'lucide-react';
+import { DataContext } from '../GameContext';
+import '../signal/signal.css';
 
-const ProgressBar = ({ score, goalScore, sus }) => {
-  // Calculate percentage
+// The crew's task progress across the top of every game screen. Crewmates and intruders
+// see exactly the same bar, so a glance at a phone never gives a role away.
+const ProgressBar = ({ score, goalScore }) => {
+  const { meetingState } = useContext(DataContext) || {};
   let percentage = (score / goalScore) * 100;
   if (isNaN(percentage)) {
     percentage = 0;
@@ -13,57 +16,39 @@ const ProgressBar = ({ score, goalScore, sus }) => {
   }
 
   const isComplete = percentage >= 100;
-  
-  // Theme based on role - keeping them visually similar
-  const theme = sus
-    ? {
-        gradient: 'from-red-500 via-orange-500 to-red-400',
-        glowColor: 'shadow-red-500/30',
-        accentColor: 'text-red-400',
-        icon: Skull,
-        message: 'Eliminate Crew',
-      }
-    : {
-        gradient: 'from-cyan-500 via-emerald-500 to-cyan-400',
-        glowColor: 'shadow-emerald-500/30',
-        accentColor: 'text-cyan-400',
-        icon: Target,
-        message: 'Complete Tasks',
-      };
-
-  const Icon = theme.icon;
+  // Meeting screens are yellow, so the bar switches to ink there.
+  const onYellow = meetingState?.stage === 'waiting' || meetingState?.stage === 'voting';
+  const fg = onYellow ? 'var(--sg-ink)' : '#fff';
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-40 bg-gray-900/95 backdrop-blur-sm border-b border-gray-700/50">
-      <div className="max-w-lg mx-auto px-3 py-1.5 flex items-center gap-3">
-        {/* Icon and Message */}
-        <div className={`flex items-center gap-1.5 ${theme.accentColor}`}>
-          <Icon size={12} className={isComplete ? 'animate-pulse' : ''} />
-          <span className="text-xs font-medium whitespace-nowrap">{theme.message}</span>
-        </div>
-
-        {/* Progress Container */}
-        <div className="flex-grow">
+    <div
+      className="sg fixed top-0 left-0 z-40 pointer-events-none"
+      style={{ right: 64, paddingTop: 'calc(env(safe-area-inset-top, 0px) + 22px)', paddingLeft: 20, color: fg }}
+    >
+      <div className="max-w-lg flex items-center gap-2.5" style={{ fontWeight: 700, fontSize: 14 }}>
+        <span>Tasks</span>
+        <div
+          className="flex-grow overflow-hidden"
+          style={{ height: 8, borderRadius: 8, background: onYellow ? 'rgba(26,20,0,0.18)' : 'rgba(255,255,255,0.25)' }}
+          role="progressbar"
+          aria-valuenow={score}
+          aria-valuemin="0"
+          aria-valuemax={goalScore}
+          aria-label={`Progress: ${percentage}%`}
+        >
           <div
-            className="w-full h-2 rounded-full bg-gray-800 overflow-hidden"
-            role="progressbar"
-            aria-valuenow={score}
-            aria-valuemin="0"
-            aria-valuemax={goalScore}
-            aria-label={`Progress: ${percentage}%`}
+            className="h-full"
+            style={{ width: `${percentage}%`, transition: 'width 0.7s cubic-bezier(.34,1.56,.64,1)' }}
           >
-            {/* Progress fill */}
             <div
-              className={`h-full bg-gradient-to-r ${theme.gradient} transition-all duration-500 ease-out rounded-full ${
-                isComplete ? `shadow-lg ${theme.glowColor}` : ''
-              }`}
-              style={{ width: `${percentage}%` }}
+              key={score}
+              className={`h-full ${score > 0 ? 'sg-bounce' : ''}`}
+              data-complete={isComplete || undefined}
+              style={{ background: fg, borderRadius: 8, transformOrigin: 'left center' }}
             />
           </div>
         </div>
-
-        {/* Percentage */}
-        <span className="text-xs font-mono text-gray-400 w-8 text-right">
+        <span className="sg-num" style={{ minWidth: '3.2ch', textAlign: 'right' }}>
           {percentage}%
         </span>
       </div>

@@ -2,12 +2,7 @@ import { createContext, useState, useEffect, useRef, useMemo, useCallback } from
 import { io } from "socket.io-client";
 import { ENDPOINT } from './ENDPOINT';
 import { AudioHandler } from './AudioHandler';
-import PlayerRole from './components/PlayerRole';
-import MeetingDisplay from './components/MeetingDisplay';
-import MeltdownAvertedDisplay from './components/MeltdownAverted';
 import FakeTaskReveal from './components/FakeTaskReveal';
-import IntrudersRevealedDisplay from './components/IntrudersRevealedDisplay';
-import TauntNotification from './components/TauntNotification';
 import { markHasPlayedGame } from './tutorial/tutorialStorage';
 import { isMobile as isMobileDevice } from 'react-device-detect';
 import { getRoomCodeFromSearch, clearRoomCodeFromUrl } from './utils/inviteLinks';
@@ -623,7 +618,8 @@ export default function GameContext({ children }) {
         socketRef.current.on('taunt_received', (data) => {
             isMobile && setDialog({
                 title: "You've received a message...",
-                body: <TauntNotification message={data.message || ""} />
+                kind: 'taunt',
+                message: data.message || "",
             });
         });
 
@@ -657,12 +653,11 @@ export default function GameContext({ children }) {
             const myPlayerId = localStorage.getItem('player_id');
             const isIntruder = data.intruder_ids?.includes(myPlayerId);
             
-            isMobile && setDialog({ 
-                title: isIntruder ? "🚨 EXPOSED! 🚨" : "🚨 TASKS COMPLETE! 🚨", 
-                body: <IntrudersRevealedDisplay 
-                    intruderNames={data.intruder_names || []} 
-                    isIntruder={isIntruder}
-                />
+            // Same full-screen moment on every phone, intruders included.
+            isMobile && setDialog({
+                title: isIntruder ? "Exposed" : "Tasks complete",
+                kind: 'revealed',
+                intruderNames: data.intruder_names || [],
             });
         });
 
@@ -674,7 +669,7 @@ export default function GameContext({ children }) {
             setCodesNeeded(undefined);
             setMeltdownTimer(undefined);
             setMeltdownCode(undefined);
-            isMobile && setDialog({ title: "Meltdown Averted!", body: <MeltdownAvertedDisplay /> });
+            isMobile && setDialog({ title: "Meltdown averted", body: "The reactor is safe. Back to your tasks." });
         });
 
         socketRef.current.on('reset', () => {
@@ -810,14 +805,8 @@ export default function GameContext({ children }) {
                 setMeetingState(meetingData);
                 setShowSusPage(false)
                 
-                if (meetingData.stage === 'waiting') {
-                    isMobile && setDialog({ 
-                        title: "Emergency Meeting Called!", 
-                        body: <MeetingDisplay meetingData={meetingData} /> 
-                    });
-                } else {
-                    setDialog(undefined)
-                }
+                // The yellow meeting screen is the announcement; no pop-up on top of it.
+                setDialog(undefined)
             } catch (error) {
                 console.error("Error parsing meeting data:", error);
             }
@@ -936,7 +925,7 @@ export default function GameContext({ children }) {
                     setRunning(true);
                     setTaskCreationMode(false);  // Exit task creation mode
                     
-                    isMobile && setDialog({ title: "Game Started", body: <PlayerRole sus={me.sus} otherIntruders={otherIntruders}/> });
+                    isMobile && setDialog({ title: "The game has started", kind: 'role', sus: !!me.sus, otherIntruders });
 
                 } else if (data.action === "start_game") {
                     setRunning(true);
@@ -969,7 +958,7 @@ export default function GameContext({ children }) {
         socket.emit('test_switch_role', { player_id: playerId }, (response) => {
             if (!response?.ok) return;
             setShowSusPage(false);
-            isMobile && setDialog({ title: "Role Switched", body: <PlayerRole sus={response.sus} otherIntruders={[]}/> });
+            isMobile && setDialog({ title: "Role switched", kind: 'role', sus: !!response.sus, otherIntruders: [] });
         });
     }, [playerState]);
 

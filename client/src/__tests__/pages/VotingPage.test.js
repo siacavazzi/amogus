@@ -136,8 +136,7 @@ describe('VotingPage', () => {
         it('renders the voting page with title', () => {
             renderWithContext(<VotingPage />, votingContext);
             
-            // Component has "Emergency Vote" as the title
-            expect(screen.getByRole('heading', { name: /Emergency Vote/i })).toBeInTheDocument();
+            expect(screen.getByRole('heading', { name: /^Vote$/i })).toBeInTheDocument();
         });
 
         it('displays countdown timer', () => {

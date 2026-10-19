@@ -87,7 +87,6 @@ export const ProfilePicture = ({
   // Get death styling if dead
   const deathInfo = isDead && deathCause ? getDeathInfo(deathCause) : null;
   const DeathIcon = deathInfo?.icon;
-  const actualRingColor = deathInfo ? deathInfo.ring : ringColor;
   
   const [selfieUrl, onSelfieError] = useSelfieFallback(getSelfieUrl(selfie, selfieAccess));
 
@@ -107,23 +106,23 @@ export const ProfilePicture = ({
           src={selfieUrl}
           referrerPolicy="no-referrer"
           alt="Player"
-          className={`${sizeClasses} rounded-full object-cover ring-4 ${actualRingColor} shadow-lg ${isDead ? 'grayscale opacity-70' : ''}`}
+          className={`${sizeClasses} rounded-full object-cover ${isDead ? 'grayscale opacity-70' : ''}`}
           onError={onSelfieError}
         />
       ) : getAvatar(imageCode) ? (
-        <div className={`${sizeClasses} rounded-full overflow-hidden ring-4 ${actualRingColor} shadow-lg ${isDead ? 'grayscale opacity-70' : ''}`}>
+        <div className={`${sizeClasses} rounded-full overflow-hidden ${isDead ? 'grayscale opacity-70' : ''}`}>
           <Avatar id={imageCode} className="w-full h-full" />
         </div>
       ) : (
-        <div className={`${sizeClasses} rounded-full ring-4 ${actualRingColor} shadow-lg bg-gray-700 flex items-center justify-center ${isDead ? 'opacity-70' : ''}`}>
+        <div className={`${sizeClasses} rounded-full bg-gray-700 flex items-center justify-center ${isDead ? 'opacity-70' : ''}`}>
           <Shield size={size === 'large' ? 32 : size === 'medium' ? 24 : 16} className="text-gray-500" />
         </div>
       )}
       
       {/* Death icon overlay */}
       {isDead && DeathIcon && (
-        <div className={`absolute -bottom-1 -right-1 ${iconSize.container} rounded-lg ${deathInfo.bg} ${deathInfo.border} border flex items-center justify-center`}>
-          <DeathIcon size={iconSize.icon} className={deathInfo.color} />
+        <div className={`absolute -bottom-1 -right-1 ${iconSize.container} rounded-full flex items-center justify-center`} style={{ background: '#fff', color: '#1a1400' }}>
+          <DeathIcon size={iconSize.icon} strokeWidth={2.75} />
         </div>
       )}
     </div>
@@ -137,47 +136,29 @@ export const PlayerCardCompact = ({
   variant = "default" // "default", "survivor", "dead"
 }) => {
   const isDead = !player.alive;
-  const deathInfo = isDead && player.death_cause ? getDeathInfo(player.death_cause) : null;
-  
-  // Determine styling based on variant
-  let cardBg, cardBorder;
-  if (variant === "survivor") {
-    cardBg = "bg-green-500/10";
-    cardBorder = "border-green-500/30";
-  } else if (variant === "dead" && deathInfo) {
-    cardBg = deathInfo.bg;
-    cardBorder = deathInfo.border;
-  } else {
-    cardBg = "bg-gray-800/50";
-    cardBorder = "border-gray-700/50";
-  }
   
   return (
-    <div className={`relative overflow-hidden flex items-center gap-3 p-3 rounded-xl border ${cardBg} ${cardBorder} backdrop-blur-sm transition-all hover:scale-[1.02]`}>
-      {/* Profile picture */}
+    <div className="sg flex items-center gap-3" style={{ padding: 10, borderRadius: 18, background: 'rgba(0,0,0,0.18)', color: '#fff' }}>
       <ProfilePicture 
         imageCode={player.pic}
         selfie={player.selfie}
         size="small"
         isDead={isDead}
         deathCause={player.death_cause}
-        ringColor={variant === "survivor" ? "ring-green-500/50" : "ring-gray-500/30"}
       />
-      
-      {/* Player info */}
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 text-left">
         <div className="flex items-center gap-2">
-          <span className="font-medium text-white truncate">
+          <span className="truncate" style={{ fontWeight: 900, fontSize: 17 }}>
             {player.username}
           </span>
           {player.sus && (
-            <span className="text-[10px] px-1.5 py-0.5 bg-red-500/30 text-red-300 rounded font-medium uppercase">
+            <span style={{ fontSize: 11, fontWeight: 900, padding: '2px 8px', borderRadius: 999, background: '#fff', color: 'var(--sg-out)' }}>
               Intruder
             </span>
           )}
         </div>
         {showDeathInfo && player.death_message && (
-          <p className="text-xs text-gray-400 mt-1 break-words whitespace-normal text-left">
+          <p className="break-words whitespace-normal" style={{ fontWeight: 500, fontSize: 14, opacity: 0.85, marginTop: 2 }}>
             {player.death_message}
           </p>
         )}
@@ -191,27 +172,20 @@ export const PlayerBadge = ({
   player,
   variant = "default" // "default", "survivor", "intruder"
 }) => {
-  const variantStyles = {
-    default: "bg-gray-500/10 border-gray-500/30",
-    survivor: "bg-green-500/10 border-green-500/30",
-    intruder: "bg-red-500/10 border-red-500/30"
-  };
-  
   return (
-    <div className={`flex items-center gap-2 px-3 py-2 rounded-xl ${variantStyles[variant]} border backdrop-blur-sm transition-all hover:scale-105`}>
+    <div className="sg flex items-center gap-2" style={{ padding: '6px 12px 6px 6px', borderRadius: 999, background: 'rgba(0,0,0,0.18)', color: '#fff' }}>
       <ProfilePicture 
         imageCode={player.pic}
         selfie={player.selfie}
         size="tiny"
         isDead={!player.alive}
         deathCause={player.death_cause}
-        ringColor={variant === "survivor" ? "ring-green-500/50" : variant === "intruder" ? "ring-red-500/50" : "ring-gray-500/30"}
       />
-      <span className="text-sm font-medium text-white">
+      <span style={{ fontWeight: 700, fontSize: 15 }}>
         {player.username}
       </span>
       {player.sus && variant !== "intruder" && (
-        <span className="text-xs">🔪</span>
+        <span style={{ fontSize: 11, fontWeight: 900, padding: '1px 7px', borderRadius: 999, background: '#fff', color: 'var(--sg-out)' }}>Intruder</span>
       )}
     </div>
   );

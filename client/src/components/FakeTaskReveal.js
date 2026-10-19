@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { AlertTriangle, XCircle } from 'lucide-react';
 
 /**
  * FakeTaskReveal - A dramatic reveal animation when a player completes a fake task
@@ -7,7 +6,6 @@ import { AlertTriangle, XCircle } from 'lucide-react';
  */
 const FakeTaskReveal = ({ task, location, onComplete }) => {
   const [phase, setPhase] = useState('glitch'); // 'glitch', 'reveal', 'exit'
-  const [glitchOffset, setGlitchOffset] = useState({ x: 0, y: 0 });
   const onCompleteRef = useRef(onComplete);
   const hasCompletedRef = useRef(false);
 
@@ -15,20 +13,6 @@ const FakeTaskReveal = ({ task, location, onComplete }) => {
   useEffect(() => {
     onCompleteRef.current = onComplete;
   }, [onComplete]);
-
-  // Glitch effect
-  useEffect(() => {
-    if (phase !== 'glitch') return;
-
-    const glitchInterval = setInterval(() => {
-      setGlitchOffset({
-        x: (Math.random() - 0.5) * 20,
-        y: (Math.random() - 0.5) * 10,
-      });
-    }, 50);
-
-    return () => clearInterval(glitchInterval);
-  }, [phase]);
 
   // Phase transitions - longer display time
   useEffect(() => {
@@ -46,84 +30,26 @@ const FakeTaskReveal = ({ task, location, onComplete }) => {
     return () => timers.forEach(t => clearTimeout(t));
   }, []);
 
+  // A private moment: the phone stays blue, the task gets struck out and the phone shakes.
   return (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-none"
-      style={{
-        backgroundColor: phase === 'exit' ? 'rgba(0,0,0,0)' : 'rgba(0,0,0,0.85)',
-        transition: 'background-color 0.4s ease-out',
-      }}
+      className="sg-layer sg-round"
+      style={{ zIndex: 9999, pointerEvents: 'none', opacity: phase === 'exit' ? 0 : 1, transition: 'opacity .4s' }}
+      role="alert"
     >
-      {/* Glitch scanlines */}
-      {phase === 'glitch' && (
-        <div
-          className="absolute inset-0 pointer-events-none overflow-hidden"
-          style={{
-            background: `repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 2px,
-                rgba(255, 0, 0, 0.05) 2px,
-                rgba(255, 0, 0, 0.05) 4px
-              )`,
-          }}
-        />
-      )}
-
-      {/* Red warning flashes */}
-      {phase === 'glitch' && (
-        <div
-          className="absolute inset-0 bg-red-500/30 animate-pulse"
-          style={{ animationDuration: '0.1s' }}
-        />
-      )}
-
-      {/* Main content container */}
-      <div
-        className={`relative flex flex-col items-center transition-all duration-500 ${
-          phase === 'exit' ? 'opacity-0 scale-90' : 'opacity-100 scale-100'
-        }`}
-        style={{
-          transform: phase === 'glitch' 
-            ? `translate(${glitchOffset.x}px, ${glitchOffset.y}px)` 
-            : 'translate(0, 0)',
-        }}
-      >
-        {/* Central icon */}
-        <div
-          className={`relative mb-6 transition-all duration-300 ${
-            phase === 'glitch' ? 'scale-150 opacity-0' : 'scale-100 opacity-100'
-          }`}
-        >
-          {/* Pulsing ring */}
-          <div className="absolute inset-0 -m-6 border-4 border-red-500/40 rounded-full animate-ping" style={{ animationDuration: '1s' }} />
-
-          {/* Icon background */}
-          <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-red-600 to-red-800 flex items-center justify-center shadow-2xl shadow-red-500/50">
-            <XCircle size={44} className="text-white" />
-          </div>
-        </div>
-
-        {/* FAKE TASK label */}
-        <div
-          className={`transition-all duration-300 ${
-            phase === 'reveal' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-          }`}
-        >
-          <h1
-            className="text-4xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-b from-red-400 via-red-500 to-red-700 tracking-tight text-center"
-            style={{
-              textShadow: '0 0 40px rgba(239, 68, 68, 0.5)',
-            }}
-          >
-            FAKE TASK!
-          </h1>
-          
-          <p className="text-red-400/80 text-sm text-center mt-3 flex items-center justify-center gap-2">
-            <AlertTriangle size={14} />
-            No points awarded
+      <div className={`sg-center ${phase === 'reveal' ? 'sg-nudge' : ''}`} style={{ height: '100%', padding: 24 }}>
+        {task && (
+          <p className="sg-big sg-h3" style={{ maxWidth: '16ch', textDecoration: phase === 'glitch' ? 'none' : 'line-through', textDecorationThickness: 5, opacity: 0.85 }}>
+            {task}
           </p>
-        </div>
+        )}
+        {location && <p className="sg-small">{location}</p>}
+        <h1 className="sg-big sg-h1" style={{ marginTop: 18, opacity: phase === 'glitch' ? 0 : 1, transform: phase === 'glitch' ? 'scale(1.6)' : 'none', transition: 'all .28s cubic-bezier(.5,0,.2,1)' }}>
+          FAKE TASK!
+        </h1>
+        <p className="sg-lede" style={{ opacity: phase === 'glitch' ? 0 : 0.9, transition: 'opacity .3s .2s' }}>
+          An intruder sent you on that one. No points awarded.
+        </p>
       </div>
     </div>
   );

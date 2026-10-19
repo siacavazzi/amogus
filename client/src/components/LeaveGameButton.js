@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { DataContext } from '../GameContext';
-import { LogOut, AlertTriangle } from 'lucide-react';
+import { LogOut } from 'lucide-react';
+import '../signal/signal.css';
 
 function LeaveGameButton({ className = '' }) {
     const { socket, roomCode, running } = useContext(DataContext);
@@ -31,45 +32,34 @@ function LeaveGameButton({ className = '' }) {
 
     return (
         <>
-            {/* Leave Button */}
+            {/* Leave Button: a quiet round button that sits on any screen colour */}
             <button
                 onClick={handleLeaveClick}
-                className={`flex items-center gap-2 px-3 py-2 bg-gray-800/80 hover:bg-red-600/80 border border-gray-600 hover:border-red-500 rounded-lg text-gray-400 hover:text-white transition-all text-sm backdrop-blur-sm ${className}`}
+                className={`sg flex items-center justify-center gap-2 rounded-full transition-opacity hover:opacity-100 ${className}`}
+                style={{ minWidth: 40, height: 40, padding: '0 11px', background: 'rgba(0,0,0,0.18)', color: 'inherit', opacity: 0.85, fontWeight: 700, fontSize: 14 }}
                 title="Leave Game"
+                aria-label="Leave game"
             >
-                <LogOut size={16} />
+                <LogOut size={17} strokeWidth={2.5} />
                 <span className="hidden sm:inline">Leave</span>
             </button>
 
-            {/* Confirmation Modal */}
+            {/* Confirmation */}
             {showConfirm && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-                    <div className="bg-gray-800 rounded-2xl p-6 max-w-sm w-full border border-gray-600 shadow-2xl">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="p-3 bg-red-500/20 rounded-full">
-                                <AlertTriangle size={24} className="text-red-400" />
-                            </div>
-                            <h2 className="text-xl font-bold text-white">Leave Game?</h2>
-                        </div>
-                        
-                        <p className="text-gray-300 mb-6">
-                            {running 
-                                ? "You will be marked as eliminated and cannot rejoin this game. Are you sure you want to leave?"
-                                : "Are you sure you want to leave this room?"
+                <div className="sg fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.55)' }}>
+                    <div className="sg-a sg-rise w-full max-w-sm" style={{ background: '#fff', color: 'var(--sg-ink)', borderRadius: 24, padding: 22 }}>
+                        <h2 className="sg-big" style={{ fontSize: 30, marginBottom: 10 }}>Leave game?</h2>
+                        <p style={{ fontWeight: 500, fontSize: 16, lineHeight: 1.4, marginBottom: 20, opacity: 0.8 }}>
+                            {running
+                                ? "You'll be marked as eliminated and can't rejoin this game."
+                                : "You'll leave this room."
                             }
                         </p>
-                        
                         <div className="flex gap-3">
-                            <button
-                                onClick={handleCancel}
-                                className="flex-1 px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors"
-                            >
-                                Cancel
+                            <button onClick={handleCancel} className="sg-btn" style={{ background: '#eceae4', color: 'var(--sg-ink)' }}>
+                                Stay
                             </button>
-                            <button
-                                onClick={handleConfirmLeave}
-                                className="flex-1 px-4 py-3 bg-red-600 hover:bg-red-500 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
-                            >
+                            <button onClick={handleConfirmLeave} className="sg-btn" style={{ background: 'var(--sg-out)', color: '#fff' }}>
                                 <LogOut size={18} />
                                 Leave
                             </button>

@@ -89,7 +89,8 @@ const IntruderPage = ({
     activeCards,
     players,
     taskLocations,
-    intrudersRevealed
+    intrudersRevealed,
+    killCooldown = 0,
   } = useContext(DataContext);
 
   // Check if intruders have been revealed (tasks 100%)
@@ -433,6 +434,10 @@ const IntruderPage = ({
               <Eye size={16} />
               <span>You are exposed - find safety!</span>
             </div>
+            {/* The round screen hides the kill cooldown so it looks like a crewmate's; it lives here. */}
+            <p data-testid="kill-cooldown" className="text-sm font-bold text-white/90">
+              {killCooldown > 0 ? `Next kill in ${killCooldown}s` : 'Kill ready'}
+            </p>
           </>
         )}
       </div>

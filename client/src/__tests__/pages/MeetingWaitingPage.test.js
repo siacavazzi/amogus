@@ -23,8 +23,7 @@ describe('MeetingWaitingPage', () => {
 
         expect(screen.getByText('Blair')).toBeInTheDocument();
         expect(screen.getByText('Offline')).toBeInTheDocument();
-        expect(screen.getAllByText('2', { selector: '.text-3xl' })).toHaveLength(2);
-        expect(screen.getByText('0', { selector: '.text-3xl' })).toBeInTheDocument();
+        expect(screen.getByTestId('ready-count')).toHaveTextContent('0 of 2 ready');
     });
 
     it('sends the current round and meeting IDs for readiness and death reports', () => {

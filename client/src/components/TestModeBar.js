@@ -9,16 +9,15 @@ const TestModeBar = () => {
     const sus = !!playerState?.sus;
 
     return (
-        <div className="relative z-10 -mt-3 mb-5 flex justify-center">
-            <div className="flex items-center gap-2 rounded-full border border-amber-500/40 bg-gray-900/95 backdrop-blur-sm pl-3 pr-1 py-1 shadow-lg">
-                <FlaskConical size={12} className="text-amber-400" />
-                <span className="text-xs text-amber-200 whitespace-nowrap">
-                    Test game · {sus ? 'Intruder' : 'Crewmate'}
-                </span>
+        <div className="flex justify-center">
+            <div className="sg flex items-center gap-2 rounded-full pl-3 pr-1 py-1" style={{ background: 'rgba(0,0,0,0.22)', color: '#fff', fontWeight: 700, fontSize: 13 }}>
+                <FlaskConical size={13} />
+                <span className="whitespace-nowrap">Test game · {sus ? 'Intruder' : 'Crewmate'}</span>
                 <button
                     onClick={switchTestRole}
                     disabled={!connected}
-                    className="flex items-center gap-1 rounded-full bg-amber-500/20 hover:bg-amber-500/30 px-2.5 py-1 text-xs font-semibold text-amber-100 transition-colors disabled:opacity-40"
+                    className="flex items-center gap-1 rounded-full px-2.5 py-1 disabled:opacity-40"
+                    style={{ background: '#fff', color: 'var(--sg-round)', fontWeight: 700 }}
                 >
                     <Repeat size={12} />
                     Switch to {sus ? 'Crewmate' : 'Intruder'}

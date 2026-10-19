@@ -33,31 +33,16 @@ describe('ProgressBar', () => {
         });
     });
 
-    describe('Crewmate Theme', () => {
-        it('shows complete tasks message for crewmates', () => {
-            render(<ProgressBar score={5} goalScore={10} sus={false} />);
-            
-            expect(screen.getByText(/Complete Tasks/i)).toBeInTheDocument();
-        });
+    describe('Same bar for every role', () => {
+        it('looks identical for crewmates and intruders', () => {
+            const crew = render(<ProgressBar score={5} goalScore={10} sus={false} />);
+            const crewHtml = crew.container.innerHTML;
+            crew.unmount();
+            const intruder = render(<ProgressBar score={5} goalScore={10} sus={true} />);
 
-        it('does not show eliminate message for crewmates', () => {
-            render(<ProgressBar score={5} goalScore={10} sus={false} />);
-            
+            expect(intruder.container.innerHTML).toBe(crewHtml);
+            expect(screen.getByText('Tasks')).toBeInTheDocument();
             expect(screen.queryByText(/Eliminate/i)).not.toBeInTheDocument();
-        });
-    });
-
-    describe('Intruder Theme', () => {
-        it('shows eliminate crew message for intruders', () => {
-            render(<ProgressBar score={5} goalScore={10} sus={true} />);
-            
-            expect(screen.getByText(/Eliminate Crew/i)).toBeInTheDocument();
-        });
-
-        it('does not show complete tasks for intruders', () => {
-            render(<ProgressBar score={5} goalScore={10} sus={true} />);
-            
-            expect(screen.queryByText(/Complete Tasks/i)).not.toBeInTheDocument();
         });
     });
 
@@ -107,12 +92,10 @@ describe('ProgressBar', () => {
     });
 
     describe('Visual Styling', () => {
-        it('applies complete styling at 100%', () => {
+        it('marks the bar complete at 100%', () => {
             const { container } = render(<ProgressBar score={10} goalScore={10} />);
-            
-            // At 100%, should have glow effect
-            // CSS class testing is limited
-            expect(container.querySelector('.shadow-lg')).toBeInTheDocument();
+
+            expect(container.querySelector('[data-complete]')).toBeInTheDocument();
         });
     });
 });

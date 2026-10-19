@@ -105,17 +105,17 @@ export const tutorialCoachCopy = {
   intruderKill: {
     step: 'Intruder · 1 of 3',
     accent: 'rose',
-    body: 'When you\'re alone with a crewmate, quietly tell them they\'re out. Then swipe the slider on your phone to log the kill. Try it now.',
+    body: 'When you\'re alone with a crewmate, quietly tell them they\'re out. Then swipe the slider on your phone to log the kill. It looks just like finishing a task, so nobody nearby can tell. Try it now.',
   },
   intruderCooldown: {
     step: 'Intruder · 1 of 3',
     accent: 'orange',
-    body: 'After each kill there\'s a short cooldown — so you can\'t eliminate the whole crew back-to-back. Wait for the timer to finish.',
+    body: 'After each kill there\'s a short cooldown, so you can\'t eliminate the whole crew back-to-back. Your screen keeps showing a cover task meanwhile. Wait for the timer to finish.',
   },
   intruderVent: {
     step: 'Intruder · 2 of 3',
     accent: 'rose',
-    body: 'Intruders carry a hidden hand of ability cards — fake tasks, sabotage, and more. Tap ENTER VENT above to open your cards.',
+    body: 'Intruders carry a hidden hand of ability cards — fake tasks, sabotage, and more. In a real game you hold CALL MEETING for a second to open your vent (a quick tap still calls a meeting, just like a crewmate). Here, just tap it.',
   },
   intruderCards: {
     step: 'Intruder · 3 of 3',

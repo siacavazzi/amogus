@@ -201,15 +201,6 @@ describe('CrewPage', () => {
             expect(contextValue.setAudio).not.toHaveBeenCalledWith('complete_task');
             expect(contextValue.setShowAnimation).not.toHaveBeenCalledWith(true);
         });
-
-        it('shows active status when no cooldown', () => {
-            renderWithContext(
-                <CrewmemberPage setShowSusPage={mockSetShowSusPage} />,
-                { ...crewmateContext, killCooldown: 0 }
-            );
-            
-            expect(screen.getByText(/ACTIVE/i)).toBeInTheDocument();
-        });
     });
 
     describe('Intruder in Disguise View', () => {
@@ -222,63 +213,97 @@ describe('CrewPage', () => {
             },
             task: mockTask,
             killCooldown: 0,
+            lobbyState: { tasks: [{ task: 'Water the plants', location: 'Garden' }] },
         };
 
-        it('shows ENTER VENT button for intruders', () => {
-            renderWithContext(
-                <CrewmemberPage setShowSusPage={mockSetShowSusPage} />,
-                intruderContext
-            );
-            
-            expect(screen.getByText(/ENTER VENT/i)).toBeInTheDocument();
+        afterEach(() => jest.useRealTimers());
+
+        it('shows the same CALL MEETING button and labels a crewmate sees', () => {
+            renderWithContext(<CrewmemberPage setShowSusPage={mockSetShowSusPage} />, intruderContext);
+
+            expect(screen.getByText(/CALL MEETING/i)).toBeInTheDocument();
+            expect(screen.getByText(/Current task/i)).toBeInTheDocument();
+            expect(screen.getByText(/Slide to complete task/i)).toBeInTheDocument();
+            expect(screen.queryByText(/VENT|Eliminate|Intruder/i)).not.toBeInTheDocument();
         });
 
-        it('calls setShowSusPage when vent button clicked', () => {
-            renderWithContext(
-                <CrewmemberPage setShowSusPage={mockSetShowSusPage} />,
-                intruderContext
-            );
-            
-            const ventButton = screen.getByText(/ENTER VENT/i).closest('button');
-            fireEvent.click(ventButton);
-            
+        it('shows a cover task from the room task list', () => {
+            renderWithContext(<CrewmemberPage setShowSusPage={mockSetShowSusPage} />, intruderContext);
+
+            expect(screen.getByText('Water the plants')).toBeInTheDocument();
+            expect(screen.getByText('Garden')).toBeInTheDocument();
+        });
+
+        it('calls a meeting on a tap, like a crewmate', () => {
+            const { contextValue } = renderWithContext(<CrewmemberPage setShowSusPage={mockSetShowSusPage} />, intruderContext);
+
+            fireEvent.click(screen.getByText(/CALL MEETING/i).closest('button'));
+
+            expect(contextValue.handleCallMeeting).toHaveBeenCalled();
+            expect(mockSetShowSusPage).not.toHaveBeenCalled();
+        });
+
+        it('opens the vent when CALL MEETING is held', () => {
+            jest.useFakeTimers();
+            const { contextValue } = renderWithContext(<CrewmemberPage setShowSusPage={mockSetShowSusPage} />, intruderContext);
+            const button = screen.getByText(/CALL MEETING/i).closest('button');
+
+            fireEvent.pointerDown(button, { button: 0 });
+            act(() => { jest.advanceTimersByTime(1000); });
+            fireEvent.pointerUp(button);
+            fireEvent.click(button);
+
             expect(mockSetShowSusPage).toHaveBeenCalledWith(true);
+            expect(contextValue.handleCallMeeting).not.toHaveBeenCalled();
         });
 
-        it('shows cooldown status when on cooldown', () => {
-            renderWithContext(
-                <CrewmemberPage setShowSusPage={mockSetShowSusPage} />,
-                { ...intruderContext, killCooldown: 10 }
-            );
-            
-            expect(screen.getByText(/STANDBY/i)).toBeInTheDocument();
-        });
-
-        it('shows eliminate objective for intruders', () => {
-            renderWithContext(
-                <CrewmemberPage setShowSusPage={mockSetShowSusPage} />,
-                intruderContext
-            );
-            
-            expect(screen.getByText(/Eliminate all crewmates/i)).toBeInTheDocument();
-        });
-
-        it('selects the dead sound while preserving the elimination event and cooldown', () => {
+        it('logs a kill with the same sound and animation as a finished task', () => {
             window.localStorage.getItem.mockImplementation((key) =>
                 key === 'player_id' ? 'test_player_id' : null
             );
-            const { contextValue } = renderWithContext(
-                <CrewmemberPage setShowSusPage={mockSetShowSusPage} />,
-                intruderContext
-            );
+            const { contextValue } = renderWithContext(<CrewmemberPage setShowSusPage={mockSetShowSusPage} />, intruderContext);
 
             fireEvent.click(screen.getByTestId('slider-trigger'));
 
-            expect(contextValue.setAudio).toHaveBeenCalledWith('dead');
+            expect(contextValue.setAudio).toHaveBeenCalledWith('complete_task');
+            expect(contextValue.setShowAnimation).toHaveBeenCalledWith(true);
             expect(contextValue.socket.emit).toHaveBeenCalledWith('kill_player', {
                 player_id: 'test_player_id',
             });
             expect(contextValue.setKillCooldown).toHaveBeenCalledWith(15);
+            expect(contextValue.completeTask).not.toHaveBeenCalled();
+        });
+
+        it('does not restart the cooldown while it is running', () => {
+            const { contextValue } = renderWithContext(<CrewmemberPage setShowSusPage={mockSetShowSusPage} />, { ...intruderContext, killCooldown: 10 });
+
+            expect(screen.getByTestId('slider-trigger')).not.toBeDisabled();
+            fireEvent.click(screen.getByTestId('slider-trigger'));
+
+            expect(contextValue.setKillCooldown).not.toHaveBeenCalled();
+            expect(contextValue.setShowAnimation).toHaveBeenCalledWith(true);
+        });
+    });
+
+    describe('Crewmate hold', () => {
+        it('shows the role while CALL MEETING is held and hides it on release', () => {
+            jest.useFakeTimers();
+            const { contextValue } = renderWithContext(<CrewmemberPage setShowSusPage={mockSetShowSusPage} />, {
+                running: true,
+                playerState: { username: 'CrewPlayer', sus: false, alive: true },
+                task: mockTask,
+            });
+            const button = screen.getByText(/CALL MEETING/i).closest('button');
+
+            fireEvent.pointerDown(button, { button: 0 });
+            act(() => { jest.advanceTimersByTime(1000); });
+            expect(screen.getByText('Crewmate')).toBeInTheDocument();
+            fireEvent.pointerUp(button);
+            fireEvent.click(button);
+
+            expect(screen.queryByText('Crewmate')).not.toBeInTheDocument();
+            expect(contextValue.handleCallMeeting).not.toHaveBeenCalled();
+            jest.useRealTimers();
         });
     });
 
