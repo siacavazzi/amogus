@@ -3,6 +3,7 @@ import './LandingPage.css';
 import PhoneShowcase from './PhoneShowcase';
 import { usePageMeta } from '../../seo/usePageMeta';
 import { SiteNav, SiteFooter } from '../../components/SiteChrome';
+import { Home, Speaker, Cards, Radiation } from '../../signal/icons';
 
 const TAGLINE_WORDS = ['Gaslight.', 'Sneak.', 'Vote.', 'Repeat.'];
 
@@ -26,22 +27,22 @@ const STEPS = [
 
 const FEATURES = [
     {
-        emoji: '\uD83C\uDFE0',
+        Icon: Home,
         title: 'Custom tasks for your venue',
         body: 'Generate a pack for your rooms or write your own tasks. Review the list, import it, and open the room for friends.',
     },
     {
-        emoji: '\uD83D\uDD0A',
+        Icon: Speaker,
         title: 'Sonos integration',
         body: 'Pipe meeting bells and reactor alarms through your speakers for full house-wide chaos.',
     },
     {
-        emoji: '\uD83C\uDCCF',
+        Icon: Cards,
         title: 'Sabotage cards',
         body: 'Intruders draw cards mid-game. Hack phones, force votes, mess with the room.',
     },
     {
-        emoji: '\u2622\uFE0F',
+        Icon: Radiation,
         title: 'Reactor meltdown',
         body: 'A panic-mode minigame the whole group has to scramble to stop. Or not.',
     },
@@ -166,7 +167,7 @@ function LandingPage() {
                     <div className="lp-features__grid">
                         {FEATURES.map((f) => (
                             <div className="lp-feature" key={f.title}>
-                                <span className="lp-feature__emoji" aria-hidden="true">{f.emoji}</span>
+                                <span className="lp-feature__emoji" aria-hidden="true"><f.Icon size={32} /></span>
                                 <h3 className="lp-feature__title">{f.title}</h3>
                                 <p className="lp-feature__body">{f.body}</p>
                             </div>

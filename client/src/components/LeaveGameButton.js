@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { DataContext } from '../GameContext';
-import { LogOut } from 'lucide-react';
+import { LogOut } from '../signal/icons';
 import '../signal/signal.css';
 
 function LeaveGameButton({ className = '' }) {

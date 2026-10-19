@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect, useRef, useMemo } from 'react';
 import { DataContext } from '../GameContext';
-import { Users, Play, ChevronDown, ChevronUp, List, Download, Trash2, Check, LogOut, MapPin, Settings, ArrowRight, ArrowLeft, X, Zap, Copy, Sparkles, Minus, Plus } from 'lucide-react';
+import { Users, Play, ChevronDown, ChevronUp, List, Download, Trash2, Check, LogOut, MapPin, Settings, ArrowRight, ArrowLeft, X, Zap, Copy, Sparkles, Minus, Plus } from '../signal/icons';
 import { readGameDraft, clearGameDraft } from './seo/gameDraft';
 
 const DEFAULT_CARD_DECK_COUNTS = {

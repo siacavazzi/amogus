@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect, useRef, useMemo } from 'react';
-import { ChevronLeft, Camera, User, Sparkles, ArrowRight, Shuffle } from 'lucide-react';
+import { ChevronLeft, Camera, User, Sparkles, ArrowRight, Shuffle } from '../signal/icons';
 import { DataContext } from '../GameContext';
 import CameraCapture from '../components/CameraCapture';
 import Avatar, { getAvatar } from '../components/Avatar';

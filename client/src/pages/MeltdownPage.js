@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import { DataContext } from "../GameContext";
-import { FaRadiation } from "react-icons/fa";
-import { AlertTriangle, Activity } from "lucide-react";
+import { AlertTriangle, Activity, Radiation } from "../signal/icons";
 
 function ReactorMeltdown() {
     const {
@@ -248,7 +247,7 @@ function ReactorMeltdown() {
             {/* Reactor Icon */}
             <div className="relative z-10 mb-4">
                 <div className="absolute inset-0 blur-xl bg-red-500 opacity-50 rounded-full animate-pulse"></div>
-                <FaRadiation className="relative text-red-500 text-6xl animate-spin" style={{ animationDuration: '2s' }} />
+                <Radiation size="1em" className="relative text-red-500 text-6xl animate-spin" style={{ animationDuration: '2s' }} />
             </div>
 
             <div

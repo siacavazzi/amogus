@@ -1,5 +1,5 @@
 import React from 'react';
-import { MessageSquare } from 'lucide-react';
+import { MessageSquare } from '../signal/icons';
 
 /**
  * Rich in-modal display for a taunt message received from an intruder.

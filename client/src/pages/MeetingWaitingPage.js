@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { DataContext } from '../GameContext';
 import MUECustomSlider from '../components/swiper';
 import LeaveGameButton from '../components/LeaveGameButton';
-import { Check } from 'lucide-react';
+import { Check } from '../signal/icons';
 import { Face, Words, takeOrigin, vibrate } from '../signal';
 
 // Every phone floods yellow at once: the meeting is the loudest moment in the game.

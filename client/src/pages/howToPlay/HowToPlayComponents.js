@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight } from '../../signal/icons';
 
 function joinClasses(...classNames) {
   return classNames.filter(Boolean).join(' ');

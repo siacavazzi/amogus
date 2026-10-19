@@ -30,7 +30,7 @@ import {
     RotatingRing,
     Vignette,
 } from '../../../components/ui/BackgroundEffects';
-import { Check, X, AlertTriangle } from 'lucide-react';
+import { Check, X, AlertTriangle } from '../../../signal/icons';
 
 describe('Button Components', () => {
     describe('PrimaryButton', () => {

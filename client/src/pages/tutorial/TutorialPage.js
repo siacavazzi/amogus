@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, CheckCircle2, GraduationCap } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, GraduationCap } from '../../signal/icons';
 import { DataContext } from '../../GameContext';
 import CrewmemberPage from '../CrewPage';
 import MeetingWaitingPage from '../MeetingWaitingPage';

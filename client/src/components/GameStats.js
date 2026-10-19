@@ -9,7 +9,7 @@ import {
     AlertTriangle,
     MessageSquare,
     Send
-} from 'lucide-react';
+} from '../signal/icons';
 
 const StatItem = ({ icon: Icon, label, value }) => (
     <div className="flex items-center gap-3" style={{ padding: '9px 0' }}>

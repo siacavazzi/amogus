@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo, useContext } from 'react';
 import { DataContext } from '../GameContext';
-import { Wifi, Radio, Zap, Signal, Activity } from 'lucide-react';
+import { Wifi, Radio, Zap, Signal, Activity } from '../signal/icons';
 
 // Floating particle component
 const FloatingParticle = ({ delay, duration, size, left, color }) => (

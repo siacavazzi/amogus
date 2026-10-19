@@ -2,7 +2,7 @@
 import React, { useEffect, useContext, useCallback, useRef, useState } from 'react';
 import { DataContext } from './GameContext';
 import { Howl, Howler } from 'howler';
-import { Volume2, X } from 'lucide-react';
+import { Volume2, X } from './signal/icons';
 import { isMobile } from 'react-device-detect';
 
 // Import local audio files

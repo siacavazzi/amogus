@@ -12,7 +12,7 @@ import {
   Users,
   Vote,
   Zap,
-} from 'lucide-react';
+} from '../../signal/icons';
 
 export const heroStats = [
   { value: 'Free', label: 'Browser game, no account' },

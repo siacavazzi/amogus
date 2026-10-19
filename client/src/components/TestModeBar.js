@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { FlaskConical, Repeat } from 'lucide-react';
+import { FlaskConical, Repeat } from '../signal/icons';
 import { DataContext } from '../GameContext';
 
 // Shown on the crew screen in a test game so a tester can try both roles.

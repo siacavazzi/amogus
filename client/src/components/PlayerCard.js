@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import { ENDPOINT } from "../ENDPOINT";
 import { DataContext } from '../GameContext';
 import Avatar, { getAvatar } from './Avatar';
-import { Skull, Vote, Radiation, DoorOpen, UserX, Shield } from 'lucide-react';
+import { Skull, Vote, Radiation, DoorOpen, UserX, Shield } from '../signal/icons';
 
 function getSelfieUrl(filename, access) {
   if (!filename || !access?.sid || !access?.token) return null;

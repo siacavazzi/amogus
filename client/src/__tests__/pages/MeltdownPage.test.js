@@ -12,9 +12,10 @@ import React from 'react';
 import { renderWithContext, screen, fireEvent, waitFor } from '../../test-utils';
 import ReactorMeltdown from '../../pages/MeltdownPage';
 
-// Mock react-icons
-jest.mock('react-icons/fa', () => ({
-    FaRadiation: () => <span data-testid="radiation-icon">☢</span>,
+// Stand-in for the radiation icon
+jest.mock('../../signal/icons', () => ({
+    ...jest.requireActual('../../signal/icons'),
+    Radiation: () => <span data-testid="radiation-icon">☢</span>,
 }));
 
 describe('MeltdownPage', () => {

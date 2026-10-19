@@ -2,7 +2,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { DataContext } from '../GameContext';
 import LeaveGameButton from '../components/LeaveGameButton';
-import { LogOut, Zap, Clock, MapPin, AlertTriangle, Eye, X, Send, Users, FileText, MessageSquare } from 'lucide-react';
+import { LogOut, Zap, Clock, MapPin, AlertTriangle, Eye, X, Send, Users, FileText, MessageSquare } from '../signal/icons';
 import { StatusBadge, PrimaryButton } from '../components/ui';
 import { Card } from '../components/ui';
 import CardCarousel from '../components/CardCarousel';

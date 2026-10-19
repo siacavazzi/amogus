@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, Skull, Target, ShieldAlert } from 'lucide-react';
+import { AlertTriangle, Skull, Target, ShieldAlert } from '../signal/icons';
 
 /**
  * IntrudersRevealedDisplay - Shown to crewmates when tasks reach 100%

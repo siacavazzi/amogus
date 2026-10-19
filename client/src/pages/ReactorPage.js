@@ -1,7 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 import { DataContext } from "../GameContext";
-import { FaRadiation } from "react-icons/fa";
-import { AlertTriangle, Zap, Activity, LogOut } from "lucide-react";
+import { AlertTriangle, Zap, Activity, LogOut, Radiation } from "../signal/icons";
 
 function ReactorNormal() {
     const { socket,
@@ -117,7 +116,7 @@ function ReactorNormal() {
                 {/* Reactor Core Icon */}
                 <div className="relative mb-8">
                     <div className={`absolute inset-0 blur-xl ${isSabotaging ? 'bg-red-500' : 'bg-cyan-500'} opacity-50 rounded-full animate-pulse`}></div>
-                    <FaRadiation 
+                    <Radiation size="1em" 
                         className={`relative text-[150px] transition-all duration-300 ${
                             isSabotaging 
                                 ? "text-red-500 animate-spin" 
@@ -158,7 +157,7 @@ function ReactorNormal() {
                             </>
                         ) : (
                             <>
-                                <FaRadiation size={28} />
+                                <Radiation size={28} />
                                 <span>SABOTAGE CORE</span>
                             </>
                         )}

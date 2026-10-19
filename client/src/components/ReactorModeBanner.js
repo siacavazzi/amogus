@@ -1,6 +1,6 @@
 import React from 'react';
 import { isMobile as isMobileDevice } from 'react-device-detect';
-import { Monitor, Speaker, Radio, Smartphone, AlertTriangle } from 'lucide-react';
+import { Monitor, Speaker, Radio, Smartphone, AlertTriangle } from '../signal/icons';
 
 /**
  * Resolve whether the current device is acting as a mobile player or as the reactor.

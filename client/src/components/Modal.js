@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useRef, useCallback } from "react";
 import { DataContext } from "../GameContext";
-import { X, Volume2 } from "lucide-react";
+import { X, Volume2 } from "../signal/icons";
 import { RoleReveal, RevealedMoment, TauntToast } from "../signal/Moments";
 import "../signal/signal.css";
 

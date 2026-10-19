@@ -1,7 +1,7 @@
 // src/pages/ImposterPage.jsx
 import React, { useContext, useEffect } from 'react';
 import { DataContext } from '../GameContext';
-import { LogOut, Zap, Clock, MapPin, AlertTriangle, Eye } from 'lucide-react';
+import { LogOut, Zap, Clock, MapPin, AlertTriangle, Eye } from '../signal/icons';
 
 // ActionCard component defined OUTSIDE to prevent re-creation on every render
 function ActionCard({ action, text, location, duration, id, time_left, active = false, countdown, onPlay }) {

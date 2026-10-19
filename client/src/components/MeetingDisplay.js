@@ -1,7 +1,7 @@
 // src/components/MeetingDisplay.jsx
 import React from 'react';
 import PropTypes from 'prop-types';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from '../signal/icons';
 
 const MeetingDisplay = ({ message = "Meeting called" }) => {
   return (

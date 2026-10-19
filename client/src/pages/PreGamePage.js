@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect, useRef, useCallback } from 'react';
 import { DataContext } from '../GameContext';
 import PlayerCard from '../components/PlayerCard';
-import { Plus, X, Check, Send, MapPin, Copy, Save, Play, LogOut, Users, ClipboardList, ToggleLeft, ToggleRight, Pencil, Zap, Wifi, Share2 } from 'lucide-react';
+import { Plus, X, Check, Send, MapPin, Copy, Save, Play, LogOut, Users, ClipboardList, ToggleLeft, ToggleRight, Pencil, Zap, Wifi, Share2 } from '../signal/icons';
 import { FloatingParticles, useFloatingParticles, GlowingOrb, GridOverlay } from '../components/ui';
 import { buildRoomInviteUrl } from '../utils/inviteLinks';
 

@@ -3,7 +3,7 @@
 import React, { useContext, useEffect, useState, useMemo } from "react";
 import { DataContext } from "../GameContext";
 import PlayerCard from "../components/PlayerCard";
-import { ChevronLeft, Copy, Check, LogOut, Play, Users, Zap, Wifi } from 'lucide-react';
+import { ChevronLeft, Copy, Check, LogOut, Play, Users, Zap, Wifi } from '../signal/icons';
 
 // Floating particle component
 const FloatingParticle = ({ delay, duration, size, left, color }) => (

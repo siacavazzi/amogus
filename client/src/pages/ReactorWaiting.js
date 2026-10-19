@@ -1,7 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { DataContext } from '../GameContext';
-import { Copy, Check, Users, Monitor, Speaker, ExternalLink, Github, Volume2, LogOut } from 'lucide-react';
-import { FaRadiation } from 'react-icons/fa';
+import { Copy, Check, Users, Monitor, Speaker, ExternalLink, Github, Volume2, LogOut, Radiation } from '../signal/icons';
 
 function ReactorWaiting() {
   const { roomCode, players, socket } = useContext(DataContext);
@@ -58,7 +57,7 @@ function ReactorWaiting() {
       <div className="relative z-10 flex flex-col items-center max-w-4xl w-full flex-1 justify-center">
         {/* Reactor Icon */}
         <div className="mb-6">
-          <FaRadiation className="text-cyan-400 text-7xl animate-pulse" />
+          <Radiation size="1em" className="text-cyan-400 text-7xl animate-pulse" />
         </div>
 
         {/* Room Code Display */}
@@ -119,7 +118,7 @@ function ReactorWaiting() {
           {/* Reactor Info */}
           <div className="bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl border border-red-500/30">
             <div className="flex items-center gap-2 mb-3">
-              <FaRadiation className="text-red-400 text-xl" />
+              <Radiation size="1em" className="text-red-400 text-xl" />
               <h3 className="text-lg font-semibold text-red-400">Core Control</h3>
             </div>
             <p className="text-gray-400 text-sm">

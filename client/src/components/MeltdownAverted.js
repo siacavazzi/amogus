@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck } from '../signal/icons';
 
 const MeltdownAvertedDisplay = ({ message = "Meltdown Averted!" }) => {
     return (

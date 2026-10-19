@@ -27,7 +27,7 @@ import {
     Zap, Clock, MapPin, Hand,
     Radiation, ClipboardX, Megaphone, Volume2, Ban, RefreshCw, FastForward,
     Skull, MessageSquare,
-} from 'lucide-react';
+} from '../signal/icons';
 
 const SWIPE_THRESHOLD_RATIO = 0.15; // fraction of width before commit
 const FLICK_VELOCITY = 0.3;          // px/ms over the last moments of the drag

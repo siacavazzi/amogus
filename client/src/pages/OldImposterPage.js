@@ -2,7 +2,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { DataContext } from '../GameContext';
 import MUECustomSlider from '../components/swiper';
-import { FaExclamationTriangle } from 'react-icons/fa';
+import { AlertTriangle } from '../signal/icons';
 
 const OldImposterPage = () => {
   const {
@@ -52,7 +52,7 @@ const OldImposterPage = () => {
       onClick={handleCallMeeting}
       className="flex items-center px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg shadow-lg hover:from-orange-600 hover:to-orange-700 transition-colors duration-300"
     >
-      <FaExclamationTriangle className="mr-2" />
+      <AlertTriangle size="1em" className="mr-2" />
       Call Meeting
     </button>
 

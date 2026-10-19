@@ -5,7 +5,7 @@ import AnimationOverlay from "../components/AnimationOverlay";
 import MUECustomSlider from "../components/swiper";
 import LeaveGameButton from "../components/LeaveGameButton";
 import TestModeBar from "../components/TestModeBar";
-import { MapPin } from "lucide-react";
+import { MapPin } from "../signal/icons";
 import { rememberOrigin } from "../signal";
 
 // Crewmates and intruders get this same blue screen with the same words on it. An intruder

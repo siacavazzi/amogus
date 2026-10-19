@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowRight, Check, ChevronDown, Copy, DoorOpen, Home, MapPin, Pencil, Plus, Printer, RefreshCw, Share2, Shuffle, Sofa, Utensils, X } from 'lucide-react';
+import { ArrowRight, Check, ChevronDown, Copy, DoorOpen, Home, MapPin, Pencil, Plus, Printer, RefreshCw, Share2, Shuffle, Sofa, Utensils, X } from '../../signal/icons';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
 import { VENUE_ROOMS, generateTasks, taskStyleValue } from './taskPools';

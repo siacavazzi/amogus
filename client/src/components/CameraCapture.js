@@ -1,5 +1,5 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
-import { Camera, RotateCcw, Check, X } from 'lucide-react';
+import { Camera, RotateCcw, Check, X } from '../signal/icons';
 import { CircleIconButton, SecondaryButton, ButtonGroup } from './ui';
 
 function CameraCapture({ onCapture, onCancel }) {

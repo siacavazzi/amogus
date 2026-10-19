@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import { DataContext } from '../GameContext';
-import { Plus, X, Check, Send, ThumbsDown, MapPin, Copy, Save, Play, LogOut } from 'lucide-react';
+import { Plus, X, Check, Send, ThumbsDown, MapPin, Copy, Save, Play, LogOut } from '../signal/icons';
 
 function sameLocations(left, right) {
     return left.length === right.length && left.every((location, index) => location === right[index]);

@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { DataContext } from '../GameContext';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft } from '../signal/icons';
 
 function TaskEntryPage() {
     const [task, setTask] = useState('');

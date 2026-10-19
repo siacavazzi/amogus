@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { DataContext } from '../GameContext';
-import { RotateCcw, LogOut, Check } from 'lucide-react';
+import { RotateCcw, LogOut, Check } from '../signal/icons';
 
 function EndGameButtons() {
     const { socket, roomCode, resetVotes, playerState } = useContext(DataContext);

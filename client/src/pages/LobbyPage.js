@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import { isMobile as isMobileDevice } from 'react-device-detect';
 import { DataContext } from '../GameContext';
-import { Users, Plus, ArrowRight, HelpCircle, Zap, Shield, Skull, Wifi, Monitor, Radio, Speaker, Smartphone, AlertTriangle, ChevronRight, Sparkles, GraduationCap } from 'lucide-react';
+import { Users, Plus, ArrowRight, HelpCircle, Zap, Shield, Skull, Wifi, Monitor, Radio, Speaker, Smartphone, AlertTriangle, ChevronRight, Sparkles, GraduationCap } from '../signal/icons';
 import { 
     useFloatingParticles, 
     FloatingParticles, 

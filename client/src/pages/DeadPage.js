@@ -4,7 +4,7 @@ import React, { useContext, useState } from 'react';
 import { DataContext } from '../GameContext';
 import LeaveGameButton from '../components/LeaveGameButton';
 import { ProfilePicture, getDeathInfo } from '../components/PlayerCard';
-import { Skull, Eye, EyeOff } from 'lucide-react';
+import { Skull, Eye, EyeOff } from '../signal/icons';
 
 // Get a readable death cause label
 const getDeathLabel = (cause) => {

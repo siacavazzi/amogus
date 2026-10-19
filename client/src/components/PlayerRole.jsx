@@ -2,7 +2,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Users, Shield, Skull } from 'lucide-react';
+import { Users, Shield, Skull } from '../signal/icons';
 
 const PlayerRole = ({ sus, otherIntruders }) => {
   const isCrewmate = !sus;

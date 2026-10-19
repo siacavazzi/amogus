@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Beforeunload } from 'react-beforeunload';
-import { ChevronRight, Check } from "lucide-react";
+import { ChevronRight, Check } from "../signal/icons";
 
 // Dimensions and styling constants
 const SLIDER_HEIGHT = '4.5rem';

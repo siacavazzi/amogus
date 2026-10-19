@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft } from '../../signal/icons';
 
 /**
  * Primary action button with gradient and shimmer effect

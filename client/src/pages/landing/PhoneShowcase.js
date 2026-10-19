@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { FaRadiation } from 'react-icons/fa';
 import {
     AlertTriangle,
     MapPin,
@@ -28,7 +27,8 @@ import {
     Send,
     Check,
     Ban,
-} from 'lucide-react';
+    Radiation,
+} from '../../signal/icons';
 
 // ============================================================
 // Hardcoded marketing mockups of in-game phone screens.
@@ -467,7 +467,7 @@ const INTRUDER_CARDS = [
         id: 'meltdown',
         name: 'Remote sabotage',
         desc: 'Trigger a reactor meltdown from anywhere.',
-        Icon: FaRadiation,
+        Icon: Radiation,
         meta: 'Boom',
         accent: 'rose',
     },
