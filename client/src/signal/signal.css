@@ -129,7 +129,9 @@
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background: repeating-linear-gradient(-45deg, transparent 0 34px, rgba(0, 0, 0, 0.08) 34px 68px);
+  /* One square tile holds exactly two stripe periods, so it repeats with no seam. */
+  background: linear-gradient(-45deg, transparent 0 25%, rgba(0, 0, 0, 0.08) 25% 50%, transparent 50% 75%, rgba(0, 0, 0, 0.08) 75% 100%);
+  background-size: 96px 96px;
   animation: sg-stripes 2.4s linear infinite;
 }
 .sg-hazard {
@@ -137,7 +139,8 @@
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background: repeating-linear-gradient(-45deg, var(--sg-ink) 0 30px, var(--sg-hazard) 30px 60px);
+  background: linear-gradient(-45deg, var(--sg-ink) 0 25%, var(--sg-hazard) 25% 50%, var(--sg-ink) 50% 75%, var(--sg-hazard) 75% 100%);
+  background-size: 84px 84px;
   animation: sg-hazard 0.9s linear infinite;
 }
 .sg-layer { position: fixed; inset: 0; z-index: 60; overflow: hidden; isolation: isolate; font-family: var(--sg-font); }
@@ -199,8 +202,8 @@
 @keyframes sg-wave-up { from { transform: translateY(100%); } to { transform: translateY(-6%); } }
 @keyframes sg-wave-x { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @keyframes sg-to-white { to { color: #fff; } }
-@keyframes sg-stripes { from { background-position: 0 0; } to { background-position: 96.17px 0; } }
-@keyframes sg-hazard { from { background-position: 0 0; } to { background-position: 84.85px 0; } }
+@keyframes sg-stripes { from { background-position: 0 0; } to { background-position: 96px 0; } }
+@keyframes sg-hazard { from { background-position: 0 0; } to { background-position: 84px 0; } }
 @keyframes sg-confetti {
   0% { transform: translate(-50%, -50%) rotate(0); opacity: 1; }
   55% { transform: translate(var(--x), var(--y)) rotate(var(--r1)); opacity: 1; }
