@@ -6,10 +6,12 @@
 //   - Smooth stack animation: the next card slides forward and
 //     the active one falls back into the stack.
 //   - Horizontal swipes must NOT trigger browser back-navigation.
-//     We use `touch-action: pan-y` on the gesture surface so the
-//     browser still handles vertical scroll, and we capture the
-//     pointer ourselves for horizontal motion.
-//   - Generous swipe threshold (~22% width OR a fast flick).
+//     The intruder page never scrolls, so the gesture surface uses
+//     `touch-action: none`: the browser never claims the touch for
+//     a pan (which would cancel our pointer stream mid-swipe) and we
+//     handle all motion ourselves.
+//   - The deck follows the finger 1:1, and a short swipe (~15% width)
+//     or a quick flick is enough to change cards.
 //   - Cards are coloured per action type (EMP=cyan, Fake Task=pink,
 //     Remote Sabotage=red, etc.) so the player gets a quick read
 //     on what's in their hand.
@@ -27,8 +29,14 @@ import {
     Skull, MessageSquare,
 } from 'lucide-react';
 
-const SWIPE_THRESHOLD_RATIO = 0.22; // fraction of width before commit
-const FLICK_VELOCITY = 0.6;          // px/ms — fast flick override
+const SWIPE_THRESHOLD_RATIO = 0.15; // fraction of width before commit
+const FLICK_VELOCITY = 0.3;          // px/ms over the last moments of the drag
+const FLICK_MIN_PX = 24;             // a flick still has to travel this far
+const FLICK_WINDOW_MS = 100;         // velocity is measured over this window
+const LOCK_SLOP_PX = 8;              // movement before we decide swipe vs press
+const CARD_WIDTH_RATIO = 0.76;       // matches w-[76%] max-w-[320px] below
+const CARD_MAX_WIDTH = 320;
+const SLOT_SHIFT_RATIO = 0.78;       // each slot is 78% of a card width apart
 const TRANSITION_MS = 320;
 const MAX_VISIBLE_PEEK = 2;          // cards visible on each side
 const HOLD_MS = 650;                 // press duration to fire a play
@@ -140,20 +148,17 @@ function iconFor(action) {
 function CarouselCard({
     card,
     offset,
-    dragX,
-    width,
     isActive,
     isAnimating,
     compact,
     holdProgress,
     onTap,
 }) {
-    const slotOffset = offset + (isActive && width ? dragX / width : 0);
-    const absOffset = Math.abs(slotOffset);
+    const absOffset = Math.abs(offset);
 
-    const translatePct = slotOffset * 78;
+    const translatePct = offset * SLOT_SHIFT_RATIO * 100;
     const scale = Math.max(0.82, 1 - absOffset * 0.08);
-    const rotate = slotOffset * 4;
+    const rotate = offset * 4;
     const opacity = Math.max(0, 1 - absOffset * 0.35);
     const zIndex = 10 - Math.round(absOffset * 2);
 
@@ -250,10 +255,16 @@ export default function CardCarousel({ cards, onPlayCard, compact = false, onAct
     const tapTimesRef = useRef([]);
     const hintTimerRef = useRef(null);
     const activeCardRef = useRef(null);
+    // The latest drag distance, kept outside React state so pointerup
+    // never decides on a value from a render that hasn't happened yet.
+    const dragXRef = useRef(0);
+    const animTimerRef = useRef(null);
+    const suppressClickRef = useRef(false);
 
     useEffect(() => () => {
         if (holdRafRef.current) cancelAnimationFrame(holdRafRef.current);
         if (hintTimerRef.current) clearTimeout(hintTimerRef.current);
+        if (animTimerRef.current) clearTimeout(animTimerRef.current);
     }, []);
 
     useEffect(() => {
@@ -278,13 +289,19 @@ export default function CardCarousel({ cards, onPlayCard, compact = false, onAct
         onActiveIndexChange(activeIndex, cards[activeIndex]);
     }, [activeIndex, cards, onActiveIndexChange]);
 
-    const animateTo = useCallback((newIndex) => {
-        setIsAnimating(true);
-        setDragX(0);
-        setActiveIndex(newIndex);
-        const t = setTimeout(() => setIsAnimating(false), TRANSITION_MS + 20);
-        return () => clearTimeout(t);
+    const updateDragX = useCallback((x) => {
+        dragXRef.current = x;
+        setDragX(x);
     }, []);
+
+    // Ease the deck to `newIndex` (or back to where it was).
+    const settleTo = useCallback((newIndex) => {
+        setIsAnimating(true);
+        updateDragX(0);
+        if (newIndex !== undefined) setActiveIndex(newIndex);
+        if (animTimerRef.current) clearTimeout(animTimerRef.current);
+        animTimerRef.current = setTimeout(() => setIsAnimating(false), TRANSITION_MS + 20);
+    }, [updateDragX]);
 
     const cancelHold = useCallback(() => {
         if (holdRafRef.current) cancelAnimationFrame(holdRafRef.current);
@@ -315,7 +332,7 @@ export default function CardCarousel({ cards, onPlayCard, compact = false, onAct
         if (!c) return false;
         const rect = c.getBoundingClientRect();
         const cx = rect.left + rect.width / 2;
-        const cardW = Math.min(rect.width * 0.76, 320);
+        const cardW = Math.min(rect.width * CARD_WIDTH_RATIO, CARD_MAX_WIDTH);
         return Math.abs(clientX - cx) <= cardW / 2;
     }, []);
 
@@ -342,16 +359,20 @@ export default function CardCarousel({ cards, onPlayCard, compact = false, onAct
     const handlePointerDown = useCallback((e) => {
         if (e.button !== undefined && e.button !== 0) return;
         const onActive = isOnActiveCard(e.clientX);
+        const now = performance.now();
+        suppressClickRef.current = false;
         dragState.current = {
             startX: e.clientX,
             startY: e.clientY,
-            startT: performance.now(),
             locked: false,
             pointerId: e.pointerId,
-            moved: false,
             onActive,
-            holdFired: false,
+            samples: [{ x: e.clientX, t: now }],
         };
+        // Grabbing the deck mid-animation snaps it into place so the
+        // drag tracks the finger right away.
+        if (animTimerRef.current) clearTimeout(animTimerRef.current);
+        setIsAnimating(false);
         if (onActive) startHold();
     }, [isOnActiveCard, startHold]);
 
@@ -360,25 +381,30 @@ export default function CardCarousel({ cards, onPlayCard, compact = false, onAct
         if (!s) return;
         const dx = e.clientX - s.startX;
         const dy = e.clientY - s.startY;
+        const now = performance.now();
+        s.samples.push({ x: e.clientX, t: now });
+        while (s.samples.length > 2 && now - s.samples[0].t > FLICK_WINDOW_MS) s.samples.shift();
         if (!s.locked) {
-            if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+            if (Math.abs(dx) < LOCK_SLOP_PX && Math.abs(dy) < LOCK_SLOP_PX) return;
             // Any meaningful movement cancels the hold-to-play press.
             cancelHold();
-            if (Math.abs(dy) > Math.abs(dx) || cards.length <= 1) {
+            // Thumbs swipe in an arc, so only a clearly vertical drag
+            // is ignored.
+            if (Math.abs(dy) > Math.abs(dx) * 1.5 || cards.length <= 1) {
                 dragState.current = null;
                 return;
             }
             s.locked = true;
+            suppressClickRef.current = true;
             try { e.currentTarget.setPointerCapture(s.pointerId); } catch (_) {}
         }
-        s.moved = true;
         let effective = dx;
         if ((activeIndex === 0 && dx > 0) || (activeIndex === cards.length - 1 && dx < 0)) {
             effective = dx * 0.35;
         }
-        setDragX(effective);
+        updateDragX(effective);
         if (e.cancelable) e.preventDefault();
-    }, [activeIndex, cards.length, cancelHold]);
+    }, [activeIndex, cards.length, cancelHold, updateDragX]);
 
     const endDrag = useCallback((e) => {
         const s = dragState.current;
@@ -390,23 +416,27 @@ export default function CardCarousel({ cards, onPlayCard, compact = false, onAct
             try { e.currentTarget.releasePointerCapture(s.pointerId); } catch (_) {}
 
             const w = widthRef.current || 1;
-            const dt = Math.max(1, performance.now() - s.startT);
-            const velocity = dragX / dt;
+            const x = dragXRef.current;
+            const first = s.samples[0];
+            const last = s.samples[s.samples.length - 1];
+            const velocity = (last.x - first.x) / Math.max(1, last.t - first.t);
 
-            const passedDistance = Math.abs(dragX) > w * SWIPE_THRESHOLD_RATIO;
-            const flicked = Math.abs(velocity) > FLICK_VELOCITY && Math.abs(dragX) > 20;
+            const passedDistance = Math.abs(x) > w * SWIPE_THRESHOLD_RATIO;
+            // A flick counts only when it is still moving the same way
+            // it was dragged, so pulling back and letting go cancels.
+            const flicked = Math.abs(velocity) > FLICK_VELOCITY
+                && Math.abs(x) > FLICK_MIN_PX
+                && Math.sign(velocity) === Math.sign(x);
 
             if ((passedDistance || flicked) && cards.length > 1) {
-                const direction = dragX < 0 ? 1 : -1;
+                const direction = x < 0 ? 1 : -1;
                 const next = Math.min(cards.length - 1, Math.max(0, activeIndex + direction));
                 if (next !== activeIndex) {
-                    animateTo(next);
+                    settleTo(next);
                     return;
                 }
             }
-            setIsAnimating(true);
-            setDragX(0);
-            setTimeout(() => setIsAnimating(false), TRANSITION_MS + 20);
+            settleTo();
             return;
         }
 
@@ -417,7 +447,7 @@ export default function CardCarousel({ cards, onPlayCard, compact = false, onAct
         if (s.onActive && wasHolding) {
             registerTap();
         }
-    }, [dragX, activeIndex, cards.length, animateTo, cancelHold, registerTap]);
+    }, [activeIndex, cards.length, settleTo, cancelHold, registerTap]);
 
     if (cards.length === 0) return null;
 
@@ -426,14 +456,24 @@ export default function CardCarousel({ cards, onPlayCard, compact = false, onAct
     // handled at the deck level. The card-level onTap is only used to
     // navigate from peeked cards.
     const handleCardTap = (i) => {
-        if (Math.abs(dragX) > 4) return;
+        // A mouse drag ends with a click on whatever card is under the
+        // pointer; that was a swipe, not a tap.
+        if (suppressClickRef.current) {
+            suppressClickRef.current = false;
+            return;
+        }
         if (i === activeIndex) return;
-        animateTo(i);
+        settleTo(i);
     };
 
     const activeCard = cards[activeIndex];
     activeCardRef.current = activeCard;
     const activeTheme = themeFor(activeCard?.action);
+
+    // Move the whole stack with the finger: dragging one slot's width
+    // brings the neighbouring card exactly into the middle.
+    const slotWidth = Math.min(widthRef.current * CARD_WIDTH_RATIO, CARD_MAX_WIDTH) * SLOT_SHIFT_RATIO;
+    const dragOffset = slotWidth > 0 ? dragX / slotWidth : 0;
 
     // Deck height: in non-compact mode the deck fills the flex column
     // it's nested in (page must give it a flex-1 + min-h-0 parent), so
@@ -486,13 +526,14 @@ export default function CardCarousel({ cards, onPlayCard, compact = false, onAct
             {/* Deck — gesture surface */}
             <div
                 ref={containerRef}
+                data-testid="card-deck"
                 onPointerDown={handlePointerDown}
                 onPointerMove={handlePointerMove}
                 onPointerUp={endDrag}
                 onPointerCancel={endDrag}
                 className={`relative w-full ${deckHeight} overflow-hidden`}
                 style={{
-                    touchAction: 'pan-y',
+                    touchAction: 'none',
                     overscrollBehaviorX: 'contain',
                     WebkitUserSelect: 'none',
                     userSelect: 'none',
@@ -502,9 +543,7 @@ export default function CardCarousel({ cards, onPlayCard, compact = false, onAct
                     <CarouselCard
                         key={card.id || i}
                         card={card}
-                        offset={i - activeIndex}
-                        dragX={dragX}
-                        width={widthRef.current}
+                        offset={i - activeIndex + dragOffset}
                         isActive={i === activeIndex}
                         isAnimating={isAnimating}
                         compact={compact}
@@ -521,7 +560,7 @@ export default function CardCarousel({ cards, onPlayCard, compact = false, onAct
                         <button
                             key={card.id || i}
                             type="button"
-                            onClick={() => animateTo(i)}
+                            onClick={() => settleTo(i)}
                             aria-label={`Go to card ${i + 1}`}
                             className={`h-1.5 rounded-full transition-all ${
                                 i === activeIndex

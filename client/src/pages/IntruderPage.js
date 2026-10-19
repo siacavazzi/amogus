@@ -486,7 +486,7 @@ const IntruderPage = ({
           </div>
         ) : (
           <div
-            className={highlightCards ? 'animate-pulse' : ''}
+            className={`flex-1 min-h-0 flex flex-col ${highlightCards ? 'animate-pulse' : ''}`}
             style={highlightCards ? { borderRadius: '2rem', outline: '3px solid rgba(251,113,133,0.85)', outlineOffset: '4px', boxShadow: '0 0 30px rgba(251,113,133,0.4)' } : {}}
           >
             <CardCarousel
