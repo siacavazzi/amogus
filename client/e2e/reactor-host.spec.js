@@ -3,6 +3,8 @@
 const { test, expect } = require('@playwright/test');
 const h = require('./helpers');
 
+test.afterEach(h.closeAll);
+
 test('a room created on the reactor gets a phone host and plays again from the reactor', async ({ browser }) => {
     const reactor = await h.openReactor(browser);
     const code = await h.createRoom(reactor);

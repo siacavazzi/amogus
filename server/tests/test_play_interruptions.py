@@ -115,6 +115,11 @@ class PlayInterruptionTests(SocketGameTestCase):
         self.assertTrue(game.game_running)
         self.assertEqual(set(), game.reset_votes)
 
+    def test_room_opened_without_a_task_list_lets_everyone_add_tasks(self):
+        host = self.make_client()
+        room = self.create_open_room(host)
+        self.assertTrue(server_app.game_manager.get_game(room).collaborative_mode)
+
     def test_rescued_meltdown_clears_every_code(self):
         from assets.room_protocol import room_state
         clients, room, ids, game = self.start_round()

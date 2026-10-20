@@ -3,6 +3,8 @@
 const { test, expect } = require('@playwright/test');
 const h = require('./helpers');
 
+test.afterEach(h.closeAll);
+
 test('a rescued meltdown stays over through a meeting and a rejoin', async ({ browser }) => {
     const phones = [];
     for (const name of ['Sam', 'Alex', 'Jules', 'Riley', 'Kai']) phones.push(await h.openPhone(browser, name));

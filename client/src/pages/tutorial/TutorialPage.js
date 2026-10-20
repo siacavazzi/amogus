@@ -379,6 +379,8 @@ function TutorialPage() {
   const contextValue = useMemo(() => ({
     task: ['intro', 'crewTask', 'crewCallMeeting'].includes(phase) ? tutorialTask : undefined,
     socket,
+    // The game screens hold their buttons while offline; the tutorial is always "connected".
+    connected: true,
     setShowAnimation,
     showAnimation,
     handleCallMeeting,

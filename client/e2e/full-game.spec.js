@@ -2,6 +2,8 @@
 const { test, expect } = require('@playwright/test');
 const h = require('./helpers');
 
+test.afterEach(h.closeAll);
+
 test('five phones and a reactor play a round, then play again', async ({ browser }) => {
     const names = ['Sam', 'Alex', 'Jules', 'Riley', 'Kai'];
     const phones = [];

@@ -191,22 +191,34 @@ jobs:
 
       # Real Chromium pages for the reactor and the phones tap through whole games on beta:
       # setup, roles, a task, the vent, meetings and votes, a meltdown, a rejoin, Play Again.
-      - name: Install the test browser
+      - name: Install the test browsers
         working-directory: ./client
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install --with-deps chromium webkit
 
       - name: Play games in real browsers on beta
         working-directory: ./client
-        run: npx playwright test -c e2e
+        run: npx playwright test -c e2e --project chromium
         env:
           E2E_BASE_URL: https://susparty.com
           E2E_BETA: '1'
 
+      # The main games again in Safari's engine (WebKit). Reported, not blocking, until it has
+      # a track record.
+      - name: Play the main games in Safari (WebKit) on beta
+        continue-on-error: true
+        working-directory: ./client
+        run: npx playwright test -c e2e --project webkit
+        env:
+          E2E_BASE_URL: https://susparty.com
+          E2E_BETA: '1'
+          E2E_WEBKIT: '1'
+
       - name: Keep the browser test report
-        if: failure()
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: browser-e2e
           path: |
             client/e2e/report
             client/e2e/results
+          if-no-files-found: ignore

@@ -55,6 +55,9 @@ class GameIntegrationTests(SocketGameTestCase):
             config={"num_intruders": 1},
         )
         guest = clients[1]
+        # A room opened without a task list starts open to everyone; the host closes it first.
+        clients[0].emit("toggle_collaborative_mode", {"room_code": room_code, "enabled": False})
+        self.drain_all(clients)
 
         guest.emit(
             "add_collaborative_task",

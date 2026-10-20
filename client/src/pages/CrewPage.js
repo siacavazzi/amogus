@@ -271,7 +271,7 @@ const CrewmemberPage = ({
               {shownTask.task}
             </h3>
             {shownTask.location && (
-              <span className="sg-pill">
+              <span className="sg-pill" data-testid="task-location">
                 <MapPin size={16} strokeWidth={2.75} />
                 {shownTask.location}
               </span>

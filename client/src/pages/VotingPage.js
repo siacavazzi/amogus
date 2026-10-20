@@ -10,7 +10,7 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
   const highlightActions = tutorialMode && (tutorialHighlightTarget === 'actions' || tutorialHighlightTarget === 'vote-flow');
 
   const [selectedPlayer, setSelectedPlayer] = useState(null);
-  const [timeLeft, setTimeLeft] = useState(meetingState.time_left);
+  const [timeLeft, setTimeLeft] = useState(meetingState?.time_left);
   const [hasVoted, setHasVoted] = useState(false);
   const [votedFor, setVotedFor] = useState(null);
   const [deathPending, setDeathPending] = useState(false);
@@ -94,7 +94,7 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
     }
   };
 
-  const totalTime = meetingState.time_left;
+  const totalTime = meetingState?.time_left;
   const progressPercentage = totalTime > 0 ? (timeLeft / totalTime) * 100 : 0;
   const isLowTime = timeLeft <= 10;
   const alivePlayers = players.filter(p => p.alive);

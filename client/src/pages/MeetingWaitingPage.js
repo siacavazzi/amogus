@@ -67,7 +67,7 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
           <Face player={caller} size={104} className="sg-a sg-pop" style={{ animationDelay: '820ms' }} />
         ) : null}
         <p className="sg-lede sg-a sg-rise" style={{ animationDelay: '1000ms' }}>
-          {meetingState.player_who_started_it} called it
+          {meetingState?.player_who_started_it} called it
         </p>
         <p className="sg-small sg-a sg-rise" style={{ animationDelay: '1090ms' }}>
           Go to the meeting spot, then slide ready
