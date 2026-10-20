@@ -421,5 +421,4 @@ class CardDeck:
         output = []
         for card in self.active_cards:
             output.append(card.export())
-        print(output)
         self.game.emit_to_room('active_cards', output)
