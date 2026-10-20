@@ -8,14 +8,14 @@ test('a split vote ejects no one and the round carries on', async ({ browser }) 
     const phones = await h.openPhones(browser, ['Sam', 'Alex', 'Jules', 'Riley']);
     await h.gatherRoom({ host: phones[0], phones });
     await phones[0].getByText('Start Game').click();
-    await h.revealRoles(phones);
+    const intruder = await h.revealRoles(phones);
     const [a, b, c, d] = phones;
 
-    await h.callMeeting(a, phones);
+    await h.callMeeting(phones.find(phone => phone !== intruder), phones);
     await h.vote([[a, b], [b, a], [c, b], [d, a]]);
     for (const phone of phones) await expect(phone.getByText('No one was ejected'), phone.person).toBeVisible({ timeout: 30000 });
     await h.continueAfterResults(phones);
-    for (const phone of phones) await expect(phone.getByText('CALL MEETING'), phone.person).toBeVisible();
+    for (const phone of phones) await expect(h.roundButton(phone), phone.person).toBeVisible();
 
     h.expectNoPageErrors(phones);
 });

@@ -12,9 +12,24 @@ test('one phone can run a test game and switch roles', async ({ browser }) => {
     await h.revealRoles([solo]).catch(() => {});
     await expect(solo.getByText(/Test game · (Crewmate|Intruder)/)).toBeVisible();
     const before = await solo.getByText(/Test game · /).textContent();
-    await solo.getByRole('button', { name: /Switch to/ }).click();
-    await h.dismissMessage(solo);
+    // Each switch shows the new role on the same hold-to-see card as the start of a round.
+    const switchRole = async () => {
+        await solo.getByRole('button', { name: /Switch to/ }).click();
+        await h.revealRoles([solo]).catch(() => {});
+        await h.dismissMessage(solo);
+    };
+    await switchRole();
     await expect(solo.getByText(/Test game · /)).not.toHaveText(before);
+
+    // As the intruder: ENTER VENT opens the vent with a hand of cards. As crew: CALL MEETING.
+    if (!/Intruder/.test(await solo.getByText(/Test game · /).textContent())) await switchRole();
+    await expect(solo.getByText('Test game · Intruder')).toBeVisible();
+    await expect(solo.getByText('CALL MEETING')).toHaveCount(0);
+    await h.openVent(solo);
+    await expect(solo.getByTestId('card-deck')).toBeVisible();
+    await solo.getByText('Exit to safety', { exact: false }).click();
+    await switchRole();
+    await expect(solo.getByText('CALL MEETING')).toBeVisible();
 
     h.expectNoPageErrors([solo]);
 });
@@ -74,7 +89,7 @@ test('two intruders see each other, and the crew needs both out', async ({ brows
     await h.vote(phones.map(phone => [phone, phone === first ? crew[0] : first]));
     await h.continueAfterResults(phones);
     const living = phones.filter(phone => phone !== first);
-    for (const phone of living) await expect(phone.getByText('CALL MEETING'), phone.person).toBeVisible({ timeout: 20000 });
+    for (const phone of living) await expect(h.roundButton(phone), phone.person).toBeVisible({ timeout: 20000 });
     await h.voteOutIntruder(crew[0], living, second);
     await h.continueAfterResults([first]);
     await expect(first.getByText('Crewmates Win!')).toBeVisible({ timeout: 20000 });

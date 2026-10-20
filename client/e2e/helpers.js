@@ -215,11 +215,15 @@ async function voteOutIntruder(caller, phones, intruder) {
     for (const phone of phones) await expect(phone.getByText('Crewmates Win!')).toBeVisible({ timeout: 30000 });
 }
 
-// The intruder opens the vent (hold CALL MEETING) and plays a card by name, flicking through
-// the hand and holding the card down the way a thumb would.
+// The round screen's top button: CALL MEETING for crewmates, ENTER VENT for intruders.
+function roundButton(page) {
+    return page.getByText(/^(CALL MEETING|ENTER VENT)$/);
+}
+
+// The intruder taps ENTER VENT; playCard then picks a card by name, flicking through the
+// hand and holding the card down the way a thumb would.
 async function openVent(intruder) {
-    const release = await hold(intruder, intruder.getByText('CALL MEETING'), 1400);
-    await release();
+    await intruder.getByText('ENTER VENT').click();
     await expect(intruder.getByText('Vent network active')).toBeVisible();
 }
 
@@ -267,5 +271,5 @@ function expectNoPageErrors(pages) {
 
 module.exports = {
     openPage, closeAll, openPhones, openPhone, openReactor, createRoom, createRoomOnPhone, gatherRoom, readyUp, connectReactor, joinRoom, enterName, revealRoles, swipe, hold, callMeeting, vote,
-    continueAfterResults, voteOutIntruder, openVent, playCard, dismissMessage, expectLobby, expectNoPageErrors, sleep,
+    continueAfterResults, voteOutIntruder, roundButton, openVent, playCard, dismissMessage, expectLobby, expectNoPageErrors, sleep,
 };

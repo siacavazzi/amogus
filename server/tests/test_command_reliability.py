@@ -202,7 +202,9 @@ class CommandReliabilityTests(SocketGameTestCase):
         clients, room, ids, game = self.start_round()
         for client, pid in zip(clients, ids):
             client.emit('ready', {'player_id': pid})
-        clients[0].emit('meeting', {'player_id': ids[0], 'round_id': getattr(game, 'round_id', 'missing')})
-        clients[0].emit('ready', {'player_id': ids[0], 'round_id': getattr(game, 'round_id', 'missing'),
+        caller = self.crew(game)[0]
+        client = self.client_for_player(clients, ids, caller)
+        client.emit('meeting', {'player_id': caller.player_id, 'round_id': getattr(game, 'round_id', 'missing')})
+        client.emit('ready', {'player_id': caller.player_id, 'round_id': getattr(game, 'round_id', 'missing'),
                                    'meeting_id': getattr(game.meeting, 'id', 'missing')})
         self.assertEqual('waiting', game.meeting.stage)

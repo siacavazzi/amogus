@@ -165,6 +165,9 @@ class SocketGameTestCase(unittest.TestCase):
     def living(self, game):
         return [player for player in game.players if player.alive]
 
+    def living_crew(self, game):
+        return [player for player in self.living(game) if not player.sus]
+
     def inject_card(self, game, player, action, **kwargs):
         card = Card(
             action,

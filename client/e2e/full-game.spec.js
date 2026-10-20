@@ -22,20 +22,19 @@ test('five phones and a reactor play a round, then play again', async ({ browser
     const intruder = await h.revealRoles(phones);
     const crew = phones.filter(phone => phone !== intruder);
 
-    // Crew and intruder phones look the same: same task screen, same button.
-    for (const phone of [crew[0], intruder]) {
-        await expect(phone.getByRole('slider').first()).toBeVisible();
-        await expect(phone.getByText('CALL MEETING')).toBeVisible();
-    }
+    // Same blue screen and slider for both; crew call meetings, intruders enter the vent.
+    for (const phone of [crew[0], intruder]) await expect(phone.getByRole('slider').first()).toBeVisible();
+    await expect(crew[0].getByText('CALL MEETING')).toBeVisible();
+    await expect(intruder.getByText('ENTER VENT')).toBeVisible();
+    await expect(intruder.getByText('CALL MEETING')).toHaveCount(0);
 
     // A crewmate finishes a task and the reactor's progress moves.
     const before = await reactor.getByRole('progressbar').getAttribute('aria-label');
     await h.swipe(crew[0]);
     await expect(reactor.getByRole('progressbar')).not.toHaveAttribute('aria-label', before);
 
-    // The intruder holds CALL MEETING to open the vent, then leaves it.
-    const release = await h.hold(intruder, intruder.getByText('CALL MEETING'), 1400);
-    await release();
+    // The intruder taps ENTER VENT, then leaves the vent.
+    await intruder.getByText('ENTER VENT').click();
     await expect(intruder.getByText('Exit to safety', { exact: false })).toBeVisible();
     await intruder.getByText('Exit to safety', { exact: false }).click();
 

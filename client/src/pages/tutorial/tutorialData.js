@@ -110,12 +110,12 @@ export const tutorialCoachCopy = {
   intruderCooldown: {
     step: 'Intruder · 1 of 3',
     accent: 'orange',
-    body: 'After each kill there\'s a short cooldown, so you can\'t eliminate the whole crew back-to-back. Your screen keeps showing a cover task meanwhile. Wait for the timer to finish.',
+    body: 'After each kill there\'s a short cooldown, so you can\'t eliminate the whole crew back-to-back. Wait for the timer to finish.',
   },
   intruderVent: {
     step: 'Intruder · 2 of 3',
     accent: 'rose',
-    body: 'Intruders carry a hidden hand of ability cards — fake tasks, sabotage, and more. In a real game you hold CALL MEETING for a second to open your vent (a quick tap still calls a meeting, just like a crewmate). Here, just tap it.',
+    body: 'Intruders carry a hidden hand of ability cards — fake tasks, sabotage, and more. Only a card lets an intruder call a meeting. Tap ENTER VENT to open your vent.',
   },
   intruderCards: {
     step: 'Intruder · 3 of 3',

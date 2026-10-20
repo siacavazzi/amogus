@@ -48,7 +48,7 @@ test('when the host leaves the lobby, someone else can start', async ({ browser 
     await expect(rest[0].getByText('Start Game')).toBeVisible();
     await rest[0].getByText('Start Game').click();
     await h.revealRoles(rest).catch(() => {});
-    await expect(rest[1].getByText('CALL MEETING')).toBeVisible();
+    await expect(h.roundButton(rest[1])).toBeVisible();
 
     h.expectNoPageErrors(phones);
 });
@@ -65,7 +65,7 @@ test('a crewmate who leaves mid-round is out, and the round goes on', async ({ b
     await expect(leaver.getByText('Create New Game')).toBeVisible();
 
     const others = phones.filter(phone => phone !== leaver);
-    for (const phone of others) await expect(phone.getByText('CALL MEETING'), phone.person).toBeVisible();
+    for (const phone of others) await expect(h.roundButton(phone), phone.person).toBeVisible();
     // The next meeting only waits for the people still here.
     await h.callMeeting(others.find(phone => phone !== intruder), others);
     for (const phone of others) await expect(phone.getByRole('button', { name: /^Vote for/ }).or(phone.getByText(leaver.person, { exact: true })).first()).toBeVisible();

@@ -1227,6 +1227,8 @@ def current_phase_player(data, stage=None):
 @room_event()
 def handleMeeting(data):
     game, player = current_phase_player(data)
+    if game and player and player.sus:
+        return command_error('Intruders can only call a meeting with a card.')
     if not game or not game.start_meeting(player):
         return command_error('A meeting cannot start now.')
     record_usage('meeting_started', game, player.player_id)

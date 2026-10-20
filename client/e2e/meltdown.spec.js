@@ -41,7 +41,7 @@ test('a rescued meltdown stays over through a meeting and a rejoin', async ({ br
     for (const phone of phones) {
         await expect(phone.getByRole('dialog', { name: 'Meltdown averted' })).toBeVisible();
         await phone.getByRole('button', { name: 'Got it' }).click();
-        await expect(phone.getByText('CALL MEETING')).toBeVisible();
+        await expect(h.roundButton(phone)).toBeVisible();
     }
 
     // A meeting where an innocent goes out, so the round carries on.
@@ -51,14 +51,14 @@ test('a rescued meltdown stays over through a meeting and a rejoin', async ({ br
     await h.continueAfterResults(phones);
     const living = phones.filter(phone => phone !== innocent);
     for (const phone of living) {
-        await expect(phone.getByText('CALL MEETING')).toBeVisible({ timeout: 20000 });
+        await expect(h.roundButton(phone)).toBeVisible({ timeout: 20000 });
         await expect(phone.getByTestId('meltdown-code')).toHaveCount(0);
     }
 
     // A phone that reloads mid-round comes back to its tasks, not to an old code.
     const rejoiner = living[1];
     await rejoiner.reload();
-    await expect(rejoiner.getByText('CALL MEETING')).toBeVisible({ timeout: 20000 });
+    await expect(h.roundButton(rejoiner)).toBeVisible({ timeout: 20000 });
     await expect(rejoiner.getByTestId('meltdown-code')).toHaveCount(0);
 
     h.expectNoPageErrors([...phones, reactor]);

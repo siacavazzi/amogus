@@ -17,7 +17,9 @@ class PlayInterruptionTests(SocketGameTestCase):
                 role = absent.sus
                 if disconnect_first:
                     clients[-1].disconnect()
-                clients[0].emit('meeting', {'player_id': ids[0]})
+                # Intruders can only call a meeting with a card, so a crewmate calls it.
+                caller = next(i for i, pid in enumerate(ids[:-1]) if not game.getPlayerById(pid).sus)
+                clients[caller].emit('meeting', {'player_id': ids[caller]})
                 for client, pid in zip(clients[:-1], ids[:-1]):
                     client.emit('ready', {'player_id': pid})
                 if not disconnect_first:
@@ -69,6 +71,16 @@ class PlayInterruptionTests(SocketGameTestCase):
         self.assertIsNone(game.active_meltdown)
         self.assertEqual(1, len(self.event_payloads(events, 'meltdown_end')))
         self.assertFalse(self.has_event(events, 'end_game'))
+
+    def test_intruders_can_only_call_a_meeting_with_a_card(self):
+        clients, room, ids, game = self.start_round()
+        intruder = self.intruders(game)[0]
+        client = self.client_for_player(clients, ids, intruder)
+        client.emit('meeting', {'player_id': intruder.player_id})
+        self.assertFalse(game.meeting)
+        card = self.inject_card(game, intruder, 'Self Report')
+        client.emit('play_card', {'player_id': intruder.player_id, 'card_id': card.id})
+        self.assertTrue(game.meeting)
 
     def test_room_created_on_the_reactor_gets_a_phone_host(self):
         reactor = self.make_client()
@@ -172,7 +184,7 @@ class PlayInterruptionTests(SocketGameTestCase):
         clients, room, ids, game = self.start_round()
         reactor = self.make_client()
         reactor.emit('register_reactor', {'room_code': room})
-        self.start_meeting_and_ready_living_players(clients, ids, game, game.players[0])
+        self.start_meeting_and_ready_living_players(clients, ids, game, self.crew(game)[0])
         intruder = self.intruders(game)[0]
         card = self.inject_card(game, intruder, 'Remote Sabotage')
         with patch('assets.meltdown.eventlet.spawn'):

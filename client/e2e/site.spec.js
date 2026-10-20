@@ -65,7 +65,7 @@ test('the tutorial plays through both roles to the end', async ({ browser }) => 
     await step(() => h.swipe(phone), coach('cooldown'));
     // The kill cooldown runs down on its own before the vent step.
     await expect(coach('Intruder · 2 of 3')).toBeVisible({ timeout: 60000 });
-    await step(() => phone.getByRole('button', { name: /CALL MEETING/ }).click(), coach('Intruder · 3 of 3'));
+    await step(() => phone.getByRole('button', { name: /ENTER VENT/ }).click(), coach('Intruder · 3 of 3'));
     const deck = phone.getByTestId('card-deck');
     const box = await deck.boundingBox();
     await phone.mouse.move(box.x + box.width * 0.8, box.y + box.height / 2);

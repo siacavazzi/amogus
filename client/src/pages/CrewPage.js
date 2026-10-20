@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import { DataContext } from "../GameContext";
 import AnimationOverlay from "../components/AnimationOverlay";
@@ -8,18 +8,9 @@ import TestModeBar from "../components/TestModeBar";
 import { MapPin } from "../signal/icons";
 import { rememberOrigin } from "../signal";
 
-// Crewmates and intruders get this same blue screen with the same words on it. An intruder
-// is shown a cover task from the room's task list, so a glance at their phone gives nothing away.
-const COVER_TASKS = [
-  { task: "Straighten three cushions", location: "Living room" },
-  { task: "Count the fridge magnets", location: "Kitchen" },
-  { task: "Find a book with a blue cover", location: "Living room" },
-  { task: "Fold a towel and leave it on a bed", location: "Bedroom" },
-  { task: "Line up the shoes by the door", location: "Hallway" },
-];
-
-// A tap calls a meeting. Holding for a second does something private: intruders open the
-// vent, crewmates see their role. The fill looks the same for both.
+// Crewmates and intruders share this blue screen. Only a card lets an intruder call a meeting,
+// so their button opens the vent instead, and they see their objective rather than a task.
+// A crewmate's tap calls a meeting; holding for a second shows their role.
 const HOLD_START_MS = 350;
 const HOLD_MS = 1000;
 
@@ -127,8 +118,6 @@ const CrewmemberPage = ({
     completeTask,
     taskCompletionPending,
     taskCompletionError,
-    lobbyState,
-    taskLocations,
   } = useContext(DataContext);
 
   const sus = !!playerState?.sus;
@@ -142,22 +131,10 @@ const CrewmemberPage = ({
   const highlightSlider = tutorialMode && tutorialHighlightTarget === 'slider';
 
   const [peekRole, setPeekRole] = useState(false);
-  const [coverIndex, setCoverIndex] = useState(() => Math.floor(Math.random() * 1000));
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
-  // The intruder's cover task: a real task from this room's list, so it reads like everyone else's.
-  const coverTask = useMemo(() => {
-    const roomTasks = (lobbyState?.tasks || []).filter((t) => t?.task);
-    const pool = roomTasks.length ? roomTasks : COVER_TASKS;
-    const picked = pool[coverIndex % pool.length];
-    const location = picked.location || (taskLocations?.length ? taskLocations[coverIndex % taskLocations.length] : 'Other');
-    return { task: picked.task, location, assignment_id: `cover-${coverIndex}` };
-  }, [lobbyState, taskLocations, coverIndex]);
-
-  const shownTask = sus ? coverTask : task;
 
   const reportEliminated = () => {
     if (!window.confirm('Did the intruder get you? This ends the game.')) return;
@@ -170,8 +147,7 @@ const CrewmemberPage = ({
   const handleTap = () => {
     if (meetingsOff) {
       reportEliminated();
-    } else if (sus && (lastStand || tutorialMode)) {
-      // Nobody is fooled at a last stand, and the tutorial still teaches the vent with a tap.
+    } else if (sus) {
       setShowSusPage(true);
     } else {
       handleCallMeeting();
@@ -194,13 +170,10 @@ const CrewmemberPage = ({
     }
 
     if (sus) {
-      // An intruder's swipe logs a kill, but looks and sounds exactly like finishing a task.
-      if (killCooldown <= 0) {
-        socket.emit("kill_player", { player_id: localStorage.getItem("player_id") }); // doesnt do anything yet...
-        setKillCooldown(15);
-      }
-      setAudio("complete_task");
-      setShowAnimation(true);
+      if (killCooldown > 0) return false;
+      setAudio("dead");
+      socket.emit("kill_player", { player_id: localStorage.getItem("player_id") }); // doesnt do anything yet...
+      setKillCooldown(15);
       return true;
     }
 
@@ -215,10 +188,9 @@ const CrewmemberPage = ({
 
   const handleAnimationComplete = () => {
     setShowAnimation(false);
-    if (sus) setCoverIndex((i) => i + 1);
   };
 
-  const buttonLabel = meetingsOff ? "I WAS ELIMINATED" : "CALL MEETING";
+  const buttonLabel = meetingsOff ? "I WAS ELIMINATED" : sus ? "ENTER VENT" : "CALL MEETING";
   const showSlider = !(tasksComplete && !sus);
 
   return (
@@ -264,16 +236,26 @@ const CrewmemberPage = ({
             )}
             <p className="sg-lede" style={{ marginTop: 18, opacity: 0.85 }}>Call a meeting and vote them out.</p>
           </div>
-        ) : shownTask ? (
-          <div key={shownTask.assignment_id || shownTask.task} className="sg-a sg-drop" style={{ animationDelay: '120ms' }}>
+        ) : sus ? (
+          <div key="objective" className="sg-a sg-drop" style={{ animationDelay: '120ms' }}>
+            <p className="sg-small">Current objective</p>
+            <h3 className="sg-big" style={{ fontSize: 'clamp(32px, 10.5vw, 46px)', margin: '12px 0 18px', lineHeight: 1 }}>
+              {killCooldown > 0 ? 'Lie low' : 'Eliminate the crew'}
+            </h3>
+            {killCooldown > 0 && (
+              <span className="sg-pill sg-num" data-testid="crew-kill-cooldown">Next kill in {killCooldown}s</span>
+            )}
+          </div>
+        ) : task?.task ? (
+          <div key={task.assignment_id || task.task} className="sg-a sg-drop" style={{ animationDelay: '120ms' }}>
             <p className="sg-small">Current task</p>
             <h3 className="sg-big" style={{ fontSize: 'clamp(32px, 10.5vw, 46px)', margin: '12px 0 18px', lineHeight: 1 }}>
-              {shownTask.task}
+              {task.task}
             </h3>
-            {shownTask.location && (
+            {task.location && (
               <span className="sg-pill" data-testid="task-location">
                 <MapPin size={16} strokeWidth={2.75} />
-                {shownTask.location}
+                {task.location}
               </span>
             )}
           </div>
@@ -293,14 +275,16 @@ const CrewmemberPage = ({
           >
             <MUECustomSlider
               text={
-                !sus && taskCompletionPending
+                sus
+                  ? killCooldown > 0 ? "Cooldown active" : "Slide to eliminate"
+                  : taskCompletionPending
                   ? "Confirming task…"
-                  : shownTask
+                  : task?.task
                   ? "Slide to complete task"
                   : "No task assigned"
               }
               onSuccess={handleCompleteTask}
-              disabled={sus ? (tutorialMode && killCooldown > 0) : !connected || taskCompletionPending || !task}
+              disabled={sus ? killCooldown > 0 : !connected || taskCompletionPending || !task}
               pending={!sus && taskCompletionPending}
             />
           </div>

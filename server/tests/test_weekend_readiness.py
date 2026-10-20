@@ -111,7 +111,7 @@ class WeekendReadinessTests(SocketGameTestCase):
         reactor = self.make_client()
         reactor.emit('register_reactor', {'room_code': room})
         with patch('assets.meeting.Thread'):
-            self.start_meeting_and_ready_living_players(clients, ids, game, game.players[0])
+            self.start_meeting_and_ready_living_players(clients, ids, game, self.crew(game)[0])
         reactor.disconnect()
         replacement = self.make_client()
         replacement.emit('register_reactor', {'room_code': room})
@@ -179,7 +179,7 @@ class WeekendReadinessTests(SocketGameTestCase):
             with self.subTest(force=force), patch('assets.meeting.Thread'):
                 clients, room, ids, game = self.start_round()
                 game.task_list_applied = True
-                self.start_meeting_and_ready_living_players(clients, ids, game, game.players[0])
+                self.start_meeting_and_ready_living_players(clients, ids, game, self.crew(game)[0])
                 old_meeting = game.meeting
                 old_meeting.time_left = 1
 
@@ -191,7 +191,7 @@ class WeekendReadinessTests(SocketGameTestCase):
                         for client, pid in zip(clients, ids):
                             client.emit('reset', {'player_id': pid, 'room_code': room})
                     self.start_game(clients[0], ids[0], clients)
-                    self.start_meeting_and_ready_living_players(clients, ids, game, game.players[0])
+                    self.start_meeting_and_ready_living_players(clients, ids, game, self.crew(game)[0])
                     self.drain_all(clients)
 
                 with patch('assets.meeting.time.sleep', side_effect=reset_and_start_new_meeting):
@@ -204,7 +204,7 @@ class WeekendReadinessTests(SocketGameTestCase):
     def test_meeting_deadline_still_ends_the_current_meeting_once(self):
         clients, room, ids, game = self.start_round()
         with patch('assets.meeting.Thread'):
-            self.start_meeting_and_ready_living_players(clients, ids, game, game.players[0])
+            self.start_meeting_and_ready_living_players(clients, ids, game, self.crew(game)[0])
         meeting = game.meeting
         meeting.time_left = 1
         self.drain_all(clients)
@@ -218,7 +218,7 @@ class WeekendReadinessTests(SocketGameTestCase):
     def test_meeting_timer_stops_when_the_round_ends_during_a_vote(self):
         clients, room, ids, game = self.start_round()
         with patch('assets.meeting.Thread'):
-            self.start_meeting_and_ready_living_players(clients, ids, game, game.players[0])
+            self.start_meeting_and_ready_living_players(clients, ids, game, self.crew(game)[0])
         meeting = game.meeting
         meeting.time_left = 1
 

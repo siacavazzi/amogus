@@ -12,7 +12,8 @@ class VotingDeathTests(SocketGameTestCase):
         clients, room, ids, game = self.setup_started_game(count, config={
             'num_intruders': 1, 'starting_cards': 0, 'card_draw_probability': 0,
         })
-        clients[0].emit('meeting', {'player_id': ids[0]})
+        caller = self.crew(game)[0]
+        self.client_for_player(clients, ids, caller).emit('meeting', {'player_id': caller.player_id})
         with patch('assets.meeting.Thread'):
             for client, pid in zip(clients, ids):
                 client.emit('ready', {'player_id': pid})

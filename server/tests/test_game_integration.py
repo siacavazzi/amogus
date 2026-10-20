@@ -153,7 +153,7 @@ class GameIntegrationTests(SocketGameTestCase):
             {"player_id": dead_crew.player_id},
         )
         self.drain_all(clients)
-        caller = next(player for player in self.living(game) if player.player_id != dead_crew.player_id)
+        caller = next(player for player in self.living_crew(game) if player.player_id != dead_crew.player_id)
 
         meeting_events = self.start_meeting_and_ready_living_players(clients, player_ids, game, caller)
 
@@ -173,7 +173,7 @@ class GameIntegrationTests(SocketGameTestCase):
                 "vote_time": 1,
             },
         )
-        caller = self.living(game)[0]
+        caller = self.living_crew(game)[0]
         self.start_meeting_and_ready_living_players(clients, player_ids, game, caller)
         target = self.crew(game)[0]
         voters_for_target = [player for player in self.living(game) if player.player_id != target.player_id][:3]
@@ -216,7 +216,7 @@ class GameIntegrationTests(SocketGameTestCase):
         )
         intruder = self.intruders(game)[0]
         target = self.crew(game)[0]
-        self.start_meeting_and_ready_living_players(clients, player_ids, game, self.living(game)[0])
+        self.start_meeting_and_ready_living_players(clients, player_ids, game, self.living_crew(game)[0])
 
         voters_for_target = [
             player for player in self.living(game) if player.player_id != target.player_id
@@ -253,7 +253,7 @@ class GameIntegrationTests(SocketGameTestCase):
                 "vote_time": 1,
             },
         )
-        self.start_meeting_and_ready_living_players(clients, player_ids, game, self.living(game)[0])
+        self.start_meeting_and_ready_living_players(clients, player_ids, game, self.living_crew(game)[0])
         living_before = {player.player_id for player in self.living(game)}
 
         for player in self.living(game)[:3]:
@@ -280,7 +280,7 @@ class GameIntegrationTests(SocketGameTestCase):
                 "vote_time": 1,
             },
         )
-        self.start_meeting_and_ready_living_players(clients, player_ids, game, self.living(game)[0])
+        self.start_meeting_and_ready_living_players(clients, player_ids, game, self.living_crew(game)[0])
         living_players = self.living(game)
 
         for player in living_players[:2]:
@@ -315,7 +315,7 @@ class GameIntegrationTests(SocketGameTestCase):
         )
         rejoining_player = self.crew(game)[0]
         target = self.crew(game)[1]
-        self.start_meeting_and_ready_living_players(clients, player_ids, game, self.living(game)[0])
+        self.start_meeting_and_ready_living_players(clients, player_ids, game, self.living_crew(game)[0])
         voter = next(player for player in self.living(game) if player.player_id != target.player_id)
         self.client_for_player(clients, player_ids, voter).emit(
             "vote",
