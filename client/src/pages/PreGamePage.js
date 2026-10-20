@@ -554,7 +554,7 @@ function PreGamePage() {
                     <div style={{ display: 'grid', gap: 14 }}>
                         <button type="button" onClick={copyRoomCode} className="hs-code" title="Copy room code" aria-label="Copy room code">
                             <span className="hs-label">Room code</span>
-                            <span className="hs-code__value">{roomCode}</span>
+                            <span className="hs-code__value" data-testid="room-code">{roomCode}</span>
                             <span className="hs-code__tap" aria-live="polite">
                                 {roomCodeCopied ? <><Check size={16} /> Copied</> : <><Copy size={16} /> Tap to copy</>}
                             </span>

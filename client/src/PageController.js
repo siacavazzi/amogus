@@ -79,7 +79,9 @@ const PageController = () => {
             return;
         }
 
-        if (endState && meetingState?.stage !== 'over') {
+        // Phones finish reading the vote result first (they tap Continue); the reactor has no
+        // result screen, so it goes straight to the end screen.
+        if (endState && (!isMobile || meetingState?.stage !== 'over')) {
             setCurrentPage(endState)
             return;
         }

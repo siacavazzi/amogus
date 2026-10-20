@@ -30,7 +30,7 @@ function MeltdownInfo() {
                     </p>
                     <p className="sg-small">{critical ? 'Seconds left. Hurry.' : 'seconds until meltdown'}</p>
                     <p className="sg-lede" style={{ marginTop: 14, opacity: 0.75 }}>Your code</p>
-                    <p className="sg-big sg-num" style={{ fontSize: 'clamp(48px, 15vw, 64px)', letterSpacing: '0.14em', color: 'var(--sg-meet)' }}>
+                    <p className="sg-big sg-num" data-testid="meltdown-code" style={{ fontSize: 'clamp(48px, 15vw, 64px)', letterSpacing: '0.14em', color: 'var(--sg-meet)' }}>
                         {meltdownCode}
                     </p>
                     <p className="sg-small">Type it in at the reactor</p>

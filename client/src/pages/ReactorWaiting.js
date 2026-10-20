@@ -58,7 +58,7 @@ function ReactorWaiting() {
           <>
             <p className="sg-rx__label sg-a sg-rise">Room code</p>
             <div className="sg-rx__codebox">
-              <h1 className="sg-rx__code sg-a sg-slam" aria-label={`Room code ${roomCode}`}>{roomCode}</h1>
+              <h1 className="sg-rx__code sg-a sg-slam" aria-label={`Room code ${roomCode}`} data-testid="room-code">{roomCode}</h1>
               <button type="button" onClick={copyRoomCode} className="sg-rx__copy" title="Copy room code" aria-label="Copy room code">
                 {copied ? <Check size={28} strokeWidth={3} /> : <Copy size={26} />}
               </button>

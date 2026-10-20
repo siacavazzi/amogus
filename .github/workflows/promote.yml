@@ -52,9 +52,31 @@ jobs:
         run: npm ci --legacy-peer-deps
 
       # Prod only gets a build that just played a whole game on beta
-      - name: Play a full game on beta
+      - name: Check the server plays a full game (sockets only, no browser)
         working-directory: ./client
         run: node scripts/e2e-live.js https://susparty.com --beta --browser --expect-commit "$BETA_COMMIT"
+
+      # Real Chromium pages for the reactor and the phones tap through whole games on beta:
+      # setup, roles, a task, the vent, meetings and votes, a meltdown, a rejoin, Play Again.
+      - name: Install the test browser
+        working-directory: ./client
+        run: npx playwright install --with-deps chromium
+
+      - name: Play games in real browsers on beta
+        working-directory: ./client
+        run: npx playwright test -c e2e
+        env:
+          E2E_BASE_URL: https://susparty.com
+          E2E_BETA: '1'
+
+      - name: Keep the browser test report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-e2e
+          path: |
+            client/e2e/report
+            client/e2e/results
 
       - name: Copy beta into prod and restart
         run: |

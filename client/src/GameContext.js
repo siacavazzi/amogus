@@ -13,6 +13,14 @@ const urlParams = new URLSearchParams(window.location.search);
 const mobileOverride = urlParams.get('mobile');
 const isMobile = mobileOverride !== null ? mobileOverride === 'true' : isMobileDevice;
 
+const isTestTraffic = () => {
+    try {
+        return localStorage.getItem('sus_e2e') === '1';
+    } catch (error) {
+        return false;
+    }
+};
+
 const DataContext = createContext();
 
 export default function GameContext({ children }) {
@@ -416,7 +424,11 @@ export default function GameContext({ children }) {
 
     useEffect(() => {
         socketRef.current = io(ENDPOINT, {
-            auth: (callback) => callback({ utc_offset_minutes: -new Date().getTimezoneOffset() }),
+            auth: (callback) => callback({
+                utc_offset_minutes: -new Date().getTimezoneOffset(),
+                // Browser end-to-end tests set this so their rooms stay out of usage stats.
+                ...(isTestTraffic() ? { synthetic: true } : {}),
+            }),
             reconnection: true,
             reconnectionAttempts: 10,
             reconnectionDelay: 2000,
