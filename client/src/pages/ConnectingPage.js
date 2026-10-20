@@ -85,6 +85,9 @@ function ConnectingPage() {
             Connection is taking longer than expected. Retrying...
           </p>
         )}
+        <p className="sg-small" style={{ opacity: 0.6 }}>
+          Sus Party is a free party game played on your phones. No app needed.
+        </p>
       </div>
     </div>
   );

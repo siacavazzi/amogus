@@ -21,25 +21,35 @@ const puppeteer = require('puppeteer');
             await page.setViewport({ width, height: 800 });
             await page.goto(`http://127.0.0.1:${server.address().port}/`, { waitUntil: 'networkidle0' });
             assert.deepEqual(errors, [], 'Landing startup errors');
-            const screens = ['lp-task', 'lp-meet', 'lp-card', 'lp-reactor'];
-            for (let i = 0; i < screens.length; i++) {
-                await page.$$eval('.lp-story__panel', (panels, index) => {
-                    panels[index].scrollIntoView({ block: 'center', behavior: 'instant' });
+            await page.waitForSelector('.sl-phone--hero .sl-phone__shot.is-on', { visible: true, timeout: 5000 });
+            const shots = await page.$$eval('.sl-split .sl-phone img', imgs => imgs.length);
+            assert.ok(shots >= 3, `Expected the game screenshots on the home page, found ${shots}`);
+            for (let i = 0; i < shots; i++) {
+                await page.$$eval('.sl-split .sl-phone img', (imgs, index) => {
+                    imgs[index].scrollIntoView({ block: 'center', behavior: 'instant' });
                 }, i);
-                const selector = width > 600
-                    ? `.lp-story__phone-col .${screens[i]}`
-                    : `.lp-story__panel.is-active .${screens[i]}`;
-                await page.waitForSelector(selector, { visible: true, timeout: 5000 });
+                await page.waitForFunction(index => {
+                    const img = document.querySelectorAll('.sl-split .sl-phone img')[index];
+                    return img.complete && img.naturalWidth > 0;
+                }, { timeout: 5000 }, i);
             }
+            await page.type('#sl-code', 'ab12');
             await Promise.all([
                 page.waitForNavigation({ waitUntil: 'domcontentloaded' }),
-                page.click('a[href="/play"]'),
+                page.click('.sl-join button[type="submit"]'),
             ]);
-            await page.waitForFunction(() => !document.querySelector('.lp-shell') &&
+            assert.equal(new URL(page.url()).pathname, '/play');
+            assert.match(new URL(page.url()).search, /AB12/);
+            await page.goto(`http://127.0.0.1:${server.address().port}/`, { waitUntil: 'networkidle0' });
+            await Promise.all([
+                page.waitForNavigation({ waitUntil: 'domcontentloaded' }),
+                page.click('a.sl-join__host[href="/play"]'),
+            ]);
+            await page.waitForFunction(() => !document.querySelector('.sl-hero') &&
                 document.querySelector('#root').textContent.trim().length > 0);
             assert.equal(new URL(page.url()).pathname, '/play');
             assert.deepEqual(errors, [], 'Game startup errors');
-            console.log(`PASS ${width}px: all phone screens, Play navigation, no startup errors`);
+            console.log(`PASS ${width}px: game screenshots, room code box, Host navigation, no startup errors`);
             await page.close();
         }
     } finally {
