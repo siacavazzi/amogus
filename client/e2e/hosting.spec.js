@@ -99,8 +99,7 @@ test('two intruders need five players before the host can start', async ({ brows
     h.expectNoPageErrors(phones);
 });
 
-test('BUG: when the host phone drops out of the lobby, someone else can start', async ({ browser }) => {
-    test.fail(!process.env.E2E_SHOW_BUGS, 'Host only moves on when the host taps Leave; see the lobby bug report');
+test('when the host phone drops out of the lobby, someone else can start', async ({ browser }) => {
     const phones = await h.openPhones(browser, ['Sam', 'Alex', 'Jules', 'Riley']);
     const [host, ...rest] = phones;
     await h.gatherRoom({ host, phones });
@@ -110,8 +109,7 @@ test('BUG: when the host phone drops out of the lobby, someone else can start', 
     await expect.poll(async () => (await startButtons()).reduce((a, b) => a + b, 0), { timeout: 30000 }).toBe(1);
 });
 
-test('BUG: a phone that closed the page in the lobby is not dealt into the round', async ({ browser }) => {
-    test.fail(!process.env.E2E_SHOW_BUGS, 'Players who are gone still get a role, and every meeting waits for them forever');
+test('a phone that closed the page in the lobby is not dealt into the round', async ({ browser }) => {
     const phones = await h.openPhones(browser, ['Sam', 'Alex', 'Jules', 'Riley', 'Kai']);
     await h.gatherRoom({ host: phones[0], phones });
     const gone = phones[4];

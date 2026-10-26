@@ -63,6 +63,9 @@ game_manager = GameManager(socketio, speaker, game_config, selfie_store=selfie_s
 task_list_manager = TaskListManager()
 
 client_metrics_by_sid = {}
+# How long a player can be offline before the room stops waiting for them: meetings and Play Again
+# go on without them, the host role moves on, and they aren't dealt into the next round.
+ABSENT_AFTER_SECONDS = 20
 # Sockets from the automated end-to-end run. Their rooms stay out of usage stats and logs.
 synthetic_sids = set()
 
@@ -174,14 +177,16 @@ def get_min_tasks_needed(game):
 def record_usage(event, game=None, player_id=None, resolve_game=True, **fields):
     """Record allowlisted metadata without a gameplay dependency on stats writes."""
     try:
+        # Background timers (an absence check) run without a socket request.
+        sid = request.sid if has_request_context() else None
         if game is None and resolve_game:
-            game, _ = game_manager.get_game_by_sid(request.sid)
-        if request.sid in synthetic_sids or getattr(game, 'synthetic', False):
+            game, _ = game_manager.get_game_by_sid(sid)
+        if sid in synthetic_sids or getattr(game, 'synthetic', False):
             return
         game_manager.stats_tracker.record_event(
-            event, game, player_id, connection_id=request.sid,
+            event, game, player_id, connection_id=sid,
             phase='ended' if game and game.end_state else 'round' if game and game.game_running else 'lobby',
-            **client_metrics_by_sid.get(request.sid, {}), **fields)
+            **client_metrics_by_sid.get(sid, {}), **fields)
     except Exception:
         logger.exception('Usage event write failed')
 
@@ -546,12 +551,8 @@ def handle_register_reactor(data):
         emit('error', {'message': 'Game not found'})
         return
     
-    # Allow re-registration if already the reactor (e.g., after reconnect)
-    # Only block new reactors from registering while game is running
-    if game.game_running and game.reactor_sid != sid and game.reactor_sid is not None:
-        emit('error', {'message': 'Cannot register reactor after game has started'})
-        return
-    
+    # The newest big screen takes over, mid-round too. After a wifi blink the server can still hold
+    # the old socket for up to the ping timeout, and refusing the new one froze the big screen.
     # Register this client as the reactor
     game.has_reactor = True
     game.reactor_sid = sid
@@ -650,8 +651,7 @@ def handleRejoin(data):
     
     logger.info(f"Player {player_id} rejoining room {room_code}, creator_player_id={game.creator_player_id}")
     record_reconnect(game, player)
-    player.sid = request.sid
-    player.active = True
+    player.reconnect(request.sid)
     game_manager.update_sid(player_id, request.sid)
     join_room(room_code)
     
@@ -739,9 +739,89 @@ def handle_disconnect(reason=None):
         player.ready = False
         if game.meeting and not game.end_state:
             game.try_start_voting()
+        if game.end_state:
+            count_play_again(game, room_code)
         sendPlayerList(game, room_code)
+        socketio.start_background_task(absence_timer, room_code, player.player_id, player.disconnected_at)
     # Last, so the cleanup above is still recognised as end-to-end traffic
     synthetic_sids.discard(sid)
+
+
+def absence_timer(room_code, player_id, disconnected_at):
+    socketio.sleep(ABSENT_AFTER_SECONDS)
+    mark_absent_if_still_gone(room_code, player_id, disconnected_at)
+
+
+def mark_absent_if_still_gone(room_code, player_id, disconnected_at):
+    """Stop waiting for a player who has stayed offline since disconnected_at."""
+    game = game_manager.get_game(room_code)
+    if not game:
+        return False
+    with game.state_lock:
+        player = game.getPlayerById(player_id)
+        if (game_manager.get_game(room_code) is not game or not player or player.active
+                or player.absent or player.disconnected_at != disconnected_at):
+            return False
+        player.absent = True
+        game.revision += 1
+        logger.info(f"Player {player_id} in room {room_code} is offline; the room stops waiting for them")
+        if player.player_id == game.creator_player_id:
+            reassign_room_creator(game, room_code)
+        if game.meeting and not game.end_state:
+            if game.meeting.stage == 'waiting':
+                game.try_start_voting()
+            elif game.meeting.stage == 'voting':
+                game.meeting.on_player_death()  # re-checks whether everyone present has voted
+        if game.end_state:
+            count_play_again(game, room_code)
+        if game_manager.get_game(room_code) is game:
+            sendPlayerList(game, room_code)
+        return True
+
+
+def remove_players(game, room_code, players):
+    for player in players:
+        if player not in game.players:
+            continue
+        game.players.remove(player)
+        selfie_store.delete(player.selfie)
+        player.selfie = None
+        if player.pic not in game.backgrounds and not any(other.pic == player.pic for other in game.players):
+            game.backgrounds.append(player.pic)
+        game_manager.unregister_player(player.player_id)
+        logger.info(f"Removed {player.player_id} from room {room_code} (left={player.left}, absent={player.absent})")
+
+
+def reset_room_to_lobby(game, room_code, reason, player_id=None):
+    game._record_abandoned_round(reason)
+    record_usage('round_reset', game, player_id, reason=reason, flush=True)
+    # People who tapped Leave mid-round were kept so the round could finish; they go now.
+    remove_players(game, room_code, [p for p in game.players if p.left])
+    for p in game.players:
+        p.reset()
+    game.reset_game_state(reason=reason)
+    socketio.emit('game_reset', {'room_code': room_code}, room=room_code)
+    sendPlayerList(game, room_code)
+
+
+def count_play_again(game, room_code, player_id=None):
+    """Count Play Again taps from connected phones; back to the lobby once all of them tapped."""
+    connected_player_ids = get_connected_player_ids(game, room_code)
+    game.reset_votes.intersection_update(connected_player_ids)
+    if player_id and player_id in connected_player_ids:
+        game.reset_votes.add(player_id)
+    votes_needed = len(connected_player_ids)
+    current_votes = len(game.reset_votes)
+    socketio.emit('reset_vote_update', {
+        'room_code': room_code,
+        'current_votes': current_votes,
+        'votes_needed': votes_needed,
+        'voters': list(game.reset_votes)
+    }, room=room_code)
+    logger.info(f"Game {room_code}: Reset vote from {player_id}. {current_votes}/{votes_needed} votes.")
+    if votes_needed > 0 and current_votes >= votes_needed:
+        reset_room_to_lobby(game, room_code, 'unanimous_reset', player_id)
+        logger.info(f"Game {room_code} has been reset to lobby (all players voted)")
 
 
 # ============ PLAYER MANAGEMENT ============
@@ -768,8 +848,7 @@ def handle_join(data):
         game, player, existing_room = get_game_and_player(player_id)
         if player:
             record_reconnect(game, player)
-            player.sid = sid
-            player.active = True
+            player.reconnect(sid)
             player.username = username
             game_manager.update_sid(player_id, sid)
             join_room(existing_room)
@@ -847,6 +926,8 @@ def start_room(game, test_mode=False):
     if game.creator_sid != request.sid:
         record_usage('start_rejected', game, reason='not_host')
         return command_error('Only the host can start the game.')
+    # Phones that have been gone past the grace period aren't dealt in; they can rejoin by invite.
+    remove_players(game, game.room_code, [p for p in game.players if p.left or (p.absent and not p.active)])
     # A test game is only for rooms that are short on players. A full room starts normally.
     test_mode = bool(test_mode) and can_start_test(game)
     reason, error = start_error_detail(game, test_mode=test_mode)
@@ -938,13 +1019,7 @@ def reset_game(data):
     if force and sid not in (game.creator_sid, game.reactor_sid):
         return command_error('Only the host or reactor can reset the game.')
     if force:
-        game._record_abandoned_round('host_reset')
-        record_usage('round_reset', game, player_id, reason='host_reset', flush=True)
-        for p in game.players:
-            p.reset()
-        game.reset_game_state(reason='host_reset')
-        socketio.emit('game_reset', {'room_code': room_code}, room=room_code)
-        sendPlayerList(game, room_code)
+        reset_room_to_lobby(game, room_code, 'host_reset', player_id)
         logger.info(f"Game {room_code} has been force reset to lobby")
         return
     
@@ -953,38 +1028,7 @@ def reset_game(data):
     if not game.end_state:
         return {'ok': False, 'error': 'The round has not ended.'}
 
-    connected_player_ids = get_connected_player_ids(game, room_code)
-    game.reset_votes.intersection_update(connected_player_ids)
-
-    # Add this player's vote only if they are currently connected to this room.
-    if player_id and player_id in connected_player_ids:
-        game.reset_votes.add(player_id)
-    
-    # Count how many players are in the game (excluding those who left)
-    total_players = len(connected_player_ids)
-    votes_needed = total_players
-    current_votes = len(game.reset_votes)
-    
-    # Broadcast the vote update to all players
-    socketio.emit('reset_vote_update', {
-        'room_code': room_code,
-        'current_votes': current_votes,
-        'votes_needed': votes_needed,
-        'voters': list(game.reset_votes)
-    }, room=room_code)
-    
-    logger.info(f"Game {room_code}: Reset vote from {player_id}. {current_votes}/{votes_needed} votes.")
-    
-    # If all players have voted, reset the game
-    if votes_needed > 0 and current_votes >= votes_needed:
-        game._record_abandoned_round('unanimous_reset')
-        record_usage('round_reset', game, player_id, reason='unanimous_reset', flush=True)
-        for p in game.players:
-            p.reset()
-        game.reset_game_state(reason='unanimous_reset')
-        socketio.emit('game_reset', {'room_code': room_code}, room=room_code)
-        sendPlayerList(game, room_code)
-        logger.info(f"Game {room_code} has been reset to lobby (all players voted)")
+    count_play_again(game, room_code, player_id)
 
 
 @socketio.on('disband_room')
@@ -1067,6 +1111,7 @@ def leave_room_handler(data):
         # During an active round, leaving counts as dying. After the round ends,
         # remove the player so reset votes only wait on people still in the room.
         if game.game_running and not game.end_state and player.alive:
+            player.left = True
             game.kill_player(player.player_id, death_cause='left_game')
             logger.info(f"Player {player.username} left during active game - marked as dead in room {room_code}")
         else:

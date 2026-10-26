@@ -126,15 +126,16 @@ class WeekendReadinessTests(SocketGameTestCase):
         self.assertEqual('victory', result['result'])
         self.assertEqual(game.stats, result['stats'])
 
-    def test_connected_reactor_cannot_be_replaced_during_a_round(self):
+    def test_new_big_screen_takes_over_during_a_round(self):
+        # After a wifi blink the old socket can linger until the ping timeout; the new screen wins.
         clients, room, ids, game = self.start_round()
         reactor = self.make_client()
         reactor.emit('register_reactor', {'room_code': room})
         original_sid = game.reactor_sid
         other = self.make_client()
         other.emit('register_reactor', {'room_code': room})
-        self.assertTrue(self.has_event(self.drain(other), 'error'))
-        self.assertEqual(original_sid, game.reactor_sid)
+        self.assertTrue(self.has_event(self.drain(other), 'reactor_registered'))
+        self.assertNotEqual(original_sid, game.reactor_sid)
 
     def test_desktop_creator_reconnect_restores_open_room_and_host_controls(self):
         reactor = self.make_client()

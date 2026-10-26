@@ -17,8 +17,10 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
 
   const alive = useMemo(() => players.filter((p) => p.alive), [players]);
   const isReady = (p) => p.active !== false && p.ready;
-  const readyCount = alive.filter(isReady).length;
-  const totalAlive = alive.length;
+  // Someone offline past the server's grace period isn't waited for, so they don't count here.
+  const present = alive.filter((p) => !p.absent);
+  const readyCount = present.filter(isReady).length;
+  const totalAlive = present.length;
   const allReady = totalAlive > 0 && readyCount === totalAlive;
   const caller = players.find((p) => p.username === meetingState?.player_who_started_it);
 

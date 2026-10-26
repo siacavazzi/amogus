@@ -81,7 +81,6 @@ test('the big screen gets back into the round after its wifi blinks', async ({ b
 });
 
 test('a phone opened as a second big screen mid-round takes over the big screen', async ({ browser }) => {
-    test.fail(!process.env.E2E_SHOW_BUGS, 'Bug: the server refuses a new big screen while it still holds the old one, so the new screen freezes');
     const { phones, reactor, code, crew } = await startRound(browser, ['Sam', 'Alex', 'Jules', 'Riley'], { reactor: true });
 
     // The host moves the big screen to the TV while the laptop is still open (or the laptop's
@@ -112,7 +111,6 @@ test('a phone that slid ready and then locked still counts as ready', async ({ b
 });
 
 test('someone who leaves mid-round is gone from the lobby after Play Again', async ({ browser }) => {
-    test.fail(!process.env.E2E_SHOW_BUGS, 'Bug: a player who leaves mid-round stays in the room and is dealt into later rounds, where they block every meeting');
     const { phones, intruder, crew } = await startRound(browser, ['Sam', 'Alex', 'Jules', 'Riley', 'Kai']);
     const leaver = crew[crew.length - 1];
     const stayers = phones.filter(phone => phone !== leaver);

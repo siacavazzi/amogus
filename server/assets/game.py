@@ -451,7 +451,7 @@ class Game:
                 card = self.card_deck.draw_card(probability)
                 if card:
                     self.players[i].cards.append(card)
-                    send_message_to_player(self.socket, self.players[i].player_id, f"You drew {card.action}")
+                    send_message_to_player(self.socket, self.players[i], f"You drew {card.action}")
 
         self.emit_player_list()
 
@@ -648,13 +648,18 @@ class Game:
         with self.state_lock:
             return sum(1 for player in self.players if player.alive)
 
+    def present_living_players(self):
+        """Living players the room waits for: not offline past the grace period."""
+        with self.state_lock:
+            return [player for player in self.players if player.alive and not player.absent]
+
     def try_start_voting(self):
         with self.state_lock:
             meeting = self.meeting
             if not meeting or meeting.stage != 'waiting' or meeting.round_id != self.round_id:
                 return False
 
-            living_players = [player for player in self.players if player.alive]
+            living_players = self.present_living_players()
             if not living_players or any(not player.ready for player in living_players):
                 return False
 

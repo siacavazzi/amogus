@@ -56,5 +56,7 @@ def setup_logging():
 
     return logger
 
-def send_message_to_player(socket, player_id, message):
-    socket.emit('message', {'player': player_id, 'message': message})
+def send_message_to_player(socket, player, message):
+    # Only to that player's phone; a player with no socket gets nothing (to=None would reach every room).
+    if player.sid:
+        socket.emit('message', {'player': player.player_id, 'message': message}, to=player.sid)
