@@ -85,6 +85,9 @@
 }
 .sg-rx__face { display: flex; flex-direction: column; align-items: center; gap: 6px; width: clamp(72px, 7vw, 116px); }
 .sg-rx__face span { font-weight: 800; font-size: clamp(14px, 1.2vw, 18px); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sg-rx__faces--many { gap: clamp(8px, 1vw, 16px); }
+.sg-rx__faces--many .sg-rx__face { width: clamp(60px, 5.2vw, 84px); gap: 4px; }
+.sg-rx__faces--many .sg-rx__face span { font-size: clamp(12px, 1vw, 15px); }
 .sg-rx__face-ring { border-radius: 50%; box-shadow: 0 0 0 4px #fff; }
 .sg-rx__empty { width: clamp(64px, 6vw, 96px); height: clamp(64px, 6vw, 96px); border-radius: 50%; box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.35); }
 

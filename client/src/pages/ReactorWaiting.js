@@ -43,6 +43,8 @@ function ReactorWaiting() {
   const joined = players || [];
   // Only the host's phone has Start, so a big group needs to know whose phone that is.
   const host = joined.find((p) => p.player_id && p.player_id === lobbyState?.host_player_id);
+  // A big group shrinks the faces so the room code, the host line and everyone still fit.
+  const many = joined.length > 10;
   const joinAt = typeof window !== 'undefined' ? `${window.location.host}/play` : '';
 
   return (
@@ -71,11 +73,20 @@ function ReactorWaiting() {
           </>
         )}
 
-        <div className="sg-rx__faces" style={{ marginTop: 'clamp(8px, 2vh, 24px)' }}>
+        <p className="sg-rx__lede sg-rx__wait" data-testid="reactor-host-hint">
+          <span className="sg-rx__blink" aria-hidden="true" />
+          {host
+            ? <span><strong>{host.username}</strong> is the host. Start the game from their phone.</span>
+            : joined.length > 0
+              ? 'Waiting for the host to start'
+              : 'The first phone to join will be the host'}
+        </p>
+
+        <div className={`sg-rx__faces${many ? ' sg-rx__faces--many' : ''}`} style={{ marginTop: 'clamp(8px, 2vh, 24px)' }}>
           {joined.length > 0 ? (
             joined.map((player) => (
               <div key={player.player_id || player.id || player.username} className="sg-rx__face sg-a sg-pop">
-                <Face player={player} size={88} className="sg-rx__face-ring" />
+                <Face player={player} size={many ? 56 : 88} className="sg-rx__face-ring" />
                 <span>{player.username}</span>
                 {player === host && <span className="sg-rx__host-tag">Host</span>}
               </div>
@@ -89,15 +100,6 @@ function ReactorWaiting() {
             {joined.length} player{joined.length !== 1 ? 's' : ''} connected
           </p>
         )}
-
-        <p className="sg-rx__lede sg-rx__wait" data-testid="reactor-host-hint">
-          <span className="sg-rx__blink" aria-hidden="true" />
-          {host
-            ? <span><strong>{host.username}</strong> is the host. Start the game from their phone.</span>
-            : joined.length > 0
-              ? 'Waiting for the host to start'
-              : 'The first phone to join will be the host'}
-        </p>
       </div>
 
       <div className="sg-rx__help">
