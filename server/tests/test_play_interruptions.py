@@ -92,10 +92,24 @@ class PlayInterruptionTests(SocketGameTestCase):
         game = server_app.game_manager.get_game(room)
         self.assertEqual(ids[0], game.creator_player_id)
         self.assertEqual(game.getPlayerById(ids[0]).sid, game.creator_sid)
+        # The big screen is told who the host is, so it can say whose phone has Start.
+        lobby = self.event_payloads(self.drain(reactor), 'lobby_state')[-1]
+        self.assertEqual(ids[0], lobby['host_player_id'])
         self.add_tasks(phones[0], room, 10)
         self.drain_all(phones + [reactor])
         self.start_game(phones[0], ids[0], phones)
         self.assertTrue(game.game_running)
+
+    def test_reactor_hears_the_new_host_when_the_host_leaves(self):
+        reactor = self.make_client()
+        room = self.create_open_room(reactor)
+        reactor.emit('register_reactor', {'room_code': room})
+        phones = [self.make_client() for _ in range(3)]
+        ids = [self.join_player(phone, room, f'P{i}', use_join_game=True) for i, phone in enumerate(phones)]
+        self.drain_all(phones + [reactor])
+        phones[0].emit('leave_room', {'player_id': ids[0], 'room_code': room})
+        lobby = self.event_payloads(self.drain(reactor), 'lobby_state')[-1]
+        self.assertEqual(ids[1], lobby['host_player_id'])
 
     def test_reactor_play_again_returns_the_room_to_the_lobby(self):
         reactor = self.make_client()

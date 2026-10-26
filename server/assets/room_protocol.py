@@ -54,6 +54,7 @@ def lobby_state(game):
         'task_list_name': game.collaborative_task_list_name,
         'collaborative_mode': game.collaborative_mode, 'can_start': error is None,
         'can_start_test': can_start_test(game), 'start_error': error,
+        'host_player_id': game.creator_player_id,
     })
 
 

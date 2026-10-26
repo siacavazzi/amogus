@@ -37,6 +37,9 @@
     ],
     "device_bu1z9zjqsmuxnfc3y": [
       "98D8CN"
+    ],
+    "device_o2rscqtiumvoklzsa": [
+      "44NSFX"
     ]
   },
   "code_to_name": {
@@ -52,6 +55,7 @@
     "J4A7XQ": "Example List",
     "R5UJJJ": "Example List",
     "8JZYBX": "Family cleanup task pack",
-    "98D8CN": "Example List"
+    "98D8CN": "Example List",
+    "44NSFX": "Example List"
   }
 }

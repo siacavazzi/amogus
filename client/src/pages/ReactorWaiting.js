@@ -7,7 +7,7 @@ import '../signal/reactor.css';
 // The room's big screen before the game: the code huge enough to read from across the room,
 // and the faces of everyone who has joined. The blinking dot is the one thing that moves.
 function ReactorWaiting() {
-  const { roomCode, players, socket } = useContext(DataContext);
+  const { roomCode, players, socket, lobbyState } = useContext(DataContext);
   const [copied, setCopied] = useState(false);
 
   const copyRoomCode = async () => {
@@ -41,6 +41,8 @@ function ReactorWaiting() {
   };
 
   const joined = players || [];
+  // Only the host's phone has Start, so a big group needs to know whose phone that is.
+  const host = joined.find((p) => p.player_id && p.player_id === lobbyState?.host_player_id);
   const joinAt = typeof window !== 'undefined' ? `${window.location.host}/play` : '';
 
   return (
@@ -75,6 +77,7 @@ function ReactorWaiting() {
               <div key={player.player_id || player.id || player.username} className="sg-rx__face sg-a sg-pop">
                 <Face player={player} size={88} className="sg-rx__face-ring" />
                 <span>{player.username}</span>
+                {player === host && <span className="sg-rx__host-tag">Host</span>}
               </div>
             ))
           ) : (
@@ -87,9 +90,13 @@ function ReactorWaiting() {
           </p>
         )}
 
-        <p className="sg-rx__lede sg-rx__wait">
+        <p className="sg-rx__lede sg-rx__wait" data-testid="reactor-host-hint">
           <span className="sg-rx__blink" aria-hidden="true" />
-          Waiting for the host to start
+          {host
+            ? <span><strong>{host.username}</strong> is the host. Start the game from their phone.</span>
+            : joined.length > 0
+              ? 'Waiting for the host to start'
+              : 'The first phone to join will be the host'}
         </p>
       </div>
 

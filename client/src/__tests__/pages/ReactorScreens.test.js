@@ -14,6 +14,19 @@ describe('Reactor waiting screen', () => {
         fireEvent.click(screen.getByTitle('Leave Room'));
         expect(contextValue.socket.emit).toHaveBeenCalledWith('leave_room', { room_code: 'ABCD' });
     });
+
+    it('names the host so the room knows whose phone starts the game', () => {
+        renderWithContext(<ReactorWaiting />, {
+            roomCode: 'ABCD', players: mockPlayers, lobbyState: { host_player_id: 'player2' },
+        });
+        expect(screen.getByTestId('reactor-host-hint')).toHaveTextContent('Bob is the host. Start the game from their phone.');
+        expect(screen.getByText('Host')).toBeInTheDocument();
+    });
+
+    it('says the first phone to join hosts when nobody has joined', () => {
+        renderWithContext(<ReactorWaiting />, { roomCode: 'ABCD', players: [] });
+        expect(screen.getByTestId('reactor-host-hint')).toHaveTextContent('The first phone to join will be the host');
+    });
 });
 
 describe('Reactor round screen', () => {

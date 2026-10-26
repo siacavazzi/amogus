@@ -17,6 +17,9 @@ test('a room created on the reactor gets a phone host and plays again from the r
     }
     const [host, ...guests] = phones;
     await expect(reactor.getByText('3 players connected')).toBeVisible();
+    // The big screen says whose phone has Start, so a big group doesn't stall.
+    await expect(reactor.getByTestId('reactor-host-hint')).toHaveText('Sam is the host. Start the game from their phone.');
+    if (process.env.E2E_SHOT) await reactor.screenshot({ path: process.env.E2E_SHOT });
 
     // The first phone in hosts; the others wait for it.
     await expect(host.getByText('Start Game')).toBeVisible();
