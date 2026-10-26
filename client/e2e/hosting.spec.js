@@ -99,6 +99,20 @@ test('two intruders need five players before the host can start', async ({ brows
     h.expectNoPageErrors(phones);
 });
 
+test('a room short on tasks is told how many to add, and everyone can help', async ({ browser }) => {
+    const phones = await h.openPhones(browser, ['Sam', 'Alex', 'Jules', 'Riley']);
+    const [host, guest] = phones;
+    await h.gatherRoom({ host, phones, settings: { groupTasks: true } });
+
+    await expect(host.getByText('Add 12 more tasks to start. 4 players need 12; the room has 0.')).toBeVisible();
+    await expect(guest.getByText('The room needs 12 more tasks before the host can start. Everyone can add some.')).toBeVisible();
+    await Promise.all([h.addTasks(host, 6), h.addTasks(guest, 6)]);
+    await expect(host.getByText('Start Game')).toBeVisible();
+    await expect(guest.getByText('Waiting for host to start the game...')).toBeVisible();
+
+    h.expectNoPageErrors(phones);
+});
+
 test('BUG: when the host phone drops out of the lobby, someone else can start', async ({ browser }) => {
     test.fail(!process.env.E2E_SHOW_BUGS, 'Host only moves on when the host taps Leave; see the lobby bug report');
     const phones = await h.openPhones(browser, ['Sam', 'Alex', 'Jules', 'Riley']);

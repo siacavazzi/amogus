@@ -758,6 +758,20 @@ def handle_disconnect(reason=None):
 
 # ============ PLAYER MANAGEMENT ============
 
+MAX_NAME_LENGTH = 24  # Same cap as the name box on the join screen
+
+
+def unique_name(game, username, player=None):
+    """Number a repeated name (Sam, Sam 2) so votes and the player list can tell people apart."""
+    taken = {other.username.casefold() for other in game.players if other is not player}
+    name, number = username, 2
+    while name.casefold() in taken:
+        suffix = f' {number}'
+        name = username[:MAX_NAME_LENGTH - len(suffix)] + suffix
+        number += 1
+    return name
+
+
 @socketio.on('join')
 @room_event(reconnect=True)
 def handle_join(data):
@@ -769,6 +783,7 @@ def handle_join(data):
     pic = data.get('pic')  # Chosen avatar index; the server assigns a free one if missing or taken
     sid = request.sid
 
+    username = ' '.join(username.split())[:MAX_NAME_LENGTH] if isinstance(username, str) else ''
     if not username:
         record_usage('join_rejected', resolve_game=False, reason='username_required', room_code=room_code, command='join')
         emit('error', {'message': 'Username is required'}, to=sid)
@@ -782,7 +797,7 @@ def handle_join(data):
             record_reconnect(game, player)
             player.sid = sid
             player.active = True
-            player.username = username
+            player.username = unique_name(game, username, player)
             game_manager.update_sid(player_id, sid)
             join_room(existing_room)
             
@@ -823,7 +838,7 @@ def handle_join(data):
         except (ValueError, OSError):
             logger.warning('Photo upload failed. The player will use a default avatar.')
 
-    player = game.addPlayer(sid, username, selfie_filename, pic=pic)
+    player = game.addPlayer(sid, unique_name(game, username), selfie_filename, pic=pic)
     game_manager.register_player(player.player_id, room_code, sid)
     join_room(room_code)
     
