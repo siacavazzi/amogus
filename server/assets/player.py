@@ -142,20 +142,20 @@ class Player:
     def remove_card(self, card):
         self.cards.remove(card)
 
-    def to_json(self):
-        # Convert the object's attributes to a dictionary
-        print("Debug - self.cards:", self.cards)
+    def to_json(self, show_role=True, show_secrets=True):
+        """Serialize the player. Other phones get show_role only when the role is known to
+        them, and show_secrets (cards, meltdown code) only for the player's own phone."""
         return json.dumps({
             "sid": self.sid,
             "player_id": self.player_id,
             "username": self.username,
             "active": self.active,
-            "sus": self.sus,
+            "sus": self.sus if show_role else False,
             "alive": self.alive,
             "pic": self.pic,
             "selfie": self.selfie,
-            "meltdown_code": self.meltdown_code,
-            "cards": [card.export() for card in self.cards if hasattr(card, 'export')],
+            "meltdown_code": self.meltdown_code if show_secrets else None,
+            "cards": [card.export() for card in self.cards if hasattr(card, 'export')] if show_secrets else [],
             "ready": self.ready,
             "death_cause": self.death_cause,
             "death_message": self.death_message

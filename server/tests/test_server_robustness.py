@@ -74,7 +74,6 @@ class ServerRobustnessTests(SocketGameTestCase):
 
     # ---- room isolation ----
 
-    @unittest.expectedFailure
     def test_card_messages_stay_in_their_room(self):
         clients, room, ids, game = self.setup_started_game(5, config=QUIET)
         stranger = self.make_client()
@@ -85,7 +84,6 @@ class ServerRobustnessTests(SocketGameTestCase):
         # send_message_to_player emits 'message' with no room, so every socket on the server gets it.
         self.assertFalse(self.has_event(stranger.get_received(), 'message'))
 
-    @unittest.expectedFailure
     def test_crewmate_snapshot_does_not_reveal_who_the_intruders_are(self):
         clients, room, ids, game = self.setup_started_game(5, config={'starting_cards': 2, 'card_draw_probability': 0})
         crew = self.crewmate(game)

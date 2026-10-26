@@ -147,7 +147,7 @@ class Card:
     def notify_intruders(self, player):
         for other_player in self.game.players:
             if (other_player is not player) and other_player.sus and other_player.alive:
-                send_message_to_player(self.socket, other_player.player_id, f"{player.username} played {self.action}")
+                send_message_to_player(self.socket, other_player, f"{player.username} played {self.action}")
 
 
     def play_card(self, player, extra_data=None):
@@ -170,6 +170,8 @@ class Card:
             self.game.speaker.play_sound(self.sound)
         elif self.action == 'Remote Sabotage':
             remove_card = self.game.start_meltdown()
+            if not remove_card and not self.game.reactor_sid:
+                send_message_to_player(self.socket, player, "Remote Sabotage needs the reactor screen, and it's not connected. Keep the card for later.")
     # active cards
         elif self.action == 'Area Denial':
             if not self.game.denied_location:
@@ -215,10 +217,10 @@ class Card:
                     self.game.speaker.play_sound('sus')
                     # Notify other intruders
                     self.notify_intruders(player)
-                    send_message_to_player(self.socket, player.player_id, f"Fake task sent to {target_player.username}")
+                    send_message_to_player(self.socket, player, f"Fake task sent to {target_player.username}")
                     print(f"Fake task '{task_text}' at '{task_location}' queued for {target_player.username}")
                 else:
-                    send_message_to_player(self.socket, player.player_id, "Invalid target - must be alive crewmate")
+                    send_message_to_player(self.socket, player, "Invalid target - must be alive crewmate")
                     remove_card = False
         elif self.action == 'Taunt Message':
             if not extra_data:
@@ -245,10 +247,10 @@ class Card:
                     })
                     self.game.speaker.play_sound('sus')
                     self.notify_intruders(player)
-                    send_message_to_player(self.socket, player.player_id, f"Taunt sent to {target_player.username}")
+                    send_message_to_player(self.socket, player, f"Taunt sent to {target_player.username}")
                     print(f"Taunt message sent to {target_player.username}: {message}")
                 else:
-                    send_message_to_player(self.socket, player.player_id, "Invalid taunt - choose an alive crewmate and enter a message")
+                    send_message_to_player(self.socket, player, "Invalid taunt - choose an alive crewmate and enter a message")
                     remove_card = False
         elif self.action == 'Discard and Draw':
             remove_card = False
@@ -257,7 +259,7 @@ class Card:
                 player.remove_card(self)
                 player.cards.pop(0)
                 card= self.card_deck.draw_card()
-                send_message_to_player(self.socket, player.player_id, f"You drew: {card.action}")
+                send_message_to_player(self.socket, player, f"You drew: {card.action}")
                 player.cards.append(card)
 
         elif self.action == 'Shorten Meltdown':

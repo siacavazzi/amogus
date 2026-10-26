@@ -163,7 +163,7 @@ def broadcast_lobby(game):
 
 
 def sendPlayerList(game, room_code, action='player_list'):
-    game.emit_to_room('game_data', {'action': action, 'list': [p.to_json() for p in game.players]})
+    game.emit_player_list(action)
     broadcast_lobby(game)
 
 
@@ -496,7 +496,7 @@ def handle_join_game(data):
     emit('game_joined', {'room_code': room_code, 'is_creator': is_creator})
     emit('task_locations', game.locations)
     # Lets the avatar picker show which avatars are taken before this socket joins as a player.
-    emit('game_data', {**metadata(game), 'action': 'player_list', 'list': [p.to_json() for p in game.players]})
+    emit('game_data', {**metadata(game), 'action': 'player_list', 'list': game.player_view()})
     record_usage('room_entered', game, is_creator=is_creator)
     logger.info(f"Client {sid} joined room {room_code}, is_creator={is_creator}")
 
@@ -569,7 +569,7 @@ def handle_register_reactor(data):
         'is_creator': game.creator_sid == sid,
     })
     emit('task_locations', game.locations)
-    emit('game_data', {**metadata(game), 'action': 'rejoin', 'list': [player.to_json() for player in game.players]})
+    emit('game_data', {**metadata(game), 'action': 'rejoin', 'list': game.player_view()})
     
     # If game is running, send current game state to reactor
     if game.game_running:
@@ -837,7 +837,7 @@ def handle_join(data):
     sendPlayerList(game, room_code)
     
     # Also send directly to the joining player to avoid race condition
-    player_list = [p.to_json() for p in game.players]
+    player_list = game.player_view(player)
     emit('game_data', {**metadata(game), 'action': 'player_list', 'list': player_list}, to=sid)
 
 

@@ -144,7 +144,7 @@ class CommandReliabilityTests(SocketGameTestCase):
         client.emit('complete_task', self.command(game, player), callback=True)
         duplicate = client.emit('complete_task', command, callback=True)
         self.assertEqual(first, duplicate)
-        self.assertEqual(1, duplicate['state']['stats']['tasks_completed'])
+        self.assertEqual(1, duplicate['state']['crew_score'])
         self.assertEqual(2, game.crew_score)
 
     def test_completion_snapshot_preserves_names_after_intruder_reveal(self):
