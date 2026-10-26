@@ -33,7 +33,9 @@ def start_error_detail(game, test_mode=False):
         return 'too_few_locations', 'Add at least 2 locations before you start the game.'
     tasks = game.collaborative_tasks
     if len(tasks) < minimum_tasks(game):
-        return 'too_few_tasks', f'Need at least {minimum_tasks(game)} tasks. The room has {len(tasks)}.'
+        missing = minimum_tasks(game) - len(tasks)
+        return 'too_few_tasks', (f'Add {missing} more task{"s" if missing != 1 else ""} to start. '
+                                 f'{len(game.players)} players need {minimum_tasks(game)}; the room has {len(tasks)}.')
     return None, None
 
 
@@ -47,13 +49,14 @@ def can_start_test(game):
 
 
 def lobby_state(game):
-    error = start_error(game)
+    reason, error = start_error_detail(game)
     return copy.deepcopy({
         **metadata(game), 'locations': game.locations, 'tasks': game.collaborative_tasks,
         'min_tasks': minimum_tasks(game), 'task_list_code': game.collaborative_task_list_code,
         'task_list_name': game.collaborative_task_list_name,
         'collaborative_mode': game.collaborative_mode, 'can_start': error is None,
-        'can_start_test': can_start_test(game), 'start_error': error,
+        'can_start_test': can_start_test(game), 'start_error': error, 'start_reason': reason,
+        'tasks_missing': max(0, minimum_tasks(game) - len(game.collaborative_tasks)),
         'host_player_id': game.creator_player_id,
     })
 

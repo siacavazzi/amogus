@@ -144,7 +144,6 @@ class Player:
 
     def to_json(self):
         # Convert the object's attributes to a dictionary
-        print("Debug - self.cards:", self.cards)
         return json.dumps({
             "sid": self.sid,
             "player_id": self.player_id,
