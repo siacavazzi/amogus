@@ -35,7 +35,6 @@ class ServerRobustnessTests(SocketGameTestCase):
 
     # ---- state that survives Play Again ----
 
-    @unittest.expectedFailure
     def test_player_who_left_mid_round_is_not_dealt_into_the_next_round(self):
         clients, room, ids, game = self.setup_started_game(5, config=QUIET)
         clients[-1].emit('leave_room', {'player_id': ids[-1], 'room_code': room})
@@ -43,7 +42,6 @@ class ServerRobustnessTests(SocketGameTestCase):
         self.start_next_round(clients[0], ids[0], room, game)
         self.assertNotIn(ids[-1], [p.player_id for p in game.players])
 
-    @unittest.expectedFailure
     def test_meeting_in_the_next_round_is_not_blocked_by_someone_who_left(self):
         clients, room, ids, game = self.setup_started_game(5, config=QUIET)
         clients[-1].emit('leave_room', {'player_id': ids[-1], 'room_code': room})
@@ -57,7 +55,6 @@ class ServerRobustnessTests(SocketGameTestCase):
         # Everyone still in the room slid ready; the person who left never can.
         self.assertEqual('voting', game.meeting.stage)
 
-    @unittest.expectedFailure
     def test_meltdown_code_for_a_player_with_no_socket_is_not_sent_to_every_room(self):
         clients, room, ids, game = self.setup_started_game(5, config=QUIET)
         clients[-1].emit('leave_room', {'player_id': ids[-1], 'room_code': room})
@@ -66,6 +63,9 @@ class ServerRobustnessTests(SocketGameTestCase):
         stranger = self.make_client()
         self.create_open_room(stranger)
         self.drain(stranger)
+        # A meltdown needs a big screen to type the codes into.
+        reactor = self.make_client()
+        reactor.emit('register_reactor', {'room_code': room})
         with game.state_lock:
             game.start_meltdown()
             game.active_meltdown.distribute_codes()
@@ -94,7 +94,6 @@ class ServerRobustnessTests(SocketGameTestCase):
 
     # ---- reconnects ----
 
-    @unittest.expectedFailure
     def test_reactor_that_reconnects_mid_round_before_its_old_socket_times_out_gets_back_in(self):
         clients, room, ids, game = self.setup_started_game(5, config=QUIET)
         old = self.make_client()
@@ -119,8 +118,7 @@ class ServerRobustnessTests(SocketGameTestCase):
         self.assertTrue(self.has_event(events, 'game_start'))
         self.assertTrue(self.first_event(events, 'room_state')['running'])
 
-    @unittest.expectedFailure
-    def test_ready_player_whose_phone_blinks_stays_ready(self):
+    def test_ready_player_whose_phone_blinks_must_slide_ready_again(self):
         clients, room, ids, game = self.setup_started_game(5, config=QUIET)
         caller = self.crewmate(game)
         self.client_for_player(clients, ids, caller).emit('meeting', {'player_id': caller.player_id})
@@ -131,7 +129,9 @@ class ServerRobustnessTests(SocketGameTestCase):
         # Slide ready, pocket the phone, the screen locks and the socket drops, then it comes back.
         client.disconnect()
         self.make_client().emit('rejoin', {'player_id': sleeper.player_id})
-        self.assertTrue(sleeper.ready)
+        # Sam's call: a dropped phone is un-readied and slides again; the meeting stops
+        # waiting for it after ABSENT_AFTER_SECONDS if it stays offline.
+        self.assertFalse(sleeper.ready)
 
     def test_old_socket_closing_after_a_rejoin_does_not_mark_the_player_offline(self):
         clients, room, ids, game = self.setup_started_game(5, config=QUIET)
@@ -176,6 +176,110 @@ class ServerRobustnessTests(SocketGameTestCase):
         # Login.js sends whatever player_id localStorage still holds along with the new room code.
         phone.emit('join', {'player_id': ids[2], 'username': 'Kai', 'room_code': new_room})
         self.assertTrue(self.has_event(phone.get_received(), 'player_id'))
+
+    # ---- players who stay offline (the room stops waiting after a grace period) ----
+
+    def go_offline(self, clients, ids, player):
+        self.client_for_player(clients, ids, player).disconnect()
+        return player.disconnected_at
+
+    def grace_period_passes(self, room, player, disconnected_at):
+        return server_app.mark_absent_if_still_gone(room, player.player_id, disconnected_at)
+
+    def test_meeting_goes_on_without_a_phone_that_stays_offline(self):
+        clients, room, ids, game = self.setup_started_game(5, config=QUIET)
+        caller = self.crewmate(game)
+        gone = next(p for p in game.players if p is not caller and p.player_id != ids[0])
+        self.client_for_player(clients, ids, caller).emit('meeting', {'player_id': caller.player_id})
+        stamp = self.go_offline(clients, ids, gone)
+        here = [(c, pid) for c, pid in zip(clients, ids) if pid != gone.player_id]
+        for client, pid in here:
+            client.emit('ready', {'player_id': pid})
+        self.assertEqual('waiting', game.meeting.stage, 'a short drop is still waited for')
+        self.assertTrue(self.grace_period_passes(room, gone, stamp))
+        self.assertTrue(gone.absent)
+        self.assertEqual('voting', game.meeting.stage)
+        for client, pid in here:
+            client.emit('veto', {'player_id': pid})
+        self.assertFalse(game.meeting, 'everyone present voted, so the meeting ends')
+
+    def test_vote_finishes_when_the_last_voter_stays_offline(self):
+        clients, room, ids, game = self.setup_started_game(5, config=QUIET)
+        self.start_meeting_and_ready_living_players(clients, ids, game, self.crewmate(game))
+        self.assertEqual('voting', game.meeting.stage)
+        gone = game.getPlayerById(ids[-1])
+        stamp = self.go_offline(clients, ids, gone)
+        for client, pid in zip(clients[:-1], ids[:-1]):
+            client.emit('veto', {'player_id': pid})
+        self.assertTrue(self.grace_period_passes(room, gone, stamp))
+        self.assertFalse(game.meeting)
+
+    def test_a_phone_back_within_the_grace_period_is_still_waited_for(self):
+        clients, room, ids, game = self.setup_started_game(5, config=QUIET)
+        blinker = game.getPlayerById(ids[2])
+        stamp = self.go_offline(clients, ids, blinker)
+        replacement = self.make_client()
+        replacement.emit('rejoin', {'player_id': blinker.player_id})
+        self.assertFalse(self.grace_period_passes(room, blinker, stamp))
+        self.assertFalse(blinker.absent)
+
+    def test_a_player_who_comes_back_after_the_grace_period_plays_on(self):
+        clients, room, ids, game = self.setup_started_game(5, config=QUIET)
+        gone = game.getPlayerById(ids[2])
+        stamp = self.go_offline(clients, ids, gone)
+        self.grace_period_passes(room, gone, stamp)
+        replacement = self.make_client()
+        replacement.emit('rejoin', {'player_id': gone.player_id})
+        self.assertFalse(gone.absent)
+        self.assertTrue(gone.active)
+        self.assertTrue(gone.alive)
+
+    def test_host_passes_on_when_the_host_phone_stays_offline_in_the_lobby(self):
+        clients, room, ids, game = self.setup_lobby(4)
+        host = game.getPlayerById(ids[0])
+        stamp = self.go_offline(clients, ids, host)
+        self.assertEqual(ids[0], game.creator_player_id, 'a short drop keeps the host')
+        self.drain_all(clients[1:])
+        self.assertTrue(self.grace_period_passes(room, host, stamp))
+        self.assertNotEqual(ids[0], game.creator_player_id)
+        new_host = clients[ids.index(game.creator_player_id)]
+        notice = self.first_event(self.drain(new_host), 'player_id')
+        self.assertTrue(notice['is_creator'])
+        self.add_tasks(new_host, room, 12)
+        new_host.emit('start_game', {'player_id': game.creator_player_id})
+        self.assertTrue(game.game_running)
+
+    def test_phone_gone_from_the_lobby_is_not_dealt_into_the_round(self):
+        clients, room, ids, game = self.setup_lobby(5)
+        gone = game.getPlayerById(ids[-1])
+        stamp = self.go_offline(clients, ids, gone)
+        self.grace_period_passes(room, gone, stamp)
+        self.add_tasks(clients[0], room, 15)
+        clients[0].emit('start_game', {'player_id': ids[0]})
+        self.assertTrue(game.game_running)
+        self.assertNotIn(gone, game.players)
+        self.assertEqual(4, len(game.players))
+        returning = self.make_client()
+        returning.emit('rejoin', {'player_id': gone.player_id})
+        self.assertTrue(self.has_event(returning.get_received(), 'rejoin_failed'),
+                        'their old session is gone; they join again from the invite')
+
+    def test_play_again_goes_through_when_the_last_phone_to_tap_goes_offline(self):
+        clients, room, ids, game = self.setup_started_game(4, config=QUIET)
+        with game.state_lock:
+            game.end_state = 'victory'
+        for client, pid in zip(clients[:-1], ids[:-1]):
+            client.emit('reset', {'player_id': pid, 'room_code': room})
+        self.assertTrue(game.game_running, 'still waiting on the fourth phone')
+        clients[-1].disconnect()
+        self.assertFalse(game.game_running)
+
+    def test_a_phone_leaving_the_results_screen_before_anyone_taps_does_not_reset(self):
+        clients, room, ids, game = self.setup_started_game(4, config=QUIET)
+        with game.state_lock:
+            game.end_state = 'victory'
+        clients[-1].disconnect()
+        self.assertTrue(game.game_running)
 
     # ---- timers across Play Again ----
 

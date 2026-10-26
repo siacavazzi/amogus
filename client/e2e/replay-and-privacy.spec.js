@@ -44,12 +44,8 @@ test('after Play Again the ghosts are back, roles are dealt again and progress s
     h.expectNoPageErrors([...phones, reactor]);
 });
 
-// KNOWN BUG: Play Again needs a tap from every connected phone, and the count is only checked
-// when someone taps. If the last phone that hasn't tapped goes offline (locked, battery,
-// walked off), everyone else is already showing "Ready!" with the button disabled, so the
-// room never gets back to the lobby. Remove test.fail() once a disconnect re-checks the count.
+// Play Again needs a tap from every connected phone; a phone dropping off re-checks the count.
 test('Play Again goes through when the only phone left to tap goes offline', async ({ browser }) => {
-    test.fail();
     const phones = await h.openPhones(browser, ['Sam', 'Alex', 'Jules', 'Riley']);
     await h.gatherRoom({ host: phones[0], phones });
     await phones[0].getByText('Start Game').click();

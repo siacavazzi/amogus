@@ -237,9 +237,10 @@ class Card:
                         break
 
                 if target_player and not target_player.sus and target_player.alive and message:
-                    self.socket.emit('taunt_received', {
-                        'message': message
-                    }, to=target_player.sid)
+                    if target_player.sid:
+                        self.socket.emit('taunt_received', {
+                            'message': message
+                        }, to=target_player.sid)
                     self.game.stats['taunts_sent'].append({
                         'sender_name': player.username,
                         'target_name': target_player.username,
