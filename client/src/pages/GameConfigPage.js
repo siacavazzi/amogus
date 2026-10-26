@@ -52,6 +52,51 @@ const CARD_COUNT_CONTROLS = [
     { key: 'area_denial_per_location', label: 'Area Denial / Location', description: 'Cards created for each enabled location.' },
 ];
 
+// Defined outside GameConfigPage: a component made inside it is a new type each render, so
+// React would rebuild the slider on every change and a finger drag would stop after one step.
+const SliderInput = ({ label, value, onChange, min, max, step = 1, unit = '', description }) => {
+    const id = `setting-${label.toLowerCase().replace(/[^a-z]+/g, '-')}`;
+    return (
+        <div className="hs-slider">
+            <div className="hs-slider__top">
+                <label htmlFor={id}>{label}</label>
+                <b>
+                    {typeof value === 'number' && value < 1 && value > 0
+                        ? `${Math.round(value * 100)}%`
+                        : `${value}${unit}`}
+                </b>
+            </div>
+            <input
+                id={id}
+                type="range"
+                min={min}
+                max={max}
+                step={step}
+                value={value}
+                onChange={(e) => onChange(parseFloat(e.target.value))}
+                className="hs-range"
+            />
+            {description && <small>{description}</small>}
+        </div>
+    );
+};
+
+const CountStepper = ({ label, description, value, onDecrease, onIncrease }) => (
+    <div className="hs-stepper">
+        <div className="hs-stepper__text">
+            <b>{label}</b>
+            <span>{description}</span>
+        </div>
+        <button type="button" onClick={onDecrease} aria-label={`Decrease ${label}`} className="hs-round">
+            <Minus size={18} />
+        </button>
+        <span className="hs-stepper__val">{value}</span>
+        <button type="button" onClick={onIncrease} aria-label={`Increase ${label}`} className="hs-round">
+            <Plus size={18} />
+        </button>
+    </div>
+);
+
 // Get or create a persistent device ID for task list ownership
 function getDeviceId() {
     let deviceId = localStorage.getItem('device_id');
@@ -63,7 +108,7 @@ function getDeviceId() {
 }
 
 function GameConfigPage() {
-    const { socket, roomCode } = useContext(DataContext);
+    const { socket, roomCode, connected } = useContext(DataContext);
     
     // Two-step wizard: 'tasklist' or 'settings'
     const [step, setStep] = useState('tasklist');
@@ -397,49 +442,6 @@ function GameConfigPage() {
         setStep('settings');
     };
 
-    const SliderInput = ({ label, value, onChange, min, max, step = 1, unit = '', description }) => {
-        const id = `setting-${label.toLowerCase().replace(/[^a-z]+/g, '-')}`;
-        return (
-            <div className="hs-slider">
-                <div className="hs-slider__top">
-                    <label htmlFor={id}>{label}</label>
-                    <b>
-                        {typeof value === 'number' && value < 1 && value > 0
-                            ? `${Math.round(value * 100)}%`
-                            : `${value}${unit}`}
-                    </b>
-                </div>
-                <input
-                    id={id}
-                    type="range"
-                    min={min}
-                    max={max}
-                    step={step}
-                    value={value}
-                    onChange={(e) => onChange(parseFloat(e.target.value))}
-                    className="hs-range"
-                />
-                {description && <small>{description}</small>}
-            </div>
-        );
-    };
-
-    const CountStepper = ({ label, description, value, onDecrease, onIncrease }) => (
-        <div className="hs-stepper">
-            <div className="hs-stepper__text">
-                <b>{label}</b>
-                <span>{description}</span>
-            </div>
-            <button type="button" onClick={onDecrease} aria-label={`Decrease ${label}`} className="hs-round">
-                <Minus size={18} />
-            </button>
-            <span className="hs-stepper__val">{value}</span>
-            <button type="button" onClick={onIncrease} aria-label={`Increase ${label}`} className="hs-round">
-                <Plus size={18} />
-            </button>
-        </div>
-    );
-
     const realLocationsOf = (list) => (list?.locations || []).filter((l) => l !== 'Other');
 
     // Step 1: Task List Selection
@@ -599,7 +601,7 @@ function GameConfigPage() {
             )}
 
             <div style={{ display: 'grid', gap: 10 }}>
-                <button type="button" onClick={proceedToSettings} disabled={taskListLoading} className="sg-btn sg-btn-white" style={{ minHeight: 68, fontSize: 19 }}>
+                <button type="button" onClick={proceedToSettings} disabled={taskListLoading || !connected} className="sg-btn sg-btn-white" style={{ minHeight: 68, fontSize: 19 }}>
                     {currentTaskList
                         ? (taskListLoading ? <span>Applying Task List...</span> : <><span>Use This Task List</span><ArrowRight size={24} /></>)
                         : <><span>Create Tasks with Group</span><ArrowRight size={24} /></>}
@@ -787,7 +789,7 @@ function GameConfigPage() {
             </div>
 
             <div style={{ display: 'grid', gap: 4 }}>
-                <button type="button" onClick={handleOpenRoom} disabled={isSaving} className="sg-btn sg-btn-white" style={{ minHeight: 68, fontSize: 21 }}>
+                <button type="button" onClick={handleOpenRoom} disabled={isSaving || !connected} className="sg-btn sg-btn-white" style={{ minHeight: 68, fontSize: 21 }}>
                     {isSaving ? <span>Opening Room...</span> : <><Play size={24} /><span>Open Room</span></>}
                 </button>
                 <button type="button" onClick={() => setStep('tasklist')} className="sg-link" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
@@ -814,6 +816,9 @@ function GameConfigPage() {
                 </div>
 
                 <p className="hs-steps">Step {step === 'tasklist' ? 1 : 2} of 2</p>
+                {!connected && (
+                    <p className="hs-hint" role="status">Reconnecting… your room is safe.</p>
+                )}
 
                 {step === 'tasklist' ? renderTaskListStep() : renderSettingsStep()}
 

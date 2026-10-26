@@ -88,6 +88,9 @@ class Game:
         self.is_open = False  # Room not open until creator configures it
         self.creator_sid = None  # Track who created the room (socket id, can change on reconnect)
         self.creator_player_id = None  # Track who created the room (player id, persistent)
+        # Secret handed to the creating socket, so a host who reconnects or reloads during
+        # setup (before they have a player) can take the room back.
+        self.host_token = None
         
         # Reactor (desktop) support - must be set before CardDeck is created
         self.has_reactor = False
