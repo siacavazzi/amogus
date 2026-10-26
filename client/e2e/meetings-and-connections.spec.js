@@ -50,7 +50,8 @@ test('a phone that loses its connection mid-round comes back to the same task', 
     const task = (await dropper.getByTestId('task-location').locator('..').textContent()).trim();
 
     await dropper.context().setOffline(true);
-    await expect(dropper.getByText(/Reconnect|Connection lost/).first()).toBeVisible({ timeout: 30000 });
+    // Chromium doesn't always close the socket when offline; then the drop shows after the ping timeout.
+    await expect(dropper.getByText(/Reconnect|Connection lost/).first()).toBeVisible({ timeout: 60000 });
     await h.sleep(3000);
     await dropper.context().setOffline(false);
     await expect(dropper.getByText('CALL MEETING')).toBeVisible({ timeout: 30000 });
