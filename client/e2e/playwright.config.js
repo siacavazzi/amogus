@@ -40,7 +40,11 @@ module.exports = defineConfig({
             name: 'chromium',
             use: {
                 browserName: 'chromium',
-                launchOptions: process.env.PLAYWRIGHT_CHROMIUM_PATH ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH } : {},
+                launchOptions: {
+                    ...(process.env.PLAYWRIGHT_CHROMIUM_PATH ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH } : {}),
+                    // A pretend camera that needs no permission prompt, for the selfie screen.
+                    args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'],
+                },
             },
         },
         ...(process.env.E2E_WEBKIT === '1' ? [{

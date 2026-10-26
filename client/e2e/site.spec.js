@@ -82,3 +82,24 @@ test('the tutorial plays through both roles to the end', async ({ browser }) => 
     await expect(phone.getByText("You're ready to play!")).toBeVisible({ timeout: 20000 });
     h.expectNoPageErrors([phone]);
 });
+
+test.fail("How to Play's card section is readable", async ({ browser }) => {
+    // Known bug: "How intruders use cards" draws near-black text on a near-black panel.
+    const phone = await h.openPhone(browser, 'Reader');
+    await phone.goto('/how-to-play');
+    const contrasts = await phone.locator('.htp-card h3').evaluateAll(headings => {
+        const rgb = value => (value.match(/[\d.]+/g) || []).map(Number);
+        const luminance = ([r, g, b]) => {
+            const channel = c => { c /= 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
+            return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+        };
+        return headings.map(heading => {
+            let panel = heading;
+            while (panel && rgb(getComputedStyle(panel).backgroundColor)[3] === 0) panel = panel.parentElement;
+            const [a, b] = [luminance(rgb(getComputedStyle(heading).color)), luminance(rgb(getComputedStyle(panel || document.body).backgroundColor))];
+            return { text: heading.textContent, contrast: (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05) };
+        });
+    });
+    expect(contrasts.length).toBeGreaterThan(0);
+    for (const { text, contrast } of contrasts) expect(contrast, text).toBeGreaterThanOrEqual(3);
+});
