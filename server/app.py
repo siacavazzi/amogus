@@ -372,11 +372,12 @@ def handle_create_game(data=None):
     acquisition = data.get('acquisition') if isinstance(data, dict) else None
     room_code, game = game_manager.create_game(sid, acquisition, synthetic=sid in synthetic_sids)
     game.creator_sid = sid  # Track room creator
+    game.host_token = secrets.token_urlsafe(16)
     record_usage('host_entered', game, flush=True)
     join_room(room_code)
     
     logger.info(f"Game created with room code: {room_code}")
-    emit('game_created', {'room_code': room_code, 'is_creator': True})
+    emit('game_created', {'room_code': room_code, 'is_creator': True, 'host_token': game.host_token})
     emit('game_config', game.get_config())
 
 
@@ -465,7 +466,14 @@ def handle_join_game(data):
         logger.warning(f"Join attempt for non-existent room: {room_code}")
         return
     
-    if not game.is_open:
+    # The host coming back to setup (a dropped connection or a reload) before they have a player.
+    host_token = data.get('host_token')
+    host_returning = bool(
+        isinstance(host_token, str) and game.host_token and game.creator_player_id is None
+        and secrets.compare_digest(host_token, game.host_token)
+    )
+
+    if not game.is_open and not host_returning:
         room_entry_error('room_not_open', room_code,
                          'This room is not open yet. Ask the host to open it, then try again.')
         logger.warning(f"Join attempt for not-yet-open room: {room_code}")
@@ -486,6 +494,10 @@ def handle_join_game(data):
         is_creator = True
         game.creator_sid = sid  # Update the socket ID
         logger.info(f"Creator {player_id} reconnected to room {room_code}")
+    elif host_returning:
+        is_creator = True
+        game.creator_sid = sid
+        logger.info(f"Host returned to setup of room {room_code}")
     elif game.creator_player_id is None and (
         sid == game.creator_sid or not is_sid_connected_to_room(game.creator_sid, room_code)
     ):
@@ -493,7 +505,7 @@ def handle_join_game(data):
         game.creator_sid = sid
         logger.info(f"Creator socket refreshed for room {room_code}")
     
-    emit('game_joined', {'room_code': room_code, 'is_creator': is_creator})
+    emit('game_joined', {'room_code': room_code, 'is_creator': is_creator, 'is_open': game.is_open})
     emit('task_locations', game.locations)
     # Lets the avatar picker show which avatars are taken before this socket joins as a player.
     emit('game_data', {**metadata(game), 'action': 'player_list', 'list': [p.to_json() for p in game.players]})
@@ -664,7 +676,7 @@ def handleRejoin(data):
         logger.info(f"Non-creator {player_id} rejoined room {room_code}")
     
     # Send current game state
-    emit('game_joined', {'room_code': room_code, 'is_creator': is_creator})
+    emit('game_joined', {'room_code': room_code, 'is_creator': is_creator, 'is_open': game.is_open})
     emit('task_locations', game.locations)
     sendPlayerList(game, room_code, "rejoin")
     
