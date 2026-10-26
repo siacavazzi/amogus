@@ -1,5 +1,6 @@
-// A big group on a laptop-sized big screen: twenty phones join a room the reactor made, and
-// the line naming the host still has to be on screen, since that is who has Start.
+// Big groups: the room is made on the big screen and a crowd of phones piles in. The line
+// naming the host has to stay on screen, and the first phone in has to get everyone started.
+// Two groups this size never got a round going.
 const { test, expect } = require('@playwright/test');
 const h = require('./helpers');
 
@@ -22,4 +23,46 @@ test('twenty phones join and the big screen still says who the host is', async (
         await expect(reactor.getByTestId('room-code')).toBeInViewport({ ratio: 1 });
         if (process.env.E2E_SHOT) await reactor.screenshot({ path: `${process.env.E2E_SHOT}-${viewport.width}.png` });
     }
+});
+
+const NAMES = ['Sam', 'Alex', 'Jules', 'Riley', 'Kai', 'Noor', 'Mia', 'Theo',
+    'Ava', 'Leo', 'Zoe', 'Max', 'Ivy', 'Eli', 'Ada', 'Ben'];
+
+test('sixteen phones in a room made on the reactor: the first phone hosts and starts', async ({ browser }) => {
+    test.setTimeout(8 * 60 * 1000);
+    const reactor = await h.openReactor(browser);
+    const code = await h.createRoom(reactor, { intruders: 2 });
+
+    const phones = await h.openPhones(browser, NAMES);
+    const [host, ...guests] = phones;
+    await h.joinRoom(host, code);
+    // Everyone else joins at the same moment, the way a room full of people does.
+    await Promise.all(guests.map(phone => h.joinRoom(phone, code)));
+
+    await expect(reactor.getByText(`${NAMES.length} players connected`)).toBeVisible();
+    await expect(reactor.getByTestId('reactor-host-hint')).toHaveText('Sam is the host. Start the game from their phone.');
+    for (const phone of phones) await expect(phone.getByRole('button', { name: `Players (${NAMES.length})` }), phone.person).toBeVisible();
+    for (const guest of guests) await expect(guest.getByText('Waiting for host to start the game...'), guest.person).toBeVisible();
+
+    // The example list has 34 tasks and a room needs 3 per player, so sixteen phones can't
+    // start on it alone. The host lets everyone add tasks and the room writes the rest.
+    await expect(host.getByText('Need at least 48 tasks. The room has 34.')).toBeVisible();
+    await host.getByRole('button', { name: /^Tasks \(/ }).click();
+    await host.getByTitle('Tap to let everyone add tasks').click();
+    await expect(guests[0].getByText('Only the host can add tasks right now')).toHaveCount(0);
+    await Promise.all([h.addTasks(host, 4), h.addTasks(guests[0], 5), h.addTasks(guests[1], 5)]);
+
+    await host.getByText('Start Game').click();
+    let intruders = 0;
+    for (const phone of phones) {
+        const release = await h.hold(phone, phone.getByText('Hold to see it').first(), 500);
+        if (/Intruder/.test(await phone.locator('body').innerText())) intruders++;
+        await release();
+        await phone.getByText('Got it').click();
+    }
+    expect(intruders, 'the two intruders the reactor asked for').toBe(2);
+    for (const phone of phones) await expect(h.roundButton(phone), phone.person).toBeVisible();
+    await expect(reactor.getByRole('progressbar')).toBeVisible();
+
+    h.expectNoPageErrors([...phones, reactor]);
 });

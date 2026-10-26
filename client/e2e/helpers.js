@@ -255,6 +255,22 @@ async function playCard(intruder, action) {
     throw new Error(`${intruder.person} has no ${action} card`);
 }
 
+// Write tasks from a phone's lobby Tasks tab (the host, or anyone once everyone can add tasks).
+async function addTasks(page, count, prefix = `${page.person}'s task`) {
+    await page.getByRole('button', { name: /^Tasks \(/ }).click();
+    const added = [];
+    for (let i = 0; i < count; i++) {
+        const text = `${prefix} ${i + 1}`;
+        await page.locator('#new-task-text').fill(text);
+        const form = page.locator('#new-task-text').locator('xpath=ancestor::*[.//button[@title="Add task"]][1]');
+        await form.getByTitle('Add task').click();
+        await expect(page.getByText(text)).toBeVisible();
+        added.push(text);
+    }
+    await page.getByRole('button', { name: /^Players \(/ }).click();
+    return added;
+}
+
 async function expectLobby(page) {
     await expect(page.getByTestId('room-code')).toBeVisible({ timeout: 20000 });
 }
@@ -271,5 +287,5 @@ function expectNoPageErrors(pages) {
 
 module.exports = {
     openPage, closeAll, openPhones, openPhone, openReactor, createRoom, createRoomOnPhone, gatherRoom, readyUp, connectReactor, joinRoom, enterName, revealRoles, swipe, hold, callMeeting, vote,
-    continueAfterResults, voteOutIntruder, roundButton, openVent, playCard, dismissMessage, expectLobby, expectNoPageErrors, sleep,
+    continueAfterResults, voteOutIntruder, roundButton, addTasks, openVent, playCard, dismissMessage, expectLobby, expectNoPageErrors, sleep,
 };
