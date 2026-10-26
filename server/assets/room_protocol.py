@@ -68,12 +68,14 @@ def room_state(game, player=None, sid=None):
     return copy.deepcopy({
         **metadata(game), 'running': game.game_running, 'room_open': game.is_open,
         'is_creator': game.creator_sid == sid,
-        'players': [json.loads(p.to_json()) for p in game.players],
+        'players': [json.loads(p) for p in game.player_view(player)],
         'task': player.task if player else None, 'crew_score': game.crew_score,
         'task_goal': game.taskGoal, 'meeting': json.loads(game.meeting.to_json()) if game.meeting else None,
         'votes': game.meeting.compute_vote_counts() if game.meeting else {},
         'veto_votes': len(game.meeting.veto_votes) if game.meeting else 0,
-        'end_state': game.end_state, 'stats': game.stats, 'task_creation_mode': game.task_creation_mode,
+        'end_state': game.end_state,
+        # Mid-round stats name who sent fake tasks and taunts, so they wait for the end.
+        'stats': game.stats if game.end_state else None, 'task_creation_mode': game.task_creation_mode,
         'test_mode': game.test_mode,
         'locations': game.locations, 'config': game.get_config(),
         'collaborative_tasks': lobby_state(game), 'active_hack': game.active_hack,

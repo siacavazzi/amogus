@@ -1,3 +1,4 @@
+import math
 import random
 import json
 import logging
@@ -268,8 +269,11 @@ class Game:
         with self.state_lock:
             if not self.game_running or self.end_state or self.meeting or self.active_meltdown:
                 return False
+            if not self.reactor_sid:
+                return False  # Codes are typed in at the reactor; without one a meltdown can't be stopped.
             self.stats['meltdowns_triggered'] += 1
-            meltdown_duration = max(self.meltdown_time - self.meltdown_time_mod, 1)
+            # Shorten Meltdown cards stack, but always leave half the time to reach the reactor.
+            meltdown_duration = max(self.meltdown_time - self.meltdown_time_mod, math.ceil(self.meltdown_time / 2), 1)
             meltdown = Meltdown(self.players, meltdown_duration, self.socket, self.speaker, self.code_percent)
             meltdown.game = self
             meltdown.round_id = self.round_id
@@ -327,9 +331,33 @@ class Game:
                 self.speaker.play_sound("sus_victory")
             return True
 
-    def emit_player_list(self):
-        player_list = [player.to_json() for player in self.players]
-        self.emit_to_room('game_data', {'action': 'player_list', 'list': player_list})
+    def player_view(self, viewer=None):
+        """The player list as `viewer` may see it (None: the reactor or anyone not playing).
+
+        A phone sees its own role, cards and code. Roles of others show only once they're
+        known: to fellow intruders, for the dead, for exposed intruders, and at game over.
+        """
+        viewer_is_intruder = bool(viewer and viewer.sus)
+        view = []
+        for player in self.players:
+            own = viewer is player
+            show_role = (own or bool(self.end_state) or not player.alive
+                         or (player.sus and (viewer_is_intruder or self.intruders_revealed)))
+            view.append(player.to_json(show_role=show_role, show_secrets=own))
+        return view
+
+    def emit_player_list(self, action='player_list'):
+        """Send each phone its own view of the player list, and everyone else the public one."""
+        with self.state_lock:
+            self.last_activity = time.time()
+            player_sids = [player.sid for player in self.players if player.sid]
+            public = self._add_state_metadata({'action': action, 'list': self.player_view()})
+            if self.room_code:
+                self.socket.emit('game_data', public, room=self.room_code, skip_sid=player_sids or None)
+            for player in self.players:
+                if player.sid:
+                    self.socket.emit('game_data', self._add_state_metadata(
+                        {'action': action, 'list': self.player_view(player)}), to=player.sid)
 
     def start_hack(self, duration):
         with self.state_lock:
@@ -451,7 +479,7 @@ class Game:
                 card = self.card_deck.draw_card(probability)
                 if card:
                     self.players[i].cards.append(card)
-                    send_message_to_player(self.socket, self.players[i].player_id, f"You drew {card.action}")
+                    send_message_to_player(self.socket, self.players[i], f"You drew {card.action}")
 
         self.emit_player_list()
 

@@ -1,6 +1,6 @@
-// After the round: the next round starts clean for everyone, including the dead. Plus two
-// known gaps: Play Again with a phone that has gone quiet, and what a phone is told about
-// other people's roles.
+// After the round: the next round starts clean for everyone, including the dead. Plus Play
+// Again with a phone that has gone quiet (a known gap), and what a phone is told about other
+// people's roles.
 const { test, expect } = require('@playwright/test');
 const h = require('./helpers');
 
@@ -64,12 +64,8 @@ test('Play Again goes through when the only phone left to tap goes offline', asy
     for (const phone of tappers) await h.expectLobby(phone);
 });
 
-// KNOWN BUG: the server sends every phone the whole player list with each player's role
-// ("sus"), cards and meltdown code. Anyone can read it from the browser's network tools (on
-// the reactor laptop it's two clicks), so the intruder is never really secret. Remove
-// test.fail() once crew phones are only sent their own role.
+// Nothing a crewmate's phone receives names the intruder, even in the browser's network tools.
 test("a crewmate's phone is never told who the intruder is", async ({ browser }) => {
-    test.fail();
     const phones = await h.openPhones(browser, ['Sam', 'Alex', 'Jules', 'Riley']);
     for (const phone of phones) {
         phone.frames = [];

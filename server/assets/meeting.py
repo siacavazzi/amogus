@@ -219,4 +219,6 @@ class Meeting:
                 "voted_out": self.voted_out,
                 "votes": self.votes,
                 "veto_votes": len(self.veto_votes),
+                # After the vote the crew learns how many intruders remain, never who.
+                "intruders_left": sum(1 for p in self.game.players if p.sus and p.alive) if self.stage == 'over' else None,
             })
