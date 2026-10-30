@@ -1,13 +1,12 @@
 import os
 import logging
-import random
-import string
 import time
 from threading import Thread, Lock
 from assets.game import Game
 from assets.taskHandler import TaskHandler
 from assets.sonosHandler import GameSpeaker
 from assets.stats_tracker import StatsTracker
+from assets.room_codes import random_room_code, clean_room_code, canonical_room_code
 
 
 ROOM_TIMEOUT_SECONDS = 24 * 60 * 60
@@ -39,10 +38,7 @@ class GameManager:
 
     def _generate_room_code(self, length=4):
         """Generate a unique room code."""
-        while True:
-            code = ''.join(random.choices(string.ascii_uppercase, k=length))
-            if code not in self.games:
-                return code
+        return random_room_code(self.games, length)
 
     def create_game(self, sid, acquisition=None, synthetic=False):
         """Create a new game and return the room code."""
@@ -91,9 +87,17 @@ class GameManager:
         self.stats_tracker.record_game_created(room_code, game.acquisition, game)
         return room_code, game
 
+    def resolve_room_code(self, room_code):
+        """The live room a typed code means: exact match first, then with look-alikes fixed."""
+        typed = clean_room_code(room_code)
+        if typed in self.games:
+            return typed
+        meant = canonical_room_code(typed)
+        return meant if meant in self.games else typed
+
     def get_game(self, room_code):
         """Get a game by room code."""
-        return self.games.get(room_code)
+        return self.games.get(self.resolve_room_code(room_code))
 
     def get_game_by_player_id(self, player_id):
         """Get the game a player belongs to."""

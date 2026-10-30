@@ -25,9 +25,30 @@ test('a visitor types a room code on the home page and lands in that room', asyn
     await lost.locator('#sl-code').fill('ZZZZ');
     await lost.getByRole('button', { name: 'Join', exact: true }).click();
     await expect(lost.getByText('Room code not found')).toBeVisible();
+    await expect(lost.getByText(/Room codes only use the letters A E H M R T W X Y/)).toBeVisible();
     await expect(lost.getByRole('button', { name: 'Change code' })).toBeVisible();
 
     h.expectNoPageErrors([host, visitor, lost]);
+});
+
+test('a room code typed with look-alike characters still finds the room', async ({ browser }) => {
+    const [host, visitor] = await h.openPhones(browser, ['Sam', 'Alex']);
+    const code = await h.createRoomOnPhone(host);
+    await h.enterName(host);
+    expect(code).toMatch(/^[AEHMRTWXY]{4}$/);
+
+    // What someone squinting at the big screen might type: 4 for A, 3 for E, p for R, 7 for T, v for Y.
+    const twins = { A: '4', E: '3', R: 'p', T: '7', Y: 'v' };
+    const typed = [...code].map(ch => twins[ch] || ch.toLowerCase()).join('');
+    await visitor.goto('/play');
+    await h.skipTutorialPrompt(visitor);
+    await visitor.locator('#game-entry-code').fill(typed);
+    await expect(visitor.locator('#game-entry-code')).toHaveValue(typed.toUpperCase());
+    await visitor.getByRole('button', { name: /Join Game/ }).click();
+    await h.enterName(visitor);
+    await expect(host.getByText('Alex', { exact: true })).toBeVisible();
+
+    h.expectNoPageErrors([host, visitor]);
 });
 
 test('an invite link opened before the room is open gets in once the host opens it', async ({ browser }) => {
