@@ -55,14 +55,14 @@ function SocialDeductionPage() {
                             <caption>In-person social deduction games compared</caption>
                             <thead><tr><th scope="col">Game</th><th scope="col">Group and equipment</th><th scope="col">Choose it when…</th></tr></thead>
                             <tbody>
-                                <tr><th scope="row">Sus Party</th><td>A phone browser and internet for each player. The task generator prepares groups of 5–15.</td><td>You want to use your house as the map, complete real tasks, and gather for accusations. Free.</td></tr>
+                                <tr><th scope="row">Sus Party</th><td>A phone browser and internet for each player. The task generator prepares groups of 3–30.</td><td>You want to use your house as the map, complete real tasks, and gather for accusations. Free.</td></tr>
                                 <tr><th scope="row"><a href="https://cryptozoic.com/products/spyfall-game" target="_blank" rel="noopener noreferrer">Spyfall</a></th><td>3–8 players and the card game.</td><td>You want a seated game of careful questions. One spy does not know the location that everyone else shares.</td></tr>
                                 <tr><th scope="row"><a href="https://beziergames.com/products/one-night-ultimate-werewolf" target="_blank" rel="noopener noreferrer">One Night Ultimate Werewolf</a></th><td>3–10 players and the game. No moderator required.</td><td>You want a short hidden-role round without player elimination. The publisher describes games of about ten minutes.</td></tr>
                                 <tr><th scope="row"><a href="https://www.jackboxgames.com/games/push-the-button" target="_blank" rel="noopener noreferrer">Push the Button</a></th><td>4–10 players, a shared display, phones, and a copy of The Jackbox Party Pack 6.</td><td>You want to judge suspicious answers and drawings on a screen instead of set up physical tasks.</td></tr>
                             </tbody>
                         </table>
                     </div>
-                    <p>The linked publisher pages supply the player counts and game details. Sus Party has no fixed 15-player cap.</p>
+                    <p>The linked publisher pages supply the player counts and game details. Sus Party has no fixed player cap.</p>
                 </section>
                 <section className="seo-section">
                     <h2>How a Sus Party round creates clues</h2>

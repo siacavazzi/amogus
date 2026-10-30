@@ -57,7 +57,7 @@ export default function FamilyReunionPage() {
                     <h2>Fit the game to the family home</h2>
                     <p>
                         Gather a group for one round of the <a href={SETUP_URL}>ten-player house setup</a>.
-                        The generator covers three to fifteen players; adjust the head count to match your group.
+                        The generator covers three to thirty players; adjust the head count to match your group.
                         It starts with the living room, kitchen, and hallway. Review the tasks and
                         set out their materials. If your group wants less movement, use
                         {' '}<a href={NEARBY_LOCATIONS_URL}>two nearby locations</a> and edit the tasks for your group.

@@ -60,3 +60,14 @@ class LobbyNamesAndTasksTests(SocketGameTestCase):
         clients, room_code, player_ids, game = self.setup_lobby(30)
         self.assertGreaterEqual(len(tasks), minimum_tasks(game))
         self.assertEqual(len({task["task"] for task in tasks}), len(tasks))
+
+    def test_the_example_list_spreads_doable_tasks_across_its_four_rooms(self):
+        tasks = json.loads((Path(server_app.__file__).parent / "tasks.json").read_text())
+        rooms = {}
+        for task in tasks:
+            rooms.setdefault(task["location"], []).append(task["task"])
+        self.assertEqual(list(rooms), ["Kitchen", "Living Room", "Bedroom", "Other"])
+        self.assertTrue(all(len(room_tasks) >= 20 for room_tasks in rooms.values()))
+        # Hosts' own lists are mostly actions; keep "find something X" scavenger items a minority.
+        finds = [task["task"] for task in tasks if task["task"].startswith("Find something")]
+        self.assertLess(len(finds), len(tasks) // 8)

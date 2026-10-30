@@ -62,7 +62,7 @@ export const setupGuides = [
     tone: 'neutral',
     title: 'Good first-game setup',
     items: [
-      'The generator prepares groups of 5 to 15. The game requires at least two crew members per intruder and has no fixed 15-player cap.',
+      'The generator prepares groups of 3 to 30. The game requires at least two crew members per intruder and has no fixed player cap.',
       'Keep tasks short, obvious, and spread across several rooms.',
       'Make sure every player has a phone and knows how to swipe a task complete.',
     ],

@@ -23,7 +23,7 @@ const FAQS = [
     },
     {
         q: 'How many players do we need?',
-        a: 'The game requires at least two crew members per intruder, so one intruder needs at least three players. For a first game, four to six players with one intruder is an option. The task generator prepares groups of five to fifteen. That is a generator range, not a cap on the game.',
+        a: 'The game requires at least two crew members per intruder, so one intruder needs at least three players. For a first game, four to six players with one intruder is an option. The task generator prepares groups of three to thirty. That is a generator range, not a cap on the game.',
     },
     {
         q: 'Can we play without an app?',

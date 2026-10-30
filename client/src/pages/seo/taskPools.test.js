@@ -1,8 +1,8 @@
-import { generateTasks, VENUE_ROOMS } from './taskPools';
+import { generateTasks, TASKS, VENUE_ROOMS } from './taskPools';
 
 describe('task packs that can start a game', () => {
     test.each(Object.keys(VENUE_ROOMS))('%s supplies enough unique tasks for every supported group', (venue) => {
-        for (const playerCount of [5, 8, 15]) {
+        for (const playerCount of [5, 8, 15, 30]) {
             for (const taskStyle of [0, 50, 100]) {
                 const result = generateTasks({ venue, playerCount, taskStyle, selectedRooms: ['Area A', 'Area B'] });
                 expect(result.tasks.length).toBeGreaterThanOrEqual(playerCount * 3);
@@ -33,15 +33,53 @@ describe('task packs that can start a game', () => {
         expect(new Set(pack.tasks.map(task => task.task)).size).toBe(24);
     });
 
-    it('supplies a large cleanup group at two custom locations', () => {
-        const result = generateTasks({ preset: 'cleanup', playerCount: 15, selectedRooms: ['Upstairs', 'Downstairs'] });
-        expect(result.tasks).toHaveLength(45);
-        expect(new Set(result.tasks.map(task => `${task.location}:${task.task}`)).size).toBe(45);
+    it.each([15, 30])('supplies a cleanup group of %i at two custom locations', (playerCount) => {
+        const result = generateTasks({ preset: 'cleanup', playerCount, selectedRooms: ['Upstairs', 'Downstairs'] });
+        expect(result.tasks).toHaveLength(playerCount * 3);
+        expect(new Set(result.tasks.map(task => `${task.location}:${task.task}`)).size).toBe(playerCount * 3);
+    });
+
+    it('caps the generator at thirty players and suggests more intruders for big groups', () => {
+        const result = generateTasks({ playerCount: 45, selectedRooms: ['Kitchen', 'Hallway'] });
+        expect(result.tasks).toHaveLength(90);
+        expect(result.recommendations.intruderCount).toBe(3);
+        expect(generateTasks({ playerCount: 12, selectedRooms: ['Kitchen', 'Hallway'] }).recommendations.intruderCount).toBe(2);
+    });
+
+    it('fills a thirty-player pack from one style when the other style runs out', () => {
+        const result = generateTasks({ playerCount: 30, taskStyle: 100, selectedRooms: ['Only Room', 'Other Room'] });
+        expect(result.tasks).toHaveLength(90);
     });
 
     it('keeps task counts balanced across selected rooms', () => {
         const result = generateTasks({ venue: 'house', playerCount: 15, movement: 'normal', taskStyle: 'mix', selectedRooms: ['Kitchen', 'Hallway', 'Living Room'] });
         const counts = ['Kitchen', 'Hallway', 'Living Room'].map(room => result.tasks.filter(task => task.location === room).length);
         expect(Math.max(...counts) - Math.min(...counts)).toBeLessThanOrEqual(1);
+    });
+
+    it('every venue room has its own tasks', () => {
+        const rooms = new Set(Object.values(VENUE_ROOMS).flat().filter(room => !/^Room [A-C]$/.test(room)));
+        for (const room of rooms) {
+            const result = generateTasks({ playerCount: 3, taskStyle: 0, selectedRooms: [room, 'Elsewhere'], random: () => 0 });
+            expect(result.candidates[room].length).toBeGreaterThan(TASKS.any.length);
+        }
+    });
+});
+
+describe('task pools follow how hosts write their own tasks', () => {
+    const allTasks = Object.values(TASKS).flat().map(task => task.task);
+
+    it('drops make-believe jobs that real task lists never use', () => {
+        expect(allTasks.filter(task => /spaceship|airlock|alien|laser|calibrat|invisible|gravity|command station|medal/i.test(task))).toEqual([]);
+    });
+
+    it('keeps pure counting tasks rare', () => {
+        const counting = allTasks.filter(task => /^count /i.test(task));
+        expect(counting.length / allTasks.length).toBeLessThan(0.05);
+    });
+
+    it('keeps tasks short and free of duplicates within each pool', () => {
+        for (const pool of Object.values(TASKS)) expect(new Set(pool.map(task => task.task)).size).toBe(pool.length);
+        expect(allTasks.every(task => task.split(' ').length <= 20)).toBe(true);
     });
 });
