@@ -12,6 +12,7 @@ test('setup starts on Auto and eight players get two intruders', async ({ browse
     const phones = await h.openPhones(browser, names(8));
     const [host] = phones;
     await host.goto('/play');
+    await h.skipTutorialPrompt(host);
     await host.getByText('Create New Game').first().click();
     await host.getByText('Add Example List').first().click();
     await host.getByText('Use This Task List').first().click();
