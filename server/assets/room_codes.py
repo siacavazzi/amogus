@@ -21,8 +21,13 @@ LOOKALIKES = {
     'V': 'Y',
 }
 
-# Rude words the alphabet can still spell
-BLOCKED_WORDS = ('TWAT',)
+# Words a random room code must not contain (kids and youth groups play).
+# Same list as the lobby fixes branch, so either can merge first.
+BLOCKED_WORDS = (
+    'FUCK', 'FUK', 'FCK', 'SHIT', 'CUNT', 'COCK', 'DICK', 'DIK', 'PUSS', 'TWAT', 'SLUT', 'WHOR', 'HOE',
+    'FAG', 'NIG', 'NGR', 'KKK', 'CUM', 'JIZ', 'TIT', 'ASS', 'ARSE', 'PISS', 'PORN', 'SEX', 'RAPE', 'NAZI',
+    'POO', 'PEE', 'POOP', 'BUTT', 'PENI', 'DAMN', 'HELL', 'BOOB', 'WANK', 'SPIC', 'GOOK', 'DYKE', 'KIKE',
+)
 
 
 def random_room_code(taken=(), length=ROOM_CODE_LENGTH):
