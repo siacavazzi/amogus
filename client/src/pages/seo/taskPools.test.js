@@ -1,3 +1,4 @@
+import { CLEANUP_TASKS } from './cleanupTasks';
 import { generateTasks, TASKS, VENUE_ROOMS } from './taskPools';
 
 describe('task packs that can start a game', () => {
@@ -81,5 +82,14 @@ describe('task pools follow how hosts write their own tasks', () => {
     it('keeps tasks short and free of duplicates within each pool', () => {
         for (const pool of Object.values(TASKS)) expect(new Set(pool.map(task => task.task)).size).toBe(pool.length);
         expect(allTasks.every(task => task.split(' ').length <= 20)).toBe(true);
+    });
+});
+
+describe('cleanup chores', () => {
+    it('stay broad enough for any home', () => {
+        const chores = Object.values(CLEANUP_TASKS).flat();
+        expect(chores.filter(task => /pencil|envelope|coin|batter|placemat|cutlery|pajama|grocery|mail spot/i.test(task))).toEqual([]);
+        expect(chores.every(task => task.split(' ').length <= 12)).toBe(true);
+        for (const pool of Object.values(CLEANUP_TASKS)) expect(new Set(pool).size).toBe(pool.length);
     });
 });
