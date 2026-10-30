@@ -1239,6 +1239,10 @@ def handleMeeting(data):
     game, player = current_phase_player(data)
     if game and player and player.sus:
         return command_error('Intruders can only call a meeting with a card.')
+    # A double tap, or two people calling at once: the meeting they want is already open, so the
+    # extra tap is not an error (an error box would cover the ready slide).
+    if game and player and game.meeting and game.meeting.round_id == game.round_id:
+        return {'ok': True, 'meeting_id': game.meeting.id}
     if not game or not game.start_meeting(player):
         return command_error('A meeting cannot start now.')
     record_usage('meeting_started', game, player.player_id)
