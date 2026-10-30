@@ -82,3 +82,56 @@ test('a host who is killed can still start the vote from the dead screen', async
 
     h.expectNoPageErrors(phones);
 });
+
+// Over 10 players the vote opens once 80% have slid ready; the host can turn that off.
+const BIG = ['Sam', 'Alex', 'Jules', 'Riley', 'Kai', 'Noor', 'Mia', 'Theo', 'Ava', 'Leo', 'Zoe', 'Max'];
+
+async function bigMeeting(browser, settings) {
+    const phones = await h.openPhones(browser, BIG);
+    const reactor = await h.openReactor(browser);
+    const host = phones[0];
+    await h.gatherRoom({ host, phones, reactor, settings: { intruders: 2, ...settings } });
+    await host.getByText('Start Game').click();
+    for (const phone of phones) {
+        const release = await h.hold(phone, phone.getByText('Hold to see it').first(), 500);
+        await release();
+        await phone.getByText('Got it').click();
+    }
+    const caller = await crewCaller(phones, null);
+    await caller.getByText('CALL MEETING').click();
+    // The caller slides last, so the ready count is the same whoever called it.
+    const order = [...phones.filter(phone => phone !== caller), caller];
+    return { phones, reactor, order };
+}
+
+test('twelve players: the vote opens once ten have slid ready', async ({ browser }) => {
+    test.setTimeout(8 * 60 * 1000);
+    const { phones, reactor, order } = await bigMeeting(browser, {});
+
+    await expect(reactor.getByTestId('reactor-ready-needed')).toHaveText('Voting opens at 10 ready');
+    await expect(phones[0].getByTestId('ready-needed')).toHaveText('Voting opens at 10 ready');
+    await h.readyUp(order.slice(0, 9));
+    await expect(reactor.getByTestId('reactor-ready-count')).toHaveText('9 of 12 ready');
+    await h.readyUp(order.slice(9, 10));
+
+    // Two people never slid, and every phone, theirs included, goes to the vote.
+    for (const phone of phones) await expect(phone.getByText('Tap who you think it is'), phone.person).toBeVisible();
+    await expect(reactor.getByText('VOTE ON YOUR PHONES')).toBeVisible();
+
+    h.expectNoPageErrors([...phones, reactor]);
+});
+
+test('twelve players with "Everyone ready" set: the vote waits for the last one', async ({ browser }) => {
+    test.setTimeout(8 * 60 * 1000);
+    const { phones, reactor, order } = await bigMeeting(browser, { meetingQuorum: false });
+
+    await expect(reactor.getByTestId('reactor-ready-needed')).toHaveCount(0);
+    await h.readyUp(order.slice(0, 11));
+    await expect(reactor.getByTestId('reactor-ready-count')).toHaveText('11 of 12 ready');
+    await h.sleep(2000);
+    await expect(reactor.getByTestId('reactor-ready-count')).toHaveText('11 of 12 ready');
+    await h.readyUp(order.slice(11));
+    for (const phone of phones) await expect(phone.getByText('Tap who you think it is'), phone.person).toBeVisible();
+
+    h.expectNoPageErrors([...phones, reactor]);
+});

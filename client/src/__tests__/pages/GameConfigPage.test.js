@@ -28,6 +28,22 @@ describe('GameConfigPage card deck settings', () => {
         });
     });
 
+    it('lets the host make every meeting wait for everyone', async () => {
+        const { contextValue } = renderWithContext(<GameConfigPage />, { roomCode: 'ROOM4' });
+
+        fireEvent.click(screen.getByRole('button', { name: /Create Tasks with Group/i }));
+        fireEvent.click(screen.getByRole('button', { name: /Advanced Settings/i }));
+        expect(screen.getByRole('button', { name: /80% ready in big games/ })).toHaveAttribute('aria-pressed', 'true');
+        fireEvent.click(screen.getByRole('button', { name: /^Everyone ready/ }));
+        fireEvent.click(screen.getByRole('button', { name: /Open Room/i }));
+
+        await waitFor(() => {
+            expect(contextValue.socket.emit).toHaveBeenCalledWith('update_game_config', expect.objectContaining({
+                config: expect.objectContaining({ meeting_quorum: false }),
+            }));
+        });
+    });
+
     it('switches to custom mode when a card count changes', async () => {
         const { contextValue } = renderWithContext(<GameConfigPage />, { roomCode: 'ROOM2' });
 

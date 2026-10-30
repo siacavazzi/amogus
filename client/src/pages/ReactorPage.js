@@ -117,6 +117,7 @@ function ReactorNormal() {
                     stage={meetingState.stage}
                     callerName={meetingState.player_who_started_it}
                     hostName={meetingState.host_name}
+                    meeting={meetingState}
                     players={players || []}
                 >
                     {sabotage('sg-btn-ink sg-rx__sabotage--quiet')}

@@ -119,6 +119,7 @@ function GameConfigPage() {
         locations: ['Basement', '1st Floor', '2nd Floor', '3rd Floor'],
         vote_time: 180,
         vote_threshold: 0.66,
+        meeting_quorum: true,
         meltdown_time: 60,
         code_percent: 0.6,
         num_intruders: 1,
@@ -753,6 +754,28 @@ function GameConfigPage() {
                             step={0.05}
                             description="Votes needed to eject"
                         />
+                        <div style={{ display: 'grid', gap: 8 }}>
+                            <div className="hs-slider__top">
+                                <span style={{ fontWeight: 800, fontSize: 16 }}>Start Voting When</span>
+                            </div>
+                            <div className="hs-presets" role="group" aria-label="Start Voting When">
+                                {[
+                                    { value: true, label: '80% ready in big games', description: 'Up to 10 players, everyone slides ready. Over 10, voting opens at 80%.' },
+                                    { value: false, label: 'Everyone ready', description: 'Every meeting waits for every player, however big the game.' },
+                                ].map((option) => (
+                                    <button
+                                        key={String(option.value)}
+                                        type="button"
+                                        onClick={() => updateConfig('meeting_quorum', option.value)}
+                                        aria-pressed={(config.meeting_quorum !== false) === option.value}
+                                        className="hs-preset"
+                                    >
+                                        <b>{option.label}</b>
+                                        <span>{option.description}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
 
                         <h3><Zap size={18} /> Meltdown Sabotage</h3>
                         <SliderInput

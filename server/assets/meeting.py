@@ -6,6 +6,12 @@ from threading import Thread
 from uuid import uuid4
 
 
+# Big rooms never get every phone to slide ready (a ~40-player room froze twice on 2026-10-30).
+# From QUORUM_MIN_PLAYERS present players up, voting opens once MEETING_QUORUM of them are ready.
+MEETING_QUORUM = 0.8
+QUORUM_MIN_PLAYERS = 11
+
+
 class Meeting:
     # How long the host waits before they can start voting without everyone ready.
     # Long enough that an intruder host can't use it to cut the meeting off before people arrive.
@@ -233,6 +239,9 @@ class Meeting:
                 "host_name": host.username if host else None,
                 "host_override_in": self.host_override_in() if self.stage == 'waiting' else None,
                 "started_by_host": self.started_by_host,
+                # Lets phones show "voting opens at N" without knowing the room's settings.
+                "ready_quorum": MEETING_QUORUM if getattr(self.game, 'meeting_quorum', False) else None,
+                "ready_quorum_min_players": QUORUM_MIN_PLAYERS,
                 # After the vote the crew learns how many intruders remain, never who.
                 "intruders_left": sum(1 for p in self.game.players if p.sus and p.alive) if self.stage == 'over' else None,
             })

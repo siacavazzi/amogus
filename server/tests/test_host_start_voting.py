@@ -106,3 +106,48 @@ class HostStartVotingTests(SocketGameTestCase):
         result = self.host_starts_voting(clients[0], ids[0], game)
         self.assertFalse(result['ok'])
         self.assertFalse(game.meeting.started_by_host)
+
+
+class MeetingQuorumTests(SocketGameTestCase):
+    """Over 10 players, voting opens at 80% ready; up to 10, everyone. The host can turn it off."""
+
+    def meeting_with_ready(self, player_count, ready_count, config=None):
+        clients, room, ids, game = self.setup_started_game(player_count, config={**QUIET, **(config or {})})
+        caller = next(p for p in game.players if not p.sus)
+        self.client_for_player(clients, ids, caller).emit('meeting', {'player_id': caller.player_id})
+        # Everyone but the caller first, so the caller's slide is never the one that tips it.
+        order = sorted(zip(clients, ids), key=lambda pair: pair[1] == caller.player_id)
+        for client, pid in order[:ready_count]:
+            client.emit('ready', {'player_id': pid})
+        self.drain_all(clients)
+        return clients, ids, game
+
+    def test_eleven_players_vote_once_nine_are_ready(self):
+        clients, ids, game = self.meeting_with_ready(11, 8)
+        self.assertEqual('waiting', game.meeting.stage, '8 of 11 is under 80%')
+        clients, ids, game = self.meeting_with_ready(11, 9)
+        self.assertEqual('voting', game.meeting.stage, '9 of 11 is 80% rounded up')
+
+    def test_forty_players_vote_once_thirty_two_are_ready(self):
+        clients, ids, game = self.meeting_with_ready(40, 31)
+        self.assertEqual('waiting', game.meeting.stage)
+        clients, ids, game = self.meeting_with_ready(40, 32)
+        self.assertEqual('voting', game.meeting.stage)
+
+    def test_ten_players_still_wait_for_everyone(self):
+        clients, ids, game = self.meeting_with_ready(10, 9)
+        self.assertEqual('waiting', game.meeting.stage)
+
+    def test_host_can_turn_the_quorum_off(self):
+        clients, ids, game = self.meeting_with_ready(12, 11, config={'meeting_quorum': False})
+        self.assertFalse(game.meeting_quorum)
+        self.assertEqual('waiting', game.meeting.stage)
+
+    def test_meeting_tells_phones_the_quorum(self):
+        clients, room, ids, game = self.setup_started_game(5, config=QUIET)
+        caller = next(p for p in game.players if not p.sus)
+        self.client_for_player(clients, ids, caller).emit('meeting', {'player_id': caller.player_id})
+        meeting = json.loads(self.event_payloads(self.drain(clients[1]), 'meeting')[-1])
+        self.assertEqual(0.8, meeting['ready_quorum'])
+        self.assertEqual(11, meeting['ready_quorum_min_players'])
+        self.assertEqual(True, game.get_config()['meeting_quorum'])
