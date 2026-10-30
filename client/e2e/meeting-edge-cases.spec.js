@@ -75,11 +75,11 @@ test('a phone that drops before voting opens holds the meeting until it is back 
 
     await caller.getByText('CALL MEETING').click();
     await h.readyUp(others);
-    await dropper.context().setOffline(true);
+    await h.goOffline(dropper);
     await expect(caller.getByText('Offline')).toBeVisible({ timeout: 60000 });
     await expect(caller.getByTestId('ready-count')).toHaveText('3 of 4 ready');
 
-    await dropper.context().setOffline(false);
+    await h.goOnline(dropper);
     await h.readyUp([dropper]);
     for (const phone of phones) await expect(phone.getByText('VOTE', { exact: true }), phone.person).toBeVisible({ timeout: 20000 });
 

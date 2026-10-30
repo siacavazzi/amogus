@@ -89,7 +89,8 @@ async function joinWithSelfie(guest, code) {
     await expect(guest.getByText('You', { exact: true })).toBeVisible();
 }
 
-test('a player joins with a selfie and everyone sees it', async ({ browser }) => {
+test('a player joins with a selfie and everyone sees it', async ({ browser, browserName }) => {
+    test.skip(browserName === 'webkit', "Playwright's WebKit has no fake camera; the camera tests run in Chromium");
     const [host, guest] = await h.openPhones(browser, ['Sam', 'Alex']);
     const code = await h.createRoomOnPhone(host);
     await h.enterName(host);
@@ -103,7 +104,8 @@ test('a player joins with a selfie and everyone sees it', async ({ browser }) =>
     h.expectNoPageErrors([host, guest]);
 });
 
-test.fail('the camera turns off once the selfie is taken', async ({ browser }) => {
+test.fail('the camera turns off once the selfie is taken', async ({ browser, browserName }) => {
+    test.skip(browserName === 'webkit', "Playwright's WebKit has no fake camera; the camera tests run in Chromium");
     // Known bug: the camera screen opens the camera twice (and again on Retake) but only
     // stops the last stream, so the camera light stays on for the rest of the game.
     const [host, guest] = await h.openPhones(browser, ['Sam', 'Alex']);

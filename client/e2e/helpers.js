@@ -25,6 +25,7 @@ async function openPage(browser, name, options) {
         await context.addCookies([{ name: 'sus_channel', value: 'beta', domain: hostname, path: '/' }]);
     }
     const page = await context.newPage();
+    await routeSocket(page);
     page.person = name;
     page.errors = [];
     page.on('pageerror', error => {
@@ -149,12 +150,43 @@ async function hold(page, locator, ms) {
 }
 
 // Tap a button that asks "Are you sure?" (window.confirm). In Playwright's WebKit a real tap that
-// opens a confirm never returns, although the dialog handler in openPage accepts it, so there the
-// tap is sent from the page itself a moment later. Safari on a phone shows the dialog normally.
+// opens a confirm never returns, and a tap sent from the page doesn't get the dialog handler's yes
+// either, so there the page's confirm says yes for that one tap. Safari on a phone shows the dialog.
 async function tapAndConfirm(locator) {
-    if (locator.page().context().browser().browserType().name() !== 'webkit') return locator.click();
+    if (!isWebKit(locator.page())) return locator.click();
     await expect(locator).toBeVisible();
-    await locator.evaluate(button => setTimeout(() => button.click(), 0));
+    await locator.evaluate(button => {
+        const ask = window.confirm;
+        window.confirm = () => true;
+        try { button.click(); } finally { window.confirm = ask; }
+    });
+}
+
+const isWebKit = page => page.context().browser().browserType().name() === 'webkit';
+
+// In WebKit the game's socket goes through Playwright, so goOffline can cut it: Playwright's
+// WebKit keeps an open WebSocket working after setOffline. (Chromium closes it, or the server's
+// ping timeout catches it.)
+async function routeSocket(page) {
+    page.sockets = [];
+    if (!isWebKit(page)) return;
+    await page.routeWebSocket(/socket\.io/, ws => {
+        if (page.offline) return ws.close({ code: 1006, reason: 'offline' });
+        page.sockets.push(ws);
+        ws.connectToServer();
+    });
+}
+
+// Cut a page off the network (and its game socket with it), or bring it back.
+async function goOffline(page) {
+    page.offline = true;
+    await page.context().setOffline(true);
+    for (const ws of page.sockets.splice(0)) await ws.close({ code: 1006, reason: 'offline' }).catch(() => {});
+}
+
+async function goOnline(page) {
+    page.offline = false;
+    await page.context().setOffline(false);
 }
 
 // Lock a phone the way an iPhone does in a pocket: the page goes hidden, its JavaScript stops,
@@ -169,11 +201,11 @@ async function lock(page) {
         document.dispatchEvent(new Event('visibilitychange'));
     }, visible);
     await setVisible(false);
-    await page.context().setOffline(true);
+    await goOffline(page);
     await cdp.send('Debugger.enable');
     await cdp.send('Debugger.pause');
     return async () => {
-        await page.context().setOffline(false);
+        await goOnline(page);
         await cdp.send('Debugger.resume');
         await cdp.send('Debugger.disable');
         await setVisible(true);
@@ -323,6 +355,6 @@ function expectNoPageErrors(pages) {
 }
 
 module.exports = {
-    lock, tapAndConfirm, openPage, closeAll, openPhones, openPhone, openReactor, createRoom, createRoomOnPhone, gatherRoom, readyUp, connectReactor, joinRoom, enterName, revealRoles, swipe, hold, callMeeting, vote,
+    lock, goOffline, goOnline, tapAndConfirm, openPage, closeAll, openPhones, openPhone, openReactor, createRoom, createRoomOnPhone, gatherRoom, readyUp, connectReactor, joinRoom, enterName, revealRoles, swipe, hold, callMeeting, vote,
     continueAfterResults, voteOutIntruder, roundButton, addTasks, openVent, playCard, dismissMessage, expectLobby, expectNoPageErrors, sleep,
 };
