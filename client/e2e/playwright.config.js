@@ -52,7 +52,9 @@ module.exports = defineConfig({
         ...(process.env.E2E_WEBKIT === '1' ? [{
             name: 'webkit',
             use: { browserName: 'webkit' },
-            testMatch: ['full-game.spec.js', 'game-endings.spec.js', 'cards.spec.js', 'site.spec.js'],
+            // Most players are on iPhones, so Safari plays the games, the meetings and the reconnects too.
+            testMatch: ['full-game.spec.js', 'game-endings.spec.js', 'cards.spec.js', 'site.spec.js', 'meetings-and-connections.spec.js',
+                'meeting-edge-cases.spec.js', 'reconnects.spec.js', 'lobby.spec.js', 'onboarding.spec.js', 'other-modes.spec.js', 'hosting.spec.js'],
         }] : []),
     ],
     use: {

@@ -48,7 +48,7 @@ test('someone killed mid-vote reports it, and votes cast for them come back', as
     await h.vote([[caller, victim]]);
     await expect(caller.getByText(`Voted for ${victim.person}`)).toBeVisible();
 
-    await victim.getByRole('button', { name: "I've Been Killed" }).click();
+    await h.tapAndConfirm(victim.getByRole('button', { name: "I've Been Killed" }));
     await expect(victim.getByText("You're out")).toBeVisible();
     // That vote no longer counts, so the caller is asked again.
     await expect(caller.getByText('Tap who you think it is')).toBeVisible();

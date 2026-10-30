@@ -77,6 +77,8 @@ const initializeSounds = () => {
 };
 
 let loopTimeout = null;
+// The sound being looped, and its 'end' handler (see loopSound)
+let loopState = null;
 
 export const AudioHandler = () => {
   const { 
@@ -183,6 +185,10 @@ export const AudioHandler = () => {
 
   // Helper function to stop all sounds
   const stopAllSounds = useCallback(() => {
+    if (loopState) {
+      loopState.sound.off('end', loopState.replay);
+      loopState = null;
+    }
     if (loopTimeout !== null) {
       clearTimeout(loopTimeout);
       loopTimeout = null;
@@ -205,14 +211,38 @@ export const AudioHandler = () => {
     
     if (audioEnabled) {
       const sound = soundsRef.current[soundName];
-      sound.loop(true);
+      // Loop by replaying on 'end' rather than with Howler's loop(true). A sound whose length the
+      // browser couldn't read (a file that failed to load, or a codec it can't decode) has a
+      // length of 0, and Howler's own loop then replays it forever in one call stack until the
+      // page throws "Maximum call stack size exceeded". A sound that ends almost as soon as it
+      // starts is played once and left alone.
+      const loop = { sound, startedAt: Date.now() };
+      const replay = () => {
+        if (loopState !== loop) return;
+        if (Date.now() - loop.startedAt < 250) {
+          sound.off('end', replay);
+          loopState = null;
+          return;
+        }
+        setTimeout(() => {
+          if (loopState !== loop) return;
+          loop.startedAt = Date.now();
+          sound.play();
+        }, 0);
+      };
+      loop.replay = replay;
+      loopState = loop;
+      sound.on('end', replay);
       sound.play();
-      
+
       // Stop after duration (in seconds)
       if (duration) {
         loopTimeout = setTimeout(() => {
+          if (loopState === loop) {
+            sound.off('end', replay);
+            loopState = null;
+          }
           sound.stop();
-          sound.loop(false);
           loopTimeout = null;
         }, duration * 1000);
       }

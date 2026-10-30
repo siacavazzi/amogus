@@ -44,7 +44,7 @@ for (const crewWins of [true, false]) {
 
         // A body: the victim reports from the meeting screen, leaving one against one.
         await last.getByText('CALL MEETING').click();
-        await victim.getByRole('button', { name: "I've Been Killed" }).click();
+        await h.tapAndConfirm(victim.getByRole('button', { name: "I've Been Killed" }));
         await h.dismissMessage(last);
         await expect(last.getByTestId('last-stand-tasks-left')).toHaveText('Last stand: 3 tasks to win', { timeout: 20000 });
         await expect(last.getByText('I WAS ELIMINATED')).toBeVisible();

@@ -148,6 +148,39 @@ async function hold(page, locator, ms) {
     return async () => page.mouse.up();
 }
 
+// Tap a button that asks "Are you sure?" (window.confirm). In Playwright's WebKit a real tap that
+// opens a confirm never returns, although the dialog handler in openPage accepts it, so there the
+// tap is sent from the page itself a moment later. Safari on a phone shows the dialog normally.
+async function tapAndConfirm(locator) {
+    if (locator.page().context().browser().browserType().name() !== 'webkit') return locator.click();
+    await expect(locator).toBeVisible();
+    await locator.evaluate(button => setTimeout(() => button.click(), 0));
+}
+
+// Lock a phone the way an iPhone does in a pocket: the page goes hidden, its JavaScript stops,
+// and its connection drops. Returns unlock(), which brings it back in the same order a phone does.
+// Chromium only: it pauses the page's JavaScript through the DevTools protocol. (Chromium's own
+// "frozen" page state breaks localStorage after it resumes, which phones don't do.)
+async function lock(page) {
+    const cdp = await page.context().newCDPSession(page);
+    const setVisible = visible => page.evaluate(shown => {
+        Object.defineProperty(document, 'visibilityState', { value: shown ? 'visible' : 'hidden', configurable: true });
+        Object.defineProperty(document, 'hidden', { value: !shown, configurable: true });
+        document.dispatchEvent(new Event('visibilitychange'));
+    }, visible);
+    await setVisible(false);
+    await page.context().setOffline(true);
+    await cdp.send('Debugger.enable');
+    await cdp.send('Debugger.pause');
+    return async () => {
+        await page.context().setOffline(false);
+        await cdp.send('Debugger.resume');
+        await cdp.send('Debugger.disable');
+        await setVisible(true);
+        await cdp.detach().catch(() => {});
+    };
+}
+
 // Every phone peeks at its role; returns the intruder's page.
 async function revealRoles(phones) {
     let intruder;
@@ -290,6 +323,6 @@ function expectNoPageErrors(pages) {
 }
 
 module.exports = {
-    openPage, closeAll, openPhones, openPhone, openReactor, createRoom, createRoomOnPhone, gatherRoom, readyUp, connectReactor, joinRoom, enterName, revealRoles, swipe, hold, callMeeting, vote,
+    lock, tapAndConfirm, openPage, closeAll, openPhones, openPhone, openReactor, createRoom, createRoomOnPhone, gatherRoom, readyUp, connectReactor, joinRoom, enterName, revealRoles, swipe, hold, callMeeting, vote,
     continueAfterResults, voteOutIntruder, roundButton, addTasks, openVent, playCard, dismissMessage, expectLobby, expectNoPageErrors, sleep,
 };
