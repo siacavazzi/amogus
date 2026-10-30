@@ -10,8 +10,10 @@ on:
     branches-ignore: [main]
   workflow_dispatch:
 
+# A push to a branch with an open PR starts this twice (push and pull_request); one run per
+# branch is enough, so the later one replaces the earlier.
 concurrency:
-  group: check-${{ github.ref }}
+  group: check-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 # Runners are pinned to Ubuntu 24.04: ubuntu-latest moved to 26.04, where the Playwright

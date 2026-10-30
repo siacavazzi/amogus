@@ -11,19 +11,32 @@ test.afterEach(h.closeAll);
 async function startRound(browser, names, { reactor: withReactor = false } = {}) {
     const phones = await h.openPhones(browser, names);
     const reactor = withReactor ? await h.openReactor(browser) : null;
+    for (const page of [...phones, reactor].filter(Boolean)) await routeSocket(page);
     const code = await h.gatherRoom({ host: phones[0], phones, reactor });
     await phones[0].getByText('Start Game').click();
     const intruder = await h.revealRoles(phones);
     return { phones, reactor, code, intruder, crew: phones.filter(phone => phone !== intruder) };
 }
 
+// The game's socket goes through Playwright, so a blink can cut it. Going offline alone doesn't:
+// Playwright's WebKit keeps an open WebSocket working, and Chromium sometimes does too.
+async function routeSocket(page) {
+    page.sockets = [];
+    await page.routeWebSocket(/socket\.io/, ws => {
+        if (page.cut) return ws.close({ code: 1006, reason: 'offline' });
+        page.sockets.push(ws);
+        ws.connectToServer();
+    });
+}
+
 // Cut a page off the network for a moment, as a phone locking or a wifi blink would.
 async function blink(page, ms = 3000) {
+    page.cut = true;
     await page.context().setOffline(true);
-    // Chromium doesn't always close the socket when it goes offline; then the drop only shows
-    // after socket.io's ping timeout (25s interval + 20s wait).
+    for (const ws of page.sockets.splice(0)) await ws.close({ code: 1006, reason: 'offline' }).catch(() => {});
     await expect(page.getByText(/Reconnect|Connection lost/).first()).toBeVisible({ timeout: 60000 });
     await h.sleep(ms);
+    page.cut = false;
     await page.context().setOffline(false);
 }
 

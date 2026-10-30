@@ -47,7 +47,7 @@ for (const crewWins of [true, false]) {
         await h.tapAndConfirm(victim.getByRole('button', { name: "I've Been Killed" }));
         await h.dismissMessage(last);
         await expect(last.getByTestId('last-stand-tasks-left')).toHaveText('Last stand: 3 tasks to win', { timeout: 20000 });
-        await expect(last.getByText('I WAS ELIMINATED')).toBeVisible();
+        await expect(last.getByRole('button', { name: 'I WAS ELIMINATED' })).toBeVisible();
 
         if (crewWins) {
             for (let done = 0; done < 3; done++) {
@@ -56,7 +56,7 @@ for (const crewWins of [true, false]) {
             }
             for (const phone of phones) await expect(phone.getByText('Crewmates Win!'), phone.person).toBeVisible({ timeout: 20000 });
         } else {
-            await last.getByText('I WAS ELIMINATED').click();
+            await last.getByRole('button', { name: 'I WAS ELIMINATED' }).click();
             for (const phone of phones) await expect(phone.getByText('Intruders Win!'), phone.person).toBeVisible({ timeout: 20000 });
         }
         h.expectNoPageErrors(phones);
