@@ -128,16 +128,24 @@ test("a task pack from the generator becomes the room's tasks", async ({ browser
     const phones = await h.openPhones(browser, ['Sam', 'Alex', 'Jules']);
     const [host] = phones;
 
+    // A first-time visitor builds a pack and rewrites one task.
     await host.goto('/among-us-irl-task-generator');
+    await host.getByRole('button', { name: /^Edit task 1 in/ }).first().click();
+    const edited = 'Find the blue mug and set it upside down';
+    await host.getByRole('textbox', { name: /Edit task/ }).fill(edited);
+    await host.getByRole('textbox', { name: /Edit task/ }).press('Enter');
     const pack = await host.getByTestId('task-text').allTextContents();
     expect(pack.length).toBeGreaterThan(10);
+    expect(pack).toContain(edited);
+
+    // "Use this pack" goes straight to host setup with the pack loaded: no tutorial prompt,
+    // no Create New Game, no Import button.
     await host.getByRole('link', { name: /Use this pack/ }).click();
-    await expect(host).toHaveURL(/setup=generated/);
-    await host.getByRole('button', { name: 'Skip for now' }).click({ timeout: 5000 }).catch(() => {});
-    await host.getByText('Create New Game').click();
-    await expect(host.getByText('Your generated task pack')).toBeVisible();
-    await host.getByRole('button', { name: 'Import generated tasks' }).click();
+    await expect(host.getByRole('heading', { name: 'Task list' })).toBeVisible();
     await expect(host.getByText(`${pack.length} tasks`).first()).toBeVisible();
+    await expect(host.getByText(edited)).toBeVisible();
+    await expect(host.getByRole('heading', { name: 'Try the tutorial first' })).toHaveCount(0);
+    await expect(host.getByRole('button', { name: /Import generated tasks/ })).toHaveCount(0);
     await host.getByText('Use This Task List').click();
 
     // The generator's suggested settings come along: 90-second meetings.
@@ -156,6 +164,34 @@ test("a task pack from the generator becomes the room's tasks", async ({ browser
     expect(pack.some(task => shown.includes(task)), `"${shown}" is a task from the pack`).toBe(true);
 
     h.expectNoPageErrors(phones);
+});
+
+test('a pack built on a laptop opens one room, even in a new tab or after leaving', async ({ browser }) => {
+    const laptop = await h.openReactor(browser);
+    await laptop.goto('/among-us-irl-task-generator');
+    const count = (await laptop.getByTestId('task-text').allTextContents()).length;
+
+    // Opened in a new tab, the pack still arrives (it is kept for the whole browser).
+    const [tab] = await Promise.all([
+        laptop.context().waitForEvent('page'),
+        laptop.getByRole('link', { name: /Use this pack/ }).click({ modifiers: ['ControlOrMeta'] }),
+    ]);
+    tab.person = 'Laptop tab';
+    tab.errors = [];
+    tab.on('pageerror', error => tab.errors.push(error.message));
+    tab.on('dialog', dialog => dialog.accept());
+    await expect(tab.getByText(`${count} tasks`).first()).toBeVisible();
+    const code = await tab.evaluate(() => localStorage.getItem('room_code'));
+    expect(code).toMatch(/^[A-Z]{4}$/);
+
+    // Leaving the room goes back to the home screen; it does not open a second room.
+    await tab.getByRole('button', { name: 'Leave room' }).click();
+    await expect(tab.getByText('Create New Game')).toBeVisible();
+    await h.sleep(1500);
+    await expect(tab.getByText('Create New Game')).toBeVisible();
+    await expect(tab.getByRole('heading', { name: 'Task list' })).toHaveCount(0);
+
+    h.expectNoPageErrors([laptop, tab]);
 });
 
 test('a first-time phone is offered the tutorial, and can skip it for good', async ({ browser }) => {

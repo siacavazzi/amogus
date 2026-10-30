@@ -96,7 +96,7 @@ function HowToPlayPage() {
             </CardGrid>
             <p>
               <a href="/among-us-irl-task-generator?venue=house&players=8&movement=normal">Prepare a task pack for your rooms</a>,
-              {' '}select “Use these tasks in a new game,” then create the room and select “Import generated tasks” in host setup.
+              {' '}then select “Use this pack.” Sus Party creates the room with your tasks already loaded.
             </p>
             <GameplayScreenshots screens={['host-setup', 'task-list']} />
           </Section>

@@ -102,7 +102,7 @@ function AmongUsIrlPage() {
                             <span className="seo-step__num" aria-hidden="true">3</span>
                             <div>
                                 <h3>Take it into Sus Party</h3>
-                                <p>Select “Use this pack.” Create a room, then select “Import generated tasks” in host setup.</p>
+                                <p>Select “Use this pack.” Sus Party creates your room with the tasks already loaded.</p>
                             </div>
                         </li>
                         <li className="seo-step">

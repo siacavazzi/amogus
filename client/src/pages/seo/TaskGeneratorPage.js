@@ -222,7 +222,7 @@ export default function TaskGeneratorPage() {
 
                 <section className="task-builder__next" aria-labelledby="next-title">
                     <h2 id="next-title">Next: get everyone into the game</h2>
-                    <ol><li><span>1</span><div><h3>Review the pack</h3><p>Visit each location. Swap or edit tasks that do not fit.</p></div></li><li><span>2</span><div><h3>Create a room and import it</h3><p>Select “Use this pack,” create a room, then select “Import generated tasks.”</p></div></li><li><span>3</span><div><h3>Share your room code</h3><p>Open the room. Everyone joins from their phone browser.</p></div></li></ol>
+                    <ol><li><span>1</span><div><h3>Review the pack</h3><p>Visit each location. Swap or edit tasks that do not fit.</p></div></li><li><span>2</span><div><h3>Use this pack</h3><p>Sus Party creates your room with these tasks loaded. Pick the number of intruders and open the room.</p></div></li><li><span>3</span><div><h3>Share your room code</h3><p>Open the room. Everyone joins from their phone browser.</p></div></li></ol>
                 </section>
                 <section className="task-builder__notes">
                     <div><h2>Why locations matter</h2><p>In an Among Us IRL game, tasks give crewmates somewhere to go and intruders an excuse to follow. Spread your pack across rooms or separate areas. Travel to the named location before each task.</p><p>The generator supports 3–15 players. The game itself has no fixed fifteen-player cap. The app requires at least three task entries per player.</p></div>

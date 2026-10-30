@@ -59,8 +59,8 @@ export default function PhonePartyPage() {
                         A job in the hallway gives another player a chance to notice who passed through.
                     </p>
                     <p>
-                        Choose “Use this pack,” then create a room and select “Import generated
-                        tasks” in host setup. Before you start, show the <a href="/tutorial">player tutorial</a>
+                        Choose “Use this pack.” Sus Party creates your room with the tasks loaded.
+                        Before you start, show the <a href="/tutorial">player tutorial</a>
                         {' '}and explain the quiet elimination rule. A dead player marks themselves dead in the app
                         and keeps the intruder’s identity to themselves.
                     </p>

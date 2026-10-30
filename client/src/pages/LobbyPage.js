@@ -8,6 +8,7 @@ import { dismissTutorialPrompt, shouldRecommendTutorial } from '../tutorial/tuto
 import { getAcquisition } from '../seo/discovery';
 import RoomEntryNotice from '../components/RoomEntryNotice';
 import { getRoomCodeFromSearch, clearRoomCodeFromUrl } from '../utils/inviteLinks';
+import { readGeneratedSetup, claimGeneratedRoomCreation } from './seo/gameDraft';
 
 function LobbyPage() {
     const [inputRoomCode, setInputRoomCode] = useState(getRoomCodeFromSearch);
@@ -17,6 +18,9 @@ function LobbyPage() {
     const [error, setError] = useState('');
     const [showTutorialPrompt, setShowTutorialPrompt] = useState(false);
     const { socket, roomEntryStatus, setRoomEntryStatus } = useContext(DataContext);
+    // Arriving from "Use this pack": open the room straight away, the pack loads in host setup.
+    const [generatedSetup] = useState(readGeneratedSetup);
+    const autoCreated = useRef(false);
 
     useEffect(() => {
         if (roomEntryStatus?.room_code) setInputRoomCode(roomEntryStatus.room_code);
@@ -30,8 +34,8 @@ function LobbyPage() {
     const tutorialHref = '/tutorial?returnTo=play';
 
     useEffect(() => {
-        setShowTutorialPrompt(isMobile && !getRoomCodeFromSearch() && !roomEntryStatus && shouldRecommendTutorial());
-    }, [isMobile, roomEntryStatus]);
+        setShowTutorialPrompt(isMobile && !generatedSetup && !getRoomCodeFromSearch() && !roomEntryStatus && shouldRecommendTutorial());
+    }, [isMobile, roomEntryStatus, generatedSetup]);
 
     // Listen for errors and success to reset the button states
     useEffect(() => {
@@ -76,6 +80,13 @@ function LobbyPage() {
             setIsCreating(false);
         }, 10000);
     };
+
+    useEffect(() => {
+        if (!socket || !generatedSetup || autoCreated.current) return;
+        autoCreated.current = true;
+        if (claimGeneratedRoomCreation(generatedSetup)) handleCreateGame();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [socket, generatedSetup]);
 
     const handleJoinGame = (e) => {
         e?.preventDefault();

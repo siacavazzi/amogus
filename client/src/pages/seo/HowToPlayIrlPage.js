@@ -138,7 +138,7 @@ function HowToPlayIrlPage() {
                             <span className="seo-step__num" aria-hidden="true">5</span>
                             <div>
                                 <h3>Create the room and invite friends</h3>
-                                <p>Select “Use this pack,” create a room, and select “Import generated tasks.” Review the settings and share the code.</p>
+                                <p>Select “Use this pack.” Sus Party creates the room with your tasks loaded. Review the settings and share the code.</p>
                             </div>
                         </li>
                     </ol>
