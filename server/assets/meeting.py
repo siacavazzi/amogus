@@ -7,6 +7,9 @@ from uuid import uuid4
 
 
 class Meeting:
+    # How long the host waits before they can start voting without everyone ready.
+    # Long enough that an intruder host can't use it to cut the meeting off before people arrive.
+    HOST_OVERRIDE_AFTER_SECONDS = 15
 
     def __init__(self, vote_time, socket, player_who_started_it, game):
         self.id = str(uuid4())
@@ -23,6 +26,12 @@ class Meeting:
         self.voted_out = None
         self.final_votes = None
         self.countdown_started = False
+        self.opened_at = time.monotonic()
+        self.started_by_host = False
+
+    def host_override_in(self):
+        """Seconds until the host may start voting early; 0 once they can."""
+        return max(0, math.ceil(self.HOST_OVERRIDE_AFTER_SECONDS - (time.monotonic() - self.opened_at)))
 
     def _is_current(self):
         return self.game.meeting is self and self.game.round_id == self.round_id
@@ -207,6 +216,8 @@ class Meeting:
     def to_json(self):
         """Convert the current meeting state and round identity to JSON."""
         with self.game.state_lock:
+            host_id = getattr(self.game, 'creator_player_id', None)
+            host = self.game.getPlayerById(host_id) if host_id else None
             return json.dumps({
                 "id": self.id,
                 "room_code": self.game.room_code,
@@ -219,6 +230,9 @@ class Meeting:
                 "voted_out": self.voted_out,
                 "votes": self.votes,
                 "veto_votes": len(self.veto_votes),
+                "host_name": host.username if host else None,
+                "host_override_in": self.host_override_in() if self.stage == 'waiting' else None,
+                "started_by_host": self.started_by_host,
                 # After the vote the crew learns how many intruders remain, never who.
                 "intruders_left": sum(1 for p in self.game.players if p.sus and p.alive) if self.stage == 'over' else None,
             })

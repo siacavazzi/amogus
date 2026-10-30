@@ -694,11 +694,27 @@ class Game:
             if not living_players or any(not player.ready for player in living_players):
                 return False
 
-            started = meeting.start_voting()
-            if started:
-                for player in self.players:
-                    player.ready = not player.alive
-            return started
+            return self._open_voting_locked(meeting)
+
+    def host_start_voting(self):
+        """The host's override for a meeting stuck waiting on phones that never slid ready."""
+        with self.state_lock:
+            meeting = self.meeting
+            if not meeting or meeting.stage != 'waiting' or meeting.round_id != self.round_id:
+                return False
+            if meeting.host_override_in() > 0:
+                return False
+            return self._open_voting_locked(meeting, started_by_host=True)
+
+    def _open_voting_locked(self, meeting, started_by_host=False):
+        meeting.started_by_host = started_by_host
+        started = meeting.start_voting()
+        if not started:
+            meeting.started_by_host = False
+        else:
+            for player in self.players:
+                player.ready = not player.alive
+        return started
 
 
     def _begin_last_stand_locked(self):

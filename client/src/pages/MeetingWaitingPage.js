@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { DataContext } from '../GameContext';
 import MUECustomSlider from '../components/swiper';
 import LeaveGameButton from '../components/LeaveGameButton';
+import HostStartVoting from '../components/HostStartVoting';
 import { Check } from '../signal/icons';
 import { Face, Words, takeOrigin, vibrate } from '../signal';
 
@@ -109,6 +110,8 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
         </p>
 
         {meReady && <p className="sg-small">You're ready</p>}
+
+        {!tutorialMode && <HostStartVoting />}
 
         <button type="button" className="sg-link" onClick={handleImDead}>
           I've Been Killed

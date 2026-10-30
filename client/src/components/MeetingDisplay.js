@@ -7,7 +7,7 @@ import '../signal/reactor.css';
 
 // The reactor's meeting screen: the same yellow flood the phones get, with the roll call big
 // enough to read from across the room. The moving stripes are the one thing in motion.
-const MeetingDisplay = ({ message = "Meeting called", stage = 'waiting', callerName, players = [], children }) => {
+const MeetingDisplay = ({ message = "Meeting called", stage = 'waiting', callerName, hostName, players = [], children }) => {
   const alive = players.filter((p) => p.alive !== false);
   const isReady = (p) => p.active !== false && p.ready;
   const readyCount = alive.filter(isReady).length;
@@ -68,6 +68,12 @@ const MeetingDisplay = ({ message = "Meeting called", stage = 'waiting', callerN
               {readyCount === alive.length ? 'Everyone is here. Voting opens.' : `${readyCount} of ${alive.length} ready`}
             </p>
           )}
+
+          {!voting && hostName && readyCount < alive.length && (
+            <p className="sg-rx__note" data-testid="reactor-host-can-start">
+              Stuck? {hostName} is the host and can start the vote from their phone.
+            </p>
+          )}
         </div>
         {children && <div className="sg-rx__foot">{children}</div>}
       </div>
@@ -79,6 +85,7 @@ MeetingDisplay.propTypes = {
   message: PropTypes.string,
   stage: PropTypes.string,
   callerName: PropTypes.string,
+  hostName: PropTypes.string,
   players: PropTypes.array,
   children: PropTypes.node,
 };
