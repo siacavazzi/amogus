@@ -14,10 +14,12 @@ concurrency:
   group: check-${{ github.ref }}
   cancel-in-progress: true
 
+# Runners are pinned to Ubuntu 24.04: ubuntu-latest moved to 26.04, where the Playwright
+# version in client/package.json can't install its browsers.
 jobs:
   unit:
     name: Server and client tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -68,7 +70,7 @@ jobs:
 
   socket-games:
     name: Server plays full games (sockets, 5 and 40 players)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -96,7 +98,7 @@ jobs:
 
   browser:
     name: Browser games (${{ matrix.name }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -128,6 +130,10 @@ jobs:
         run: npx playwright test -c e2e --project ${{ matrix.project }} --shard ${{ matrix.shard }}
         env:
           E2E_WEBKIT: ${{ matrix.project == 'webkit' && '1' || '' }}
+      - name: List known bugs
+        if: always()
+        working-directory: ./client
+        run: node scripts/e2e-summary.js >> "$GITHUB_STEP_SUMMARY"
       - name: Keep the browser test report
         if: always()
         uses: actions/upload-artifact@v4

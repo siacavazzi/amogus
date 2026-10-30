@@ -342,7 +342,17 @@ def admin_stats():
 @app.route('/health')
 def health_check():
     """Health check endpoint for load balancers and monitoring."""
-    return {'status': 'healthy', 'games': len(game_manager.games), 'version': VERSION}, 200
+    # Rooms that real people are in right now (test rooms left out), so a deploy can wait for
+    # rounds to finish before it restarts the server and drops them.
+    in_use = [game for game in list(game_manager.games.values())
+              if not getattr(game, 'synthetic', False) and any(player.active for player in game.players)]
+    return {
+        'status': 'healthy',
+        'games': len(game_manager.games),
+        'rooms_in_use': len(in_use),
+        'rounds_running': sum(1 for game in in_use if game.game_running),
+        'version': VERSION,
+    }, 200
 
 
 @app.route('/api/version')

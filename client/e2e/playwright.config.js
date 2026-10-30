@@ -16,7 +16,9 @@ module.exports = defineConfig({
     timeout: 4 * 60 * 1000,
     expect: { timeout: 15 * 1000 },
     retries: 0,
-    reporter: process.env.CI ? [['list'], ['html', { open: 'never', outputFolder: 'report' }]] : 'list',
+    reporter: process.env.CI
+        ? [['list'], ['html', { open: 'never', outputFolder: 'report' }], ['json', { outputFile: 'results.json' }]]
+        : 'list',
     outputDir: 'results',
     webServer: local ? [
         {
