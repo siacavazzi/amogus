@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect, useRef } from 'react';
 import { DataContext } from '../GameContext';
 import { Users, Play, ChevronDown, ChevronUp, List, Download, Trash2, Check, LogOut, MapPin, Settings, ArrowRight, ArrowLeft, X, Zap, Copy, Sparkles, Minus, Plus } from '../signal/icons';
 import { readGameDraft, clearGameDraft } from './seo/gameDraft';
+import { AUTO_INTRUDERS_SUMMARY, playersForIntruders } from '../utils/intruders';
 import '../signal/host.css';
 
 const DEFAULT_CARD_DECK_COUNTS = {
@@ -121,7 +122,7 @@ function GameConfigPage() {
         vote_threshold: 0.66,
         meltdown_time: 60,
         code_percent: 0.6,
-        num_intruders: 1,
+        num_intruders: 'auto',
         card_draw_probability: 1,
         starting_cards: 2,
         task_ratio: 10,
@@ -188,7 +189,8 @@ function GameConfigPage() {
                     ...(data.card_deck_counts || {}),
                 },
                 ...(generatedSettings ? {
-                    num_intruders: generatedSettings.intruderCount,
+                    // Auto counts the people who actually join; the pack's number assumed a headcount.
+                    num_intruders: 'auto',
                     vote_time: generatedSettings.meetingSeconds,
                     task_ratio: generatedSettings.taskGoalPerCrewmate,
                 } : {}),
@@ -297,6 +299,8 @@ function GameConfigPage() {
             socket.off('error', handleError);
         };
     }, [socket, deviceId, generatedDraft]);
+
+    const autoIntruders = config.num_intruders === 'auto';
 
     const updateConfig = (key, value) => {
         setConfig(prev => ({ ...prev, [key]: value }));
@@ -629,6 +633,14 @@ function GameConfigPage() {
 
             <div className="hs-panel">
                 <h2 className="hs-title">Number of Intruders</h2>
+                <button
+                    type="button"
+                    onClick={() => updateConfig('num_intruders', 'auto')}
+                    aria-pressed={autoIntruders}
+                    className="hs-num hs-num--auto"
+                >
+                    Auto
+                </button>
                 <div className="hs-num-row" role="group" aria-label="Number of Intruders">
                     {[1, 2, 3, 4].map((num) => (
                         <button
@@ -642,11 +654,19 @@ function GameConfigPage() {
                         </button>
                     ))}
                 </div>
-                <p className="sg-lede hs-muted">
-                    {config.num_intruders === 1 && 'Best for 4-6 players'}
-                    {config.num_intruders === 2 && 'Best for 6-10 players'}
-                    {config.num_intruders === 3 && 'Best for 10-15 players'}
-                    {config.num_intruders === 4 && 'Best for 15+ players (chaos mode!)'}
+                {!autoIntruders && (
+                    <CountStepper
+                        label="Intruders"
+                        description="Any number, for big groups"
+                        value={config.num_intruders}
+                        onDecrease={() => updateConfig('num_intruders', Math.max(1, config.num_intruders - 1))}
+                        onIncrease={() => updateConfig('num_intruders', config.num_intruders + 1)}
+                    />
+                )}
+                <p className="sg-lede hs-muted" data-testid="intruder-advice">
+                    {autoIntruders
+                        ? `The game picks 1 intruder per 5 players when you start: ${AUTO_INTRUDERS_SUMMARY}.`
+                        : `Best for ${playersForIntruders(config.num_intruders)[0]} to ${playersForIntruders(config.num_intruders)[1]} players. Needs at least ${config.num_intruders * 2 + 1} players to start.`}
                 </p>
             </div>
 

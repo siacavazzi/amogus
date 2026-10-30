@@ -74,3 +74,48 @@ describe('GameConfigPage card deck settings', () => {
         }));
     });
 });
+
+describe('GameConfigPage intruder count', () => {
+    beforeEach(() => {
+        localStorage.clear();
+        sessionStorage.clear();
+    });
+
+    const openRoomWith = async (contextValue, roomCode, numIntruders) => {
+        fireEvent.click(screen.getByRole('button', { name: /Open Room/i }));
+        await waitFor(() => {
+            expect(contextValue.socket.emit).toHaveBeenCalledWith('update_game_config', expect.objectContaining({
+                room_code: roomCode,
+                config: expect.objectContaining({ num_intruders: numIntruders }),
+            }));
+        });
+    };
+
+    it('starts on Auto and saves it', async () => {
+        const { contextValue } = renderWithContext(<GameConfigPage />, { roomCode: 'AUTO' });
+        fireEvent.click(screen.getByRole('button', { name: /Create Tasks with Group/i }));
+        expect(screen.getByRole('button', { name: 'Auto' })).toHaveAttribute('aria-pressed', 'true');
+        expect(screen.getByTestId('intruder-advice')).toHaveTextContent('1 intruder per 5 players');
+        await openRoomWith(contextValue, 'AUTO', 'auto');
+    });
+
+    it('lets the host pick a number, including more than four', async () => {
+        const { contextValue } = renderWithContext(<GameConfigPage />, { roomCode: 'PICK' });
+        fireEvent.click(screen.getByRole('button', { name: /Create Tasks with Group/i }));
+        fireEvent.click(screen.getByRole('button', { name: '4' }));
+        expect(screen.getByRole('button', { name: 'Auto' })).toHaveAttribute('aria-pressed', 'false');
+        fireEvent.click(screen.getByRole('button', { name: 'Increase Intruders' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Increase Intruders' }));
+        expect(screen.getByTestId('intruder-advice')).toHaveTextContent('Best for 28 to 32 players. Needs at least 13 players to start.');
+        await openRoomWith(contextValue, 'PICK', 6);
+    });
+
+    it('goes back to Auto', async () => {
+        const { contextValue } = renderWithContext(<GameConfigPage />, { roomCode: 'BACK' });
+        fireEvent.click(screen.getByRole('button', { name: /Create Tasks with Group/i }));
+        fireEvent.click(screen.getByRole('button', { name: '2' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Auto' }));
+        expect(screen.queryByRole('button', { name: 'Increase Intruders' })).toBeNull();
+        await openRoomWith(contextValue, 'BACK', 'auto');
+    });
+});

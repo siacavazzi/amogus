@@ -2,13 +2,15 @@
 import copy
 import json
 
+from assets.scaling import minimum_tasks as minimum_tasks_for
+
 
 def metadata(game):
     return {'room_code': game.room_code, 'revision': game.revision, 'round_id': game.round_id}
 
 
 def minimum_tasks(game):
-    return max(len(game.players) * 3, 10)
+    return minimum_tasks_for(len(game.players))
 
 
 TEST_MODE_MAX_PLAYERS = 2
@@ -24,11 +26,12 @@ def start_error_detail(game, test_mode=False):
         return 'already_started', 'The game already started.'
     if not game.is_open:
         return 'room_not_open', 'Open the room before you start the game.'
-    if game.numIntruders < 1:
+    intruders = game.intruder_count_for_start()
+    if intruders < 1:
         return 'no_intruders', 'At least 1 intruder is required.'
-    minimum_players = game.numIntruders * 2 + 1
+    minimum_players = intruders * 2 + 1
     if len(game.players) < minimum_players and not (test_mode and can_test_with_players(game)):
-        return 'too_few_players', f'Need at least {minimum_players} players for {game.numIntruders} intruder(s).'
+        return 'too_few_players', f'Need at least {minimum_players} players for {intruders} intruder(s).'
     if len({loc for loc in game.locations if loc and loc.lower() != 'other'}) < 2:
         return 'too_few_locations', 'Add at least 2 locations before you start the game.'
     tasks = game.collaborative_tasks
@@ -58,6 +61,7 @@ def lobby_state(game):
         'can_start_test': can_start_test(game), 'start_error': error, 'start_reason': reason,
         'tasks_missing': max(0, minimum_tasks(game) - len(game.collaborative_tasks)),
         'host_player_id': game.creator_player_id,
+        'intruder_count': game.intruder_count_for_start(), 'auto_intruders': game.auto_intruders,
     })
 
 

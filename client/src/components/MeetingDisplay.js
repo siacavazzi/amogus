@@ -13,6 +13,9 @@ const MeetingDisplay = ({ message = "Meeting called", stage = 'waiting', callerN
   const readyCount = alive.filter(isReady).length;
   const caller = callerName ? players.find((p) => p.username === callerName) : undefined;
   const voting = stage === 'voting';
+  // Big groups get smaller faces so the whole roll call still fits on one screen.
+  const crowd = alive.length > 24 ? ' sg-rx__roll--crowd' : alive.length > 12 ? ' sg-rx__roll--many' : '';
+  const faceSize = alive.length > 24 ? 48 : alive.length > 12 ? 68 : 104;
 
   return (
     <>
@@ -37,13 +40,13 @@ const MeetingDisplay = ({ message = "Meeting called", stage = 'waiting', callerN
           </div>
 
           {alive.length > 0 && (
-            <div className="sg-rx__roll sg-a sg-fade" style={{ marginTop: 'clamp(6px, 2vh, 22px)', animationDelay: '1000ms' }}>
+            <div className={`sg-rx__roll${crowd} sg-a sg-fade`} data-testid="reactor-roll" style={{ marginTop: 'clamp(6px, 2vh, 22px)', animationDelay: '1000ms' }}>
               {alive.map((player) => {
                 const ready = voting || isReady(player);
                 return (
                   <div key={player.player_id || player.id || player.username} className="sg-rx__face">
                     <div style={{ position: 'relative' }}>
-                      <Face player={player} size={104} style={{ opacity: ready ? 1 : 0.35, transition: 'opacity .3s' }} />
+                      <Face player={player} size={faceSize} style={{ opacity: ready ? 1 : 0.35, transition: 'opacity .3s' }} />
                       {ready && !voting && (
                         <span key="ok" className="sg-rx__tick sg-a sg-pop">
                           <Check size={18} strokeWidth={4} />

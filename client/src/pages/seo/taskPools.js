@@ -1,5 +1,6 @@
 /** Location-based missions for the task generator. */
 import { CLEANUP_TASKS } from './cleanupTasks';
+import { autoIntruderCount } from '../../utils/intruders';
 
 const practical = [
     'Count the chairs in this area.',
@@ -203,7 +204,7 @@ function generateTasks({ venue = 'apartment', playerCount = 8, taskStyle = 'stan
     }
     return {
         tasks, rooms, candidates, sabotages: SABOTAGE_IDEAS.other,
-        recommendations: { intruderCount: players >= 10 ? 2 : 1, meetingSeconds: 90, taskGoalPerCrewmate: preset === 'cleanup' ? 2 : 5 },
+        recommendations: { intruderCount: autoIntruderCount(players), meetingSeconds: 90, taskGoalPerCrewmate: preset === 'cleanup' ? 2 : 5 },
     };
 }
 

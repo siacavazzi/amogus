@@ -293,6 +293,11 @@
 .sg-rx__sabotage--quiet { width: auto; min-height: 56px; font-size: 18px; border-radius: 18px; padding: 12px 22px; }
 .sg-rx__sabotage--quiet svg { width: 22px; height: 22px; }
 .sg-rx__roll .sg-rx__face { width: clamp(84px, 8vw, 128px); }
+.sg-rx__roll.sg-rx__roll--many { gap: clamp(8px, 1vw, 16px); }
+.sg-rx__roll.sg-rx__roll--many .sg-rx__face { width: clamp(64px, 5.6vw, 90px); gap: 4px; }
+.sg-rx__roll.sg-rx__roll--crowd { gap: clamp(4px, 0.6vw, 10px); }
+.sg-rx__roll.sg-rx__roll--crowd .sg-rx__face { width: clamp(52px, 4.4vw, 70px); gap: 2px; }
+.sg-rx__roll--many .sg-rx__face span, .sg-rx__roll--crowd .sg-rx__face span { font-size: clamp(11px, 0.9vw, 14px); }
 .sg-rx__reveal-title { font-size: clamp(48px, min(8vw, 13vh), 150px); }
 @media (max-width: 600px) {
   .sg-rx__leave span { display: none; }
