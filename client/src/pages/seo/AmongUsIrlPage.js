@@ -4,18 +4,6 @@ import SeoPageLayout from './SeoPageLayout';
 import GameplayScreenshots from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
-const SCHEMA = {
-    '@context': 'https://schema.org',
-    '@type': 'SoftwareApplication',
-    name: 'Sus Party',
-    applicationCategory: 'Game',
-    operatingSystem: 'Any (browser-based)',
-    description:
-        'Sus Party is a free browser game for in-person social deduction with private roles, task lists, meetings, and votes.',
-    url: 'https://susparty.com',
-    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-};
-
 const FAQS = [
     {
         q: 'What is Among Us IRL?',
@@ -23,7 +11,15 @@ const FAQS = [
     },
     {
         q: 'How many players do we need?',
-        a: 'The game requires at least two crew members per intruder, so one intruder needs at least three players. For a first game, four to six players with one intruder is an option. The task generator prepares groups of five to fifteen. That is a generator range, not a cap on the game.',
+        a: 'Anywhere from 3 to 40+. The game requires at least two crew members per intruder, so one intruder needs at least three players. For a first game, four to six players with one intruder is an easy start. Youth groups have played with about 40 phones in one game. The task generator prepares groups of five to fifteen; add tasks for a bigger group.',
+    },
+    {
+        q: 'Is Sus Party free? Do we need to download an app?',
+        a: 'It is free, with no ads, account, or download. Everyone opens susparty.com in a phone browser and joins with the room code.',
+    },
+    {
+        q: 'How do you play Among Us in real life?',
+        a: 'Most players are crew and complete real tasks around the house. One or more secret intruders fake tasks and eliminate crew members in private. Anyone can call a meeting to argue and vote someone out. The crew wins by finishing tasks and voting out every intruder; the intruders win by outnumbering the crew.',
     },
     {
         q: 'Can we play without an app?',
@@ -35,11 +31,35 @@ const FAQS = [
     },
 ];
 
+const SCHEMA = {
+    '@context': 'https://schema.org',
+    '@graph': [
+        {
+            '@type': 'SoftwareApplication',
+            name: 'Sus Party',
+            applicationCategory: 'Game',
+            operatingSystem: 'Any (browser-based)',
+            description:
+                'Sus Party is a free browser game for in-person social deduction with private roles, task lists, meetings, and votes, for 3 to 40+ players.',
+            url: 'https://susparty.com',
+            offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+        },
+        {
+            '@type': 'FAQPage',
+            mainEntity: FAQS.map((faq) => ({
+                '@type': 'Question',
+                name: faq.q,
+                acceptedAnswer: { '@type': 'Answer', text: faq.a },
+            })),
+        },
+    ],
+};
+
 function AmongUsIrlPage() {
     usePageMeta({
-        title: 'Free Among Us IRL App | Sus Party',
+        title: 'Among Us IRL: Free App for 3 to 40+ Players | Sus Party',
         description:
-            'Play Among Us in real life with Sus Party. Turn your rooms into a map, use real tasks and secret roles, and run meetings from phone browsers. Free, no install.',
+            'Play Among Us in real life for free. Phones deal secret roles, real tasks, meetings and votes for 3 to 40+ players at home, at school, or at a youth group. No install.',
         canonical: 'https://susparty.com/among-us-irl',
         ogImage: 'https://susparty.com/og-image.jpg',
         schema: SCHEMA,
@@ -54,6 +74,7 @@ function AmongUsIrlPage() {
                     Someone heads to the kitchen for a task. Someone follows them a little too closely.
                     A meeting starts, and suddenly everyone has an alibi. Sus Party is the free Among Us IRL app
                     that turns your rooms into the map and your friends into the suspects.
+                    It works for 3 players or 40+: a family night, a birthday, a class, or a whole youth group.
                 </p>
                 <div className="seo-actions">
                     <a href="/among-us-irl-task-generator?venue=house&players=8&movement=normal" className="seo-btn--primary">
@@ -72,6 +93,7 @@ function AmongUsIrlPage() {
                         <li><a href="#classroom-setup">Classroom setup</a></li>
                         <li><a href="#vacation-house-setup">Vacation-house setup</a></li>
                         <li><a href="#other-venues">Apartment, dorm, or office</a></li>
+                        <li><a href="#big-groups">Big groups of 20 to 40+</a></li>
                     </ul>
                 </nav>
 
@@ -138,6 +160,21 @@ function AmongUsIrlPage() {
                             <p>Intruders use cards to disrupt the crew. At the task goal, the app reveals living intruders. The crew still has to vote them out.</p>
                         </div>
                     </div>
+                </section>
+
+                <section className="seo-section" id="rules">
+                    <p className="seo-section__kicker">The rules</p>
+                    <h2>How to play Among Us in real life</h2>
+                    <ul className="seo-list">
+                        <li><strong>Crew:</strong> most players. Walk to each task on your phone, do it in the room, and slide to finish it.</li>
+                        <li><strong>Intruders:</strong> one or more secret players. They fake tasks, use sabotage cards, and eliminate crew members when nobody is watching.</li>
+                        <li><strong>Meetings:</strong> a crew member calls one from their phone. Everyone gathers at the meeting point, shares what they saw, and votes.</li>
+                        <li><strong>Winning:</strong> the crew wins by finishing tasks and voting out every intruder. The intruders win once they match the crew in number.</li>
+                    </ul>
+                    <p>
+                        A first round takes 10 to 20 minutes. Read the full <a href="/how-to-play-among-us-irl">rules and a sample round</a>,
+                        or deal paper roles with the <a href="/among-us-role-generator">Among Us role generator</a>.
+                    </p>
                 </section>
 
                 <GameplayScreenshots screens={['crew-task', 'intruder-cards']} />
@@ -211,6 +248,24 @@ function AmongUsIrlPage() {
                     </p>
                 </section>
 
+                <section className="seo-section" id="big-groups">
+                    <p className="seo-section__kicker">Big groups</p>
+                    <h2>Play with 20, 30, or 40+ people</h2>
+                    <p>
+                        One Sus Party room can hold a whole youth group, class, or party. Groups of about 40 have played a single game.
+                        A few things keep a big game moving:
+                    </p>
+                    <ul className="seo-list">
+                        <li>Open susparty.com/play on a laptop, TV, or projector and create the room there. It becomes the big screen and shows the room code to everyone.</li>
+                        <li>Players type susparty.com on their phones and enter the code. The first phone to join is the host and starts the game.</li>
+                        <li>Use more intruders as the group grows, and plan more tasks than players so nobody stands around.</li>
+                        <li>Pick a meeting point with room for everyone, and spread tasks across several areas.</li>
+                    </ul>
+                    <p>
+                        Running it for a youth group, library, or school? See the <a href="/among-us-irl-for-youth-groups">youth group and classroom guide</a>.
+                    </p>
+                </section>
+
                 <section className="seo-section">
                     <p className="seo-section__kicker">FAQ</p>
                     <h2>Among Us IRL questions</h2>
@@ -230,6 +285,8 @@ function AmongUsIrlPage() {
                         <li><a href="/how-to-play-among-us-irl">How to play: rules and sample round</a></li>
                         <li><a href="/among-us-irl-task-ideas">Task ideas by venue and movement</a></li>
                         <li><a href="/among-us-irl-task-generator?venue=house&players=8&movement=normal">Make a task list for your space</a></li>
+                        <li><a href="/among-us-role-generator">Deal secret roles with the role generator</a></li>
+                        <li><a href="/among-us-irl-for-youth-groups">Run it for a youth group or class</a></li>
                         <li><a href="/among-us-birthday-party">Make it the main birthday activity</a></li>
                         <li><a href="/social-deduction-games">Compare social deduction games for your group</a></li>
                     </ul>

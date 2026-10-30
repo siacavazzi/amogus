@@ -53,9 +53,10 @@ export default function YouthGroupsPage() {
                 <section className="seo-section">
                     <h2>Group size and devices</h2>
                     <p>
-                        One game room works well for about 6 to 15 players and supports up to about 15. With 20 or 30 students,
-                        split them into two or three games that run side by side in separate areas, each with its own room code and adult.
-                        Another option is to run one game while a second group plays a different activity, then swap.
+                        One game room can hold the whole group: youth groups have run single Sus Party games with about 40 phones.
+                        With 20 or more players, open the game on a laptop, TV or projector first so the room code and every meeting show on a big screen,
+                        and use three or four intruders. If you have several leaders and separate spaces, two smaller games side by side also work
+                        and give each player more tasks.
                     </p>
                     <p>
                         In Sus Party, each player needs a browser and internet. Check the Wi-Fi before the session. Some library and school networks block game sites,
