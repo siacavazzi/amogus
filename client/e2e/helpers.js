@@ -27,7 +27,11 @@ async function openPage(browser, name, options) {
     const page = await context.newPage();
     page.person = name;
     page.errors = [];
-    page.on('pageerror', error => page.errors.push(error.message));
+    page.on('pageerror', error => {
+        page.errors.push(error.message);
+        // The stack says where it broke, which the message alone doesn't (Safari's especially).
+        console.log(`[${name}] page error: ${error.stack || error.message}`);
+    });
     // Confirm prompts ("Did the intruder get you?") get a yes, as the person meant to tap it.
     page.on('dialog', dialog => dialog.accept());
     return page;
