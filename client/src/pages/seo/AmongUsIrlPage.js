@@ -11,7 +11,7 @@ const FAQS = [
     },
     {
         q: 'How many players do we need?',
-        a: 'Anywhere from 3 to 40+. The game requires at least two crew members per intruder, so one intruder needs at least three players. For a first game, four to six players with one intruder is an easy start. Youth groups have played with about 40 phones in one game. The task generator prepares groups of five to fifteen; add tasks for a bigger group.',
+        a: 'Anywhere from 3 to 20+. The game requires at least two crew members per intruder, so one intruder needs at least three players. For a first game, four to six players with one intruder is an easy start. The task generator prepares groups of five to fifteen; add tasks for a bigger group.',
     },
     {
         q: 'Is Sus Party free? Do we need to download an app?',
@@ -40,7 +40,7 @@ const SCHEMA = {
             applicationCategory: 'Game',
             operatingSystem: 'Any (browser-based)',
             description:
-                'Sus Party is a free browser game for in-person social deduction with private roles, task lists, meetings, and votes, for 3 to 40+ players.',
+                'Sus Party is a free browser game for in-person social deduction with private roles, task lists, meetings, and votes, for 3 to 20+ players.',
             url: 'https://susparty.com',
             offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
         },
@@ -57,9 +57,9 @@ const SCHEMA = {
 
 function AmongUsIrlPage() {
     usePageMeta({
-        title: 'Among Us IRL: Free App for 3 to 40+ Players | Sus Party',
+        title: 'Among Us IRL: Free App for 3 to 20+ Players | Sus Party',
         description:
-            'Play Among Us in real life for free. Phones deal secret roles, real tasks, meetings and votes for 3 to 40+ players at home, at school, or at a youth group. No install.',
+            'Play Among Us in real life for free. Phones deal secret roles, real tasks, meetings and votes for 3 to 20+ players at home, at school, or at a youth group. No install.',
         canonical: 'https://susparty.com/among-us-irl',
         ogImage: 'https://susparty.com/og-image.jpg',
         schema: SCHEMA,
@@ -74,7 +74,7 @@ function AmongUsIrlPage() {
                     Someone heads to the kitchen for a task. Someone follows them a little too closely.
                     A meeting starts, and suddenly everyone has an alibi. Sus Party is the free Among Us IRL app
                     that turns your rooms into the map and your friends into the suspects.
-                    It works for 3 players or 40+: a family night, a birthday, a class, or a whole youth group.
+                    It works for 3 players or 20+: a family night, a birthday, a class, or a whole youth group.
                 </p>
                 <div className="seo-actions">
                     <a href="/among-us-irl-task-generator?venue=house&players=8&movement=normal" className="seo-btn--primary">
@@ -93,7 +93,7 @@ function AmongUsIrlPage() {
                         <li><a href="#classroom-setup">Classroom setup</a></li>
                         <li><a href="#vacation-house-setup">Vacation-house setup</a></li>
                         <li><a href="#other-venues">Apartment, dorm, or office</a></li>
-                        <li><a href="#big-groups">Big groups of 20 to 40+</a></li>
+                        <li><a href="#big-groups">Big groups of 20+</a></li>
                     </ul>
                 </nav>
 
@@ -250,9 +250,9 @@ function AmongUsIrlPage() {
 
                 <section className="seo-section" id="big-groups">
                     <p className="seo-section__kicker">Big groups</p>
-                    <h2>Play with 20, 30, or 40+ people</h2>
+                    <h2>Play with 20 or more people</h2>
                     <p>
-                        One Sus Party room can hold a whole youth group, class, or party. Groups of about 40 have played a single game.
+                        One Sus Party room can hold a whole youth group, class, or party.
                         A few things keep a big game moving:
                     </p>
                     <ul className="seo-list">

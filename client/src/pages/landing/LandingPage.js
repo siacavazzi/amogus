@@ -54,8 +54,8 @@ const FAQS = [
     { q: 'What are good Among Us IRL tasks at home?', a: 'Count coasters at the dining table, read a title from a shared shelf, or sort host-provided cards. Use short tasks in different areas so players have reasons to split up.' },
     { q: 'How do Among Us IRL room codes work?', a: 'The host creates a Sus Party game and shares its four-character room code. Friends open susparty.com/play and enter that code to join the same game.' },
     { q: 'Can we play online from different homes?', a: 'Sus Party connects your phones online, but the group plays together in the same physical space. The tasks, secret eliminations, and meetings happen in real life.' },
-    { q: 'How many players?', a: 'Anywhere from 3 to 40+. Youth groups have played with about 40 phones in one game. The game needs at least two crew members per intruder, so add intruders as the group grows. The task generator builds packs for 5–15 players; add more tasks for a bigger group.' },
-    { q: 'How do 40 people join at once?', a: 'Open susparty.com/play on a laptop or TV first and create the room there. It becomes the big screen (the Reactor) and shows the room code to the whole group. Players type susparty.com on their phones and enter the code; the first phone in is the host. No download or sign-up.' },
+    { q: 'How many players?', a: 'Anywhere from 3 to 20+. The game needs at least two crew members per intruder, so add intruders as the group grows. The task generator builds packs for 5–15 players; add more tasks for a bigger group.' },
+    { q: 'How does a big group join at once?', a: 'Open susparty.com/play on a laptop or TV first and create the room there. It becomes the big screen (the Reactor) and shows the room code to the whole group. Players type susparty.com on their phones and enter the code; the first phone in is the host. No download or sign-up.' },
     { q: 'Does it cost anything?', a: 'No. It\u2019s free, open source, and ad-free.' },
     { q: 'Where do we play?', a: 'Use shared areas in a house, apartment, dorm, office, or vacation rental. Choose at least two task locations so players have a route. Each phone needs internet.' },
 ];
@@ -150,8 +150,8 @@ function JoinForm() {
 
 function LandingPage() {
     usePageMeta({
-        title: 'Sus Party | Free Among Us IRL Game for 3 to 40+ Players',
-        description: 'Play Among Us in real life, free in your phone browser. Real tasks, secret roles, meetings and votes for 3 to 40+ players at parties, youth groups and classes.',
+        title: 'Sus Party | Free Among Us IRL Game for 3 to 20+ Players',
+        description: 'Play Among Us in real life, free in your phone browser. Real tasks, secret roles, meetings and votes for 3 to 20+ players at parties, youth groups and classes.',
         canonical: 'https://susparty.com/',
     });
     const [tagIdx, setTagIdx] = useState(0);
@@ -182,7 +182,7 @@ function LandingPage() {
                         </p>
                         <JoinForm />
                         <p className="sl-footnote">
-                            3 to 40+ players · One host phone runs the room ·{' '}
+                            3 to 20+ players · One host phone runs the room ·{' '}
                             <a href="/how-to-play">How to play</a>
                         </p>
                     </div>
@@ -269,7 +269,7 @@ function LandingPage() {
                     <h2 id="sl-seo-heading" className="sl-h2">Choose the game for your group.</h2>
                     <p className="sl-body">
                         Sus Party is a free browser app for an Among Us-inspired party game in real life. Open
-                        <a href="https://susparty.com"> susparty.com</a> on your phones, gather anywhere from 3 to 40+ people, and
+                        <a href="https://susparty.com"> susparty.com</a> on your phones, gather anywhere from 3 to 20+ people, and
                         turn your house into the board. Players move room to room, complete real tasks,
                         survive sabotage, call meetings, and vote out the secret saboteur. No app to install,
                         no signup, no ads.

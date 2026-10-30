@@ -53,7 +53,7 @@ export default function YouthGroupsPage() {
                 <section className="seo-section">
                     <h2>Group size and devices</h2>
                     <p>
-                        One game room can hold the whole group: youth groups have run single Sus Party games with about 40 phones.
+                        One game room can hold the whole group, even with 20 or more players.
                         With 20 or more players, open the game on a laptop, TV or projector first so the room code and every meeting show on a big screen,
                         and use three or four intruders. If you have several leaders and separate spaces, two smaller games side by side also work
                         and give each player more tasks.
