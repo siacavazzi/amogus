@@ -2,6 +2,8 @@ import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { DataContext } from '../GameContext';
 import MUECustomSlider from '../components/swiper';
 import LeaveGameButton from '../components/LeaveGameButton';
+import HostStartVoting from '../components/HostStartVoting';
+import { readyNeeded } from '../utils/meetingQuorum';
 import { Check } from '../signal/icons';
 import { Face, Words, takeOrigin, vibrate } from '../signal';
 
@@ -21,7 +23,8 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
   const present = alive.filter((p) => !p.absent);
   const readyCount = present.filter(isReady).length;
   const totalAlive = present.length;
-  const allReady = totalAlive > 0 && readyCount === totalAlive;
+  const needed = readyNeeded(meetingState, totalAlive);
+  const allReady = totalAlive > 0 && readyCount >= needed;
   const caller = players.find((p) => p.username === meetingState?.player_who_started_it);
 
   const handleReadyUp = () => {
@@ -107,8 +110,13 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
         <p data-testid="ready-count" className="sg-lede sg-num" style={{ marginTop: 4 }}>
           {allReady ? 'Everyone is here. Voting opens.' : `${readyCount} of ${totalAlive} ready`}
         </p>
+        {!allReady && needed < totalAlive && (
+          <p data-testid="ready-needed" className="sg-small">Voting opens at {needed} ready</p>
+        )}
 
         {meReady && <p className="sg-small">You're ready</p>}
+
+        {!tutorialMode && <HostStartVoting />}
 
         <button type="button" className="sg-link" onClick={handleImDead}>
           I've Been Killed

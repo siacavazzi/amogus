@@ -1,4 +1,6 @@
 // Pure helpers for the role generator, kept apart from the page for tests.
+import { autoIntruderCount } from '../../utils/intruders';
+
 export const MAX_PLAYERS = 20;
 
 export function parseNames(text, count) {
@@ -7,10 +9,9 @@ export function parseNames(text, count) {
     return Array.from({ length: count }, (_, index) => `Player ${index + 1}`);
 }
 
+// The same count a Sus Party room picks on Auto.
 export function suggestedIntruders(playerCount) {
-    if (playerCount >= 15) return 3;
-    if (playerCount >= 10) return 2;
-    return 1;
+    return autoIntruderCount(playerCount);
 }
 
 function randomIndex(limit, random) {

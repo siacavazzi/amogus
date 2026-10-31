@@ -3,6 +3,8 @@ from contextlib import nullcontext
 
 import eventlet
 
+from assets.scaling import meltdown_codes_needed
+
 
 class Meltdown:
     def __init__(self, players, time, socketio, speaker, code_percent):
@@ -11,7 +13,9 @@ class Meltdown:
         self.time_left = time
         self.living_players = [player for player in players if player.alive]
         self.num_players = len(self.living_players)
-        self.codes_needed = max(int(self.num_players * code_percent), 1)
+        # Phones offline long enough to be marked absent can't bring a code to the reactor, so they don't count.
+        present = sum(1 for player in self.living_players if not getattr(player, 'absent', False))
+        self.codes_needed = meltdown_codes_needed(present, code_percent)
         self.valid_pins = [random.randint(1000, 9999) for _ in range(self.num_players)]
         self.codes_entered = 0
         self.meltdown_active = True

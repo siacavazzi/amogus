@@ -71,7 +71,8 @@ class GameManager:
                 numIntruders=self.config['NUMBER_OF_INTRUDERS'],
                 starting_cards=self.config['STARTING_CARDS'],
                 vote_threshold=self.config['VOTE_THRESHOLD'],
-                room_code=room_code  # Pass room code for scoped emissions
+                room_code=room_code,  # Pass room code for scoped emissions
+                auto_intruders=self.config.get('AUTO_INTRUDERS', False),
             )
             
             # Hook end-of-game reporting via Game's optional callback

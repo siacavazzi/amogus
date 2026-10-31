@@ -3,6 +3,7 @@
 import React, { useContext, useState } from 'react';
 import { DataContext } from '../GameContext';
 import LeaveGameButton from '../components/LeaveGameButton';
+import HostStartVoting from '../components/HostStartVoting';
 import { ProfilePicture, getDeathInfo } from '../components/PlayerCard';
 import { Skull, Eye, EyeOff } from '../signal/icons';
 
@@ -60,6 +61,9 @@ const DeadPage = () => {
         <h1 className="sg-big sg-h1 sg-a sg-slam" style={{ animationDelay: '300ms' }}>You're out</h1>
         <p className="sg-lede" style={{ maxWidth: '24ch', opacity: 0.85 }}>"{deathMessage}"</p>
         <p className="sg-small" style={{ maxWidth: '28ch' }}>Stay quiet and keep watching. You can still cheer at the end.</p>
+
+        {/* A dead host still runs the room: the meeting may be stuck on them */}
+        <HostStartVoting dark />
 
         <div className="w-full max-w-sm" style={{ marginTop: 10 }}>
           <button type="button" className="sg-btn sg-btn-ghost" onClick={() => setShowSpectate(!showSpectate)} style={{ background: 'rgba(255,255,255,0.12)' }}>

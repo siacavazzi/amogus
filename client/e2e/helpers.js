@@ -10,6 +10,18 @@ const PHONE = {
 };
 const DESKTOP = { viewport: { width: 1440, height: 900 } };
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+// Hold "see your role" on every phone; returns the phones that turned out to be intruders.
+async function revealAllRoles(phones) {
+    const intruders = [];
+    for (const phone of phones) {
+        const release = await hold(phone, phone.getByText('Hold to see it').first(), 500);
+        if (/Intruder/.test(await phone.locator('body').innerText())) intruders.push(phone);
+        await release();
+        await phone.getByText('Got it').click();
+    }
+    return intruders;
+}
+
 // Whether something shows up within a short wait (for screens that only some flows show).
 const appears = (locator, timeout = 3000) => locator.first().waitFor({ state: 'visible', timeout }).then(() => true, () => false);
 
@@ -51,7 +63,8 @@ async function skipTutorialPrompt(page) {
 // Pick the example task list, apply any settings, and open the room.
 //   settings: { intruders, meltdownTime, tasksPerPlayer, startingCards, cardDrawChance,
 //               deck: { 'EMP': 1, 'Fake Task': 1, ... } (a custom deck; unnamed cards are set to 0),
-//               groupTasks: true (no list; the room writes its tasks together in the lobby) }
+//               groupTasks: true (no list; the room writes its tasks together in the lobby),
+//               meetingQuorum: false (big games wait for everyone to slide ready, not 80%) }
 async function setUpRoom(page, settings = {}) {
     await page.goto('/play');
     await skipTutorialPrompt(page);
@@ -63,8 +76,13 @@ async function setUpRoom(page, settings = {}) {
         await page.getByText('Use This Task List').first().click();
     }
     await expect(page.getByRole('heading', { name: 'Game settings' })).toBeVisible();
-    if (settings.intruders) {
-        await page.getByRole('group', { name: 'Number of Intruders' }).getByRole('button', { name: String(settings.intruders), exact: true }).click();
+    // Rooms start on Auto (1 intruder per 5 players). A number picks it; past 4 it uses the stepper.
+    if (settings.intruders === 'auto') {
+        await page.getByRole('button', { name: 'Auto', exact: true }).click();
+    } else if (settings.intruders) {
+        const pick = Math.min(settings.intruders, 4);
+        await page.getByRole('group', { name: 'Number of Intruders' }).getByRole('button', { name: String(pick), exact: true }).click();
+        for (let n = pick; n < settings.intruders; n++) await page.getByRole('button', { name: 'Increase Intruders' }).click();
     }
     const sliders = {
         meltdownTime: 'setting-meltdown-time',
@@ -73,9 +91,13 @@ async function setUpRoom(page, settings = {}) {
         cardDrawChance: 'setting-card-draw-chance',
     };
     const wanted = Object.keys(sliders).filter(key => settings[key] !== undefined);
-    if (wanted.length || settings.deck) {
+    if (wanted.length || settings.deck || settings.meetingQuorum === false) {
         await page.getByRole('button', { name: /Advanced Settings/ }).click();
         for (const key of wanted) await page.locator(`#${sliders[key]}`).fill(String(settings[key]));
+    }
+    if (settings.meetingQuorum === false) {
+        await page.getByRole('button', { name: /^Everyone ready/ }).click();
+        await expect(page.getByRole('button', { name: /^Everyone ready/ })).toHaveAttribute('aria-pressed', 'true');
     }
     if (settings.deck) {
         await page.getByRole('button', { name: /^Custom/ }).click();
@@ -359,6 +381,6 @@ function expectNoPageErrors(pages) {
 }
 
 module.exports = {
-    lock, goOffline, goOnline, tapAndConfirm, openPage, closeAll, openPhones, openPhone, openReactor, createRoom, createRoomOnPhone, gatherRoom, readyUp, connectReactor, joinRoom, enterName, revealRoles, swipe, hold, callMeeting, vote,
-    continueAfterResults, voteOutIntruder, roundButton, addTasks, openVent, playCard, dismissMessage, expectLobby, expectNoPageErrors, sleep, skipTutorialPrompt,
+    lock, goOffline, goOnline, tapAndConfirm, openPage, closeAll, skipTutorialPrompt, openPhones, openPhone, openReactor, createRoom, createRoomOnPhone, gatherRoom, readyUp, connectReactor, joinRoom, enterName, revealRoles, revealAllRoles, swipe, hold, callMeeting, vote,
+    continueAfterResults, voteOutIntruder, roundButton, addTasks, openVent, playCard, dismissMessage, expectLobby, expectNoPageErrors, sleep,
 };
