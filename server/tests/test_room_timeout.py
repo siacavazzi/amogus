@@ -10,7 +10,7 @@ SERVER_DIR = Path(__file__).resolve().parents[1]
 if str(SERVER_DIR) not in sys.path:
     sys.path.insert(0, str(SERVER_DIR))
 
-from assets.game_manager import GameManager  # noqa: E402
+from assets.game_manager import GameManager, ROOM_TIMEOUT_SECONDS  # noqa: E402
 
 
 class RoomTimeoutTests(unittest.TestCase):
@@ -38,8 +38,11 @@ class RoomTimeoutTests(unittest.TestCase):
         with patch('assets.game_manager.time.time', return_value=self.now):
             self.manager._cleanup_inactive_games()
 
+    def test_timeout_is_three_hours(self):
+        self.assertEqual(3 * 60 * 60, ROOM_TIMEOUT_SECONDS)
+
     def test_room_survives_a_long_party_break(self):
-        self.add_room('LIVE', 23 * 60 * 60)
+        self.add_room('LIVE', 2 * 60 * 60 + 59 * 60)
         self.clean_rooms()
         self.assertIn('LIVE', self.manager.games)
         self.manager.socketio.emit.assert_not_called()
@@ -50,13 +53,13 @@ class RoomTimeoutTests(unittest.TestCase):
         self.assertIn('DONE', self.manager.games)
         self.manager.socketio.emit.assert_not_called()
 
-    def test_room_survives_the_exact_day_boundary(self):
-        self.add_room('LIVE', 24 * 60 * 60)
+    def test_room_survives_the_exact_three_hour_boundary(self):
+        self.add_room('LIVE', 3 * 60 * 60)
         self.clean_rooms()
         self.assertIn('LIVE', self.manager.games)
 
     def test_activity_before_cleanup_acquires_room_lock_keeps_room(self):
-        self.add_room('LIVE', 24 * 60 * 60 + 1)
+        self.add_room('LIVE', 3 * 60 * 60 + 1)
         game = self.manager.games['LIVE']
 
         class ResumeBeforeLock:
@@ -70,9 +73,9 @@ class RoomTimeoutTests(unittest.TestCase):
         self.clean_rooms()
         self.assertIn('LIVE', self.manager.games)
 
-    def test_rooms_expire_after_a_day_and_remove_player_mappings(self):
-        self.add_room('LIVE', 24 * 60 * 60 + 1)
-        self.add_room('DONE', 24 * 60 * 60 + 1, ended=True)
+    def test_rooms_expire_after_three_idle_hours_and_remove_player_mappings(self):
+        self.add_room('LIVE', 3 * 60 * 60 + 1)
+        self.add_room('DONE', 3 * 60 * 60 + 1, ended=True)
         self.manager.games['DONE'].last_activity = self.now
         self.manager.player_to_game = {'player': 'LIVE'}
         self.manager.sid_to_game = {'socket': 'LIVE'}
@@ -84,3 +87,16 @@ class RoomTimeoutTests(unittest.TestCase):
         self.manager.socketio.emit.assert_any_call(
             'room_disbanded', {'message': 'Room closed due to inactivity'}, room='LIVE'
         )
+
+    def test_old_room_with_recent_activity_is_kept(self):
+        # Inactivity, not age: a room created long ago but still in play stays open.
+        self.add_room('LIVE', 10 * 60 * 60)
+        self.manager.games['LIVE'].last_activity = self.now - 5 * 60
+        self.clean_rooms()
+        self.assertIn('LIVE', self.manager.games)
+        self.manager.socketio.emit.assert_not_called()
+
+    def test_idle_room_expires_after_three_hours_not_a_day(self):
+        self.add_room('IDLE', 4 * 60 * 60)
+        self.clean_rooms()
+        self.assertNotIn('IDLE', self.manager.games)

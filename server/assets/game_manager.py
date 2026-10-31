@@ -9,7 +9,9 @@ from assets.stats_tracker import StatsTracker
 from assets.room_codes import random_room_code, clean_room_code, canonical_room_code
 
 
-ROOM_TIMEOUT_SECONDS = 24 * 60 * 60
+# A room closes after 3 hours with no game activity (any command, broadcast or
+# round change refreshes it). A finished game closes 3 hours after it ended.
+ROOM_TIMEOUT_SECONDS = 3 * 60 * 60
 
 
 class GameManager:
