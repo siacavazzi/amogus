@@ -124,7 +124,7 @@ function HowToPlayIrlPage() {
                             <span className="seo-step__num" aria-hidden="true">3</span>
                             <div>
                                 <h3>Pick the intruder count</h3>
-                                <p>The game settings recommend one intruder for 4–6 players, two for 6–10, three for 10–15, and four for 15+.</p>
+                                <p>Leave it on Auto and the game picks one intruder for every five players when you start: one for 3–7 players, two for 8–12, three for 13–17, and so on for groups of any size. You can also pick a number yourself.</p>
                             </div>
                         </li>
                         <li className="seo-step">
@@ -189,7 +189,7 @@ function HowToPlayIrlPage() {
                             <span className="seo-step__num" aria-hidden="true">1</span>
                             <div>
                                 <h3>Start with eight players</h3>
-                                <p>Choose two intruders, which matches the game settings recommendation for six to ten players.</p>
+                                <p>Auto picks two intruders for eight players.</p>
                             </div>
                         </li>
                         <li className="seo-step">

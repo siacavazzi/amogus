@@ -41,7 +41,8 @@ test('a phone locked mid-round for a minute comes back to its role and task', as
 
 test('half the room locks their phones during a meeting, and the vote opens once they are back', async ({ browser }) => {
     test.setTimeout(6 * 60 * 1000);
-    const { phones, crew, intruder } = await startRound(browser, ['Sam', 'Alex', 'Jules', 'Riley', 'Kai', 'Noor', 'Mia', 'Theo']);
+    // One intruder, so voting them out ends the round (Auto would deal eight phones two).
+    const { phones, crew, intruder } = await startRound(browser, ['Sam', 'Alex', 'Jules', 'Riley', 'Kai', 'Noor', 'Mia', 'Theo'], { settings: { intruders: 1 } });
     const caller = crew[0];
     const pocketed = phones.filter(phone => phone !== caller).slice(0, 4);
     const awake = phones.filter(phone => !pocketed.includes(phone));

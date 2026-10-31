@@ -1,5 +1,6 @@
 /** Location-based missions for the task generator. */
 import { CLEANUP_TASKS } from './cleanupTasks';
+import { autoIntruderCount } from '../../utils/intruders';
 
 // Pools follow the task lists hosts write for real games: short, physical jobs that keep a
 // player at the location for 10 to 40 seconds, then reset so the next player can redo them.
@@ -295,7 +296,7 @@ function generateTasks({ venue = 'apartment', playerCount = 8, taskStyle = 'stan
     }
     return {
         tasks, rooms, candidates, sabotages: SABOTAGE_IDEAS.other,
-        recommendations: { intruderCount: players >= 20 ? 3 : players >= 10 ? 2 : 1, meetingSeconds: 90, taskGoalPerCrewmate: preset === 'cleanup' ? 2 : 5 },
+        recommendations: { intruderCount: autoIntruderCount(players), meetingSeconds: 90, taskGoalPerCrewmate: preset === 'cleanup' ? 2 : 5 },
     };
 }
 
