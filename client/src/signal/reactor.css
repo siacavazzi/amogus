@@ -305,21 +305,24 @@
 }
 
 /* The QR code beside the room code: scanning opens the join page with the code filled in.
-   About as tall as the code itself, so it reads from across the room and leaves the faces room. */
-.sg-rx__codebox--qr { flex-wrap: wrap; row-gap: 12px; }
-.sg-rx__codebox--qr .sg-rx__code { font-size: clamp(64px, min(19vw, 34vh), 380px); }
+   It stands as tall as the label, code and address together, big enough to scan from across
+   the room, and the faces start no lower than before. */
+.sg-rx__join { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: clamp(12px, 2.4vh, 28px) clamp(20px, 3.5vw, 64px); width: 100%; }
+.sg-rx__joincode { display: flex; flex-direction: column; align-items: center; gap: clamp(10px, 2.2vh, 26px); min-width: 0; }
+.sg-rx__join .sg-rx__code { font-size: clamp(64px, min(17vw, 30vh), 360px); }
+.sg-rx__join .sg-rx__lede { font-size: clamp(18px, 2vw, 34px); text-align: center; }
 .sg-rx__qr {
-  margin: 0 0 0 clamp(8px, 1.6vw, 32px);
+  margin: 0;
   flex: none;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: clamp(6px, 0.7vw, 12px) clamp(6px, 0.7vw, 12px) clamp(4px, 0.5vw, 8px);
   gap: 2px;
+  padding: clamp(8px, 0.9vw, 16px) clamp(8px, 0.9vw, 16px) clamp(4px, 0.6vw, 10px);
   background: #fff;
   color: var(--sg-ink, #111);
-  border-radius: clamp(14px, 1.6vw, 24px);
+  border-radius: clamp(14px, 1.6vw, 26px);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
 }
-.sg-rx__qr svg { display: block; width: clamp(120px, min(16vw, 24vh), 360px); height: auto; }
-.sg-rx__qr figcaption { font-weight: 900; font-size: clamp(11px, 1vw, 18px); letter-spacing: 0.08em; text-transform: uppercase; }
+.sg-rx__qr svg { display: block; width: clamp(160px, min(23vw, 38vh), 520px); height: auto; }
+.sg-rx__qr figcaption { font-weight: 900; font-size: clamp(12px, 1.2vw, 22px); letter-spacing: 0.08em; text-transform: uppercase; }

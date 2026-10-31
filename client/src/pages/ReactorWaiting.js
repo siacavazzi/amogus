@@ -64,25 +64,28 @@ function ReactorWaiting() {
 
       <div className="sg-rx__main">
         {roomCode && (
-          <>
-            <p className="sg-rx__label sg-a sg-rise">Room code</p>
-            <div className={`sg-rx__codebox${qrUrl ? ' sg-rx__codebox--qr' : ''}`}>
-              <h1 className="sg-rx__code sg-a sg-slam" aria-label={`Room code ${roomCode}`} data-testid="room-code">{roomCode}</h1>
-              <button type="button" onClick={copyRoomCode} className="sg-rx__copy" title="Copy room code" aria-label="Copy room code">
-                {copied ? <Check size={28} strokeWidth={3} /> : <Copy size={26} />}
-              </button>
-              {qrUrl && (
-                <figure className="sg-rx__qr sg-a sg-pop">
-                  <RoomQrCode value={qrUrl} title={`QR code to join room ${roomCode}`} data-testid="room-qr" />
-                  <figcaption>Scan to join</figcaption>
-                </figure>
-              )}
+          // The code and the address on the left, the QR code beside them as tall as both together.
+          <div className="sg-rx__join">
+            <div className="sg-rx__joincode">
+              <p className="sg-rx__label sg-a sg-rise">Room code</p>
+              <div className="sg-rx__codebox">
+                <h1 className="sg-rx__code sg-a sg-slam" aria-label={`Room code ${roomCode}`} data-testid="room-code">{roomCode}</h1>
+                <button type="button" onClick={copyRoomCode} className="sg-rx__copy" title="Copy room code" aria-label="Copy room code">
+                  {copied ? <Check size={28} strokeWidth={3} /> : <Copy size={26} />}
+                </button>
+              </div>
+              <p className="sg-rx__lede sg-a sg-rise" style={{ animationDelay: '200ms' }}>
+                {qrUrl ? 'Scan the code, or join on your phone at ' : 'Join on your phone at '}
+                <span style={{ whiteSpace: 'nowrap' }}>{joinAt}</span>
+              </p>
             </div>
-            <p className="sg-rx__lede sg-a sg-rise" style={{ animationDelay: '200ms' }}>
-              {qrUrl ? 'Scan the code, or join on your phone at ' : 'Join on your phone at '}
-              <span style={{ whiteSpace: 'nowrap' }}>{joinAt}</span>
-            </p>
-          </>
+            {qrUrl && (
+              <figure className="sg-rx__qr sg-a sg-pop">
+                <RoomQrCode value={qrUrl} title={`QR code to join room ${roomCode}`} data-testid="room-qr" />
+                <figcaption>Scan to join</figcaption>
+              </figure>
+            )}
+          </div>
         )}
 
         <p className="sg-rx__lede sg-rx__wait" data-testid="reactor-host-hint">
