@@ -303,3 +303,23 @@
   .sg-rx__leave span { display: none; }
   .sg-rx__alert { font-size: 13px; letter-spacing: 0.03em; padding: 8px 14px; }
 }
+
+/* The QR code beside the room code: scanning opens the join page with the code filled in.
+   About as tall as the code itself, so it reads from across the room and leaves the faces room. */
+.sg-rx__codebox--qr { flex-wrap: wrap; row-gap: 12px; }
+.sg-rx__codebox--qr .sg-rx__code { font-size: clamp(64px, min(19vw, 34vh), 380px); }
+.sg-rx__qr {
+  margin: 0 0 0 clamp(8px, 1.6vw, 32px);
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(6px, 0.7vw, 12px) clamp(6px, 0.7vw, 12px) clamp(4px, 0.5vw, 8px);
+  gap: 2px;
+  background: #fff;
+  color: var(--sg-ink, #111);
+  border-radius: clamp(14px, 1.6vw, 24px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+}
+.sg-rx__qr svg { display: block; width: clamp(120px, min(16vw, 24vh), 360px); height: auto; }
+.sg-rx__qr figcaption { font-weight: 900; font-size: clamp(11px, 1vw, 18px); letter-spacing: 0.08em; text-transform: uppercase; }

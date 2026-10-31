@@ -27,3 +27,18 @@ export function buildRoomInviteUrl(roomCode, origin = window.location.origin) {
     url.searchParams.set(ROOM_QUERY_PARAM, normalizedRoomCode);
     return url.toString();
 }
+
+// Tells the join apart from a link pasted into a group chat (the join event reports it).
+export const JOIN_VIA_QUERY_PARAM = 'via';
+
+// The link the reactor's QR code opens: the invite link, marked as a scan. A reactor on the
+// beta channel (a cookie set by ?beta=1) hands phones the beta too, or they would join prod.
+export function buildRoomQrUrl(roomCode, { origin = window.location.origin, beta = false } = {}) {
+    const inviteUrl = buildRoomInviteUrl(roomCode, origin);
+    if (!inviteUrl) return '';
+
+    const url = new URL(inviteUrl);
+    url.searchParams.set(JOIN_VIA_QUERY_PARAM, 'qr');
+    if (beta) url.searchParams.set('beta', '1');
+    return url.toString();
+}
