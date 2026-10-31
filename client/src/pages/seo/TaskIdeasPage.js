@@ -213,7 +213,7 @@ function TaskIdeasPage() {
         <SeoPageLayout>
             <div className="seo-hero">
                 <p className="seo-eyebrow">
-                    <a href="/among-us-irl" style={{ color: '#a5b4fc', textDecoration: 'none' }}>
+                    <a href="/among-us-irl" style={{ color: "inherit" }}>
                         Among Us IRL
                     </a>{' '}
                     › Task ideas

@@ -183,7 +183,7 @@ test("a task pack from the generator becomes the room's tasks", async ({ browser
     await host.getByText('Start Game').click();
     const intruder = await h.revealRoles(phones);
     const crewmate = phones.find(phone => phone !== intruder);
-    const shown = await crewmate.getByTestId('task-location').locator('..').textContent();
+    const shown = await crewmate.getByTestId('current-task').textContent();
     expect(pack.some(task => shown.includes(task)), `"${shown}" is a task from the pack`).toBe(true);
 
     h.expectNoPageErrors(phones);

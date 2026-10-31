@@ -61,25 +61,25 @@ export function ReactorModeBanner({ variant = 'full', className = '', showSwitch
                 <h2><Speaker size={22} /> Sonos integration</h2>
                 <p>
                     Optional. Pipe meeting calls, meltdown alarms, and round audio through a Sonos speaker for in-room ambience.
-                    Configure it on the Reactor screen after creating a game.
+                    Run the free connector on a computer on your Sonos network and enter the room code.
                 </p>
                 <details>
                     <summary><ChevronRight size={14} /> How does it work?</summary>
                     <div>
                         <p>
-                            Sus Party can connect to a Sonos speaker on your local network and play sound effects through it instead of (or in addition to) the Reactor's own speakers.
+                            A small connector app runs on a computer on the same Wi-Fi as your Sonos speakers. It joins your game with the room code and plays the game's sound effects through the speaker you choose.
                         </p>
                         <ul>
                             <li>Meeting calls and meltdown alarms become room-filling.</li>
                             <li>Players hear cues even when their phone is silent.</li>
-                            <li>Setup happens on the Reactor screen. Pick a speaker from the dropdown.</li>
+                            <li>Download the connector, run it, type your room code, and pick a speaker when it asks.</li>
                         </ul>
                         <p>
-                            Requires the Reactor device and the Sonos speaker on the same Wi-Fi network. Skip it if you don't have one. The game runs fine without it.
+                            The computer running the connector must be on the same Wi-Fi as the speaker. Skip it if you don't have one. The game runs fine without it.
                         </p>
                         <p>
                             <a href="https://github.com/siacavazzi/amogus-sonos-connector" target="_blank" rel="noopener noreferrer">
-                                Sonos connector source on GitHub
+                                Get the Sonos connector
                             </a>
                         </p>
                     </div>
