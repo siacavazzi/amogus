@@ -56,7 +56,7 @@ test('an invite link opened before the room is open gets in once the host opens 
     await host.goto('/play');
     await host.getByRole('button', { name: 'Skip for now' }).click({ timeout: 5000 }).catch(() => {});
     await host.getByText('Create New Game').click();
-    await host.getByText('Add Example List').click();
+    await h.addExampleList(host);
     const code = await host.evaluate(() => localStorage.getItem('room_code'));
 
     await early.goto(`/play?room=${code}`);

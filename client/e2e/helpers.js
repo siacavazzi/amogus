@@ -66,6 +66,14 @@ async function skipTutorialPrompt(page) {
 //               deck: { 'EMP': 1, 'Fake Task': 1, ... } (a custom deck; unnamed cards are set to 0),
 //               groupTasks: true (no list; the room writes its tasks together in the lobby),
 //               meetingQuorum: false (big games wait for everyone to slide ready, not 80%) }
+// Adds the example list and waits for it to land in "Your saved lists". That list refreshes a
+// moment after the add and pushes "Use This Task List" down the page; a tap in that moment
+// (Safari, on the live beta) went down on the button and came up beside it, so nothing happened.
+async function addExampleList(page) {
+    await page.getByText('Add Example List').first().click();
+    await expect(page.locator('.hs-listrow__meta').first()).toHaveText(/\d+ tasks · [A-Z0-9]{6}/);
+}
+
 async function setUpRoom(page, settings = {}) {
     await page.goto('/play');
     await skipTutorialPrompt(page);
@@ -73,7 +81,7 @@ async function setUpRoom(page, settings = {}) {
     if (settings.groupTasks) {
         await page.getByRole('button', { name: /Create Tasks with Group/ }).click();
     } else {
-        await page.getByText('Add Example List').first().click();
+        await addExampleList(page);
         await page.getByText('Use This Task List').first().click();
     }
     await expect(page.getByRole('heading', { name: 'Game settings' })).toBeVisible();
@@ -382,6 +390,6 @@ function expectNoPageErrors(pages) {
 }
 
 module.exports = {
-    lock, goOffline, goOnline, tapAndConfirm, openPage, closeAll, skipTutorialPrompt, openPhones, openPhone, openReactor, createRoom, createRoomOnPhone, gatherRoom, readyUp, connectReactor, joinRoom, enterName, revealRoles, revealAllRoles, swipe, hold, callMeeting, vote,
+    lock, goOffline, goOnline, tapAndConfirm, addExampleList, openPage, closeAll, skipTutorialPrompt, openPhones, openPhone, openReactor, createRoom, createRoomOnPhone, gatherRoom, readyUp, connectReactor, joinRoom, enterName, revealRoles, revealAllRoles, swipe, hold, callMeeting, vote,
     continueAfterResults, voteOutIntruder, roundButton, addTasks, openVent, playCard, dismissMessage, expectLobby, expectNoPageErrors, sleep,
 };

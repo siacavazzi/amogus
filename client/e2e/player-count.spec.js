@@ -14,7 +14,7 @@ test('setup starts on Auto and eight players get two intruders', async ({ browse
     await host.goto('/play');
     await h.skipTutorialPrompt(host);
     await host.getByText('Create New Game').first().click();
-    await host.getByText('Add Example List').first().click();
+    await h.addExampleList(host);
     await host.getByText('Use This Task List').first().click();
     await expect(host.getByRole('button', { name: 'Auto', exact: true })).toHaveAttribute('aria-pressed', 'true');
     await expect(host.getByTestId('intruder-advice')).toContainText('1 intruder per 5 players');
