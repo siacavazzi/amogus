@@ -44,14 +44,8 @@ test('sixteen phones in a room made on the reactor: the first phone hosts and st
     for (const phone of phones) await expect(phone.getByRole('button', { name: `Players (${NAMES.length})` }), phone.person).toBeVisible();
     for (const guest of guests) await expect(guest.getByText('Waiting for host to start the game...'), guest.person).toBeVisible();
 
-    // The example list has 34 tasks and a room needs 3 per player, so sixteen phones can't
-    // start on it alone. The host lets everyone add tasks and the room writes the rest.
-    await expect(host.getByText('Need at least 48 tasks. The room has 34.')).toBeVisible();
-    await host.getByRole('button', { name: /^Tasks \(/ }).click();
-    await host.getByTitle('Tap to let everyone add tasks').click();
-    await expect(guests[0].getByText('Only the host can add tasks right now')).toHaveCount(0);
-    await Promise.all([h.addTasks(host, 4), h.addTasks(guests[0], 5), h.addTasks(guests[1], 5)]);
-
+    // The example list has enough tasks for a room this size, so the host can start straight away.
+    await expect(host.getByText('Start Game')).toBeVisible();
     await host.getByText('Start Game').click();
     let intruders = 0;
     for (const phone of phones) {
@@ -63,6 +57,64 @@ test('sixteen phones in a room made on the reactor: the first phone hosts and st
     expect(intruders, 'the two intruders the reactor asked for').toBe(2);
     for (const phone of phones) await expect(h.roundButton(phone), phone.person).toBeVisible();
     await expect(reactor.getByRole('progressbar')).toBeVisible();
+
+    h.expectNoPageErrors([...phones, reactor]);
+});
+
+// A whole game at a big party's size, start to finish and into a second round: every phone has
+// to reveal, ready up, vote and see the result, and nothing may wait on a phone forever.
+test('thirty phones play a whole round with a meeting and vote, then start another', async ({ browser }) => {
+    test.setTimeout(15 * 60 * 1000);
+    const names = Array.from({ length: 30 }, (_, i) => `P${String(i + 1).padStart(2, '0')}`);
+    const reactor = await h.openReactor(browser);
+    const code = await h.createRoom(reactor, { intruders: 1 });
+
+    const phones = await h.openPhones(browser, names);
+    const [host, ...guests] = phones;
+    await h.joinRoom(host, code);
+    // A crowd joins in waves of ten, as people find the link at different moments.
+    for (let i = 0; i < guests.length; i += 10) await Promise.all(guests.slice(i, i + 10).map(phone => h.joinRoom(phone, code)));
+    await expect(reactor.getByText('30 players connected')).toBeVisible();
+    for (const phone of phones) await expect(phone.getByRole('button', { name: 'Players (30)' }), phone.person).toBeVisible();
+
+    // Thirty phones need 90 tasks; the room writes what the example list is short of.
+    const needed = host.getByText(/^Need at least \d+ tasks\. The room has \d+\.$/);
+    if (await needed.isVisible()) {
+        const [, want, have] = (await needed.textContent()).match(/(\d+) tasks\. The room has (\d+)/).map(Number);
+        await host.getByRole('button', { name: /^Tasks \(/ }).click();
+        await host.getByTitle('Tap to let everyone add tasks').click();
+        await host.getByRole('button', { name: /^Players \(/ }).click();
+        const writers = guests.slice(0, 4);
+        const each = Math.ceil((want - have) / writers.length);
+        await Promise.all(writers.map(phone => h.addTasks(phone, each)));
+        await expect(needed).toBeHidden();
+    }
+
+    await host.getByText('Start Game').click();
+    const intruder = await h.revealRoles(phones);
+    for (const phone of phones) await expect(h.roundButton(phone), phone.person).toBeVisible();
+    const crew = phones.filter(phone => phone !== intruder);
+
+    // Some tasks get done, and the big screen's bar moves.
+    await Promise.all(crew.slice(0, 6).map(phone => h.swipe(phone)));
+    await expect(reactor.getByRole('progressbar')).not.toHaveAttribute('aria-valuenow', '0', { timeout: 20000 });
+
+    // A meeting: all thirty ready up, all thirty vote, and the intruder goes.
+    await crew[3].getByText('CALL MEETING').click();
+    await expect(crew[3].getByTestId('ready-count')).toHaveText('0 of 30 ready');
+    await h.readyUp(phones);
+    for (const phone of phones) await expect(phone.getByText('Select a Player'), phone.person).toBeVisible({ timeout: 30000 });
+    await h.vote(phones.map(phone => [phone, phone === intruder ? crew[0] : intruder]));
+    await h.continueAfterResults(phones);
+    for (const phone of phones) await expect(phone.getByText('Crewmates Win!'), phone.person).toBeVisible({ timeout: 30000 });
+
+    // Everyone goes again.
+    for (const phone of phones) await phone.getByRole('button', { name: /Play Again/ }).click();
+    for (const phone of phones) await h.expectLobby(phone);
+    await expect(host.getByRole('button', { name: 'Players (30)' })).toBeVisible();
+    await host.getByText('Start Game').click();
+    await h.revealRoles(phones);
+    for (const phone of phones) await expect(h.roundButton(phone), phone.person).toBeVisible();
 
     h.expectNoPageErrors([...phones, reactor]);
 });

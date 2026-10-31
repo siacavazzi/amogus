@@ -37,6 +37,9 @@ class PlayInterruptionTests(SocketGameTestCase):
                 self.assertEqual('voting', game.meeting.stage)
 
     def start_manual_meltdown(self, client, pid, game):
+        # Codes are typed in at the reactor, so a meltdown needs one connected.
+        reactor = self.make_client()
+        reactor.emit('register_reactor', {'room_code': game.room_code})
         # Drive the real countdown synchronously with a controlled sleep boundary.
         with patch('assets.meltdown.eventlet.spawn'):
             client.emit('meltdown', {'player_id': pid})

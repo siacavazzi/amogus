@@ -30,8 +30,12 @@ body.htp-document #root { overflow: visible; overflow-x: clip; }
 .htp-section > p { color: var(--site-body); margin: 24px 0 0; }
 .htp-role-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .htp-card--role { display: block; border-top: 0; padding: 24px; border-radius: 22px; color: #fff; }
-.htp-card--crew { background: var(--sg-round); }
-.htp-card--intruder { background: var(--sg-dark); }
+/* Only the two role cards are filled panels; the other cards are ruled rows in page ink,
+   with the tone on their top rule (a dark fill under ink text made them unreadable). */
+.htp-card--role.htp-card--crew { background: var(--sg-round); }
+.htp-card--role.htp-card--intruder { background: var(--sg-dark); }
+.htp-card--crew:not(.htp-card--role) { border-top-color: var(--sg-round); }
+.htp-card--intruder:not(.htp-card--role) { border-top-color: #e5484d; }
 .htp-role-card__header { margin-bottom: 14px; }
 .htp-role-card__label { display: inline-block; border: 2px solid currentColor; border-radius: 999px; padding: 2px 12px; font-size: .88rem; font-weight: 800; }
 .htp-card--crew .htp-role-card__label { color: #fff; }

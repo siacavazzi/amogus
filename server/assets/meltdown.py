@@ -88,7 +88,8 @@ class Meltdown:
                 return
             for index, player in enumerate(self.living_players):
                 player.meltdown_code = self.valid_pins[index]
-                self.socketio.emit("meltdown_code", self.valid_pins[index], to=player.sid)
+                if player.sid:  # to=None would send the code to every room; an offline player gets it on rejoin
+                    self.socketio.emit("meltdown_code", self.valid_pins[index], to=player.sid)
                 print(f"sending code {self.valid_pins[index]} to {player.sid}")
             if self.game:
                 self.game.revision += 1

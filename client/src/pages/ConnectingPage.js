@@ -45,10 +45,18 @@ function ConnectingPage() {
       setStatusText('Taking longer than expected...');
     }, 3000);
 
-    // Reload after 6 seconds if still connecting
-    const reloadTimer = setTimeout(() => {
+    // Reload after 6 seconds if still connecting. Not while the phone is offline: a reload then
+    // lands on the browser's "no internet" page, which never comes back by itself. Wait for the
+    // connection instead (the socket usually reconnects on its own first).
+    let reloadTimer;
+    const reloadWhenOnline = () => {
+      if (navigator.onLine === false) {
+        reloadTimer = setTimeout(reloadWhenOnline, 1000);
+        return;
+      }
       window.location.reload();
-    }, 6000);
+    };
+    reloadTimer = setTimeout(reloadWhenOnline, 6000);
 
     return () => {
       clearInterval(fastInterval);

@@ -9,6 +9,17 @@ const createHowlMock = (options) => {
     const sound = {
         options,
         isLooping: false,
+        handlers: {},
+        on: jest.fn((event, handler) => {
+            (sound.handlers[event] ||= []).push(handler);
+            return sound;
+        }),
+        off: jest.fn((event, handler) => {
+            sound.handlers[event] = (sound.handlers[event] || []).filter((h) => h !== handler);
+            return sound;
+        }),
+        // What Howler does when a sound reaches its end
+        finish: () => (sound.handlers.end || []).slice().forEach((handler) => handler()),
         play: jest.fn(),
         stop: jest.fn(),
         pause: jest.fn(),
@@ -71,24 +82,68 @@ describe('AudioHandler', () => {
         jest.useRealTimers();
     });
 
-    it('returns a loop to non-loop mode when stop_sound arrives early', () => {
+    beforeEach(() => {
+        mockHowls.forEach((sound) => {
+            sound.handlers = {};
+            sound.play.mockClear();
+            sound.stop.mockClear();
+        });
+    });
+
+    it('loops a sound by playing it again each time it ends, until the duration is up', () => {
         const socket = createSocket();
         const { unmount } = mountAudioHandler(socket);
         const meltdown = soundFor('meltdown');
         act(() => socket.trigger('loop_sound', { sound: 'meltdown', duration: 30 }));
+        expect(meltdown.play).toHaveBeenCalledTimes(1);
 
-        expect(meltdown.isLooping).toBe(true);
+        act(() => jest.advanceTimersByTime(5000));
+        act(() => meltdown.finish());
+        act(() => jest.advanceTimersByTime(0));
+        expect(meltdown.play).toHaveBeenCalledTimes(2);
+
+        act(() => jest.advanceTimersByTime(25000));
+        expect(meltdown.stop).toHaveBeenCalled();
+        act(() => meltdown.finish());
+        act(() => jest.advanceTimersByTime(1000));
+        expect(meltdown.play).toHaveBeenCalledTimes(2);
+        unmount();
+    });
+
+    it('plays a sound with no length once instead of looping it forever', () => {
+        // Howler reports an unreadable file as 0 seconds long and ends it the moment it starts.
+        // Its own loop then replayed it in one call stack until the page crashed (seen in Safari).
+        const socket = createSocket();
+        const { unmount } = mountAudioHandler(socket);
+        const meltdown = soundFor('meltdown');
+        meltdown.play.mockImplementation(() => meltdown.finish());
+
+        act(() => socket.trigger('loop_sound', { sound: 'meltdown', duration: 30 }));
+        act(() => jest.advanceTimersByTime(30000));
+
+        expect(meltdown.play).toHaveBeenCalledTimes(1);
+        expect(meltdown.loop).not.toHaveBeenCalledWith(true);
+        meltdown.play.mockImplementation(() => {});
+        unmount();
+    });
+
+    it('stops a loop when stop_sound arrives early', () => {
+        const socket = createSocket();
+        const { unmount } = mountAudioHandler(socket);
+        const meltdown = soundFor('meltdown');
+        act(() => socket.trigger('loop_sound', { sound: 'meltdown', duration: 30 }));
         expect(meltdown.play).toHaveBeenCalledTimes(1);
         meltdown.stop.mockClear();
-        meltdown.loop.mockClear();
 
         act(() => socket.trigger('stop_sound'));
-
         expect(meltdown.stop).toHaveBeenCalledTimes(1);
         expect(meltdown.loop).toHaveBeenLastCalledWith(false);
-        expect(meltdown.isLooping).toBe(false);
 
+        // A late 'end' doesn't start it again, and the duration timer doesn't stop it twice.
+        act(() => jest.advanceTimersByTime(5000));
+        act(() => meltdown.finish());
         act(() => jest.advanceTimersByTime(30000));
+        expect(meltdown.play).toHaveBeenCalledTimes(1);
         expect(meltdown.stop).toHaveBeenCalledTimes(1);
         unmount();
     });

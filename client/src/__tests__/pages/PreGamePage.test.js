@@ -178,7 +178,7 @@ describe('PreGamePage', () => {
 
             await waitFor(() => {
                 expect(screen.queryByRole('button', { name: /start game/i })).not.toBeInTheDocument();
-                expect(screen.getByText(/Need 2 more tasks total/i)).toBeInTheDocument();
+                expect(screen.getByText(/Add 2 more tasks to start/i)).toBeInTheDocument();
             });
 
             simulateSocketEvent(contextValue.socket, 'collaborative_tasks', {
@@ -259,6 +259,45 @@ describe('PreGamePage', () => {
             fireEvent.click(screen.getByRole('button', { name: /start test game/i }));
             expect(contextValue.socket.emit).toHaveBeenCalledWith('start_game', expect.objectContaining({ test_mode: true }));
             expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        });
+
+        const shortOnTasks = (overrides = {}) => ({
+            room_code: 'TEST1', revision: 2, round_id: 'round-1',
+            locations: ['Kitchen', 'Yard', 'Other'],
+            tasks: Array.from({ length: 30 }, (_, index) => ({ task: `Task ${index}`, location: index % 2 ? 'Yard' : 'Kitchen' })),
+            min_tasks: 36, task_list_code: null, task_list_name: null, collaborative_mode: false,
+            can_start: false, can_start_test: false, start_reason: 'too_few_tasks', tasks_missing: 6,
+            start_error: 'Add 6 more tasks to start. 12 players need 36; the room has 30.',
+            ...overrides,
+        });
+
+        it('tells a host short on tasks how many to add and lets everyone help', () => {
+            const { contextValue } = renderWithContext(<PreGamePage />, {
+                ...defaultContext,
+                taskLocations: ['Kitchen', 'Yard', 'Other'],
+                isRoomCreator: true,
+            });
+            act(() => simulateSocketEvent(contextValue.socket, 'lobby_state', shortOnTasks()));
+
+            expect(screen.getByText('Add 6 more tasks to start. 12 players need 36; the room has 30.')).toBeInTheDocument();
+            fireEvent.click(screen.getByRole('button', { name: /let everyone help/i }));
+            expect(contextValue.socket.emit).toHaveBeenCalledWith('toggle_collaborative_mode', { room_code: 'TEST1', enabled: true });
+            expect(screen.getByRole('button', { name: /^Tasks/i })).toHaveAttribute('aria-pressed', 'true');
+        });
+
+        it('asks guests to add tasks once everyone can', () => {
+            const { contextValue } = renderWithContext(<PreGamePage />, {
+                ...defaultContext,
+                taskLocations: ['Kitchen', 'Yard', 'Other'],
+                isRoomCreator: false,
+            });
+            act(() => simulateSocketEvent(contextValue.socket, 'lobby_state', shortOnTasks()));
+            expect(screen.getByText(/Waiting for host to start the game/i)).toBeInTheDocument();
+
+            act(() => simulateSocketEvent(contextValue.socket, 'lobby_state', shortOnTasks({ revision: 3, collaborative_mode: true })));
+            expect(screen.getByText(/The room needs 6 more tasks before the host can start/i)).toBeInTheDocument();
+            fireEvent.click(screen.getByRole('button', { name: /add tasks/i }));
+            expect(screen.getByRole('button', { name: /^Tasks/i })).toHaveAttribute('aria-pressed', 'true');
         });
 
         it('ignores lobby snapshots for a different room', () => {

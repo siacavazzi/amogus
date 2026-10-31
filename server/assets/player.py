@@ -91,6 +91,11 @@ class Player:
         self.pic = pic
         self.selfie = selfie  # Filename of selfie image (e.g., "abc123.jpg")
         self.active = True
+        self.disconnected_at = None
+        # Offline long enough that the room stops waiting for them (see app.mark_absent_if_still_gone)
+        self.absent = False
+        # Tapped Leave mid-round: kept until the round ends so the result counts them, then removed
+        self.left = False
         
         self.alive = True
         self.task = None
@@ -109,6 +114,12 @@ class Player:
         
     def disconnect(self):
         self.active = False
+
+    def reconnect(self, sid):
+        self.sid = sid
+        self.active = True
+        self.absent = False
+        self.disconnected_at = None
 
     def reset(self):
         """Reset player state for a new game (keeps identity)."""
@@ -142,20 +153,21 @@ class Player:
     def remove_card(self, card):
         self.cards.remove(card)
 
-    def to_json(self):
-        # Convert the object's attributes to a dictionary
-        print("Debug - self.cards:", self.cards)
+    def to_json(self, show_role=True, show_secrets=True):
+        """Serialize the player. Other phones get show_role only when the role is known to
+        them, and show_secrets (cards, meltdown code) only for the player's own phone."""
         return json.dumps({
             "sid": self.sid,
             "player_id": self.player_id,
             "username": self.username,
             "active": self.active,
-            "sus": self.sus,
+            "absent": self.absent,
+            "sus": self.sus if show_role else False,
             "alive": self.alive,
             "pic": self.pic,
             "selfie": self.selfie,
-            "meltdown_code": self.meltdown_code,
-            "cards": [card.export() for card in self.cards if hasattr(card, 'export')],
+            "meltdown_code": self.meltdown_code if show_secrets else None,
+            "cards": [card.export() for card in self.cards if hasattr(card, 'export')] if show_secrets else [],
             "ready": self.ready,
             "death_cause": self.death_cause,
             "death_message": self.death_message

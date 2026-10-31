@@ -25,9 +25,14 @@ async function openPage(browser, name, options) {
         await context.addCookies([{ name: 'sus_channel', value: 'beta', domain: hostname, path: '/' }]);
     }
     const page = await context.newPage();
+    await routeSocket(page);
     page.person = name;
     page.errors = [];
-    page.on('pageerror', error => page.errors.push(error.message));
+    page.on('pageerror', error => {
+        page.errors.push(error.message);
+        // The stack says where it broke, which the message alone doesn't (Safari's especially).
+        console.log(`[${name}] page error: ${error.stack || error.message}`);
+    });
     // Confirm prompts ("Did the intruder get you?") get a yes, as the person meant to tap it.
     page.on('dialog', dialog => dialog.accept());
     return page;
@@ -142,6 +147,74 @@ async function hold(page, locator, ms) {
     await page.mouse.down();
     await sleep(ms);
     return async () => page.mouse.up();
+}
+
+// Tap a button that asks "Are you sure?" (window.confirm). In Playwright's WebKit a real tap that
+// opens a confirm never returns, and a tap sent from the page doesn't get the dialog handler's yes
+// either, so there the page's confirm says yes for that one tap. Safari on a phone shows the dialog.
+async function tapAndConfirm(locator) {
+    if (!isWebKit(locator.page())) return locator.click();
+    await expect(locator).toBeVisible();
+    await locator.evaluate(button => {
+        const ask = window.confirm;
+        window.confirm = () => true;
+        try { button.click(); } finally { window.confirm = ask; }
+    });
+}
+
+const isWebKit = page => page.context().browser().browserType().name() === 'webkit';
+
+// The game's socket goes through Playwright, so goOffline cuts it at once, as a phone losing its
+// connection does. setOffline alone doesn't: Playwright's WebKit keeps an open WebSocket working,
+// and Chromium sometimes keeps it until the ping timeout (on localhost especially), which hid
+// what the app does when the drop is noticed straight away.
+async function routeSocket(page) {
+    page.sockets = [];
+    await page.routeWebSocket(/socket\.io/, ws => {
+        if (page.offline) return ws.close({ code: 1006, reason: 'offline' });
+        page.sockets.push(ws);
+        ws.connectToServer();
+    });
+}
+
+// Cut a page off the network (and its game socket with it), or bring it back.
+async function goOffline(page) {
+    page.offline = true;
+    await page.context().setOffline(true);
+    for (const ws of page.sockets.splice(0)) await ws.close({ code: 1006, reason: 'offline' }).catch(() => {});
+}
+
+async function goOnline(page) {
+    page.offline = false;
+    await page.context().setOffline(false);
+}
+
+// Lock a phone the way an iPhone does in a pocket: the page goes hidden, its JavaScript stops,
+// and its connection drops. Returns unlock(), which brings it back in the same order a phone does.
+// Chromium only: it pauses the page's JavaScript through the DevTools protocol. (Chromium's own
+// "frozen" page state breaks localStorage after it resumes, which phones don't do.)
+async function lock(page) {
+    const cdp = await page.context().newCDPSession(page);
+    const setVisible = visible => page.evaluate(shown => {
+        Object.defineProperty(document, 'visibilityState', { value: shown ? 'visible' : 'hidden', configurable: true });
+        Object.defineProperty(document, 'hidden', { value: !shown, configurable: true });
+        document.dispatchEvent(new Event('visibilitychange'));
+    }, visible);
+    await setVisible(false);
+    await goOffline(page);
+    await cdp.send('Debugger.enable');
+    await cdp.send('Debugger.pause');
+    return async () => {
+        await goOnline(page);
+        await cdp.send('Debugger.resume');
+        await cdp.send('Debugger.disable').catch(() => {});
+        // The connecting screen's reload timer ran out while the phone was locked, so it can
+        // reload the page the moment it wakes, as an iPhone does. A fresh page is visible anyway.
+        await setVisible(true).catch(error => {
+            if (!/context was destroyed|navigat/i.test(error.message)) throw error;
+        });
+        await cdp.detach().catch(() => {});
+    };
 }
 
 // Every phone peeks at its role; returns the intruder's page.
@@ -286,6 +359,6 @@ function expectNoPageErrors(pages) {
 }
 
 module.exports = {
-    openPage, closeAll, openPhones, openPhone, openReactor, createRoom, createRoomOnPhone, gatherRoom, readyUp, connectReactor, joinRoom, enterName, revealRoles, swipe, hold, callMeeting, vote,
+    lock, goOffline, goOnline, tapAndConfirm, openPage, closeAll, openPhones, openPhone, openReactor, createRoom, createRoomOnPhone, gatherRoom, readyUp, connectReactor, joinRoom, enterName, revealRoles, swipe, hold, callMeeting, vote,
     continueAfterResults, voteOutIntruder, roundButton, addTasks, openVent, playCard, dismissMessage, expectLobby, expectNoPageErrors, sleep, skipTutorialPrompt,
 };

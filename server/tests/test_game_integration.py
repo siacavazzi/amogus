@@ -108,7 +108,7 @@ class GameIntegrationTests(SocketGameTestCase):
         rejoin_client.emit("rejoin", {"player_id": crew_player.player_id})
         rejoin_events = self.drain(rejoin_client)
 
-        self.assertEqual({"room_code": room_code, "is_creator": crew_player.player_id == game.creator_player_id}, self.first_event(rejoin_events, "game_joined"))
+        self.assertEqual({"room_code": room_code, "is_creator": crew_player.player_id == game.creator_player_id, "is_open": True}, self.first_event(rejoin_events, "game_joined"))
         self.assertTrue(self.has_event(rejoin_events, "game_start"))
         self.assertEqual(1, self.first_event(rejoin_events, "crew_score")["score"])
         self.assertEqual(game.round_id, self.first_event(rejoin_events, "crew_score")["round_id"])

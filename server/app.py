@@ -64,6 +64,9 @@ game_manager = GameManager(socketio, speaker, game_config, selfie_store=selfie_s
 task_list_manager = TaskListManager()
 
 client_metrics_by_sid = {}
+# How long a player can be offline before the room stops waiting for them: meetings and Play Again
+# go on without them, the host role moves on, and they aren't dealt into the next round.
+ABSENT_AFTER_SECONDS = 20
 # Sockets from the automated end-to-end run. Their rooms stay out of usage stats and logs.
 synthetic_sids = set()
 
@@ -164,7 +167,7 @@ def broadcast_lobby(game):
 
 
 def sendPlayerList(game, room_code, action='player_list'):
-    game.emit_to_room('game_data', {'action': action, 'list': [p.to_json() for p in game.players]})
+    game.emit_player_list(action)
     broadcast_lobby(game)
 
 
@@ -175,14 +178,16 @@ def get_min_tasks_needed(game):
 def record_usage(event, game=None, player_id=None, resolve_game=True, **fields):
     """Record allowlisted metadata without a gameplay dependency on stats writes."""
     try:
+        # Background timers (an absence check) run without a socket request.
+        sid = request.sid if has_request_context() else None
         if game is None and resolve_game:
-            game, _ = game_manager.get_game_by_sid(request.sid)
-        if request.sid in synthetic_sids or getattr(game, 'synthetic', False):
+            game, _ = game_manager.get_game_by_sid(sid)
+        if sid in synthetic_sids or getattr(game, 'synthetic', False):
             return
         game_manager.stats_tracker.record_event(
-            event, game, player_id, connection_id=request.sid,
+            event, game, player_id, connection_id=sid,
             phase='ended' if game and game.end_state else 'round' if game and game.game_running else 'lobby',
-            **client_metrics_by_sid.get(request.sid, {}), **fields)
+            **client_metrics_by_sid.get(sid, {}), **fields)
     except Exception:
         logger.exception('Usage event write failed')
 
@@ -350,7 +355,17 @@ def admin_stats():
 @app.route('/health')
 def health_check():
     """Health check endpoint for load balancers and monitoring."""
-    return {'status': 'healthy', 'games': len(game_manager.games), 'version': VERSION}, 200
+    # Rooms that real people are in right now (test rooms left out), so a deploy can wait for
+    # rounds to finish before it restarts the server and drops them.
+    in_use = [game for game in list(game_manager.games.values())
+              if not getattr(game, 'synthetic', False) and any(player.active for player in game.players)]
+    return {
+        'status': 'healthy',
+        'games': len(game_manager.games),
+        'rooms_in_use': len(in_use),
+        'rounds_running': sum(1 for game in in_use if game.game_running),
+        'version': VERSION,
+    }, 200
 
 
 @app.route('/api/version')
@@ -380,11 +395,12 @@ def handle_create_game(data=None):
     acquisition = data.get('acquisition') if isinstance(data, dict) else None
     room_code, game = game_manager.create_game(sid, acquisition, synthetic=sid in synthetic_sids)
     game.creator_sid = sid  # Track room creator
+    game.host_token = secrets.token_urlsafe(16)
     record_usage('host_entered', game, flush=True)
     join_room(room_code)
     
     logger.info(f"Game created with room code: {room_code}")
-    emit('game_created', {'room_code': room_code, 'is_creator': True})
+    emit('game_created', {'room_code': room_code, 'is_creator': True, 'host_token': game.host_token})
     emit('game_config', game.get_config())
 
 
@@ -472,7 +488,14 @@ def handle_join_game(data):
         logger.warning(f"Join attempt for non-existent room: {room_code}")
         return
     
-    if not game.is_open:
+    # The host coming back to setup (a dropped connection or a reload) before they have a player.
+    host_token = data.get('host_token')
+    host_returning = bool(
+        isinstance(host_token, str) and game.host_token and game.creator_player_id is None
+        and secrets.compare_digest(host_token, game.host_token)
+    )
+
+    if not game.is_open and not host_returning:
         room_entry_error('room_not_open', room_code,
                          'This room is not open yet. Ask the host to open it, then try again.')
         logger.warning(f"Join attempt for not-yet-open room: {room_code}")
@@ -493,6 +516,10 @@ def handle_join_game(data):
         is_creator = True
         game.creator_sid = sid  # Update the socket ID
         logger.info(f"Creator {player_id} reconnected to room {room_code}")
+    elif host_returning:
+        is_creator = True
+        game.creator_sid = sid
+        logger.info(f"Host returned to setup of room {room_code}")
     elif game.creator_player_id is None and (
         sid == game.creator_sid or not is_sid_connected_to_room(game.creator_sid, room_code)
     ):
@@ -500,10 +527,10 @@ def handle_join_game(data):
         game.creator_sid = sid
         logger.info(f"Creator socket refreshed for room {room_code}")
     
-    emit('game_joined', {'room_code': room_code, 'is_creator': is_creator})
+    emit('game_joined', {'room_code': room_code, 'is_creator': is_creator, 'is_open': game.is_open})
     emit('task_locations', game.locations)
     # Lets the avatar picker show which avatars are taken before this socket joins as a player.
-    emit('game_data', {**metadata(game), 'action': 'player_list', 'list': [p.to_json() for p in game.players]})
+    emit('game_data', {**metadata(game), 'action': 'player_list', 'list': game.player_view()})
     record_usage('room_entered', game, is_creator=is_creator)
     logger.info(f"Client {sid} joined room {room_code}, is_creator={is_creator}")
 
@@ -553,12 +580,8 @@ def handle_register_reactor(data):
         emit('error', {'message': 'Game not found'})
         return
     
-    # Allow re-registration if already the reactor (e.g., after reconnect)
-    # Only block new reactors from registering while game is running
-    if game.game_running and game.reactor_sid != sid and game.reactor_sid is not None:
-        emit('error', {'message': 'Cannot register reactor after game has started'})
-        return
-    
+    # The newest big screen takes over, mid-round too. After a wifi blink the server can still hold
+    # the old socket for up to the ping timeout, and refusing the new one froze the big screen.
     # Register this client as the reactor
     game.has_reactor = True
     game.reactor_sid = sid
@@ -576,7 +599,7 @@ def handle_register_reactor(data):
         'is_creator': game.creator_sid == sid,
     })
     emit('task_locations', game.locations)
-    emit('game_data', {**metadata(game), 'action': 'rejoin', 'list': [player.to_json() for player in game.players]})
+    emit('game_data', {**metadata(game), 'action': 'rejoin', 'list': game.player_view()})
     
     # If game is running, send current game state to reactor
     if game.game_running:
@@ -657,8 +680,7 @@ def handleRejoin(data):
     
     logger.info(f"Player {player_id} rejoining room {room_code}, creator_player_id={game.creator_player_id}")
     record_reconnect(game, player)
-    player.sid = request.sid
-    player.active = True
+    player.reconnect(request.sid)
     game_manager.update_sid(player_id, request.sid)
     join_room(room_code)
     
@@ -671,7 +693,7 @@ def handleRejoin(data):
         logger.info(f"Non-creator {player_id} rejoined room {room_code}")
     
     # Send current game state
-    emit('game_joined', {'room_code': room_code, 'is_creator': is_creator})
+    emit('game_joined', {'room_code': room_code, 'is_creator': is_creator, 'is_open': game.is_open})
     emit('task_locations', game.locations)
     sendPlayerList(game, room_code, "rejoin")
     
@@ -746,12 +768,106 @@ def handle_disconnect(reason=None):
         player.ready = False
         if game.meeting and not game.end_state:
             game.try_start_voting()
+        if game.end_state:
+            count_play_again(game, room_code)
         sendPlayerList(game, room_code)
+        socketio.start_background_task(absence_timer, room_code, player.player_id, player.disconnected_at)
     # Last, so the cleanup above is still recognised as end-to-end traffic
     synthetic_sids.discard(sid)
 
 
+def absence_timer(room_code, player_id, disconnected_at):
+    socketio.sleep(ABSENT_AFTER_SECONDS)
+    mark_absent_if_still_gone(room_code, player_id, disconnected_at)
+
+
+def mark_absent_if_still_gone(room_code, player_id, disconnected_at):
+    """Stop waiting for a player who has stayed offline since disconnected_at."""
+    game = game_manager.get_game(room_code)
+    if not game:
+        return False
+    with game.state_lock:
+        player = game.getPlayerById(player_id)
+        if (game_manager.get_game(room_code) is not game or not player or player.active
+                or player.absent or player.disconnected_at != disconnected_at):
+            return False
+        player.absent = True
+        game.revision += 1
+        logger.info(f"Player {player_id} in room {room_code} is offline; the room stops waiting for them")
+        if player.player_id == game.creator_player_id:
+            reassign_room_creator(game, room_code)
+        if game.meeting and not game.end_state:
+            if game.meeting.stage == 'waiting':
+                game.try_start_voting()
+            elif game.meeting.stage == 'voting':
+                game.meeting.on_player_death()  # re-checks whether everyone present has voted
+        if game.end_state:
+            count_play_again(game, room_code)
+        if game_manager.get_game(room_code) is game:
+            sendPlayerList(game, room_code)
+        return True
+
+
+def remove_players(game, room_code, players):
+    for player in players:
+        if player not in game.players:
+            continue
+        game.players.remove(player)
+        selfie_store.delete(player.selfie)
+        player.selfie = None
+        if player.pic not in game.backgrounds and not any(other.pic == player.pic for other in game.players):
+            game.backgrounds.append(player.pic)
+        game_manager.unregister_player(player.player_id)
+        logger.info(f"Removed {player.player_id} from room {room_code} (left={player.left}, absent={player.absent})")
+
+
+def reset_room_to_lobby(game, room_code, reason, player_id=None):
+    game._record_abandoned_round(reason)
+    record_usage('round_reset', game, player_id, reason=reason, flush=True)
+    # People who tapped Leave mid-round were kept so the round could finish; they go now.
+    remove_players(game, room_code, [p for p in game.players if p.left])
+    for p in game.players:
+        p.reset()
+    game.reset_game_state(reason=reason)
+    socketio.emit('game_reset', {'room_code': room_code}, room=room_code)
+    sendPlayerList(game, room_code)
+
+
+def count_play_again(game, room_code, player_id=None):
+    """Count Play Again taps from connected phones; back to the lobby once all of them tapped."""
+    connected_player_ids = get_connected_player_ids(game, room_code)
+    game.reset_votes.intersection_update(connected_player_ids)
+    if player_id and player_id in connected_player_ids:
+        game.reset_votes.add(player_id)
+    votes_needed = len(connected_player_ids)
+    current_votes = len(game.reset_votes)
+    socketio.emit('reset_vote_update', {
+        'room_code': room_code,
+        'current_votes': current_votes,
+        'votes_needed': votes_needed,
+        'voters': list(game.reset_votes)
+    }, room=room_code)
+    logger.info(f"Game {room_code}: Reset vote from {player_id}. {current_votes}/{votes_needed} votes.")
+    if votes_needed > 0 and current_votes >= votes_needed:
+        reset_room_to_lobby(game, room_code, 'unanimous_reset', player_id)
+        logger.info(f"Game {room_code} has been reset to lobby (all players voted)")
+
+
 # ============ PLAYER MANAGEMENT ============
+
+MAX_NAME_LENGTH = 24  # Same cap as the name box on the join screen
+
+
+def unique_name(game, username, player=None):
+    """Number a repeated name (Sam, Sam 2) so votes and the player list can tell people apart."""
+    taken = {other.username.casefold() for other in game.players if other is not player}
+    name, number = username, 2
+    while name.casefold() in taken:
+        suffix = f' {number}'
+        name = username[:MAX_NAME_LENGTH - len(suffix)] + suffix
+        number += 1
+    return name
+
 
 @socketio.on('join')
 @room_event(reconnect=True)
@@ -764,6 +880,7 @@ def handle_join(data):
     pic = data.get('pic')  # Chosen avatar index; the server assigns a free one if missing or taken
     sid = request.sid
 
+    username = ' '.join(username.split())[:MAX_NAME_LENGTH] if isinstance(username, str) else ''
     if not username:
         record_usage('join_rejected', resolve_game=False, reason='username_required', room_code=room_code, command='join')
         emit('error', {'message': 'Username is required'}, to=sid)
@@ -775,9 +892,8 @@ def handle_join(data):
         game, player, existing_room = get_game_and_player(player_id)
         if player:
             record_reconnect(game, player)
-            player.sid = sid
-            player.active = True
-            player.username = username
+            player.reconnect(sid)
+            player.username = unique_name(game, username, player)
             game_manager.update_sid(player_id, sid)
             join_room(existing_room)
             
@@ -817,7 +933,7 @@ def handle_join(data):
         except (ValueError, OSError):
             logger.warning('Photo upload failed. The player will use a default avatar.')
 
-    player = game.addPlayer(sid, username, selfie_filename, pic=pic)
+    player = game.addPlayer(sid, unique_name(game, username), selfie_filename, pic=pic)
     game_manager.register_player(player.player_id, room_code, sid)
     join_room(room_code)
     
@@ -843,7 +959,7 @@ def handle_join(data):
     sendPlayerList(game, room_code)
     
     # Also send directly to the joining player to avoid race condition
-    player_list = [p.to_json() for p in game.players]
+    player_list = game.player_view(player)
     emit('game_data', {**metadata(game), 'action': 'player_list', 'list': player_list}, to=sid)
 
 
@@ -853,6 +969,8 @@ def start_room(game, test_mode=False):
     if game.creator_sid != request.sid:
         record_usage('start_rejected', game, reason='not_host')
         return command_error('Only the host can start the game.')
+    # Phones that have been gone past the grace period aren't dealt in; they can rejoin by invite.
+    remove_players(game, game.room_code, [p for p in game.players if p.left or (p.absent and not p.active)])
     # A test game is only for rooms that are short on players. A full room starts normally.
     test_mode = bool(test_mode) and can_start_test(game)
     reason, error = start_error_detail(game, test_mode=test_mode)
@@ -944,13 +1062,7 @@ def reset_game(data):
     if force and sid not in (game.creator_sid, game.reactor_sid):
         return command_error('Only the host or reactor can reset the game.')
     if force:
-        game._record_abandoned_round('host_reset')
-        record_usage('round_reset', game, player_id, reason='host_reset', flush=True)
-        for p in game.players:
-            p.reset()
-        game.reset_game_state(reason='host_reset')
-        socketio.emit('game_reset', {'room_code': room_code}, room=room_code)
-        sendPlayerList(game, room_code)
+        reset_room_to_lobby(game, room_code, 'host_reset', player_id)
         logger.info(f"Game {room_code} has been force reset to lobby")
         return
     
@@ -959,38 +1071,7 @@ def reset_game(data):
     if not game.end_state:
         return {'ok': False, 'error': 'The round has not ended.'}
 
-    connected_player_ids = get_connected_player_ids(game, room_code)
-    game.reset_votes.intersection_update(connected_player_ids)
-
-    # Add this player's vote only if they are currently connected to this room.
-    if player_id and player_id in connected_player_ids:
-        game.reset_votes.add(player_id)
-    
-    # Count how many players are in the game (excluding those who left)
-    total_players = len(connected_player_ids)
-    votes_needed = total_players
-    current_votes = len(game.reset_votes)
-    
-    # Broadcast the vote update to all players
-    socketio.emit('reset_vote_update', {
-        'room_code': room_code,
-        'current_votes': current_votes,
-        'votes_needed': votes_needed,
-        'voters': list(game.reset_votes)
-    }, room=room_code)
-    
-    logger.info(f"Game {room_code}: Reset vote from {player_id}. {current_votes}/{votes_needed} votes.")
-    
-    # If all players have voted, reset the game
-    if votes_needed > 0 and current_votes >= votes_needed:
-        game._record_abandoned_round('unanimous_reset')
-        record_usage('round_reset', game, player_id, reason='unanimous_reset', flush=True)
-        for p in game.players:
-            p.reset()
-        game.reset_game_state(reason='unanimous_reset')
-        socketio.emit('game_reset', {'room_code': room_code}, room=room_code)
-        sendPlayerList(game, room_code)
-        logger.info(f"Game {room_code} has been reset to lobby (all players voted)")
+    count_play_again(game, room_code, player_id)
 
 
 @socketio.on('disband_room')
@@ -1073,6 +1154,7 @@ def leave_room_handler(data):
         # During an active round, leaving counts as dying. After the round ends,
         # remove the player so reset votes only wait on people still in the room.
         if game.game_running and not game.end_state and player.alive:
+            player.left = True
             game.kill_player(player.player_id, death_cause='left_game')
             logger.info(f"Player {player.username} left during active game - marked as dead in room {room_code}")
         else:
@@ -1235,6 +1317,10 @@ def handleMeeting(data):
     game, player = current_phase_player(data)
     if game and player and player.sus:
         return command_error('Intruders can only call a meeting with a card.')
+    # A double tap, or two people calling at once: the meeting they want is already open, so the
+    # extra tap is not an error (an error box would cover the ready slide).
+    if game and player and game.meeting and game.meeting.round_id == game.round_id:
+        return {'ok': True, 'meeting_id': game.meeting.id}
     if not game or not game.start_meeting(player):
         return command_error('A meeting cannot start now.')
     record_usage('meeting_started', game, player.player_id)

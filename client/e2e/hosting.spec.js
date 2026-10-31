@@ -19,7 +19,7 @@ test('in a room made on the reactor, host passes on when the host leaves and the
     const [host, next, ...rest] = phones;
     await expect(reactor.getByTestId('reactor-host-hint')).toHaveText('Sam is the host. Start the game from their phone.');
 
-    await host.getByRole('button', { name: 'Leave room' }).click();
+    await h.tapAndConfirm(host.getByRole('button', { name: 'Leave room' }));
     await expect(host.getByText('Create New Game')).toBeVisible();
     await expect(reactor.getByText('4 players connected')).toBeVisible();
     await expect(reactor.getByTestId('reactor-host-hint')).toHaveText('Alex is the host. Start the game from their phone.');
@@ -99,8 +99,21 @@ test('two intruders need five players before the host can start', async ({ brows
     h.expectNoPageErrors(phones);
 });
 
-test('BUG: when the host phone drops out of the lobby, someone else can start', async ({ browser }) => {
-    test.fail(!process.env.E2E_SHOW_BUGS, 'Host only moves on when the host taps Leave; see the lobby bug report');
+test('a room short on tasks is told how many to add, and everyone can help', async ({ browser }) => {
+    const phones = await h.openPhones(browser, ['Sam', 'Alex', 'Jules', 'Riley']);
+    const [host, guest] = phones;
+    await h.gatherRoom({ host, phones, settings: { groupTasks: true } });
+
+    await expect(host.getByText('Add 12 more tasks to start. 4 players need 12; the room has 0.')).toBeVisible();
+    await expect(guest.getByText('The room needs 12 more tasks before the host can start. Everyone can add some.')).toBeVisible();
+    await Promise.all([h.addTasks(host, 6), h.addTasks(guest, 6)]);
+    await expect(host.getByText('Start Game')).toBeVisible();
+    await expect(guest.getByText('Waiting for host to start the game...')).toBeVisible();
+
+    h.expectNoPageErrors(phones);
+});
+
+test('when the host phone drops out of the lobby, someone else can start', async ({ browser }) => {
     const phones = await h.openPhones(browser, ['Sam', 'Alex', 'Jules', 'Riley']);
     const [host, ...rest] = phones;
     await h.gatherRoom({ host, phones });
@@ -110,8 +123,7 @@ test('BUG: when the host phone drops out of the lobby, someone else can start', 
     await expect.poll(async () => (await startButtons()).reduce((a, b) => a + b, 0), { timeout: 30000 }).toBe(1);
 });
 
-test('BUG: a phone that closed the page in the lobby is not dealt into the round', async ({ browser }) => {
-    test.fail(!process.env.E2E_SHOW_BUGS, 'Players who are gone still get a role, and every meeting waits for them forever');
+test('a phone that closed the page in the lobby is not dealt into the round', async ({ browser }) => {
     const phones = await h.openPhones(browser, ['Sam', 'Alex', 'Jules', 'Riley', 'Kai']);
     await h.gatherRoom({ host: phones[0], phones });
     const gone = phones[4];

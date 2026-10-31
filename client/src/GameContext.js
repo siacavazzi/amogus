@@ -23,6 +23,25 @@ const isTestTraffic = () => {
 
 const DataContext = createContext();
 
+// The host's key to a room they are still setting up (they have no player yet), so a
+// dropped connection or a reload can take the setup screen back.
+const HOST_TOKEN_KEY = 'host_token';
+const readHostToken = (roomCode) => {
+    try {
+        const saved = JSON.parse(localStorage.getItem(HOST_TOKEN_KEY) || 'null');
+        return saved && saved.room_code === roomCode ? saved.token : null;
+    } catch (error) {
+        return null;
+    }
+};
+const saveHostToken = (roomCode, token) => {
+    try {
+        if (token) localStorage.setItem(HOST_TOKEN_KEY, JSON.stringify({ room_code: roomCode, token }));
+    } catch (error) {
+        // Without storage the host just can't come back after a reload.
+    }
+};
+
 export default function GameContext({ children }) {
     const [playerState, setPlayerState] = useState({
         username: '',
@@ -394,6 +413,28 @@ export default function GameContext({ children }) {
         }
     }, [connected, playerState, roundId, running, task, requestRoomState, roomCode, applyRoomSnapshot]);
 
+    // Keep phones awake while a game runs, so a phone in a pocket doesn't lock and miss a
+    // meeting. The browser drops the lock whenever the page is hidden, so take it again on return.
+    useEffect(() => {
+        if (!isMobile || !running || !navigator.wakeLock) return undefined;
+        let lock = null;
+        let active = true;
+        const acquire = () => {
+            if (document.visibilityState !== 'visible' || (lock && !lock.released)) return;
+            navigator.wakeLock.request('screen').then((granted) => {
+                if (active) lock = granted;
+                else granted.release().catch(() => {});
+            }).catch(() => {});
+        };
+        acquire();
+        document.addEventListener('visibilitychange', acquire);
+        return () => {
+            active = false;
+            document.removeEventListener('visibilitychange', acquire);
+            if (lock) lock.release().catch(() => {});
+        };
+    }, [running]);
+
     // Handle page visibility changes (mobile browser suspension/resume)
     useEffect(() => {
         const handleVisibilityChange = () => {
@@ -470,6 +511,9 @@ export default function GameContext({ children }) {
                     player_id: playerId,
                 });
                 requestRoomState(socketRef.current, roomCode || localStorage.getItem('room_code'), playerId);
+            } else if (isMobile && roomCode && readHostToken(roomCode)) {
+                // A phone host coming back to a room they were still setting up.
+                socketRef.current.emit('join_game', { room_code: roomCode, host_token: readHostToken(roomCode) });
             } else if (!isMobile && roomCode) {
                 // Reactor reconnecting - re-register as reactor
                 socketRef.current.emit('register_reactor', { room_code: roomCode });
@@ -497,6 +541,7 @@ export default function GameContext({ children }) {
             sessionStorage.setItem('is_room_creator', isCreator.toString());
             setRoomOpen(false);  // Room not open until creator opens it
             localStorage.setItem('room_code', data.room_code);
+            saveHostToken(data.room_code, data.host_token);
             
             // Desktop clients register as reactor
             if (!isMobile) {
@@ -526,7 +571,8 @@ export default function GameContext({ children }) {
             setIsRoomCreator(isCreator);
             sessionStorage.setItem('is_room_creator', isCreator.toString());
             console.log('Setting isRoomCreator to:', isCreator);
-            setRoomOpen(true);  // If we joined, the room must be open
+            // Only the host returning to setup joins a room that isn't open yet.
+            setRoomOpen(data.is_open !== false);
             localStorage.setItem('room_code', data.room_code);
             autoJoinInviteRef.current = null;
             
