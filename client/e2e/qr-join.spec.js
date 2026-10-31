@@ -60,3 +60,23 @@ test("scanning the reactor's QR code joins the room without typing the code", as
 
     h.expectNoPageErrors([reactor, phone]);
 });
+
+// Room codes are random, and a code of wide letters (W, M) once pushed the QR under the code,
+// which pushed the host line half off a 720p screen. Every code has to fit beside the QR.
+test('the widest room code still fits beside the QR code on a laptop screen', async ({ browser }) => {
+    const reactor = await h.openReactor(browser);
+    await h.createRoom(reactor);
+    // Shows the widest possible code in place of the one the room drew.
+    await reactor.getByTestId('room-code').evaluate(node => { node.textContent = 'WWWW'; });
+    for (const viewport of [{ width: 1280, height: 720 }, { width: 1366, height: 768 }, { width: 1920, height: 1080 }]) {
+        await reactor.setViewportSize(viewport);
+        // The code slams in and the QR pops in, scaled while they move, so measure once they land.
+        await reactor.evaluate(() => Promise.all(['.sg-rx__code', '.sg-rx__qr']
+            .flatMap(selector => document.querySelector(selector).getAnimations().map(animation => animation.finished))));
+        const code = await reactor.getByTestId('room-code').boundingBox();
+        const qr = await reactor.getByTestId('room-qr').boundingBox();
+        expect(qr.x, `QR beside the code at ${viewport.width}`).toBeGreaterThan(code.x + code.width);
+        expect(qr.y, `QR level with the code at ${viewport.width}`).toBeLessThan(code.y + code.height);
+        await expect(reactor.getByTestId('reactor-host-hint')).toBeInViewport({ ratio: 1 });
+    }
+});
