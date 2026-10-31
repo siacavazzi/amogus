@@ -42,7 +42,7 @@ test('when the host leaves the lobby, someone else can start', async ({ browser 
     const phones = await h.openPhones(browser, ['Sam', 'Alex', 'Jules', 'Riley']);
     const [host, ...rest] = phones;
     await h.gatherRoom({ host, phones });
-    await host.getByRole('button', { name: 'Leave room' }).click();
+    await h.tapAndConfirm(host.getByRole('button', { name: 'Leave room' }));
     await expect(host.getByText('Create New Game')).toBeVisible();
     for (const phone of rest) await expect(phone.getByText('Sam', { exact: true })).toHaveCount(0);
     await expect(rest[0].getByText('Start Game')).toBeVisible();

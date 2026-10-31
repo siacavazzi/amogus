@@ -13,9 +13,11 @@ concurrency:
   group: droplet
   cancel-in-progress: false
 
+# Runners are pinned to Ubuntu 24.04: ubuntu-latest moved to 26.04, where the Playwright
+# version in client/package.json can't install its browsers.
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     
     steps:
       - name: Checkout code
@@ -112,28 +114,12 @@ jobs:
           rsync -avz --delete \
             ./client/build/ root@${{ secrets.DROPLET_IP }}:/opt/amogus-beta/client/build/
 
-          # Upload deploy scripts (in case they changed)
-          rsync -avz \
-            ./deploy/ root@${{ secrets.DROPLET_IP }}:/opt/amogus/deploy/
+          # Deploy scripts go next to beta; promote copies them for prod
+          rsync -avz --delete \
+            ./deploy/ root@${{ secrets.DROPLET_IP }}:/opt/amogus-beta/deploy/
 
-      # Nginx is shared by prod and beta (it routes each browser by cookie), so
-      # config changes apply to both as soon as they reach main.
-      - name: Apply Nginx configuration
-        run: |
-          ssh root@${{ secrets.DROPLET_IP }} 'bash -s' << 'EOF'
-            set -e
-            config=/etc/nginx/sites-available/amogus
-            backup=$(mktemp)
-            cp -p "$config" "$backup"
-            if cp /opt/amogus/deploy/nginx-amogus.conf "$config" && nginx -t && systemctl reload nginx; then
-              rm -f "$backup"
-            else
-              cp -p "$backup" "$config"
-              nginx -t && systemctl reload nginx
-              rm -f "$backup"
-              exit 1
-            fi
-          EOF
+      # Nginx is shared by prod and beta, so its config is applied by "Promote beta to prod",
+      # after the gate has passed, never straight from main.
 
       - name: Restart beta
         env:
@@ -167,8 +153,9 @@ jobs:
             fi
             systemctl daemon-reload
             systemctl enable amogus-beta
-            # Ensure all Python dependencies are installed
-            /opt/amogus/venv/bin/pip install -q flask flask-socketio flask-cors eventlet gunicorn soco
+            # Beta shares prod's virtualenv. This only adds packages that are missing, never upgrades
+            # ones prod is using.
+            /opt/amogus/venv/bin/pip install -q -r /opt/amogus-beta/server/requirements.txt soco
             systemctl restart amogus-beta
             sleep 3
             systemctl status amogus-beta --no-pager || true
@@ -182,42 +169,59 @@ jobs:
           echo "Beta version: $(curl -s --cookie 'sus_channel=beta' https://susparty.com/api/version)"
           echo "Prod version: $(curl -s https://susparty.com/api/version)"
 
-      # Five scripted phones play a whole round on beta over the real WebSocket:
-      # join, tasks, both intruder cards, a reconnect, a meeting and vote, the win.
+      # Scripted phones play whole games on beta over the real WebSocket: 5 players (join, tasks,
+      # both intruder cards, a reconnect, a meeting and vote, the win, two last stands), then 40.
       # Their rooms are marked synthetic, so they stay out of usage stats.
       - name: Check the server plays a full game (sockets only, no browser)
         working-directory: ./client
-        run: node scripts/e2e-live.js https://susparty.com --beta --browser --expect-commit "$REACT_APP_COMMIT"
+        run: |
+          node scripts/e2e-live.js https://susparty.com --beta --browser --expect-commit "$REACT_APP_COMMIT"
+          node scripts/e2e-live.js https://susparty.com --beta --players 40 --expect-commit "$REACT_APP_COMMIT"
 
-      # Real Chromium pages for the reactor and the phones tap through whole games on beta:
-      # setup, roles, a task, the vent, meetings and votes, a meltdown, a rejoin, Play Again.
-      - name: Install the test browsers
+  # Real browser pages for the reactor and the phones play whole games on beta, split across
+  # parallel jobs. Each test makes its own room, so they don't get in each other's way.
+  browser:
+    name: Browser games on beta (${{ matrix.name }})
+    needs: build-and-deploy
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: 'Chromium 1/3', project: chromium, shard: '1/3' }
+          - { name: 'Chromium 2/3', project: chromium, shard: '2/3' }
+          - { name: 'Chromium 3/3', project: chromium, shard: '3/3' }
+          - { name: 'Safari 1/2', project: webkit, shard: '1/2' }
+          - { name: 'Safari 2/2', project: webkit, shard: '2/2' }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+      - name: Install dependencies
         working-directory: ./client
-        run: npx playwright install --with-deps chromium webkit
-
+        run: npm ci --legacy-peer-deps
+      - name: Install the test browser
+        working-directory: ./client
+        run: npx playwright install --with-deps ${{ matrix.project }}
       - name: Play games in real browsers on beta
         working-directory: ./client
-        run: npx playwright test -c e2e --project chromium
+        run: npx playwright test -c e2e --project ${{ matrix.project }} --shard ${{ matrix.shard }}
         env:
           E2E_BASE_URL: https://susparty.com
           E2E_BETA: '1'
-
-      # The main games again in Safari's engine (WebKit). Reported, not blocking, until it has
-      # a track record.
-      - name: Play the main games in Safari (WebKit) on beta
-        continue-on-error: true
+          E2E_WEBKIT: ${{ matrix.project == 'webkit' && '1' || '' }}
+      - name: List known bugs
+        if: always()
         working-directory: ./client
-        run: npx playwright test -c e2e --project webkit
-        env:
-          E2E_BASE_URL: https://susparty.com
-          E2E_BETA: '1'
-          E2E_WEBKIT: '1'
-
+        run: node scripts/e2e-summary.js >> "$GITHUB_STEP_SUMMARY"
       - name: Keep the browser test report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: browser-e2e
+          name: browser-${{ matrix.project }}-${{ strategy.job-index }}
           path: |
             client/e2e/report
             client/e2e/results

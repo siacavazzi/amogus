@@ -93,7 +93,7 @@ class Meeting:
             return
         if self.check_veto_threshold():
             self.end_meeting(early=True)
-        elif len(self.votes) + len(self.veto_votes) >= self.game.get_num_living_players():
+        elif len(self.votes) + len(self.veto_votes) >= len(self.game.present_living_players()):
             self.end_meeting()
 
     def compute_vote_counts(self):
@@ -113,7 +113,7 @@ class Meeting:
 
     def check_veto_threshold(self):
         with self.game.state_lock:
-            return len(self.veto_votes) > (self.game.get_num_living_players() / 2)
+            return len(self.veto_votes) > (len(self.game.present_living_players()) / 2)
 
     def determine_voted_out(self, vote_counts):
         """Return the top-voted player when the configured threshold is met."""
@@ -132,7 +132,7 @@ class Meeting:
                 return None
 
             voted_out_player, votes_received = sorted_votes[0]
-            living_player_count = self.game.get_num_living_players()
+            living_player_count = len(self.game.present_living_players())
             required_votes = math.ceil(living_player_count * self.game.vote_threshold)
             if votes_received < required_votes:
                 print(f"Not enough votes. Got {votes_received}, need {required_votes} ({self.game.vote_threshold * 100:.0f}% of {living_player_count} living players).")
@@ -219,4 +219,6 @@ class Meeting:
                 "voted_out": self.voted_out,
                 "votes": self.votes,
                 "veto_votes": len(self.veto_votes),
+                # After the vote the crew learns how many intruders remain, never who.
+                "intruders_left": sum(1 for p in self.game.players if p.sus and p.alive) if self.stage == 'over' else None,
             })
