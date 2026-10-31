@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect, useRef, useCallback } from 'react';
 import { DataContext } from '../GameContext';
-import { Plus, X, Check, Send, MapPin, Copy, Save, Play, LogOut, ToggleLeft, ToggleRight, Pencil, Share2 } from '../signal/icons';
+import { Plus, X, Check, Send, MapPin, Copy, Save, Play, LogOut, ToggleLeft, ToggleRight, Pencil, Share2, ChevronRight } from '../signal/icons';
 import { Face } from '../signal';
 import '../signal/host.css';
 import { buildRoomInviteUrl } from '../utils/inviteLinks';
@@ -576,11 +576,15 @@ function PreGamePage() {
                         aria-label={`Players (${players.length})`}>
                         <span className="hs-tab__label">Players</span>
                         <span className="hs-tab__num">{players.length}</span>
+                        <span className="hs-tab__go" aria-hidden="true">See players <ChevronRight size={16} /></span>
                     </button>
                     <button type="button" className="hs-tab" aria-pressed={activeTab === 'tasks'} onClick={() => setActiveTab('tasks')}
                         aria-label={`Tasks (${tasks.length})`}>
                         <span className="hs-tab__label">Tasks</span>
                         <span className="hs-tab__num">{tasks.length}</span>
+                        <span className="hs-tab__go" aria-hidden="true" data-testid="tasks-tab-cue">
+                            {canAddTasks ? <><Pencil size={14} /> View &amp; edit</> : 'See tasks'} <ChevronRight size={16} />
+                        </span>
                     </button>
                 </div>
 

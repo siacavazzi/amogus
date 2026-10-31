@@ -53,17 +53,33 @@
 .hs-code__tap { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; font-size: 15px; opacity: 0.8; }
 .hs-code:focus-visible { outline: 3px solid #fff; outline-offset: 6px; border-radius: 16px; }
 
-.hs-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.hs-tabs { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
 .hs-tab {
   appearance: none; border: 0; cursor: pointer; border-radius: 20px; padding: 12px 16px 14px;
   background: rgba(0, 0, 0, 0.16); color: #fff; font-family: var(--sg-font);
   display: flex; flex-direction: column-reverse; align-items: flex-start; gap: 2px; text-align: left;
   transition: transform 0.12s ease;
 }
+.hs-tab { position: relative; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.3); }
 .hs-tab:active { transform: scale(0.97); }
+/* Tap cue on the tab you're not viewing, so "Tasks" reads as a button, not a stat */
+.hs-tab__go {
+  order: -1; margin-top: 8px;
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 6px 8px 6px 11px; border-radius: 999px;
+  background: #fff; color: var(--sg-round);
+  font-weight: 900; font-size: 14px; line-height: 1; white-space: nowrap;
+}
+/* The tab you're looking at keeps the same height, so nothing jumps when you switch */
+.hs-tab[aria-pressed='true'] .hs-tab__go { visibility: hidden; }
+@media (max-width: 370px) {
+  .hs-tab { padding-left: 12px; padding-right: 12px; }
+  .hs-tab__go { font-size: 13px; padding-left: 9px; padding-right: 6px; gap: 3px; }
+}
+.hs-tab:active .hs-tab__go { background: rgba(255, 255, 255, 0.8); }
 .hs-tab__label { font-weight: 800; font-size: 17px; }
 .hs-tab__num { font-weight: 900; font-size: 46px; line-height: 0.95; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
-.hs-tab[aria-pressed='true'] { background: #fff; color: var(--sg-round); }
+.hs-tab[aria-pressed='true'] { background: #fff; color: var(--sg-round); box-shadow: none; }
 .hs-tab:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 
 .hs-roll { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 10px; list-style: none; margin: 4px 0 0; padding: 0; }
