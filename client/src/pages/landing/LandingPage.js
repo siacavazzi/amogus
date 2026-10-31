@@ -3,7 +3,7 @@ import './Landing.css';
 import { usePageMeta } from '../../seo/usePageMeta';
 import { SiteNav, SiteFooter } from '../../components/SiteChrome';
 import { Home, Speaker, Cards, Radiation, ArrowRight } from '../../signal/icons';
-import { ROOM_QUERY_PARAM } from '../../utils/inviteLinks';
+import { ROOM_QUERY_PARAM, VIA_QUERY_PARAM } from '../../utils/inviteLinks';
 
 const TAGLINE_WORDS = ['Gaslight.', 'Sneak.', 'Vote.', 'Repeat.'];
 
@@ -123,7 +123,7 @@ function JoinForm() {
     const clean = code.replace(/[^a-z0-9]/gi, '').toUpperCase().slice(0, 4);
     const submit = (e) => {
         e.preventDefault();
-        window.location.href = clean.length === 4 ? `/play?${ROOM_QUERY_PARAM}=${clean}` : '/play';
+        window.location.href = clean.length === 4 ? `/play?${ROOM_QUERY_PARAM}=${clean}&${VIA_QUERY_PARAM}=home` : '/play';
     };
     return (
         <form className="sl-join" onSubmit={submit} aria-label="Join a game">

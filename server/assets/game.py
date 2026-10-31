@@ -91,6 +91,9 @@ class Game:
         # (used by GameManager to record usage stats)
         self.on_end_callback = None
         self.on_abort_callback = None
+        # Optional callback(event, game, player_id=None, **fields) for the gameplay event log
+        self.on_event_callback = None
+        self.task_seconds = []  # Assignment-to-done seconds for this round's real tasks
         self._stats_start_recorded = False
         self._stats_recorded = False
         self.is_open = False  # Room not open until creator configures it
@@ -215,6 +218,8 @@ class Game:
             self.last_activity = time.time()
             if event == 'end_game':
                 self.cancel_meltdown()
+                if self.meeting:
+                    self.meeting.log_end(self.meeting.reason or 'round_ended')
 
             # Fire end-of-game stats callback once when the game ends
             if event == 'end_game' and not self._stats_recorded:
@@ -259,6 +264,48 @@ class Game:
         })
         return json.dumps(payload) if isinstance(data, str) else payload
 
+    def log_event(self, event, player_id=None, **fields):
+        """Write a gameplay event without letting a stats failure touch the round."""
+        if not self.on_event_callback:
+            return
+        try:
+            self.on_event_callback(event, self, player_id=player_id, **fields)
+        except Exception:
+            logging.getLogger('app_logger').exception('Gameplay event write failed')
+
+    def round_seconds(self):
+        start = getattr(self, 'round_started_monotonic', None)
+        return round(max(0, time.monotonic() - start), 3) if start is not None else None
+
+    def living_counts(self):
+        living = [player for player in self.players if player.alive]
+        return {
+            'living_crew': sum(1 for player in living if not player.sus),
+            'living_intruders': sum(1 for player in living if player.sus),
+        }
+
+    def task_summary(self):
+        """Task timing for the round summary: no task text, only durations and counts."""
+        seconds = sorted(self.task_seconds)
+        now = time.monotonic()
+        held = [now - player.task_assigned_monotonic for player in self.players
+                if player.alive and not player.sus and player.task
+                and getattr(player, 'task_assigned_monotonic', None) is not None]
+        return {
+            'median_task_seconds': round(seconds[len(seconds) // 2], 1) if seconds else None,
+            'slowest_task_seconds': round(seconds[-1], 1) if seconds else None,
+            # No skip button exists, so a task held this long is the "gave up on it" signal.
+            'tasks_held_over_5_min_at_end': sum(1 for value in held if value >= 300),
+        }
+
+    def task_source(self):
+        """Where this room's tasks came from, without their text."""
+        if self.task_list_applied:
+            return 'generator' if getattr(self, 'setup_origin', None) == 'generator' else 'saved_list'
+        if self.collaborative_tasks:
+            return 'group' if self.collaborative_mode else 'typed'
+        return 'builtin'
+
     def begin_round(self):
         """Invalidate snapshots and command results from the previous round."""
         with self.state_lock:
@@ -283,7 +330,7 @@ class Game:
         self.last_gameplay_at = None
         self._round_metrics = {}
 
-    def start_meltdown(self):
+    def start_meltdown(self, trigger='reactor'):
         with self.state_lock:
             if not self.game_running or self.end_state or self.meeting or self.active_meltdown:
                 return False
@@ -295,6 +342,7 @@ class Game:
             meltdown = Meltdown(self.players, meltdown_duration, self.socket, self.speaker, self.code_percent)
             meltdown.game = self
             meltdown.round_id = self.round_id
+            meltdown.trigger = trigger
             self.active_meltdown = meltdown
             self.meltdown_time_mod = 0
             self.card_deck.active_cards = [
@@ -311,6 +359,8 @@ class Game:
         with self.state_lock:
             if not self.active_meltdown:
                 return False
+            if self.active_meltdown.meltdown_active:
+                self.active_meltdown.log_end('round_ended')
             self.active_meltdown.meltdown_active = False
             self.active_meltdown = None
             self.revision += 1
@@ -454,6 +504,7 @@ class Game:
             assigned_task['assignment_id'] = str(uuid4())
             assigned_task['round_id'] = self.round_id
             player.task = assigned_task
+            player.task_assigned_monotonic = time.monotonic()
             self.revision += 1
             return assigned_task
     
@@ -619,6 +670,8 @@ class Game:
 
     def reset_game_state(self, reason='lobby_reset'):
         with self.state_lock:
+            if self.meeting:
+                self.meeting.log_end(reason)
             self._record_abandoned_round(reason)
             self.cancel_meltdown()
             self.begin_round()
@@ -648,6 +701,7 @@ class Game:
         self.last_stand = False
         self.card_deck = CardDeck(self.locations, self.socket, self)
         self.reset_votes = set()  # Clear reset votes
+        self.task_seconds = []
         self._stats_start_recorded = False
         self._stats_recorded = False  # Allow next end to record stats
         
@@ -682,7 +736,7 @@ class Game:
             if player.pic in self.backgrounds:
                 self.backgrounds.remove(player.pic)
 
-    def start_meeting(self, player_who_started_it):
+    def start_meeting(self, player_who_started_it, trigger='button'):
         with self.state_lock:
             if not self.game_running or self.end_state or self.meeting:
                 return False
@@ -692,7 +746,7 @@ class Game:
                 return False  # Both players know who the intruder is; a 1-1 vote can't resolve.
             for player in self.players:
                 player.ready = not player.alive
-            self.meeting = Meeting(self.vote_time, self.socket, player_who_started_it, self)
+            self.meeting = Meeting(self.vote_time, self.socket, player_who_started_it, self, trigger=trigger)
             self.revision += 1
             self.stats['meetings_called'] += 1
             self.speaker.play_sound('meeting')
@@ -719,7 +773,8 @@ class Game:
             if not living_players or ready < self.ready_needed(len(living_players)):
                 return False
 
-            return self._open_voting_locked(meeting)
+            how = 'all_ready' if ready >= len(living_players) else 'quorum'
+            return self._open_voting_locked(meeting, opened_by=how)
 
     def ready_needed(self, present):
         """How many present living players must slide ready before voting opens."""
@@ -735,10 +790,11 @@ class Game:
                 return False
             if meeting.host_override_in() > 0:
                 return False
-            return self._open_voting_locked(meeting, started_by_host=True)
+            return self._open_voting_locked(meeting, started_by_host=True, opened_by='host')
 
-    def _open_voting_locked(self, meeting, started_by_host=False):
+    def _open_voting_locked(self, meeting, started_by_host=False, opened_by=None):
         meeting.started_by_host = started_by_host
+        meeting.note_ready_snapshot(opened_by)
         started = meeting.start_voting()
         if not started:
             meeting.started_by_host = False
@@ -767,6 +823,7 @@ class Game:
             # A meeting can't resolve 1-1, so close it without a vote or card draw.
             self.meeting.stage = 'over'
             self.meeting.reason = 'last_stand'
+            self.meeting.log_end('last_stand')
             self.emit_to_room('meeting', self.meeting.to_json())
             self.meeting = None
         self.send_last_stand_notice()
@@ -820,6 +877,10 @@ class Game:
         # Set death cause and message using the player's method
         death_message = player.set_death(death_cause, task_name)
         self.revision += 1
+        self.log_event('player_died', player.player_id, cause=death_cause,
+                       role='intruder' if player.sus else 'crew',
+                       during='meeting' if self.meeting else 'meltdown' if self.active_meltdown else 'round',
+                       round_seconds=self.round_seconds(), **self.living_counts())
         print(f"Player {player.username} died: {death_cause} - {death_message}")
 
         if self.end_state:

@@ -1,4 +1,5 @@
 import random
+import time
 from contextlib import nullcontext
 
 import eventlet
@@ -22,6 +23,25 @@ class Meltdown:
         self.game = None  # Set after creation
         self.round_id = None
         self.speaker = speaker
+        self.trigger = 'reactor'
+        self.duration = time
+        self.present_at_start = present
+        self.started_at = None  # monotonic; set when the countdown starts
+        self.wrong_pins = 0
+        self._end_logged = False
+
+    def log_end(self, end_reason):
+        """One meltdown_ended line: whether it was winnable and how close the room came."""
+        if self._end_logged or not self.game:
+            return
+        self._end_logged = True
+        self.game.log_event(
+            'meltdown_ended', end_reason=end_reason, trigger=self.trigger,
+            codes_needed=self.codes_needed, codes_entered=self.codes_entered,
+            codes_handed_out=self.num_players, present_at_start=self.present_at_start,
+            wrong_pins=self.wrong_pins, duration_seconds=self.duration,
+            seconds_used=round(time.monotonic() - self.started_at, 1) if self.started_at else None,
+            round_seconds=self.game.round_seconds(), **self.game.living_counts())
 
     def _state_lock(self):
         return self.game.state_lock if self.game else nullcontext()
@@ -55,6 +75,7 @@ class Meltdown:
         with self._state_lock():
             if not self._is_current_locked():
                 return
+            self.started_at = time.monotonic()
             print(f"Meltdown initiated! {self.time_left} seconds remaining.")
             self.emit_to_room("codes_needed", self.codes_needed)
             self.distribute_codes()
@@ -107,10 +128,12 @@ class Meltdown:
                 input_pin = int(input_pin)
             except (TypeError, ValueError):
                 print("Invalid PIN format. PIN should be a number.")
+                self.wrong_pins += 1
                 self.emit_to_room("code_incorrect")
                 return False
 
             if input_pin not in self.valid_pins:
+                self.wrong_pins += 1
                 self.emit_to_room("code_incorrect")
                 return False
 
@@ -129,6 +152,7 @@ class Meltdown:
         with self._state_lock():
             if not self._is_current_locked():
                 return False
+            self.log_end('codes_entered' if success else 'time_ran_out')
             self.meltdown_active = False
             # The codes die with the meltdown; a later room_state must not bring the code screen back.
             for player in self.living_players:

@@ -80,6 +80,9 @@ class GameManager:
             # Hook end-of-game reporting via Game's optional callback
             game.on_end_callback = self.stats_tracker.record_game_ended
             game.on_abort_callback = self.stats_tracker.record_round_abandoned
+            # Looked up per call: tests swap the tracker after the manager exists.
+            game.on_event_callback = lambda event, room, player_id=None, **fields: \
+                self.stats_tracker.record_event(event, room, player_id, **fields)
             game.acquisition = StatsTracker.normalize_acquisition(acquisition)
             game.synthetic = synthetic
 
@@ -180,6 +183,11 @@ class GameManager:
                 for player in game.players:
                     self.selfie_store.delete(player.selfie)
                     player.selfie = None
+            meeting, meltdown = getattr(game, 'meeting', None), getattr(game, 'active_meltdown', None)
+            if meeting:
+                meeting.log_end('room_closed')
+            if meltdown and meltdown.meltdown_active:
+                meltdown.log_end('room_closed')
             try:
                 self.stats_tracker.record_room_closed(game, reason)
             except Exception:

@@ -108,7 +108,7 @@ describe('PreGamePage', () => {
             fireEvent.click(screen.getByRole('button', { name: /invite players to room/i }));
 
             await waitFor(() => {
-                expect(navigator.clipboard.writeText).toHaveBeenCalledWith('http://localhost/play?room=ABCD');
+                expect(navigator.clipboard.writeText).toHaveBeenCalledWith('http://localhost/play?room=ABCD&via=share');
             });
         });
 
@@ -121,7 +121,7 @@ describe('PreGamePage', () => {
             await waitFor(() => {
                 expect(navigator.share).toHaveBeenCalledWith(expect.objectContaining({
                     title: 'Join my Sus Party room',
-                    url: 'http://localhost/play?room=ABCD',
+                    url: 'http://localhost/play?room=ABCD&via=share',
                 }));
             });
             expect(navigator.clipboard.writeText).not.toHaveBeenCalled();

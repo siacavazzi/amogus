@@ -167,11 +167,11 @@ class Card:
         if self.action == 'EMP':
             remove_card = self.game.start_hack(self.duration)
         elif self.action == 'Self Report':
-            remove_card = self.game.start_meeting(player)
+            remove_card = self.game.start_meeting(player, trigger='card')
         elif self.action == 'Taunt':
             self.game.speaker.play_sound(self.sound)
         elif self.action == 'Remote Sabotage':
-            remove_card = self.game.start_meltdown()
+            remove_card = self.game.start_meltdown(trigger='card')
             if not remove_card and not self.game.reactor_sid:
                 send_message_to_player(self.socket, player, "Remote Sabotage needs the reactor screen, and it's not connected. Keep the card for later.")
     # active cards

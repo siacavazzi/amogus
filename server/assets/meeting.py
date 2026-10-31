@@ -5,6 +5,8 @@ from collections import Counter
 from threading import Thread
 from uuid import uuid4
 
+import eventlet
+
 
 # Big rooms never get every phone to slide ready (a ~40-player room froze twice on 2026-10-30).
 # From QUORUM_MIN_PLAYERS present players up, voting opens once MEETING_QUORUM of them are ready.
@@ -16,8 +18,10 @@ class Meeting:
     # How long the host waits before they can start voting without everyone ready.
     # Long enough that an intruder host can't use it to cut the meeting off before people arrive.
     HOST_OVERRIDE_AFTER_SECONDS = 15
+    # A ready stage still open at these marks writes a meeting_stalled line to the event log.
+    STALL_LOG_AFTER_SECONDS = (90, 300)
 
-    def __init__(self, vote_time, socket, player_who_started_it, game):
+    def __init__(self, vote_time, socket, player_who_started_it, game, trigger='button'):
         self.id = str(uuid4())
         self.round_id = game.round_id
         self.stage = 'waiting'
@@ -34,6 +38,74 @@ class Meeting:
         self.countdown_started = False
         self.opened_at = time.monotonic()
         self.started_by_host = False
+        self.trigger = trigger
+        self.voting_opened_at = None
+        self.opened_by = None
+        self.ready_snapshot = None
+        self._end_logged = False
+        self._ballots = None  # Ballots cast, kept before self.votes becomes the per-player tally
+        for after in self.STALL_LOG_AFTER_SECONDS:
+            eventlet.spawn_after(after, self.log_if_stalled)
+
+    def ready_counts(self):
+        """Who the ready stage is waiting on, as counts only."""
+        living = [player for player in self.game.players if player.alive]
+        present = [player for player in living if not player.absent]
+        not_ready = [player for player in living if not player.ready]
+        return {
+            'living': len(living), 'present_living': len(present),
+            'ready': sum(1 for player in present if player.ready),
+            'ready_needed': self.game.ready_needed(len(present)),
+            'not_ready_connected': sum(1 for player in not_ready if player.active and not player.absent),
+            'not_ready_offline': sum(1 for player in not_ready if not player.active or player.absent),
+        }
+
+    def note_ready_snapshot(self, opened_by):
+        self.opened_by = opened_by
+        self.ready_snapshot = self.ready_counts()
+
+    def log_if_stalled(self):
+        with self.game.state_lock:
+            if not self._is_current() or self.stage != 'waiting' or self.game.end_state:
+                return
+            self.game.log_event('meeting_stalled', meeting_id=self.id, trigger=self.trigger,
+                                waiting_seconds=round(time.monotonic() - self.opened_at, 1),
+                                host_connected=self._host_connected(), **self.ready_counts())
+
+    def _host_connected(self):
+        host = self.game.getPlayerById(getattr(self.game, 'creator_player_id', None))
+        return bool(host and host.active)
+
+    def log_end(self, end_reason):
+        """One meeting_ended line per meeting, however it ends."""
+        if self._end_logged:
+            return
+        self._end_logged = True
+        now = time.monotonic()
+        voted_out = self.game.getPlayerById(self.voted_out) if self.voted_out else None
+        if end_reason == 'votes':
+            outcome = 'voted_out' if voted_out else self._no_ejection_reason()
+        else:
+            outcome = end_reason
+        present = len(self.game.present_living_players())
+        self.game.log_event(
+            'meeting_ended', meeting_id=self.id, trigger=self.trigger, end_reason=end_reason, outcome=outcome,
+            voted_out_role=('intruder' if voted_out.sus else 'crew') if voted_out else None,
+            ready_stage_seconds=round((self.voting_opened_at or now) - self.opened_at, 1),
+            voting_seconds=round(now - self.voting_opened_at, 1) if self.voting_opened_at else None,
+            voting_opened_by=self.opened_by, ready_at_vote_open=self.ready_snapshot,
+            ready_at_end=None if self.voting_opened_at else self.ready_counts(),
+            votes_cast=self._ballots if self._ballots is not None else len(self.votes),
+            vetoes=len(self.veto_votes), present_living_at_end=present,
+            round_seconds=self.game.round_seconds())
+
+    def _no_ejection_reason(self):
+        counts = sorted((count for count in (self.final_votes or {}).values() if count > 0), reverse=True)
+        if not counts:
+            return 'no_votes'
+        if len(counts) > 1 and counts[0] == counts[1]:
+            return 'tie'
+        return 'below_threshold'
 
     def host_override_in(self):
         """Seconds until the host may start voting early; 0 once they can."""
@@ -58,6 +130,7 @@ class Meeting:
 
             self.stage = 'voting'
             self.countdown_started = True
+            self.voting_opened_at = time.monotonic()
             self.game.revision += 1
             self.game.emit_to_room("meeting", self.to_json())
             self.speaker.play_sound('hurry')
@@ -167,6 +240,7 @@ class Meeting:
             for player in self.game.players:
                 player.ready = not player.alive
 
+            self._ballots = len(self.votes)
             if early:
                 self.reason = 'veto'
                 print("Meeting ended early due to veto threshold...")
@@ -175,7 +249,9 @@ class Meeting:
             else:
                 print("Meeting over...")
                 final_votes = self.compute_vote_counts()
+                self.final_votes = final_votes
                 self.voted_out = self.determine_voted_out(final_votes)
+                self.reason = 'votes'  # Set before the ejection, which can end the round and log this meeting.
                 if self.voted_out:
                     self.game.stats['players_voted_out'] += 1
                     voted_player = self.game.getPlayerById(self.voted_out)
@@ -191,6 +267,7 @@ class Meeting:
                 self.votes = self.compute_vote_counts()
                 self.game.emit_to_room("meeting", self.to_json())
 
+            self.log_end(self.reason)
             self.game.drawCards(probability=self.game.card_draw_probability)
             if self.game.last_stand and not self.game.end_state:
                 self.game.send_last_stand_notice()

@@ -100,6 +100,36 @@ class StatsTracker:
             'landing_page': page if isinstance(page, str) and page in pages else '/play',
         }
 
+    VISIT_TOOLS = ('task_generator', 'role_generator', 'task_ideas', 'how_to_play')
+
+    @classmethod
+    def normalize_visit(cls, value):
+        """Landing-to-room time and which site tools the host opened first. Never URLs or text."""
+        value = value if isinstance(value, dict) else {}
+        seconds = value.get('seconds_since_landing')
+        tools = value.get('tools_used')
+        pages = value.get('pages_viewed')
+        return {
+            'seconds_since_landing': round(min(float(seconds), 7 * 86400), 1)
+                if type(seconds) in (int, float) and seconds >= 0 else None,
+            'pages_viewed': min(pages, 100) if type(pages) is int and pages >= 0 else None,
+            'tools_used': sorted({tool for tool in tools if tool in cls.VISIT_TOOLS})
+                if isinstance(tools, list) else [],
+        }
+
+    @staticmethod
+    def task_key(task):
+        """A stable, unsalted hash of a task's words and place, so the same task matches across rooms.
+
+        The text itself stays out of the log; anyone holding a list of site-written tasks can
+        hash it the same way to name them.
+        """
+        if not isinstance(task, dict) or task.get('is_fake'):
+            return None
+        words = ' '.join(str(task.get('task', '')).split()).casefold()
+        place = ' '.join(str(task.get('location', '')).split()).casefold()
+        return hashlib.sha256(f'{words}|{place}'.encode()).hexdigest()[:16] if words else None
+
     def _acquisition_bucket(self, acquisition):
         acquisition = self.normalize_acquisition(acquisition)
         key = acquisition['source'] + '|' + acquisition['landing_page']
@@ -201,6 +231,10 @@ class StatsTracker:
                 'task_goal': getattr(game, 'taskGoal', None), 'tasks_per_crewmate': getattr(game, 'task_ratio', None),
                 'meeting_seconds': getattr(game, 'vote_time', None), 'has_reactor': getattr(game, 'has_reactor', False),
                 'card_deck_preset': getattr(game, 'card_deck_preset', None),
+                'meeting_quorum': getattr(game, 'meeting_quorum', None),
+                'auto_intruders': getattr(game, 'auto_intruders', None),
+                'task_source': game.task_source() if hasattr(game, 'task_source') else None,
+                'setup_origin': getattr(game, 'setup_origin', None),
                 'acquisition': self.normalize_acquisition(getattr(game, 'acquisition', None)),
                 'first_task_seconds': None, 'last_gameplay_at': game.round_started_at,
             }
@@ -294,7 +328,8 @@ class StatsTracker:
                       last_gameplay_at=getattr(game, 'last_gameplay_at', None),
                       player_count_at_end=len(players),
                       active_player_count_at_end=sum(bool(getattr(player, 'active', False)) for player in players),
-                      crew_score=getattr(game, 'crew_score', None), task_goal=getattr(game, 'taskGoal', None))
+                      crew_score=getattr(game, 'crew_score', None), task_goal=getattr(game, 'taskGoal', None),
+                      **(game.task_summary() if hasattr(game, 'task_summary') else {}))
         # Keep the event summary free of the legacy record's names and task text.
         summary = {key: value for key, value in record.items() if key not in ('fake_tasks_sent', 'fake_tasks_completed', 'taunts_sent')}
         stats = getattr(game, 'stats', {})
@@ -325,7 +360,13 @@ class StatsTracker:
         self.record_round_abandoned(game, reason)
         self.record_event('room_closed', game, reason=reason, flush=True,
                           room_lifetime_seconds=round(max(0, time.time() - game.created_at), 3),
-                          rounds_started=game.round_number, player_count=len(game.players))
+                          rounds_started=game.round_number, player_count=len(game.players),
+                          # For rooms that never started: how far the host got.
+                          was_opened=bool(getattr(game, 'is_open', False)),
+                          last_setup_step=getattr(game, 'last_setup_step', None),
+                          setup_origin=getattr(game, 'setup_origin', None),
+                          task_source=game.task_source() if hasattr(game, 'task_source') else None,
+                          has_reactor=bool(getattr(game, 'reactor_sid', None) or getattr(game, 'has_reactor', False)))
 
     # ---- reporting ----
 

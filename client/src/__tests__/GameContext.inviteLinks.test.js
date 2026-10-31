@@ -73,6 +73,7 @@ describe('GameContext invite links', () => {
             expect(mockSocket.emit).toHaveBeenCalledWith('join_game', {
                 room_code: 'ABCD',
                 player_id: undefined,
+                entry_method: 'invite_link',
             });
         });
     });

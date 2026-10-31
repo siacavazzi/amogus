@@ -3,6 +3,7 @@ import { DataContext } from '../GameContext';
 import { Users, Play, ChevronDown, ChevronUp, List, Download, Trash2, Check, LogOut, MapPin, Settings, ArrowRight, ArrowLeft, X, Zap, Copy, Sparkles, Minus, Plus } from '../signal/icons';
 import { readGeneratedSetup, clearGameDraft } from './seo/gameDraft';
 import { AUTO_INTRUDERS_SUMMARY, playersForIntruders } from '../utils/intruders';
+import { sendClientMetric } from '../utils/clientMetrics';
 import '../signal/host.css';
 
 const DEFAULT_CARD_DECK_COUNTS = {
@@ -113,6 +114,7 @@ function GameConfigPage() {
     
     // Two-step wizard: 'tasklist' or 'settings'
     const [step, setStep] = useState('tasklist');
+    useEffect(() => { sendClientMetric(socket, { kind: 'setup_step', step }); }, [socket, step]);
     const [showContent, setShowContent] = useState(false);
     const [copied, setCopied] = useState(false);
 
