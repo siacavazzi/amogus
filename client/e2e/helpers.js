@@ -31,7 +31,8 @@ const openContexts = new Set();
 async function openPage(browser, name, options) {
     const context = await browser.newContext(options);
     openContexts.add(context);
-    await context.addInitScript(() => localStorage.setItem('sus_e2e', '1'));
+    // Runs in every document, including the blank page a new tab starts on, where storage is off.
+    await context.addInitScript(() => { try { localStorage.setItem('sus_e2e', '1'); } catch (_) { /* about:blank */ } });
     if (BETA) {
         const { hostname } = new URL(process.env.E2E_BASE_URL);
         await context.addCookies([{ name: 'sus_channel', value: 'beta', domain: hostname, path: '/' }]);
