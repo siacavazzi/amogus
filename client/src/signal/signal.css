@@ -272,7 +272,7 @@
 .sg-join__bar { display: flex; justify-content: space-between; align-items: center; min-height: 48px; width: 100%; max-width: 480px; margin: 0 auto; }
 .sg-join__back { width: auto; min-height: 44px; padding: 10px 16px 10px 10px; font-size: 16px; gap: 4px; }
 .sg-join__body { width: 100%; max-width: 480px; margin: 0 auto; padding-top: 3vh; }
-.sg-join__form { display: grid; gap: 14px; }
+.sg-join__form { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
 .sg-join__form .sg-pill { justify-self: start; }
 .sg-join__ask { display: block; text-align: left; margin: 6px 0 6px; }
 .sg-join__name {

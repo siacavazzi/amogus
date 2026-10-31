@@ -11,17 +11,26 @@ function CameraCapture({ onCapture, onCancel }) {
     const [error, setError] = useState(null);
     const [facingMode, setFacingMode] = useState('user'); // 'user' for front camera
 
+    // Stops whatever camera stream is open. Each start bumps the request number, so a stream
+    // that arrives after a newer start (or after the screen closed) is stopped, not kept.
+    const requestRef = useRef(0);
+    const stopCamera = useCallback(() => {
+        requestRef.current += 1;
+        if (streamRef.current) {
+            streamRef.current.getTracks().forEach(track => track.stop());
+            streamRef.current = null;
+        }
+        setStream(null);
+    }, []);
+
     const startCamera = useCallback(async () => {
+        stopCamera();
+        const request = requestRef.current;
         try {
             // Check if we're in a secure context (HTTPS or localhost)
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                 setError('Camera not available. Make sure you\'re using HTTPS or localhost.');
                 return;
-            }
-
-            // Stop any existing stream
-            if (streamRef.current) {
-                streamRef.current.getTracks().forEach(track => track.stop());
             }
 
             const mediaStream = await navigator.mediaDevices.getUserMedia({
@@ -32,6 +41,10 @@ function CameraCapture({ onCapture, onCancel }) {
                 },
                 audio: false
             });
+            if (request !== requestRef.current) {
+                mediaStream.getTracks().forEach(track => track.stop());
+                return;
+            }
             
             streamRef.current = mediaStream;
             setStream(mediaStream);
@@ -40,6 +53,7 @@ function CameraCapture({ onCapture, onCancel }) {
             }
             setError(null);
         } catch (err) {
+            if (request !== requestRef.current) return;
             console.error('Error accessing camera:', err);
             if (err.name === 'NotAllowedError') {
                 setError('Camera permission denied. Please allow camera access to take a selfie.');
@@ -55,32 +69,22 @@ function CameraCapture({ onCapture, onCancel }) {
                 setError(`Could not access camera: ${err.message || err.name || 'Unknown error'}`);
             }
         }
-    }, [facingMode]);
+    }, [facingMode, stopCamera]);
 
+    // One camera at a time: open it while there's no photo, close it otherwise and on the way out.
     useEffect(() => {
+        if (capturedImage) return undefined;
         startCamera();
-        
-        return () => {
-            // Cleanup: stop all tracks when component unmounts
-            if (streamRef.current) {
-                streamRef.current.getTracks().forEach(track => track.stop());
-                streamRef.current = null;
-            }
-        };
-    }, [startCamera]);
-
-    // Restart camera when facing mode changes
-    useEffect(() => {
-        if (!capturedImage) {
-            startCamera();
-        }
-    }, [facingMode, capturedImage, startCamera]);
+        return stopCamera;
+    }, [capturedImage, startCamera, stopCamera]);
 
     const capturePhoto = () => {
         if (!videoRef.current || !canvasRef.current) return;
 
         const video = videoRef.current;
         const canvas = canvasRef.current;
+        // Too early: the camera hasn't sent a frame yet, so the photo would be blank.
+        if (!video.videoWidth || !video.videoHeight) return;
         const context = canvas.getContext('2d');
 
         // Set canvas size to match video
@@ -103,27 +107,16 @@ function CameraCapture({ onCapture, onCancel }) {
         const imageData = canvas.toDataURL('image/jpeg', 0.8);
         setCapturedImage(imageData);
 
-        // Stop the camera stream
-        if (streamRef.current) {
-            streamRef.current.getTracks().forEach(track => track.stop());
-            streamRef.current = null;
-            setStream(null);
-        }
+        stopCamera();
     };
 
     const retakePhoto = () => {
         setCapturedImage(null);
-        startCamera();
     };
 
     const confirmPhoto = () => {
         if (capturedImage) {
-            // Ensure stream is stopped
-            if (streamRef.current) {
-                streamRef.current.getTracks().forEach(track => track.stop());
-                streamRef.current = null;
-                setStream(null);
-            }
+            stopCamera();
             onCapture(capturedImage);
         }
     };
@@ -133,11 +126,7 @@ function CameraCapture({ onCapture, onCancel }) {
     };
 
     const skipPhoto = () => {
-        if (streamRef.current) {
-            streamRef.current.getTracks().forEach(track => track.stop());
-            streamRef.current = null;
-            setStream(null);
-        }
+        stopCamera();
         onCancel();
     };
 
