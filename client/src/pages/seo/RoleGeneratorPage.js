@@ -152,7 +152,7 @@ function RoleGenerator() {
 
 export default function RoleGeneratorPage() {
     usePageMeta({
-        title: 'Among Us Role Generator for Real Life | Sus Party',
+        title: 'Among Us Role Generator and Picker for Real Life | Sus Party',
         description: DESCRIPTION, canonical: CANONICAL, schema: SCHEMA,
     });
     return (
