@@ -161,11 +161,13 @@ async function openRound(phones, cardCounts = {}) {
     const startMarks = new Map(phones.map(phone => [phone, phone.mark()]));
     await host.command('start_game', { player_id: ids.get(host) });
     await Promise.all(phones.map(phone => phone.waitFor('game_start', undefined, { since: startMarks.get(phone) })));
-    const players = (await host.waitFor('game_data', data => data.action === 'start_game', { since: startMarks.get(host) })).list.map(parse);
-    const byId = new Map(players.map(player => [player.player_id, player]));
-    const phoneOf = playerId => phones.find(phone => ids.get(phone) === playerId);
-    const intruder = phoneOf(players.find(player => player.sus).player_id);
-    const crew = phones.filter(phone => !byId.get(ids.get(phone)).sus);
+    // Each phone is told only its own role and cards, so ask every phone about itself.
+    const self = new Map(await Promise.all(phones.map(async phone => {
+        const list = (await phone.waitFor('game_data', data => data.action === 'start_game', { since: startMarks.get(phone) })).list.map(parse);
+        return [phone, list.find(player => player.player_id === ids.get(phone))];
+    })));
+    const intruder = phones.find(phone => self.get(phone).sus);
+    const crew = phones.filter(phone => !self.get(phone).sus);
     assert.equal(crew.length, phones.length - 1, 'One intruder');
     const roundId = (await crew[0].waitFor('task', undefined, { since: startMarks.get(crew[0]) })).round_id;
     log(`Round started: ${intruder.name} is the intruder`);
@@ -181,7 +183,7 @@ async function openRound(phones, cardCounts = {}) {
         return task;
     };
 
-    return { host, roomCode, ids, players, byId, phoneOf, intruder, crew, roundId, currentTask, completeTask };
+    return { host, roomCode, ids, self, intruder, crew, roundId, currentTask, completeTask };
 }
 
 async function closeRoom({ host, ids, roomCode }, phones) {
@@ -199,7 +201,7 @@ async function playGame() {
         log(`${phones.length} phones connected`);
         // One taunt and one fake task for the intruder
         const round = await openRound(phones, { fake_task: 1, taunt_message: 1 });
-        const { host, ids, byId, intruder, crew, roundId, currentTask, completeTask } = round;
+        const { host, ids, self, intruder, crew, roundId, currentTask, completeTask } = round;
 
         // Every crewmate does a task, and the score reaches everyone
         for (const phone of crew) await completeTask(phone);
@@ -207,7 +209,7 @@ async function playGame() {
         log(`${crew.length} tasks completed, crew score ${crew.length}`);
 
         // The intruder plays both cards
-        const cards = byId.get(ids.get(intruder)).cards.map(parse);
+        const cards = self.get(intruder).cards.map(parse);
         const card = action => cards.find(item => item.action === action);
         assert.ok(card('Taunt Message') && card('Fake Task'), `Intruder hand: ${cards.map(item => item.action).join(', ')}`);
         const [tauntTarget, fakeTarget] = crew;

@@ -19,12 +19,12 @@ async function startRound(browser, names, { reactor: withReactor = false } = {})
 
 // Cut a page off the network for a moment, as a phone locking or a wifi blink would.
 async function blink(page, ms = 3000) {
-    await page.context().setOffline(true);
+    await h.goOffline(page);
     // Chromium doesn't always close the socket when it goes offline; then the drop only shows
     // after socket.io's ping timeout (25s interval + 20s wait).
     await expect(page.getByText(/Reconnect|Connection lost/).first()).toBeVisible({ timeout: 60000 });
     await h.sleep(ms);
-    await page.context().setOffline(false);
+    await h.goOnline(page);
 }
 
 test('someone who refreshes mid-round keeps their role and task', async ({ browser }) => {
