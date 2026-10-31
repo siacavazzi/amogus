@@ -43,7 +43,8 @@ describe('task packs that can start a game', () => {
     it('caps the generator at thirty players and suggests more intruders for big groups', () => {
         const result = generateTasks({ playerCount: 45, selectedRooms: ['Kitchen', 'Hallway'] });
         expect(result.tasks).toHaveLength(90);
-        expect(result.recommendations.intruderCount).toBe(3);
+        // Auto: one intruder per five players.
+        expect(result.recommendations.intruderCount).toBe(6);
         expect(generateTasks({ playerCount: 12, selectedRooms: ['Kitchen', 'Hallway'] }).recommendations.intruderCount).toBe(2);
     });
 

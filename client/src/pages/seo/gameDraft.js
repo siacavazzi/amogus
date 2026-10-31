@@ -12,7 +12,7 @@ function validDraft(draft) {
         draft.tasks.every(task => task && typeof task.task === 'string' && task.task.trim() &&
             task.task.length <= 250 && draft.locations.includes(task.location)) &&
         draft.recommendations &&
-        Number.isInteger(draft.recommendations.intruderCount) && draft.recommendations.intruderCount >= 1 && draft.recommendations.intruderCount <= 4 &&
+        Number.isInteger(draft.recommendations.intruderCount) && draft.recommendations.intruderCount >= 1 && draft.recommendations.intruderCount <= Math.max(1, Math.floor(draft.playerCount / 2)) &&
         Number.isInteger(draft.recommendations.meetingSeconds) && draft.recommendations.meetingSeconds >= 30 && draft.recommendations.meetingSeconds <= 300 &&
         Number.isInteger(draft.recommendations.taskGoalPerCrewmate) && draft.recommendations.taskGoalPerCrewmate >= 1 && draft.recommendations.taskGoalPerCrewmate <= 100;
 }
