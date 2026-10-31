@@ -63,7 +63,8 @@ const PageController = () => {
 
     useEffect(() => {
         if (!connected) {
-            setCurrentPage("connecting");
+            // A host mid-setup keeps their choices on screen while the connection comes back.
+            setCurrentPage(page => (page === "gameConfig" ? page : "connecting"));
             return;
         }
 

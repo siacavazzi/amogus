@@ -512,6 +512,12 @@ function PreGamePage() {
     const canStartTestGame = isHost && !fullGameReady && (serverLobbyState?.can_start_test ?? fallbackCanStartTest);
     const canStartGame = fullGameReady || canStartTestGame;
     
+    // Short on tasks: the host (and everyone, in collaborative mode) gets a way to fix it.
+    const tasksMissing = serverLobbyState?.tasks_missing ?? missingTotalTasks;
+    const needsMoreTasks = !canStartGame && realLocations.length >= 2 && (serverLobbyState
+        ? serverLobbyState.start_reason === 'too_few_tasks'
+        : !hasEnoughTotalTasks);
+
     // Calculate what's missing
     const getTasksNeededMessage = () => {
         if (serverLobbyState?.start_error) return serverLobbyState.start_error;
@@ -519,7 +525,7 @@ function PreGamePage() {
             return `Add at least ${2 - realLocations.length} more location${2 - realLocations.length !== 1 ? 's' : ''} first`;
         }
         if (!hasEnoughTotalTasks) {
-            return `Need ${missingTotalTasks} more task${missingTotalTasks !== 1 ? 's' : ''} total`;
+            return `Add ${missingTotalTasks} more task${missingTotalTasks !== 1 ? 's' : ''} to start.`;
         }
         if (players.length < 3) return 'Need at least 3 players for one intruder.';
         return '';
@@ -916,7 +922,34 @@ function PreGamePage() {
                                 )}
                             </>
                         ) : isHost ? (
-                            <p className="hs-notice" style={{ textAlign: 'center' }}>{getTasksNeededMessage()}</p>
+                            <>
+                                <p className="hs-notice" style={{ textAlign: 'center' }}>{getTasksNeededMessage()}</p>
+                                {needsMoreTasks && (
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+                                        {activeTab !== 'tasks' && (
+                                            <button type="button" onClick={() => setActiveTab('tasks')} className="sg-btn sg-btn-line hs-btn-sm" style={{ flex: '1 1 auto', whiteSpace: 'nowrap' }}>
+                                                <Plus size={18} /> <span>Add tasks</span>
+                                            </button>
+                                        )}
+                                        {!collaborativeMode && (
+                                            <button type="button" onClick={() => { handleToggleCollaborativeMode(); setActiveTab('tasks'); }} className="sg-btn sg-btn-line hs-btn-sm" style={{ flex: '1 1 auto', whiteSpace: 'nowrap' }}>
+                                                <span>Let everyone help</span>
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
+                            </>
+                        ) : needsMoreTasks && collaborativeMode ? (
+                            <>
+                                <p className="hs-notice" style={{ textAlign: 'center' }}>
+                                    The room needs {tasksMissing} more task{tasksMissing !== 1 ? 's' : ''} before the host can start. Everyone can add some.
+                                </p>
+                                {activeTab !== 'tasks' && (
+                                    <button type="button" onClick={() => setActiveTab('tasks')} className="sg-btn sg-btn-line hs-btn-sm">
+                                        <Plus size={18} /> <span>Add tasks</span>
+                                    </button>
+                                )}
+                            </>
                         ) : (
                             <p className="hs-notice hs-wait">
                                 <span className="hs-dot hs-dot--still" style={{ background: '#fff' }} aria-hidden="true" />

@@ -1,6 +1,6 @@
-// After the round: the next round starts clean for everyone, including the dead. Plus two
-// known gaps: Play Again with a phone that has gone quiet, and what a phone is told about
-// other people's roles.
+// After the round: the next round starts clean for everyone, including the dead. Plus Play
+// Again with a phone that has gone quiet (a known gap), and what a phone is told about other
+// people's roles.
 const { test, expect } = require('@playwright/test');
 const h = require('./helpers');
 
@@ -44,12 +44,8 @@ test('after Play Again the ghosts are back, roles are dealt again and progress s
     h.expectNoPageErrors([...phones, reactor]);
 });
 
-// KNOWN BUG: Play Again needs a tap from every connected phone, and the count is only checked
-// when someone taps. If the last phone that hasn't tapped goes offline (locked, battery,
-// walked off), everyone else is already showing "Ready!" with the button disabled, so the
-// room never gets back to the lobby. Remove test.fail() once a disconnect re-checks the count.
+// Play Again needs a tap from every connected phone; a phone dropping off re-checks the count.
 test('Play Again goes through when the only phone left to tap goes offline', async ({ browser }) => {
-    test.fail();
     const phones = await h.openPhones(browser, ['Sam', 'Alex', 'Jules', 'Riley']);
     await h.gatherRoom({ host: phones[0], phones });
     await phones[0].getByText('Start Game').click();
@@ -64,12 +60,8 @@ test('Play Again goes through when the only phone left to tap goes offline', asy
     for (const phone of tappers) await h.expectLobby(phone);
 });
 
-// KNOWN BUG: the server sends every phone the whole player list with each player's role
-// ("sus"), cards and meltdown code. Anyone can read it from the browser's network tools (on
-// the reactor laptop it's two clicks), so the intruder is never really secret. Remove
-// test.fail() once crew phones are only sent their own role.
+// Nothing a crewmate's phone receives names the intruder, even in the browser's network tools.
 test("a crewmate's phone is never told who the intruder is", async ({ browser }) => {
-    test.fail();
     const phones = await h.openPhones(browser, ['Sam', 'Alex', 'Jules', 'Riley']);
     for (const phone of phones) {
         phone.frames = [];

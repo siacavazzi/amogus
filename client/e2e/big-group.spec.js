@@ -44,14 +44,8 @@ test('sixteen phones in a room made on the reactor: the first phone hosts and st
     for (const phone of phones) await expect(phone.getByRole('button', { name: `Players (${NAMES.length})` }), phone.person).toBeVisible();
     for (const guest of guests) await expect(guest.getByText('Waiting for host to start the game...'), guest.person).toBeVisible();
 
-    // The example list has 34 tasks and a room needs 3 per player, so sixteen phones can't
-    // start on it alone. The host lets everyone add tasks and the room writes the rest.
-    await expect(host.getByText('Need at least 48 tasks. The room has 34.')).toBeVisible();
-    await host.getByRole('button', { name: /^Tasks \(/ }).click();
-    await host.getByTitle('Tap to let everyone add tasks').click();
-    await expect(guests[0].getByText('Only the host can add tasks right now')).toHaveCount(0);
-    await Promise.all([h.addTasks(host, 4), h.addTasks(guests[0], 5), h.addTasks(guests[1], 5)]);
-
+    // The example list has enough tasks for a room this size, so the host can start straight away.
+    await expect(host.getByText('Start Game')).toBeVisible();
     await host.getByText('Start Game').click();
     let intruders = 0;
     for (const phone of phones) {

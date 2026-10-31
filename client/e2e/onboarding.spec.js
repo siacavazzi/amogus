@@ -104,10 +104,10 @@ test('a player joins with a selfie and everyone sees it', async ({ browser, brow
     h.expectNoPageErrors([host, guest]);
 });
 
-test.fail('the camera turns off once the selfie is taken', async ({ browser, browserName }) => {
+test('the camera turns off once the selfie is taken', async ({ browser, browserName }) => {
     test.skip(browserName === 'webkit', "Playwright's WebKit has no fake camera; the camera tests run in Chromium");
-    // Known bug: the camera screen opens the camera twice (and again on Retake) but only
-    // stops the last stream, so the camera light stays on for the rest of the game.
+    // The camera screen used to open the camera twice (and again on Retake) but stop only the
+    // last stream, so the camera light stayed on for the rest of the game.
     const [host, guest] = await h.openPhones(browser, ['Sam', 'Alex']);
     await guest.addInitScript(() => {
         window.cameraStreams = [];
@@ -187,6 +187,25 @@ test('a first-time phone is offered the tutorial, and can skip it for good', asy
     await expect(guest.getByRole('heading', { name: 'Try the tutorial first' })).toHaveCount(0);
 
     h.expectNoPageErrors([phone, guest, host]);
+});
+
+test('a phone keeps its screen awake while a game runs', async ({ browser }) => {
+    const phones = await h.openPhones(browser, ['Sam', 'Alex', 'Jules']);
+    for (const phone of phones) {
+        await phone.addInitScript(() => {
+            window.wakeLocks = [];
+            Object.defineProperty(navigator, 'wakeLock', {
+                configurable: true,
+                value: { request: async type => { const lock = { type, released: false, release: async () => { lock.released = true; } }; window.wakeLocks.push(lock); return lock; } },
+            });
+        });
+    }
+    await h.gatherRoom({ host: phones[0], phones });
+    const held = page => page.evaluate(() => window.wakeLocks.filter(lock => lock.type === 'screen' && !lock.released).length);
+    expect(await held(phones[1])).toBe(0);
+    await phones[0].getByText('Start Game').click();
+    for (const phone of phones) await expect.poll(() => held(phone), { message: phone.person }).toBe(1);
+    h.expectNoPageErrors(phones);
 });
 
 test('the app can be added to a home screen', async ({ request, baseURL }) => {

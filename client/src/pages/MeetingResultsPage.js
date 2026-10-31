@@ -22,7 +22,9 @@ export default function MeetingResultPage({ tutorialMode = false, tutorialHighli
     : undefined;
   const ejected = !!meetingState?.voted_out && meetingState?.reason !== 'veto';
   const wasIntruder = !!votedOutPlayer?.sus;
-  const intrudersLeft = players.filter((p) => p.sus && p.alive && p.player_id !== meetingState?.voted_out).length;
+  // The server sends the count: crew phones aren't told who the other intruders are.
+  const intrudersLeft = meetingState?.intruders_left
+    ?? players.filter((p) => p.sus && p.alive && p.player_id !== meetingState?.voted_out).length;
 
   useEffect(() => {
     const t1 = setTimeout(() => setPhase('reveal'), ejected ? HOLD_MS : 300);

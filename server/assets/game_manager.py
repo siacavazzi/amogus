@@ -11,6 +11,12 @@ from assets.stats_tracker import StatsTracker
 
 
 ROOM_TIMEOUT_SECONDS = 24 * 60 * 60
+# Words a random room code must not contain
+BLOCKED_ROOM_WORDS = (
+    'FUCK', 'FUK', 'FCK', 'SHIT', 'CUNT', 'COCK', 'DICK', 'DIK', 'PUSS', 'TWAT', 'SLUT', 'WHOR', 'HOE',
+    'FAG', 'NIG', 'NGR', 'KKK', 'CUM', 'JIZ', 'TIT', 'ASS', 'ARSE', 'PISS', 'PORN', 'SEX', 'RAPE', 'NAZI',
+    'POO', 'PEE', 'POOP', 'BUTT', 'PENI', 'DAMN', 'HELL', 'BOOB', 'WANK', 'SPIC', 'GOOK', 'DYKE', 'KIKE',
+)
 
 
 class GameManager:
@@ -38,10 +44,10 @@ class GameManager:
         self._start_cleanup_thread()
 
     def _generate_room_code(self, length=4):
-        """Generate a unique room code."""
+        """Generate a unique room code that doesn't spell a rude word (kids and youth groups play)."""
         while True:
             code = ''.join(random.choices(string.ascii_uppercase, k=length))
-            if code not in self.games:
+            if code not in self.games and not any(word in code for word in BLOCKED_ROOM_WORDS):
                 return code
 
     def create_game(self, sid, acquisition=None, synthetic=False):

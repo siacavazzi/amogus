@@ -83,8 +83,8 @@ test('the tutorial plays through both roles to the end', async ({ browser }) => 
     h.expectNoPageErrors([phone]);
 });
 
-test.fail("How to Play's card section is readable", async ({ browser }) => {
-    // Known bug: "How intruders use cards" draws near-black text on a near-black panel.
+test("How to Play's card section is readable", async ({ browser }) => {
+    // "How intruders use cards" used to draw near-black text on a near-black panel.
     const phone = await h.openPhone(browser, 'Reader');
     await phone.goto('/how-to-play');
     const contrasts = await phone.locator('.htp-card h3').evaluateAll(headings => {

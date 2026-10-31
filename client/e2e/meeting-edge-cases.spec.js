@@ -86,12 +86,8 @@ test('a phone that drops before voting opens holds the meeting until it is back 
     h.expectNoPageErrors(phones);
 });
 
-// KNOWN BUG: a meeting only opens voting once every living player has slid ready, and an
-// offline player can't. If one phone dies or its owner goes home without tapping Leave,
-// every meeting from then on waits forever: there's no timeout and no host override.
-// Remove test.fail() once the meeting can go on without them.
+// A phone offline for more than the server's grace period (20s) is no longer waited for.
 test('a phone that never comes back does not hold the meeting forever', async ({ browser }) => {
-    test.fail();
     const phones = await h.openPhones(browser, ['Sam', 'Alex', 'Jules', 'Riley', 'Kai']);
     await h.gatherRoom({ host: phones[0], phones });
     await phones[0].getByText('Start Game').click();
