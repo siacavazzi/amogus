@@ -161,11 +161,13 @@ async function openRound(phones, cardCounts = {}) {
     const startMarks = new Map(phones.map(phone => [phone, phone.mark()]));
     await host.command('start_game', { player_id: ids.get(host) });
     await Promise.all(phones.map(phone => phone.waitFor('game_start', undefined, { since: startMarks.get(phone) })));
-    const players = (await host.waitFor('game_data', data => data.action === 'start_game', { since: startMarks.get(host) })).list.map(parse);
-    const byId = new Map(players.map(player => [player.player_id, player]));
-    const phoneOf = playerId => phones.find(phone => ids.get(phone) === playerId);
-    const intruder = phoneOf(players.find(player => player.sus).player_id);
-    const crew = phones.filter(phone => !byId.get(ids.get(phone)).sus);
+    // Each phone is told only its own role and cards, so ask every phone about itself.
+    const self = new Map(await Promise.all(phones.map(async phone => {
+        const list = (await phone.waitFor('game_data', data => data.action === 'start_game', { since: startMarks.get(phone) })).list.map(parse);
+        return [phone, list.find(player => player.player_id === ids.get(phone))];
+    })));
+    const intruder = phones.find(phone => self.get(phone).sus);
+    const crew = phones.filter(phone => !self.get(phone).sus);
     assert.equal(crew.length, phones.length - 1, 'One intruder');
     const roundId = (await crew[0].waitFor('task', undefined, { since: startMarks.get(crew[0]) })).round_id;
     log(`Round started: ${intruder.name} is the intruder`);
@@ -181,7 +183,7 @@ async function openRound(phones, cardCounts = {}) {
         return task;
     };
 
-    return { host, roomCode, ids, players, byId, phoneOf, intruder, crew, roundId, currentTask, completeTask };
+    return { host, roomCode, ids, self, intruder, crew, roundId, currentTask, completeTask };
 }
 
 async function closeRoom({ host, ids, roomCode }, phones) {
@@ -199,7 +201,7 @@ async function playGame() {
         log(`${phones.length} phones connected`);
         // One taunt and one fake task for the intruder
         const round = await openRound(phones, { fake_task: 1, taunt_message: 1 });
-        const { host, ids, byId, intruder, crew, roundId, currentTask, completeTask } = round;
+        const { host, ids, self, intruder, crew, roundId, currentTask, completeTask } = round;
 
         // Every crewmate does a task, and the score reaches everyone
         for (const phone of crew) await completeTask(phone);
@@ -207,7 +209,7 @@ async function playGame() {
         log(`${crew.length} tasks completed, crew score ${crew.length}`);
 
         // The intruder plays both cards
-        const cards = byId.get(ids.get(intruder)).cards.map(parse);
+        const cards = self.get(intruder).cards.map(parse);
         const card = action => cards.find(item => item.action === action);
         assert.ok(card('Taunt Message') && card('Fake Task'), `Intruder hand: ${cards.map(item => item.action).join(', ')}`);
         const [tauntTarget, fakeTarget] = crew;
@@ -250,9 +252,22 @@ async function playGame() {
         const meetingMarks = new Map(phones.map(phone => [phone, phone.mark()]));
         await crew[0].command('meeting', { player_id: ids.get(crew[0]), round_id: roundId });
         const meeting = parse(await host.waitFor('meeting', data => parse(data).stage === 'waiting', { since: meetingMarks.get(host) }));
-        await Promise.all(phones.map(phone => phone.command('ready', { player_id: ids.get(phone), round_id: roundId, meeting_id: meeting.id })));
+        // Phones slide ready one after another. In rooms over 10 players voting opens at 80% ready,
+        // and a phone that slides just as it opens is told the ready phase is over, which is fine.
+        const votingOpen = phone => phone.events.slice(meetingMarks.get(phone)).some(entry => entry.event === 'meeting' && parse(entry.data).stage === 'voting');
+        let readied = 0;
+        for (const phone of phones) {
+            if (votingOpen(phone)) continue;
+            try {
+                await phone.command('ready', { player_id: ids.get(phone), round_id: roundId, meeting_id: meeting.id });
+                readied++;
+            } catch (error) {
+                if (!(phones.length > 10 && /no longer in the ready phase/.test(error.message))) throw error;
+            }
+        }
         await Promise.all(phones.map(phone => phone.waitFor('meeting', data => parse(data).stage === 'voting', { since: meetingMarks.get(phone) })));
-        log('Meeting called, everyone ready, voting open');
+        if (phones.length <= 10) assert.equal(readied, phones.length, 'Small rooms wait for everyone');
+        log(`Meeting called, ${readied} of ${phones.length} slid ready, voting open`);
         const endMarks = new Map(phones.map(phone => [phone, phone.mark()]));
         await Promise.all(phones.map(phone => phone.command('vote', {
             player_id: ids.get(phone), round_id: roundId, meeting_id: meeting.id,

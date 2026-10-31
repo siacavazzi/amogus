@@ -16,7 +16,7 @@ test('the intruder wins once the crew is down to one', async ({ browser }) => {
     // A body is found: the victim says so from the meeting screen and is out.
     await caller.getByText('CALL MEETING').click();
     await expect(victim.getByText('Go to the meeting spot', { exact: false })).toBeVisible();
-    await victim.getByRole('button', { name: "I've Been Killed" }).click();
+    await h.tapAndConfirm(victim.getByRole('button', { name: "I've Been Killed" }));
     await expect(victim.getByText("You're out")).toBeVisible();
     await expect(victim.getByText('Murdered', { exact: true })).toBeVisible();
 

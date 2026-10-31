@@ -19,7 +19,7 @@ test('in a room made on the reactor, host passes on when the host leaves and the
     const [host, next, ...rest] = phones;
     await expect(reactor.getByTestId('reactor-host-hint')).toHaveText('Sam is the host. Start the game from their phone.');
 
-    await host.getByRole('button', { name: 'Leave room' }).click();
+    await h.tapAndConfirm(host.getByRole('button', { name: 'Leave room' }));
     await expect(host.getByText('Create New Game')).toBeVisible();
     await expect(reactor.getByText('4 players connected')).toBeVisible();
     await expect(reactor.getByTestId('reactor-host-hint')).toHaveText('Alex is the host. Start the game from their phone.');

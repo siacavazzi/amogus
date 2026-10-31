@@ -348,7 +348,17 @@ def admin_stats():
 @app.route('/health')
 def health_check():
     """Health check endpoint for load balancers and monitoring."""
-    return {'status': 'healthy', 'games': len(game_manager.games), 'version': VERSION}, 200
+    # Rooms that real people are in right now (test rooms left out), so a deploy can wait for
+    # rounds to finish before it restarts the server and drops them.
+    in_use = [game for game in list(game_manager.games.values())
+              if not getattr(game, 'synthetic', False) and any(player.active for player in game.players)]
+    return {
+        'status': 'healthy',
+        'games': len(game_manager.games),
+        'rooms_in_use': len(in_use),
+        'rounds_running': sum(1 for game in in_use if game.game_running),
+        'version': VERSION,
+    }, 200
 
 
 @app.route('/api/version')
@@ -1302,6 +1312,10 @@ def handleMeeting(data):
     game, player = current_phase_player(data)
     if game and player and player.sus:
         return command_error('Intruders can only call a meeting with a card.')
+    # A double tap, or two people calling at once: the meeting they want is already open, so the
+    # extra tap is not an error (an error box would cover the ready slide).
+    if game and player and game.meeting and game.meeting.round_id == game.round_id:
+        return {'ok': True, 'meeting_id': game.meeting.id}
     if not game or not game.start_meeting(player):
         return command_error('A meeting cannot start now.')
     record_usage('meeting_started', game, player.player_id)
@@ -1348,6 +1362,32 @@ def handleEndMeeting(data=None):
     if not game or game.creator_sid != request.sid or not game.meeting or data.get('meeting_id') != game.meeting.id:
         return command_error('Only the host can end the current meeting.')
     game.meeting.end_meeting()
+    return {'ok': True}
+
+
+@socketio.on('host_start_voting')
+@room_event()
+def handleHostStartVoting(data=None):
+    """Host only: open voting while some phones never slid ready (a big, chaotic room)."""
+    data = data or {}
+    game, player, room = get_game_and_player(data.get('player_id'))
+    # Dead hosts keep the button: the host is often the first one killed.
+    if not game or not player or game.creator_sid != request.sid or player.player_id != game.creator_player_id:
+        return command_error('Only the host can start voting early.', game, player, reason='not_host')
+    meeting = game.meeting
+    if (not game.game_running or game.end_state or not meeting or meeting.stage != 'waiting'
+            or data.get('round_id') != game.round_id or data.get('meeting_id') != meeting.id):
+        return command_error('This meeting is no longer in the ready phase.', game, player, reason='stale_meeting')
+    wait = meeting.host_override_in()
+    if wait > 0:
+        return command_error(f'Give everyone {wait} more seconds to get there.', game, player, reason='too_early')
+    present = game.present_living_players()
+    not_ready = sum(1 for p in present if not p.ready)
+    if not game.host_start_voting():
+        return command_error('Voting could not start.', game, player)
+    record_usage('meeting_host_started_voting', game, player.player_id,
+                 not_ready=not_ready, present=len(present))
+    sendPlayerList(game, room)
     return {'ok': True}
 
 

@@ -122,7 +122,10 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
           <div style={{ height: '100%', width: `${progressPercentage}%`, background: isLowTime ? 'var(--sg-out)' : 'var(--sg-ink)', borderRadius: 8, transition: 'width 1s linear' }} />
         </div>
         <p className="sg-lede" style={{ marginTop: 14 }}>{voteLabel}</p>
-        <p className="sg-small" style={{ marginTop: 2 }}>{alivePlayers.length} players voting</p>
+        <p className="sg-small" style={{ marginTop: 2 }}>
+          {alivePlayers.length} players voting
+          {meetingState?.started_by_host && meetingState?.host_name ? ` · ${meetingState.host_name} started it early` : ''}
+        </p>
       </div>
 
       {/* Players */}

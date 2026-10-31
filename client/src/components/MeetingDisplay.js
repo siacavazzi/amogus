@@ -4,13 +4,17 @@ import PropTypes from 'prop-types';
 import { Check } from '../signal/icons';
 import { Face, Words } from '../signal';
 import '../signal/reactor.css';
+import { readyNeeded } from '../utils/meetingQuorum';
 
 // The reactor's meeting screen: the same yellow flood the phones get, with the roll call big
 // enough to read from across the room. The moving stripes are the one thing in motion.
-const MeetingDisplay = ({ message = "Meeting called", stage = 'waiting', callerName, players = [], children }) => {
+const MeetingDisplay = ({ message = "Meeting called", stage = 'waiting', callerName, hostName, meeting, players = [], children }) => {
   const alive = players.filter((p) => p.alive !== false);
+  // Someone offline past the server's grace period isn't waited for.
+  const present = alive.filter((p) => !p.absent);
   const isReady = (p) => p.active !== false && p.ready;
-  const readyCount = alive.filter(isReady).length;
+  const readyCount = present.filter(isReady).length;
+  const needed = readyNeeded(meeting, present.length);
   const caller = callerName ? players.find((p) => p.username === callerName) : undefined;
   const voting = stage === 'voting';
   // Big groups get smaller faces so the whole roll call still fits on one screen.
@@ -68,7 +72,17 @@ const MeetingDisplay = ({ message = "Meeting called", stage = 'waiting', callerN
 
           {!voting && alive.length > 0 && (
             <p className="sg-rx__lede sg-num" data-testid="reactor-ready-count">
-              {readyCount === alive.length ? 'Everyone is here. Voting opens.' : `${readyCount} of ${alive.length} ready`}
+              {readyCount >= needed ? 'Everyone is here. Voting opens.' : `${readyCount} of ${present.length} ready`}
+            </p>
+          )}
+
+          {!voting && readyCount < needed && needed < present.length && (
+            <p className="sg-rx__note" data-testid="reactor-ready-needed">Voting opens at {needed} ready</p>
+          )}
+
+          {!voting && hostName && readyCount < needed && (
+            <p className="sg-rx__note" data-testid="reactor-host-can-start">
+              Stuck? {hostName} is the host and can start the vote from their phone.
             </p>
           )}
         </div>
@@ -82,6 +96,8 @@ MeetingDisplay.propTypes = {
   message: PropTypes.string,
   stage: PropTypes.string,
   callerName: PropTypes.string,
+  hostName: PropTypes.string,
+  meeting: PropTypes.object,
   players: PropTypes.array,
   children: PropTypes.node,
 };

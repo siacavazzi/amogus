@@ -37,9 +37,14 @@ async function openPage(browser, name, options) {
         await context.addCookies([{ name: 'sus_channel', value: 'beta', domain: hostname, path: '/' }]);
     }
     const page = await context.newPage();
+    await routeSocket(page);
     page.person = name;
     page.errors = [];
-    page.on('pageerror', error => page.errors.push(error.message));
+    page.on('pageerror', error => {
+        page.errors.push(error.message);
+        // The stack says where it broke, which the message alone doesn't (Safari's especially).
+        console.log(`[${name}] page error: ${error.stack || error.message}`);
+    });
     // Confirm prompts ("Did the intruder get you?") get a yes, as the person meant to tap it.
     page.on('dialog', dialog => dialog.accept());
     return page;
@@ -58,7 +63,8 @@ async function skipTutorialPrompt(page) {
 // Pick the example task list, apply any settings, and open the room.
 //   settings: { intruders, meltdownTime, tasksPerPlayer, startingCards, cardDrawChance,
 //               deck: { 'EMP': 1, 'Fake Task': 1, ... } (a custom deck; unnamed cards are set to 0),
-//               groupTasks: true (no list; the room writes its tasks together in the lobby) }
+//               groupTasks: true (no list; the room writes its tasks together in the lobby),
+//               meetingQuorum: false (big games wait for everyone to slide ready, not 80%) }
 async function setUpRoom(page, settings = {}) {
     await page.goto('/play');
     await skipTutorialPrompt(page);
@@ -85,9 +91,13 @@ async function setUpRoom(page, settings = {}) {
         cardDrawChance: 'setting-card-draw-chance',
     };
     const wanted = Object.keys(sliders).filter(key => settings[key] !== undefined);
-    if (wanted.length || settings.deck) {
+    if (wanted.length || settings.deck || settings.meetingQuorum === false) {
         await page.getByRole('button', { name: /Advanced Settings/ }).click();
         for (const key of wanted) await page.locator(`#${sliders[key]}`).fill(String(settings[key]));
+    }
+    if (settings.meetingQuorum === false) {
+        await page.getByRole('button', { name: /^Everyone ready/ }).click();
+        await expect(page.getByRole('button', { name: /^Everyone ready/ })).toHaveAttribute('aria-pressed', 'true');
     }
     if (settings.deck) {
         await page.getByRole('button', { name: /^Custom/ }).click();
@@ -159,6 +169,70 @@ async function hold(page, locator, ms) {
     await page.mouse.down();
     await sleep(ms);
     return async () => page.mouse.up();
+}
+
+// Tap a button that asks "Are you sure?" (window.confirm). In Playwright's WebKit a real tap that
+// opens a confirm never returns, and a tap sent from the page doesn't get the dialog handler's yes
+// either, so there the page's confirm says yes for that one tap. Safari on a phone shows the dialog.
+async function tapAndConfirm(locator) {
+    if (!isWebKit(locator.page())) return locator.click();
+    await expect(locator).toBeVisible();
+    await locator.evaluate(button => {
+        const ask = window.confirm;
+        window.confirm = () => true;
+        try { button.click(); } finally { window.confirm = ask; }
+    });
+}
+
+const isWebKit = page => page.context().browser().browserType().name() === 'webkit';
+
+// In WebKit the game's socket goes through Playwright, so goOffline can cut it: Playwright's
+// WebKit keeps an open WebSocket working after setOffline. (Chromium closes it, or the server's
+// ping timeout catches it.)
+async function routeSocket(page) {
+    page.sockets = [];
+    if (!isWebKit(page)) return;
+    await page.routeWebSocket(/socket\.io/, ws => {
+        if (page.offline) return ws.close({ code: 1006, reason: 'offline' });
+        page.sockets.push(ws);
+        ws.connectToServer();
+    });
+}
+
+// Cut a page off the network (and its game socket with it), or bring it back.
+async function goOffline(page) {
+    page.offline = true;
+    await page.context().setOffline(true);
+    for (const ws of page.sockets.splice(0)) await ws.close({ code: 1006, reason: 'offline' }).catch(() => {});
+}
+
+async function goOnline(page) {
+    page.offline = false;
+    await page.context().setOffline(false);
+}
+
+// Lock a phone the way an iPhone does in a pocket: the page goes hidden, its JavaScript stops,
+// and its connection drops. Returns unlock(), which brings it back in the same order a phone does.
+// Chromium only: it pauses the page's JavaScript through the DevTools protocol. (Chromium's own
+// "frozen" page state breaks localStorage after it resumes, which phones don't do.)
+async function lock(page) {
+    const cdp = await page.context().newCDPSession(page);
+    const setVisible = visible => page.evaluate(shown => {
+        Object.defineProperty(document, 'visibilityState', { value: shown ? 'visible' : 'hidden', configurable: true });
+        Object.defineProperty(document, 'hidden', { value: !shown, configurable: true });
+        document.dispatchEvent(new Event('visibilitychange'));
+    }, visible);
+    await setVisible(false);
+    await goOffline(page);
+    await cdp.send('Debugger.enable');
+    await cdp.send('Debugger.pause');
+    return async () => {
+        await goOnline(page);
+        await cdp.send('Debugger.resume');
+        await cdp.send('Debugger.disable');
+        await setVisible(true);
+        await cdp.detach().catch(() => {});
+    };
 }
 
 // Every phone peeks at its role; returns the intruder's page.
@@ -303,6 +377,6 @@ function expectNoPageErrors(pages) {
 }
 
 module.exports = {
-    openPage, closeAll, skipTutorialPrompt, openPhones, openPhone, openReactor, createRoom, createRoomOnPhone, gatherRoom, readyUp, connectReactor, joinRoom, enterName, revealRoles, revealAllRoles, swipe, hold, callMeeting, vote,
+    lock, goOffline, goOnline, tapAndConfirm, openPage, closeAll, skipTutorialPrompt, openPhones, openPhone, openReactor, createRoom, createRoomOnPhone, gatherRoom, readyUp, connectReactor, joinRoom, enterName, revealRoles, revealAllRoles, swipe, hold, callMeeting, vote,
     continueAfterResults, voteOutIntruder, roundButton, addTasks, openVent, playCard, dismissMessage, expectLobby, expectNoPageErrors, sleep,
 };
