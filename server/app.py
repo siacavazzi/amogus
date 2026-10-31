@@ -5,6 +5,7 @@ import os
 import secrets
 import sys
 import copy
+import re
 import time
 from functools import wraps
 from uuid import uuid4
@@ -13,7 +14,9 @@ from flask import Flask, request, send_from_directory, abort, has_request_contex
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask_cors import CORS
 from assets.game_manager import GameManager
-from assets.room_codes import ROOM_CODE_ALPHABET, has_unused_letters
+from assets.stats_tracker import StatsTracker
+from assets.room_codes import ROOM_CODE_ALPHABET, has_unused_letters, clean_room_code
+from assets import client_info
 from assets.sonosHandler import SonosController
 from assets.utils import *
 from assets.taskHandler import *
@@ -65,6 +68,11 @@ game_manager = GameManager(socketio, speaker, game_config, selfie_store=selfie_s
 task_list_manager = TaskListManager()
 
 client_metrics_by_sid = {}
+# What the phone said about its last dropped connection, kept for the rejoin that follows.
+last_drop_by_sid = {}
+# Room entry attempts per socket, so a socket that gives up after errors can be counted.
+entry_attempts_by_sid = {}
+metric_counts_by_sid = {}
 # How long a player can be offline before the room stops waiting for them: meetings and Play Again
 # go on without them, the host role moves on, and they aren't dealt into the next round.
 ABSENT_AFTER_SECONDS = 20
@@ -193,10 +201,25 @@ def record_usage(event, game=None, player_id=None, resolve_game=True, **fields):
         logger.exception('Usage event write failed')
 
 
+def clean_last_drop(value):
+    """The phone's own account of its last dropped socket: was the page hidden, was it offline."""
+    if not isinstance(value, dict):
+        return None
+    def seconds(key):
+        number = value.get(key)
+        return round(min(float(number), 86400), 1) if type(number) in (int, float) and number >= 0 else None
+    return {
+        'page_hidden': value.get('page_hidden') is True,
+        'hidden_seconds': seconds('hidden_seconds'),
+        'browser_offline': value.get('browser_offline') is True,
+        'seconds_since_drop': seconds('seconds_since_drop'),
+    }
+
+
 def record_reconnect(game, player):
     disconnected_at = getattr(player, 'disconnected_at', None)
     record_usage('player_reconnected' if not player.active else 'session_resumed', game, player.player_id,
-                 was_disconnected=not player.active,
+                 was_disconnected=not player.active, last_drop=last_drop_by_sid.get(request.sid),
                  recovery_seconds=round(max(0, time.time() - disconnected_at), 3) if disconnected_at else None)
     player.disconnected_at = None
 
@@ -218,10 +241,29 @@ def room_not_found_message(room_code):
     return message
 
 
-def room_entry_error(code, room_code, message):
+ENTRY_METHODS = {'qr', 'share_link', 'invite_link', 'typed', 'host_return'}
+
+
+def entry_details(data, room_code):
+    """How a phone reached a room: QR/link or typed, which try this is, and whether the code was fixed up."""
+    method = data.get('entry_method') if isinstance(data, dict) else None
+    typed = clean_room_code(data.get('room_code')) if isinstance(data, dict) else ''
+    attempts = entry_attempts_by_sid.setdefault(request.sid, {'tries': 0, 'errors': []})
+    attempts['tries'] += 1
+    return {
+        'entry_method': method if method in ENTRY_METHODS else 'unknown',
+        'attempt': attempts['tries'],
+        'code_corrected': bool(typed) and typed != room_code,
+    }
+
+
+def room_entry_error(code, room_code, message, details=None):
+    attempts = entry_attempts_by_sid.setdefault(request.sid, {'tries': 0, 'errors': []})
+    attempts['errors'].append(code)
+    del attempts['errors'][:-10]
     record_usage('join_rejected', game_manager.get_game(room_code),
                  resolve_game=False, room_code=room_code, reason=code,
-                 command=(getattr(request, 'event', {}) or {}).get('message'))
+                 command=(getattr(request, 'event', {}) or {}).get('message'), **(details or {}))
     emit('error', {
         'scope': 'room_entry', 'code': code,
         'room_code': room_code, 'message': message,
@@ -397,7 +439,11 @@ def handle_create_game(data=None):
     room_code, game = game_manager.create_game(sid, acquisition, synthetic=sid in synthetic_sids)
     game.creator_sid = sid  # Track room creator
     game.host_token = secrets.token_urlsafe(16)
-    record_usage('host_entered', game, flush=True)
+    # "Use this pack" on the task generator creates the room with the pack already loaded.
+    game.last_setup_step = 'created'
+    game.setup_origin = 'generator' if isinstance(data, dict) and data.get('setup') == 'generated' else 'play_page'
+    record_usage('host_entered', game, flush=True, setup_origin=game.setup_origin,
+                 **StatsTracker.normalize_visit(acquisition))
     join_room(room_code)
     
     logger.info(f"Game created with room code: {room_code}")
@@ -440,10 +486,26 @@ def handle_update_game_config(data):
         emit('error', {'message': 'Cannot change settings while game is running'})
         return
     
+    before = game.get_config()
     game.update_config(config)
+    record_settings_change(game, before, game.get_config())
     logger.info(f"Game {room_code} config updated: {config}")
     emit('game_config', game.get_config())
     socketio.emit('task_locations', game.locations, room=room_code)
+
+
+LOGGED_SETTINGS = ('vote_time', 'vote_threshold', 'meeting_quorum', 'meltdown_time', 'code_percent',
+                   'num_intruders', 'card_draw_probability', 'starting_cards', 'task_ratio', 'card_deck_preset')
+
+
+def record_settings_change(game, before, after):
+    """Which host settings moved. Location names are the host's words, so only their count goes in."""
+    changed = {key: after[key] for key in LOGGED_SETTINGS if before.get(key) != after.get(key)}
+    locations_changed = before.get('locations') != after.get('locations')
+    deck_changed = before.get('card_deck_counts') != after.get('card_deck_counts')
+    if changed or locations_changed or deck_changed:
+        record_usage('settings_changed', game, changed=changed, location_count=len(after.get('locations') or []),
+                     locations_changed=locations_changed, card_counts_changed=deck_changed)
 
 
 @socketio.on('open_room')
@@ -464,6 +526,7 @@ def handle_open_room(data):
     
     if not game.is_open:
         game.room_opened_at = time.time()
+        game.last_setup_step = 'opened'
         record_usage('room_opened', game, flush=True,
                      setup_seconds=round(max(0, time.monotonic() - game.lobby_started_monotonic), 3))
         # "Create Tasks with Group" opens with no list: everyone writes the tasks, as promised.
@@ -482,10 +545,11 @@ def handle_join_game(data):
     sid = request.sid
     room_code = game_manager.resolve_room_code(data.get('room_code'))
     player_id = data.get('player_id')  # Optional: for reconnecting players
+    details = entry_details(data, room_code)
     
     game = game_manager.get_game(room_code)
     if not game:
-        room_entry_error('room_not_found', room_code, room_not_found_message(room_code))
+        room_entry_error('room_not_found', room_code, room_not_found_message(room_code), details)
         logger.warning(f"Join attempt for non-existent room: {room_code}")
         return
     
@@ -498,13 +562,13 @@ def handle_join_game(data):
 
     if not game.is_open and not host_returning:
         room_entry_error('room_not_open', room_code,
-                         'This room is not open yet. Ask the host to open it, then try again.')
+                         'This room is not open yet. Ask the host to open it, then try again.', details)
         logger.warning(f"Join attempt for not-yet-open room: {room_code}")
         return
     
     if game.game_running:
         room_entry_error('round_in_progress', room_code,
-                         'This round already started. New players can join when the host returns to the lobby.')
+                         'This round already started. New players can join when the host returns to the lobby.', details)
         logger.warning(f"Join attempt for running game: {room_code}")
         return
     
@@ -532,7 +596,9 @@ def handle_join_game(data):
     emit('task_locations', game.locations)
     # Lets the avatar picker show which avatars are taken before this socket joins as a player.
     emit('game_data', {**metadata(game), 'action': 'player_list', 'list': game.player_view()})
-    record_usage('room_entered', game, is_creator=is_creator)
+    attempts = entry_attempts_by_sid.pop(request.sid, {'errors': []})
+    record_usage('room_entered', game, is_creator=is_creator, **details,
+                 errors_before=len(attempts['errors']), error_reasons_before=sorted(set(attempts['errors'])))
     logger.info(f"Client {sid} joined room {room_code}, is_creator={is_creator}")
 
 
@@ -633,6 +699,42 @@ def handle_register_reactor(data):
     emit('room_state', room_state(game, sid=sid))
 
 
+# ============ PHONE-SIDE METRICS ============
+
+SETUP_STEPS = {'tasklist', 'settings'}
+END_SCREEN_ACTIONS = {'host_your_own', 'play_again', 'feedback_open', 'feedback_sent', 'how_to_play'}
+CLIENT_METRICS_PER_SOCKET = 60
+
+
+def clean_label(value, limit, pattern=r'[A-Za-z0-9_./:-]+'):
+    return value[:limit] if isinstance(value, str) and re.fullmatch(pattern, value[:limit]) else None
+
+
+@socketio.on('client_metric')
+def handle_client_metric(data=None):
+    """Allowlisted signals only the browser sees: setup screens, end-screen taps, uncaught errors."""
+    if not isinstance(data, dict):
+        return
+    sent = metric_counts_by_sid.get(request.sid, 0)
+    if sent >= CLIENT_METRICS_PER_SOCKET:
+        return
+    metric_counts_by_sid[request.sid] = sent + 1
+    game, _ = game_manager.get_game_by_sid(request.sid)
+    kind = data.get('kind')
+    if kind == 'setup_step' and data.get('step') in SETUP_STEPS:
+        if game and request.sid == game.creator_sid and not game.game_running:
+            game.last_setup_step = data['step']
+            record_usage('setup_step', game, step=data['step'])
+    elif kind == 'end_screen_action' and data.get('action') in END_SCREEN_ACTIONS:
+        record_usage('end_screen_action', game, action=data['action'])
+    elif kind == 'client_error':
+        # Error class, screen and minified location only: messages can quote what someone typed.
+        record_usage('client_error', game, error_type=clean_label(data.get('error_type'), 40) or 'unknown',
+                     screen=clean_label(data.get('screen'), 60), where=clean_label(data.get('where'), 80),
+                     client_version=clean_label(data.get('client_version'), 40),
+                     unhandled_rejection=data.get('unhandled_rejection') is True)
+
+
 # ============ CONNECTION HANDLING ============
 
 @socketio.on('connect')
@@ -640,18 +742,17 @@ def handle_connect(auth=None):
     token = secrets.token_urlsafe(32)
     selfie_tokens_by_sid[request.sid] = token
     emit('selfie_access', {'sid': request.sid, 'token': token})
-    user_agent = request.headers.get('User-Agent', '').lower()
-    device = ('tablet' if 'ipad' in user_agent or ('android' in user_agent and 'mobile' not in user_agent)
-              else 'mobile' if any(value in user_agent for value in ('mobile', 'iphone', 'ipod'))
-              else 'desktop' if user_agent else 'unknown')
     offset = auth.get('utc_offset_minutes') if isinstance(auth, dict) else None
     if isinstance(auth, dict) and auth.get('synthetic') is True:
         synthetic_sids.add(request.sid)
     client_metrics_by_sid[request.sid] = {
-        'device_class': device,
+        **client_info.describe(request.headers.get('User-Agent', '')),
         'utc_offset_minutes': offset if type(offset) is int and -840 <= offset <= 840 else None,
     }
-    record_usage('connection_opened')
+    last_drop = clean_last_drop(auth.get('last_drop') if isinstance(auth, dict) else None)
+    if last_drop:
+        last_drop_by_sid[request.sid] = last_drop
+    record_usage('connection_opened', **({'last_drop': last_drop} if last_drop else {}))
     logger.info(f'Client connected: {request.sid}')
     # Don't auto-join any room on connect - client must create or join
 
@@ -757,6 +858,13 @@ def handle_disconnect(reason=None):
         'server disconnect', 'client namespace disconnect', 'server namespace disconnect',
     } else 'unknown'
     record_usage('connection_closed', game, player.player_id if player else None, reason=disconnect_reason)
+    attempts = entry_attempts_by_sid.pop(sid, None)
+    if attempts and attempts['errors'] and not player:
+        # This phone tried a room, got only errors, and left: a lost player.
+        record_usage('join_abandoned', game, attempts=attempts['tries'], errors=len(attempts['errors']),
+                     last_reason=attempts['errors'][-1], error_reasons=sorted(set(attempts['errors'])))
+    last_drop_by_sid.pop(sid, None)
+    metric_counts_by_sid.pop(sid, None)
     client_metrics_by_sid.pop(sid, None)
     selfie_tokens_by_sid.pop(sid, None)
     game_manager.unregister_sid(sid)
@@ -1257,6 +1365,11 @@ def handleTaskComplete(data):
                 break
         if percentage >= 100 and not game.intruders_revealed:
             game.on_tasks_complete()
+    finished_task = player.task
+    assigned_at = getattr(player, 'task_assigned_monotonic', None)
+    task_seconds = round(time.monotonic() - assigned_at, 1) if assigned_at is not None else None
+    if task_seconds is not None and not is_fake:
+        game.task_seconds.append(task_seconds)
     queued_task = player.fake_task
     player.fake_task = None
     game.assign_task(player, queued_task)
@@ -1266,7 +1379,8 @@ def handleTaskComplete(data):
     while len(game.command_results) > 256:
         game.command_results.popitem(last=False)
     record_usage('task_completed', game, player.player_id, is_fake=is_fake, crew_score=game.crew_score,
-                 task_goal=game.taskGoal)
+                 task_goal=game.taskGoal, task_seconds=task_seconds,
+                 task_key=StatsTracker.task_key(finished_task), round_seconds=game.round_seconds())
     return response
 
 
@@ -1424,7 +1538,7 @@ def handleMeltdown(data=None):
     if game:
         # Verify this is either a reactor or a player in the game
         if game.reactor_sid == sid or (data and data.get('player_id')):
-            if game.start_meltdown():
+            if game.start_meltdown(trigger='reactor' if game.reactor_sid == sid else 'phone'):
                 record_usage('meltdown_started', game, data.get('player_id') if data else None)
                 logger.warning(f"Meltdown started in room {room_code} (triggered by sid: {sid})")
         else:

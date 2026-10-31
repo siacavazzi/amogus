@@ -1,5 +1,15 @@
 export const ROOM_QUERY_PARAM = 'room';
 export const ROOM_QUERY_PARAM_ALIAS = 'room_code';
+// Tags where a join link came from, so the event log can split joins by channel.
+export const VIA_QUERY_PARAM = 'via';
+const ENTRY_METHOD_BY_VIA = { qr: 'qr', share: 'share_link', home: 'typed' };
+
+/** How this page load reached a room: a QR scan, a shared link, a code typed on the home page, or an untagged link. */
+export function getEntryMethodFromSearch(search = window.location.search) {
+    const params = new URLSearchParams(search || '');
+    if (!getRoomCodeFromSearch(search)) return null;
+    return ENTRY_METHOD_BY_VIA[params.get(VIA_QUERY_PARAM)] || 'invite_link';
+}
 
 export function normalizeRoomCode(value) {
     if (!value) return '';
@@ -16,14 +26,16 @@ export function clearRoomCodeFromUrl() {
     const url = new URL(window.location.href);
     url.searchParams.delete(ROOM_QUERY_PARAM);
     url.searchParams.delete(ROOM_QUERY_PARAM_ALIAS);
+    url.searchParams.delete(VIA_QUERY_PARAM);
     window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
 }
 
-export function buildRoomInviteUrl(roomCode, origin = window.location.origin) {
+export function buildRoomInviteUrl(roomCode, origin = window.location.origin, via = null) {
     const normalizedRoomCode = normalizeRoomCode(roomCode);
     if (!normalizedRoomCode) return '';
 
     const url = new URL('/play', origin);
     url.searchParams.set(ROOM_QUERY_PARAM, normalizedRoomCode);
+    if (via) url.searchParams.set(VIA_QUERY_PARAM, via);
     return url.toString();
 }

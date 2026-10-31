@@ -33,7 +33,7 @@ import YouthGroupsPage from './pages/seo/YouthGroupsPage';
 import PrintableTaskCardsPage from './pages/seo/PrintableTaskCardsPage';
 import HolidayPartyPage from './pages/seo/HolidayPartyPage';
 import { getRoomCodeFromSearch } from './utils/inviteLinks';
-import { captureAcquisition } from './seo/discovery';
+import { captureAcquisition, noteVisit } from './seo/discovery';
 import { usePageMeta } from './seo/usePageMeta';
 
 const StylePreview = lazy(() => import('./preview/StylePreview'));
@@ -185,7 +185,7 @@ function GamePage() {
 
 function App() {
     const route = getRoute();
-    useEffect(() => { captureAcquisition(); }, []);
+    useEffect(() => { captureAcquisition(); noteVisit(); }, []);
 
   if (process.env.NODE_ENV === 'development' && window.location.pathname === '/style-preview') {
     return <Suspense fallback={<div>Loading preview…</div>}><StylePreview /></Suspense>;

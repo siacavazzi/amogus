@@ -74,7 +74,7 @@ function LobbyPage() {
         clearRoomCodeFromUrl();
         setIsCreating(true);
         setError('');
-        socket.emit('create_game', { acquisition: getAcquisition() });
+        socket.emit('create_game', { acquisition: getAcquisition(), ...(generatedSetup ? { setup: 'generated' } : {}) });
         
         setTimeout(() => {
             setIsCreating(false);
@@ -101,7 +101,7 @@ function LobbyPage() {
         if (playerId && localStorage.getItem('room_code') === inputRoomCode) {
             socket.emit('rejoin', { player_id: playerId });
         } else {
-            socket.emit('join_game', { room_code: inputRoomCode });
+            socket.emit('join_game', { room_code: inputRoomCode, entry_method: 'typed' });
         }
         clearTimeout(entryTimeout.current);
         entryTimeout.current = setTimeout(() => {

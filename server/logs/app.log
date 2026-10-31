@@ -8644,3 +8644,224 @@
 2026-10-07 01:32:26,907 - app_logger - INFO - Client connected: VrQbsA97DzEY7pw3AAAb
 2026-10-07 01:32:29,270 - app_logger - INFO - Client connected: Iur55_-jdL3qGZkpAAAe
 2026-10-07 13:15:31,313 - app_logger - INFO - Client disconnected: Iur55_-jdL3qGZkpAAAe
+2026-10-31 18:59:49,171 - app_logger - dev-5f91f39 - INFO - Starting Sus Party prod server version dev-5f91f39 (commit 5f91f39, built None)
+2026-10-31 18:59:49,181 - app_logger - dev-5f91f39 - INFO - Starting server...
+2026-10-31 18:59:49,181 - app_logger - dev-5f91f39 - INFO -  * Running with HTTP at: http://192.0.2.2:5001
+2026-10-31 18:59:49,181 - app_logger - dev-5f91f39 - INFO -  * For HTTPS, generate certificates with:
+2026-10-31 18:59:49,181 - app_logger - dev-5f91f39 - INFO -    openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365
+2026-10-31 19:00:06,168 - app_logger - dev-5f91f39 - INFO - Client connected: dNM-yZBwKS3K3VF0AAB7
+2026-10-31 19:00:06,169 - app_logger - dev-5f91f39 - INFO - Client connected: 5HT_zTo2nadtLzdmAAB8
+2026-10-31 19:00:06,170 - app_logger - dev-5f91f39 - INFO - Client connected: sRoZOkip_QnSWd7YAAB9
+2026-10-31 19:00:06,171 - app_logger - dev-5f91f39 - INFO - Client connected: RpsH8RFqIOIWC8iRAAB-
+2026-10-31 19:00:06,171 - app_logger - dev-5f91f39 - INFO - Client connected: uYT-dpzzCLAN3pMBAAB_
+2026-10-31 19:00:06,219 - app_logger - dev-5f91f39 - INFO - Game created with room code: HRAY
+2026-10-31 19:00:06,221 - app_logger - dev-5f91f39 - INFO - Game HRAY config updated: {'num_intruders': 1, 'starting_cards': 2, 'task_ratio': 3, 'vote_time': 30, 'vote_threshold': 0.5, 'card_draw_probability': 0, 'card_deck_preset': 'custom', 'card_deck_counts': {'self_report': 0, 'emp': 0, 'fake_task': 1, 'taunt_message': 1, 'remote_sabotage': 0, 'shorten_meltdown': 0, 'area_denial_per_location': 0}}
+2026-10-31 19:00:06,264 - app_logger - dev-5f91f39 - INFO - Room HRAY is now open for players
+2026-10-31 19:00:06,268 - app_logger - dev-5f91f39 - INFO - Set creator_player_id to d4466a17-ca11-4c3f-abca-4e1d09a98bb4 for room HRAY
+2026-10-31 19:00:06,269 - app_logger - dev-5f91f39 - INFO - New player E2E Host joined room HRAY with ID d4466a17-ca11-4c3f-abca-4e1d09a98bb4, is_creator=True
+2026-10-31 19:00:06,311 - app_logger - dev-5f91f39 - INFO - Client 5HT_zTo2nadtLzdmAAB8 joined room HRAY, is_creator=False
+2026-10-31 19:00:06,314 - app_logger - dev-5f91f39 - INFO - New player E2E Player 1 joined room HRAY with ID 5f391675-9a93-49dc-b71b-c09177fba715, is_creator=False
+2026-10-31 19:00:06,316 - app_logger - dev-5f91f39 - INFO - Client RpsH8RFqIOIWC8iRAAB- joined room HRAY, is_creator=False
+2026-10-31 19:00:06,319 - app_logger - dev-5f91f39 - INFO - New player E2E Player 2 joined room HRAY with ID 08d0d28a-d1e9-4d23-92a2-c8618d2d12ad, is_creator=False
+2026-10-31 19:00:06,321 - app_logger - dev-5f91f39 - INFO - Client dNM-yZBwKS3K3VF0AAB7 joined room HRAY, is_creator=False
+2026-10-31 19:00:06,324 - app_logger - dev-5f91f39 - INFO - New player E2E Player 3 joined room HRAY with ID ef402af5-aeb8-4e31-926e-8ed8b98bab63, is_creator=False
+2026-10-31 19:00:06,327 - app_logger - dev-5f91f39 - INFO - Client sRoZOkip_QnSWd7YAAB9 joined room HRAY, is_creator=False
+2026-10-31 19:00:06,331 - app_logger - dev-5f91f39 - INFO - New player E2E Player 4 joined room HRAY with ID 62b9e400-9d80-4ba4-95fa-18ef90ad00b8, is_creator=False
+2026-10-31 19:00:06,335 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room HRAY: E2E task 1
+2026-10-31 19:00:06,336 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room HRAY: E2E task 2
+2026-10-31 19:00:06,337 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room HRAY: E2E task 3
+2026-10-31 19:00:06,338 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room HRAY: E2E task 4
+2026-10-31 19:00:06,338 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room HRAY: E2E task 5
+2026-10-31 19:00:06,339 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room HRAY: E2E task 6
+2026-10-31 19:00:06,340 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room HRAY: E2E task 7
+2026-10-31 19:00:06,340 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room HRAY: E2E task 8
+2026-10-31 19:00:06,341 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room HRAY: E2E task 9
+2026-10-31 19:00:06,342 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room HRAY: E2E task 10
+2026-10-31 19:00:06,343 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room HRAY: E2E task 11
+2026-10-31 19:00:06,344 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room HRAY: E2E task 12
+2026-10-31 19:00:06,344 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room HRAY: E2E task 13
+2026-10-31 19:00:06,345 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room HRAY: E2E task 14
+2026-10-31 19:00:06,346 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room HRAY: E2E task 15
+2026-10-31 19:00:06,347 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room HRAY: E2E task 16
+2026-10-31 19:00:06,348 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room HRAY: E2E task 17
+2026-10-31 19:00:06,348 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room HRAY: E2E task 18
+2026-10-31 19:00:06,667 - app_logger - dev-5f91f39 - INFO - Client disconnected: sRoZOkip_QnSWd7YAAB9
+2026-10-31 19:00:06,674 - app_logger - dev-5f91f39 - INFO - Client connected: vGGydK3TwYzPFyKSAACB
+2026-10-31 19:00:06,719 - app_logger - dev-5f91f39 - INFO - Player 62b9e400-9d80-4ba4-95fa-18ef90ad00b8 rejoining room HRAY, creator_player_id=d4466a17-ca11-4c3f-abca-4e1d09a98bb4
+2026-10-31 19:00:06,719 - app_logger - dev-5f91f39 - INFO - Non-creator 62b9e400-9d80-4ba4-95fa-18ef90ad00b8 rejoined room HRAY
+2026-10-31 19:00:06,720 - app_logger - dev-5f91f39 - INFO - Sending task to player
+2026-10-31 19:00:06,966 - app_logger - dev-5f91f39 - INFO - Room HRAY has been disbanded
+2026-10-31 19:00:06,968 - app_logger - dev-5f91f39 - INFO - Client disconnected: uYT-dpzzCLAN3pMBAAB_
+2026-10-31 19:00:06,969 - app_logger - dev-5f91f39 - INFO - Client disconnected: vGGydK3TwYzPFyKSAACB
+2026-10-31 19:00:06,970 - app_logger - dev-5f91f39 - INFO - Client disconnected: 5HT_zTo2nadtLzdmAAB8
+2026-10-31 19:00:06,970 - app_logger - dev-5f91f39 - INFO - Client disconnected: RpsH8RFqIOIWC8iRAAB-
+2026-10-31 19:00:06,971 - app_logger - dev-5f91f39 - INFO - Client disconnected: dNM-yZBwKS3K3VF0AAB7
+2026-10-31 19:00:06,976 - app_logger - dev-5f91f39 - INFO - Client connected: KOKs-6lb9AZK_NGUAACF
+2026-10-31 19:00:06,978 - app_logger - dev-5f91f39 - INFO - Client connected: TNYXk0TA1SZ3ZLD_AACG
+2026-10-31 19:00:06,978 - app_logger - dev-5f91f39 - INFO - Client connected: 5-LU7y8j9sixswGNAACH
+2026-10-31 19:00:07,026 - app_logger - dev-5f91f39 - INFO - Game created with room code: YXAY
+2026-10-31 19:00:07,028 - app_logger - dev-5f91f39 - INFO - Game YXAY config updated: {'num_intruders': 1, 'starting_cards': 0, 'task_ratio': 3, 'vote_time': 30, 'vote_threshold': 0.5, 'card_draw_probability': 0, 'card_deck_preset': 'custom', 'card_deck_counts': {'self_report': 0, 'emp': 0, 'fake_task': 0, 'taunt_message': 0, 'remote_sabotage': 0, 'shorten_meltdown': 0, 'area_denial_per_location': 0}}
+2026-10-31 19:00:07,072 - app_logger - dev-5f91f39 - INFO - Room YXAY is now open for players
+2026-10-31 19:00:07,075 - app_logger - dev-5f91f39 - INFO - Set creator_player_id to 78467c62-8ba8-47de-a2ca-069324bfaa8c for room YXAY
+2026-10-31 19:00:07,076 - app_logger - dev-5f91f39 - INFO - New player E2E Host (last stand) joined room YXAY with ID 78467c62-8ba8-47de-a2ca-069324bfaa8c, is_creator=True
+2026-10-31 19:00:07,119 - app_logger - dev-5f91f39 - INFO - Client TNYXk0TA1SZ3ZLD_AACG joined room YXAY, is_creator=False
+2026-10-31 19:00:07,122 - app_logger - dev-5f91f39 - INFO - New player E2E Player 1 (last stand joined room YXAY with ID 766f39fe-ceed-4f05-936c-1736fd8c067e, is_creator=False
+2026-10-31 19:00:07,124 - app_logger - dev-5f91f39 - INFO - Client 5-LU7y8j9sixswGNAACH joined room YXAY, is_creator=False
+2026-10-31 19:00:07,127 - app_logger - dev-5f91f39 - INFO - New player E2E Player 2 (last stand joined room YXAY with ID 51306ad2-29ea-4b28-a9d6-b5d30870343e, is_creator=False
+2026-10-31 19:00:07,131 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room YXAY: E2E task 1
+2026-10-31 19:00:07,131 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room YXAY: E2E task 2
+2026-10-31 19:00:07,132 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room YXAY: E2E task 3
+2026-10-31 19:00:07,132 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room YXAY: E2E task 4
+2026-10-31 19:00:07,133 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room YXAY: E2E task 5
+2026-10-31 19:00:07,134 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room YXAY: E2E task 6
+2026-10-31 19:00:07,134 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room YXAY: E2E task 7
+2026-10-31 19:00:07,134 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room YXAY: E2E task 8
+2026-10-31 19:00:07,135 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room YXAY: E2E task 9
+2026-10-31 19:00:07,136 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room YXAY: E2E task 10
+2026-10-31 19:00:07,136 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room YXAY: E2E task 11
+2026-10-31 19:00:07,137 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room YXAY: E2E task 12
+2026-10-31 19:00:07,438 - app_logger - dev-5f91f39 - INFO - Room YXAY has been disbanded
+2026-10-31 19:00:07,440 - app_logger - dev-5f91f39 - INFO - Client disconnected: KOKs-6lb9AZK_NGUAACF
+2026-10-31 19:00:07,441 - app_logger - dev-5f91f39 - INFO - Client disconnected: 5-LU7y8j9sixswGNAACH
+2026-10-31 19:00:07,441 - app_logger - dev-5f91f39 - INFO - Client disconnected: TNYXk0TA1SZ3ZLD_AACG
+2026-10-31 19:00:07,445 - app_logger - dev-5f91f39 - INFO - Client connected: NXU_Qjdumo3PbWmUAACL
+2026-10-31 19:00:07,446 - app_logger - dev-5f91f39 - INFO - Client connected: qh1EUZN_JRzdmpfQAACM
+2026-10-31 19:00:07,447 - app_logger - dev-5f91f39 - INFO - Client connected: FlAP9QrRpK3ExiHLAACN
+2026-10-31 19:00:07,497 - app_logger - dev-5f91f39 - INFO - Game created with room code: YAHY
+2026-10-31 19:00:07,499 - app_logger - dev-5f91f39 - INFO - Game YAHY config updated: {'num_intruders': 1, 'starting_cards': 0, 'task_ratio': 3, 'vote_time': 30, 'vote_threshold': 0.5, 'card_draw_probability': 0, 'card_deck_preset': 'custom', 'card_deck_counts': {'self_report': 0, 'emp': 0, 'fake_task': 0, 'taunt_message': 0, 'remote_sabotage': 0, 'shorten_meltdown': 0, 'area_denial_per_location': 0}}
+2026-10-31 19:00:07,545 - app_logger - dev-5f91f39 - INFO - Room YAHY is now open for players
+2026-10-31 19:00:07,548 - app_logger - dev-5f91f39 - INFO - Set creator_player_id to cbf4085a-07a9-438e-9acf-e95fe98cd383 for room YAHY
+2026-10-31 19:00:07,550 - app_logger - dev-5f91f39 - INFO - New player E2E Host (last stand) joined room YAHY with ID cbf4085a-07a9-438e-9acf-e95fe98cd383, is_creator=True
+2026-10-31 19:00:07,591 - app_logger - dev-5f91f39 - INFO - Client qh1EUZN_JRzdmpfQAACM joined room YAHY, is_creator=False
+2026-10-31 19:00:07,595 - app_logger - dev-5f91f39 - INFO - New player E2E Player 1 (last stand joined room YAHY with ID a0ab4904-2538-47a8-a0ff-d3003b944cbe, is_creator=False
+2026-10-31 19:00:07,597 - app_logger - dev-5f91f39 - INFO - Client FlAP9QrRpK3ExiHLAACN joined room YAHY, is_creator=False
+2026-10-31 19:00:07,602 - app_logger - dev-5f91f39 - INFO - New player E2E Player 2 (last stand joined room YAHY with ID 5b4d0eeb-31ac-4798-b8b0-5e099ae0ae4b, is_creator=False
+2026-10-31 19:00:07,605 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room YAHY: E2E task 1
+2026-10-31 19:00:07,605 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room YAHY: E2E task 2
+2026-10-31 19:00:07,606 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room YAHY: E2E task 3
+2026-10-31 19:00:07,606 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room YAHY: E2E task 4
+2026-10-31 19:00:07,607 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room YAHY: E2E task 5
+2026-10-31 19:00:07,607 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room YAHY: E2E task 6
+2026-10-31 19:00:07,608 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room YAHY: E2E task 7
+2026-10-31 19:00:07,608 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room YAHY: E2E task 8
+2026-10-31 19:00:07,609 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room YAHY: E2E task 9
+2026-10-31 19:00:07,609 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room YAHY: E2E task 10
+2026-10-31 19:00:07,610 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room YAHY: E2E task 11
+2026-10-31 19:00:07,610 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room YAHY: E2E task 12
+2026-10-31 19:00:07,858 - app_logger - dev-5f91f39 - INFO - Room YAHY has been disbanded
+2026-10-31 19:00:07,860 - app_logger - dev-5f91f39 - INFO - Client disconnected: NXU_Qjdumo3PbWmUAACL
+2026-10-31 19:00:07,861 - app_logger - dev-5f91f39 - INFO - Client disconnected: FlAP9QrRpK3ExiHLAACN
+2026-10-31 19:00:07,862 - app_logger - dev-5f91f39 - INFO - Client disconnected: qh1EUZN_JRzdmpfQAACM
+2026-10-31 19:00:56,830 - app_logger - dev-5f91f39 - INFO - Starting Sus Party prod server version dev-5f91f39 (commit 5f91f39, built None)
+2026-10-31 19:00:56,844 - app_logger - dev-5f91f39 - INFO - Starting server...
+2026-10-31 19:00:56,845 - app_logger - dev-5f91f39 - INFO -  * Running with HTTP at: http://192.0.2.2:5001
+2026-10-31 19:00:56,845 - app_logger - dev-5f91f39 - INFO -  * For HTTPS, generate certificates with:
+2026-10-31 19:00:56,845 - app_logger - dev-5f91f39 - INFO -    openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365
+2026-10-31 19:01:05,544 - app_logger - dev-5f91f39 - INFO - Client connected: AeAAv9JAsR0JGTv1AAAF
+2026-10-31 19:01:05,545 - app_logger - dev-5f91f39 - INFO - Client connected: GVr8i-BYhyi_VoaKAAAG
+2026-10-31 19:01:05,545 - app_logger - dev-5f91f39 - INFO - Client connected: 4nULXnkrKDMBvm1IAAAH
+2026-10-31 19:01:05,546 - app_logger - dev-5f91f39 - INFO - Client connected: UiTqC7KCCr0rrujrAAAI
+2026-10-31 19:01:05,546 - app_logger - dev-5f91f39 - INFO - Client connected: uBdfr_mcbF-0Bn9YAAAJ
+2026-10-31 19:01:05,596 - app_logger - dev-5f91f39 - INFO - Game created with room code: WMXT
+2026-10-31 19:01:05,598 - app_logger - dev-5f91f39 - INFO - Game WMXT config updated: {'num_intruders': 1, 'starting_cards': 2, 'task_ratio': 3, 'vote_time': 30, 'vote_threshold': 0.5, 'card_draw_probability': 0, 'card_deck_preset': 'custom', 'card_deck_counts': {'self_report': 0, 'emp': 0, 'fake_task': 1, 'taunt_message': 1, 'remote_sabotage': 0, 'shorten_meltdown': 0, 'area_denial_per_location': 0}}
+2026-10-31 19:01:05,645 - app_logger - dev-5f91f39 - INFO - Room WMXT is now open for players
+2026-10-31 19:01:05,648 - app_logger - dev-5f91f39 - INFO - Set creator_player_id to e61ec075-c8ca-4566-b471-6c19f3e9b99d for room WMXT
+2026-10-31 19:01:05,650 - app_logger - dev-5f91f39 - INFO - New player E2E Host joined room WMXT with ID e61ec075-c8ca-4566-b471-6c19f3e9b99d, is_creator=True
+2026-10-31 19:01:05,693 - app_logger - dev-5f91f39 - INFO - Client uBdfr_mcbF-0Bn9YAAAJ joined room WMXT, is_creator=False
+2026-10-31 19:01:05,698 - app_logger - dev-5f91f39 - INFO - New player E2E Player 1 joined room WMXT with ID a19265b0-5f38-4575-ac4d-33bb5e49f18e, is_creator=False
+2026-10-31 19:01:05,701 - app_logger - dev-5f91f39 - INFO - Client UiTqC7KCCr0rrujrAAAI joined room WMXT, is_creator=False
+2026-10-31 19:01:05,712 - app_logger - dev-5f91f39 - INFO - New player E2E Player 2 joined room WMXT with ID d7e6e070-75a7-4afd-8e21-ce05fbdb3f6c, is_creator=False
+2026-10-31 19:01:05,715 - app_logger - dev-5f91f39 - INFO - Client 4nULXnkrKDMBvm1IAAAH joined room WMXT, is_creator=False
+2026-10-31 19:01:05,719 - app_logger - dev-5f91f39 - INFO - New player E2E Player 3 joined room WMXT with ID ba97e24a-2b7f-463c-8364-bbab7c85e1aa, is_creator=False
+2026-10-31 19:01:05,721 - app_logger - dev-5f91f39 - INFO - Client GVr8i-BYhyi_VoaKAAAG joined room WMXT, is_creator=False
+2026-10-31 19:01:05,725 - app_logger - dev-5f91f39 - INFO - New player E2E Player 4 joined room WMXT with ID 46a50c4f-5681-4a4f-b9ff-c18293b53961, is_creator=False
+2026-10-31 19:01:05,727 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room WMXT: E2E task 1
+2026-10-31 19:01:05,730 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room WMXT: E2E task 2
+2026-10-31 19:01:05,730 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room WMXT: E2E task 3
+2026-10-31 19:01:05,731 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room WMXT: E2E task 4
+2026-10-31 19:01:05,731 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room WMXT: E2E task 5
+2026-10-31 19:01:05,732 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room WMXT: E2E task 6
+2026-10-31 19:01:05,733 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room WMXT: E2E task 7
+2026-10-31 19:01:05,733 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room WMXT: E2E task 8
+2026-10-31 19:01:05,734 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room WMXT: E2E task 9
+2026-10-31 19:01:05,734 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room WMXT: E2E task 10
+2026-10-31 19:01:05,735 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room WMXT: E2E task 11
+2026-10-31 19:01:05,735 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room WMXT: E2E task 12
+2026-10-31 19:01:05,736 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room WMXT: E2E task 13
+2026-10-31 19:01:05,736 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room WMXT: E2E task 14
+2026-10-31 19:01:05,737 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room WMXT: E2E task 15
+2026-10-31 19:01:05,737 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room WMXT: E2E task 16
+2026-10-31 19:01:05,738 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room WMXT: E2E task 17
+2026-10-31 19:01:05,738 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room WMXT: E2E task 18
+2026-10-31 19:01:06,031 - app_logger - dev-5f91f39 - INFO - Client disconnected: 4nULXnkrKDMBvm1IAAAH
+2026-10-31 19:01:06,038 - app_logger - dev-5f91f39 - INFO - Client connected: de57RBZoffJg_N1XAAAL
+2026-10-31 19:01:06,083 - app_logger - dev-5f91f39 - INFO - Player ba97e24a-2b7f-463c-8364-bbab7c85e1aa rejoining room WMXT, creator_player_id=e61ec075-c8ca-4566-b471-6c19f3e9b99d
+2026-10-31 19:01:06,083 - app_logger - dev-5f91f39 - INFO - Non-creator ba97e24a-2b7f-463c-8364-bbab7c85e1aa rejoined room WMXT
+2026-10-31 19:01:06,084 - app_logger - dev-5f91f39 - INFO - Sending task to player
+2026-10-31 19:01:06,332 - app_logger - dev-5f91f39 - INFO - Room WMXT has been disbanded
+2026-10-31 19:01:06,334 - app_logger - dev-5f91f39 - INFO - Client disconnected: AeAAv9JAsR0JGTv1AAAF
+2026-10-31 19:01:06,334 - app_logger - dev-5f91f39 - INFO - Client disconnected: GVr8i-BYhyi_VoaKAAAG
+2026-10-31 19:01:06,335 - app_logger - dev-5f91f39 - INFO - Client disconnected: UiTqC7KCCr0rrujrAAAI
+2026-10-31 19:01:06,335 - app_logger - dev-5f91f39 - INFO - Client disconnected: de57RBZoffJg_N1XAAAL
+2026-10-31 19:01:06,335 - app_logger - dev-5f91f39 - INFO - Client disconnected: uBdfr_mcbF-0Bn9YAAAJ
+2026-10-31 19:01:06,341 - app_logger - dev-5f91f39 - INFO - Client connected: WoHT_IMmeobJp60yAAAP
+2026-10-31 19:01:06,342 - app_logger - dev-5f91f39 - INFO - Client connected: VM5CVEKZnhEBOSUKAAAQ
+2026-10-31 19:01:06,342 - app_logger - dev-5f91f39 - INFO - Client connected: j-Ax_DXL2lsLBIgDAAAR
+2026-10-31 19:01:06,391 - app_logger - dev-5f91f39 - INFO - Game created with room code: AHTX
+2026-10-31 19:01:06,393 - app_logger - dev-5f91f39 - INFO - Game AHTX config updated: {'num_intruders': 1, 'starting_cards': 0, 'task_ratio': 3, 'vote_time': 30, 'vote_threshold': 0.5, 'card_draw_probability': 0, 'card_deck_preset': 'custom', 'card_deck_counts': {'self_report': 0, 'emp': 0, 'fake_task': 0, 'taunt_message': 0, 'remote_sabotage': 0, 'shorten_meltdown': 0, 'area_denial_per_location': 0}}
+2026-10-31 19:01:06,436 - app_logger - dev-5f91f39 - INFO - Room AHTX is now open for players
+2026-10-31 19:01:06,440 - app_logger - dev-5f91f39 - INFO - Set creator_player_id to 407e2e80-a753-4fff-af12-18b1e793fba7 for room AHTX
+2026-10-31 19:01:06,442 - app_logger - dev-5f91f39 - INFO - New player E2E Host (last stand) joined room AHTX with ID 407e2e80-a753-4fff-af12-18b1e793fba7, is_creator=True
+2026-10-31 19:01:06,484 - app_logger - dev-5f91f39 - INFO - Client j-Ax_DXL2lsLBIgDAAAR joined room AHTX, is_creator=False
+2026-10-31 19:01:06,489 - app_logger - dev-5f91f39 - INFO - New player E2E Player 1 (last stand joined room AHTX with ID 37a85700-0ec7-4efe-b039-14de443c1b5b, is_creator=False
+2026-10-31 19:01:06,492 - app_logger - dev-5f91f39 - INFO - Client WoHT_IMmeobJp60yAAAP joined room AHTX, is_creator=False
+2026-10-31 19:01:06,497 - app_logger - dev-5f91f39 - INFO - New player E2E Player 2 (last stand joined room AHTX with ID c51e521c-92d4-4062-898f-81c9d8ff357f, is_creator=False
+2026-10-31 19:01:06,499 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room AHTX: E2E task 1
+2026-10-31 19:01:06,501 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room AHTX: E2E task 2
+2026-10-31 19:01:06,501 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room AHTX: E2E task 3
+2026-10-31 19:01:06,502 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room AHTX: E2E task 4
+2026-10-31 19:01:06,502 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room AHTX: E2E task 5
+2026-10-31 19:01:06,503 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room AHTX: E2E task 6
+2026-10-31 19:01:06,503 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room AHTX: E2E task 7
+2026-10-31 19:01:06,504 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room AHTX: E2E task 8
+2026-10-31 19:01:06,504 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room AHTX: E2E task 9
+2026-10-31 19:01:06,505 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room AHTX: E2E task 10
+2026-10-31 19:01:06,505 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room AHTX: E2E task 11
+2026-10-31 19:01:06,506 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room AHTX: E2E task 12
+2026-10-31 19:01:06,806 - app_logger - dev-5f91f39 - INFO - Room AHTX has been disbanded
+2026-10-31 19:01:06,808 - app_logger - dev-5f91f39 - INFO - Client disconnected: VM5CVEKZnhEBOSUKAAAQ
+2026-10-31 19:01:06,808 - app_logger - dev-5f91f39 - INFO - Client disconnected: WoHT_IMmeobJp60yAAAP
+2026-10-31 19:01:06,809 - app_logger - dev-5f91f39 - INFO - Client disconnected: j-Ax_DXL2lsLBIgDAAAR
+2026-10-31 19:01:06,815 - app_logger - dev-5f91f39 - INFO - Client connected: gefmq9hZCW_Xd13jAAAV
+2026-10-31 19:01:06,816 - app_logger - dev-5f91f39 - INFO - Client connected: LlceNrs7uzN-wQtWAAAW
+2026-10-31 19:01:06,817 - app_logger - dev-5f91f39 - INFO - Client connected: 8UUPFvF_EJRPYoNPAAAX
+2026-10-31 19:01:06,868 - app_logger - dev-5f91f39 - INFO - Game created with room code: MTWH
+2026-10-31 19:01:06,870 - app_logger - dev-5f91f39 - INFO - Game MTWH config updated: {'num_intruders': 1, 'starting_cards': 0, 'task_ratio': 3, 'vote_time': 30, 'vote_threshold': 0.5, 'card_draw_probability': 0, 'card_deck_preset': 'custom', 'card_deck_counts': {'self_report': 0, 'emp': 0, 'fake_task': 0, 'taunt_message': 0, 'remote_sabotage': 0, 'shorten_meltdown': 0, 'area_denial_per_location': 0}}
+2026-10-31 19:01:06,916 - app_logger - dev-5f91f39 - INFO - Room MTWH is now open for players
+2026-10-31 19:01:06,920 - app_logger - dev-5f91f39 - INFO - Set creator_player_id to d28afc41-6167-4075-9013-db2aad8b3678 for room MTWH
+2026-10-31 19:01:06,922 - app_logger - dev-5f91f39 - INFO - New player E2E Host (last stand) joined room MTWH with ID d28afc41-6167-4075-9013-db2aad8b3678, is_creator=True
+2026-10-31 19:01:06,963 - app_logger - dev-5f91f39 - INFO - Client LlceNrs7uzN-wQtWAAAW joined room MTWH, is_creator=False
+2026-10-31 19:01:06,968 - app_logger - dev-5f91f39 - INFO - New player E2E Player 1 (last stand joined room MTWH with ID 07d5bb87-178c-43e2-8a6b-ccc513391c71, is_creator=False
+2026-10-31 19:01:06,971 - app_logger - dev-5f91f39 - INFO - Client 8UUPFvF_EJRPYoNPAAAX joined room MTWH, is_creator=False
+2026-10-31 19:01:06,976 - app_logger - dev-5f91f39 - INFO - New player E2E Player 2 (last stand joined room MTWH with ID e00bdd1a-4924-400b-a985-42c63251f611, is_creator=False
+2026-10-31 19:01:06,979 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room MTWH: E2E task 1
+2026-10-31 19:01:06,980 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room MTWH: E2E task 2
+2026-10-31 19:01:06,983 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room MTWH: E2E task 3
+2026-10-31 19:01:06,983 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room MTWH: E2E task 4
+2026-10-31 19:01:06,984 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room MTWH: E2E task 5
+2026-10-31 19:01:06,984 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room MTWH: E2E task 6
+2026-10-31 19:01:06,985 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room MTWH: E2E task 7
+2026-10-31 19:01:06,985 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room MTWH: E2E task 8
+2026-10-31 19:01:06,986 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room MTWH: E2E task 9
+2026-10-31 19:01:06,986 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room MTWH: E2E task 10
+2026-10-31 19:01:06,987 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room MTWH: E2E task 11
+2026-10-31 19:01:06,987 - app_logger - dev-5f91f39 - INFO - Collaborative task added in room MTWH: E2E task 12
+2026-10-31 19:01:07,239 - app_logger - dev-5f91f39 - INFO - Room MTWH has been disbanded
+2026-10-31 19:01:07,241 - app_logger - dev-5f91f39 - INFO - Client disconnected: gefmq9hZCW_Xd13jAAAV
+2026-10-31 19:01:07,241 - app_logger - dev-5f91f39 - INFO - Client disconnected: LlceNrs7uzN-wQtWAAAW
+2026-10-31 19:01:07,242 - app_logger - dev-5f91f39 - INFO - Client disconnected: 8UUPFvF_EJRPYoNPAAAX
+2026-10-31 19:01:34,899 - app_logger - dev-5f91f39 - INFO - Starting Sus Party prod server version dev-5f91f39 (commit 5f91f39, built None)
+2026-10-31 19:01:34,910 - app_logger - dev-5f91f39 - INFO - Starting server...
+2026-10-31 19:01:34,910 - app_logger - dev-5f91f39 - INFO -  * Running with HTTP at: http://192.0.2.2:5001
+2026-10-31 19:01:34,910 - app_logger - dev-5f91f39 - INFO -  * For HTTPS, generate certificates with:
+2026-10-31 19:01:34,910 - app_logger - dev-5f91f39 - INFO -    openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365

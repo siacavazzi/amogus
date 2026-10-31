@@ -5,7 +5,8 @@ import { AudioHandler } from './AudioHandler';
 import FakeTaskReveal from './components/FakeTaskReveal';
 import { markHasPlayedGame } from './tutorial/tutorialStorage';
 import { isMobile as isMobileDevice } from 'react-device-detect';
-import { getRoomCodeFromSearch, clearRoomCodeFromUrl } from './utils/inviteLinks';
+import { getRoomCodeFromSearch, getEntryMethodFromSearch, clearRoomCodeFromUrl } from './utils/inviteLinks';
+import { createDropTracker, installErrorReporting } from './utils/clientMetrics';
 import { createRequestId, emitVolatileWithAck, SOCKET_COMMAND_TIMEOUT_MS } from './utils/socketCommand';
 
 // Allow URL param override for testing: ?mobile=true or ?mobile=false
@@ -464,9 +465,13 @@ export default function GameContext({ children }) {
     }, [playerState?.username, requestRoomState]);
 
     useEffect(() => {
+        const dropTracker = createDropTracker();
+        const stopErrorReporting = installErrorReporting(() => socketRef.current);
         socketRef.current = io(ENDPOINT, {
             auth: (callback) => callback({
                 utc_offset_minutes: -new Date().getTimezoneOffset(),
+                // After a dropped socket: was the page hidden (phone locked) or offline when it dropped.
+                last_drop: dropTracker.report(),
                 // Browser end-to-end tests set this so their rooms stay out of usage stats.
                 ...(isTestTraffic() ? { synthetic: true } : {}),
             }),
@@ -477,11 +482,13 @@ export default function GameContext({ children }) {
         });
 
         socketRef.current.on('connect', () => {
+            dropTracker.clear();
             setConnected(true);
             // Try to rejoin existing game if we have a player_id
             let playerId = localStorage.getItem('player_id');
             let roomCode = localStorage.getItem('room_code');
             const inviteRoomCode = getRoomCodeFromSearch();
+            const inviteEntryMethod = getEntryMethodFromSearch();
 
             if (inviteRoomCode && inviteRoomCode !== roomCode) {
                 localStorage.removeItem('player_id');
@@ -505,6 +512,7 @@ export default function GameContext({ children }) {
                 socketRef.current.emit('join_game', {
                     room_code: inviteRoomCode,
                     player_id: undefined,
+                    entry_method: inviteEntryMethod,
                 });
             } else if (playerId) {
                 socketRef.current.emit('rejoin', {
@@ -513,7 +521,7 @@ export default function GameContext({ children }) {
                 requestRoomState(socketRef.current, roomCode || localStorage.getItem('room_code'), playerId);
             } else if (isMobile && roomCode && readHostToken(roomCode)) {
                 // A phone host coming back to a room they were still setting up.
-                socketRef.current.emit('join_game', { room_code: roomCode, host_token: readHostToken(roomCode) });
+                socketRef.current.emit('join_game', { room_code: roomCode, host_token: readHostToken(roomCode), entry_method: 'host_return' });
             } else if (!isMobile && roomCode) {
                 // Reactor reconnecting - re-register as reactor
                 socketRef.current.emit('register_reactor', { room_code: roomCode });
@@ -660,6 +668,7 @@ export default function GameContext({ children }) {
         });
 
         socketRef.current.on('disconnect', () => {
+            dropTracker.noteDisconnect();
             setSelfieAccess(null);
             // Only mark as disconnected, don't clear state
             // Socket.io will auto-reconnect and we'll rejoin with our player_id
@@ -995,6 +1004,8 @@ export default function GameContext({ children }) {
 
         // Cleanup on unmount
         return () => {
+            dropTracker.stop();
+            stopErrorReporting();
             if (socketRef.current) {
                 socketRef.current.disconnect();
             }
