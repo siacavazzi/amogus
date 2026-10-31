@@ -164,10 +164,12 @@ const TASK_SECTIONS = [
     },
 ];
 
+const TASK_COUNT = TASK_SECTIONS.reduce((total, section) => total + section.tasks.length, 0);
+
 const SCHEMA = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
-    name: 'Free Among Us IRL Task Ideas for Home',
+    name: `${TASK_COUNT} Free Among Us Tasks to Do in Real Life`,
     description:
         'Physical task ideas for kitchens, living rooms, and hallways, plus classroom and vacation-house examples. Use them in a real-life Sus Party game.',
     url: 'https://susparty.com/among-us-irl-task-ideas',
@@ -199,9 +201,9 @@ const TIPS = [
 
 function TaskIdeasPage() {
     usePageMeta({
-        title: 'Among Us Tasks in Real Life: Free Ideas at Home | Sus Party',
+        title: `Among Us Tasks in Real Life: ${TASK_COUNT} Free Ideas at Home | Sus Party`,
         description:
-            'Among Us tasks to do in real life at home: easy ideas for every room, for kids and adults. Copy the free list or build a task pack in one click.',
+            `A free list of ${TASK_COUNT} easy Among Us tasks to do in real life at home, in a classroom, or at a vacation house, for kids and adults. Copy them or build your own task list.`,
         canonical: 'https://susparty.com/among-us-irl-task-ideas',
         ogImage: 'https://susparty.com/og-image.jpg',
         schema: SCHEMA,
@@ -216,10 +218,11 @@ function TaskIdeasPage() {
                     </a>{' '}
                     › Task ideas
                 </p>
-                <h1 className="seo-h1">Among Us IRL task ideas for home</h1>
+                <h1 className="seo-h1">Among Us tasks in real life: {TASK_COUNT} free ideas for home</h1>
                 <p className="seo-lead">
                     Counting mugs gets a lot more suspicious when someone follows you into the kitchen.
-                    Sus Party turns your home into an Among Us IRL map. Use these free physical task ideas,
+                    Here is a free list of easy Among Us IRL tasks for the kitchen, living room, hallway, classroom,
+                    and vacation house, for kids and adults. Sus Party turns your home into the map. Use these tasks,
                     then let the game handle secret roles, task lists, meetings, and votes on everyone’s phones.
                 </p>
                 <div className="seo-actions">

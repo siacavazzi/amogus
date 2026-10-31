@@ -119,7 +119,7 @@ function LobbyPage() {
     };
 
     const updateCode = event => {
-        setInputRoomCode(event.target.value.toUpperCase().replace(/[^A-Za-z]/g, '').slice(0, 4));
+        setInputRoomCode(event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4));
         setRoomEntryStatus(null);
         setError('');
         clearRoomCodeFromUrl();

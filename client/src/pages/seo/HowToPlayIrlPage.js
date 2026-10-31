@@ -64,7 +64,7 @@ const MISTAKES = [
 
 function HowToPlayIrlPage() {
     usePageMeta({
-        title: 'How to Play Among Us in Real Life at Home | Sus Party',
+        title: 'How to Play Among Us in Real Life: Rules and Setup | Sus Party',
         description:
             'Learn how to play Among Us in real life with Sus Party: prepare tasks, create a room, invite friends, run meetings, and follow the app’s vote and win rules.',
         canonical: 'https://susparty.com/how-to-play-among-us-irl',
