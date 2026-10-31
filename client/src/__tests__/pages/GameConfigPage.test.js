@@ -79,7 +79,7 @@ describe('GameConfigPage card deck settings', () => {
         const receive = (event, data) => act(() => {
             contextValue.socket.on.mock.calls.filter(call => call[0] === event).slice(-1)[0][1](data);
         });
-        fireEvent.click(screen.getByRole('button', { name: 'Import generated tasks' }));
+        expect(contextValue.socket.emit).toHaveBeenCalledWith('create_task_list', expect.objectContaining({ name: 'House tasks' }));
         receive('task_list_created', { task_list: { code: 'PACK01', name: 'House tasks', tasks, locations: ['Kitchen', 'Hallway', 'Other'] } });
         fireEvent.click(screen.getByRole('button', { name: /Use This Task List/ }));
         receive('task_list_applied', { task_list_code: 'PACK01', task_count: 24 });
@@ -88,6 +88,51 @@ describe('GameConfigPage card deck settings', () => {
         expect(contextValue.socket.emit).toHaveBeenCalledWith('update_game_config', expect.objectContaining({
             config: expect.objectContaining({ vote_time: 90, task_ratio: 5 }),
         }));
+    });
+
+    describe('a pack from the task generator', () => {
+        const tasks = Array.from({ length: 24 }, (_, index) => ({ task: `Task ${index}`, location: index % 2 ? 'Kitchen' : 'Hallway' }));
+
+        beforeEach(() => {
+            const items = new Map();
+            sessionStorage.getItem.mockImplementation(key => items.get(key) || null);
+            sessionStorage.setItem.mockImplementation((key, value) => items.set(key, value));
+            sessionStorage.removeItem.mockImplementation(key => items.delete(key));
+            window.history.replaceState(null, '', '/play?setup=generated');
+            saveGameDraft({ name: 'House tasks', playerCount: 8, locations: ['Kitchen', 'Hallway'], tasks,
+                recommendations: { intruderCount: 1, meetingSeconds: 90, taskGoalPerCrewmate: 5 } });
+        });
+
+        afterEach(() => window.history.replaceState(null, '', '/'));
+
+        const receiver = contextValue => (event, data) => act(() => {
+            contextValue.socket.on.mock.calls.filter(call => call[0] === event).slice(-1)[0][1](data);
+        });
+
+        it('is loaded and selected without pressing an import button', () => {
+            const { contextValue } = renderWithContext(<GameConfigPage />, { roomCode: 'ROOM4' });
+            const creates = contextValue.socket.emit.mock.calls.filter(([event]) => event === 'create_task_list');
+            expect(creates).toHaveLength(1);
+            expect(creates[0][1].tasks).toEqual(tasks);
+            expect(creates[0][1].locations).toEqual(['Kitchen', 'Hallway']);
+            expect(screen.queryByRole('button', { name: /Import generated tasks/ })).not.toBeInTheDocument();
+            expect(screen.getByText('Loading your pack…')).toBeInTheDocument();
+
+            receiver(contextValue)('task_list_created', { task_list: { code: 'PACK02', name: 'House tasks', tasks, locations: ['Kitchen', 'Hallway', 'Other'] } });
+            expect(screen.queryByText('Your generated task pack')).not.toBeInTheDocument();
+            expect(screen.getByRole('heading', { name: 'House tasks' })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /Use This Task List/ })).toBeInTheDocument();
+            expect(window.location.search).toBe('');
+        });
+
+        it('offers a retry when loading the pack fails', () => {
+            const { contextValue } = renderWithContext(<GameConfigPage />, { roomCode: 'ROOM5' });
+            receiver(contextValue)('error', { message: 'Too many tasks.' });
+            expect(screen.getByRole('alert')).toHaveTextContent('Too many tasks.');
+            contextValue.socket.emit.mockClear();
+            fireEvent.click(screen.getByRole('button', { name: 'Try loading the pack again' }));
+            expect(contextValue.socket.emit).toHaveBeenCalledWith('create_task_list', expect.objectContaining({ name: 'House tasks' }));
+        });
     });
 });
 

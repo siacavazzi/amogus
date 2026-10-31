@@ -37,7 +37,7 @@ const FAQS = [
     },
     {
         q: 'How do you set up Among Us in real life?',
-        a: 'Generate a task pack for your rooms, select “Use these tasks in a new game,” and create the room. Select “Import generated tasks” in host setup, review the list and settings, then share the four-letter code. Friends join on their phones. A larger device can join as the optional Reactor display.',
+        a: 'Generate a task pack for your rooms, then select “Use this pack.” Sus Party creates the room with your tasks loaded. Review the list and settings, then share the four-letter code. Friends join on their phones. A larger device can join as the optional Reactor display.',
         href: '/how-to-play-among-us-irl', linkLabel: 'Follow the setup and sample round',
     },
     {
