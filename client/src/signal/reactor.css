@@ -309,7 +309,10 @@
    the room, and the faces start no lower than before. */
 .sg-rx__join { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: clamp(12px, 2.4vh, 28px) clamp(20px, 3.5vw, 64px); width: 100%; }
 .sg-rx__joincode { display: flex; flex-direction: column; align-items: center; gap: clamp(10px, 2.2vh, 26px); min-width: 0; }
-.sg-rx__join .sg-rx__code { font-size: clamp(64px, min(17vw, 30vh), 360px); }
+/* Sized so the widest code (WWWW) still fits beside the QR on one line: the width left after
+   the page padding, gaps, copy button and QR, split over four of the widest letters. Wider and
+   the QR wraps under the code and pushes the host line off a 720p screen. */
+.sg-rx__join .sg-rx__code { font-size: clamp(56px, min(17vw, 30vh, (85vw - min(23vw, 38vh) - 90px) / 4.4), 360px); }
 .sg-rx__join .sg-rx__lede { font-size: clamp(18px, 2vw, 34px); text-align: center; }
 .sg-rx__qr {
   margin: 0;
