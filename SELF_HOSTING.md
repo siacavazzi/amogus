@@ -119,13 +119,14 @@ All game settings are stored in `server/config.py`. Edit this file to customize 
 | Setting | Default | Description |
 |---------|---------|-------------|
 | `MELTDOWN_TIME` | `60` | Time (in seconds) players have to stop a meltdown before it ends the game |
-| `CODE_PERCENT` | `0.6` | Fraction of players who must enter their code to stop a meltdown. `0.6` = 60% of players |
+| `CODE_PERCENT` | `0.6` | Fraction of connected living players who must enter their code to stop a meltdown, capped at 8 codes (one keypad can't take more in time). `0.6` = 60% of players |
 
 ### Intruder Settings
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `NUMBER_OF_INTRUDERS` | `2` | Number of intruders assigned each game. Adjust based on group size |
+| `AUTO_INTRUDERS` | `True` | New rooms pick 1 intruder per 5 players at each start. The host can pick a number in setup instead |
+| `NUMBER_OF_INTRUDERS` | `1` | Number of intruders when `AUTO_INTRUDERS` is off |
 | `CARD_DRAW_PROBABILITY` | `0.90` | Chance (0.0-1.0) an intruder draws a card. Lower this if intruders are too powerful |
 | `STARTING_CARDS` | `2` | Number of ability cards intruders start with |
 
@@ -159,6 +160,7 @@ LOCATIONS = [
 ]
 
 VOTE_TIME = 120           # Shorter voting time
+AUTO_INTRUDERS = False    # Always use the number below
 NUMBER_OF_INTRUDERS = 3   # More intruders for larger group
 TASK_RATIO = 15           # More tasks to complete
 MELTDOWN_TIME = 45        # Less time for meltdowns

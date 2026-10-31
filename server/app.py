@@ -13,6 +13,7 @@ from flask import Flask, request, send_from_directory, abort, has_request_contex
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask_cors import CORS
 from assets.game_manager import GameManager
+from assets.room_codes import ROOM_CODE_ALPHABET, has_unused_letters
 from assets.sonosHandler import SonosController
 from assets.utils import *
 from assets.taskHandler import *
@@ -21,7 +22,7 @@ from assets.selfie_store import SelfieStore
 from assets.version import VERSION, VERSION_INFO
 from config import (
     LOCATIONS, VOTE_TIME, VOTE_THRESHOLD, MELTDOWN_TIME, CODE_PERCENT,
-    NUMBER_OF_INTRUDERS, CARD_DRAW_PROBABILITY, STARTING_CARDS, TASK_RATIO,
+    NUMBER_OF_INTRUDERS, AUTO_INTRUDERS, CARD_DRAW_PROBABILITY, STARTING_CARDS, TASK_RATIO,
     SONOS_ENABLED, SPEAKER_VOLUME, IGNORE_BEDROOM_SPEAKERS
 )
 
@@ -43,6 +44,7 @@ game_config = {
     'MELTDOWN_TIME': MELTDOWN_TIME,
     'CODE_PERCENT': CODE_PERCENT,
     'NUMBER_OF_INTRUDERS': NUMBER_OF_INTRUDERS,
+    'AUTO_INTRUDERS': AUTO_INTRUDERS,
     'CARD_DRAW_PROBABILITY': CARD_DRAW_PROBABILITY,
     'STARTING_CARDS': STARTING_CARDS,
     'TASK_RATIO': TASK_RATIO,
@@ -209,6 +211,13 @@ def command_error(message, game=None, player=None, reason='condition_not_met'):
     return result
 
 
+def room_not_found_message(room_code):
+    message = 'We cannot find this room. Check the code, or ask the host for a new invite.'
+    if has_unused_letters(room_code):
+        message += f' Room codes only use the letters {" ".join(ROOM_CODE_ALPHABET)}.'
+    return message
+
+
 def room_entry_error(code, room_code, message):
     record_usage('join_rejected', game_manager.get_game(room_code),
                  resolve_game=False, room_code=room_code, reason=code,
@@ -227,7 +236,7 @@ def room_event(mutate=True, reconnect=False):
             payload = data if isinstance(data, dict) else {}
             player_id = payload.get('player_id')
             game, player, room = get_game_and_player(player_id) if player_id else (None, None, None)
-            requested_room = payload.get('room_code', '').upper()
+            requested_room = game_manager.resolve_room_code(payload.get('room_code'))
             if not game and requested_room:
                 game, room = game_manager.get_game(requested_room), requested_room
             if not game:
@@ -400,7 +409,7 @@ def handle_create_game(data=None):
 @room_event(mutate=False)
 def handle_get_game_config(data):
     """Get the current game configuration."""
-    room_code = data.get('room_code', '').upper() if data else None
+    room_code = game_manager.resolve_room_code(data.get('room_code')) if data else None
     
     if not room_code:
         room_code = game_manager.sid_to_game.get(request.sid)
@@ -415,7 +424,7 @@ def handle_get_game_config(data):
 def handle_update_game_config(data):
     """Update game configuration (only room creator can do this)."""
     sid = request.sid
-    room_code = data.get('room_code', '').upper()
+    room_code = game_manager.resolve_room_code(data.get('room_code'))
     config = data.get('config', {})
     
     game = game_manager.get_game(room_code)
@@ -442,7 +451,7 @@ def handle_update_game_config(data):
 def handle_open_room(data):
     """Open the room for other players to join."""
     sid = request.sid
-    room_code = data.get('room_code', '').upper()
+    room_code = game_manager.resolve_room_code(data.get('room_code'))
     
     game = game_manager.get_game(room_code)
     if not game:
@@ -471,13 +480,12 @@ def handle_open_room(data):
 def handle_join_game(data):
     """Join an existing game room by room code."""
     sid = request.sid
-    room_code = data.get('room_code', '').upper()
+    room_code = game_manager.resolve_room_code(data.get('room_code'))
     player_id = data.get('player_id')  # Optional: for reconnecting players
     
     game = game_manager.get_game(room_code)
     if not game:
-        room_entry_error('room_not_found', room_code,
-                         'We cannot find this room. Check the code, or ask the host for a new invite.')
+        room_entry_error('room_not_found', room_code, room_not_found_message(room_code))
         logger.warning(f"Join attempt for non-existent room: {room_code}")
         return
     
@@ -534,7 +542,7 @@ def handle_join_game(data):
 def handle_sonos_join(data):
     """Handle a Sonos connector joining a game room."""
     sid = request.sid
-    room_code = data.get('room_code', '').upper() if data else None
+    room_code = game_manager.resolve_room_code(data.get('room_code')) if data else None
     
     if not room_code:
         emit('sonos_error', {'message': 'Room code is required'})
@@ -558,7 +566,7 @@ def handle_sonos_join(data):
 def handle_register_reactor(data):
     """Register a desktop client as the reactor for a game room."""
     sid = request.sid
-    room_code = data.get('room_code', '').upper() if data else None
+    room_code = game_manager.resolve_room_code(data.get('room_code')) if data else None
     
     # Try to get room from data or from sid mapping
     if not room_code:
@@ -868,7 +876,7 @@ def handle_join(data):
     """Handle player joining/creating within a game room."""
     player_id = data.get('player_id')
     username = data.get('username')
-    room_code = data.get('room_code', '').upper()
+    room_code = game_manager.resolve_room_code(data.get('room_code'))
     selfie_data = data.get('selfie')  # Base64 encoded image data
     pic = data.get('pic')  # Chosen avatar index; the server assigns a free one if missing or taken
     sid = request.sid
@@ -904,8 +912,7 @@ def handle_join(data):
     # New player joining a room
     game = game_manager.get_game(room_code)
     if not game:
-        room_entry_error('room_not_found', room_code,
-                         'We cannot find this room. Check the code, or ask the host for a new invite.')
+        room_entry_error('room_not_found', room_code, room_not_found_message(room_code))
         return
 
     if not game.is_open and sid != game.creator_sid:
@@ -1030,7 +1037,7 @@ def reset_game(data):
     """Vote to reset a game - when all players vote, game resets to lobby."""
     sid = request.sid
     player_id = data.get('player_id') if isinstance(data, dict) else None
-    room_code = data.get('room_code', '').upper() if isinstance(data, dict) else None
+    room_code = game_manager.resolve_room_code(data.get('room_code')) if isinstance(data, dict) else None
     force = data.get('force', False) if isinstance(data, dict) else False
     
     game = None
@@ -1074,7 +1081,7 @@ def disband_room(data):
     """Disband a room completely - all players return to main lobby."""
     sid = request.sid
     player_id = data.get('player_id') if isinstance(data, dict) else None
-    room_code = data.get('room_code', '').upper() if isinstance(data, dict) else None
+    room_code = game_manager.resolve_room_code(data.get('room_code')) if isinstance(data, dict) else None
     
     game = None
     
@@ -1110,7 +1117,7 @@ def leave_room_handler(data):
     """Handle a player or reactor leaving the room."""
     sid = request.sid
     player_id = data.get('player_id') if isinstance(data, dict) else None
-    room_code = data.get('room_code', '').upper() if isinstance(data, dict) else None
+    room_code = game_manager.resolve_room_code(data.get('room_code')) if isinstance(data, dict) else None
     
     game = None
     player = None
@@ -1364,6 +1371,32 @@ def handleEndMeeting(data=None):
     return {'ok': True}
 
 
+@socketio.on('host_start_voting')
+@room_event()
+def handleHostStartVoting(data=None):
+    """Host only: open voting while some phones never slid ready (a big, chaotic room)."""
+    data = data or {}
+    game, player, room = get_game_and_player(data.get('player_id'))
+    # Dead hosts keep the button: the host is often the first one killed.
+    if not game or not player or game.creator_sid != request.sid or player.player_id != game.creator_player_id:
+        return command_error('Only the host can start voting early.', game, player, reason='not_host')
+    meeting = game.meeting
+    if (not game.game_running or game.end_state or not meeting or meeting.stage != 'waiting'
+            or data.get('round_id') != game.round_id or data.get('meeting_id') != meeting.id):
+        return command_error('This meeting is no longer in the ready phase.', game, player, reason='stale_meeting')
+    wait = meeting.host_override_in()
+    if wait > 0:
+        return command_error(f'Give everyone {wait} more seconds to get there.', game, player, reason='too_early')
+    present = game.present_living_players()
+    not_ready = sum(1 for p in present if not p.ready)
+    if not game.host_start_voting():
+        return command_error('Voting could not start.', game, player)
+    record_usage('meeting_host_started_voting', game, player.player_id,
+                 not_ready=not_ready, present=len(present))
+    sendPlayerList(game, room)
+    return {'ok': True}
+
+
 # ============ MELTDOWN HANDLING ============
 
 @socketio.on('meltdown')
@@ -1381,7 +1414,7 @@ def handleMeltdown(data=None):
     
     # If not found, try by room_code (reactor triggering)
     if not game and data and data.get('room_code'):
-        room_code = data.get('room_code', '').upper()
+        room_code = game_manager.resolve_room_code(data.get('room_code'))
         game = game_manager.get_game(room_code)
     
     # Finally, try by SID (reactor registered to a room)
@@ -1406,7 +1439,7 @@ def handlePinEntry(data):
     """Handle meltdown PIN entry."""
     player_id = data.get('player_id')
     pin = data.get('pin')
-    room_code = data.get('room_code', '').upper() if data.get('room_code') else None
+    room_code = game_manager.resolve_room_code(data.get('room_code')) if data.get('room_code') else None
     sid = request.sid
     
     logger.info(f"PIN entry attempt: player_id={player_id}, room_code={room_code}, pin={pin}")
@@ -1640,7 +1673,7 @@ def handle_duplicate_task_list(data):
 @room_event()
 def handle_apply_task_list_to_game(data):
     """Apply a saved task list to the current game."""
-    room_code = data.get('room_code', '').upper()
+    room_code = game_manager.resolve_room_code(data.get('room_code'))
     task_list_code = data.get('task_list_code', '').upper()
     sid = request.sid
     
@@ -1702,7 +1735,7 @@ def handle_apply_task_list_to_game(data):
 @room_event()
 def handle_toggle_task_creation_mode(data):
     """Toggle task creation mode on/off from the lobby - only affects requesting client."""
-    room_code = data.get('room_code', '').upper()
+    room_code = game_manager.resolve_room_code(data.get('room_code'))
     enable = data.get('enable', True)
     
     game = game_manager.get_game(room_code)
@@ -1737,7 +1770,7 @@ def handle_toggle_task_creation_mode(data):
 @room_event(mutate=False)
 def handle_get_collaborative_tasks(data):
     """Get current collaborative tasks for a room."""
-    room_code = data.get('room_code', '').upper()
+    room_code = game_manager.resolve_room_code(data.get('room_code'))
     device_id = data.get('device_id')  # To check ownership
     
     game = game_manager.get_game(room_code)
@@ -1773,7 +1806,7 @@ def handle_get_collaborative_tasks(data):
 @room_event()
 def handle_toggle_collaborative_mode(data):
     """Toggle whether all players can add tasks or just the host."""
-    room_code = data.get('room_code', '').upper()
+    room_code = game_manager.resolve_room_code(data.get('room_code'))
     enabled = data.get('enabled', False)
     sid = request.sid
     
@@ -1801,7 +1834,7 @@ def handle_toggle_collaborative_mode(data):
 @room_event()
 def handle_add_collaborative_task(data):
     """Add a task during collaborative creation phase."""
-    room_code = data.get('room_code', '').upper()
+    room_code = game_manager.resolve_room_code(data.get('room_code'))
     task = data.get('task', {})
     sid = request.sid
     
@@ -1853,7 +1886,7 @@ def handle_add_collaborative_task(data):
 @room_event()
 def handle_remove_collaborative_task(data):
     """Remove a task during collaborative creation phase."""
-    room_code = data.get('room_code', '').upper()
+    room_code = game_manager.resolve_room_code(data.get('room_code'))
     task_index = data.get('task_index')
     
     game = game_manager.get_game(room_code)
@@ -1896,7 +1929,7 @@ def handle_remove_collaborative_task(data):
 @room_event()
 def handle_update_game_locations(data):
     """Update game locations during task creation mode. Only the host can do this."""
-    room_code = data.get('room_code', '').upper()
+    room_code = game_manager.resolve_room_code(data.get('room_code'))
     locations = data.get('locations', [])
     sid = request.sid
     
@@ -1933,7 +1966,7 @@ def handle_update_game_locations(data):
 @socketio.on('finalize_collaborative_tasks')
 @room_event()
 def handle_finalize_collaborative_tasks(data):
-    game = game_manager.get_game(data.get('room_code', '').upper())
+    game = game_manager.get_game(game_manager.resolve_room_code(data.get('room_code')))
     if not game:
         return command_error('Game not found.')
     return start_room(game, test_mode=data.get('test_mode'))
@@ -1943,7 +1976,7 @@ def handle_finalize_collaborative_tasks(data):
 @room_event()
 def handle_save_collaborative_tasks(data):
     """Save the current collaborative tasks as a new or updated task list."""
-    room_code = data.get('room_code', '').upper()
+    room_code = game_manager.resolve_room_code(data.get('room_code'))
     name = data.get('name', 'Collaborative Task List')
     device_id = data.get('device_id')  # Use device_id for ownership
     force_new = data.get('force_new', False)  # Explicitly create a new list

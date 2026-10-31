@@ -141,6 +141,7 @@
   background: rgba(0, 0, 0, 0.18); color: #fff;
 }
 .hs-num[aria-pressed='true'] { background: #fff; color: var(--sg-round); }
+.hs-num--auto { aspect-ratio: auto; width: 100%; padding: 14px 0; margin-bottom: 10px; font-size: 32px; text-transform: uppercase; }
 .hs-disclose {
   appearance: none; border: 0; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px;
   background: none; color: inherit; font: 900 20px var(--sg-font); padding: 0;

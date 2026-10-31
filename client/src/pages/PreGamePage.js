@@ -915,6 +915,12 @@ function PreGamePage() {
                                 <button type="button" onClick={handleStartGame} className="sg-btn sg-btn-white hs-start">
                                     <Play size={26} /> <span>Start Game</span>
                                 </button>
+                                {isHost && !canStartTestGame && Number.isInteger(serverLobbyState?.intruder_count) && (
+                                    <p className="hs-hint" data-testid="lobby-intruder-count">
+                                        {serverLobbyState.intruder_count} intruder{serverLobbyState.intruder_count !== 1 ? 's' : ''} this round
+                                        {serverLobbyState.auto_intruders ? ' (Auto: 1 per 5 players)' : ''}
+                                    </p>
+                                )}
                                 {canStartTestGame && (
                                     <p className="hs-hint">
                                         Only {players.length} player{players.length !== 1 ? 's' : ''} so far. Starting now runs a test game.
