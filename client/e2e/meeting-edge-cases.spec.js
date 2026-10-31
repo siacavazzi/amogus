@@ -48,7 +48,7 @@ test('someone killed mid-vote reports it, and votes cast for them come back', as
     await h.vote([[caller, victim]]);
     await expect(caller.getByText(`Voted for ${victim.person}`)).toBeVisible();
 
-    await victim.getByRole('button', { name: "I've Been Killed" }).click();
+    await h.tapAndConfirm(victim.getByRole('button', { name: "I've Been Killed" }));
     await expect(victim.getByText("You're out")).toBeVisible();
     // That vote no longer counts, so the caller is asked again.
     await expect(caller.getByText('Tap who you think it is')).toBeVisible();
@@ -75,11 +75,11 @@ test('a phone that drops before voting opens holds the meeting until it is back 
 
     await caller.getByText('CALL MEETING').click();
     await h.readyUp(others);
-    await dropper.context().setOffline(true);
+    await h.goOffline(dropper);
     await expect(caller.getByText('Offline')).toBeVisible({ timeout: 60000 });
     await expect(caller.getByTestId('ready-count')).toHaveText('3 of 4 ready');
 
-    await dropper.context().setOffline(false);
+    await h.goOnline(dropper);
     await h.readyUp([dropper]);
     for (const phone of phones) await expect(phone.getByText('VOTE', { exact: true }), phone.person).toBeVisible({ timeout: 20000 });
 
