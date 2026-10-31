@@ -23,7 +23,7 @@ const FAQS = [
     },
     {
         q: 'How many players can play?',
-        a: 'The game requires at least two crew members per intruder. One intruder needs at least three players. The task generator prepares groups of three to thirty, but the game has no fixed player cap. Adjust the intruder count to suit your group.',
+        a: 'The game requires at least two crew members per intruder. One intruder needs at least three players. Groups of 3 to 20+ can play. The task generator prepares groups of three to thirty. Raise the intruder count as the group grows, or leave it on Auto.',
         href: '/how-to-play-among-us-irl#before-play', linkLabel: 'Choose a first-round setup',
     },
     {
