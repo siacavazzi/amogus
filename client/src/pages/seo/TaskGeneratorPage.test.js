@@ -67,6 +67,19 @@ it('keeps edits when the player count changes', () => {
     expect(within(screen.getByRole('region', { name: 'Your task pack' })).getByText(/45 tasks/)).toBeInTheDocument();
 });
 
+it('builds a ready pack for thirty players and carries it into the game draft', () => {
+    render(<TaskGeneratorPage />);
+    const slider = screen.getByRole('slider', { name: /Players/i });
+    expect(slider).toHaveAttribute('max', '30');
+    fireEvent.change(slider, { target: { value: '30' } });
+    expect(within(screen.getByRole('region', { name: 'Your task pack' })).getByText(/90 tasks/)).toBeInTheDocument();
+    const usePack = screen.getByRole('link', { name: /Use this pack/i });
+    usePack.addEventListener('click', event => event.preventDefault());
+    fireEvent.click(usePack);
+    expect(readGameDraft()).toMatchObject({ playerCount: 30 });
+    expect(readGameDraft().tasks).toHaveLength(90);
+});
+
 it('blocks import until at least two locations remain', () => {
     render(<TaskGeneratorPage />);
     fireEvent.click(screen.getByRole('checkbox', { name: 'Living Room', exact: true }));

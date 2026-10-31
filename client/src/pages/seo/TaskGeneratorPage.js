@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ArrowRight, Check, ChevronDown, Copy, DoorOpen, Home, MapPin, Pencil, Plus, Printer, RefreshCw, Share2, Shuffle, Sofa, Utensils, X } from '../../signal/icons';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
-import { VENUE_ROOMS, generateTasks, taskStyleValue } from './taskPools';
+import { MAX_PLAYERS, VENUE_ROOMS, generateTasks, taskStyleValue } from './taskPools';
 import { saveGameDraft } from './gameDraft';
 import { CLEANUP_ROOMS } from './cleanupTasks';
 import './TaskGeneratorPage.css';
@@ -17,7 +17,7 @@ function initialSetup() {
     const requestedRooms = [...new Set(params.getAll('room').map(room => room.trim()).filter(room => room && room.length <= 60))].slice(0, 12);
     const options = {
         venue, preset,
-        playerCount: Math.max(3, Math.min(15, Math.floor(Number(params.get('players')) || (preset === 'cleanup' ? 4 : 8)))),
+        playerCount: Math.max(3, Math.min(MAX_PLAYERS, Math.floor(Number(params.get('players')) || (preset === 'cleanup' ? 4 : 8)))),
         taskStyle: preset === 'cleanup' ? 0 : taskStyleValue(params.get('style') ?? 50),
         selectedRooms: requestedRooms.length >= 2 ? requestedRooms : preset === 'cleanup' ? CLEANUP_ROOMS : defaultRooms(venue),
     };
@@ -165,7 +165,7 @@ export default function TaskGeneratorPage() {
                         </fieldset>}
                         <div className="task-builder__field">
                             <label htmlFor="gen-players">Players</label>
-                            <div className="task-builder__players"><span>3</span><input id="gen-players" type="range" min="3" max="15" step="1" value={options.playerCount} onChange={event => update('playerCount', Number(event.target.value))} style={{ '--range-fill': `${(options.playerCount - 3) / 12 * 100}%` }} /><span>15</span><output htmlFor="gen-players">{options.playerCount}</output></div>
+                            <div className="task-builder__players"><span>3</span><input id="gen-players" type="range" min="3" max={MAX_PLAYERS} step="1" value={options.playerCount} onChange={event => update('playerCount', Number(event.target.value))} style={{ '--range-fill': `${(options.playerCount - 3) / (MAX_PLAYERS - 3) * 100}%` }} /><span>{MAX_PLAYERS}</span><output htmlFor="gen-players">{options.playerCount}</output></div>
                         </div>
                         {!isCleanup && <div className="task-builder__field">
                             <label htmlFor="gen-style">Task style <span className="task-builder__current-style">{styleText}</span></label>
@@ -225,7 +225,7 @@ export default function TaskGeneratorPage() {
                     <ol><li><span>1</span><div><h3>Review the pack</h3><p>Visit each location. Swap or edit tasks that do not fit.</p></div></li><li><span>2</span><div><h3>Use this pack</h3><p>Sus Party creates your room with these tasks loaded. Pick the number of intruders and open the room.</p></div></li><li><span>3</span><div><h3>Share your room code</h3><p>Open the room. Everyone joins from their phone browser.</p></div></li></ol>
                 </section>
                 <section className="task-builder__notes">
-                    <div><h2>Why locations matter</h2><p>In an Among Us IRL game, tasks give crewmates somewhere to go and intruders an excuse to follow. Spread your pack across rooms or separate areas. Travel to the named location before each task.</p><p>The generator supports 3–15 players. The game itself has no fixed fifteen-player cap. The app asks for at least three task entries per player, up to 60.</p></div>
+                    <div><h2>Why locations matter</h2><p>In an Among Us IRL game, tasks give crewmates somewhere to go and intruders an excuse to follow. Spread your pack across rooms or separate areas. Travel to the named location before each task.</p><p>The generator supports 3–30 players. The game itself has no fixed player cap. The app asks for at least three task entries per player, up to 60.</p></div>
                     <div><h2>Start with a short round</h2><p>Try {pack.recommendations.intruderCount || 1} intruder{pack.recommendations.intruderCount > 1 ? 's' : ''}, 90-second meetings, and {pack.recommendations.taskGoalPerCrewmate || 5} tasks per crewmate. The host can change these settings before the room opens.</p><p>{isCleanup ? 'Review each chore before play. Replace jobs that are already complete or do not fit your home.' : 'Task completion reveals the intruders. The crew still needs to vote them out. Sus Party supplies the sabotage cards.'}</p><p><a href="/how-to-play-among-us-irl">Read the round rules</a> · <a href="/among-us-irl-task-ideas">Browse more task ideas</a></p></div>
                 </section>
             </main>

@@ -54,7 +54,7 @@ const FAQS = [
     { q: 'What are good Among Us IRL tasks at home?', a: 'Count coasters at the dining table, read a title from a shared shelf, or sort host-provided cards. Use short tasks in different areas so players have reasons to split up.' },
     { q: 'How do Among Us IRL room codes work?', a: 'The host creates a Sus Party game and shares its four-character room code. Friends open susparty.com/play and enter that code to join the same game.' },
     { q: 'Can we play online from different homes?', a: 'Sus Party connects your phones online, but the group plays together in the same physical space. The tasks, secret eliminations, and meetings happen in real life.' },
-    { q: 'How many players?', a: 'Anywhere from 3 to 20+. The game needs at least two crew members per intruder, so add intruders as the group grows. The task generator builds packs for 5–15 players; add more tasks for a bigger group.' },
+    { q: 'How many players?', a: 'Anywhere from 3 to 20+. The game needs at least two crew members per intruder, so add intruders as the group grows. The task generator builds packs for 3–30 players.' },
     { q: 'How does a big group join at once?', a: 'Open susparty.com/play on a laptop or TV first and create the room there. It becomes the big screen (the Reactor) and shows the room code to the whole group. Players type susparty.com on their phones and enter the code; the first phone in is the host. No download or sign-up.' },
     { q: 'Does it cost anything?', a: 'No. It\u2019s free, open source, and ad-free.' },
     { q: 'Where do we play?', a: 'Use shared areas in a house, apartment, dorm, office, or vacation rental. Choose at least two task locations so players have a route. Each phone needs internet.' },

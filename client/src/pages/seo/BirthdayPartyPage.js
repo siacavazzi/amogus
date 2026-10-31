@@ -39,7 +39,7 @@ function BirthdayPartyPage() {
                     <h2>Check the guest list before you plan the tasks</h2>
                     <p>
                         Each player needs a phone browser and internet. Guests play together in your home;
-                        this is not a remote game. The generator covers five to fifteen players, and the host can change the setup.
+                        this is not a remote game. The generator covers three to thirty players, and the host can change the setup.
                         For children, arrange adult supervision and confirm device access before you choose this as the main activity.
                     </p>
                     <p>

@@ -109,7 +109,7 @@ function GroupGamesPage() {
                 <section className="seo-section">
                     <h2>What if the guest count changes?</h2>
                     <p>
-                        For Sus Party, change the player slider before you save the task pack. The generator covers five to fifteen players.
+                        For Sus Party, change the player slider before you save the task pack. The generator covers three to thirty players.
                         With an odd guest count in the team games, rotate one player’s timer or scorekeeper role between turns.
                         Decide the format once the guest list is clear, rather than split a group that wants to play together.
                     </p>

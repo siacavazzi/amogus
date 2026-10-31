@@ -11,7 +11,7 @@ const FAQS = [
     },
     {
         q: 'How many players do we need?',
-        a: 'Anywhere from 3 to 20+. The game requires at least two crew members per intruder, so one intruder needs at least three players. For a first game, four to six players with one intruder is an easy start. The task generator prepares groups of five to fifteen; add tasks for a bigger group.',
+        a: 'Anywhere from 3 to 20+. The game requires at least two crew members per intruder, so one intruder needs at least three players. For a first game, four to six players with one intruder is an easy start. The task generator prepares groups of three to thirty.',
     },
     {
         q: 'Is Sus Party free? Do we need to download an app?',
