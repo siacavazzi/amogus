@@ -51,7 +51,8 @@ async function skipTutorialPrompt(page) {
 // Pick the example task list, apply any settings, and open the room.
 //   settings: { intruders, meltdownTime, tasksPerPlayer, startingCards, cardDrawChance,
 //               deck: { 'EMP': 1, 'Fake Task': 1, ... } (a custom deck; unnamed cards are set to 0),
-//               groupTasks: true (no list; the room writes its tasks together in the lobby) }
+//               groupTasks: true (no list; the room writes its tasks together in the lobby),
+//               meetingQuorum: false (big games wait for everyone to slide ready, not 80%) }
 async function setUpRoom(page, settings = {}) {
     await page.goto('/play');
     await skipTutorialPrompt(page);
@@ -73,9 +74,13 @@ async function setUpRoom(page, settings = {}) {
         cardDrawChance: 'setting-card-draw-chance',
     };
     const wanted = Object.keys(sliders).filter(key => settings[key] !== undefined);
-    if (wanted.length || settings.deck) {
+    if (wanted.length || settings.deck || settings.meetingQuorum === false) {
         await page.getByRole('button', { name: /Advanced Settings/ }).click();
         for (const key of wanted) await page.locator(`#${sliders[key]}`).fill(String(settings[key]));
+    }
+    if (settings.meetingQuorum === false) {
+        await page.getByRole('button', { name: /^Everyone ready/ }).click();
+        await expect(page.getByRole('button', { name: /^Everyone ready/ })).toHaveAttribute('aria-pressed', 'true');
     }
     if (settings.deck) {
         await page.getByRole('button', { name: /^Custom/ }).click();

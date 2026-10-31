@@ -9,6 +9,7 @@ from assets.taskHandler import *
 from assets.meltdown import *
 from assets.card import *
 from assets.meeting import *
+from assets.meeting import MEETING_QUORUM, QUORUM_MIN_PLAYERS
 import time
 from threading import RLock, Thread
 from flask_socketio import emit
@@ -64,6 +65,9 @@ class Game:
         self.code_percent = code_percent
         self.vote_time = vote_time
         self.vote_threshold = vote_threshold
+        # Rooms over QUORUM_MIN_PLAYERS - 1 open voting once MEETING_QUORUM of them slide ready;
+        # a host who wants everyone at every meeting turns this off in Advanced Settings.
+        self.meeting_quorum = True
         
         # Multi-game support
         self.room_code = room_code
@@ -138,6 +142,7 @@ class Game:
             'locations': [loc for loc in self.locations if loc != 'Other'],
             'vote_time': self.vote_time,
             'vote_threshold': self.vote_threshold,
+            'meeting_quorum': self.meeting_quorum,
             'meltdown_time': self.meltdown_time,
             'code_percent': self.code_percent,
             'num_intruders': self.numIntruders,
@@ -177,6 +182,8 @@ class Game:
             self.vote_time = int(config['vote_time'])
         if 'vote_threshold' in config:
             self.vote_threshold = float(config['vote_threshold'])
+        if 'meeting_quorum' in config:
+            self.meeting_quorum = config['meeting_quorum'] is True
         if 'meltdown_time' in config:
             self.meltdown_time = int(config['meltdown_time'])
         if 'code_percent' in config:
@@ -691,14 +698,37 @@ class Game:
                 return False
 
             living_players = self.present_living_players()
-            if not living_players or any(not player.ready for player in living_players):
+            ready = sum(1 for player in living_players if player.ready)
+            if not living_players or ready < self.ready_needed(len(living_players)):
                 return False
 
-            started = meeting.start_voting()
-            if started:
-                for player in self.players:
-                    player.ready = not player.alive
-            return started
+            return self._open_voting_locked(meeting)
+
+    def ready_needed(self, present):
+        """How many present living players must slide ready before voting opens."""
+        if self.meeting_quorum and present >= QUORUM_MIN_PLAYERS:
+            return math.ceil(present * MEETING_QUORUM)
+        return present
+
+    def host_start_voting(self):
+        """The host's override for a meeting stuck waiting on phones that never slid ready."""
+        with self.state_lock:
+            meeting = self.meeting
+            if not meeting or meeting.stage != 'waiting' or meeting.round_id != self.round_id:
+                return False
+            if meeting.host_override_in() > 0:
+                return False
+            return self._open_voting_locked(meeting, started_by_host=True)
+
+    def _open_voting_locked(self, meeting, started_by_host=False):
+        meeting.started_by_host = started_by_host
+        started = meeting.start_voting()
+        if not started:
+            meeting.started_by_host = False
+        else:
+            for player in self.players:
+                player.ready = not player.alive
+        return started
 
 
     def _begin_last_stand_locked(self):

@@ -45,4 +45,25 @@ describe('MeetingWaitingPage', () => {
         }));
         confirm.mockRestore();
     });
+
+    it('in a big game, says how many need to be ready before voting opens', () => {
+        const players = Array.from({ length: 12 }, (_, i) => ({
+            player_id: `p-${i}`, username: `P${i}`, alive: true, active: true, ready: i < 6,
+        }));
+        renderWithContext(<MeetingWaitingPage />, {
+            ...meetingContext,
+            players,
+            meetingState: { ...meetingContext.meetingState, ready_quorum: 0.8, ready_quorum_min_players: 11 },
+        });
+        expect(screen.getByTestId('ready-count')).toHaveTextContent('6 of 12 ready');
+        expect(screen.getByTestId('ready-needed')).toHaveTextContent('Voting opens at 10 ready');
+    });
+
+    it('in a small game, waits for everyone without mentioning a quorum', () => {
+        renderWithContext(<MeetingWaitingPage />, {
+            ...meetingContext,
+            meetingState: { ...meetingContext.meetingState, ready_quorum: 0.8, ready_quorum_min_players: 11 },
+        });
+        expect(screen.queryByTestId('ready-needed')).not.toBeInTheDocument();
+    });
 });

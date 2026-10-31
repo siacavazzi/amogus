@@ -1364,6 +1364,32 @@ def handleEndMeeting(data=None):
     return {'ok': True}
 
 
+@socketio.on('host_start_voting')
+@room_event()
+def handleHostStartVoting(data=None):
+    """Host only: open voting while some phones never slid ready (a big, chaotic room)."""
+    data = data or {}
+    game, player, room = get_game_and_player(data.get('player_id'))
+    # Dead hosts keep the button: the host is often the first one killed.
+    if not game or not player or game.creator_sid != request.sid or player.player_id != game.creator_player_id:
+        return command_error('Only the host can start voting early.', game, player, reason='not_host')
+    meeting = game.meeting
+    if (not game.game_running or game.end_state or not meeting or meeting.stage != 'waiting'
+            or data.get('round_id') != game.round_id or data.get('meeting_id') != meeting.id):
+        return command_error('This meeting is no longer in the ready phase.', game, player, reason='stale_meeting')
+    wait = meeting.host_override_in()
+    if wait > 0:
+        return command_error(f'Give everyone {wait} more seconds to get there.', game, player, reason='too_early')
+    present = game.present_living_players()
+    not_ready = sum(1 for p in present if not p.ready)
+    if not game.host_start_voting():
+        return command_error('Voting could not start.', game, player)
+    record_usage('meeting_host_started_voting', game, player.player_id,
+                 not_ready=not_ready, present=len(present))
+    sendPlayerList(game, room)
+    return {'ok': True}
+
+
 # ============ MELTDOWN HANDLING ============
 
 @socketio.on('meltdown')
