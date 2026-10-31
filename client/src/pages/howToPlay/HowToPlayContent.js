@@ -18,7 +18,7 @@ export const heroStats = [
   { value: 'Free', label: 'Browser game, no account' },
   { value: '1 phone each', label: 'Phones are the controller' },
   { value: 'Your space', label: 'Several rooms or two task stations' },
-  { value: '5-15', label: 'Players in a generated setup' },
+  { value: '3 to 20+', label: 'Players, one phone each' },
 ];
 
 export const jumpLinks = [

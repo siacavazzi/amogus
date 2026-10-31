@@ -124,7 +124,6 @@ function LoginPage() {
                         <button type="submit" className="sg-btn sg-btn-white" disabled={!username.trim()}>
                             Next: Choose Avatar <ArrowRight size={22} />
                         </button>
-                        <p className="sg-small" style={{ textAlign: 'center', opacity: 0.6 }}>sussy amogus time ;)</p>
                     </form>
                 )}
 

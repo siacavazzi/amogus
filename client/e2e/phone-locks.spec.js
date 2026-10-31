@@ -24,17 +24,17 @@ test('a phone locked mid-round for a minute comes back to its role and task', as
     test.setTimeout(4 * 60 * 1000);
     const { phones, crew } = await startRound(browser, ['Sam', 'Alex', 'Jules', 'Riley']);
     const pocketed = crew[1];
-    const task = (await pocketed.getByTestId('task-location').locator('..').textContent()).trim();
+    const task = (await pocketed.getByTestId('current-task').textContent()).trim();
 
     const unlock = await h.lock(pocketed);
     await h.sleep(POCKET_MS);
     await unlock();
 
     await expect(pocketed.getByText('CALL MEETING')).toBeVisible({ timeout: 30000 });
-    await expect(pocketed.getByTestId('task-location').locator('..')).toHaveText(task);
+    await expect(pocketed.getByTestId('current-task')).toHaveText(task);
     // And it can still play: its next tap goes through.
     await h.swipe(pocketed);
-    await expect(pocketed.getByTestId('task-location').locator('..')).not.toHaveText(task, { timeout: 15000 });
+    await expect(pocketed.getByTestId('current-task')).not.toHaveText(task, { timeout: 15000 });
 
     h.expectNoPageErrors(phones);
 });

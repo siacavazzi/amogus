@@ -32,6 +32,7 @@ import KidsPartyPage from './pages/seo/KidsPartyPage';
 import YouthGroupsPage from './pages/seo/YouthGroupsPage';
 import PrintableTaskCardsPage from './pages/seo/PrintableTaskCardsPage';
 import HolidayPartyPage from './pages/seo/HolidayPartyPage';
+import NotFoundPage from './pages/info/NotFoundPage';
 import { getRoomCodeFromSearch } from './utils/inviteLinks';
 import { captureAcquisition, noteVisit } from './seo/discovery';
 import { usePageMeta } from './seo/usePageMeta';
@@ -170,7 +171,11 @@ function getRoute() {
     return 'holiday-party';
   }
 
-  return 'landing';
+  if (normalizedPath === '/' || normalizedPath === '/index.html') {
+    return 'landing';
+  }
+
+  return 'not-found';
 }
 
 function GamePage() {
@@ -256,6 +261,7 @@ function App() {
   if (route === 'printable-cards') return <PrintableTaskCardsPage />;
   if (route === 'holiday-party') return <HolidayPartyPage />;
 
+  if (route === 'not-found') return <NotFoundPage />;
   return <LandingPage />;
 }
 

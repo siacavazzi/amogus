@@ -143,7 +143,7 @@ function LobbyPage() {
                 <div className="sg-home__top sg-a sg-rise">
                     <h1 className="sg-big sg-home__mark">Sus Party</h1>
                     <p className="sg-lede">The real-life social deduction game</p>
-                    <p className="sg-small" style={{ marginTop: 6 }}>4–16+ players · Real-time · Physical Tasks</p>
+                    <p className="sg-small" style={{ marginTop: 6 }}>3 to 20+ players · Real-time · Physical Tasks</p>
                 </div>
 
                 <div className="sg-home__body sg-a sg-rise" style={{ animationDelay: '120ms' }}>
@@ -215,7 +215,7 @@ function LobbyPage() {
                 <div className="sg-a sg-rise">
                     <h1 className="sg-big sg-rx-lobby__mark">Sus Party</h1>
                     <p className="sg-rx__lede">The real-life social deduction game</p>
-                    <p className="sg-small" style={{ marginTop: 8 }}>4–16+ players · Real-time · Physical Tasks</p>
+                    <p className="sg-small" style={{ marginTop: 8 }}>3 to 20+ players · Real-time · Physical Tasks</p>
 
                     <div className="sg-rx-lobby__form">
                         <RoomEntryNotice status={roomEntryStatus} busy={isJoining} onRetry={() => handleJoinGame()} onChangeCode={changeCode} />

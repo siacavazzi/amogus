@@ -247,12 +247,12 @@ const CrewmemberPage = ({
             )}
           </div>
         ) : task?.task ? (
-          <div key={task.assignment_id || task.task} className="sg-a sg-drop" style={{ animationDelay: '120ms' }}>
+          <div key={task.assignment_id || task.task} data-testid="current-task" className="sg-a sg-drop" style={{ animationDelay: '120ms' }}>
             <p className="sg-small">Current task</p>
             <h3 className="sg-big" style={{ fontSize: 'clamp(32px, 10.5vw, 46px)', margin: '12px 0 18px', lineHeight: 1 }}>
               {task.task}
             </h3>
-            {task.location && (
+            {task.location && task.location !== 'Other' && (
               <span className="sg-pill" data-testid="task-location">
                 <MapPin size={16} strokeWidth={2.75} />
                 {task.location}

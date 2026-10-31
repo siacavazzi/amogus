@@ -60,7 +60,7 @@ test('mashing Call Meeting, the ready slide and Vote counts each person once', a
 test('the same phone opens the game in a second tab mid-round and keeps one seat', async ({ browser }) => {
     const { phones, crew } = await startRound(browser, ['Sam', 'Alex', 'Jules', 'Riley']);
     const twoTabs = crew[1];
-    const task = (await twoTabs.getByTestId('task-location').locator('..').textContent()).trim();
+    const task = (await twoTabs.getByTestId('current-task').textContent()).trim();
 
     // A second tab in the same browser (same saved player) opens the game.
     const second = await twoTabs.context().newPage();
@@ -69,7 +69,7 @@ test('the same phone opens the game in a second tab mid-round and keeps one seat
     second.on('pageerror', error => second.errors.push(error.message));
     await second.goto('/play');
     await expect(second.getByText('CALL MEETING')).toBeVisible({ timeout: 30000 });
-    await expect(second.getByTestId('task-location').locator('..')).toHaveText(task);
+    await expect(second.getByTestId('current-task')).toHaveText(task);
 
     // The room still counts four people, and the newest tab plays for them.
     await crew[0].getByText('CALL MEETING').click();
@@ -85,14 +85,14 @@ test('the same phone opens the game in a second tab mid-round and keeps one seat
 test('reloading over and over mid-round lands back in the same round', async ({ browser }) => {
     const { phones, crew } = await startRound(browser, ['Sam', 'Alex', 'Jules', 'Riley']);
     const fidget = crew[1];
-    const task = (await fidget.getByTestId('task-location').locator('..').textContent()).trim();
+    const task = (await fidget.getByTestId('current-task').textContent()).trim();
 
     for (let i = 0; i < 4; i++) {
         await fidget.reload({ waitUntil: 'commit' });
         await h.sleep(300 + i * 200);
     }
     await expect(fidget.getByText('CALL MEETING')).toBeVisible({ timeout: 30000 });
-    await expect(fidget.getByTestId('task-location').locator('..')).toHaveText(task);
+    await expect(fidget.getByTestId('current-task')).toHaveText(task);
 
     // The room still works with them in it.
     await h.callMeeting(crew[0], phones);

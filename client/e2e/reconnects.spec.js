@@ -30,11 +30,11 @@ async function blink(page, ms = 3000) {
 test('someone who refreshes mid-round keeps their role and task', async ({ browser }) => {
     const { phones, crew } = await startRound(browser, ['Sam', 'Alex', 'Jules', 'Riley']);
     const refresher = crew[1];
-    const task = (await refresher.getByTestId('task-location').locator('..').textContent()).trim();
+    const task = (await refresher.getByTestId('current-task').textContent()).trim();
 
     await refresher.reload();
     await expect(refresher.getByText('CALL MEETING')).toBeVisible({ timeout: 30000 });
-    await expect(refresher.getByTestId('task-location').locator('..')).toHaveText(task);
+    await expect(refresher.getByTestId('current-task')).toHaveText(task);
 
     h.expectNoPageErrors(phones);
 });

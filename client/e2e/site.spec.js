@@ -20,11 +20,22 @@ test('every page in the sitemap opens cleanly on a phone and a laptop', async ({
             const response = await page.goto(url);
             expect(response.status(), `${url} on the ${page.person}`).toBeLessThan(400);
             await expect(page.locator('h1').first(), `${url} has a heading on the ${page.person}`).toBeVisible();
+            await expect(page.getByText("This page isn't here"), `${url} is a real page`).toHaveCount(0);
             const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
             expect(overflow, `${url} doesn't scroll sideways on the ${page.person}`).toBeLessThanOrEqual(1);
         }
     }
     h.expectNoPageErrors([phone, laptop]);
+});
+
+test('an address the site does not have says so, with a way back', async ({ browser }) => {
+    const phone = await h.openPhone(browser, 'Phone');
+    await phone.goto('/no-such-page');
+    await expect(phone.getByRole('heading', { name: "This page isn't here" })).toBeVisible();
+    await expect(phone.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
+    await phone.getByRole('link', { name: 'Host or join a game' }).click();
+    await expect(phone).toHaveURL(/\/play$/);
+    h.expectNoPageErrors([phone]);
 });
 
 test('the home page gets a visitor into a room', async ({ browser }) => {

@@ -32,7 +32,7 @@ test('the room writes its own tasks together and plays them', async ({ browser }
     await host.getByText('Start Game').click();
     const intruder = await h.revealRoles(phones);
     const crewmate = phones.find(phone => phone !== intruder);
-    const shown = await crewmate.getByTestId('task-location').locator('..').textContent();
+    const shown = await crewmate.getByTestId('current-task').textContent();
     expect(tasks.some(text => shown.includes(text)), `"${shown}" is one of the room's tasks`).toBe(true);
 
     h.expectNoPageErrors(phones);

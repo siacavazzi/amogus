@@ -47,7 +47,7 @@ test('a phone that loses its connection mid-round comes back to the same task', 
     await phones[0].getByText('Start Game').click();
     const intruder = await h.revealRoles(phones);
     const dropper = phones.find(phone => phone !== intruder);
-    const task = (await dropper.getByTestId('task-location').locator('..').textContent()).trim();
+    const task = (await dropper.getByTestId('current-task').textContent()).trim();
 
     await h.goOffline(dropper);
     // Chromium doesn't always close the socket when offline; then the drop shows after the ping timeout.
@@ -55,7 +55,7 @@ test('a phone that loses its connection mid-round comes back to the same task', 
     await h.sleep(3000);
     await h.goOnline(dropper);
     await expect(dropper.getByText('CALL MEETING')).toBeVisible({ timeout: 30000 });
-    await expect(dropper.getByTestId('task-location').locator('..')).toHaveText(task);
+    await expect(dropper.getByTestId('current-task')).toHaveText(task);
 
     h.expectNoPageErrors(phones);
 });
