@@ -252,9 +252,22 @@ async function playGame() {
         const meetingMarks = new Map(phones.map(phone => [phone, phone.mark()]));
         await crew[0].command('meeting', { player_id: ids.get(crew[0]), round_id: roundId });
         const meeting = parse(await host.waitFor('meeting', data => parse(data).stage === 'waiting', { since: meetingMarks.get(host) }));
-        await Promise.all(phones.map(phone => phone.command('ready', { player_id: ids.get(phone), round_id: roundId, meeting_id: meeting.id })));
+        // Phones slide ready one after another. In rooms over 10 players voting opens at 80% ready,
+        // and a phone that slides just as it opens is told the ready phase is over, which is fine.
+        const votingOpen = phone => phone.events.slice(meetingMarks.get(phone)).some(entry => entry.event === 'meeting' && parse(entry.data).stage === 'voting');
+        let readied = 0;
+        for (const phone of phones) {
+            if (votingOpen(phone)) continue;
+            try {
+                await phone.command('ready', { player_id: ids.get(phone), round_id: roundId, meeting_id: meeting.id });
+                readied++;
+            } catch (error) {
+                if (!(phones.length > 10 && /no longer in the ready phase/.test(error.message))) throw error;
+            }
+        }
         await Promise.all(phones.map(phone => phone.waitFor('meeting', data => parse(data).stage === 'voting', { since: meetingMarks.get(phone) })));
-        log('Meeting called, everyone ready, voting open');
+        if (phones.length <= 10) assert.equal(readied, phones.length, 'Small rooms wait for everyone');
+        log(`Meeting called, ${readied} of ${phones.length} slid ready, voting open`);
         const endMarks = new Map(phones.map(phone => [phone, phone.mark()]));
         await Promise.all(phones.map(phone => phone.command('vote', {
             player_id: ids.get(phone), round_id: roundId, meeting_id: meeting.id,
