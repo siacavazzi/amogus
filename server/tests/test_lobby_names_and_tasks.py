@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 from tests.integration_helpers import SocketGameTestCase, server_app
-from assets.game_manager import BLOCKED_ROOM_WORDS
+from assets.room_codes import BLOCKED_WORDS
 from assets.room_protocol import lobby_state, minimum_tasks
 
 
@@ -32,15 +32,15 @@ class LobbyNamesAndTasksTests(SocketGameTestCase):
 
     def test_room_codes_skip_rude_words(self):
         manager = server_app.game_manager
-        rolls = iter(["F", "U", "C", "K", "B", "E", "A", "R"])
-        import assets.game_manager as module
+        rolls = iter(["F", "U", "C", "K", "H", "E", "A", "R"])
+        import assets.room_codes as module
         real_choices = module.random.choices
         module.random.choices = lambda population, k: [next(rolls) for _ in range(k)]
         try:
-            self.assertEqual(manager._generate_room_code(), "BEAR")
+            self.assertEqual(manager._generate_room_code(), "HEAR")
         finally:
             module.random.choices = real_choices
-        self.assertIn("FUCK", BLOCKED_ROOM_WORDS)
+        self.assertIn("FUCK", BLOCKED_WORDS)
 
     def test_a_room_short_on_tasks_says_how_many_to_add(self):
         clients, room_code, player_ids, game = self.setup_lobby(12)
