@@ -186,12 +186,12 @@ async function tapAndConfirm(locator) {
 
 const isWebKit = page => page.context().browser().browserType().name() === 'webkit';
 
-// In WebKit the game's socket goes through Playwright, so goOffline can cut it: Playwright's
-// WebKit keeps an open WebSocket working after setOffline. (Chromium closes it, or the server's
-// ping timeout catches it.)
+// The game's socket goes through Playwright, so goOffline cuts it at once, as a phone losing its
+// connection does. setOffline alone doesn't: Playwright's WebKit keeps an open WebSocket working,
+// and Chromium sometimes keeps it until the ping timeout (on localhost especially), which hid
+// what the app does when the drop is noticed straight away.
 async function routeSocket(page) {
     page.sockets = [];
-    if (!isWebKit(page)) return;
     await page.routeWebSocket(/socket\.io/, ws => {
         if (page.offline) return ws.close({ code: 1006, reason: 'offline' });
         page.sockets.push(ws);
@@ -229,8 +229,12 @@ async function lock(page) {
     return async () => {
         await goOnline(page);
         await cdp.send('Debugger.resume');
-        await cdp.send('Debugger.disable');
-        await setVisible(true);
+        await cdp.send('Debugger.disable').catch(() => {});
+        // The connecting screen's reload timer ran out while the phone was locked, so it can
+        // reload the page the moment it wakes, as an iPhone does. A fresh page is visible anyway.
+        await setVisible(true).catch(error => {
+            if (!/context was destroyed|navigat/i.test(error.message)) throw error;
+        });
         await cdp.detach().catch(() => {});
     };
 }
