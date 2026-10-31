@@ -1,7 +1,5 @@
 // Host setup on a phone, before anyone joins: task lists shared by code, the settings
 // sliders, avatars, and a host whose connection drops or page reloads mid-setup.
-// Tests marked test.fail are known bugs: they pass while the bug is there, and Playwright
-// flags them once it's fixed so the marker can come off.
 const { test, expect } = require('@playwright/test');
 const h = require('./helpers');
 
@@ -54,9 +52,9 @@ test('an avatar someone has is locked for the next player', async ({ browser }) 
     h.expectNoPageErrors([host, guest]);
 });
 
-test.fail('a long name keeps the avatar screen on the phone', async ({ browser }) => {
-    // Known bug: the name is drawn huge on one line, so a 15-letter name pushes the avatar
-    // grid and the Join Game button off the right edge of every phone.
+test('a long name keeps the avatar screen on the phone', async ({ browser }) => {
+    // The name is drawn huge on one line; a 15-letter name used to push the avatar grid and
+    // the Join Game button off the right edge of every phone.
     const [host, guest] = await h.openPhones(browser, ['Sam', 'Christopher-Lee']);
     const code = await h.createRoomOnPhone(host);
     await guest.goto(`/play?room=${code}`);
@@ -72,9 +70,8 @@ test.fail('a long name keeps the avatar screen on the phone', async ({ browser }
     expect(sideways).toBeLessThanOrEqual(1);
 });
 
-test.fail('the settings sliders follow a finger', async ({ browser }) => {
-    // Known bug: each slider is a component defined inside GameConfigPage, so every change
-    // remounts it and the drag stops after one step. On a phone a full drag moves 15 seconds.
+test('the settings sliders follow a finger', async ({ browser }) => {
+    // The sliders used to be rebuilt on every change, so a finger drag stopped after one step.
     const host = await h.openPhone(browser, 'Sam');
     await startSetup(host);
     await host.getByText('Add Example List').click();
@@ -107,10 +104,9 @@ async function expectRoomOpens(host) {
     await h.enterName(host);
 }
 
-test.fail('a host whose connection drops during setup can still open the room', async ({ browser }) => {
-    // Known bug: a phone host has no player yet, so after a reconnect the server no longer
-    // knows the socket is the creator ("Join the room before you send this command"), and
-    // the setup screen starts over. Locking the phone mid-setup does this.
+test('a host whose connection drops during setup can still open the room', async ({ browser }) => {
+    // A phone host has no player yet. Before the host token, a reconnect (locking the phone
+    // is enough) lost the room: "Join the room before you send this command".
     const host = await h.openPhone(browser, 'Sam');
     let connection;
     await host.routeWebSocket(/socket\.io/, ws => { ws.connectToServer(); connection = ws; });
@@ -119,20 +115,22 @@ test.fail('a host whose connection drops during setup can still open the room', 
     await host.getByText('Use This Task List').click();
     await expect(host.getByRole('heading', { name: 'Game settings' })).toBeVisible();
     await connection.close();
-    await expect(host.getByText('Reconnect to your room')).toBeVisible();
-    await expect(host.getByText('Reconnect to your room')).toBeHidden({ timeout: 15000 });
+    // The setup screen stays up, saying it's reconnecting, until the connection is back.
+    await expect(host.getByText(/Reconnecting/)).toBeVisible();
+    await expect(host.getByText(/Reconnecting/)).toBeHidden({ timeout: 15000 });
+    await expect(host.getByRole('heading', { name: 'Game settings' })).toBeVisible();
     await expectRoomOpens(host);
 });
 
-test.fail('a host whose page reloads during setup can still open the room', async ({ browser }) => {
-    // Known bug: after a reload the host lands on the name screen of their own unopened
-    // room, and joining says "Ask the host to open the room". iPhones reload tabs left in
-    // the background, e.g. while the host shares the code in Messages.
+test('a host whose page reloads during setup can still open the room', async ({ browser }) => {
+    // iPhones reload tabs left in the background, e.g. while the host shares the code in
+    // Messages. This used to land the host on the name screen of their own unopened room.
     const host = await h.openPhone(browser, 'Sam');
     await startSetup(host);
     await host.getByText('Add Example List').click();
     await host.getByText('Use This Task List').click();
     await host.reload();
-    await expect(host.getByText('Create New Game').or(host.getByText('Open Room')).or(host.getByPlaceholder(/name/i)).first()).toBeVisible();
+    // Back on the setup screen of the same room, with the saved list still there to pick.
+    await expect(host.getByRole('heading', { name: 'Task list' })).toBeVisible();
     await expectRoomOpens(host);
 });

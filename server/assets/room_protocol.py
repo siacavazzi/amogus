@@ -33,7 +33,9 @@ def start_error_detail(game, test_mode=False):
         return 'too_few_locations', 'Add at least 2 locations before you start the game.'
     tasks = game.collaborative_tasks
     if len(tasks) < minimum_tasks(game):
-        return 'too_few_tasks', f'Need at least {minimum_tasks(game)} tasks. The room has {len(tasks)}.'
+        missing = minimum_tasks(game) - len(tasks)
+        return 'too_few_tasks', (f'Add {missing} more task{"s" if missing != 1 else ""} to start. '
+                                 f'{len(game.players)} players need {minimum_tasks(game)}; the room has {len(tasks)}.')
     return None, None
 
 
@@ -47,13 +49,14 @@ def can_start_test(game):
 
 
 def lobby_state(game):
-    error = start_error(game)
+    reason, error = start_error_detail(game)
     return copy.deepcopy({
         **metadata(game), 'locations': game.locations, 'tasks': game.collaborative_tasks,
         'min_tasks': minimum_tasks(game), 'task_list_code': game.collaborative_task_list_code,
         'task_list_name': game.collaborative_task_list_name,
         'collaborative_mode': game.collaborative_mode, 'can_start': error is None,
-        'can_start_test': can_start_test(game), 'start_error': error,
+        'can_start_test': can_start_test(game), 'start_error': error, 'start_reason': reason,
+        'tasks_missing': max(0, minimum_tasks(game) - len(game.collaborative_tasks)),
         'host_player_id': game.creator_player_id,
     })
 
@@ -68,12 +71,14 @@ def room_state(game, player=None, sid=None):
     return copy.deepcopy({
         **metadata(game), 'running': game.game_running, 'room_open': game.is_open,
         'is_creator': game.creator_sid == sid,
-        'players': [json.loads(p.to_json()) for p in game.players],
+        'players': [json.loads(p) for p in game.player_view(player)],
         'task': player.task if player else None, 'crew_score': game.crew_score,
         'task_goal': game.taskGoal, 'meeting': json.loads(game.meeting.to_json()) if game.meeting else None,
         'votes': game.meeting.compute_vote_counts() if game.meeting else {},
         'veto_votes': len(game.meeting.veto_votes) if game.meeting else 0,
-        'end_state': game.end_state, 'stats': game.stats, 'task_creation_mode': game.task_creation_mode,
+        'end_state': game.end_state,
+        # Mid-round stats name who sent fake tasks and taunts, so they wait for the end.
+        'stats': game.stats if game.end_state else None, 'task_creation_mode': game.task_creation_mode,
         'test_mode': game.test_mode,
         'locations': game.locations, 'config': game.get_config(),
         'collaborative_tasks': lobby_state(game), 'active_hack': game.active_hack,

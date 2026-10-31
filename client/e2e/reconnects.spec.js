@@ -19,12 +19,12 @@ async function startRound(browser, names, { reactor: withReactor = false } = {})
 
 // Cut a page off the network for a moment, as a phone locking or a wifi blink would.
 async function blink(page, ms = 3000) {
-    await page.context().setOffline(true);
+    await h.goOffline(page);
     // Chromium doesn't always close the socket when it goes offline; then the drop only shows
     // after socket.io's ping timeout (25s interval + 20s wait).
     await expect(page.getByText(/Reconnect|Connection lost/).first()).toBeVisible({ timeout: 60000 });
     await h.sleep(ms);
-    await page.context().setOffline(false);
+    await h.goOnline(page);
 }
 
 test('someone who refreshes mid-round keeps their role and task', async ({ browser }) => {
@@ -81,7 +81,6 @@ test('the big screen gets back into the round after its wifi blinks', async ({ b
 });
 
 test('a phone opened as a second big screen mid-round takes over the big screen', async ({ browser }) => {
-    test.fail(!process.env.E2E_SHOW_BUGS, 'Bug: the server refuses a new big screen while it still holds the old one, so the new screen freezes');
     const { phones, reactor, code, crew } = await startRound(browser, ['Sam', 'Alex', 'Jules', 'Riley'], { reactor: true });
 
     // The host moves the big screen to the TV while the laptop is still open (or the laptop's
@@ -97,8 +96,8 @@ test('a phone opened as a second big screen mid-round takes over the big screen'
     h.expectNoPageErrors([...phones, reactor, tv]);
 });
 
-test('a phone that slid ready and then locked still counts as ready', async ({ browser }) => {
-    test.fail(!process.env.E2E_SHOW_BUGS, 'Bug: a dropped socket un-readies the player, so the meeting waits until they unlock and slide again');
+// Sam's call: a phone that drops is un-readied and slides again when it comes back.
+test('a phone that slid ready and then locked slides ready again after coming back', async ({ browser }) => {
     const { phones, crew } = await startRound(browser, ['Sam', 'Alex', 'Jules', 'Riley']);
     const pocketed = crew[1];
     await crew[0].getByText('CALL MEETING').click();
@@ -106,13 +105,12 @@ test('a phone that slid ready and then locked still counts as ready', async ({ b
 
     await blink(pocketed);
     await expect(pocketed.getByText('Go to the meeting spot', { exact: false })).toBeVisible({ timeout: 30000 });
-    await expect(pocketed.getByRole('slider'), 'the phone still shows its ready slide after coming back').toHaveCount(0, { timeout: 5000 });
+    await expect(pocketed.getByRole('slider'), 'the phone shows its ready slide again after coming back').toHaveCount(1, { timeout: 15000 });
 
     h.expectNoPageErrors(phones);
 });
 
 test('someone who leaves mid-round is gone from the lobby after Play Again', async ({ browser }) => {
-    test.fail(!process.env.E2E_SHOW_BUGS, 'Bug: a player who leaves mid-round stays in the room and is dealt into later rounds, where they block every meeting');
     const { phones, intruder, crew } = await startRound(browser, ['Sam', 'Alex', 'Jules', 'Riley', 'Kai']);
     const leaver = crew[crew.length - 1];
     const stayers = phones.filter(phone => phone !== leaver);

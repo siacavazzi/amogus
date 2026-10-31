@@ -48,7 +48,7 @@ test('someone killed mid-vote reports it, and votes cast for them come back', as
     await h.vote([[caller, victim]]);
     await expect(caller.getByText(`Voted for ${victim.person}`)).toBeVisible();
 
-    await victim.getByRole('button', { name: "I've Been Killed" }).click();
+    await h.tapAndConfirm(victim.getByRole('button', { name: "I've Been Killed" }));
     await expect(victim.getByText("You're out")).toBeVisible();
     // That vote no longer counts, so the caller is asked again.
     await expect(caller.getByText('Tap who you think it is')).toBeVisible();
@@ -75,23 +75,19 @@ test('a phone that drops before voting opens holds the meeting until it is back 
 
     await caller.getByText('CALL MEETING').click();
     await h.readyUp(others);
-    await dropper.context().setOffline(true);
+    await h.goOffline(dropper);
     await expect(caller.getByText('Offline')).toBeVisible({ timeout: 60000 });
     await expect(caller.getByTestId('ready-count')).toHaveText('3 of 4 ready');
 
-    await dropper.context().setOffline(false);
+    await h.goOnline(dropper);
     await h.readyUp([dropper]);
     for (const phone of phones) await expect(phone.getByText('VOTE', { exact: true }), phone.person).toBeVisible({ timeout: 20000 });
 
     h.expectNoPageErrors(phones);
 });
 
-// KNOWN BUG: a meeting only opens voting once every living player has slid ready, and an
-// offline player can't. If one phone dies or its owner goes home without tapping Leave,
-// every meeting from then on waits forever: there's no timeout and no host override.
-// Remove test.fail() once the meeting can go on without them.
+// A phone offline for more than the server's grace period (20s) is no longer waited for.
 test('a phone that never comes back does not hold the meeting forever', async ({ browser }) => {
-    test.fail();
     const phones = await h.openPhones(browser, ['Sam', 'Alex', 'Jules', 'Riley', 'Kai']);
     await h.gatherRoom({ host: phones[0], phones });
     await phones[0].getByText('Start Game').click();

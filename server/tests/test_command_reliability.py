@@ -144,7 +144,7 @@ class CommandReliabilityTests(SocketGameTestCase):
         client.emit('complete_task', self.command(game, player), callback=True)
         duplicate = client.emit('complete_task', command, callback=True)
         self.assertEqual(first, duplicate)
-        self.assertEqual(1, duplicate['state']['stats']['tasks_completed'])
+        self.assertEqual(1, duplicate['state']['crew_score'])
         self.assertEqual(2, game.crew_score)
 
     def test_completion_snapshot_preserves_names_after_intruder_reveal(self):
@@ -208,3 +208,35 @@ class CommandReliabilityTests(SocketGameTestCase):
         client.emit('ready', {'player_id': caller.player_id, 'round_id': getattr(game, 'round_id', 'missing'),
                                    'meeting_id': getattr(game.meeting, 'id', 'missing')})
         self.assertEqual('waiting', game.meeting.stage)
+
+
+class DoubleTapMeetingTests(SocketGameTestCase):
+    def test_second_tap_on_call_meeting_is_not_an_error(self):
+        # An excited double tap, or two people calling at once, used to put an error box over
+        # the ready slide on the second phone.
+        clients, room, ids, game = self.setup_started_game(4, config={'starting_cards': 0, 'card_draw_probability': 0})
+        caller, other = self.crew(game)[:2]
+        caller_client = self.client_for_player(clients, ids, caller)
+        other_client = self.client_for_player(clients, ids, other)
+        self.drain_all(clients)
+
+        caller_client.emit('meeting', {'player_id': caller.player_id})
+        meeting = game.meeting
+        caller_client.emit('meeting', {'player_id': caller.player_id})
+        other_client.emit('meeting', {'player_id': other.player_id})
+
+        self.assertIs(meeting, game.meeting)
+        self.assertEqual(1, game.stats['meetings_called'])
+        for client in (caller_client, other_client):
+            self.assertFalse(self.has_event(client.get_received(), 'error'))
+
+    def test_meeting_tap_after_the_round_ended_is_still_refused(self):
+        clients, room, ids, game = self.setup_started_game(4, config={'starting_cards': 0, 'card_draw_probability': 0})
+        caller = self.crew(game)[0]
+        client = self.client_for_player(clients, ids, caller)
+        with game.state_lock:
+            game.end_state = 'victory'
+        self.drain_all(clients)
+        client.emit('meeting', {'player_id': caller.player_id})
+        self.assertFalse(game.meeting)
+        self.assertTrue(self.has_event(client.get_received(), 'error'))

@@ -1,5 +1,6 @@
 // The intruder's meltdown cards: Shorten Meltdown, then Remote Sabotage from the vent, and the
-// room typing its codes in at the reactor. Plus two ways those cards go wrong today.
+// room typing its codes in at the reactor. Plus the limits on them: stacked shortening leaves
+// half the time, and Remote Sabotage needs a reactor to type the codes into.
 const { test, expect } = require('@playwright/test');
 const h = require('./helpers');
 
@@ -57,11 +58,8 @@ test('Shorten Meltdown, then Remote Sabotage from the vent, and the room stops i
     h.expectNoPageErrors([...phones, reactor]);
 });
 
-// KNOWN BUG: each Shorten Meltdown takes 10-15s off the next meltdown and they add up with a
-// floor of 1 second. Three of them against a 30s meltdown leave the room 1 second. Remove
-// test.fail() once there's a sensible floor.
+// Shorten Meltdown cards add up, but never below half the meltdown time (15s of 30s here).
 test('stacked Shorten Meltdown cards still leave time to reach the reactor', async ({ browser }) => {
-    test.fail();
     const phones = await h.openPhones(browser, ['Sam', 'Alex', 'Jules', 'Riley']);
     const reactor = await h.openReactor(browser);
     await h.gatherRoom({
@@ -76,19 +74,15 @@ test('stacked Shorten Meltdown cards still leave time to reach the reactor', asy
         await h.dismissMessage(intruder);
         await h.sleep(500);
     }
-    // Today the meltdown lasts one second: the round is over before anyone can move.
     await reactor.getByRole('button', { name: /SABOTAGE CORE/ }).click();
     for (const phone of phones) await expect(phone.getByTestId('meltdown-code'), phone.person).toHaveText(/^\d{4}$/);
     await h.sleep(5000);
     await expect(reactor.getByText('The reactor blew')).toHaveCount(0);
 });
 
-// KNOWN BUG: Remote Sabotage cards are dealt while a reactor is in the room. If the reactor
-// leaves, the card still works, but codes can only be typed in at the reactor, so the
-// meltdown can't be stopped and every crewmate dies. Remove test.fail() once the card is
-// refused (or the meltdown can be stopped another way) when no reactor is connected.
+// Codes can only be typed in at the reactor, so once it leaves, Remote Sabotage is refused and
+// the intruder keeps the card.
 test('Remote Sabotage does nothing once the reactor has left', async ({ browser }) => {
-    test.fail();
     const phones = await h.openPhones(browser, ['Sam', 'Alex', 'Jules', 'Riley']);
     const reactor = await h.openReactor(browser);
     await h.gatherRoom({
@@ -102,8 +96,11 @@ test('Remote Sabotage does nothing once the reactor has left', async ({ browser 
     await h.sleep(1500);
     await h.openVent(intruder);
     await h.playCard(intruder, 'Remote Sabotage');
+    await expect(intruder.getByText(/needs the reactor screen/)).toBeVisible();
     const crew = phones.find(phone => phone !== intruder);
-    await expect(crew.getByTestId('meltdown-code')).toHaveCount(0, { timeout: 5000 });
     await h.sleep(3000);
     await expect(crew.getByTestId('meltdown-code')).toHaveCount(0);
+    await expect(h.roundButton(crew)).toBeVisible();
+
+    h.expectNoPageErrors(phones);
 });
