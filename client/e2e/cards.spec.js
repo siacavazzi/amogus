@@ -79,7 +79,9 @@ test('area denial keeps new tasks out of the denied room', async ({ browser }) =
     for (let i = 0; i < 4; i++) {
         await h.swipe(worker);
         await h.sleep(2000);
-        await expect(worker.getByTestId('task-location')).not.toHaveText(denied);
+        // Tasks with no room ("Other") show no location chip, so check the chip only when there is one.
+        await expect(worker.getByTestId('current-task')).toBeVisible();
+        await expect(worker.getByTestId('task-location').getByText(denied, { exact: true })).toHaveCount(0);
     }
 
     h.expectNoPageErrors(phones);
