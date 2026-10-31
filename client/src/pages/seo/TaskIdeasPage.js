@@ -280,7 +280,7 @@ function TaskIdeasPage() {
                     href="/among-us-irl-task-generator?venue=house&players=8" label="Build your house task pack"
                     secondaryLabel="Play Sus Party">
                     Select your rooms and player count, review the tasks, then choose “Use this pack.”
-                    Create a room and select “Import generated tasks” in host setup. Sus Party deals the
+                    Sus Party creates your room with the tasks loaded, deals the
                     secret roles and runs the round while your group plays in person.
                 </GameSetupCta>
 

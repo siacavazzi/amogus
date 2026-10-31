@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import { DataContext } from '../GameContext';
 import { Users, Play, ChevronDown, ChevronUp, List, Download, Trash2, Check, LogOut, MapPin, Settings, ArrowRight, ArrowLeft, X, Zap, Copy, Sparkles, Minus, Plus } from '../signal/icons';
-import { readGameDraft, clearGameDraft } from './seo/gameDraft';
+import { readGeneratedSetup, clearGameDraft } from './seo/gameDraft';
 import { AUTO_INTRUDERS_SUMMARY, playersForIntruders } from '../utils/intruders';
 import '../signal/host.css';
 
@@ -142,8 +142,7 @@ function GameConfigPage() {
     const [currentTaskList, setCurrentTaskList] = useState(null);
     const [taskListLoading, setTaskListLoading] = useState(false);
     const [taskListApplied, setTaskListApplied] = useState(false);
-    const [generatedDraft, setGeneratedDraft] = useState(() =>
-        new URLSearchParams(window.location.search).get('setup') === 'generated' ? readGameDraft() : null);
+    const [generatedDraft, setGeneratedDraft] = useState(readGeneratedSetup);
     const [generatedImportError, setGeneratedImportError] = useState('');
     const generatedImportRef = useRef(false);
     const generatedSettingsRef = useRef(null);
@@ -345,6 +344,12 @@ function GameConfigPage() {
         });
     };
 
+    // A pack from the task generator loads by itself; the button below is only a retry.
+    useEffect(() => {
+        if (generatedDraft && socket && !generatedImportRef.current && !generatedImportError) importGeneratedTasks();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [socket, generatedDraft]);
+
     const loadTaskListByCode = () => {
         if (!loadTaskListCode.trim()) return;
         setTaskListLoading(true);
@@ -461,15 +466,16 @@ function GameConfigPage() {
                 <div className="hs-panel">
                     <h2 className="hs-title">Your generated task pack</h2>
                     <p className="sg-lede">{generatedDraft.tasks.length} tasks across {generatedDraft.locations.length} areas for {generatedDraft.playerCount} players.</p>
-                    <p className="sg-small">Import the list, review its tasks, then apply it to this room.</p>
-                    <button type="button" onClick={importGeneratedTasks} disabled={taskListLoading} className="sg-btn sg-btn-line">
-                        {taskListLoading ? 'Import in progress…' : 'Import generated tasks'}
-                    </button>
-                    {generatedImportError && <p role="alert" className="hs-error">{generatedImportError}</p>}
+                    {generatedImportError ? <>
+                        <p role="alert" className="hs-error">{generatedImportError}</p>
+                        <button type="button" onClick={importGeneratedTasks} disabled={taskListLoading} className="sg-btn sg-btn-line">
+                            Try loading the pack again
+                        </button>
+                    </> : <p className="sg-small" role="status">Loading your pack…</p>}
                 </div>
             )}
 
-            {showStarterTemplatePromo && !generatedDraft && (
+            {showStarterTemplatePromo && !generatedDraft && !currentTaskList && (
                 <div className="hs-panel">
                     <div className="hs-bar" style={{ minHeight: 0, alignItems: 'flex-start' }}>
                         <div style={{ display: 'grid', gap: 4, minWidth: 0 }}>

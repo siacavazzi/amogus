@@ -81,7 +81,7 @@ function SocialDeductionPage() {
 
                 <GameSetupCta title="Turn the rooms you already have into a game"
                     href="/among-us-irl-task-generator?venue=house&players=8&movement=normal" label="Build an eight-player house setup">
-                    Choose your areas, review a task pack, then select “Use this pack.” Create the room and select “Import generated tasks” in host setup.
+                    Choose your areas, review a task pack, then select “Use this pack.” Sus Party creates the room with your tasks loaded.
                 </GameSetupCta>
                 <section className="seo-section">
                     <h2>Can we play without a board or a paid app?</h2>

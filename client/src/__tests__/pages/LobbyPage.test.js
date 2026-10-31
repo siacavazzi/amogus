@@ -10,6 +10,7 @@
 import React from 'react';
 import { renderWithContext, screen, fireEvent, waitFor } from '../../test-utils';
 import LobbyPage from '../../pages/LobbyPage';
+import { saveGameDraft } from '../../pages/seo/gameDraft';
 
 describe('LobbyPage', () => {
     describe('Rendering', () => {
@@ -113,6 +114,52 @@ describe('LobbyPage', () => {
                     expect(screen.getByText(/Room not found/i)).toBeInTheDocument();
                 });
             }
+        });
+    });
+
+    describe('Arriving from the task generator', () => {
+        const tasks = Array.from({ length: 24 }, (_, index) => ({ task: `Task ${index}`, location: 'Kitchen' }));
+        let items;
+
+        beforeEach(() => {
+            items = new Map();
+            sessionStorage.getItem.mockImplementation(key => (items.has(key) ? items.get(key) : null));
+            sessionStorage.setItem.mockImplementation((key, value) => items.set(key, String(value)));
+            sessionStorage.removeItem.mockImplementation(key => items.delete(key));
+            saveGameDraft({ name: 'House tasks', playerCount: 8, locations: ['Kitchen', 'Hallway'], tasks,
+                recommendations: { intruderCount: 1, meetingSeconds: 90, taskGoalPerCrewmate: 5 } });
+        });
+
+        afterEach(() => {
+            window.history.replaceState(null, '', '/');
+            sessionStorage.getItem.mockReset();
+            sessionStorage.setItem.mockReset();
+            sessionStorage.removeItem.mockReset();
+        });
+
+        const createCalls = socket => socket.emit.mock.calls.filter(([event]) => event === 'create_game');
+
+        it('creates the room straight away, without the tutorial prompt', () => {
+            window.history.replaceState(null, '', '/play?setup=generated');
+            const { contextValue } = renderWithContext(<LobbyPage />);
+            expect(createCalls(contextValue.socket)).toHaveLength(1);
+            expect(screen.getByText(/Creating Room/i)).toBeInTheDocument();
+            expect(screen.queryByRole('heading', { name: 'Try the tutorial first' })).not.toBeInTheDocument();
+        });
+
+        it('does not open a second room for the same pack after the host leaves', () => {
+            window.history.replaceState(null, '', '/play?setup=generated');
+            const first = renderWithContext(<LobbyPage />);
+            first.unmount();
+            const { contextValue } = renderWithContext(<LobbyPage />);
+            expect(createCalls(contextValue.socket)).toHaveLength(0);
+            expect(screen.getByText(/Create New Game/i)).toBeInTheDocument();
+        });
+
+        it('leaves a plain visit to /play alone', () => {
+            window.history.replaceState(null, '', '/play');
+            const { contextValue } = renderWithContext(<LobbyPage />);
+            expect(createCalls(contextValue.socket)).toHaveLength(0);
         });
     });
 });
