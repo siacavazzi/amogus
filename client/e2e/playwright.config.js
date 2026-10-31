@@ -16,7 +16,9 @@ module.exports = defineConfig({
     timeout: 4 * 60 * 1000,
     expect: { timeout: 15 * 1000 },
     retries: 0,
-    reporter: process.env.CI ? [['list'], ['html', { open: 'never', outputFolder: 'report' }]] : 'list',
+    reporter: process.env.CI
+        ? [['list'], ['html', { open: 'never', outputFolder: 'report' }], ['json', { outputFile: 'results.json' }]]
+        : 'list',
     outputDir: 'results',
     webServer: local ? [
         {
@@ -50,7 +52,9 @@ module.exports = defineConfig({
         ...(process.env.E2E_WEBKIT === '1' ? [{
             name: 'webkit',
             use: { browserName: 'webkit' },
-            testMatch: ['full-game.spec.js', 'game-endings.spec.js', 'cards.spec.js', 'site.spec.js'],
+            // Most players are on iPhones, so Safari plays the games, the meetings and the reconnects too.
+            testMatch: ['full-game.spec.js', 'game-endings.spec.js', 'cards.spec.js', 'site.spec.js', 'meetings-and-connections.spec.js',
+                'meeting-edge-cases.spec.js', 'reconnects.spec.js', 'lobby.spec.js', 'onboarding.spec.js', 'other-modes.spec.js', 'hosting.spec.js'],
         }] : []),
     ],
     use: {
