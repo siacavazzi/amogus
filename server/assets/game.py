@@ -14,6 +14,7 @@ import time
 from threading import RLock, Thread
 from flask_socketio import emit
 from assets.utils import *
+from assets.scaling import MAX_CARD_DRAWS_PER_MEETING, auto_intruder_count
 
 # Number of built-in player avatars (client/src/components/Avatar.js); Player.pic is an index into them.
 AVATAR_COUNT = 18
@@ -26,7 +27,7 @@ def is_avatar_id(pic):
 
 class Game:
 
-    def __init__(self, socket, task_handler, speaker, task_ratio, meltdown_time, code_percent, locations, vote_time, card_draw_probability, numIntruders, starting_cards, vote_threshold, room_code=None):
+    def __init__(self, socket, task_handler, speaker, task_ratio, meltdown_time, code_percent, locations, vote_time, card_draw_probability, numIntruders, starting_cards, vote_threshold, room_code=None, auto_intruders=False):
         self.state_lock = RLock()
         self.revision = 0
         self.round_id = str(uuid4())
@@ -44,6 +45,9 @@ class Game:
         self.starting_cards = starting_cards
         self.numIntruders = numIntruders
         self.initial_numIntruders = numIntruders  # Store initial value for reset
+        # Auto: the intruder count is worked out from the headcount at each Start (see assets/scaling.py)
+        self.auto_intruders = auto_intruders
+        self.round_intruder_count = None  # Intruders dealt this round, for stats
         self.numCrew = None
         self.taskGoal = None
         self.completed_tasks = 0
@@ -145,7 +149,7 @@ class Game:
             'meeting_quorum': self.meeting_quorum,
             'meltdown_time': self.meltdown_time,
             'code_percent': self.code_percent,
-            'num_intruders': self.numIntruders,
+            'num_intruders': 'auto' if self.auto_intruders else self.initial_numIntruders,
             'card_draw_probability': self.card_draw_probability,
             'starting_cards': self.starting_cards,
             'task_ratio': self.task_ratio,
@@ -189,8 +193,12 @@ class Game:
         if 'code_percent' in config:
             self.code_percent = float(config['code_percent'])
         if 'num_intruders' in config:
-            self.numIntruders = int(config['num_intruders'])
-            self.initial_numIntruders = self.numIntruders
+            if config['num_intruders'] == 'auto':
+                self.auto_intruders = True
+            else:
+                self.auto_intruders = False
+                self.numIntruders = int(config['num_intruders'])
+                self.initial_numIntruders = self.numIntruders
         if 'card_draw_probability' in config:
             self.card_draw_probability = float(config['card_draw_probability'])
         if 'starting_cards' in config:
@@ -483,22 +491,28 @@ class Game:
         for player in self.players:
             player.sus = False
 
+    def intruder_count_for_start(self):
+        """Intruders the next round deals: the host's number, or one per five players on Auto."""
+        if self.auto_intruders:
+            return auto_intruder_count(len(self.players))
+        return self.initial_numIntruders
+
     def drawCards(self, probability=1):
-        for i in range(0, len(self.players)):
-            if self.players[i].sus and self.players[i].alive:
-                card = self.card_deck.draw_card(probability)
-                if card:
-                    self.players[i].cards.append(card)
-                    send_message_to_player(self.socket, self.players[i], f"You drew {card.action}")
+        # A few intruders draw per meeting, so a big room isn't flooded with room-wide card effects.
+        intruders = [player for player in self.players if player.sus and player.alive]
+        random.shuffle(intruders)
+        for intruder in intruders[:MAX_CARD_DRAWS_PER_MEETING]:
+            card = self.card_deck.draw_card(probability)
+            if card:
+                intruder.cards.append(card)
+                send_message_to_player(self.socket, intruder, f"You drew {card.action}")
 
         self.emit_player_list()
 
 
     def assignRoles(self):
         self.resetRoles()
-        
-        # Rebuild the card deck now that we know if there's a reactor
-        self.card_deck._build_deck()
+        self.numIntruders = self.intruder_count_for_start()
 
         if self.numIntruders > len(self.players):
             self.numIntruders = len(self.players)
@@ -508,6 +522,9 @@ class Game:
             self.numIntruders = min(self.numIntruders, len(self.players) - 1)
 
         self.numCrew = len(self.players) - self.numIntruders
+        self.round_intruder_count = self.numIntruders
+        # Rebuild the card deck now that we know if there's a reactor and how many intruders need hands
+        self.card_deck._build_deck()
         self.ruleset = 'last_stand' if len(self.players) == 3 and self.numIntruders == 1 else 'standard'
         self.last_stand = False
         random.shuffle(self.players)
