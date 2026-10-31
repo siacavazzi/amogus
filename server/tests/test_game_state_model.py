@@ -177,6 +177,7 @@ class GameStateModelTests(unittest.TestCase):
 
     def test_disconnected_living_player_must_be_ready_before_voting(self):
         game, _socket = make_game(13)
+        game.meeting_quorum = False  # 13 players would otherwise vote at 80% ready
         game.game_running = True
         meeting_caller = game.players[0]
         meeting_caller.ready = True

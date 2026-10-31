@@ -1,4 +1,6 @@
 import random
+
+from assets.scaling import deck_copies
 import json
 import uuid
 import time
@@ -260,8 +262,9 @@ class Card:
                 player.remove_card(self)
                 player.cards.pop(0)
                 card= self.card_deck.draw_card()
-                send_message_to_player(self.socket, player, f"You drew: {card.action}")
-                player.cards.append(card)
+                if card:
+                    send_message_to_player(self.socket, player, f"You drew: {card.action}")
+                    player.cards.append(card)
 
         elif self.action == 'Shorten Meltdown':
             if self not in self.card_deck.active_cards:
@@ -311,15 +314,19 @@ class CardDeck:
         has_reactor = self.game.has_reactor if self.game else True
 
         preset = sanitize_card_deck_preset(getattr(self.game, 'card_deck_preset', CARD_DECK_PRESET_DEFAULT))
-        if preset != CARD_DECK_PRESET_DEFAULT:
-            custom_counts = getattr(self.game, 'card_deck_counts', DEFAULT_CARD_DECK_COUNTS)
-            counts = get_card_deck_counts_for_preset(preset, custom_counts)
-            self._build_configured_deck(counts, has_reactor)
-            print(f"Card deck built with {len(self.cards)} cards (reactor: {has_reactor}, preset: {preset})")
-            return
-
-        self._build_default_deck(has_reactor)
-        print(f"Card deck built with {len(self.cards)} cards (reactor: {has_reactor}, preset: {preset})")
+        # A big room's intruders all start with cards, so it gets one more copy of the deck per few intruders.
+        copies = deck_copies(getattr(self.game, 'numIntruders', 1) or 1)
+        deck = []
+        for _ in range(copies):
+            if preset != CARD_DECK_PRESET_DEFAULT:
+                custom_counts = getattr(self.game, 'card_deck_counts', DEFAULT_CARD_DECK_COUNTS)
+                counts = get_card_deck_counts_for_preset(preset, custom_counts)
+                self._build_configured_deck(counts, has_reactor)
+            else:
+                self._build_default_deck(has_reactor)
+            deck.extend(self.cards)
+        self.cards = deck
+        print(f"Card deck built with {len(self.cards)} cards (reactor: {has_reactor}, preset: {preset}, copies: {copies})")
 
     def _build_default_deck(self, has_reactor):
         self.cards = [
@@ -406,18 +413,25 @@ class CardDeck:
             return None
         
         if not self.cards:
-            if not self.discard:
-                return None 
             self.refill_deck()
+        if not self.cards:
+            return None  # Every card is in someone's hand or in effect
         card = random.choice(self.cards)
         self.cards.remove(card)
         self.discard.append(card)
         return card
 
     def refill_deck(self):
-        """Refill the deck from the discard pile and shuffle."""
-        self.cards = self.discard
-        self.discard = []
+        """Refill the deck from the discard pile and shuffle.
+
+        Drawn cards go to the discard pile straight away, so cards still in a hand or
+        still in effect stay out: otherwise two intruders could hold the same card.
+        """
+        in_use = {id(card) for card in self.active_cards}
+        for player in getattr(self.game, 'players', []):
+            in_use.update(id(card) for card in player.cards)
+        self.cards = [card for card in self.discard if id(card) not in in_use]
+        self.discard = [card for card in self.discard if id(card) in in_use]
         random.shuffle(self.cards)
 
     def emit_active_cards(self):

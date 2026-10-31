@@ -99,10 +99,15 @@ test('thirty phones play a whole round with a meeting and vote, then start anoth
     await Promise.all(crew.slice(0, 6).map(phone => h.swipe(phone)));
     await expect(reactor.getByRole('progressbar')).not.toHaveAttribute('aria-valuenow', '0', { timeout: 20000 });
 
-    // A meeting: all thirty ready up, all thirty vote, and the intruder goes.
+    // A meeting: in a room this size voting opens at 80% ready (24 of 30), so the six who never
+    // slide don't hold it up. Then all thirty vote, and the intruder goes.
     await crew[3].getByText('CALL MEETING').click();
     await expect(crew[3].getByTestId('ready-count')).toHaveText('0 of 30 ready');
-    await h.readyUp(phones);
+    await expect(crew[3].getByTestId('ready-needed')).toHaveText('Voting opens at 24 ready');
+    await expect(reactor.getByTestId('reactor-ready-needed')).toHaveText('Voting opens at 24 ready');
+    await h.readyUp(phones.slice(0, 23));
+    await expect(crew[3].getByTestId('ready-count')).toHaveText('23 of 30 ready');
+    await h.readyUp(phones.slice(23, 24));
     for (const phone of phones) await expect(phone.getByText('Select a Player'), phone.person).toBeVisible({ timeout: 30000 });
     await h.vote(phones.map(phone => [phone, phone === intruder ? crew[0] : intruder]));
     await h.continueAfterResults(phones);

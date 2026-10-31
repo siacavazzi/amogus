@@ -35,7 +35,11 @@ CODE_PERCENT = 0.6
 
 ##### INTRUDER SETTINGS #######
 
-# Number of intruders per game
+# Pick the intruder count from the headcount at each start: 1 per 5 players (see assets/scaling.py).
+# The host can still choose a number in setup.
+AUTO_INTRUDERS = True
+
+# Number of intruders per game when AUTO_INTRUDERS is off or the host picks a number
 NUMBER_OF_INTRUDERS = 1
 
 # Probability of intruder drawing a card (0.0 to 1.0)

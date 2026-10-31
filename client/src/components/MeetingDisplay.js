@@ -4,15 +4,22 @@ import PropTypes from 'prop-types';
 import { Check } from '../signal/icons';
 import { Face, Words } from '../signal';
 import '../signal/reactor.css';
+import { readyNeeded } from '../utils/meetingQuorum';
 
 // The reactor's meeting screen: the same yellow flood the phones get, with the roll call big
 // enough to read from across the room. The moving stripes are the one thing in motion.
-const MeetingDisplay = ({ message = "Meeting called", stage = 'waiting', callerName, players = [], children }) => {
+const MeetingDisplay = ({ message = "Meeting called", stage = 'waiting', callerName, hostName, meeting, players = [], children }) => {
   const alive = players.filter((p) => p.alive !== false);
+  // Someone offline past the server's grace period isn't waited for.
+  const present = alive.filter((p) => !p.absent);
   const isReady = (p) => p.active !== false && p.ready;
-  const readyCount = alive.filter(isReady).length;
+  const readyCount = present.filter(isReady).length;
+  const needed = readyNeeded(meeting, present.length);
   const caller = callerName ? players.find((p) => p.username === callerName) : undefined;
   const voting = stage === 'voting';
+  // Big groups get smaller faces so the whole roll call still fits on one screen.
+  const crowd = alive.length > 24 ? ' sg-rx__roll--crowd' : alive.length > 12 ? ' sg-rx__roll--many' : '';
+  const faceSize = alive.length > 24 ? 48 : alive.length > 12 ? 68 : 104;
 
   return (
     <>
@@ -37,13 +44,13 @@ const MeetingDisplay = ({ message = "Meeting called", stage = 'waiting', callerN
           </div>
 
           {alive.length > 0 && (
-            <div className="sg-rx__roll sg-a sg-fade" style={{ marginTop: 'clamp(6px, 2vh, 22px)', animationDelay: '1000ms' }}>
+            <div className={`sg-rx__roll${crowd} sg-a sg-fade`} data-testid="reactor-roll" style={{ marginTop: 'clamp(6px, 2vh, 22px)', animationDelay: '1000ms' }}>
               {alive.map((player) => {
                 const ready = voting || isReady(player);
                 return (
                   <div key={player.player_id || player.id || player.username} className="sg-rx__face">
                     <div style={{ position: 'relative' }}>
-                      <Face player={player} size={104} style={{ opacity: ready ? 1 : 0.35, transition: 'opacity .3s' }} />
+                      <Face player={player} size={faceSize} style={{ opacity: ready ? 1 : 0.35, transition: 'opacity .3s' }} />
                       {ready && !voting && (
                         <span key="ok" className="sg-rx__tick sg-a sg-pop">
                           <Check size={18} strokeWidth={4} />
@@ -65,7 +72,17 @@ const MeetingDisplay = ({ message = "Meeting called", stage = 'waiting', callerN
 
           {!voting && alive.length > 0 && (
             <p className="sg-rx__lede sg-num" data-testid="reactor-ready-count">
-              {readyCount === alive.length ? 'Everyone is here. Voting opens.' : `${readyCount} of ${alive.length} ready`}
+              {readyCount >= needed ? 'Everyone is here. Voting opens.' : `${readyCount} of ${present.length} ready`}
+            </p>
+          )}
+
+          {!voting && readyCount < needed && needed < present.length && (
+            <p className="sg-rx__note" data-testid="reactor-ready-needed">Voting opens at {needed} ready</p>
+          )}
+
+          {!voting && hostName && readyCount < needed && (
+            <p className="sg-rx__note" data-testid="reactor-host-can-start">
+              Stuck? {hostName} is the host and can start the vote from their phone.
             </p>
           )}
         </div>
@@ -79,6 +96,8 @@ MeetingDisplay.propTypes = {
   message: PropTypes.string,
   stage: PropTypes.string,
   callerName: PropTypes.string,
+  hostName: PropTypes.string,
+  meeting: PropTypes.object,
   players: PropTypes.array,
   children: PropTypes.node,
 };

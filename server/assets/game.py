@@ -9,10 +9,12 @@ from assets.taskHandler import *
 from assets.meltdown import *
 from assets.card import *
 from assets.meeting import *
+from assets.meeting import MEETING_QUORUM, QUORUM_MIN_PLAYERS
 import time
 from threading import RLock, Thread
 from flask_socketio import emit
 from assets.utils import *
+from assets.scaling import MAX_CARD_DRAWS_PER_MEETING, auto_intruder_count
 
 # Number of built-in player avatars (client/src/components/Avatar.js); Player.pic is an index into them.
 AVATAR_COUNT = 18
@@ -25,7 +27,7 @@ def is_avatar_id(pic):
 
 class Game:
 
-    def __init__(self, socket, task_handler, speaker, task_ratio, meltdown_time, code_percent, locations, vote_time, card_draw_probability, numIntruders, starting_cards, vote_threshold, room_code=None):
+    def __init__(self, socket, task_handler, speaker, task_ratio, meltdown_time, code_percent, locations, vote_time, card_draw_probability, numIntruders, starting_cards, vote_threshold, room_code=None, auto_intruders=False):
         self.state_lock = RLock()
         self.revision = 0
         self.round_id = str(uuid4())
@@ -43,6 +45,9 @@ class Game:
         self.starting_cards = starting_cards
         self.numIntruders = numIntruders
         self.initial_numIntruders = numIntruders  # Store initial value for reset
+        # Auto: the intruder count is worked out from the headcount at each Start (see assets/scaling.py)
+        self.auto_intruders = auto_intruders
+        self.round_intruder_count = None  # Intruders dealt this round, for stats
         self.numCrew = None
         self.taskGoal = None
         self.completed_tasks = 0
@@ -64,6 +69,9 @@ class Game:
         self.code_percent = code_percent
         self.vote_time = vote_time
         self.vote_threshold = vote_threshold
+        # Rooms over QUORUM_MIN_PLAYERS - 1 open voting once MEETING_QUORUM of them slide ready;
+        # a host who wants everyone at every meeting turns this off in Advanced Settings.
+        self.meeting_quorum = True
         
         # Multi-game support
         self.room_code = room_code
@@ -138,9 +146,10 @@ class Game:
             'locations': [loc for loc in self.locations if loc != 'Other'],
             'vote_time': self.vote_time,
             'vote_threshold': self.vote_threshold,
+            'meeting_quorum': self.meeting_quorum,
             'meltdown_time': self.meltdown_time,
             'code_percent': self.code_percent,
-            'num_intruders': self.numIntruders,
+            'num_intruders': 'auto' if self.auto_intruders else self.initial_numIntruders,
             'card_draw_probability': self.card_draw_probability,
             'starting_cards': self.starting_cards,
             'task_ratio': self.task_ratio,
@@ -177,13 +186,19 @@ class Game:
             self.vote_time = int(config['vote_time'])
         if 'vote_threshold' in config:
             self.vote_threshold = float(config['vote_threshold'])
+        if 'meeting_quorum' in config:
+            self.meeting_quorum = config['meeting_quorum'] is True
         if 'meltdown_time' in config:
             self.meltdown_time = int(config['meltdown_time'])
         if 'code_percent' in config:
             self.code_percent = float(config['code_percent'])
         if 'num_intruders' in config:
-            self.numIntruders = int(config['num_intruders'])
-            self.initial_numIntruders = self.numIntruders
+            if config['num_intruders'] == 'auto':
+                self.auto_intruders = True
+            else:
+                self.auto_intruders = False
+                self.numIntruders = int(config['num_intruders'])
+                self.initial_numIntruders = self.numIntruders
         if 'card_draw_probability' in config:
             self.card_draw_probability = float(config['card_draw_probability'])
         if 'starting_cards' in config:
@@ -476,22 +491,28 @@ class Game:
         for player in self.players:
             player.sus = False
 
+    def intruder_count_for_start(self):
+        """Intruders the next round deals: the host's number, or one per five players on Auto."""
+        if self.auto_intruders:
+            return auto_intruder_count(len(self.players))
+        return self.initial_numIntruders
+
     def drawCards(self, probability=1):
-        for i in range(0, len(self.players)):
-            if self.players[i].sus and self.players[i].alive:
-                card = self.card_deck.draw_card(probability)
-                if card:
-                    self.players[i].cards.append(card)
-                    send_message_to_player(self.socket, self.players[i], f"You drew {card.action}")
+        # A few intruders draw per meeting, so a big room isn't flooded with room-wide card effects.
+        intruders = [player for player in self.players if player.sus and player.alive]
+        random.shuffle(intruders)
+        for intruder in intruders[:MAX_CARD_DRAWS_PER_MEETING]:
+            card = self.card_deck.draw_card(probability)
+            if card:
+                intruder.cards.append(card)
+                send_message_to_player(self.socket, intruder, f"You drew {card.action}")
 
         self.emit_player_list()
 
 
     def assignRoles(self):
         self.resetRoles()
-        
-        # Rebuild the card deck now that we know if there's a reactor
-        self.card_deck._build_deck()
+        self.numIntruders = self.intruder_count_for_start()
 
         if self.numIntruders > len(self.players):
             self.numIntruders = len(self.players)
@@ -501,6 +522,9 @@ class Game:
             self.numIntruders = min(self.numIntruders, len(self.players) - 1)
 
         self.numCrew = len(self.players) - self.numIntruders
+        self.round_intruder_count = self.numIntruders
+        # Rebuild the card deck now that we know if there's a reactor and how many intruders need hands
+        self.card_deck._build_deck()
         self.ruleset = 'last_stand' if len(self.players) == 3 and self.numIntruders == 1 else 'standard'
         self.last_stand = False
         random.shuffle(self.players)
@@ -691,14 +715,37 @@ class Game:
                 return False
 
             living_players = self.present_living_players()
-            if not living_players or any(not player.ready for player in living_players):
+            ready = sum(1 for player in living_players if player.ready)
+            if not living_players or ready < self.ready_needed(len(living_players)):
                 return False
 
-            started = meeting.start_voting()
-            if started:
-                for player in self.players:
-                    player.ready = not player.alive
-            return started
+            return self._open_voting_locked(meeting)
+
+    def ready_needed(self, present):
+        """How many present living players must slide ready before voting opens."""
+        if self.meeting_quorum and present >= QUORUM_MIN_PLAYERS:
+            return math.ceil(present * MEETING_QUORUM)
+        return present
+
+    def host_start_voting(self):
+        """The host's override for a meeting stuck waiting on phones that never slid ready."""
+        with self.state_lock:
+            meeting = self.meeting
+            if not meeting or meeting.stage != 'waiting' or meeting.round_id != self.round_id:
+                return False
+            if meeting.host_override_in() > 0:
+                return False
+            return self._open_voting_locked(meeting, started_by_host=True)
+
+    def _open_voting_locked(self, meeting, started_by_host=False):
+        meeting.started_by_host = started_by_host
+        started = meeting.start_voting()
+        if not started:
+            meeting.started_by_host = False
+        else:
+            for player in self.players:
+                player.ready = not player.alive
+        return started
 
 
     def _begin_last_stand_locked(self):
