@@ -19,6 +19,7 @@ async function arriveLate(browser, code, name) {
 }
 
 test('a latecomer is dealt into the running round with a secret role', async ({ browser }) => {
+    test.setTimeout(8 * 60 * 1000); // eleven browsers; Safari takes over four minutes
     const phones = await h.openPhones(browser, NAMES);
     const [host] = phones;
     const reactor = await h.openReactor(browser);

@@ -17,7 +17,7 @@ async function revealAllRoles(phones) {
         const release = await hold(phone, phone.getByText('Hold to see it').first(), 500);
         if (/Intruder/.test(await phone.locator('body').innerText())) intruders.push(phone);
         await release();
-        await phone.getByText('Got it').click();
+        await tapGotIt(phone);
     }
     return intruders;
 }
@@ -205,6 +205,18 @@ async function tapAndConfirm(locator) {
 
 const isWebKit = page => page.context().browser().browserType().name() === 'webkit';
 
+// Close the role pop-up. In Playwright's WebKit, a phone whose first tap since loading the page is
+// this one (a latecomer who reloaded) never gets the tap acknowledged: the pop-up closes and the
+// page carries on, but click() waits forever. There the tap is sent from the page instead, and
+// the pop-up closing is what's checked.
+async function tapGotIt(phone) {
+    const button = phone.getByText('Got it');
+    if (!isWebKit(phone)) return button.click();
+    await expect(button).toBeVisible();
+    await button.evaluate(element => element.click());
+    await expect(phone.getByText('Hold to see it')).toHaveCount(0);
+}
+
 // The game's socket goes through Playwright, so goOffline cuts it at once, as a phone losing its
 // connection does. setOffline alone doesn't: Playwright's WebKit keeps an open WebSocket working,
 // and Chromium sometimes keeps it until the ping timeout (on localhost especially), which hid
@@ -266,7 +278,7 @@ async function revealRoles(phones) {
         const role = await phone.locator('body').innerText();
         if (/Intruder/.test(role)) intruder = phone;
         await release();
-        await phone.getByText('Got it').click();
+        await tapGotIt(phone);
     }
     expect(intruder, 'one phone is the intruder').toBeTruthy();
     return intruder;
