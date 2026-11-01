@@ -29,10 +29,18 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
   const caller = players.find((p) => p.username === meetingState?.player_who_started_it);
 
   const handleReadyUp = () => {
-    socket.emit('ready', {
-      player_id: playerState?.player_id || playerState?.playerId || localStorage.getItem('player_id'),
+    const playerId = playerState?.player_id || playerState?.playerId || localStorage.getItem('player_id');
+    const payload = {
+      player_id: playerId,
       round_id: meetingState?.round_id || roundId,
       meeting_id: meetingState?.id || meetingState?.meeting_id,
+    };
+    // On prod 26 ready slides came from a socket that had reconnected but never rejoined, and
+    // the server threw them away while the meeting waited. Rejoin, then send the slide again.
+    socket.emit('ready', payload, (result) => {
+      if (result?.ok !== false || !/^Reconnect before/.test(result?.error || '')) return;
+      socket.once('game_joined', () => socket.emit('ready', payload));
+      socket.emit('rejoin', { player_id: playerId });
     });
   };
 
