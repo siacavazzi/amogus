@@ -4,7 +4,7 @@ import { LogOut } from '../signal/icons';
 import '../signal/signal.css';
 
 function LeaveGameButton({ className = '' }) {
-    const { socket, roomCode, running } = useContext(DataContext);
+    const { socket, roomCode, running, waitingForNextRound } = useContext(DataContext);
     const [showConfirm, setShowConfirm] = useState(false);
 
     const handleLeaveClick = () => {
@@ -50,7 +50,7 @@ function LeaveGameButton({ className = '' }) {
                     <div className="sg-a sg-rise w-full max-w-sm" style={{ background: '#fff', color: 'var(--sg-ink)', borderRadius: 24, padding: 22 }}>
                         <h2 className="sg-big" style={{ fontSize: 30, marginBottom: 10 }}>Leave game?</h2>
                         <p style={{ fontWeight: 500, fontSize: 16, lineHeight: 1.4, marginBottom: 20, opacity: 0.8 }}>
-                            {running
+                            {running && !waitingForNextRound
                                 ? "You'll be marked as eliminated and can't rejoin this game."
                                 : "You'll leave this room."
                             }

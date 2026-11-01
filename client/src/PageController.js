@@ -26,6 +26,7 @@ import TaskEntryPage from "./pages/TaskEntryPage";
 import VotingPage from "./pages/VotingPage";
 import MeetingResultPage from "./pages/MeetingResultsPage";
 import GameConfigPage from "./pages/GameConfigPage";
+import WaitingNextRoundPage from "./pages/WaitingNextRoundPage";
 
 // Screens that still lean on the Signal setup flatten layer (see signal/setup.css): the
 // reactor's desktop home and the selfie camera on the join screen. The other setup screens
@@ -57,6 +58,8 @@ const PageController = () => {
         isRoomCreator,
         roomOpen,
         taskCreationMode,
+        waitingForNextRound,
+        roundRunningAtEntry,
     } = useContext(DataContext);
 
     const [currentPage, setCurrentPage] = useState("connecting");
@@ -77,6 +80,19 @@ const PageController = () => {
         // Show config page for room creator before room is opened
         if (inRoom && isRoomCreator && !roomOpen && !running) {
             setCurrentPage("gameConfig");
+            return;
+        }
+
+        // Joined mid-round: wait out this round (meetings, meltdowns and the result included).
+        if (isMobile && waitingForNextRound) {
+            setCurrentPage("waitingNextRound");
+            return;
+        }
+
+        // Came in while a round was on and hasn't picked a name yet: they can still join the
+        // waiting list, whatever the round is doing meanwhile.
+        if (isMobile && roundRunningAtEntry && !(playerState?.playerId || playerState?.player_id)) {
+            setCurrentPage("login");
             return;
         }
 
@@ -181,6 +197,8 @@ const PageController = () => {
         roomCode,
         isRoomCreator,
         roomOpen,
+        waitingForNextRound,
+        roundRunningAtEntry,
     ]);
 
     const pages = {
@@ -205,6 +223,7 @@ const PageController = () => {
         meltdown_fail: <NuclearMeltdownScreen />,
         reactorWaiting: <ReactorWaiting />,
         taskEntry: <TaskEntryPage />,
+        waitingNextRound: <WaitingNextRoundPage />,
         unknown: (
             <p>
                 You're really not supposed to see this... Uhhh please go talk to
@@ -215,8 +234,9 @@ const PageController = () => {
 
     return (
         <div>
-            <Modal />
-            {running && isMobile && !endState && (
+            {/* Round pop-ups (meltdown over, last stand...) aren't for phones that are not in the round */}
+            {currentPage !== "waitingNextRound" && !(currentPage === "login" && roundRunningAtEntry) && <Modal />}
+            {running && isMobile && !endState && currentPage !== "waitingNextRound" && (
                 <ProgressBar
                     score={crewScore}
                     goalScore={taskGoal}

@@ -180,7 +180,7 @@ class GameManager:
             print(f"Game {room_code} deleted")
         with game.state_lock:
             if self.selfie_store:
-                for player in game.players:
+                for player in game.players + game.waiting_players:
                     self.selfie_store.delete(player.selfie)
                     player.selfie = None
             meeting, meltdown = getattr(game, 'meeting', None), getattr(game, 'active_meltdown', None)

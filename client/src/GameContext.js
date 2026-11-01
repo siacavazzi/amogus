@@ -102,6 +102,10 @@ export default function GameContext({ children }) {
     const [intrudersRevealed, setIntrudersRevealed] = useState(null) // { intruder_names, intruder_ids, message } when tasks 100%
     const [testMode, setTestMode] = useState(false) // One or two players trying the game
     const [lastStand, setLastStand] = useState(false) // 3-player rounds at 1 intruder vs 1 crew: no meetings
+    // Joined mid-round: on the waiting list, dealt in when the room returns to the lobby
+    const [waitingForNextRound, setWaitingForNextRound] = useState(false)
+    const [waitingPlayers, setWaitingPlayers] = useState([]) // Everyone on that list (names and faces)
+    const [roundRunningAtEntry, setRoundRunningAtEntry] = useState(false) // A round was on when this phone came in
     let otherIntruders = [];
     // const [meetineTimeLeft, setMee]
 
@@ -162,6 +166,9 @@ export default function GameContext({ children }) {
         setIntrudersRevealed(null)
         setTestMode(false)
         setLastStand(false)
+        setWaitingForNextRound(false)
+        setWaitingPlayers([])
+        setRoundRunningAtEntry(false)
     }
 
     const resetState = () => {
@@ -323,6 +330,8 @@ export default function GameContext({ children }) {
             : null);
         setActiveCards(Array.isArray(snapshot.active_cards) ? snapshot.active_cards : []);
         setLastStand(!!snapshot.last_stand);
+        setWaitingForNextRound(!!snapshot.waiting);
+        if (Array.isArray(snapshot.waiting_players)) setWaitingPlayers(snapshot.waiting_players);
         setMeltdownTimer(snapshot.meltdown?.time_left ?? undefined);
         setCodesNeeded(snapshot.meltdown?.codes_needed ?? undefined);
         setMeltdownCode(snapshot.meltdown_code || undefined);
@@ -603,6 +612,7 @@ export default function GameContext({ children }) {
             console.log('Setting isRoomCreator to:', isCreator);
             // Only the host returning to setup joins a room that isn't open yet.
             setRoomOpen(data.is_open !== false);
+            setRoundRunningAtEntry(!!data.round_running);
             localStorage.setItem('room_code', data.room_code);
             autoJoinInviteRef.current = null;
             
@@ -675,6 +685,11 @@ export default function GameContext({ children }) {
 
         socketRef.current.on('room_state', (data) => {
             applyRoomSnapshot(data);
+        });
+
+        socketRef.current.on('waiting_players', (data) => {
+            if (!acceptRoomData(data)) return;
+            setWaitingPlayers(Array.isArray(data?.players) ? data.players : []);
         });
 
         socketRef.current.on('lobby_state', (data) => {
@@ -791,6 +806,10 @@ export default function GameContext({ children }) {
             setIntrudersRevealed(null);
             setTestMode(false);
             setLastStand(false);
+            // Anyone who waited out the round is in the lobby now, with everyone else.
+            setWaitingForNextRound(false);
+            setWaitingPlayers([]);
+            setRoundRunningAtEntry(false);
             // Clear any open modals/dialogs
             setModalOpen(false);
             setDialog(undefined);
@@ -956,6 +975,14 @@ export default function GameContext({ children }) {
             if (data && data.player_id) {
                 localStorage.setItem('player_id', data.player_id);
                 setPlayerState(prevState => ({ ...prevState, playerId: data.player_id }));
+                if (data.waiting) {
+                    // Joined mid-round: the waiting screen shows their own name and face.
+                    setWaitingForNextRound(true);
+                    setPlayerState(prevState => ({
+                        ...prevState, playerId: data.player_id, player_id: data.player_id,
+                        username: data.username || prevState.username, pic: data.pic, selfie: data.selfie,
+                    }));
+                }
                 // Update creator status if provided (for reconnection)
                 if (data.is_creator !== undefined) {
                     console.log('Setting isRoomCreator from player_id event:', data.is_creator);
@@ -1135,6 +1162,10 @@ export default function GameContext({ children }) {
         testMode,
         switchTestRole,
         lastStand,
+        // Joined mid-round, plays from the next round
+        waitingForNextRound,
+        waitingPlayers,
+        roundRunningAtEntry,
     }), [
         endState,
         gameStats,
@@ -1184,6 +1215,9 @@ export default function GameContext({ children }) {
         taskCompletionError,
         testMode,
         switchTestRole,
+        waitingForNextRound,
+        waitingPlayers,
+        roundRunningAtEntry,
     ]);
 
     return (

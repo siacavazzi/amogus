@@ -139,10 +139,11 @@ def serve_selfie(filename):
     if not game:
         abort(404)
     with game.state_lock:
+        members = game.players + game.waiting_players
         viewer = (sid in (game.creator_sid, game.reactor_sid)
-                  or any(player.sid == sid and player.active for player in game.players))
+                  or any(player.sid == sid and player.active for player in members))
         if (game_manager.get_game(room_code) is not game or not viewer
-                or not any(player.selfie == filename for player in game.players)):
+                or not any(player.selfie == filename for player in members)):
             abort(404)
         if selfie_store.expired(filename):
             selfie_store.delete(filename)
@@ -165,9 +166,15 @@ def get_game_and_player(player_id):
     """Helper to get game and player from player_id."""
     game, room_code = game_manager.get_game_by_player_id(player_id)
     if game:
-        player = game.getPlayerById(player_id)
+        player = game.getPlayerById(player_id) or game.get_waiting_player(player_id)
         return game, player, room_code
     return None, None, None
+
+
+# What a phone on the next-round waiting list may do. Everything else (tasks, meetings, votes,
+# cards, meltdown codes) belongs to the round it isn't in, so the room refuses it quietly.
+WAITING_LIST_COMMANDS = {'handle_room_state', 'handleRejoin', 'handle_disconnect', 'handle_join',
+                         'handle_join_game', 'leave_room_handler', 'reset_game'}
 
 
 def broadcast_lobby(game):
@@ -295,6 +302,8 @@ def room_event(mutate=True, reconnect=False):
                     return command_error('The room no longer exists.', reason='room_removed')
                 if requested_room and requested_room != room:
                     return command_error('The command belongs to another room.', reason='wrong_room')
+                if player is not None and player.waiting and handler.__name__ not in WAITING_LIST_COMMANDS:
+                    return {'ok': False, 'error': 'You join at the start of the next round.', 'waiting': True}
                 if not reconnect:
                     if player_id and (not player or player.sid != request.sid or not player.active):
                         return command_error('Reconnect before you send this command.', game, player, reason='obsolete_session')
@@ -578,12 +587,9 @@ def handle_join_game(data):
         logger.warning(f"Join attempt for not-yet-open room: {room_code}")
         return
     
-    if game.game_running:
-        room_entry_error('round_in_progress', room_code,
-                         'This round already started. New players can join when the host returns to the lobby.', details)
-        logger.warning(f"Join attempt for running game: {room_code}")
-        return
-    
+    # A round in progress no longer turns phones away: they go on the next-round waiting list.
+    round_running = bool(game.game_running)
+
     join_room(room_code)
     game_manager.sid_to_game[sid] = room_code
     
@@ -597,19 +603,20 @@ def handle_join_game(data):
         is_creator = True
         game.creator_sid = sid
         logger.info(f"Host returned to setup of room {room_code}")
-    elif game.creator_player_id is None and (
+    elif not round_running and game.creator_player_id is None and (
         sid == game.creator_sid or not is_sid_connected_to_room(game.creator_sid, room_code)
     ):
         is_creator = True
         game.creator_sid = sid
         logger.info(f"Creator socket refreshed for room {room_code}")
     
-    emit('game_joined', {'room_code': room_code, 'is_creator': is_creator, 'is_open': game.is_open})
+    emit('game_joined', {'room_code': room_code, 'is_creator': is_creator, 'is_open': game.is_open,
+                         'round_running': round_running, 'waiting_count': len(game.waiting_players)})
     emit('task_locations', game.locations)
     # Lets the avatar picker show which avatars are taken before this socket joins as a player.
     emit('game_data', {**metadata(game), 'action': 'player_list', 'list': game.player_view()})
     attempts = entry_attempts_by_sid.pop(request.sid, {'errors': []})
-    record_usage('room_entered', game, is_creator=is_creator, **details,
+    record_usage('room_entered', game, is_creator=is_creator, round_running=round_running, **details,
                  errors_before=len(attempts['errors']), error_reasons_before=sorted(set(attempts['errors'])))
     logger.info(f"Client {sid} joined room {room_code}, is_creator={is_creator}")
 
@@ -797,6 +804,16 @@ def handleRejoin(data):
     player.reconnect(request.sid)
     game_manager.update_sid(player_id, request.sid)
     join_room(room_code)
+
+    if player.waiting:
+        # Still waiting for the next round: none of the round's state is theirs to restore.
+        emit('game_joined', {'room_code': room_code, 'is_creator': False, 'is_open': game.is_open,
+                             'round_running': True, 'waiting_count': len(game.waiting_players)})
+        emit('task_locations', game.locations)
+        emit('player_id', player_id_payload(player, False))
+        game.emit_waiting_list()
+        emit('room_state', room_state(game, player, request.sid))
+        return {'ok': True, 'state': room_state(game, player, request.sid)}
     
     # Check if this player is the creator
     is_creator = (player_id == game.creator_player_id)
@@ -882,6 +899,12 @@ def handle_disconnect(reason=None):
     game_manager.unregister_sid(sid)
     if game and game.reactor_sid == sid:
         game.reactor_sid = None
+    waiting = game.get_waiting_player(sid=sid) if game else None
+    if waiting:
+        waiting.disconnected_at = time.time()
+        waiting.disconnect()
+        game.emit_waiting_list()
+        socketio.start_background_task(absence_timer, room_code, waiting.player_id, waiting.disconnected_at)
     player = game.getPlayerBySid(sid) if game else None
     if player:
         player.disconnected_at = time.time()
@@ -909,12 +932,16 @@ def mark_absent_if_still_gone(room_code, player_id, disconnected_at):
     if not game:
         return False
     with game.state_lock:
-        player = game.getPlayerById(player_id)
+        player = game.getPlayerById(player_id) or game.get_waiting_player(player_id)
         if (game_manager.get_game(room_code) is not game or not player or player.active
                 or player.absent or player.disconnected_at != disconnected_at):
             return False
         player.absent = True
         game.revision += 1
+        if player.waiting:
+            # Kept on the list in case they come back; Start drops phones that are still gone.
+            game.emit_waiting_list()
+            return True
         logger.info(f"Player {player_id} in room {room_code} is offline; the room stops waiting for them")
         if player.player_id == game.creator_player_id:
             reassign_room_creator(game, room_code)
@@ -950,6 +977,7 @@ def reset_room_to_lobby(game, room_code, reason, player_id=None):
     remove_players(game, room_code, [p for p in game.players if p.left])
     for p in game.players:
         p.reset()
+    admit_waiting_list(game, room_code)
     game.reset_game_state(reason=reason)
     socketio.emit('game_reset', {'room_code': room_code}, room=room_code)
     sendPlayerList(game, room_code)
@@ -982,7 +1010,7 @@ MAX_NAME_LENGTH = 24  # Same cap as the name box on the join screen
 
 def unique_name(game, username, player=None):
     """Number a repeated name (Sam, Sam 2) so votes and the player list can tell people apart."""
-    taken = {other.username.casefold() for other in game.players if other is not player}
+    taken = {other.username.casefold() for other in game.players + game.waiting_players if other is not player}
     name, number = username, 2
     while name.casefold() in taken:
         suffix = f' {number}'
@@ -1026,7 +1054,11 @@ def handle_join(data):
                 logger.info(f"Updated creator_sid to {sid} for room {existing_room}")
             
             logger.info(f"Player {player.username} (ID: {player.player_id}) reconnected, is_creator={is_creator}")
-            emit('player_id', {'player_id': player.player_id, 'pic': player.pic, 'is_creator': is_creator}, to=sid)
+            emit('player_id', player_id_payload(player, is_creator), to=sid)
+            if player.waiting:
+                emit('room_state', room_state(game, player, sid), to=sid)
+                game.emit_waiting_list()
+                return
             sendPlayerList(game, existing_room)
             return
 
@@ -1041,12 +1073,6 @@ def handle_join(data):
                          'This room is not open yet. Ask the host to open it, then try again.')
         return
 
-    if game.game_running:
-        room_entry_error('round_in_progress', room_code,
-                         'This round already started. New players can join when the host returns to the lobby.')
-        logger.warning(f"Join attempt while game running: {username}")
-        return
-
     # Save selfie if provided
     selfie_filename = None
     if selfie_data:
@@ -1054,6 +1080,10 @@ def handle_join(data):
             selfie_filename = selfie_store.save(selfie_data)
         except (ValueError, OSError):
             logger.warning('Photo upload failed. The player will use a default avatar.')
+
+    if game.game_running:
+        join_waiting_list(game, room_code, sid, username, selfie_filename, pic)
+        return
 
     player = game.addPlayer(sid, unique_name(game, username), selfie_filename, pic=pic)
     game_manager.register_player(player.player_id, room_code, sid)
@@ -1074,7 +1104,7 @@ def handle_join(data):
     record_usage('player_joined', game, player.player_id, is_creator=is_creator,
                  player_count=len(game.players), flush=True)
     
-    emit('player_id', {'player_id': player.player_id, 'pic': player.pic, 'is_creator': is_creator}, to=sid)
+    emit('player_id', player_id_payload(player, is_creator), to=sid)
     logger.info(f"New player {username} joined room {room_code} with ID {player.player_id}, is_creator={is_creator}")
     
     # Send player list to all players in the room
@@ -1083,6 +1113,41 @@ def handle_join(data):
     # Also send directly to the joining player to avoid race condition
     player_list = game.player_view(player)
     emit('game_data', {**metadata(game), 'action': 'player_list', 'list': player_list}, to=sid)
+
+
+def player_id_payload(player, is_creator):
+    payload = {'player_id': player.player_id, 'pic': player.pic, 'is_creator': is_creator}
+    if player.waiting:
+        payload.update(waiting=True, username=player.username, selfie=player.selfie)
+    return payload
+
+
+def join_waiting_list(game, room_code, sid, username, selfie_filename, pic):
+    """A phone that arrived mid-round: on the waiting list now, dealt in at the next round."""
+    player = game.add_waiting_player(sid, unique_name(game, username), selfie_filename, pic=pic)
+    game_manager.register_player(player.player_id, room_code, sid)
+    join_room(room_code)
+    record_usage('player_joined', game, player.player_id, is_creator=False, waiting_for_next_round=True,
+                 player_count=len(game.players), waiting_count=len(game.waiting_players), flush=True)
+    logger.info(f"New player {username} joined the waiting list of room {room_code} with ID {player.player_id}")
+    emit('player_id', player_id_payload(player, False), to=sid)
+    emit('room_state', room_state(game, player, sid), to=sid)
+    game.emit_waiting_list()
+
+
+def admit_waiting_list(game, room_code):
+    """Back in the lobby: the waiting phones become ordinary players for the next round."""
+    admitted = game.admit_waiting_players()
+    for player in admitted:
+        record_usage('waiting_player_admitted', game, player.player_id, was_connected=player.active,
+                     player_count=len(game.players), flush=True)
+        if player.sid:
+            socketio.emit('player_id', player_id_payload(player, False), to=player.sid)
+    if admitted and game.creator_player_id is None:
+        reassign_room_creator(game, room_code)
+    if admitted:
+        game.emit_waiting_list()
+    return admitted
 
 
 # ============ GAME FLOW ============
@@ -1269,6 +1334,18 @@ def leave_room_handler(data):
     record_usage('player_left' if player else 'room_exited', game, player_id,
                  is_creator=was_creator_player or is_creator_socket, is_reactor=is_reactor,
                  player_count=len(game.players), flush=True)
+
+    if player and player.waiting:
+        game.remove_waiting_player(player)
+        selfie_store.delete(player.selfie)
+        player.selfie = None
+        player.sid = None
+        game_manager.unregister_player(player_id)
+        game_manager.unregister_sid(sid)
+        leave_room(room_code)
+        emit('left_room')
+        game.emit_waiting_list()
+        return
 
     if player:
         selfie_store.delete(player.selfie)
