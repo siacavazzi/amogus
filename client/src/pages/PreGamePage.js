@@ -518,6 +518,10 @@ function PreGamePage() {
         ? serverLobbyState.start_reason === 'too_few_tasks'
         : !hasEnoughTotalTasks);
 
+    const handleUseExampleTasks = () => {
+        socket?.emit('add_example_tasks', { room_code: roomCode, player_id: playerId });
+    };
+
     // Calculate what's missing
     const getTasksNeededMessage = () => {
         if (serverLobbyState?.start_error) return serverLobbyState.start_error;
@@ -936,6 +940,10 @@ function PreGamePage() {
                                 <p className="hs-notice" style={{ textAlign: 'center' }}>{getTasksNeededMessage()}</p>
                                 {needsMoreTasks && (
                                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+                                        {/* One tap to a startable room: big lobbies stalled writing 40+ tasks by hand. */}
+                                        <button type="button" data-testid="use-example-tasks" onClick={handleUseExampleTasks} className="sg-btn sg-btn-blue hs-btn-sm" style={{ flex: '1 1 100%', whiteSpace: 'nowrap' }}>
+                                            <span>{tasks.length ? 'Add the example tasks' : 'Use the example list'}</span>
+                                        </button>
                                         {activeTab !== 'tasks' && (
                                             <button type="button" onClick={() => setActiveTab('tasks')} className="sg-btn sg-btn-line hs-btn-sm" style={{ flex: '1 1 auto', whiteSpace: 'nowrap' }}>
                                                 <Plus size={18} /> <span>Add tasks</span>

@@ -444,6 +444,11 @@ class TaskListManager:
             source_template=STARTER_TEMPLATE_KEY
         )
 
+    def example_tasks(self):
+        """The starter template's tasks and locations, for a lobby that needs tasks right now."""
+        tasks = self._load_default_tasks() or []
+        return [task.copy() for task in tasks], self._extract_locations(tasks)
+
     def get_default_task_list_template(self):
         """Return metadata for the shared starter task template."""
         tasks = self._load_default_tasks()

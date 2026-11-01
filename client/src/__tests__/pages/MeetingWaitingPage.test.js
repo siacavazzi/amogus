@@ -28,12 +28,13 @@ describe('MeetingWaitingPage', () => {
         expect(screen.queryByText('Alex called it')).toBeNull();
     });
 
-    it('shows an absent living player as offline and still waiting', () => {
+    it('shows a player who slid ready and then dropped as offline but still ready', () => {
         renderWithContext(<MeetingWaitingPage />, meetingContext);
 
         expect(screen.getByText('Blair')).toBeInTheDocument();
         expect(screen.getByText('Offline')).toBeInTheDocument();
-        expect(screen.getByTestId('ready-count')).toHaveTextContent('0 of 2 ready');
+        // The server keeps a dropped phone's ready, so the count does too.
+        expect(screen.getByTestId('ready-count')).toHaveTextContent('1 of 2 ready');
     });
 
     it('sends the current round and meeting IDs for readiness and death reports', () => {
@@ -44,7 +45,7 @@ describe('MeetingWaitingPage', () => {
             player_id: expect.any(String),
             round_id: 'round-8',
             meeting_id: 'meeting-8',
-        }));
+        }), expect.any(Function));
 
         const confirm = jest.spyOn(window, 'confirm').mockReturnValue(true);
         fireEvent.click(screen.getByRole('button', { name: /I've Been Killed/i }));
@@ -54,6 +55,31 @@ describe('MeetingWaitingPage', () => {
             meeting_id: 'meeting-8',
         }));
         confirm.mockRestore();
+    });
+
+    it('rejoins and slides again when the server says this socket must reconnect first', () => {
+        const { contextValue } = renderWithContext(<MeetingWaitingPage />, meetingContext);
+        const { socket } = contextValue;
+        socket.once = jest.fn();
+
+        fireEvent.click(screen.getByRole('button', { name: /Ready up/i }));
+        const readyCall = socket.emit.mock.calls.find(call => call[0] === 'ready');
+        readyCall[2]({ ok: false, error: 'Reconnect before you send this command.' });
+
+        expect(socket.emit).toHaveBeenCalledWith('rejoin', { player_id: readyCall[1].player_id });
+        const [event, afterRejoin] = socket.once.mock.calls[0];
+        expect(event).toBe('game_joined');
+        afterRejoin();
+        expect(socket.emit.mock.calls.filter(call => call[0] === 'ready')).toHaveLength(2);
+    });
+
+    it('does not rejoin when the slide simply arrived after the meeting moved on', () => {
+        const { contextValue } = renderWithContext(<MeetingWaitingPage />, meetingContext);
+        const { socket } = contextValue;
+        socket.once = jest.fn();
+        fireEvent.click(screen.getByRole('button', { name: /Ready up/i }));
+        socket.emit.mock.calls.find(call => call[0] === 'ready')[2]({ ok: false, error: 'This meeting is no longer in the ready phase.' });
+        expect(socket.emit).not.toHaveBeenCalledWith('rejoin', expect.anything());
     });
 
     it('in a big game, says how many need to be ready before voting opens', () => {

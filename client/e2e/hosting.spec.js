@@ -99,6 +99,21 @@ test('two intruders need five players before the host can start', async ({ brows
     h.expectNoPageErrors(phones);
 });
 
+test('a room short on tasks can start on the example list in one tap', async ({ browser }) => {
+    const phones = await h.openPhones(browser, ['Sam', 'Alex', 'Jules', 'Riley']);
+    const [host, guest] = phones;
+    await h.gatherRoom({ host, phones, settings: { groupTasks: true } });
+
+    await expect(host.getByText('Add 12 more tasks to start. 4 players need 12; the room has 0.')).toBeVisible();
+    await expect(guest.getByTestId('use-example-tasks')).toHaveCount(0);
+    await host.getByRole('button', { name: 'Use the example list' }).click();
+    await expect(host.getByText('Start Game')).toBeVisible();
+    await host.getByText('Start Game').click();
+    await expect(h.roundButton(guest)).toBeVisible({ timeout: 20000 });
+
+    h.expectNoPageErrors(phones);
+});
+
 test('a room short on tasks is told how many to add, and everyone can help', async ({ browser }) => {
     const phones = await h.openPhones(browser, ['Sam', 'Alex', 'Jules', 'Riley']);
     const [host, guest] = phones;
