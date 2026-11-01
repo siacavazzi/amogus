@@ -23,7 +23,8 @@ class HostSetupReconnectTests(SocketGameTestCase):
         back = self.make_client()
         back.emit('join_game', {'room_code': room, 'host_token': token})
         joined = events(back.get_received(), 'game_joined')[0]
-        self.assertEqual({'room_code': room, 'is_creator': True, 'is_open': False}, joined)
+        self.assertEqual({'room_code': room, 'is_creator': True, 'is_open': False,
+                          'round_running': False, 'waiting_count': 0}, joined)
 
         back.emit('open_room', {'room_code': room})
         self.assertTrue(server_app.game_manager.get_game(room).is_open)

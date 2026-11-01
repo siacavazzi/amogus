@@ -33,6 +33,7 @@ jest.mock('../pages/ReactorPage', () => () => <div data-testid="reactor-page">Re
 jest.mock('../pages/ReactorWaiting', () => () => <div data-testid="reactor-waiting-page">Reactor Waiting</div>);
 jest.mock('../pages/GameRunning', () => () => <div data-testid="game-running-page">Game Running</div>);
 jest.mock('../pages/TaskEntryPage', () => () => <div data-testid="task-entry-page">Task Entry</div>);
+jest.mock('../pages/WaitingNextRoundPage', () => () => <div data-testid="waiting-next-round-page">Waiting</div>);
 jest.mock('../components/Modal', () => () => null);
 jest.mock('../components/ProgressBar', () => () => null);
 
@@ -238,6 +239,55 @@ describe('PageController', () => {
             });
             
             expect(screen.getByTestId('meltdown-end-page')).toBeInTheDocument();
+        });
+    });
+    describe('Joining mid-round', () => {
+        const waiting = {
+            connected: true,
+            inRoom: true,
+            roomCode: 'ROOM',
+            roomOpen: true,
+            running: true,
+            waitingForNextRound: true,
+            playerState: { username: 'Late', playerId: 'late-1', alive: true },
+        };
+
+        it('shows the waiting screen instead of the round', () => {
+            renderWithContext(<PageController />, waiting);
+            expect(screen.getByTestId('waiting-next-round-page')).toBeInTheDocument();
+        });
+
+        it('keeps the waiting screen through meetings, meltdown codes and the end screen', () => {
+            renderWithContext(<PageController />, {
+                ...waiting,
+                meetingState: { stage: 'voting' },
+                meltdownCode: 1234,
+                endState: 'victory',
+            });
+            expect(screen.getByTestId('waiting-next-round-page')).toBeInTheDocument();
+        });
+
+        it('lets a phone that arrived mid-round pick a name even if the round ends meanwhile', () => {
+            renderWithContext(<PageController />, {
+                connected: true,
+                inRoom: true,
+                roomCode: 'ROOM',
+                roomOpen: true,
+                running: true,
+                endState: 'victory',
+                roundRunningAtEntry: true,
+                playerState: { username: '', playerId: '' },
+            });
+            expect(screen.getByTestId('login-page')).toBeInTheDocument();
+        });
+
+        it('shows the lobby once the room resets', () => {
+            renderWithContext(<PageController />, {
+                ...waiting,
+                running: false,
+                waitingForNextRound: false,
+            });
+            expect(screen.getByTestId('pregame-page')).toBeInTheDocument();
         });
     });
 });

@@ -93,4 +93,7 @@ def room_state(game, player=None, sid=None):
                     if game.active_meltdown else None,
         'meltdown_code': player.meltdown_code if player and game.active_meltdown else None,
         'ruleset': game.ruleset, 'last_stand': game.last_stand,
+        # Phones that joined mid-round and play from the next round (names and faces only)
+        'waiting': bool(player is not None and getattr(player, 'waiting', False)),
+        'waiting_players': game.waiting_view(),
     })
