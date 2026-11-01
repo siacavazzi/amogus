@@ -128,7 +128,7 @@ jobs:
       # Playwright starts the local Flask and React servers itself (see e2e/playwright.config.js).
       - name: Play games in real browsers
         working-directory: ./client
-        run: npx playwright test -c e2e --project ${{ matrix.project }} e2e/late-join.spec.js e2e/live-join.spec.js
+        run: npx playwright test -c e2e e2e/late-join.spec.js e2e/live-join.spec.js --project=${{ matrix.project }}
         env:
           E2E_WEBKIT: ${{ matrix.project == 'webkit' && '1' || '' }}
       - name: List known bugs
