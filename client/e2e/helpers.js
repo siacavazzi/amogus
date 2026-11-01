@@ -17,7 +17,19 @@ async function revealAllRoles(phones) {
         const release = await hold(phone, phone.getByText('Hold to see it').first(), 500);
         if (/Intruder/.test(await phone.locator('body').innerText())) intruders.push(phone);
         await release();
-        await phone.getByText('Got it').click();
+        console.log(`[dbg] Got it on ${phone.person}`);
+        try {
+            await phone.getByText('Got it').click({ timeout: 8000 });
+        } catch (e) {
+            console.log(`[dbg] HUNG on ${phone.person}`);
+            const probe = await Promise.race([
+                phone.evaluate(() => ({ text: document.body.innerText.slice(0, 400), open: !!document.querySelector('[role=dialog]') })).catch(err => 'eval error ' + err.message),
+                sleep(5000).then(() => 'EVAL TIMED OUT (main thread blocked)'),
+            ]);
+            console.log('[dbg] probe', JSON.stringify(probe));
+            console.log('[dbg] console tail', JSON.stringify((phone.dbgConsole || []).slice(-40)));
+            throw e;
+        }
     }
     return intruders;
 }
@@ -41,6 +53,9 @@ async function openPage(browser, name, options) {
     await routeSocket(page);
     page.person = name;
     page.errors = [];
+    page.dbgConsole = [];
+    page.on('console', msg => { page.dbgConsole.push(`${msg.type()}: ${msg.text()}`.slice(0, 200)); });
+    page.on('dialog', d => console.log(`[dbg] DIALOG on ${name}: ${d.type()} ${d.message()}`));
     page.on('pageerror', error => {
         page.errors.push(error.message);
         // The stack says where it broke, which the message alone doesn't (Safari's especially).
