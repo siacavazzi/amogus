@@ -274,6 +274,9 @@ class Meeting:
             print(f"Final Votes: {self.votes}, Veto Votes: {len(self.veto_votes)}")
             self.game.meeting = None
             self.game.revision += 1
+            # Phones that arrived during the meeting join the round now, if it is still safe.
+            if not self.game.end_state and hasattr(self.game, 'admit_latecomers'):
+                self.game.admit_latecomers()
             return True
 
     def _vote_countdown(self):
@@ -320,5 +323,8 @@ class Meeting:
                 "ready_quorum": MEETING_QUORUM if getattr(self.game, 'meeting_quorum', False) else None,
                 "ready_quorum_min_players": QUORUM_MIN_PLAYERS,
                 # After the vote the crew learns how many intruders remain, never who.
-                "intruders_left": sum(1 for p in self.game.players if p.sus and p.alive) if self.stage == 'over' else None,
+                # Not once someone joined mid-round: a count that went up would name the latecomer.
+                "intruders_left": (sum(1 for p in self.game.players if p.sus and p.alive)
+                                   if self.stage == 'over' and not getattr(self.game, 'late_joins', 0) else None),
+                "intruders_hidden": bool(getattr(self.game, 'late_joins', 0)),
             })

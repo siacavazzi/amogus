@@ -4,7 +4,9 @@ from server.tests.integration_helpers import SocketGameTestCase, server_app
 
 class WaitingListTests(SocketGameTestCase):
     def start_round(self, players=5):
-        return self.setup_started_game(players, config={'starting_cards': 0, 'card_draw_probability': 0})
+        # These are about the waiting list itself, so latecomers never join the round live here.
+        return self.setup_started_game(players, config={'starting_cards': 0, 'card_draw_probability': 0,
+                                                        'late_join_live': False})
 
     def join_late(self, room, name='Late'):
         late = self.make_client()

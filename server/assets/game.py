@@ -14,7 +14,8 @@ import time
 from threading import RLock, Thread
 from flask_socketio import emit
 from assets.utils import *
-from assets.scaling import MAX_CARD_DRAWS_PER_MEETING, auto_intruder_count
+from assets.scaling import (MAX_CARD_DRAWS_PER_MEETING, auto_intruder_count, late_intruder_odds,
+                            late_task_goal_increase, LATE_JOIN_MIN_CREW_LEAD)
 
 # Number of built-in player avatars (client/src/components/Avatar.js); Player.pic is an index into them.
 AVATAR_COUNT = 18
@@ -75,6 +76,12 @@ class Game:
         # Rooms over QUORUM_MIN_PLAYERS - 1 open voting once MEETING_QUORUM of them slide ready;
         # a host who wants everyone at every meeting turns this off in Advanced Settings.
         self.meeting_quorum = True
+        # Phones that arrive mid-round join it straight away with a secret role (see
+        # admit_latecomers); off, they wait for the next round.
+        self.late_join_live = True
+        # Phones dealt into the current round after it started. Once any are, the meeting result
+        # stops saying how many intruders are left, since that number would give a late role away.
+        self.late_joins = 0
         
         # Multi-game support
         self.room_code = room_code
@@ -153,6 +160,7 @@ class Game:
             'vote_time': self.vote_time,
             'vote_threshold': self.vote_threshold,
             'meeting_quorum': self.meeting_quorum,
+            'late_join_live': self.late_join_live,
             'meltdown_time': self.meltdown_time,
             'code_percent': self.code_percent,
             'num_intruders': 'auto' if self.auto_intruders else self.initial_numIntruders,
@@ -194,6 +202,8 @@ class Game:
             self.vote_threshold = float(config['vote_threshold'])
         if 'meeting_quorum' in config:
             self.meeting_quorum = config['meeting_quorum'] is True
+        if 'late_join_live' in config:
+            self.late_join_live = config['late_join_live'] is True
         if 'meltdown_time' in config:
             self.meltdown_time = int(config['meltdown_time'])
         if 'code_percent' in config:
@@ -534,8 +544,105 @@ class Game:
 
     def emit_waiting_list(self):
         if self.room_code:
-            self.socket.emit('waiting_players', {**self._add_state_metadata({}), 'players': self.waiting_view()},
-                             room=self.room_code)
+            self.socket.emit('waiting_players', {
+                **self._add_state_metadata({}), 'players': self.waiting_view(),
+                'late_join_live': self.late_join_live, 'joins_when': self.waiting_joins_when(),
+            }, room=self.room_code)
+
+    def live_join_blocker(self):
+        """Why a waiting phone can't join the round right now, or None when it can."""
+        if not self.late_join_live:
+            return 'setting_off'
+        if not self.game_running or self.end_state:
+            return 'round_over'
+        if self.test_mode:
+            return 'test_game'
+        if self.ruleset == 'last_stand' or self.last_stand:
+            return 'last_stand'
+        if self.meeting:
+            return 'meeting'
+        if self.active_meltdown:
+            return 'meltdown'
+        counts = self.living_counts()
+        if counts['living_crew'] - (counts['living_intruders'] + 1) < LATE_JOIN_MIN_CREW_LEAD:
+            return 'crew_lead'
+        return None
+
+    def waiting_joins_when(self):
+        """What a waiting phone is told: 'meeting'/'meltdown' (joins when it ends), 'now', or 'next_round'.
+
+        A blocked crew lead reads as 'next_round', the same as the setting being off, so the
+        screen says nothing about how the round is going.
+        """
+        blocker = self.live_join_blocker()
+        if blocker is None:
+            return 'now'
+        return blocker if blocker in ('meeting', 'meltdown') else 'next_round'
+
+    def admit_latecomers(self, roll=None):
+        """Deal waiting phones into the running round while that is safe. Returns who joined.
+
+        Called when a phone joins the waiting list, comes back online, or a meeting or meltdown ends.
+        """
+        roll = roll or random.random
+        with self.state_lock:
+            admitted = []
+            for player in list(self.waiting_players):
+                if not player.active or player.absent or not player.sid:
+                    continue
+                if self.live_join_blocker():
+                    break
+                self._join_round_locked(player, roll)
+                admitted.append(player)
+            if admitted:
+                self._announce_latecomers_locked(admitted)
+            return admitted
+
+    def _join_round_locked(self, player, roll):
+        counts = self.living_counts()
+        odds = late_intruder_odds(counts['living_crew'] + counts['living_intruders'], counts['living_intruders'])
+        self.waiting_players.remove(player)
+        player.waiting = False
+        player.reset()
+        player.late_join = True
+        self.players.append(player)
+        player.sus = roll() < odds
+        if player.sus:
+            self.numIntruders += 1
+            # What Start would have dealt them
+            for _ in range(self.starting_cards):
+                card = self.card_deck.draw_card()
+                if card:
+                    player.cards.append(card)
+        else:
+            self.numCrew += 1
+            self.assign_task(player)
+        # The same for either role, so the task bar doesn't give the role away.
+        self.taskGoal += late_task_goal_increase(self.task_ratio)
+        self.late_joins += 1
+        self.revision += 1
+        self.log_event('player_joined_mid_round', player.player_id,
+                       role='intruder' if player.sus else 'crew', intruder_odds=round(odds, 2),
+                       round_seconds=self.round_seconds(), **self.living_counts())
+
+    def _announce_latecomers_locked(self, admitted):
+        from assets.room_protocol import room_state  # room_protocol reads Game; import here, not at the top
+        for player in admitted:
+            self.socket.emit('player_id', {'player_id': player.player_id, 'pic': player.pic,
+                                           'is_creator': False, 'joined_round': True}, to=player.sid)
+            self.socket.emit('room_state', room_state(self, player, player.sid), to=player.sid)
+            self.socket.emit('game_data', self._add_state_metadata({
+                'action': 'start_game', 'late_join': True, 'list': self.player_view(player)}), to=player.sid)
+            if player.task:
+                self.socket.emit('task', self._add_state_metadata({'task': player.task}), to=player.sid)
+            if player.sus:
+                for other in self.players:
+                    if other.sus and other.alive and other is not player:
+                        send_message_to_player(self.socket, other,
+                                               f"{player.username} just joined the round as an intruder, on your side.")
+        self.emit_player_list()
+        self.emit_to_room('task_goal', self.taskGoal)
+        self.emit_waiting_list()
 
     def getTask(self):
         """Get the next task for a player."""
@@ -693,6 +800,7 @@ class Game:
         """Clear players and all game state while the room lock is held."""
         self.players = []
         self.waiting_players = []
+        self.late_joins = 0
         self.crew_score = 0
         self.game_running = False
         self.active_hack = 0
@@ -754,6 +862,7 @@ class Game:
         self.card_deck = CardDeck(self.locations, self.socket, self)
         self.reset_votes = set()  # Clear reset votes
         self.task_seconds = []
+        self.late_joins = 0
         self._stats_start_recorded = False
         self._stats_recorded = False  # Allow next end to record stats
         

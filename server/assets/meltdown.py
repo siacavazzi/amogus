@@ -165,6 +165,8 @@ class Meltdown:
                     self.game.active_meltdown = None
                 self.speaker.play_sound("meltdown_over")
                 self.emit_to_room('meltdown_end')
+                if self.game and hasattr(self.game, 'admit_latecomers'):
+                    self.game.admit_latecomers()
             else:
                 print("Meltdown failed!")
                 self.speaker.play_sound("meltdown_fail")

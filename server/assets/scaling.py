@@ -39,3 +39,33 @@ def minimum_tasks(player_count):
 def deck_copies(intruder_count):
     """Copies of the card deck a round needs so every intruder's hand can be dealt."""
     return max(1, math.ceil(intruder_count / MAX_CARD_DRAWS_PER_MEETING))
+
+
+# Latecomers who join a round already under way (see Game.admit_latecomers).
+# Each rolls for intruder. The odds lean toward 1 intruder per 5 living players: higher when the
+# crew has voted intruders out (the room is short of them), lower when intruders have picked off
+# crew. A floor keeps the door open in every room; a cap below half keeps arriving late from being
+# suspicious on its own.
+LATE_INTRUDER_ODDS = 0.20
+LATE_INTRUDER_ODDS_PER_MISSING = 0.20
+LATE_INTRUDER_ODDS_MIN = 0.10
+LATE_INTRUDER_ODDS_MAX = 0.40
+# Live joins only while living crew outnumber living intruders by this much with the newcomer
+# counted as an intruder, so a late intruder can never tip the round over on arrival.
+LATE_JOIN_MIN_CREW_LEAD = 3
+
+
+def late_intruder_odds(living_players, living_intruders):
+    """Chance a latecomer is dealt intruder, from the room as it stands now.
+
+    "Expected" is what Auto would deal a room of the living players plus the newcomer, so the
+    odds follow the same rounding as Start does.
+    """
+    expected = auto_intruder_count(living_players + 1)
+    odds = LATE_INTRUDER_ODDS + LATE_INTRUDER_ODDS_PER_MISSING * (expected - living_intruders)
+    return min(max(odds, LATE_INTRUDER_ODDS_MIN), LATE_INTRUDER_ODDS_MAX)
+
+
+def late_task_goal_increase(task_ratio):
+    """Tasks added to the goal for every latecomer, whatever role they drew, so the bar can't tell."""
+    return round(task_ratio * (1 - 1 / PLAYERS_PER_INTRUDER))

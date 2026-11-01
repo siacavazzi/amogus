@@ -54,7 +54,7 @@ module.exports = defineConfig({
             use: { browserName: 'webkit' },
             // Most players are on iPhones, so Safari plays the games, the meetings and the reconnects too.
             testMatch: ['full-game.spec.js', 'game-endings.spec.js', 'cards.spec.js', 'site.spec.js', 'meetings-and-connections.spec.js',
-                'meeting-edge-cases.spec.js', 'reconnects.spec.js', 'lobby.spec.js', 'onboarding.spec.js', 'other-modes.spec.js', 'hosting.spec.js', 'qr-join.spec.js'],
+                'meeting-edge-cases.spec.js', 'reconnects.spec.js', 'lobby.spec.js', 'onboarding.spec.js', 'other-modes.spec.js', 'hosting.spec.js', 'qr-join.spec.js', 'late-join.spec.js', 'live-join.spec.js'],
         }] : []),
     ],
     use: {

@@ -39,4 +39,10 @@ describe('ReactorPage latecomers corner', () => {
         expect(screen.queryByTestId('reactor-waiting-list')).toBeNull();
         expect(screen.getByText('Late? Scan to join the next round')).toBeInTheDocument();
     });
+
+    it('invites latecomers straight into the round when the room deals them in', () => {
+        render(<LateJoin roomCode="MTRX" live waitingPlayers={[{ player_id: 'a', username: 'Jamie', pic: 1 }]} />);
+        expect(screen.getByText('Late? Scan to join')).toBeInTheDocument();
+        expect(screen.getByText('+1 waiting to join')).toBeInTheDocument();
+    });
 });

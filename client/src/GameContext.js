@@ -106,6 +106,8 @@ export default function GameContext({ children }) {
     const [waitingForNextRound, setWaitingForNextRound] = useState(false)
     const [waitingPlayers, setWaitingPlayers] = useState([]) // Everyone on that list (names and faces)
     const [roundRunningAtEntry, setRoundRunningAtEntry] = useState(false) // A round was on when this phone came in
+    const [lateJoinLive, setLateJoinLive] = useState(false) // The room deals latecomers into the round
+    const [waitingJoinsWhen, setWaitingJoinsWhen] = useState('next_round') // 'now' | 'meeting' | 'meltdown' | 'next_round'
     let otherIntruders = [];
     // const [meetineTimeLeft, setMee]
 
@@ -169,6 +171,8 @@ export default function GameContext({ children }) {
         setWaitingForNextRound(false)
         setWaitingPlayers([])
         setRoundRunningAtEntry(false)
+        setLateJoinLive(false)
+        setWaitingJoinsWhen('next_round')
     }
 
     const resetState = () => {
@@ -315,6 +319,8 @@ export default function GameContext({ children }) {
         setLastStand(!!snapshot.last_stand);
         setWaitingForNextRound(!!snapshot.waiting);
         if (Array.isArray(snapshot.waiting_players)) setWaitingPlayers(snapshot.waiting_players);
+        if (snapshot.late_join_live !== undefined) setLateJoinLive(!!snapshot.late_join_live);
+        if (snapshot.joins_when) setWaitingJoinsWhen(snapshot.joins_when);
         setMeltdownTimer(snapshot.meltdown?.time_left ?? undefined);
         setCodesNeeded(snapshot.meltdown?.codes_needed ?? undefined);
         setMeltdownCode(snapshot.meltdown_code || undefined);
@@ -591,6 +597,7 @@ export default function GameContext({ children }) {
             // Only the host returning to setup joins a room that isn't open yet.
             setRoomOpen(data.is_open !== false);
             setRoundRunningAtEntry(!!data.round_running);
+            setLateJoinLive(!!data.late_join_live);
             localStorage.setItem('room_code', data.room_code);
             autoJoinInviteRef.current = null;
             
@@ -668,6 +675,8 @@ export default function GameContext({ children }) {
         socketRef.current.on('waiting_players', (data) => {
             if (!acceptRoomData(data)) return;
             setWaitingPlayers(Array.isArray(data?.players) ? data.players : []);
+            if (data?.late_join_live !== undefined) setLateJoinLive(!!data.late_join_live);
+            if (data?.joins_when) setWaitingJoinsWhen(data.joins_when);
         });
 
         socketRef.current.on('lobby_state', (data) => {
@@ -953,9 +962,15 @@ export default function GameContext({ children }) {
             if (data && data.player_id) {
                 localStorage.setItem('player_id', data.player_id);
                 setPlayerState(prevState => ({ ...prevState, playerId: data.player_id }));
+                if (data.joined_round) {
+                    // Dealt into the round already under way; the role pop-up follows.
+                    setWaitingForNextRound(false);
+                    setRoundRunningAtEntry(false);
+                }
                 if (data.waiting) {
                     // Joined mid-round: the waiting screen shows their own name and face.
                     setWaitingForNextRound(true);
+                    if (data.joins_when) setWaitingJoinsWhen(data.joins_when);
                     setPlayerState(prevState => ({
                         ...prevState, playerId: data.player_id, player_id: data.player_id,
                         username: data.username || prevState.username, pic: data.pic, selfie: data.selfie,
@@ -1019,7 +1034,8 @@ export default function GameContext({ children }) {
                     setRunning(true);
                     setTaskCreationMode(false);  // Exit task creation mode
                     
-                    isMobile && setDialog({ title: "The game has started", kind: 'role', sus: !!me.sus, otherIntruders });
+                    isMobile && setDialog({ title: data.late_join ? "You're in this round" : "The game has started",
+                        kind: 'role', sus: !!me.sus, otherIntruders });
 
                 } else if (data.action === "start_game") {
                     setRunning(true);
@@ -1144,6 +1160,8 @@ export default function GameContext({ children }) {
         waitingForNextRound,
         waitingPlayers,
         roundRunningAtEntry,
+        lateJoinLive,
+        waitingJoinsWhen,
     }), [
         endState,
         gameStats,
@@ -1196,6 +1214,8 @@ export default function GameContext({ children }) {
         waitingForNextRound,
         waitingPlayers,
         roundRunningAtEntry,
+        lateJoinLive,
+        waitingJoinsWhen,
     ]);
 
     return (

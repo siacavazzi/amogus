@@ -65,7 +65,8 @@ async function skipTutorialPrompt(page) {
 //   settings: { intruders, meltdownTime, tasksPerPlayer, startingCards, cardDrawChance,
 //               deck: { 'EMP': 1, 'Fake Task': 1, ... } (a custom deck; unnamed cards are set to 0),
 //               groupTasks: true (no list; the room writes its tasks together in the lobby),
-//               meetingQuorum: false (big games wait for everyone to slide ready, not 80%) }
+//               meetingQuorum: false (big games wait for everyone to slide ready, not 80%),
+//               lateJoin: false (latecomers wait for the next round instead of joining the round) }
 // Adds the example list and waits for it to land in "Your saved lists". That list refreshes a
 // moment after the add and pushes "Use This Task List" down the page; a tap in that moment
 // (Safari, on the live beta) went down on the button and came up beside it, so nothing happened.
@@ -100,13 +101,17 @@ async function setUpRoom(page, settings = {}) {
         cardDrawChance: 'setting-card-draw-chance',
     };
     const wanted = Object.keys(sliders).filter(key => settings[key] !== undefined);
-    if (wanted.length || settings.deck || settings.meetingQuorum === false) {
+    if (wanted.length || settings.deck || settings.meetingQuorum === false || settings.lateJoin === false) {
         await page.getByRole('button', { name: /Advanced Settings/ }).click();
         for (const key of wanted) await page.locator(`#${sliders[key]}`).fill(String(settings[key]));
     }
     if (settings.meetingQuorum === false) {
         await page.getByRole('button', { name: /^Everyone ready/ }).click();
         await expect(page.getByRole('button', { name: /^Everyone ready/ })).toHaveAttribute('aria-pressed', 'true');
+    }
+    if (settings.lateJoin === false) {
+        await page.getByRole('button', { name: /^Wait for next round/ }).click();
+        await expect(page.getByRole('button', { name: /^Wait for next round/ })).toHaveAttribute('aria-pressed', 'true');
     }
     if (settings.deck) {
         await page.getByRole('button', { name: /^Custom/ }).click();

@@ -123,6 +123,7 @@ function GameConfigPage() {
         vote_time: 180,
         vote_threshold: 0.66,
         meeting_quorum: true,
+        late_join_live: true,
         meltdown_time: 60,
         code_percent: 0.6,
         num_intruders: 'auto',
@@ -796,6 +797,29 @@ function GameConfigPage() {
                                         type="button"
                                         onClick={() => updateConfig('meeting_quorum', option.value)}
                                         aria-pressed={(config.meeting_quorum !== false) === option.value}
+                                        className="hs-preset"
+                                    >
+                                        <b>{option.label}</b>
+                                        <span>{option.description}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div style={{ display: 'grid', gap: 8 }}>
+                            <div className="hs-slider__top">
+                                <span style={{ fontWeight: 800, fontSize: 16 }}>Late Arrivals</span>
+                            </div>
+                            <div className="hs-presets" role="group" aria-label="Late Arrivals">
+                                {[
+                                    { value: true, label: 'Join the round', description: 'Dealt straight in, secretly crew or intruder. If the round is close, they wait for the next one.' },
+                                    { value: false, label: 'Wait for next round', description: 'They join the lobby and play from the next round.' },
+                                ].map((option) => (
+                                    <button
+                                        key={String(option.value)}
+                                        type="button"
+                                        onClick={() => updateConfig('late_join_live', option.value)}
+                                        aria-pressed={(config.late_join_live !== false) === option.value}
                                         className="hs-preset"
                                     >
                                         <b>{option.label}</b>
