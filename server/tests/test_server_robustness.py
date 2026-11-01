@@ -347,3 +347,37 @@ class ServerRobustnessTests(SocketGameTestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class MeetingAutoOpenTests(SocketGameTestCase):
+    """Sam's fallback (2026-11-01): voting opens on its own 90 s into the ready stage."""
+
+    def test_voting_opens_on_its_own_when_someone_never_slides(self):
+        clients, room, ids, game = self.setup_started_game(5, config=QUIET)
+        caller = self.crew(game)[0]
+        self.client_for_player(clients, ids, caller).emit('meeting', {'player_id': caller.player_id})
+        meeting = game.meeting
+        self.client_for_player(clients, ids, caller).emit('ready', {'player_id': caller.player_id})
+        self.assertEqual('waiting', meeting.stage)  # four phones awake but never slid
+
+        self.assertTrue(meeting.auto_open_voting())
+        self.assertEqual('voting', meeting.stage)
+        self.assertEqual('timeout', meeting.opened_by)
+        self.assertFalse(meeting.started_by_host)
+        self.assertFalse(meeting.auto_open_voting())  # a second timer firing does nothing
+
+    def test_the_timer_from_an_earlier_meeting_does_not_open_a_later_one(self):
+        clients, room, ids, game = self.setup_started_game(5, config=QUIET)
+        caller = self.crew(game)[0]
+        caller_client = self.client_for_player(clients, ids, caller)
+        caller_client.emit('meeting', {'player_id': caller.player_id})
+        old = game.meeting
+        game.meeting = None
+        caller_client.emit('meeting', {'player_id': caller.player_id})
+        self.assertIsNot(old, game.meeting)
+        self.assertFalse(old.auto_open_voting())
+        self.assertEqual('waiting', game.meeting.stage)
+
+    def test_the_timer_is_ninety_seconds(self):
+        from assets.meeting import Meeting
+        self.assertEqual(90, Meeting.AUTO_OPEN_AFTER_SECONDS)
