@@ -17,7 +17,7 @@ async function revealAllRoles(phones) {
         const release = await hold(phone, phone.getByText('Hold to see it').first(), 500);
         if (/Intruder/.test(await phone.locator('body').innerText())) intruders.push(phone);
         await release();
-        await phone.getByText('Got it').click();
+        await tapGotIt(phone);
     }
     return intruders;
 }
@@ -65,7 +65,8 @@ async function skipTutorialPrompt(page) {
 //   settings: { intruders, meltdownTime, tasksPerPlayer, startingCards, cardDrawChance,
 //               deck: { 'EMP': 1, 'Fake Task': 1, ... } (a custom deck; unnamed cards are set to 0),
 //               groupTasks: true (no list; the room writes its tasks together in the lobby),
-//               meetingQuorum: false (big games wait for everyone to slide ready, not 80%) }
+//               meetingQuorum: false (big games wait for everyone to slide ready, not 80%),
+//               lateJoin: false (latecomers wait for the next round instead of joining the round) }
 // Adds the example list and waits for it to land in "Your saved lists". That list refreshes a
 // moment after the add and pushes "Use This Task List" down the page; a tap in that moment
 // (Safari, on the live beta) went down on the button and came up beside it, so nothing happened.
@@ -100,13 +101,22 @@ async function setUpRoom(page, settings = {}) {
         cardDrawChance: 'setting-card-draw-chance',
     };
     const wanted = Object.keys(sliders).filter(key => settings[key] !== undefined);
-    if (wanted.length || settings.deck || settings.meetingQuorum === false) {
+    if (wanted.length || settings.deck || settings.meetingQuorum === false || settings.lateJoin === false) {
         await page.getByRole('button', { name: /Advanced Settings/ }).click();
+        // The task goal starts on Auto, which hides its slider; a number turns Auto off.
+        if (settings.tasksPerPlayer !== undefined) {
+            const autoTasks = page.getByRole('button', { name: 'Auto task goal' });
+            if (await autoTasks.getAttribute('aria-pressed') === 'true') await autoTasks.click();
+        }
         for (const key of wanted) await page.locator(`#${sliders[key]}`).fill(String(settings[key]));
     }
     if (settings.meetingQuorum === false) {
         await page.getByRole('button', { name: /^Everyone ready/ }).click();
         await expect(page.getByRole('button', { name: /^Everyone ready/ })).toHaveAttribute('aria-pressed', 'true');
+    }
+    if (settings.lateJoin === false) {
+        await page.getByRole('button', { name: /^Wait for next round/ }).click();
+        await expect(page.getByRole('button', { name: /^Wait for next round/ })).toHaveAttribute('aria-pressed', 'true');
     }
     if (settings.deck) {
         await page.getByRole('button', { name: /^Custom/ }).click();
@@ -195,6 +205,18 @@ async function tapAndConfirm(locator) {
 
 const isWebKit = page => page.context().browser().browserType().name() === 'webkit';
 
+// Close the role pop-up. In Playwright's WebKit, a phone whose first tap since loading the page is
+// this one (a latecomer who reloaded) never gets the tap acknowledged: the pop-up closes and the
+// page carries on, but click() waits forever. There the tap is sent from the page instead, and
+// the pop-up closing is what's checked.
+async function tapGotIt(phone) {
+    const button = phone.getByText('Got it');
+    if (!isWebKit(phone)) return button.click();
+    await expect(button).toBeVisible();
+    await button.evaluate(element => element.click());
+    await expect(phone.getByText('Hold to see it')).toHaveCount(0);
+}
+
 // The game's socket goes through Playwright, so goOffline cuts it at once, as a phone losing its
 // connection does. setOffline alone doesn't: Playwright's WebKit keeps an open WebSocket working,
 // and Chromium sometimes keeps it until the ping timeout (on localhost especially), which hid
@@ -256,7 +278,7 @@ async function revealRoles(phones) {
         const role = await phone.locator('body').innerText();
         if (/Intruder/.test(role)) intruder = phone;
         await release();
-        await phone.getByText('Got it').click();
+        await tapGotIt(phone);
     }
     expect(intruder, 'one phone is the intruder').toBeTruthy();
     return intruder;

@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect, useRef } from 'react';
 import { DataContext } from '../GameContext';
 import { Users, Play, ChevronDown, ChevronUp, List, Download, Trash2, Check, LogOut, MapPin, Settings, ArrowRight, ArrowLeft, X, Zap, Copy, Sparkles, Minus, Plus } from '../signal/icons';
 import { readGeneratedSetup, clearGameDraft } from './seo/gameDraft';
-import { AUTO_INTRUDERS_SUMMARY, playersForIntruders } from '../utils/intruders';
+import { AUTO_INTRUDERS_SUMMARY, AUTO_TASKS_SUMMARY, TASKS_PER_CREWMATE, playersForIntruders } from '../utils/intruders';
 import { sendClientMetric } from '../utils/clientMetrics';
 import '../signal/host.css';
 
@@ -123,12 +123,13 @@ function GameConfigPage() {
         vote_time: 180,
         vote_threshold: 0.66,
         meeting_quorum: true,
+        late_join_live: true,
         meltdown_time: 60,
         code_percent: 0.6,
         num_intruders: 'auto',
         card_draw_probability: 1,
         starting_cards: 2,
-        task_ratio: 10,
+        task_ratio: 'auto',
         card_deck_preset: 'default',
         card_deck_counts: DEFAULT_CARD_DECK_COUNTS,
     });
@@ -303,6 +304,7 @@ function GameConfigPage() {
     }, [socket, deviceId, generatedDraft]);
 
     const autoIntruders = config.num_intruders === 'auto';
+    const autoTasks = config.task_ratio === 'auto';
 
     const updateConfig = (key, value) => {
         setConfig(prev => ({ ...prev, [key]: value }));
@@ -805,6 +807,29 @@ function GameConfigPage() {
                             </div>
                         </div>
 
+                        <div style={{ display: 'grid', gap: 8 }}>
+                            <div className="hs-slider__top">
+                                <span style={{ fontWeight: 800, fontSize: 16 }}>Late Arrivals</span>
+                            </div>
+                            <div className="hs-presets" role="group" aria-label="Late Arrivals">
+                                {[
+                                    { value: true, label: 'Join the round', description: 'Dealt straight in, secretly crew or intruder. If the round is close, they wait for the next one.' },
+                                    { value: false, label: 'Wait for next round', description: 'They join the lobby and play from the next round.' },
+                                ].map((option) => (
+                                    <button
+                                        key={String(option.value)}
+                                        type="button"
+                                        onClick={() => updateConfig('late_join_live', option.value)}
+                                        aria-pressed={(config.late_join_live !== false) === option.value}
+                                        className="hs-preset"
+                                    >
+                                        <b>{option.label}</b>
+                                        <span>{option.description}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
                         <h3><Zap size={18} /> Meltdown Sabotage</h3>
                         <SliderInput
                             label="Meltdown Time"
@@ -827,14 +852,27 @@ function GameConfigPage() {
                         />
 
                         <h3><List size={18} /> Tasks</h3>
-                        <SliderInput
-                            label="Tasks Per Player"
-                            value={config.task_ratio}
-                            onChange={(v) => updateConfig('task_ratio', v)}
-                            min={5}
-                            max={25}
-                            description="Tasks to complete for crew victory"
-                        />
+                        <button
+                            type="button"
+                            onClick={() => updateConfig('task_ratio', autoTasks ? TASKS_PER_CREWMATE : 'auto')}
+                            aria-pressed={autoTasks}
+                            aria-label="Auto task goal"
+                            className="hs-num hs-num--auto"
+                        >
+                            Auto
+                        </button>
+                        {autoTasks ? (
+                            <p className="sg-lede hs-muted" data-testid="task-goal-advice">{AUTO_TASKS_SUMMARY}</p>
+                        ) : (
+                            <SliderInput
+                                label="Tasks Per Player"
+                                value={config.task_ratio}
+                                onChange={(v) => updateConfig('task_ratio', v)}
+                                min={2}
+                                max={25}
+                                description="Tasks each crewmate finishes, on average, to reveal the intruders"
+                            />
+                        )}
                     </div>
                 )}
             </div>

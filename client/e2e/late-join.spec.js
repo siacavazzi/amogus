@@ -10,7 +10,7 @@ test('a latecomer waits out the round, then plays the next one', async ({ browse
     const phones = await h.openPhones(browser, ['Sam', 'Alex', 'Jules', 'Riley', 'Kai']);
     const [host] = phones;
     const reactor = await h.openReactor(browser);
-    const code = await h.gatherRoom({ host, phones, reactor });
+    const code = await h.gatherRoom({ host, phones, reactor, settings: { lateJoin: false } });
     await expect(reactor.getByText('Kai')).toBeVisible();
 
     await host.getByText('Start Game').click();

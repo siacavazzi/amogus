@@ -503,7 +503,7 @@ def handle_update_game_config(data):
     socketio.emit('task_locations', game.locations, room=room_code)
 
 
-LOGGED_SETTINGS = ('vote_time', 'vote_threshold', 'meeting_quorum', 'meltdown_time', 'code_percent',
+LOGGED_SETTINGS = ('vote_time', 'vote_threshold', 'meeting_quorum', 'late_join_live', 'meltdown_time', 'code_percent',
                    'num_intruders', 'card_draw_probability', 'starting_cards', 'task_ratio', 'card_deck_preset')
 
 
@@ -599,7 +599,8 @@ def handle_join_game(data):
         logger.info(f"Creator socket refreshed for room {room_code}")
     
     emit('game_joined', {'room_code': room_code, 'is_creator': is_creator, 'is_open': game.is_open,
-                         'round_running': round_running, 'waiting_count': len(game.waiting_players)})
+                         'round_running': round_running, 'waiting_count': len(game.waiting_players),
+                         'late_join_live': game.late_join_live})
     emit('task_locations', game.locations)
     # Lets the avatar picker show which avatars are taken before this socket joins as a player.
     emit('game_data', {**metadata(game), 'action': 'player_list', 'list': game.player_view()})
@@ -796,11 +797,14 @@ def handleRejoin(data):
     if player.waiting:
         # Still waiting for the next round: none of the round's state is theirs to restore.
         emit('game_joined', {'room_code': room_code, 'is_creator': False, 'is_open': game.is_open,
-                             'round_running': True, 'waiting_count': len(game.waiting_players)})
+                             'round_running': True, 'waiting_count': len(game.waiting_players),
+                             'late_join_live': game.late_join_live})
         emit('task_locations', game.locations)
         emit('player_id', player_id_payload(player, False))
         game.emit_waiting_list()
         emit('room_state', room_state(game, player, request.sid))
+        if game.admit_latecomers():
+            return {'ok': True, 'state': room_state(game, player, request.sid)}
         return {'ok': True, 'state': room_state(game, player, request.sid)}
     
     # Check if this player is the creator
@@ -1045,6 +1049,7 @@ def handle_join(data):
             if player.waiting:
                 emit('room_state', room_state(game, player, sid), to=sid)
                 game.emit_waiting_list()
+                game.admit_latecomers()
                 return
             sendPlayerList(game, existing_room)
             return
@@ -1105,8 +1110,14 @@ def handle_join(data):
 def player_id_payload(player, is_creator):
     payload = {'player_id': player.player_id, 'pic': player.pic, 'is_creator': is_creator}
     if player.waiting:
-        payload.update(waiting=True, username=player.username, selfie=player.selfie)
+        payload.update(waiting=True, username=player.username, selfie=player.selfie,
+                       joins_when=player_game_joins_when(player))
     return payload
+
+
+def player_game_joins_when(player):
+    game, _ = game_manager.get_game_by_player_id(player.player_id)
+    return game.waiting_joins_when() if game else 'next_round'
 
 
 def join_waiting_list(game, room_code, sid, username, selfie_filename, pic):
@@ -1120,6 +1131,8 @@ def join_waiting_list(game, room_code, sid, username, selfie_filename, pic):
     emit('player_id', player_id_payload(player, False), to=sid)
     emit('room_state', room_state(game, player, sid), to=sid)
     game.emit_waiting_list()
+    # Straight into the round with a secret role, when the room allows it and it is safe now.
+    game.admit_latecomers()
 
 
 def admit_waiting_list(game, room_code):
@@ -1170,6 +1183,8 @@ def start_room(game, test_mode=False):
     sendPlayerList(game, game.room_code, 'start_game')
     game.emit_to_room('game_start', metadata(game))
     socketio.emit('task_goal', game.taskGoal, room=game.room_code)
+    # Tells the reactor whether latecomers join this round, for its "Late? Scan to join" corner.
+    game.emit_waiting_list()
     for player in game.players:
         if player.sid:
             socketio.emit('room_state', room_state(game, player, player.sid), to=player.sid)
@@ -1441,7 +1456,9 @@ def handleTaskComplete(data):
                 game.speaker.play_sound(f'{threshold}_percent_tasks')
                 break
         if percentage >= 100 and not game.intruders_revealed:
-            game.on_tasks_complete()
+            game.on_tasks_complete(player)
+            if game.meeting and game.meeting.trigger == 'tasks_complete':
+                record_usage('meeting_started', game, game.meeting.player_who_started_it.player_id, trigger='tasks_complete')
     finished_task = player.task
     assigned_at = getattr(player, 'task_assigned_monotonic', None)
     task_seconds = round(time.monotonic() - assigned_at, 1) if assigned_at is not None else None

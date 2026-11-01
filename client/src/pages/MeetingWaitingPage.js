@@ -26,6 +26,8 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
   const needed = readyNeeded(meetingState, totalAlive);
   const allReady = totalAlive > 0 && readyCount >= needed;
   const caller = players.find((p) => p.username === meetingState?.player_who_started_it);
+  // Finishing the task goal calls this meeting on its own, so nobody "called it".
+  const tasksDone = meetingState?.trigger === 'tasks_complete';
 
   const handleReadyUp = () => {
     socket.emit('ready', {
@@ -68,11 +70,11 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
           <Words text="MEETING" delay={560} />
         </h1>
 
-        {caller ? (
+        {caller && !tasksDone ? (
           <Face player={caller} size={104} className="sg-a sg-pop" style={{ animationDelay: '820ms' }} />
         ) : null}
         <p className="sg-lede sg-a sg-rise" style={{ animationDelay: '1000ms' }}>
-          {meetingState?.player_who_started_it} called it
+          {tasksDone ? 'Every task is done. The intruders are revealed.' : `${meetingState?.player_who_started_it} called it`}
         </p>
         <p className="sg-small sg-a sg-rise" style={{ animationDelay: '1090ms' }}>
           Go to the meeting spot, then slide ready

@@ -7,6 +7,15 @@ import { ProfilePicture } from '../components/PlayerCard';
 import { Clock } from '../signal/icons';
 import '../signal/signal.css';
 
+// When this phone gets dealt in. "next_round" covers both the setting being off and a round
+// too close to join, so the screen never hints at how the round is going.
+const JOINS_WHEN = {
+    now: 'Dealing you into the round…',
+    meeting: "You'll be dealt into this round when the meeting ends.",
+    meltdown: "You'll be dealt into this round once the meltdown is over.",
+    next_round: "You'll be dealt in when the next round starts.",
+};
+
 export function roundStatus({ endState, meetingState, meltdownTimer }) {
     if (endState) return 'This round is over. Everyone else is tapping Play Again.';
     if (meltdownTimer > 0) return 'A meltdown is on. The round is nearly decided.';
@@ -15,7 +24,7 @@ export function roundStatus({ endState, meetingState, meltdownTimer }) {
 }
 
 const WaitingNextRoundPage = () => {
-    const { playerState, waitingPlayers, endState, meetingState, meltdownTimer, roomCode } = useContext(DataContext);
+    const { playerState, waitingPlayers, endState, meetingState, meltdownTimer, roomCode, waitingJoinsWhen } = useContext(DataContext);
     const myId = playerState?.player_id || playerState?.playerId;
     const others = (waitingPlayers || []).filter((player) => player.player_id !== myId);
 
@@ -33,8 +42,8 @@ const WaitingNextRoundPage = () => {
                 </div>
                 <p className="sg-lede" style={{ opacity: 0.85 }}>{playerState?.username || 'Player'}</p>
                 <h1 className="sg-big sg-h1 sg-a sg-slam" style={{ animationDelay: '300ms' }}>You're in!</h1>
-                <p className="sg-lede" style={{ maxWidth: '24ch' }}>
-                    You'll be dealt in when the next round starts.
+                <p className="sg-lede" style={{ maxWidth: '24ch' }} data-testid="waiting-joins-when">
+                    {JOINS_WHEN[waitingJoinsWhen] || JOINS_WHEN.next_round}
                 </p>
                 <p className="sg-small" style={{ maxWidth: '28ch' }} data-testid="waiting-round-status">
                     {roundStatus({ endState, meetingState, meltdownTimer })} Keep this page open.
