@@ -17,8 +17,13 @@ def players(count, absent=0):
 class ScalingRuleTests(unittest.TestCase):
 
     def test_auto_picks_one_intruder_per_five_players_with_no_upper_limit(self):
-        expected = {3: 1, 7: 1, 8: 2, 12: 2, 13: 3, 20: 4, 40: 8, 100: 20}
+        expected = {3: 1, 9: 1, 10: 2, 14: 2, 15: 3, 20: 4, 40: 8, 100: 20}
         self.assertEqual(expected, {n: auto_intruder_count(n) for n in expected})
+
+    def test_each_intruder_needs_at_least_three_kills_on_auto(self):
+        for n in range(5, 200):
+            intruders = auto_intruder_count(n)
+            self.assertGreaterEqual((n - 2 * intruders) / intruders, 3, n)
 
     def test_auto_always_leaves_enough_crew_to_start(self):
         for n in range(3, 200):
@@ -90,10 +95,11 @@ class PlayerCountRoomTests(SocketGameTestCase):
         host.emit('get_game_config', {'room_code': room})
         self.assertEqual('auto', self.first_event(self.drain(host), 'game_config')['num_intruders'])
 
-    def test_auto_deals_two_intruders_to_eight_players(self):
-        clients, room, ids, game = self.setup_started_game(8)
-        self.assertTrue(game.game_running)
-        self.assertEqual(2, len(self.intruders(game)))
+    def test_auto_deals_one_intruder_to_nine_players_and_two_to_ten(self):
+        _, _, _, nine = self.setup_started_game(9)
+        self.assertEqual(1, len(self.intruders(nine)))
+        _, _, _, ten = self.setup_started_game(10)
+        self.assertEqual(2, len(self.intruders(ten)))
 
     def test_forty_players_start_with_eight_intruders_on_sixty_tasks(self):
         clients, room, ids, game = self.setup_started_game(40, task_count=60)
@@ -104,7 +110,7 @@ class PlayerCountRoomTests(SocketGameTestCase):
         self.assertTrue(all(len(intruder.cards) == game.starting_cards for intruder in self.intruders(game)))
 
     def test_lobby_shows_the_auto_count_as_people_join(self):
-        clients, room, ids, game = self.setup_lobby(12)
+        clients, room, ids, game = self.setup_lobby(14)
         late = self.make_client()
         self.join_player(late, room, 'Late')
         lobby = self.event_payloads(self.drain(clients[0]), 'lobby_state')[-1]

@@ -1,8 +1,9 @@
 """How the game scales with the number of players.
 
-One intruder per five players keeps each side's job the same size at any
-headcount: each intruder needs about three eliminations to win, whether the
-room has 6 players or 60. The caps below keep the shared things (the one
+One intruder per full five players keeps each side's job about the same size at
+any headcount: an intruder never needs fewer than three eliminations to win.
+(Rounding up instead put the second intruder at 8 players, where each needs only
+two kills; crew won 27% of those rounds over Halloween 2026.) The caps below keep the shared things (the one
 reactor keypad, the room-wide card effects, the task list a host must write)
 at a size a big group can still manage.
 """
@@ -24,8 +25,8 @@ MAX_MIN_TASKS = 60
 
 
 def auto_intruder_count(player_count):
-    """1 intruder for 3-7 players, 2 for 8-12, 3 for 13-17, and so on with no upper limit."""
-    return max(1, (player_count + 2) // PLAYERS_PER_INTRUDER)
+    """1 intruder for 3-9 players, 2 for 10-14, 3 for 15-19, and so on with no upper limit."""
+    return max(1, player_count // PLAYERS_PER_INTRUDER)
 
 
 def meltdown_codes_needed(present_players, code_percent):

@@ -167,7 +167,7 @@ describe('GameConfigPage intruder count', () => {
         expect(screen.getByRole('button', { name: 'Auto' })).toHaveAttribute('aria-pressed', 'false');
         fireEvent.click(screen.getByRole('button', { name: 'Increase Intruders' }));
         fireEvent.click(screen.getByRole('button', { name: 'Increase Intruders' }));
-        expect(screen.getByTestId('intruder-advice')).toHaveTextContent('Best for 28 to 32 players. Needs at least 13 players to start.');
+        expect(screen.getByTestId('intruder-advice')).toHaveTextContent('Best for 30 to 34 players. Needs at least 13 players to start.');
         await openRoomWith(contextValue, 'PICK', 6);
     });
 
