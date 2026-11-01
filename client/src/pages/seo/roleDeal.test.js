@@ -22,9 +22,9 @@ test('dealRoles always leaves at least one non-intruder', () => {
 });
 
 test('suggestedIntruders scales with group size', () => {
-    expect(suggestedIntruders(7)).toBe(1);
-    expect(suggestedIntruders(8)).toBe(2);
-    expect(suggestedIntruders(12)).toBe(2);
+    expect(suggestedIntruders(9)).toBe(1);
+    expect(suggestedIntruders(10)).toBe(2);
+    expect(suggestedIntruders(14)).toBe(2);
     expect(suggestedIntruders(15)).toBe(3);
     expect(suggestedIntruders(20)).toBe(4);
 });

@@ -228,7 +228,7 @@ class StatsTracker:
                 'task_fingerprint': hashlib.sha256(json.dumps(content, ensure_ascii=True).encode()).hexdigest(),
                 'task_count_at_start': len(tasks), 'used_location_count': len(locations),
                 'configured_location_count': len({str(loc).strip().casefold() for loc in getattr(game, 'locations', []) if str(loc).strip().casefold() not in ('', 'other')}),
-                'task_goal': getattr(game, 'taskGoal', None), 'tasks_per_crewmate': getattr(game, 'task_ratio', None),
+                'task_goal': getattr(game, 'taskGoal', None), 'tasks_per_crewmate': game.tasks_per_crewmate() if hasattr(game, 'tasks_per_crewmate') else getattr(game, 'task_ratio', None),
                 'meeting_seconds': getattr(game, 'vote_time', None), 'has_reactor': getattr(game, 'has_reactor', False),
                 'card_deck_preset': getattr(game, 'card_deck_preset', None),
                 'meeting_quorum': getattr(game, 'meeting_quorum', None),

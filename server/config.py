@@ -51,8 +51,9 @@ STARTING_CARDS = 2
 
 ##### TASK SETTINGS #######
 
-# Average number of tasks each player needs to finish for crew to win
-TASK_RATIO = 10
+# Tasks each crewmate needs to finish, on average, to reveal the intruders.
+# 'auto': 10 with a lone intruder, 6 with two or more (see assets/scaling.py).
+TASK_RATIO = 'auto'
 
 ##### SOUND SETTINGS #######
 

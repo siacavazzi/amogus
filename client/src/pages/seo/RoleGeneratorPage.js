@@ -10,7 +10,7 @@ const DESCRIPTION = 'Free Among Us role generator for real-life games. Enter you
 const FAQ = [
     ['Is the role picker random?', 'Yes. It shuffles the roles with your browser’s secure random number source each time you deal. Nobody can choose who becomes an intruder.'],
     ['Does it save the names or roles?', 'No. Names and roles stay in this browser tab. Close the tab or deal again and the old roles are gone.'],
-    ['How many intruders should we use?', 'One intruder for every five players: one for 3 to 7 players, two for 8 to 12, three for 13 to 17, and four for 18 to 20. The picker suggests a number when you change the group size, the same number a Sus Party room picks on Auto.'],
+    ['How many intruders should we use?', 'One intruder for every full five players: one for 3 to 9 players, two for 10 to 14, three for 15 to 19, and four for 20. The picker suggests a number when you change the group size, the same number a Sus Party room picks on Auto.'],
     ['Can each player see their role on their own phone?', 'Not with this picker, which uses one shared phone. Sus Party gives every player a private role on their own phone, plus tasks, meetings, and votes.'],
 ];
 const SCHEMA = {

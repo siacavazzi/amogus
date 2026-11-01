@@ -137,6 +137,10 @@ class GameIntegrationTests(SocketGameTestCase):
         self.assertEqual(3, game.crew_score)
         self.assertTrue(game.intruders_revealed)
         self.assertIsNone(game.end_state)
+        # The reveal calls a meeting at once, so the intruders face a vote before more kills.
+        self.assertIsNotNone(game.meeting)
+        self.assertEqual("tasks_complete", game.meeting.trigger)
+        self.assertFalse(game.meeting.player_who_started_it.sus)
         for events in completion_events.values():
             reveal = self.first_event(events, "intruders_revealed")
             self.assertIsNotNone(reveal)

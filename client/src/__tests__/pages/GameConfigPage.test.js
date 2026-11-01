@@ -167,7 +167,7 @@ describe('GameConfigPage intruder count', () => {
         expect(screen.getByRole('button', { name: 'Auto' })).toHaveAttribute('aria-pressed', 'false');
         fireEvent.click(screen.getByRole('button', { name: 'Increase Intruders' }));
         fireEvent.click(screen.getByRole('button', { name: 'Increase Intruders' }));
-        expect(screen.getByTestId('intruder-advice')).toHaveTextContent('Best for 28 to 32 players. Needs at least 13 players to start.');
+        expect(screen.getByTestId('intruder-advice')).toHaveTextContent('Best for 30 to 34 players. Needs at least 13 players to start.');
         await openRoomWith(contextValue, 'PICK', 6);
     });
 
@@ -179,4 +179,24 @@ describe('GameConfigPage intruder count', () => {
         expect(screen.queryByRole('button', { name: 'Increase Intruders' })).toBeNull();
         await openRoomWith(contextValue, 'BACK', 'auto');
     });
+
+describe('GameConfigPage task goal', () => {
+    it('starts on Auto and switches to a number', async () => {
+        const { contextValue } = renderWithContext(<GameConfigPage />, { roomCode: 'TASK' });
+        fireEvent.click(screen.getByRole('button', { name: /Create Tasks with Group/i }));
+        fireEvent.click(screen.getByRole('button', { name: /Advanced Settings/i }));
+        const auto = screen.getByRole('button', { name: 'Auto task goal' });
+        expect(auto).toHaveAttribute('aria-pressed', 'true');
+        expect(screen.getByTestId('task-goal-advice')).toHaveTextContent('10 tasks per crewmate with 1 intruder, 6 with 2 or more');
+        fireEvent.click(auto);
+        expect(screen.getByLabelText('Tasks Per Player')).toHaveValue('6');
+        fireEvent.click(screen.getByRole('button', { name: /Open Room/i }));
+        await waitFor(() => {
+            expect(contextValue.socket.emit).toHaveBeenCalledWith('update_game_config', expect.objectContaining({
+                room_code: 'TASK',
+                config: expect.objectContaining({ task_ratio: 6 }),
+            }));
+        });
+    });
+});
 });

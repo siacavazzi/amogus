@@ -18,6 +18,16 @@ describe('MeetingWaitingPage', () => {
         meetingState: { id: 'meeting-8', round_id: 'round-8', stage: 'waiting', player_who_started_it: 'Alex' },
     };
 
+    it('says the tasks called the meeting when the task goal was reached', () => {
+        renderWithContext(<MeetingWaitingPage />, {
+            ...meetingContext,
+            meetingState: { ...meetingContext.meetingState, trigger: 'tasks_complete' },
+        });
+
+        expect(screen.getByText('Every task is done. The intruders are revealed.')).toBeInTheDocument();
+        expect(screen.queryByText('Alex called it')).toBeNull();
+    });
+
     it('shows a player who slid ready and then dropped as offline but still ready', () => {
         renderWithContext(<MeetingWaitingPage />, meetingContext);
 
