@@ -222,7 +222,7 @@ export const winningCards = [
     title: 'Crew wins by removing every intruder',
     items: [
       'If all intruders are voted out, the crew wins immediately.',
-      'If the task meter reaches 100%, the game reveals the intruders by name.',
+      'If the task meter reaches 100%, the game reveals the intruders by name and calls a meeting at once.',
       'That reveal is powerful, but it does not end the game on its own. The crew still has to get the intruders voted out.',
       'In 3-player games, finishing every task wins outright for the crew.',
     ],
@@ -258,7 +258,7 @@ export const hostCards = [
     title: 'The two reminders people forget',
     items: [
       'No talking when a meeting is called until everyone is back and ready.',
-      'Finishing all tasks reveals the intruders, but the crew still needs them voted out to finish the game.',
+      'Finishing all tasks reveals the intruders and calls a meeting, but the crew still needs them voted out to finish the game.',
     ],
   },
 ];

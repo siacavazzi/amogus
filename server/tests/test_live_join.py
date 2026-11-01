@@ -33,6 +33,7 @@ class LateIntruderOddsTests(unittest.TestCase):
 
     def test_task_goal_grows_by_a_crewmate_share_times_the_crew_odds(self):
         self.assertEqual(8, late_task_goal_increase(10))
+        self.assertEqual(5, late_task_goal_increase(6))
 
 
 class LiveJoinTests(SocketGameTestCase):
@@ -61,7 +62,8 @@ class LiveJoinTests(SocketGameTestCase):
         self.assertIsNotNone(player)
         self.assertFalse(player.sus)
         self.assertEqual([], game.waiting_players)
-        self.assertEqual((crew + 1, intruders, goal + 8), (game.numCrew, game.numIntruders, game.taskGoal))
+        bump = late_task_goal_increase(game.tasks_per_crewmate())
+        self.assertEqual((crew + 1, intruders, goal + bump), (game.numCrew, game.numIntruders, game.taskGoal))
         self.assertIsNotNone(player.task)
 
         joined_round = [e for e in self.event_payloads(events, 'player_id') if e.get('joined_round')]
@@ -74,7 +76,7 @@ class LiveJoinTests(SocketGameTestCase):
 
         for client in clients:
             room_events = self.drain(client)
-            self.assertIn(goal + 8, self.event_payloads(room_events, 'task_goal'))
+            self.assertIn(goal + bump, self.event_payloads(room_events, 'task_goal'))
 
     def test_latecomer_joins_as_intruder_with_cards_and_teammates(self):
         clients, room, ids, game = self.start_round()
@@ -87,7 +89,7 @@ class LiveJoinTests(SocketGameTestCase):
         self.assertTrue(player.sus)
         self.assertEqual((crew, intruders + 1), (game.numCrew, game.numIntruders))
         # The bar moves the same as for a crewmate.
-        self.assertEqual(goal + 8, game.taskGoal)
+        self.assertEqual(goal + late_task_goal_increase(game.tasks_per_crewmate()), game.taskGoal)
         self.assertIsNone(player.task)
         self.assertEqual(1, len(player.cards))
 
@@ -168,6 +170,21 @@ class LiveJoinTests(SocketGameTestCase):
         self.assertFalse(game.end_state)
         late, late_id, _, _ = self.join_late(room)
         self.assertIsNotNone(game.get_waiting_player(late_id))
+
+    def test_no_live_join_once_tasks_are_done_and_intruders_named(self):
+        clients, room, ids, game = self.start_round()
+        with game.state_lock:
+            game.reveal_intruders()
+        late, late_id, events, _ = self.join_late(room, roll=INTRUDER_ROLL)
+        self.assertIsNotNone(game.get_waiting_player(late_id))
+        self.assertEqual('next_round', self.first_event(events, 'player_id')['joins_when'])
+
+    def test_live_join_works_on_auto_tasks_per_crewmate(self):
+        clients, room, ids, game = self.start_round(task_ratio='auto')
+        goal = game.taskGoal
+        late, late_id, _, _ = self.join_late(room, roll=CREW_ROLL)
+        self.assertIsNotNone(game.getPlayerById(late_id))
+        self.assertEqual(goal + late_task_goal_increase(game.tasks_per_crewmate()), game.taskGoal)
 
     def test_setting_off_keeps_latecomers_for_the_next_round(self):
         clients, room, ids, game = self.start_round(late_join_live=False)

@@ -14,8 +14,9 @@ import time
 from threading import RLock, Thread
 from flask_socketio import emit
 from assets.utils import *
-from assets.scaling import (MAX_CARD_DRAWS_PER_MEETING, auto_intruder_count, late_intruder_odds,
-                            late_task_goal_increase, LATE_JOIN_MIN_CREW_LEAD)
+from assets.scaling import (MAX_CARD_DRAWS_PER_MEETING, SOLO_INTRUDER_STARTING_CARDS, auto_intruder_count,
+                            auto_tasks_per_crewmate, late_intruder_odds, late_task_goal_increase,
+                            LATE_JOIN_MIN_CREW_LEAD)
 
 # Number of built-in player avatars (client/src/components/Avatar.js); Player.pic is an index into them.
 AVATAR_COUNT = 18
@@ -220,7 +221,7 @@ class Game:
         if 'starting_cards' in config:
             self.starting_cards = int(config['starting_cards'])
         if 'task_ratio' in config:
-            self.task_ratio = int(config['task_ratio'])
+            self.task_ratio = 'auto' if config['task_ratio'] == 'auto' else int(config['task_ratio'])
 
         if rebuild_card_deck:
             self.card_deck = CardDeck(self.locations, self.socket, self)
@@ -563,6 +564,9 @@ class Game:
             return 'meeting'
         if self.active_meltdown:
             return 'meltdown'
+        if self.intruders_revealed:
+            # Tasks are done and every intruder was named; a new hidden one would slip past that.
+            return 'intruders_revealed'
         counts = self.living_counts()
         if counts['living_crew'] - (counts['living_intruders'] + 1) < LATE_JOIN_MIN_CREW_LEAD:
             return 'crew_lead'
@@ -599,18 +603,22 @@ class Game:
             return admitted
 
     def _join_round_locked(self, player, roll):
+        # Everything that can fail is worked out before the player moves, so a phone is never
+        # left half-admitted (in the round but never told).
         counts = self.living_counts()
         odds = late_intruder_odds(counts['living_crew'] + counts['living_intruders'], counts['living_intruders'])
+        goal_increase = late_task_goal_increase(self.tasks_per_crewmate())
+        is_intruder = roll() < odds
         self.waiting_players.remove(player)
         player.waiting = False
         player.reset()
         player.late_join = True
         self.players.append(player)
-        player.sus = roll() < odds
+        player.sus = is_intruder
         if player.sus:
             self.numIntruders += 1
             # What Start would have dealt them
-            for _ in range(self.starting_cards):
+            for _ in range(self.starting_hand_size()):
                 card = self.card_deck.draw_card()
                 if card:
                     player.cards.append(card)
@@ -618,7 +626,7 @@ class Game:
             self.numCrew += 1
             self.assign_task(player)
         # The same for either role, so the task bar doesn't give the role away.
-        self.taskGoal += late_task_goal_increase(self.task_ratio)
+        self.taskGoal += goal_increase
         self.late_joins += 1
         self.revision += 1
         self.log_event('player_joined_mid_round', player.player_id,
@@ -700,6 +708,18 @@ class Game:
         for player in self.players:
             player.sus = False
 
+    def starting_hand_size(self):
+        """Cards each intruder is dealt. A lone intruder gets at least 3, unless the host turned cards off."""
+        if self.numIntruders == 1 and self.starting_cards > 0:
+            return max(self.starting_cards, SOLO_INTRUDER_STARTING_CARDS)
+        return self.starting_cards
+
+    def tasks_per_crewmate(self):
+        """The host's tasks per crewmate, or on Auto more with a lone intruder than with several."""
+        if self.task_ratio == 'auto':
+            return auto_tasks_per_crewmate(self.round_intruder_count or self.numIntruders)
+        return self.task_ratio
+
     def intruder_count_for_start(self):
         """Intruders the next round deals: the host's number, or one per five players on Auto."""
         if self.auto_intruders:
@@ -737,9 +757,10 @@ class Game:
         self.ruleset = 'last_stand' if len(self.players) == 3 and self.numIntruders == 1 else 'standard'
         self.last_stand = False
         random.shuffle(self.players)
+        hand_size = self.starting_hand_size()
         for i in range(0, self.numIntruders):
             self.players[i].sus = True
-            for _ in range(0, self.starting_cards):
+            for _ in range(0, hand_size):
                 card = self.card_deck.draw_card()
                 if card:
                     self.players[i].cards.append(card)
@@ -750,7 +771,8 @@ class Game:
 
         numCrew = len(self.players) - self.numIntruders
         
-        self.taskGoal = max(numCrew, 1) * self.task_ratio if self.test_mode else numCrew * self.task_ratio
+        ratio = self.tasks_per_crewmate()
+        self.taskGoal = max(numCrew, 1) * ratio if self.test_mode else numCrew * ratio
 
         print(f"{numCrew} crew and {self.numIntruders} intruders (reactor: {self.has_reactor})")
 
@@ -1000,13 +1022,18 @@ class Game:
             'task_goal': self.taskGoal,
         })
 
-    def on_tasks_complete(self):
-        """Crew hit the task goal. In last-stand rounds that wins; otherwise reveal intruders."""
+    def on_tasks_complete(self, finisher=None):
+        """Crew hit the task goal. In last-stand rounds that wins; otherwise reveal intruders and
+        call a meeting at once, so they face a vote before they can rush the last kills."""
         with self.state_lock:
             if self.end_state:
                 return
             if self.ruleset != 'last_stand':
                 self.reveal_intruders()
+                caller = finisher if finisher and finisher.alive and not finisher.sus else next(
+                    (player for player in self.players if player.alive and not player.sus), None)
+                if caller and not self.meeting:
+                    self.start_meeting(caller, trigger='tasks_complete')
                 return
             self.end_state = 'victory'
             self.stats['win_condition'] = 'tasks'

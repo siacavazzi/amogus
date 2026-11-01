@@ -121,7 +121,8 @@ function ReactorNormal() {
             <>
                 <MeetingDisplay
                     stage={meetingState.stage}
-                    callerName={meetingState.player_who_started_it}
+                    callerName={meetingState.trigger === 'tasks_complete' ? undefined : meetingState.player_who_started_it}
+                    message={meetingState.trigger === 'tasks_complete' ? 'Tasks complete: intruders revealed' : undefined}
                     hostName={meetingState.host_name}
                     meeting={meetingState}
                     players={players || []}

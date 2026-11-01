@@ -311,6 +311,7 @@ class Meeting:
                 "revision": self.game.revision,
                 "stage": self.stage,
                 "player_who_started_it": self.player_who_started_it.username,
+                "trigger": self.trigger,
                 "time_left": self.time_left,
                 "reason": self.reason,
                 "voted_out": self.voted_out,

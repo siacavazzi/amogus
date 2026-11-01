@@ -1,8 +1,9 @@
 """How the game scales with the number of players.
 
-One intruder per five players keeps each side's job the same size at any
-headcount: each intruder needs about three eliminations to win, whether the
-room has 6 players or 60. The caps below keep the shared things (the one
+One intruder per full five players keeps each side's job about the same size at
+any headcount: an intruder never needs fewer than three eliminations to win.
+(Rounding up instead put the second intruder at 8 players, where each needs only
+two kills; crew won 27% of those rounds over Halloween 2026.) The caps below keep the shared things (the one
 reactor keypad, the room-wide card effects, the task list a host must write)
 at a size a big group can still manage.
 """
@@ -23,9 +24,23 @@ MIN_TASKS = 10
 MAX_MIN_TASKS = 60
 
 
+# Tasks per crewmate on Auto. Finishing them reveals the intruders. Over Halloween 2026 crew beat a
+# lone intruder 73% of the time but two intruders only 27%, and a 10-per-crewmate goal was rarely
+# reached, so the goal comes down only when there are two or more intruders.
+SOLO_INTRUDER_TASKS_PER_CREWMATE = 10
+TASKS_PER_CREWMATE = 6
+
+# A lone intruder is found fast, so they start with at least this many random cards.
+SOLO_INTRUDER_STARTING_CARDS = 3
+
+
 def auto_intruder_count(player_count):
-    """1 intruder for 3-7 players, 2 for 8-12, 3 for 13-17, and so on with no upper limit."""
-    return max(1, (player_count + 2) // PLAYERS_PER_INTRUDER)
+    """1 intruder for 3-9 players, 2 for 10-14, 3 for 15-19, and so on with no upper limit."""
+    return max(1, player_count // PLAYERS_PER_INTRUDER)
+
+
+def auto_tasks_per_crewmate(intruder_count):
+    return SOLO_INTRUDER_TASKS_PER_CREWMATE if intruder_count <= 1 else TASKS_PER_CREWMATE
 
 
 def meltdown_codes_needed(present_players, code_percent):
@@ -66,6 +81,7 @@ def late_intruder_odds(living_players, living_intruders):
     return min(max(odds, LATE_INTRUDER_ODDS_MIN), LATE_INTRUDER_ODDS_MAX)
 
 
-def late_task_goal_increase(task_ratio):
-    """Tasks added to the goal for every latecomer, whatever role they drew, so the bar can't tell."""
-    return round(task_ratio * (1 - 1 / PLAYERS_PER_INTRUDER))
+def late_task_goal_increase(tasks_per_crewmate):
+    """Tasks added to the goal for every latecomer, whatever role they drew, so the bar can't tell:
+    one crewmate's share times the chance of being crew."""
+    return round(tasks_per_crewmate * (1 - 1 / PLAYERS_PER_INTRUDER))
