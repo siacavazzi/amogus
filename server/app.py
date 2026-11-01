@@ -1454,7 +1454,9 @@ def handleTaskComplete(data):
                 game.speaker.play_sound(f'{threshold}_percent_tasks')
                 break
         if percentage >= 100 and not game.intruders_revealed:
-            game.on_tasks_complete()
+            game.on_tasks_complete(player)
+            if game.meeting and game.meeting.trigger == 'tasks_complete':
+                record_usage('meeting_started', game, game.meeting.player_who_started_it.player_id, trigger='tasks_complete')
     finished_task = player.task
     assigned_at = getattr(player, 'task_assigned_monotonic', None)
     task_seconds = round(time.monotonic() - assigned_at, 1) if assigned_at is not None else None
