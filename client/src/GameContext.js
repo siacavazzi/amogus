@@ -241,6 +241,23 @@ export default function GameContext({ children }) {
     });
     const taskCompletionRef = useRef(null);
 
+    // A friend who typed the code before the host pressed Open waits here and joins when it opens.
+    const waitingToOpen = roomEntryStatus?.code === 'room_not_open' && roomEntryStatus?.waiting
+        ? { room_code: roomEntryStatus.room_code, entry_method: roomEntryStatus.entry_method } : null;
+    const waitingToOpenRef = useRef(null);
+    waitingToOpenRef.current = waitingToOpen;
+    const waitingRoomCode = waitingToOpen?.room_code;
+    useEffect(() => {
+        if (!waitingRoomCode) return undefined;
+        // The server says when the room opens; this re-check covers a dropped connection
+        // (a new socket isn't in the waiting room) or a host who gave up on the room.
+        const recheck = setInterval(() => {
+            const waiting = waitingToOpenRef.current;
+            if (waiting && socketRef.current?.connected) socketRef.current.emit('join_game', waiting);
+        }, 15000);
+        return () => clearInterval(recheck);
+    }, [waitingRoomCode]);
+
     const acceptRoomData = useCallback((data) => {
         if (!data || typeof data !== 'object') return true;
         const current = roomVersionRef.current;
@@ -564,6 +581,11 @@ export default function GameContext({ children }) {
             if (!isMobile) {
                 socketRef.current.emit('register_reactor', { room_code: data.room_code });
             }
+        });
+
+        socketRef.current.on('room_now_open', (data) => {
+            const waiting = waitingToOpenRef.current;
+            if (waiting && data?.room_code === waiting.room_code) socketRef.current.emit('join_game', waiting);
         });
 
         socketRef.current.on('room_opened', (data) => {
