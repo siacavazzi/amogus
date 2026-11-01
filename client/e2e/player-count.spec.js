@@ -8,8 +8,8 @@ test.afterEach(h.closeAll);
 
 const names = count => Array.from({ length: count }, (_, i) => `Guest ${i + 1}`);
 
-test('setup starts on Auto and eight players get two intruders', async ({ browser }) => {
-    const phones = await h.openPhones(browser, names(8));
+test('setup starts on Auto and ten players get two intruders', async ({ browser }) => {
+    const phones = await h.openPhones(browser, names(10));
     const [host] = phones;
     await host.goto('/play');
     await h.skipTutorialPrompt(host);

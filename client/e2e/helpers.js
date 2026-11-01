@@ -103,6 +103,11 @@ async function setUpRoom(page, settings = {}) {
     const wanted = Object.keys(sliders).filter(key => settings[key] !== undefined);
     if (wanted.length || settings.deck || settings.meetingQuorum === false || settings.lateJoin === false) {
         await page.getByRole('button', { name: /Advanced Settings/ }).click();
+        // The task goal starts on Auto, which hides its slider; a number turns Auto off.
+        if (settings.tasksPerPlayer !== undefined) {
+            const autoTasks = page.getByRole('button', { name: 'Auto task goal' });
+            if (await autoTasks.getAttribute('aria-pressed') === 'true') await autoTasks.click();
+        }
         for (const key of wanted) await page.locator(`#${sliders[key]}`).fill(String(settings[key]));
     }
     if (settings.meetingQuorum === false) {
