@@ -18,7 +18,8 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
   }, []);
 
   const alive = useMemo(() => players.filter((p) => p.alive), [players]);
-  const isReady = (p) => p.active !== false && p.ready;
+  // A phone that drops after sliding stays ready on the server, so it counts here too.
+  const isReady = (p) => Boolean(p.ready);
   // Someone offline past the server's grace period isn't waited for, so they don't count here.
   const present = alive.filter((p) => !p.absent);
   const readyCount = present.filter(isReady).length;
@@ -28,10 +29,18 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
   const caller = players.find((p) => p.username === meetingState?.player_who_started_it);
 
   const handleReadyUp = () => {
-    socket.emit('ready', {
-      player_id: playerState?.player_id || playerState?.playerId || localStorage.getItem('player_id'),
+    const playerId = playerState?.player_id || playerState?.playerId || localStorage.getItem('player_id');
+    const payload = {
+      player_id: playerId,
       round_id: meetingState?.round_id || roundId,
       meeting_id: meetingState?.id || meetingState?.meeting_id,
+    };
+    // On prod 26 ready slides came from a socket that had reconnected but never rejoined, and
+    // the server threw them away while the meeting waited. Rejoin, then send the slide again.
+    socket.emit('ready', payload, (result) => {
+      if (result?.ok !== false || !/^Reconnect before/.test(result?.error || '')) return;
+      socket.once('game_joined', () => socket.emit('ready', payload));
+      socket.emit('rejoin', { player_id: playerId });
     });
   };
 
@@ -48,7 +57,7 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
     }
   };
 
-  const meReady = playerState.ready && playerState.active !== false;
+  const meReady = Boolean(playerState.ready);
 
   return (
     <>

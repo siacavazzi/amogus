@@ -33,7 +33,7 @@ const HostStartVoting = ({ dark = false }) => {
   if (!meetingState || meetingState.stage !== 'waiting') return null;
 
   const present = (players || []).filter((p) => p.alive && !p.absent);
-  const waitingOn = present.filter((p) => !(p.active !== false && p.ready)).length;
+  const waitingOn = present.filter((p) => !p.ready).length;
   if (waitingOn === 0) return null;
 
   const secondsLeft = readyAt ? Math.max(0, Math.ceil((readyAt - Date.now()) / 1000)) : 0;

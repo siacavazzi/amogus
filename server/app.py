@@ -11,7 +11,7 @@ from functools import wraps
 from uuid import uuid4
 from assets.room_protocol import metadata, minimum_tasks, start_error_detail, can_start_test, lobby_state, room_state
 from flask import Flask, request, send_from_directory, abort, has_request_context
-from flask_socketio import SocketIO, emit, join_room, leave_room
+from flask_socketio import SocketIO, emit, join_room, leave_room, close_room
 from flask_cors import CORS
 from assets.game_manager import GameManager
 from assets.stats_tracker import StatsTracker
@@ -257,7 +257,12 @@ def entry_details(data, room_code):
     }
 
 
-def room_entry_error(code, room_code, message, details=None):
+def waiting_room(room_code):
+    """The socket.io room for phones that tried a code before the host opened it."""
+    return f'waiting-to-open:{room_code}'
+
+
+def room_entry_error(code, room_code, message, details=None, extra=None):
     attempts = entry_attempts_by_sid.setdefault(request.sid, {'tries': 0, 'errors': []})
     attempts['errors'].append(code)
     del attempts['errors'][:-10]
@@ -266,7 +271,7 @@ def room_entry_error(code, room_code, message, details=None):
                  command=(getattr(request, 'event', {}) or {}).get('message'), **(details or {}))
     emit('error', {
         'scope': 'room_entry', 'code': code,
-        'room_code': room_code, 'message': message,
+        'room_code': room_code, 'message': message, **(extra or {}),
     })
 
 
@@ -535,6 +540,9 @@ def handle_open_room(data):
     game.is_open = True
     logger.info(f"Room {room_code} is now open for players")
     emit('room_opened', {'room_code': room_code})
+    # Phones that tried the code early join now (their own join_game, so every check still runs).
+    socketio.emit('room_now_open', {'room_code': room_code}, room=waiting_room(room_code))
+    close_room(waiting_room(room_code))
     emit('task_locations', game.locations)
 
 
@@ -561,8 +569,12 @@ def handle_join_game(data):
     )
 
     if not game.is_open and not host_returning:
+        # Friends often type the code while the host is still on the setup screen. Hold them
+        # in a waiting room and tell them the moment it opens, instead of bouncing them.
+        join_room(waiting_room(room_code))
         room_entry_error('room_not_open', room_code,
-                         'This room is not open yet. Ask the host to open it, then try again.', details)
+                         "The host hasn't opened this room yet. You'll join as soon as they do.", details,
+                         extra={'waiting': True, 'entry_method': details['entry_method']})
         logger.warning(f"Join attempt for not-yet-open room: {room_code}")
         return
     
@@ -874,7 +886,8 @@ def handle_disconnect(reason=None):
     if player:
         player.disconnected_at = time.time()
         player.disconnect()
-        player.ready = False
+        # A phone that slid ready and then locked stays ready: half of all drops are back
+        # within 20 s, and un-readying them froze meetings on prod (Oct 27 - Nov 1 2026).
         if game.meeting and not game.end_state:
             game.try_start_voting()
         if game.end_state:
@@ -1914,6 +1927,49 @@ def handle_get_collaborative_tasks(data):
         'collaborative_mode': game.collaborative_mode,
         'is_owner': is_owner
     })
+
+
+@socketio.on('add_example_tasks')
+@room_event()
+def handle_add_example_tasks(data):
+    """Host only: a lobby short on tasks adds the example list in one tap.
+
+    Big lobbies stalled on Halloween 2026 because 14 people had to write 42 tasks before
+    Start worked. Tasks the room already wrote are kept; the example's are added after them.
+    """
+    game, player, room = get_game_and_player(data.get('player_id')) if data.get('player_id') else (None, None, None)
+    game = game or game_manager.get_game(game_manager.resolve_room_code(data.get('room_code')))
+    if not game:
+        return command_error('Game not found.')
+    if request.sid != game.creator_sid:
+        return command_error('Only the host can add the example list.', game, player, reason='not_host')
+    if game.game_running:
+        return command_error('Cannot change tasks while the game is running.', game, player, reason='round_running')
+    tasks, example_locations = task_list_manager.example_tasks()
+    if not tasks:
+        return command_error('The example list is missing.', game, player, reason='no_example_list')
+
+    had = len(game.collaborative_tasks)
+    # Keep the locations the room's own tasks use; drop unused defaults the host never filled.
+    used = []
+    for task in game.collaborative_tasks:
+        location = task.get('location') or 'Other'
+        if location != 'Other' and location not in used:
+            used.append(location)
+    game.locations = used + [loc for loc in example_locations if loc not in used and loc != 'Other'] + ['Other']
+    game.task_handler.locations = game.locations
+    game.collaborative_tasks = game.collaborative_tasks + [dict(task, task_id=str(uuid4())) for task in tasks]
+    game.task_handler.tasks = [task.copy() for task in game.collaborative_tasks]
+    game.task_list_applied = True
+    if not had:
+        game.collaborative_task_list_code = None
+        game.collaborative_task_list_name = task_list_manager.get_default_task_list_template()['name']
+    from assets.card import CardDeck
+    game.card_deck = CardDeck(game.locations, game.socket, game)
+    record_usage('example_tasks_added', game, player.player_id if player else None,
+                 tasks_before=had, tasks_after=len(game.collaborative_tasks), players=len(game.players))
+    socketio.emit('task_locations', game.locations, room=game.room_code)
+    return {'ok': True, 'task_count': len(game.collaborative_tasks)}
 
 
 @socketio.on('toggle_collaborative_mode')

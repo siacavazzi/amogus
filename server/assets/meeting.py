@@ -19,7 +19,10 @@ class Meeting:
     # Long enough that an intruder host can't use it to cut the meeting off before people arrive.
     HOST_OVERRIDE_AFTER_SECONDS = 15
     # A ready stage still open at these marks writes a meeting_stalled line to the event log.
-    STALL_LOG_AFTER_SECONDS = (90, 300)
+    STALL_LOG_AFTER_SECONDS = (60, 300)
+    # Sam's fallback (2026-11-01): voting opens on its own after this long, however many slid
+    # ready. Six Halloween-week meetings sat 30-118 s with every phone online but someone not sliding.
+    AUTO_OPEN_AFTER_SECONDS = 90
 
     def __init__(self, vote_time, socket, player_who_started_it, game, trigger='button'):
         self.id = str(uuid4())
@@ -46,6 +49,7 @@ class Meeting:
         self._ballots = None  # Ballots cast, kept before self.votes becomes the per-player tally
         for after in self.STALL_LOG_AFTER_SECONDS:
             eventlet.spawn_after(after, self.log_if_stalled)
+        eventlet.spawn_after(self.AUTO_OPEN_AFTER_SECONDS, self.auto_open_voting)
 
     def ready_counts(self):
         """Who the ready stage is waiting on, as counts only."""
@@ -71,6 +75,16 @@ class Meeting:
             self.game.log_event('meeting_stalled', meeting_id=self.id, trigger=self.trigger,
                                 waiting_seconds=round(time.monotonic() - self.opened_at, 1),
                                 host_connected=self._host_connected(), **self.ready_counts())
+
+    def auto_open_voting(self):
+        """The last resort for a ready stage nobody can finish: open voting anyway."""
+        with self.game.state_lock:
+            if not self._is_current() or self.stage != 'waiting' or self.game.end_state:
+                return False
+            opened = self.game._open_voting_locked(self, opened_by='timeout')
+            if opened:
+                self.game.emit_player_list()  # everyone's ready flag was reset for the vote
+            return opened
 
     def _host_connected(self):
         host = self.game.getPlayerById(getattr(self.game, 'creator_player_id', None))
