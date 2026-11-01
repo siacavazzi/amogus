@@ -134,7 +134,7 @@ All game settings are stored in `server/config.py`. Edit this file to customize 
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `TASK_RATIO` | `12` | Average number of tasks each crewmate needs to complete for crew to win |
+| `TASK_RATIO` | `'auto'` | Average number of tasks each crewmate needs to complete to reveal the intruders. `'auto'` is 10 with one intruder and 6 with two or more |
 
 ### Sound Settings
 

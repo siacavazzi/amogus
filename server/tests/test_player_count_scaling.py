@@ -3,7 +3,7 @@ import unittest
 from server.assets.card import DEFAULT_CARD_DECK_COUNTS, CardDeck
 from server.assets.meltdown import Meltdown
 from server.assets.player import Player
-from server.assets.scaling import auto_intruder_count, meltdown_codes_needed, minimum_tasks
+from server.assets.scaling import auto_intruder_count, auto_tasks_per_crewmate, meltdown_codes_needed, minimum_tasks
 from server.tests.integration_helpers import SocketGameTestCase
 
 
@@ -24,6 +24,11 @@ class ScalingRuleTests(unittest.TestCase):
         for n in range(5, 200):
             intruders = auto_intruder_count(n)
             self.assertGreaterEqual((n - 2 * intruders) / intruders, 3, n)
+
+    def test_auto_task_goal_is_higher_for_a_lone_intruder(self):
+        self.assertEqual(10, auto_tasks_per_crewmate(1))
+        self.assertEqual(6, auto_tasks_per_crewmate(2))
+        self.assertEqual(6, auto_tasks_per_crewmate(8))
 
     def test_auto_always_leaves_enough_crew_to_start(self):
         for n in range(3, 200):
@@ -100,6 +105,22 @@ class PlayerCountRoomTests(SocketGameTestCase):
         self.assertEqual(1, len(self.intruders(nine)))
         _, _, _, ten = self.setup_started_game(10)
         self.assertEqual(2, len(self.intruders(ten)))
+
+    def test_auto_task_goal_follows_the_intruder_count(self):
+        _, _, _, five = self.setup_started_game(5)
+        self.assertEqual(4 * 10, five.taskGoal)
+        _, _, _, ten = self.setup_started_game(10)
+        self.assertEqual(8 * 6, ten.taskGoal)
+        _, _, _, picked = self.setup_started_game(5, config={'task_ratio': 4})
+        self.assertEqual(4 * 4, picked.taskGoal)
+
+    def test_a_lone_intruder_starts_with_three_cards(self):
+        _, _, _, lone = self.setup_started_game(5)
+        self.assertEqual([3], [len(intruder.cards) for intruder in self.intruders(lone)])
+        _, _, _, pair = self.setup_started_game(10)
+        self.assertEqual([2, 2], [len(intruder.cards) for intruder in self.intruders(pair)])
+        _, _, _, no_cards = self.setup_started_game(5, config={'starting_cards': 0})
+        self.assertEqual([0], [len(intruder.cards) for intruder in self.intruders(no_cards)])
 
     def test_forty_players_start_with_eight_intruders_on_sixty_tasks(self):
         clients, room, ids, game = self.setup_started_game(40, task_count=60)

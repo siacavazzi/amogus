@@ -24,9 +24,23 @@ MIN_TASKS = 10
 MAX_MIN_TASKS = 60
 
 
+# Tasks per crewmate on Auto. Finishing them reveals the intruders. Over Halloween 2026 crew beat a
+# lone intruder 73% of the time but two intruders only 27%, and a 10-per-crewmate goal was rarely
+# reached, so the goal comes down only when there are two or more intruders.
+SOLO_INTRUDER_TASKS_PER_CREWMATE = 10
+TASKS_PER_CREWMATE = 6
+
+# A lone intruder is found fast, so they start with at least this many random cards.
+SOLO_INTRUDER_STARTING_CARDS = 3
+
+
 def auto_intruder_count(player_count):
     """1 intruder for 3-9 players, 2 for 10-14, 3 for 15-19, and so on with no upper limit."""
     return max(1, player_count // PLAYERS_PER_INTRUDER)
+
+
+def auto_tasks_per_crewmate(intruder_count):
+    return SOLO_INTRUDER_TASKS_PER_CREWMATE if intruder_count <= 1 else TASKS_PER_CREWMATE
 
 
 def meltdown_codes_needed(present_players, code_percent):
