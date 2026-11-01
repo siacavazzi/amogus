@@ -96,8 +96,8 @@ test('a phone opened as a second big screen mid-round takes over the big screen'
     h.expectNoPageErrors([...phones, reactor, tv]);
 });
 
-// Sam's call: a phone that drops is un-readied and slides again when it comes back.
-test('a phone that slid ready and then locked slides ready again after coming back', async ({ browser }) => {
+// A phone that slid ready and then locked stays ready: un-readying it froze meetings on prod.
+test('a phone that slid ready and then locked is still ready after coming back', async ({ browser }) => {
     const { phones, crew } = await startRound(browser, ['Sam', 'Alex', 'Jules', 'Riley']);
     const pocketed = crew[1];
     await crew[0].getByText('CALL MEETING').click();
@@ -105,7 +105,12 @@ test('a phone that slid ready and then locked slides ready again after coming ba
 
     await blink(pocketed);
     await expect(pocketed.getByText('Go to the meeting spot', { exact: false })).toBeVisible({ timeout: 30000 });
-    await expect(pocketed.getByRole('slider'), 'the phone shows its ready slide again after coming back').toHaveCount(1, { timeout: 15000 });
+    await expect(pocketed.getByText("You're ready")).toBeVisible({ timeout: 15000 });
+    await expect(pocketed.getByRole('slider'), 'no second slide after coming back').toHaveCount(0);
+
+    // Everyone else slides, and voting opens without the pocketed phone sliding again.
+    await h.readyUp(phones.filter(phone => phone !== pocketed));
+    await expect(pocketed.getByText('VOTE', { exact: true })).toBeVisible({ timeout: 15000 });
 
     h.expectNoPageErrors(phones);
 });

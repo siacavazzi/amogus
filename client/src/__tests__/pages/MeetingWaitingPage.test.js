@@ -18,12 +18,13 @@ describe('MeetingWaitingPage', () => {
         meetingState: { id: 'meeting-8', round_id: 'round-8', stage: 'waiting', player_who_started_it: 'Alex' },
     };
 
-    it('shows an absent living player as offline and still waiting', () => {
+    it('shows a player who slid ready and then dropped as offline but still ready', () => {
         renderWithContext(<MeetingWaitingPage />, meetingContext);
 
         expect(screen.getByText('Blair')).toBeInTheDocument();
         expect(screen.getByText('Offline')).toBeInTheDocument();
-        expect(screen.getByTestId('ready-count')).toHaveTextContent('0 of 2 ready');
+        // The server keeps a dropped phone's ready, so the count does too.
+        expect(screen.getByTestId('ready-count')).toHaveTextContent('1 of 2 ready');
     });
 
     it('sends the current round and meeting IDs for readiness and death reports', () => {

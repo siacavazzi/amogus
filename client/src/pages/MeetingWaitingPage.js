@@ -18,7 +18,8 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
   }, []);
 
   const alive = useMemo(() => players.filter((p) => p.alive), [players]);
-  const isReady = (p) => p.active !== false && p.ready;
+  // A phone that drops after sliding stays ready on the server, so it counts here too.
+  const isReady = (p) => Boolean(p.ready);
   // Someone offline past the server's grace period isn't waited for, so they don't count here.
   const present = alive.filter((p) => !p.absent);
   const readyCount = present.filter(isReady).length;
@@ -48,7 +49,7 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
     }
   };
 
-  const meReady = playerState.ready && playerState.active !== false;
+  const meReady = Boolean(playerState.ready);
 
   return (
     <>

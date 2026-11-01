@@ -12,7 +12,8 @@ const MeetingDisplay = ({ message = "Meeting called", stage = 'waiting', callerN
   const alive = players.filter((p) => p.alive !== false);
   // Someone offline past the server's grace period isn't waited for.
   const present = alive.filter((p) => !p.absent);
-  const isReady = (p) => p.active !== false && p.ready;
+  // A phone that drops after sliding stays ready on the server, so it counts here too.
+  const isReady = (p) => Boolean(p.ready);
   const readyCount = present.filter(isReady).length;
   const needed = readyNeeded(meeting, present.length);
   const caller = callerName ? players.find((p) => p.username === callerName) : undefined;

@@ -51,7 +51,7 @@ test('a room code typed with look-alike characters still finds the room', async 
     h.expectNoPageErrors([host, visitor]);
 });
 
-test('an invite link opened before the room is open gets in once the host opens it', async ({ browser }) => {
+test('an invite link opened before the room is open waits, then joins by itself when the host opens it', async ({ browser }) => {
     const [host, early] = await h.openPhones(browser, ['Sam', 'Alex']);
     await host.goto('/play');
     await host.getByRole('button', { name: 'Skip for now' }).click({ timeout: 5000 }).catch(() => {});
@@ -60,13 +60,38 @@ test('an invite link opened before the room is open gets in once the host opens 
     const code = await host.evaluate(() => localStorage.getItem('room_code'));
 
     await early.goto(`/play?room=${code}`);
-    await expect(early.getByText('Ask the host to open the room')).toBeVisible();
+    await expect(early.getByText('Waiting for the host to open the room')).toBeVisible();
+    await expect(early.getByRole('button', { name: 'Try again' })).toHaveCount(0);
 
     await host.getByText('Use This Task List').click();
     await host.getByText('Open Room').click();
     await h.enterName(host);
 
-    await early.getByRole('button', { name: 'Try again' }).click();
+    // No tap needed: the waiting phone goes straight on to the name screen.
+    await h.enterName(early);
+    await expect(host.getByText('Alex', { exact: true })).toBeVisible();
+
+    h.expectNoPageErrors([host, early]);
+});
+
+test('a code typed before the room is open waits, then joins when the host opens it', async ({ browser }) => {
+    const [host, early] = await h.openPhones(browser, ['Sam', 'Alex']);
+    await host.goto('/play');
+    await host.getByRole('button', { name: 'Skip for now' }).click({ timeout: 5000 }).catch(() => {});
+    await host.getByText('Create New Game').click();
+    await h.addExampleList(host);
+    const code = await host.evaluate(() => localStorage.getItem('room_code'));
+
+    await early.goto('/play');
+    await early.getByRole('button', { name: 'Skip for now' }).click({ timeout: 5000 }).catch(() => {});
+    await early.locator('#game-entry-code').fill(code);
+    await early.getByRole('button', { name: /Join Game/ }).click();
+    await expect(early.getByTestId('waiting-to-open')).toBeVisible();
+
+    await host.getByText('Use This Task List').click();
+    await host.getByText('Open Room').click();
+    await h.enterName(host);
+
     await h.enterName(early);
     await expect(host.getByText('Alex', { exact: true })).toBeVisible();
 

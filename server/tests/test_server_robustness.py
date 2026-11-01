@@ -118,7 +118,7 @@ class ServerRobustnessTests(SocketGameTestCase):
         self.assertTrue(self.has_event(events, 'game_start'))
         self.assertTrue(self.first_event(events, 'room_state')['running'])
 
-    def test_ready_player_whose_phone_blinks_must_slide_ready_again(self):
+    def test_ready_player_whose_phone_blinks_stays_ready(self):
         clients, room, ids, game = self.setup_started_game(5, config=QUIET)
         caller = self.crewmate(game)
         self.client_for_player(clients, ids, caller).emit('meeting', {'player_id': caller.player_id})
@@ -127,10 +127,32 @@ class ServerRobustnessTests(SocketGameTestCase):
         client.emit('ready', {'player_id': sleeper.player_id})
         self.assertTrue(sleeper.ready)
         # Slide ready, pocket the phone, the screen locks and the socket drops, then it comes back.
+        # Un-readying it here froze meetings on prod: people don't look at the phone again.
         client.disconnect()
+        self.assertTrue(sleeper.ready)
         self.make_client().emit('rejoin', {'player_id': sleeper.player_id})
-        # Sam's call: a dropped phone is un-readied and slides again; the meeting stops
-        # waiting for it after ABSENT_AFTER_SECONDS if it stays offline.
+        self.assertTrue(sleeper.ready)
+        self.assertEqual('waiting', game.meeting.stage)
+
+    def test_everyone_else_sliding_opens_voting_while_a_ready_phone_is_offline(self):
+        clients, room, ids, game = self.setup_started_game(5, config=QUIET)
+        caller = self.crewmate(game)
+        self.client_for_player(clients, ids, caller).emit('meeting', {'player_id': caller.player_id})
+        sleeper = next(p for p in game.players if p is not caller)
+        sleeper_client = self.client_for_player(clients, ids, sleeper)
+        sleeper_client.emit('ready', {'player_id': sleeper.player_id})
+        sleeper_client.disconnect()  # still inside the 20 s grace, so the room still counts them
+        for player in game.players:
+            if player is not sleeper:
+                self.client_for_player(clients, ids, player).emit('ready', {'player_id': player.player_id})
+        self.assertEqual('voting', game.meeting.stage)
+
+    def test_new_meeting_unreadies_a_phone_that_was_ready_last_meeting(self):
+        clients, room, ids, game = self.setup_started_game(5, config=QUIET)
+        caller = self.crewmate(game)
+        sleeper = next(p for p in game.players if p is not caller)
+        sleeper.ready = True
+        self.client_for_player(clients, ids, caller).emit('meeting', {'player_id': caller.player_id})
         self.assertFalse(sleeper.ready)
 
     def test_old_socket_closing_after_a_rejoin_does_not_mark_the_player_offline(self):
