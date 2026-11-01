@@ -329,3 +329,18 @@
 }
 .sg-rx__qr svg { display: block; width: clamp(160px, min(23vw, 38vh), 520px); height: auto; }
 .sg-rx__qr figcaption { font-weight: 900; font-size: clamp(12px, 1.2vw, 22px); letter-spacing: 0.08em; text-transform: uppercase; }
+
+/* Latecomers during a round: a small QR and the next-round waiting list in the bottom-left corner. */
+.sg-rx__late {
+  position: absolute; left: clamp(16px, 2vw, 32px); bottom: clamp(16px, 2.5vh, 32px);
+  display: flex; align-items: flex-end; gap: 16px; max-width: calc((100vw - 720px) / 2 - 32px);
+}
+.sg-rx__late-qr { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.sg-rx__late-qr svg { width: clamp(84px, 8vw, 120px); height: auto; border-radius: 10px; }
+.sg-rx__late-qr figcaption { font-weight: 800; font-size: 13px; max-width: 13ch; text-align: center; line-height: 1.2; }
+.sg-rx__late-list p { margin: 0 0 6px; font-weight: 900; font-size: clamp(14px, 1.2vw, 18px); white-space: nowrap; }
+.sg-rx__late-faces { display: flex; flex-wrap: wrap; gap: 6px; }
+@media (max-width: 1100px), (max-height: 620px) {
+  .sg-rx__late-qr { display: none; }
+  .sg-rx__late { max-width: none; }
+}

@@ -96,7 +96,9 @@ class Player:
         self.absent = False
         # Tapped Leave mid-round: kept until the round ends so the result counts them, then removed
         self.left = False
-        
+        # Joined mid-round: on the room's waiting list until the next round (see Game.waiting_players)
+        self.waiting = False
+
         self.alive = True
         self.task = None
         self.fake_task = None

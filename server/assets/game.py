@@ -36,6 +36,9 @@ class Game:
         self.round_number = 0
         self.command_results = OrderedDict()
         self.players = []
+        # Phones that arrived mid-round. They are kept out of self.players, so no role, vote,
+        # meltdown code or win check counts them, and join the lobby when the round ends.
+        self.waiting_players = []
         self.task_handler = task_handler
         self.crew_score = 0
         self.game_running = False
@@ -468,7 +471,7 @@ class Game:
                     self.hack_id = None
 
 
-    def addPlayer(self, sid, username, selfie_filename=None, pic=None):
+    def _new_player(self, sid, username, selfie_filename=None, pic=None):
         player_id = str(uuid4())
 
         # Honor the player's chosen avatar while it's free. Once every avatar is
@@ -482,11 +485,59 @@ class Game:
         if avatar in self.backgrounds:
             self.backgrounds.remove(avatar)
 
-        new_player = Player(sid=sid, player_id=player_id, username=username, pic=avatar, selfie=selfie_filename)
-        self.players.append(new_player)
+        return Player(sid=sid, player_id=player_id, username=username, pic=avatar, selfie=selfie_filename)
 
+    def addPlayer(self, sid, username, selfie_filename=None, pic=None):
+        new_player = self._new_player(sid, username, selfie_filename, pic)
+        self.players.append(new_player)
         return new_player
-    
+
+    def add_waiting_player(self, sid, username, selfie_filename=None, pic=None):
+        """A phone that arrived mid-round: it plays from the next round."""
+        new_player = self._new_player(sid, username, selfie_filename, pic)
+        new_player.waiting = True
+        self.waiting_players.append(new_player)
+        self.revision += 1
+        return new_player
+
+    def get_waiting_player(self, player_id=None, sid=None):
+        for player in self.waiting_players:
+            if (player_id and player.player_id == player_id) or (sid and player.sid == sid):
+                return player
+        return None
+
+    def remove_waiting_player(self, player):
+        """Take a waiting phone off the list and free its avatar. Returns True if it was there."""
+        if player not in self.waiting_players:
+            return False
+        self.waiting_players.remove(player)
+        in_use = any(other.pic == player.pic for other in self.players + self.waiting_players)
+        if player.pic not in self.backgrounds and not in_use:
+            self.backgrounds.append(player.pic)
+        self.revision += 1
+        return True
+
+    def admit_waiting_players(self):
+        """Move the waiting phones into the room's players; called when the room returns to the lobby."""
+        admitted = list(self.waiting_players)
+        for player in admitted:
+            player.waiting = False
+            player.reset()
+            self.players.append(player)
+        self.waiting_players = []
+        if admitted:
+            self.revision += 1
+        return admitted
+
+    def waiting_view(self):
+        """The waiting list as anyone may see it: names and faces only."""
+        return [json.loads(player.to_json(show_role=False, show_secrets=False)) for player in self.waiting_players]
+
+    def emit_waiting_list(self):
+        if self.room_code:
+            self.socket.emit('waiting_players', {**self._add_state_metadata({}), 'players': self.waiting_view()},
+                             room=self.room_code)
+
     def getTask(self):
         """Get the next task for a player."""
         return self.task_handler.get_task(self.denied_location)
@@ -656,6 +707,7 @@ class Game:
     def _reset_locked(self):
         """Clear players and all game state while the room lock is held."""
         self.players = []
+        self.waiting_players = []
         self.crew_score = 0
         self.game_running = False
         self.active_hack = 0
@@ -747,7 +799,7 @@ class Game:
         # Reset backgrounds for new profile pics
         self.backgrounds = list(range(AVATAR_COUNT))
         # Remove used backgrounds from available pool
-        for player in self.players:
+        for player in self.players + self.waiting_players:
             if player.pic in self.backgrounds:
                 self.backgrounds.remove(player.pic)
 

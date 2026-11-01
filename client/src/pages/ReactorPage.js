@@ -4,6 +4,10 @@ import { AlertTriangle, LogOut, Radiation } from "../signal/icons";
 import MeetingDisplay from "../components/MeetingDisplay";
 import IntrudersRevealedDisplay from "../components/IntrudersRevealedDisplay";
 import MeltdownAvertedDisplay, { wasMeltdownJustAverted, clearMeltdownAverted } from "../components/MeltdownAverted";
+import RoomQrCode from "../components/RoomQrCode";
+import { isBetaChannel } from "../components/BetaBadge";
+import { buildRoomQrUrl } from "../utils/inviteLinks";
+import { Face } from "../signal";
 import "../signal/reactor.css";
 
 const ARM_MS = 3000;
@@ -20,6 +24,7 @@ function ReactorNormal() {
         taskGoal,
         players,
         intrudersRevealed,
+        waitingPlayers,
      } = useContext(DataContext);
     const meeting = meetingState && meetingState.stage !== 'over';
     const [isSabotaging, setIsSabotaging] = useState(false);
@@ -182,8 +187,37 @@ function ReactorNormal() {
             </div>
 
             <div className="sg-rx__foot">{sabotage('sg-btn-red')}</div>
+            <LateJoin roomCode={roomCode} waitingPlayers={waitingPlayers} />
             {showAverted && <MeltdownAvertedDisplay />}
         </div>
+    );
+}
+
+// Bottom-left corner during a round: latecomers scan to get on the next-round waiting list,
+// and everyone sees who is joining next round. Nobody on it is part of this round.
+export function LateJoin({ roomCode, waitingPlayers }) {
+    const waiting = waitingPlayers || [];
+    const qrUrl = roomCode ? buildRoomQrUrl(roomCode, { beta: isBetaChannel() }) : '';
+    if (!qrUrl && waiting.length === 0) return null;
+    return (
+        <aside className="sg-rx__late" data-testid="reactor-late-join">
+            {qrUrl && (
+                <figure className="sg-rx__late-qr">
+                    <RoomQrCode value={qrUrl} title={`QR code to join room ${roomCode} for the next round`} />
+                    <figcaption>Late? Scan to join the next round</figcaption>
+                </figure>
+            )}
+            {waiting.length > 0 && (
+                <div className="sg-rx__late-list" data-testid="reactor-waiting-list">
+                    <p className="sg-num">+{waiting.length} joining next round</p>
+                    <div className="sg-rx__late-faces">
+                        {waiting.slice(0, 8).map((player) => (
+                            <Face key={player.player_id} player={player} size={40} className="sg-rx__face-ring" />
+                        ))}
+                    </div>
+                </div>
+            )}
+        </aside>
     );
 }
 
