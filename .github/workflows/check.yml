@@ -65,6 +65,8 @@ jobs:
         run: node scripts/check-seo.js
 
       - name: Check Nginx page routing
+        # apt hung for hours on 2026-10-31 (two runs stuck installing nginx); fail fast instead.
+        timeout-minutes: 10
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y nginx

@@ -15,7 +15,7 @@ async function startSetup(page) {
 test('a saved task list loads on another phone from its code', async ({ browser }) => {
     const [first, second] = await h.openPhones(browser, ['Sam', 'Alex']);
     await startSetup(first);
-    await first.getByText('Add Example List').click();
+    await h.addExampleList(first);
     const meta = await first.locator('.hs-listrow__meta').first().textContent();
     const listCode = meta.split('·').pop().trim();
     expect(listCode).toMatch(/^[A-Z0-9]{6}$/);
@@ -74,7 +74,7 @@ test('the settings sliders follow a finger', async ({ browser }) => {
     // The sliders used to be rebuilt on every change, so a finger drag stopped after one step.
     const host = await h.openPhone(browser, 'Sam');
     await startSetup(host);
-    await host.getByText('Add Example List').click();
+    await h.addExampleList(host);
     await host.getByText('Use This Task List').click();
     await host.getByRole('button', { name: /Advanced Settings/ }).click();
     const slider = host.locator('#setting-voting-time');
@@ -111,7 +111,7 @@ test('a host whose connection drops during setup can still open the room', async
     let connection;
     await host.routeWebSocket(/socket\.io/, ws => { ws.connectToServer(); connection = ws; });
     await startSetup(host);
-    await host.getByText('Add Example List').click();
+    await h.addExampleList(host);
     await host.getByText('Use This Task List').click();
     await expect(host.getByRole('heading', { name: 'Game settings' })).toBeVisible();
     await connection.close();
@@ -127,7 +127,7 @@ test('a host whose page reloads during setup can still open the room', async ({ 
     // Messages. This used to land the host on the name screen of their own unopened room.
     const host = await h.openPhone(browser, 'Sam');
     await startSetup(host);
-    await host.getByText('Add Example List').click();
+    await h.addExampleList(host);
     await host.getByText('Use This Task List').click();
     await host.reload();
     // Back on the setup screen of the same room, with the saved list still there to pick.
