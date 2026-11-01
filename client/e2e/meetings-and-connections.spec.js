@@ -27,15 +27,20 @@ test('someone who opens the invite link mid-round is told to wait, then joins th
     await host.getByText('Start Game').click();
     const intruder = await h.revealRoles(phones);
 
+    // The latecomer is no longer turned away: they join the waiting list for the next round.
     const late = await h.openPhone(browser, 'Kai');
     await late.goto(`/play?room=${code}`);
-    await expect(late.getByText('New players can join when the host returns to the lobby.', { exact: false })).toBeVisible();
+    await expect(late.getByTestId('round-on-notice')).toBeVisible();
+    await late.getByPlaceholder(/name/i).first().fill('Kai');
+    await late.getByText('Next: Choose Avatar').click();
+    await late.getByRole('button', { name: 'Join Game', exact: true }).click();
+    await expect(late.getByTestId('waiting-next-round')).toBeVisible();
 
-    // After the round, the latecomer gets in for the next one.
+    // After the round, the latecomer is in the lobby for the next one without doing anything.
     await h.voteOutIntruder(phones.find(phone => phone !== intruder), phones, intruder);
     for (const phone of phones) await phone.getByRole('button', { name: /Play Again/ }).click();
     await h.expectLobby(host);
-    await h.joinRoom(late, code);
+    await h.expectLobby(late);
     await expect(host.getByText('Kai')).toBeVisible();
 
     h.expectNoPageErrors([...phones, late]);
