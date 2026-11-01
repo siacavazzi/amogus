@@ -872,8 +872,9 @@ export default function GameContext({ children }) {
                 setMeetingState(meetingData);
                 setShowSusPage(false)
                 
-                // The yellow meeting screen is the announcement; no pop-up on top of it.
-                setDialog(undefined)
+                // The yellow meeting screen is the announcement; no pop-up on top of it. The one
+                // exception is the task reveal, which calls this meeting: it names the intruders.
+                setDialog((current) => (current?.kind === 'revealed' ? current : undefined))
             } catch (error) {
                 console.error("Error parsing meeting data:", error);
             }
