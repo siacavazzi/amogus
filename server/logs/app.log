@@ -8865,34 +8865,3 @@
 2026-10-31 19:01:34,910 - app_logger - dev-5f91f39 - INFO -  * Running with HTTP at: http://192.0.2.2:5001
 2026-10-31 19:01:34,910 - app_logger - dev-5f91f39 - INFO -  * For HTTPS, generate certificates with:
 2026-10-31 19:01:34,910 - app_logger - dev-5f91f39 - INFO -    openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365
-2026-11-02 20:46:35,195 - app_logger - dev-340bcb4 - INFO - Starting Sus Party prod server version dev-340bcb4 (commit 340bcb4, built None)
-2026-11-02 20:46:35,204 - app_logger - dev-340bcb4 - INFO - Starting server...
-2026-11-02 20:46:35,204 - app_logger - dev-340bcb4 - INFO -  * Running with HTTP at: http://192.0.2.2:5001
-2026-11-02 20:46:35,205 - app_logger - dev-340bcb4 - INFO -  * For HTTPS, generate certificates with:
-2026-11-02 20:46:35,205 - app_logger - dev-340bcb4 - INFO -    openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365
-2026-11-02 20:46:57,723 - app_logger - dev-340bcb4 - INFO - Starting Sus Party prod server version dev-340bcb4 (commit 340bcb4, built None)
-2026-11-02 20:46:57,731 - app_logger - dev-340bcb4 - INFO - Starting server...
-2026-11-02 20:46:57,731 - app_logger - dev-340bcb4 - INFO -  * Running with HTTP at: http://192.0.2.2:5001
-2026-11-02 20:46:57,731 - app_logger - dev-340bcb4 - INFO -  * For HTTPS, generate certificates with:
-2026-11-02 20:46:57,731 - app_logger - dev-340bcb4 - INFO -    openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365
-2026-11-02 20:48:03,706 - app_logger - dev-340bcb4 - INFO - Player b61ae2db-8df4-4db8-9216-8e257257f484 in room TXTE is offline; the room stops waiting for them
-2026-11-02 20:48:03,929 - app_logger - dev-340bcb4 - INFO - Player cd430ffe-4fcb-48f4-b7fa-b1d151f0caf1 in room TXTE is offline; the room stops waiting for them
-2026-11-02 20:48:04,073 - app_logger - dev-340bcb4 - INFO - Player 74f8f39b-f7d2-4f86-918e-b06f80e00c93 in room TXTE is offline; the room stops waiting for them
-2026-11-02 20:48:04,328 - app_logger - dev-340bcb4 - INFO - Player dfc42ba7-9fde-4644-9176-163a7d1cf14f in room TXTE is offline; the room stops waiting for them
-2026-11-02 20:48:04,328 - app_logger - dev-340bcb4 - INFO - Room TXTE has no connected player available for host reassignment
-2026-11-02 20:49:02,283 - app_logger - dev-340bcb4 - INFO - Player 381a9599-044f-4ba0-90a2-6be3f4e85a65 in room TEXA is offline; the room stops waiting for them
-2026-11-02 20:49:02,393 - app_logger - dev-340bcb4 - INFO - Player 69e60813-6a82-4493-8585-b61813554b08 in room TEXA is offline; the room stops waiting for them
-2026-11-02 20:49:02,510 - app_logger - dev-340bcb4 - INFO - Player 0fec3c96-0bc7-430b-b052-3009e61d8d44 in room TEXA is offline; the room stops waiting for them
-2026-11-02 20:49:02,636 - app_logger - dev-340bcb4 - INFO - Player ee0c1d8f-d716-4a14-a43a-65f11ecf47b6 in room TEXA is offline; the room stops waiting for them
-2026-11-02 20:49:02,996 - app_logger - dev-340bcb4 - INFO - Player 26ae9304-982d-4593-909a-8e3e29369ed9 in room TEXA is offline; the room stops waiting for them
-2026-11-02 20:49:02,996 - app_logger - dev-340bcb4 - INFO - Room TEXA has no connected player available for host reassignment
-2026-11-02 20:49:35,514 - app_logger - dev-340bcb4 - INFO - Player 91c0effa-d425-40dc-987b-529f980f5fa0 in room ATHA is offline; the room stops waiting for them
-2026-11-02 20:49:36,379 - app_logger - dev-340bcb4 - INFO - Player 8c4a916e-3b4c-4993-8764-95c006328ae9 in room ATHA is offline; the room stops waiting for them
-2026-11-02 20:49:36,485 - app_logger - dev-340bcb4 - INFO - Player 31ce6609-eadd-4da7-bf98-d71b7c7c51e6 in room ATHA is offline; the room stops waiting for them
-2026-11-02 20:49:36,652 - app_logger - dev-340bcb4 - INFO - Player 7353c345-f3d6-41ad-8d00-f75538ee1011 in room ATHA is offline; the room stops waiting for them
-2026-11-02 20:49:36,653 - app_logger - dev-340bcb4 - INFO - Room ATHA has no connected player available for host reassignment
-2026-11-02 20:49:53,169 - app_logger - dev-340bcb4 - INFO - Starting Sus Party prod server version dev-340bcb4 (commit 340bcb4, built None)
-2026-11-02 20:49:53,176 - app_logger - dev-340bcb4 - INFO - Starting server...
-2026-11-02 20:49:53,176 - app_logger - dev-340bcb4 - INFO -  * Running with HTTP at: http://192.0.2.2:5001
-2026-11-02 20:49:53,176 - app_logger - dev-340bcb4 - INFO -  * For HTTPS, generate certificates with:
-2026-11-02 20:49:53,176 - app_logger - dev-340bcb4 - INFO -    openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365
