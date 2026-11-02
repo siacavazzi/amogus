@@ -40,6 +40,21 @@
     ],
     "device_5gwvndzzzmvwrpdqg": [
       "QAQZGY"
+    ],
+    "device_o5tkyv5e5mvzqce0k": [
+      "8W2LC5"
+    ],
+    "device_xw5ff3v7wmvzqd8bc": [
+      "RPRMRQ"
+    ],
+    "device_4u1sn2kwzmvzqehff": [
+      "QYGFC9"
+    ],
+    "device_lf7tw6bljmvzqf7e3": [
+      "TXE6W3"
+    ],
+    "device_si0b4hzzvmvzqg1ub": [
+      "DBMUXS"
     ]
   },
   "code_to_name": {
@@ -56,6 +71,11 @@
     "R5UJJJ": "Example List",
     "8JZYBX": "Family cleanup task pack",
     "98D8CN": "Example List",
-    "QAQZGY": "Example List"
+    "QAQZGY": "Example List",
+    "8W2LC5": "Example List",
+    "RPRMRQ": "Example List",
+    "QYGFC9": "Example List",
+    "TXE6W3": "Example List",
+    "DBMUXS": "Example List"
   }
 }

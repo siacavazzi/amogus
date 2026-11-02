@@ -104,3 +104,18 @@ Connection metadata contains a coarse device class, OS family, browser family an
 The UTC offset supports local-hour analysis. It does not establish a country or a location.
 No event identifies a household, a school, or a test run.
 List content and a separate audit remain necessary for those classifications.
+
+## Optional game feedback
+
+Three seconds after the result screen appears, each phone (never the big screen) asks "How was this game?"
+with **Give feedback**, **Maybe later** and **Don't ask again**. The X button and Escape work like **Maybe later**.
+**Don't ask again** stores a one-week snooze in local storage. Play Again and Leave act immediately and call off the prompt for that round.
+
+Players can send a rating (Fun, Okay, Needs work), a comment of up to 1,000 characters, or both.
+The server (`submit_feedback`) accepts one response per player per round, only after that round ends.
+Retries and reconnects don't add duplicates, and the phone shows success only after the server saved it.
+
+Feedback rows hold the rating, comment, result, submission time and a test-room flag. They carry no names,
+player IDs, room codes or round IDs, and nothing about feedback goes into the gameplay event log except the
+`end_screen_action` taps `feedback_open` and `feedback_sent`. The server keeps the latest 500 rows in `stats.json`;
+the private dashboard shows the latest 25.

@@ -39,6 +39,7 @@ class StatsTracker:
             'failure_reasons': {},
             'round_outcomes': {},
             'round_history': [],
+            'game_feedback': [],
         }
         self._load()
         self.data['metrics_schema_version'] = 2
@@ -76,8 +77,10 @@ class StatsTracker:
                 json.dump(self.data, f, indent=2)
             os.replace(tmp, self.storage_path)
             self._last_save = time.monotonic()
+            return True
         except OSError:
             logging.getLogger('app_logger').exception('Usage stats write failed')
+            return False
 
     # ---- recording ----
 
@@ -368,6 +371,23 @@ class StatsTracker:
                           task_source=game.task_source() if hasattr(game, 'task_source') else None,
                           has_reactor=bool(getattr(game, 'reactor_sid', None) or getattr(game, 'has_reactor', False)))
 
+    # ---- end-of-round feedback ----
+
+    def record_game_feedback(self, game, rating, comment):
+        """Save optional feedback with no names, player ids, room codes or round ids."""
+        with self.lock:
+            previous = self.data['game_feedback']
+            self.data['game_feedback'] = (previous + [{
+                'id': str(uuid4()), 'submitted_at': time.time(), 'rating': rating, 'comment': comment,
+                'outcome': game.end_state,
+                'analytics_excluded': bool(getattr(game, 'test_mode', False) or getattr(game, 'synthetic', False)
+                                           or self.environment != 'production'),
+            }])[-500:]
+            if not self._save_locked():
+                self.data['game_feedback'] = previous
+                return False
+            return True
+
     # ---- reporting ----
 
     def snapshot(self):
@@ -386,4 +406,5 @@ class StatsTracker:
                 'failure_reasons': self.data['failure_reasons'].copy(),
                 'round_outcomes': self.data['round_outcomes'].copy(),
                 'round_history': copy.deepcopy(self.data['round_history']),
+                'game_feedback': copy.deepcopy(self.data['game_feedback']),
             }

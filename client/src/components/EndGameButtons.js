@@ -1,10 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { DataContext } from '../GameContext';
 import { RotateCcw, LogOut, Check } from '../signal/icons';
+import GameFeedback from './GameFeedback';
 
 function EndGameButtons() {
-    const { socket, roomCode, resetVotes, isMobile } = useContext(DataContext);
+    const { socket, roomCode, resetVotes, isMobile, roundId } = useContext(DataContext);
     const [sending, setSending] = useState(false);
+    // Play Again and Leave act straight away and call off the feedback prompt for this round.
+    const [skipFeedbackRound, setSkipFeedbackRound] = useState(null);
 
     const playerId = localStorage.getItem('player_id');
     // The reactor isn't a player, so it has no vote: its Play Again takes the room back to the lobby.
@@ -21,6 +24,7 @@ function EndGameButtons() {
     useEffect(() => setSending(false), [resetVotes]);
 
     const handlePlayAgain = () => {
+        setSkipFeedbackRound(roundId);
         if (!socket || sending) return;
         setSending(true);
         socket.emit('reset', isReactor
@@ -29,6 +33,7 @@ function EndGameButtons() {
     };
 
     const handleLeaveRoom = () => {
+        setSkipFeedbackRound(roundId);
         // Clear local storage first
         localStorage.removeItem('player_id');
         localStorage.removeItem('room_code');
@@ -65,6 +70,7 @@ function EndGameButtons() {
                 <LogOut size={18} />
                 <span>Leave</span>
             </button>
+            {!hasVoted && skipFeedbackRound !== roundId && <GameFeedback key={roundId} />}
         </div>
     );
 }

@@ -28,11 +28,18 @@ const appears = (locator, timeout = 3000) => locator.first().waitFor({ state: 'v
 // A fresh browser per person, marked as test traffic (and on beta, when testing beta).
 const openContexts = new Set();
 
-async function openPage(browser, name, options) {
+async function openPage(browser, name, { feedbackPrompt = false, ...options } = {}) {
     const context = await browser.newContext(options);
     openContexts.add(context);
     // Runs in every document, including the blank page a new tab starts on, where storage is off.
     await context.addInitScript(() => { try { localStorage.setItem('sus_e2e', '1'); } catch (_) { /* about:blank */ } });
+    // The "How was this game?" prompt covers the result screen after 3 s. Tests that aren't about it
+    // start snoozed, the way "Don't ask again" leaves a phone, so their taps on Play Again aren't blocked.
+    if (!feedbackPrompt) {
+        await context.addInitScript(() => {
+            try { localStorage.setItem('sus_party_feedback_snoozed_until', String(Date.now() + 365 * 24 * 3600 * 1000)); } catch (_) { /* about:blank */ }
+        });
+    }
     if (BETA) {
         const { hostname } = new URL(process.env.E2E_BASE_URL);
         await context.addCookies([{ name: 'sus_channel', value: 'beta', domain: hostname, path: '/' }]);
@@ -51,9 +58,9 @@ async function openPage(browser, name, options) {
     return page;
 }
 
-const openPhone = (browser, name) => openPage(browser, name, PHONE);
-const openReactor = browser => openPage(browser, 'Reactor', DESKTOP);
-const openPhones = (browser, names) => Promise.all(names.map(name => openPhone(browser, name)));
+const openPhone = (browser, name, extra = {}) => openPage(browser, name, { ...PHONE, ...extra });
+const openReactor = (browser, extra = {}) => openPage(browser, 'Reactor', { ...DESKTOP, ...extra });
+const openPhones = (browser, names, extra = {}) => Promise.all(names.map(name => openPhone(browser, name, extra)));
 
 async function skipTutorialPrompt(page) {
     const skip = page.getByRole('button', { name: 'Skip for now' });

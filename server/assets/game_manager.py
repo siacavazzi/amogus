@@ -258,6 +258,7 @@ class GameManager:
             'recent_games': list(reversed(completed[-25:])),
             'acquisition': sorted(snapshot['acquisition'], key=lambda row: row['rooms_created'], reverse=True),
             'acquisition_since': snapshot['acquisition_since'],
+            'game_feedback': list(reversed(snapshot['game_feedback'][-25:])),
             'metrics': {
                 'schema_version': snapshot['metrics_schema_version'], 'since': snapshot['metrics_since'],
                 'event_counts': snapshot['event_counts'], 'failure_reasons': snapshot['failure_reasons'],
