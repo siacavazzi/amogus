@@ -52,4 +52,23 @@ describe('next-round waiting list', () => {
         expect(game.getContext().waitingForNextRound).toBe(true);
         expect(game.getContext().waitingPlayers).toHaveLength(1);
     });
+    it('leaves the waiting screen when dealt into the round, with a late role pop-up', async () => {
+        game = renderWithLiveGameContext(<div>Phone</div>);
+        await game.serverEmit('player_id', { player_id: 'late-1', pic: 4, waiting: true, username: 'Late', joins_when: 'meeting' });
+        expect(game.getContext().waitingJoinsWhen).toBe('meeting');
+        await game.serverEmit('player_id', { player_id: 'late-1', pic: 4, is_creator: false, joined_round: true });
+        expect(game.getContext().waitingForNextRound).toBe(false);
+        await game.serverEmit('game_data', {
+            room_code: 'ROOM', revision: 12, action: 'start_game', late_join: true,
+            list: [JSON.stringify({ player_id: 'late-1', username: 'Late', sus: true, alive: true })],
+        });
+        expect(game.getContext().running).toBe(true);
+        expect(game.getContext().dialog).toEqual(expect.objectContaining({ title: "You're in this round", kind: 'role', sus: true }));
+    });
+
+    it('knows whether the room deals latecomers in', async () => {
+        game = renderWithLiveGameContext(<div>Phone</div>);
+        await game.serverEmit('game_joined', { room_code: 'ROOM', is_open: true, round_running: true, late_join_live: true });
+        expect(game.getContext().lateJoinLive).toBe(true);
+    });
 });

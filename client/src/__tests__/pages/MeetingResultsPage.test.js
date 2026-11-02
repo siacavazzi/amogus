@@ -9,6 +9,7 @@
  * - Players return to gameplay after viewing results
  */
 import React from 'react';
+import { act } from '@testing-library/react';
 import { renderWithContext, screen, fireEvent, mockPlayers, mockMeetingStateResults } from '../../test-utils';
 import MeetingResultPage from '../../pages/MeetingResultsPage';
 
@@ -156,6 +157,34 @@ describe('MeetingResultsPage', () => {
             // Content should be visible (animation reveals it)
             // The exact animation implementation varies
             expect(screen.getByText('Charlie')).toBeInTheDocument();
+        });
+    });
+    describe('Intruder count after a mid-round join', () => {
+        afterEach(() => jest.useRealTimers());
+
+        const revealAll = () => act(() => { jest.advanceTimersByTime(10000); });
+
+        it('withholds the number once someone joined mid-round', () => {
+            jest.useFakeTimers();
+            renderWithContext(<MeetingResultPage />, {
+                meetingState: { ...mockMeetingStateResults, intruders_left: null, intruders_hidden: true },
+                players: mockPlayers,
+                running: true,
+            });
+            revealAll();
+            expect(screen.getByText('Intruders are still among you')).toBeInTheDocument();
+            expect(screen.queryByText(/intruders? left/)).toBeNull();
+        });
+
+        it('still gives the number in a round nobody joined late', () => {
+            jest.useFakeTimers();
+            renderWithContext(<MeetingResultPage />, {
+                meetingState: { ...mockMeetingStateResults, intruders_left: 1, intruders_hidden: false },
+                players: mockPlayers,
+                running: true,
+            });
+            revealAll();
+            expect(screen.getByText('1 intruder left')).toBeInTheDocument();
         });
     });
 });

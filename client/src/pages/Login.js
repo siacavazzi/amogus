@@ -14,7 +14,7 @@ function LoginPage() {
     const [showContent, setShowContent] = useState(false);
     const lastSelfie = useRef(null);
     const scrollRef = useRef(null);
-    const { setPlayerState, socket, setTaskEntry, roomCode, roomEntryStatus, setRoomEntryStatus, players, waitingPlayers, roundRunningAtEntry } = useContext(DataContext);
+    const { setPlayerState, socket, setTaskEntry, roomCode, roomEntryStatus, setRoomEntryStatus, players, waitingPlayers, roundRunningAtEntry, lateJoinLive } = useContext(DataContext);
 
     // Avatars other players in the room already have. The camera only opens if
     // the player explicitly chooses a selfie instead.
@@ -110,7 +110,9 @@ function LoginPage() {
                         <p className="sg-pill">Join the Game · Room {roomCode}</p>
                         {roundRunningAtEntry && (
                             <p className="sg-lede" data-testid="round-on-notice" style={{ opacity: 0.9 }}>
-                                A round is on right now. Join and you'll be dealt in at the next round.
+                                {lateJoinLive
+                                    ? "A round is on right now. Join and you'll be dealt in, as crew or intruder."
+                                    : "A round is on right now. Join and you'll be dealt in at the next round."}
                             </p>
                         )}
                         <label htmlFor="username" className="sg-big sg-h1 sg-join__ask">What should we call you?</label>

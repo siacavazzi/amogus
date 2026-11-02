@@ -32,4 +32,11 @@ describe('WaitingNextRoundPage', () => {
         renderWithContext(<WaitingNextRoundPage />, { ...base, endState: 'victory' });
         expect(screen.getByTestId('waiting-round-status')).toHaveTextContent('This round is over');
     });
+    it('says when the phone will be dealt in', () => {
+        const { unmount } = renderWithContext(<WaitingNextRoundPage />, { ...base, waitingJoinsWhen: 'meeting' });
+        expect(screen.getByTestId('waiting-joins-when')).toHaveTextContent('when the meeting ends');
+        unmount();
+        renderWithContext(<WaitingNextRoundPage />, { ...base, waitingJoinsWhen: 'next_round' });
+        expect(screen.getByTestId('waiting-joins-when')).toHaveTextContent('when the next round starts');
+    });
 });

@@ -96,4 +96,5 @@ def room_state(game, player=None, sid=None):
         # Phones that joined mid-round and play from the next round (names and faces only)
         'waiting': bool(player is not None and getattr(player, 'waiting', False)),
         'waiting_players': game.waiting_view(),
+        'late_join_live': game.late_join_live, 'joins_when': game.waiting_joins_when(),
     })

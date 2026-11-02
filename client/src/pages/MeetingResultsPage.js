@@ -23,6 +23,8 @@ export default function MeetingResultPage({ tutorialMode = false, tutorialHighli
   const ejected = !!meetingState?.voted_out && meetingState?.reason !== 'veto';
   const wasIntruder = !!votedOutPlayer?.sus;
   // The server sends the count: crew phones aren't told who the other intruders are.
+  // Once someone joined mid-round the count is withheld: a number that went up would name them.
+  const intrudersHidden = !!meetingState?.intruders_hidden;
   const intrudersLeft = meetingState?.intruders_left
     ?? players.filter((p) => p.sus && p.alive && p.player_id !== meetingState?.voted_out).length;
 
@@ -83,7 +85,9 @@ export default function MeetingResultPage({ tutorialMode = false, tutorialHighli
         </p>
         {phase === 'complete' && wasIntruder && (
           <p className="sg-lede sg-a sg-fade">
-            {intrudersLeft === 0 ? 'No intruders left' : `${intrudersLeft} ${intrudersLeft === 1 ? 'intruder' : 'intruders'} left`}
+            {intrudersHidden
+              ? 'Intruders are still among you'
+              : intrudersLeft === 0 ? 'No intruders left' : `${intrudersLeft} ${intrudersLeft === 1 ? 'intruder' : 'intruders'} left`}
           </p>
         )}
         {phase === 'complete' && votedOutPlayer?.death_message && (

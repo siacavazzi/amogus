@@ -98,6 +98,8 @@ class Player:
         self.left = False
         # Joined mid-round: on the room's waiting list until the next round (see Game.waiting_players)
         self.waiting = False
+        # Was dealt into the current round after it started (see Game.admit_latecomers)
+        self.late_join = False
 
         self.alive = True
         self.task = None
@@ -134,6 +136,7 @@ class Player:
         self.death_message = None
         self.cards = []
         self.ready = False
+        self.late_join = False
     
     def set_death(self, cause, task_name=None):
         """Set the death cause and generate a death message."""
