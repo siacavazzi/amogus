@@ -4,7 +4,7 @@ import MUECustomSlider from '../components/swiper';
 import LeaveGameButton from '../components/LeaveGameButton';
 import HostStartVoting from '../components/HostStartVoting';
 import { readyNeeded } from '../utils/meetingQuorum';
-import { Check } from '../signal/icons';
+import { Check, Skull } from '../signal/icons';
 import { Face, Words, takeOrigin, vibrate } from '../signal';
 
 // Every phone floods yellow at once: the meeting is the loudest moment in the game.
@@ -67,7 +67,7 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
     <div className="sg-screen sg-round" aria-hidden="true" />
     <div
       className="sg-screen sg-meet sg-flood"
-      style={{ '--fx': origin.fx, '--fy': origin.fy, paddingBottom: meReady ? 24 : 130 }}
+      style={{ '--fx': origin.fx, '--fy': origin.fy, paddingBottom: 0 }}
     >
       <div className="sg-stripes" />
       {!tutorialMode && <LeaveGameButton className="sg-corner" />}
@@ -128,22 +128,24 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
         {meReady && <p className="sg-small">You're ready</p>}
 
         {!tutorialMode && <HostStartVoting />}
-
-        <button type="button" className="sg-link" onClick={handleImDead}>
-          I've Been Killed
-        </button>
       </div>
 
-      {!playerState.ready && (
-        <div className="fixed bottom-0 left-0 right-0 z-50">
+      {/* The dock sits in the page's flow and sticks to the bottom, so the slider can never cover
+          the death button (on prod it did, on short phones and on the host's longer screen). */}
+      <div data-testid="meeting-dock" className="sg-meet-dock">
+        <button type="button" data-testid="im-dead" className="sg-btn sg-btn-line sg-dead-btn" onClick={handleImDead}>
+          <Skull size={24} />
+          I've Been Killed
+        </button>
+        {!playerState.ready && (
           <div
             className={highlightReadySlider ? 'animate-pulse' : ''}
             style={highlightReadySlider ? { borderRadius: 999, outline: '4px solid var(--sg-ink)', outlineOffset: -8 } : {}}
           >
             <MUECustomSlider text="Slide when you're there" tone="meet" onSuccess={handleReadyUp} disabled={!connected} />
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
     </>
   );

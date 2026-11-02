@@ -51,13 +51,24 @@ function ReactorNormal() {
         return () => clearInterval(interval);
     }, [isSabotaging]);
 
+    const [sabotageError, setSabotageError] = useState(null);
+
+    useEffect(() => {
+        if (!sabotageError) return undefined;
+        const t = setTimeout(() => setSabotageError(null), 6000);
+        return () => clearTimeout(t);
+    }, [sabotageError]);
+
     const handleSabotage = () => {
+        setSabotageError(null);
         setIsSabotaging(true);
         setTimeout(() => {
-            // Send both player_id and room_code for maximum compatibility
-            socket.emit("meltdown", {
-                player_id: localStorage.getItem('player_id'),
-                room_code: roomCode
+            // The big screen speaks for the room. It never sends a player_id: this browser may have
+            // played as a phone, and the server would refuse a phone's id from the screen's socket.
+            socket.emit("meltdown", { room_code: roomCode }, (result) => {
+                if (result && result.ok === false) {
+                    setSabotageError(result.error || "The sabotage did not start. Try again.");
+                }
             });
             setIsSabotaging(false);
         }, ARM_MS);
@@ -113,6 +124,7 @@ function ReactorNormal() {
                 )}
             </button>
             {disabled && !isSabotaging && reason && <p className="sg-rx__why">{reason}</p>}
+            {!disabled && sabotageError && <p className="sg-rx__why" role="alert" data-testid="sabotage-error">{sabotageError}</p>}
         </>
     );
 
