@@ -338,3 +338,29 @@
 @media (prefers-reduced-motion: reduce) { .sg-vent__dot { animation: none; } }
 .sg-vent__killnote { font-size: 17px; letter-spacing: 0; font-weight: 800; opacity: 0.75; }
 .sg-sheet__title { margin: 0; display: flex; align-items: center; gap: 10px; font-size: 28px; line-height: 1; }
+
+/* Meeting phone: the death button and the ready slider share one dock at the bottom. The dock is
+   in the page's flow (sticky, not fixed), so nothing above it can ever end up underneath it. */
+.sg-meet-dock {
+  position: sticky;
+  bottom: 0;
+  z-index: 40;
+  margin: 16px -20px 0;
+  padding: 12px 20px calc(env(safe-area-inset-bottom, 0px) + 16px);
+  background: var(--sg-meet);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sg-meet-dock > .sg-dead-btn { max-width: 36rem; margin: 0 auto 8px; }
+/* The slider draws itself fixed to the glass on other screens; in the dock it sits in line. */
+.sg-meet-dock .sg-slide-dock { position: static; padding: 0 !important; }
+.sg-dead-btn {
+  min-height: 60px;
+  font-size: 19px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--sg-ink);
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: inset 0 0 0 3px var(--sg-ink);
+}

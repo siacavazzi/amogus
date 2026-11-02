@@ -223,7 +223,7 @@ const MUECustomSlider = ({
       }} />
 
       <div
-        className="sg fixed bottom-0 left-0 right-0 z-50 px-4"
+        className="sg sg-slide-dock fixed bottom-0 left-0 right-0 z-50 px-4"
         style={{
           userSelect: 'none',
           overscrollBehavior: 'none',

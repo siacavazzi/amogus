@@ -203,6 +203,24 @@ async function tapAndConfirm(locator) {
     });
 }
 
+// A person can tap it where it is now: on screen without scrolling, and nothing drawn on top of it.
+// Playwright's own click scrolls the page and only waits for the cover to move, so a button hidden
+// under the ready slider passed every test while nobody in a real room could reach it.
+async function expectTappable(locator, message) {
+    await expect(locator, message).toBeVisible();
+    const verdict = await locator.evaluate(element => {
+        const box = element.getBoundingClientRect();
+        const inView = box.top >= 0 && box.left >= 0 && box.bottom <= window.innerHeight && box.right <= window.innerWidth;
+        const points = [[0.5, 0.5], [0.15, 0.5], [0.85, 0.5], [0.5, 0.2], [0.5, 0.8]];
+        const covered = points.map(([x, y]) => document.elementFromPoint(box.left + box.width * x, box.top + box.height * y))
+            .filter(hit => !hit || !(hit === element || element.contains(hit)))
+            .map(hit => (hit ? `${hit.tagName.toLowerCase()}.${String(hit.className).slice(0, 40)}` : 'nothing'));
+        return { inView, covered, box: [Math.round(box.top), Math.round(box.bottom), window.innerHeight] };
+    });
+    expect(verdict.inView, `${message || 'element'} is off screen ${JSON.stringify(verdict.box)}`).toBe(true);
+    expect(verdict.covered, `${message || 'element'} is covered`).toEqual([]);
+}
+
 const isWebKit = page => page.context().browser().browserType().name() === 'webkit';
 
 // Close the role pop-up. In Playwright's WebKit, a phone whose first tap since loading the page is
@@ -310,11 +328,13 @@ async function callMeeting(caller, phones) {
     await readyUp(phones);
 }
 
+// Every phone slides at once, like a real room. One at a time, eleven Safari phones can take
+// longer than the server's 90 s fallback, which then opens voting before the last ones slide.
 async function readyUp(phones) {
-    for (const phone of phones) {
+    await Promise.all(phones.map(async (phone) => {
         await expect(phone.getByText('Go to the meeting spot', { exact: false })).toBeVisible();
         await slideUntilGone(phone);
-    }
+    }));
 }
 
 // Each voter taps a name and confirms.
@@ -414,6 +434,6 @@ function expectNoPageErrors(pages) {
 }
 
 module.exports = {
-    lock, goOffline, goOnline, tapAndConfirm, addExampleList, openPage, closeAll, skipTutorialPrompt, openPhones, openPhone, openReactor, createRoom, createRoomOnPhone, gatherRoom, readyUp, connectReactor, joinRoom, enterName, revealRoles, revealAllRoles, swipe, hold, callMeeting, vote,
+    lock, goOffline, goOnline, tapAndConfirm, expectTappable, PHONE, addExampleList, openPage, closeAll, skipTutorialPrompt, openPhones, openPhone, openReactor, createRoom, createRoomOnPhone, gatherRoom, readyUp, connectReactor, joinRoom, enterName, revealRoles, revealAllRoles, swipe, hold, callMeeting, vote,
     continueAfterResults, voteOutIntruder, roundButton, addTasks, openVent, playCard, dismissMessage, expectLobby, expectNoPageErrors, sleep,
 };

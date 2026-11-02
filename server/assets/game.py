@@ -117,6 +117,10 @@ class Game:
         # Reactor (desktop) support - must be set before CardDeck is created
         self.has_reactor = False
         self.reactor_sid = None
+        # Every big-screen socket in the room, newest last. reactor_sid is the newest. A second
+        # screen that opens and closes (another tab, an iPad) must not orphan the first one: on prod
+        # that cleared reactor_sid and every SABOTAGE CORE press after it was refused.
+        self.reactor_sids = []
         
         # Collaborative task creation (Jackbox-style)
         self.collaborative_tasks = []
@@ -343,6 +347,34 @@ class Game:
         self.round_ended_monotonic = None
         self.last_gameplay_at = None
         self._round_metrics = {}
+
+    def add_reactor(self, sid):
+        """A big screen registered: it becomes the reactor, and earlier screens stay as backups."""
+        with self.state_lock:
+            if sid in self.reactor_sids:
+                self.reactor_sids.remove(sid)
+            self.reactor_sids.append(sid)
+            self.reactor_sid = sid
+            self.has_reactor = True
+
+    def drop_reactor(self, sid, left=False):
+        """A big screen left or disconnected. The newest screen still here takes over.
+
+        Returns whether sid was a reactor. has_reactor (which builds the card deck) only goes false
+        when the last screen leaves the room on purpose; a dropped socket comes back.
+        """
+        with self.state_lock:
+            was_reactor = sid in self.reactor_sids or sid == self.reactor_sid
+            if sid in self.reactor_sids:
+                self.reactor_sids.remove(sid)
+            if self.reactor_sid == sid or self.reactor_sid not in self.reactor_sids:
+                self.reactor_sid = self.reactor_sids[-1] if self.reactor_sids else None
+            if left and was_reactor and not self.reactor_sids:
+                self.has_reactor = False
+            return was_reactor
+
+    def is_reactor(self, sid):
+        return bool(sid) and (sid == self.reactor_sid or sid in self.reactor_sids)
 
     def start_meltdown(self, trigger='reactor'):
         with self.state_lock:
