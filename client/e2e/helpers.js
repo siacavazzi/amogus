@@ -321,11 +321,15 @@ async function swipe(page) {
     await page.mouse.up();
 }
 
-// Slide, and slide again if the screen was still animating in and missed it.
+// Slide, and slide again if the screen was still animating in and missed it. A slow phone
+// (a dozen Safari pages on one CI runner) can take longer than the wait to hide the slider
+// after a slide that did register, so a retry only slides if the slider is still showing.
 async function slideUntilGone(page) {
+    const slider = page.getByRole('slider').first();
     for (let attempt = 0; attempt < 3; attempt++) {
+        if (attempt > 0 && !(await slider.isVisible())) return;
         await swipe(page);
-        if (await page.getByRole('slider').first().waitFor({ state: 'hidden', timeout: 4000 }).then(() => true, () => false)) return;
+        if (await slider.waitFor({ state: 'hidden', timeout: 4000 }).then(() => true, () => false)) return;
     }
     throw new Error(`${page.person}'s slide did not register`);
 }
