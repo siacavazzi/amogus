@@ -237,7 +237,7 @@ describe('CrewPage', () => {
             expect(contextValue.handleCallMeeting).not.toHaveBeenCalled();
         });
 
-        it('logs a kill and starts the cooldown', () => {
+        it('logs a kill and starts the cooldown without playing a sound', () => {
             window.localStorage.getItem.mockImplementation((key) =>
                 key === 'player_id' ? 'test_player_id' : null
             );
@@ -245,7 +245,7 @@ describe('CrewPage', () => {
 
             fireEvent.click(screen.getByTestId('slider-trigger'));
 
-            expect(contextValue.setAudio).toHaveBeenCalledWith('dead');
+            expect(contextValue.setAudio).not.toHaveBeenCalled();
             expect(contextValue.socket.emit).toHaveBeenCalledWith('kill_player', {
                 player_id: 'test_player_id',
             });

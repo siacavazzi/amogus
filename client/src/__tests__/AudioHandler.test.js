@@ -162,15 +162,15 @@ describe('AudioHandler', () => {
         unmount();
     });
 
-    it('plays the existing dead sound key through the legacy audio context value', () => {
+    it('plays an existing remote sound key through the legacy audio context value', () => {
         const socket = createSocket();
         const setAudio = jest.fn();
         const { rerender, unmount } = mountAudioHandler(socket, { setAudio });
-        const dead = soundFor('dead');
+        const meow = soundFor('meow');
 
         rerender(
             <DataContext.Provider value={{
-                audio: 'dead',
+                audio: 'meow',
                 setAudio,
                 audioEnabled: true,
                 setAudioEnabled: jest.fn(),
@@ -181,7 +181,7 @@ describe('AudioHandler', () => {
             </DataContext.Provider>
         );
 
-        expect(dead.play).toHaveBeenCalledTimes(1);
+        expect(meow.play).toHaveBeenCalledTimes(1);
         expect(setAudio).toHaveBeenCalledWith(undefined);
         unmount();
     });

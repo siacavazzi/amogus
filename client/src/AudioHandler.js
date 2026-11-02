@@ -36,7 +36,6 @@ const remoteSoundFiles = {
   victory: { src: [`${REMOTE_AUDIO_BASE}victory.mp3`], preload: false, html5: true },
   meltdown_fail: { src: [`${REMOTE_AUDIO_BASE}meltdown_fail.mp3`], preload: false, html5: true },
   meltdown_over: { src: [`${REMOTE_AUDIO_BASE}meltdown_over.mp3`], preload: false, html5: true },
-  dead: { src: [`${REMOTE_AUDIO_BASE}dead.mp3`], preload: false, html5: true },
   sus: { src: [`${REMOTE_AUDIO_BASE}sus.mp3`], preload: false, html5: true },
   brainrot: { src: [`${REMOTE_AUDIO_BASE}brainrot.mp3`], preload: false, html5: true },
   annoying_notif: { src: [`${REMOTE_AUDIO_BASE}annoying_notif.mp3`], preload: false, html5: true },
