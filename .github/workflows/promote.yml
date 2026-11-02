@@ -223,7 +223,7 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Play a game and open every page on prod in a real browser
         working-directory: ./client
-        run: npx playwright test -c e2e --project chromium full-game.spec.js site.spec.js
+        run: npx playwright test -c e2e --project=chromium full-game.spec.js site.spec.js
         env:
           E2E_BASE_URL: https://susparty.com
 
