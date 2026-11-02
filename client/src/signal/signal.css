@@ -301,6 +301,9 @@
 .sg-card__chips { display: flex; flex-wrap: wrap; gap: 6px; position: relative; z-index: 1; }
 .sg-card__chips span { display: inline-flex; align-items: center; gap: 5px; font-weight: 800; font-size: 13px; padding: 5px 10px; border-radius: 999px; background: rgba(0, 0, 0, 0.14); }
 .sg-card__fill { position: absolute; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.22); transition: height 60ms linear; pointer-events: none; }
+.sg-card__when { font-weight: 600; font-size: 14px; opacity: 0.8; }
+.sg-card--compact .sg-card__when { font-size: 12px; }
+.sg-card__pending { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 2; white-space: nowrap; font-weight: 800; font-size: 14px; padding: 8px 14px; border-radius: 999px; background: #fff; color: #1a1400; pointer-events: none; }
 
 .sg-vent { padding: 54px 16px 0; justify-content: flex-start; overflow: hidden; }
 .sg-vent__head { width: 100%; max-width: 640px; display: grid; gap: 4px; padding-right: 56px; flex: none; }

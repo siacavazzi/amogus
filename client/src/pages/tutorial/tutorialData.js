@@ -120,7 +120,7 @@ export const tutorialCoachCopy = {
   intruderCards: {
     step: 'Intruder · 3 of 3',
     accent: 'rose',
-    body: 'Swipe left past the EMP card to see your next card. Then press and hold Area Denial to play it.',
+    body: 'Swipe left past the EMP card to see your next card. Then tap Area Denial to play it. You get two seconds to tap again and take it back.',
   },
   complete: {
     step: 'All done',

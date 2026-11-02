@@ -2,8 +2,9 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { DataContext } from '../GameContext';
 import LeaveGameButton from '../components/LeaveGameButton';
-import { LogOut, Zap, MapPin, AlertTriangle, Eye, X, Send, FileText, MessageSquare } from '../signal/icons';
+import { LogOut, Zap, MapPin, AlertTriangle, X, Send, FileText, MessageSquare } from '../signal/icons';
 import CardCarousel from '../components/CardCarousel';
+import { cardName, cardCopy, parseCards } from '../utils/cardCopy';
 
 // ActionCard component defined OUTSIDE to prevent re-creation on every render
 function ActionCard({ action, text, location, duration, id, time_left, active = false, countdown, requires_input, onPlay }) {
@@ -11,7 +12,7 @@ function ActionCard({ action, text, location, duration, id, time_left, active = 
     return null;
   }
 
-  const formattedAction = action.replace('_', ' ');
+  const formattedAction = cardName(action);
   const durationLabel = (() => {
     if (!duration) return null;
     if (countdown) return `${time_left}s left`;
@@ -26,7 +27,7 @@ function ActionCard({ action, text, location, duration, id, time_left, active = 
         {active && <span className="sg-pill" style={{ background: 'var(--sg-ink)', color: '#fff', padding: '2px 10px' }}>Active</span>}
         {durationLabel && <span className="sg-effect__time">{durationLabel}</span>}
       </span>
-      <span className="sg-effect__text">{text}</span>
+      <span className="sg-effect__text">{cardCopy({ action, text, location, duration }).does || text}</span>
       {location && <span className="sg-effect__text" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><MapPin size={14} /> {location}</span>}
     </button>
   );
@@ -181,12 +182,7 @@ const IntruderPage = ({
 
   const activeCardsList = activeCards.filter((card) => card.time_left === undefined || card.time_left === null || card.time_left > 0);
 
-  const cards = (playerState.cards || [])
-    .map((cardJson) => {
-      try { return JSON.parse(cardJson); }
-      catch (e) { console.error('Error parsing game action card:', e); return null; }
-    })
-    .filter(Boolean);
+  const cards = parseCards(playerState.cards);
 
   return (
     <div className={`sg-screen ${isCompromised ? 'sg-out' : 'sg-dark'} sg-vent`}>
@@ -267,9 +263,6 @@ const IntruderPage = ({
                 ? <>{killCooldown}s <span className="sg-vent__killnote">until your next kill</span></>
                 : 'Kill ready'}
             </p>
-            <p className="sg-small" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <Eye size={16} /> You are exposed - find safety!
-            </p>
           </>
         )}
       </div>
@@ -302,8 +295,8 @@ const IntruderPage = ({
         {cards.length === 0 ? (
           <div className="sg-vent__empty">
             <Zap size={40} style={{ justifySelf: 'center', opacity: 0.5 }} />
-            <p className="sg-lede">No cards available</p>
-            <p className="sg-small">Complete tasks to draw cards</p>
+            <p className="sg-lede">No cards right now</p>
+            <p className="sg-small">You draw a new card after each meeting.</p>
           </div>
         ) : (
           <div
@@ -331,7 +324,7 @@ const IntruderPage = ({
             style={highlightExit ? { borderRadius: 22, outline: '4px solid var(--sg-meet)', outlineOffset: '4px' } : {}}
           >
             <button onClick={() => setShowSusPage(false)} type="button" className="sg-btn sg-btn-white" style={{ color: 'var(--sg-ink)' }}>
-              <LogOut size={24} /> Exit to safety
+              <LogOut size={24} /> Close vent
             </button>
           </div>
         )}

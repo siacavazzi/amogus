@@ -1,10 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { DataContext } from '../GameContext';
 import { Face, vibrate } from './index';
+import { listCardNames } from '../utils/cardCopy';
 
 // Role reveal. Both roles see the same blue screen and hold the card to peek; letting go
-// hides it again, so nobody reads a role over a shoulder.
-export function RoleReveal({ title, sus, otherIntruders = [], onClose }) {
+// hides it again, so nobody reads a role over a shoulder. Intruders also see which cards
+// they hold, since most never found them in the vent on their own.
+export function RoleReveal({ title, sus, otherIntruders = [], cards = [], onClose }) {
   const [peeking, setPeeking] = useState(false);
   const [seen, setSeen] = useState(false);
   const show = (e) => {
@@ -32,7 +34,7 @@ export function RoleReveal({ title, sus, otherIntruders = [], onClose }) {
           style={{
             position: 'relative',
             width: 260,
-            height: 170,
+            height: 190,
             borderRadius: 26,
             border: '3px dashed rgba(255,255,255,0.55)',
             background: 'rgba(0,0,0,0.15)',
@@ -70,6 +72,11 @@ export function RoleReveal({ title, sus, otherIntruders = [], onClose }) {
                     : 'Get them before they finish their tasks'
                   : 'Finish your tasks. Find the intruders.'}
               </span>
+              {sus && cards.length > 0 && (
+                <span data-testid="role-cards" style={{ fontWeight: 700, fontSize: 13, opacity: 0.75, padding: '0 14px', lineHeight: 1.3 }}>
+                  Your cards: {listCardNames(cards)}. Tap ENTER VENT to play them.
+                </span>
+              )}
             </span>
           )}
         </button>

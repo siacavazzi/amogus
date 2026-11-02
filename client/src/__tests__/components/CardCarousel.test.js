@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import CardCarousel from '../../components/CardCarousel';
 
 // jsdom has no PointerEvent, so fireEvent would drop clientX/clientY.
@@ -98,5 +98,113 @@ describe('CardCarousel swiping', () => {
         swipe([[-40, 0, 20], [-90, 0, 20]]);
         swipe([[40, 0, 20], [90, 0, 20]]);
         expect(screen.getByText('1 / 3')).toBeInTheDocument();
+    });
+});
+
+describe('CardCarousel tapping to play', () => {
+    let now;
+    let frames;
+    let originalPointerEvent;
+    let offsetWidth;
+
+    beforeAll(() => {
+        originalPointerEvent = window.PointerEvent;
+        window.PointerEvent = TestPointerEvent;
+        offsetWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetWidth');
+        Object.defineProperty(HTMLElement.prototype, 'offsetWidth', { configurable: true, get: () => 400 });
+    });
+
+    afterAll(() => {
+        window.PointerEvent = originalPointerEvent;
+        Object.defineProperty(HTMLElement.prototype, 'offsetWidth', offsetWidth);
+    });
+
+    beforeEach(() => {
+        now = 1000;
+        frames = [];
+        jest.spyOn(performance, 'now').mockImplementation(() => now);
+        jest.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => frames.push(cb));
+        jest.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {});
+        jest.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(() => ({
+            left: 0, top: 0, width: 400, height: 500, right: 400, bottom: 500,
+        }));
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
+    // Let `ms` pass and run the animation frames waiting on it.
+    const advance = (ms) => {
+        now += ms;
+        act(() => {
+            const waiting = frames;
+            frames = [];
+            waiting.forEach((cb) => cb(now));
+        });
+    };
+
+    const tap = (clientX = 200) => {
+        const el = screen.getByTestId('card-deck');
+        fireEvent.pointerDown(el, { clientX, clientY: 300, button: 0 });
+        fireEvent.pointerUp(el, { clientX, clientY: 300 });
+    };
+
+    it('plays a card two seconds after a tap', () => {
+        const onPlayCard = jest.fn();
+        render(<CardCarousel cards={cards} onPlayCard={onPlayCard} />);
+        tap();
+        expect(screen.getByText(/tap to cancel/i)).toBeInTheDocument();
+        advance(1000);
+        expect(onPlayCard).not.toHaveBeenCalled();
+        advance(1100);
+        expect(onPlayCard).toHaveBeenCalledTimes(1);
+        expect(onPlayCard).toHaveBeenCalledWith(cards[0]);
+    });
+
+    it('takes a play back on a second tap', () => {
+        const onPlayCard = jest.fn();
+        render(<CardCarousel cards={cards} onPlayCard={onPlayCard} />);
+        tap();
+        advance(800);
+        tap();
+        advance(3000);
+        expect(onPlayCard).not.toHaveBeenCalled();
+        expect(screen.queryByText(/tap to cancel/i)).not.toBeInTheDocument();
+    });
+
+    it('opens a card that needs a target right away', () => {
+        const onPlayCard = jest.fn();
+        const sheetCard = { id: 'f', action: 'Fake Task', text: 'Send a fake task', requires_input: true };
+        render(<CardCarousel cards={[sheetCard]} onPlayCard={onPlayCard} />);
+        tap();
+        expect(onPlayCard).toHaveBeenCalledWith(sheetCard);
+    });
+
+    it('does not play a card on a swipe', () => {
+        const onPlayCard = jest.fn();
+        render(<CardCarousel cards={cards} onPlayCard={onPlayCard} />);
+        const el = screen.getByTestId('card-deck');
+        fireEvent.pointerDown(el, { clientX: 200, clientY: 300, button: 0 });
+        now += 30;
+        fireEvent.pointerMove(el, { clientX: 100, clientY: 300 });
+        fireEvent.pointerUp(el, { clientX: 100, clientY: 300 });
+        advance(3000);
+        expect(onPlayCard).not.toHaveBeenCalled();
+    });
+
+    it('does not play when a tap lands beside the middle card', () => {
+        const onPlayCard = jest.fn();
+        render(<CardCarousel cards={cards} onPlayCard={onPlayCard} />);
+        tap(5);
+        advance(3000);
+        expect(onPlayCard).not.toHaveBeenCalled();
+    });
+
+    it('says what each card does and when to use it', () => {
+        render(<CardCarousel cards={cards} onPlayCard={jest.fn()} />);
+        expect(screen.getByText('Emergency Meeting')).toBeInTheDocument();
+        expect(screen.getByText(/Play it just before you go for a kill/)).toBeInTheDocument();
+        expect(screen.getByText(/Tap a card to play it/)).toBeInTheDocument();
     });
 });
