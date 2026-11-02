@@ -1,18 +1,15 @@
 name: Check a change
 
-# Runs on every pull request, and on pushes to any branch but main (main is checked again by
-# "Deploy to beta" when someone runs it).
+# Runs on every pull request (and by hand from the Actions tab for a branch with no PR).
 # Everything runs here in CI against a local server, so a change is tested before it's merged
-# and before it reaches beta or prod.
+# and before it reaches beta or prod. Branch pushes don't start it on their own: with a PR open
+# that made two runs, and the cancelled duplicate showed up as a red X on the PR.
 
 on:
   pull_request:
-  push:
-    branches-ignore: [main]
   workflow_dispatch:
 
-# A push to a branch with an open PR starts this twice (push and pull_request); one run per
-# branch is enough, so the later one replaces the earlier.
+# A new push to the PR replaces the run still going on the older commit.
 concurrency:
   group: check-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
