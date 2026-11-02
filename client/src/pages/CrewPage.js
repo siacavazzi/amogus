@@ -171,7 +171,6 @@ const CrewmemberPage = ({
 
     if (sus) {
       if (killCooldown > 0) return false;
-      setAudio("dead");
       socket.emit("kill_player", { player_id: localStorage.getItem("player_id") }); // doesnt do anything yet...
       setKillCooldown(15);
       return true;
