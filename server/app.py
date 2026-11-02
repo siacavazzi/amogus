@@ -140,7 +140,7 @@ def serve_selfie(filename):
         abort(404)
     with game.state_lock:
         members = game.players + game.waiting_players
-        viewer = (sid in (game.creator_sid, game.reactor_sid)
+        viewer = (sid == game.creator_sid or game.is_reactor(sid)
                   or any(player.sid == sid and player.active for player in members))
         if (game_manager.get_game(room_code) is not game or not viewer
                 or not any(player.selfie == filename for player in members)):
@@ -236,7 +236,7 @@ def command_error(message, game=None, player=None, reason='condition_not_met'):
                  command=(getattr(request, 'event', {}) or {}).get('message'), reason=reason)
     emit('error', {'message': message})
     result = {'ok': False, 'error': message}
-    if game and (player or game.reactor_sid == request.sid or game.creator_sid == request.sid):
+    if game and (player or game.is_reactor(request.sid) or game.creator_sid == request.sid):
         result['state'] = room_state(game, player, request.sid)
     return result
 
@@ -289,6 +289,12 @@ def room_event(mutate=True, reconnect=False):
         def wrapped(data=None, *args):
             payload = data if isinstance(data, dict) else {}
             player_id = payload.get('player_id')
+            screen_game = game_manager.get_game(game_manager.resolve_room_code(payload.get('room_code')))
+            if player_id and screen_game and screen_game.is_reactor(request.sid):
+                # A big screen speaks for the room, not for a phone. Its browser can still hold a
+                # player_id from playing on it, and that phone's socket isn't this one.
+                player_id = None
+                data = {key: value for key, value in payload.items() if key != 'player_id'}
             game, player, room = get_game_and_player(player_id) if player_id else (None, None, None)
             requested_room = game_manager.resolve_room_code(payload.get('room_code'))
             if not game and requested_room:
@@ -670,8 +676,7 @@ def handle_register_reactor(data):
     # The newest big screen takes over, mid-round too. After a wifi blink the server can still hold
     # the old socket for up to the ping timeout, and refusing the new one froze the big screen.
     # Register this client as the reactor
-    game.has_reactor = True
-    game.reactor_sid = sid
+    game.add_reactor(sid)
     if not game.creator_player_id and game.creator_sid not in game_manager.sid_to_game:
         game.creator_sid = sid
     
@@ -901,8 +906,8 @@ def handle_disconnect(reason=None):
     client_metrics_by_sid.pop(sid, None)
     selfie_tokens_by_sid.pop(sid, None)
     game_manager.unregister_sid(sid)
-    if game and game.reactor_sid == sid:
-        game.reactor_sid = None
+    if game:
+        game.drop_reactor(sid)
     waiting = game.get_waiting_player(sid=sid) if game else None
     if waiting:
         waiting.disconnected_at = time.time()
@@ -1261,7 +1266,7 @@ def reset_game(data):
         return
     
     # If force reset (from reactor/host), reset immediately
-    if force and sid not in (game.creator_sid, game.reactor_sid):
+    if force and sid != game.creator_sid and not game.is_reactor(sid):
         return command_error('Only the host or reactor can reset the game.')
     if force:
         reset_room_to_lobby(game, room_code, 'host_reset', player_id)
@@ -1301,7 +1306,7 @@ def disband_room(data):
     if not game:
         return
     
-    if sid not in (game.creator_sid, game.reactor_sid):
+    if sid != game.creator_sid and not game.is_reactor(sid):
         return command_error('Only the host or reactor can close the room.')
 
     # Notify all clients to leave and go back to lobby
@@ -1340,7 +1345,7 @@ def leave_room_handler(data):
         return
     
     # Check if this is the reactor leaving
-    is_reactor = (game.reactor_sid == sid)
+    is_reactor = game.is_reactor(sid)
     
     # Check if this is the room creator (before becoming a player)
     is_creator_socket = (game.creator_sid == sid)
@@ -1387,9 +1392,8 @@ def leave_room_handler(data):
             reassign_room_creator(game, room_code)
     
     if is_reactor:
-        game.reactor_sid = None
-        game.has_reactor = False
-        logger.info(f"Reactor left room {room_code}")
+        game.drop_reactor(sid, left=True)
+        logger.info(f"Reactor left room {room_code} (screens still here: {len(game.reactor_sids)})")
     
     # Clean up sid mapping and leave the socket.io room
     game_manager.unregister_sid(sid)
@@ -1623,35 +1627,43 @@ def handleHostStartVoting(data=None):
 @socketio.on('meltdown')
 @room_event()
 def handleMeltdown(data=None):
-    """Start a meltdown event."""
+    """Start a meltdown: SABOTAGE CORE on the big screen (or a phone, in older clients)."""
     sid = request.sid
+    data = data if isinstance(data, dict) else {}
     game = None
     room_code = None
-    
-    # First try to find game by player_id (mobile player triggering)
-    if data and data.get('player_id'):
-        player_id = data.get('player_id')
-        game, player, room_code = get_game_and_player(player_id)
-    
-    # If not found, try by room_code (reactor triggering)
-    if not game and data and data.get('room_code'):
+    player = None
+
+    if data.get('player_id'):
+        game, player, room_code = get_game_and_player(data.get('player_id'))
+    if not game and data.get('room_code'):
         room_code = game_manager.resolve_room_code(data.get('room_code'))
         game = game_manager.get_game(room_code)
-    
-    # Finally, try by SID (reactor registered to a room)
     if not game:
         game, room_code = game_manager.get_game_by_sid(sid)
-    
-    if game:
-        # Verify this is either a reactor or a player in the game
-        if game.reactor_sid == sid or (data and data.get('player_id')):
-            if game.start_meltdown(trigger='reactor' if game.reactor_sid == sid else 'phone'):
-                record_usage('meltdown_started', game, data.get('player_id') if data else None)
-                logger.warning(f"Meltdown started in room {room_code} (triggered by sid: {sid})")
-        else:
-            logger.warning(f"Meltdown rejected - unauthorized sid: {sid}")
-    else:
+    if not game:
         logger.warning(f"Meltdown failed - game not found for sid: {sid}")
+        return command_error('The room is gone. Reload the big screen.', reason='room_removed')
+
+    from_screen = game.is_reactor(sid)
+    if not from_screen and not player:
+        logger.warning(f"Meltdown rejected - unauthorized sid: {sid}")
+        return command_error('This screen lost its place in the room. Reload it.', game, reason='not_reactor')
+    if from_screen and game.reactor_sid != sid:
+        game.add_reactor(sid)  # The screen someone is standing at is the reactor.
+    if game.start_meltdown(trigger='reactor' if from_screen else 'phone'):
+        record_usage('meltdown_started', game, player.player_id if player else None)
+        logger.warning(f"Meltdown started in room {room_code} (triggered by sid: {sid})")
+        return {'ok': True}
+    if game.meeting:
+        message = 'Not during a meeting.'
+    elif game.active_meltdown:
+        message = 'The core is already melting down.'
+    elif not game.game_running or game.end_state:
+        message = 'The round is over.'
+    else:
+        message = 'The sabotage did not start. Try again.'
+    return command_error(message, game, player, reason='meltdown_refused')
 
 
 @socketio.on("pin_entry")

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext, useRef } from "react";
 import { DataContext } from "../GameContext";
 import LeaveGameButton from "../components/LeaveGameButton";
 import { Face } from "../signal";
+import { Skull } from "../signal/icons";
 import { emitVolatileWithAck } from "../utils/socketCommand";
 
 export default function VotingPage({ tutorialMode = false, tutorialHighlightTarget = null }) {
@@ -195,7 +196,8 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
             <span className="sg-num" style={{ background: 'var(--sg-ink)', color: 'var(--sg-meet)', borderRadius: 999, padding: '2px 9px', fontSize: 14 }}>{vetoVotes}</span>
           </button>
           {showDeathReport && (
-            <button type="button" className="sg-link" onClick={handleImDead} disabled={!canVote} style={{ alignSelf: 'center', padding: 6 }}>
+            <button type="button" data-testid="im-dead" className="sg-btn sg-btn-line sg-dead-btn" onClick={handleImDead} disabled={!canVote}>
+              <Skull size={24} />
               {deathPending ? 'Confirm death...' : "I've Been Killed"}
             </button>
           )}
