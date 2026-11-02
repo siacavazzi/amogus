@@ -1168,6 +1168,41 @@ def admit_waiting_list(game, room_code):
     return admitted
 
 
+FEEDBACK_RATINGS = {'fun', 'okay', 'needs_work'}
+
+
+@socketio.on('submit_feedback')
+@room_event(mutate=False)
+def handle_game_feedback(data=None):
+    """Optional end-of-round feedback from a phone: a rating, a comment, or both."""
+    data = data if isinstance(data, dict) else {}
+    game, _ = game_manager.get_game_by_sid(request.sid)
+    if not game:
+        return {'ok': False, 'error': 'Rejoin the room before you send feedback.'}
+    player = game.getPlayerBySid(request.sid)
+    if not ((player and player.active) or request.sid == game.creator_sid):
+        return {'ok': False, 'error': 'Only players in this game can send feedback.'}
+    if not game.end_state or data.get('round_id') != game.round_id:
+        return {'ok': False, 'error': 'Give feedback after this round ends.'}
+    rating = data.get('rating')
+    comment = data.get('comment', '')
+    if rating is not None and (not isinstance(rating, str) or rating not in FEEDBACK_RATINGS):
+        return {'ok': False, 'error': 'Choose one of the available ratings.'}
+    if not isinstance(comment, str) or len(comment) > 1000:
+        return {'ok': False, 'error': 'Keep the comment within 1,000 characters.'}
+    comment = comment.strip()
+    if rating is None and not comment:
+        return {'ok': False, 'error': 'Add a rating or a comment.'}
+    submitter = player.player_id if player else 'host'
+    if submitter in game.feedback_submitters:
+        return {'ok': True}
+    if not game_manager.stats_tracker.record_game_feedback(game, rating, comment):
+        return {'ok': False, 'error': 'Feedback did not save. Try again.'}
+    game.feedback_submitters.add(submitter)
+    # Nothing here goes to the gameplay event log: it carries room codes, and feedback stays anonymous.
+    return {'ok': True}
+
+
 # ============ GAME FLOW ============
 
 def start_room(game, test_mode=False):

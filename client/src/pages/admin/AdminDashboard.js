@@ -179,6 +179,22 @@ function AdminDashboard() {
       </section>
 
       <section className="adm-card">
+        <h2>Game feedback</h2>
+        <p className="adm-empty">The latest 25 optional responses from the end-of-round prompt. They don't represent every player.</p>
+        {(stats.game_feedback || []).length === 0 ? <p className="adm-empty">No feedback yet.</p> : (
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+            {stats.game_feedback.map(feedback => <li key={feedback.id} style={{ borderTop: '1px solid #374151', padding: '12px 0' }}>
+              <p><strong>{{ fun: 'Fun', okay: 'Okay', needs_work: 'Needs work' }[feedback.rating] || 'Comment only'}</strong>
+                {' · '}{formatTime(feedback.submitted_at)}
+                {feedback.outcome ? ` · ${feedback.outcome.replace(/_/g, ' ')}` : ''}
+                {feedback.analytics_excluded ? ' · Test room' : ''}</p>
+              {feedback.comment && <p style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{feedback.comment}</p>}
+            </li>)}
+          </ul>
+        )}
+      </section>
+
+      <section className="adm-card">
         <h2>Setup and recovery</h2>
         <p className="adm-empty">Metrics start {formatTime(metrics.since)}. Round duration excludes setup and prior rounds.</p>
         <p className="adm-empty">The average uses {averages.duration_sample_count || 0} completed rounds with a known start. Legacy durations remain separate.</p>

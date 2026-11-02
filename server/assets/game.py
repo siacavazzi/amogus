@@ -36,6 +36,8 @@ class Game:
         self.room_session_id = str(uuid4())
         self.round_number = 0
         self.command_results = OrderedDict()
+        # Who already sent end-of-round feedback this round, so retries and reconnects don't add duplicates.
+        self.feedback_submitters = set()
         self.players = []
         # Phones that arrived mid-round. They are kept out of self.players, so no role, vote,
         # meltdown code or win check counts them, and join the lobby when the round ends.
@@ -329,6 +331,7 @@ class Game:
         with self.state_lock:
             self.round_id = str(uuid4())
             self.command_results.clear()
+            self.feedback_submitters.clear()
             self.revision += 1
             return self.round_id
 
