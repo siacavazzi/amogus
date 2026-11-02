@@ -86,7 +86,7 @@ const HostStartVoting = ({ dark = false }) => {
         {label}
       </button>
       <span className="sg-small" style={{ opacity: 0.75 }}>
-        Host only. Use it when people are here but haven't slid.
+        Host only. Starts the vote even if some people haven't slid to ready.
       </span>
     </div>
   );
