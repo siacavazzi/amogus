@@ -54,7 +54,7 @@ const Modal = () => {
   );
 
   if (dialog?.kind === 'role') {
-    return frame(<RoleReveal title={dialog.title} sus={dialog.sus} otherIntruders={dialog.otherIntruders} onClose={closeModal} />);
+    return frame(<RoleReveal title={dialog.title} sus={dialog.sus} otherIntruders={dialog.otherIntruders} cards={dialog.cards} onClose={closeModal} />);
   }
   if (dialog?.kind === 'revealed') {
     return frame(<RevealedMoment intruderNames={dialog.intruderNames} onClose={closeModal} />);

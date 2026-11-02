@@ -225,7 +225,7 @@ describe('IntruderPage', () => {
                 intruderContext
             );
             
-            const backButton = screen.getByRole('button', { name: /EXIT TO SAFETY/i });
+            const backButton = screen.getByRole('button', { name: /Close vent/i });
             expect(backButton).toBeInTheDocument();
         });
 
@@ -235,7 +235,7 @@ describe('IntruderPage', () => {
                 intruderContext
             );
             
-            const backButton = screen.getByRole('button', { name: /EXIT TO SAFETY/i });
+            const backButton = screen.getByRole('button', { name: /Close vent/i });
             fireEvent.click(backButton);
             
             expect(mockSetShowSusPage).toHaveBeenCalledWith(false);

@@ -4,6 +4,7 @@ import { ENDPOINT } from './ENDPOINT';
 import { AudioHandler } from './AudioHandler';
 import FakeTaskReveal from './components/FakeTaskReveal';
 import { markHasPlayedGame } from './tutorial/tutorialStorage';
+import { parseCards } from './utils/cardCopy';
 import { isMobile as isMobileDevice } from 'react-device-detect';
 import { getRoomCodeFromSearch, getEntryMethodFromSearch, clearRoomCodeFromUrl } from './utils/inviteLinks';
 import { createDropTracker, installErrorReporting } from './utils/clientMetrics';
@@ -1058,7 +1059,7 @@ export default function GameContext({ children }) {
                     setTaskCreationMode(false);  // Exit task creation mode
                     
                     isMobile && setDialog({ title: data.late_join ? "You're in this round" : "The game has started",
-                        kind: 'role', sus: !!me.sus, otherIntruders });
+                        kind: 'role', sus: !!me.sus, otherIntruders, cards: parseCards(me.cards) });
 
                 } else if (data.action === "start_game") {
                     setRunning(true);

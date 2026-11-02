@@ -52,7 +52,7 @@ test('Shorten Meltdown, then Remote Sabotage from the vent, and the room stops i
     // The intruder is back in the vent they played from; the shortening was used up.
     await expect(intruder.getByText('Vent network active')).toBeVisible();
     await expect(intruder.getByText('Active Effects')).toHaveCount(0);
-    await intruder.getByText('Exit to safety', { exact: false }).click();
+    await intruder.getByText('Close vent', { exact: false }).click();
     for (const phone of phones) await expect(h.roundButton(phone), phone.person).toBeVisible();
 
     h.expectNoPageErrors([...phones, reactor]);

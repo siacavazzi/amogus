@@ -347,7 +347,7 @@ function roundButton(page) {
 }
 
 // The intruder taps ENTER VENT; playCard then picks a card by name, flicking through the
-// hand and holding the card down the way a thumb would.
+// hand, and taps it the way a thumb would.
 async function openVent(intruder) {
     await intruder.getByText('ENTER VENT').click();
     await expect(intruder.getByText('Vent network active')).toBeVisible();
@@ -374,8 +374,10 @@ async function playCard(intruder, action) {
         if (!shown.includes(action)) continue;
         await intruder.mouse.move(x, y);
         await intruder.mouse.down();
-        await sleep(1000);
+        await sleep(120);
         await intruder.mouse.up();
+        // A card without a sheet waits two seconds (the undo window) before it plays.
+        await sleep(2300);
         return;
     }
     throw new Error(`${intruder.person} has no ${action} card`);

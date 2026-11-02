@@ -35,8 +35,8 @@ test('five phones and a reactor play a round, then play again', async ({ browser
 
     // The intruder taps ENTER VENT, then leaves the vent.
     await intruder.getByText('ENTER VENT').click();
-    await expect(intruder.getByText('Exit to safety', { exact: false })).toBeVisible();
-    await intruder.getByText('Exit to safety', { exact: false }).click();
+    await expect(intruder.getByText('Close vent', { exact: false })).toBeVisible();
+    await intruder.getByText('Close vent', { exact: false }).click();
 
     // A crewmate calls a meeting and the room votes the intruder out.
     await h.voteOutIntruder(crew[0], phones, intruder);

@@ -15,14 +15,17 @@
 //   - Cards are coloured per action type (EMP=cyan, Fake Task=pink,
 //     Remote Sabotage=red, etc.) so the player gets a quick read
 //     on what's in their hand.
-//   - Tapping NEVER plays the active card — that's only the big
-//     "PLAY CARD" button. Tapping a peeked side card just brings
-//     it forward. This avoids "I meant to swipe but I tapped".
+//   - Tapping the middle card plays it. Cards that open a sheet
+//     (Fake Task, Taunt) open it straight away, and the sheet has a
+//     Cancel. Every other card counts down for UNDO_MS first, and a
+//     second tap cancels it, so a stray tap can be taken back.
+//     Tapping a peeked side card just brings it forward.
 //   - `compact` mode trims the deck height when the page also has
 //     to show Active Effects above; otherwise the deck stretches
 //     to feel like a real hand of cards.
 // =============================================================
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { cardCopy } from '../utils/cardCopy';
 import {
     Zap, Clock, MapPin, Hand,
     Radiation, ClipboardX, Megaphone, Volume2, Ban, RefreshCw, FastForward,
@@ -39,10 +42,7 @@ const CARD_MAX_WIDTH = 320;
 const SLOT_SHIFT_RATIO = 0.78;       // each slot is 78% of a card width apart
 const TRANSITION_MS = 320;
 const MAX_VISIBLE_PEEK = 2;          // cards visible on each side
-const HOLD_MS = 650;                 // press duration to fire a play
-const TAP_HINT_COUNT = 2;            // accidental taps before showing hint
-const TAP_HINT_WINDOW_MS = 3500;     // taps inside this window count
-const HINT_VISIBLE_MS = 2800;
+const UNDO_MS = 2000;                 // a tapped card waits this long before it plays
 
 // ----- Action -> colour -----
 // Keys match the `action` strings used in server/assets/card.py. Each card is one solid
@@ -90,7 +90,7 @@ function CarouselCard({
     isActive,
     isAnimating,
     compact,
-    holdProgress,
+    playProgress,
     onTap,
 }) {
     const absOffset = Math.abs(offset);
@@ -109,8 +109,8 @@ function CarouselCard({
         pointerEvents: absOffset > MAX_VISIBLE_PEEK ? 'none' : 'auto',
     };
 
-    const { action, text, location, duration } = card;
-    const formattedAction = (action || '').replace('_', ' ');
+    const { action, location, duration } = card;
+    const copy = cardCopy(card);
     const theme = themeFor(action);
     const ActionIcon = iconFor(action);
 
@@ -121,8 +121,9 @@ function CarouselCard({
             onClick={(e) => { e.stopPropagation(); onTap && onTap(); }}
             aria-hidden={!isActive}
         >
-            <h3 className="sg-card__title">{formattedAction}</h3>
-            <p className="sg-card__text">{text}</p>
+            <h3 className="sg-card__title">{copy.name}</h3>
+            <p className="sg-card__text">{copy.does}</p>
+            {copy.when && <p className="sg-card__text sg-card__when">{copy.when}</p>}
 
             {/* The action's icon fills whatever room is left */}
             <div className="flex-1 min-h-0 flex items-center justify-center">
@@ -138,9 +139,14 @@ function CarouselCard({
                 {duration && <span><Clock size={14} /> {duration}s</span>}
             </div>
 
-            {/* Hold-to-play: the card fills from the bottom while pressed */}
-            {isActive && holdProgress > 0 && (
-                <div className="sg-card__fill" style={{ height: `${Math.min(100, holdProgress * 100)}%` }} />
+            {/* Tapped: the card fills from the bottom until it plays */}
+            {isActive && playProgress > 0 && (
+                <>
+                    <div className="sg-card__fill" style={{ height: `${Math.min(100, playProgress * 100)}%` }} />
+                    <div className="sg-card__pending" role="status" aria-live="polite">
+                        Playing… tap to cancel
+                    </div>
+                </>
             )}
         </div>
     );
@@ -150,15 +156,12 @@ export default function CardCarousel({ cards, onPlayCard, compact = false, onAct
     const [activeIndex, setActiveIndex] = useState(0);
     const [dragX, setDragX] = useState(0);
     const [isAnimating, setIsAnimating] = useState(false);
-    const [holdProgress, setHoldProgress] = useState(0);
-    const [hintVisible, setHintVisible] = useState(false);
+    const [playProgress, setPlayProgress] = useState(0);
     const containerRef = useRef(null);
     const widthRef = useRef(0);
     const dragState = useRef(null);
-    const holdRafRef = useRef(null);
-    const holdStartRef = useRef(0);
-    const tapTimesRef = useRef([]);
-    const hintTimerRef = useRef(null);
+    // The card counting down to play: { id, start, raf }.
+    const pendingRef = useRef(null);
     const activeCardRef = useRef(null);
     // The latest drag distance, kept outside React state so pointerup
     // never decides on a value from a render that hasn't happened yet.
@@ -167,8 +170,7 @@ export default function CardCarousel({ cards, onPlayCard, compact = false, onAct
     const suppressClickRef = useRef(false);
 
     useEffect(() => () => {
-        if (holdRafRef.current) cancelAnimationFrame(holdRafRef.current);
-        if (hintTimerRef.current) clearTimeout(hintTimerRef.current);
+        if (pendingRef.current) cancelAnimationFrame(pendingRef.current.raf);
         if (animTimerRef.current) clearTimeout(animTimerRef.current);
     }, []);
 
@@ -208,29 +210,11 @@ export default function CardCarousel({ cards, onPlayCard, compact = false, onAct
         animTimerRef.current = setTimeout(() => setIsAnimating(false), TRANSITION_MS + 20);
     }, [updateDragX]);
 
-    const cancelHold = useCallback(() => {
-        if (holdRafRef.current) cancelAnimationFrame(holdRafRef.current);
-        holdRafRef.current = null;
-        setHoldProgress(0);
+    const cancelPending = useCallback(() => {
+        if (pendingRef.current) cancelAnimationFrame(pendingRef.current.raf);
+        pendingRef.current = null;
+        setPlayProgress(0);
     }, []);
-
-    const showHint = useCallback(() => {
-        setHintVisible(true);
-        if (hintTimerRef.current) clearTimeout(hintTimerRef.current);
-        hintTimerRef.current = setTimeout(() => setHintVisible(false), HINT_VISIBLE_MS);
-    }, []);
-
-    const registerTap = useCallback(() => {
-        const now = performance.now();
-        tapTimesRef.current = [
-            ...tapTimesRef.current.filter((t) => now - t < TAP_HINT_WINDOW_MS),
-            now,
-        ];
-        if (tapTimesRef.current.length >= TAP_HINT_COUNT) {
-            tapTimesRef.current = [];
-            showHint();
-        }
-    }, [showHint]);
 
     const isOnActiveCard = useCallback((clientX) => {
         const c = containerRef.current;
@@ -241,25 +225,42 @@ export default function CardCarousel({ cards, onPlayCard, compact = false, onAct
         return Math.abs(clientX - cx) <= cardW / 2;
     }, []);
 
-    const startHold = useCallback(() => {
-        cancelHold();
-        holdStartRef.current = performance.now();
+    // Tap the middle card: a sheet card opens its sheet now; any other card
+    // counts down and plays unless it is tapped again.
+    const tapActiveCard = useCallback(() => {
+        const card = activeCardRef.current;
+        if (!card) return;
+        if (pendingRef.current) {
+            cancelPending();
+            return;
+        }
+        if (card.requires_input) {
+            onPlayCard(card);
+            return;
+        }
+        const pending = { id: card.id, start: performance.now(), raf: null };
         const tick = () => {
-            const p = Math.min(1, (performance.now() - holdStartRef.current) / HOLD_MS);
-            setHoldProgress(p);
+            if (pendingRef.current !== pending) return;
+            const p = Math.min(1, (performance.now() - pending.start) / UNDO_MS);
+            setPlayProgress(p);
             if (p >= 1) {
-                holdRafRef.current = null;
-                setHoldProgress(0);
-                tapTimesRef.current = [];
-                if (hintTimerRef.current) clearTimeout(hintTimerRef.current);
-                setHintVisible(false);
-                if (activeCardRef.current) onPlayCard(activeCardRef.current);
+                pendingRef.current = null;
+                setPlayProgress(0);
+                onPlayCard(card);
                 return;
             }
-            holdRafRef.current = requestAnimationFrame(tick);
+            pending.raf = requestAnimationFrame(tick);
         };
-        holdRafRef.current = requestAnimationFrame(tick);
-    }, [cancelHold, onPlayCard]);
+        pendingRef.current = pending;
+        setPlayProgress(0.001);
+        pending.raf = requestAnimationFrame(tick);
+    }, [cancelPending, onPlayCard]);
+
+    // A card that left the hand, or a move to another card, drops the countdown.
+    useEffect(() => {
+        const pending = pendingRef.current;
+        if (pending && cards[activeIndex]?.id !== pending.id) cancelPending();
+    }, [cards, activeIndex, cancelPending]);
 
     const handlePointerDown = useCallback((e) => {
         if (e.button !== undefined && e.button !== 0) return;
@@ -278,8 +279,7 @@ export default function CardCarousel({ cards, onPlayCard, compact = false, onAct
         // drag tracks the finger right away.
         if (animTimerRef.current) clearTimeout(animTimerRef.current);
         setIsAnimating(false);
-        if (onActive) startHold();
-    }, [isOnActiveCard, startHold]);
+    }, [isOnActiveCard]);
 
     const handlePointerMove = useCallback((e) => {
         const s = dragState.current;
@@ -291,8 +291,6 @@ export default function CardCarousel({ cards, onPlayCard, compact = false, onAct
         while (s.samples.length > 2 && now - s.samples[0].t > FLICK_WINDOW_MS) s.samples.shift();
         if (!s.locked) {
             if (Math.abs(dx) < LOCK_SLOP_PX && Math.abs(dy) < LOCK_SLOP_PX) return;
-            // Any meaningful movement cancels the hold-to-play press.
-            cancelHold();
             // Thumbs swipe in an arc, so only a clearly vertical drag
             // is ignored.
             if (Math.abs(dy) > Math.abs(dx) * 1.5 || cards.length <= 1) {
@@ -309,13 +307,11 @@ export default function CardCarousel({ cards, onPlayCard, compact = false, onAct
         }
         updateDragX(effective);
         if (e.cancelable) e.preventDefault();
-    }, [activeIndex, cards.length, cancelHold, updateDragX]);
+    }, [activeIndex, cards.length, updateDragX]);
 
     const endDrag = useCallback((e) => {
         const s = dragState.current;
         dragState.current = null;
-        const wasHolding = holdRafRef.current !== null;
-        cancelHold();
         if (!s) return;
         if (s.locked) {
             try { e.currentTarget.releasePointerCapture(s.pointerId); } catch (_) {}
@@ -345,21 +341,15 @@ export default function CardCarousel({ cards, onPlayCard, compact = false, onAct
             return;
         }
 
-        // Pointer released without locking into a swipe — it was a tap.
-        // If the tap was on the active card and the hold timer didn't
-        // complete, register it as an accidental tap so we can show the
-        // hold-to-play hint after a couple of repeats.
-        if (s.onActive && wasHolding) {
-            registerTap();
-        }
-    }, [activeIndex, cards.length, settleTo, cancelHold, registerTap]);
+        // Pointer released without locking into a swipe: a tap. Only a
+        // pointer that came down on the middle card plays it.
+        if (s.onActive && e.type === 'pointerup') tapActiveCard();
+    }, [activeIndex, cards.length, settleTo, tapActiveCard]);
 
     if (cards.length === 0) return null;
 
-    // Tap on a side card brings it forward. Tap on the active card no
-    // longer plays it — playing requires a press-and-hold gesture
-    // handled at the deck level. The card-level onTap is only used to
-    // navigate from peeked cards.
+    // Tap on a side card brings it forward. A tap on the middle card is
+    // handled at the deck level (tapActiveCard), so it plays exactly once.
     const handleCardTap = (i) => {
         // A mouse drag ends with a click on whatever card is under the
         // pointer; that was a swipe, not a tap.
@@ -395,23 +385,6 @@ export default function CardCarousel({ cards, onPlayCard, compact = false, onAct
 
     return (
         <div className="w-full h-full flex flex-col min-h-0 relative">
-            {/* Hint banner: shown after a couple of accidental taps on the
-                active card to remind the player that play requires a
-                hold gesture. Floats above the deck so it never reflows
-                the layout. */}
-            <div
-                className={`pointer-events-none absolute left-1/2 -translate-x-1/2 -top-2 z-30
-                    flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap
-                    transition-all duration-200
-                    ${hintVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}`}
-                style={{ background: '#fff', color: '#1a1400', fontWeight: 800, fontSize: 14 }}
-                role="status"
-                aria-live="polite"
-            >
-                <Hand size={16} />
-                <span>Press and hold the card to play it</span>
-            </div>
-
             {/* Hand counter — hidden in compact mode to reclaim vertical
                 space on small screens. The dot pager already shows the
                 same info. */}
@@ -446,7 +419,7 @@ export default function CardCarousel({ cards, onPlayCard, compact = false, onAct
                         isActive={i === activeIndex}
                         isAnimating={isAnimating}
                         compact={compact}
-                        holdProgress={i === activeIndex ? holdProgress : 0}
+                        playProgress={i === activeIndex ? playProgress : 0}
                         onTap={() => handleCardTap(i)}
                     />
                 ))}
@@ -471,7 +444,7 @@ export default function CardCarousel({ cards, onPlayCard, compact = false, onAct
             {!compact && (
                 <p className="text-center mt-2 flex items-center justify-center gap-1.5" style={{ fontWeight: 700, fontSize: 14, opacity: 0.7 }}>
                     <Hand size={16} />
-                    {cards.length > 1 ? 'Swipe to browse · Press & hold to play' : 'Press & hold to play'}
+                    {cards.length > 1 ? 'Swipe to browse · Tap a card to play it' : 'Tap the card to play it'}
                 </p>
             )}
         </div>

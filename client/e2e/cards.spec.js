@@ -1,4 +1,4 @@
-// The intruder's cards, played from the vent the way a person would: hold the card down.
+// The intruder's cards, played from the vent the way a person would: tap the card.
 const { test, expect } = require('@playwright/test');
 const h = require('./helpers');
 
@@ -51,7 +51,7 @@ test('taunt, fake task, EMP and self report reach the other phones', async ({ br
     for (const phone of crew) await expect(phone.getByText('Devices down'), phone.person).toBeHidden({ timeout: 90000 });
 
     // Self report: the intruder calls a meeting from the vent.
-    await h.playCard(intruder, 'Self Report');
+    await h.playCard(intruder, 'Emergency Meeting');
     for (const phone of phones) await expect(phone.getByText('EMERGENCY'), phone.person).toBeVisible();
     await expect(reactor.getByText(/called it/)).toBeVisible();
 

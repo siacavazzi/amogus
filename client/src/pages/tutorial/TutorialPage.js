@@ -493,7 +493,7 @@ function TutorialPage() {
       return (
         <>
           <StatusBullet done={cardLessonPhase !== 'swipe'}>Swipe left past the EMP card</StatusBullet>
-          <StatusBullet done={areaDenialDone}>Press and hold Area Denial to play it</StatusBullet>
+          <StatusBullet done={areaDenialDone}>Tap Area Denial to play it</StatusBullet>
         </>
       );
     }

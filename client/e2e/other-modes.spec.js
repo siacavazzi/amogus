@@ -27,7 +27,7 @@ test('one phone can run a test game and switch roles', async ({ browser }) => {
     await expect(solo.getByText('CALL MEETING')).toHaveCount(0);
     await h.openVent(solo);
     await expect(solo.getByTestId('card-deck')).toBeVisible();
-    await solo.getByText('Exit to safety', { exact: false }).click();
+    await solo.getByText('Close vent', { exact: false }).click();
     await switchRole();
     await expect(solo.getByText('CALL MEETING')).toBeVisible();
 
