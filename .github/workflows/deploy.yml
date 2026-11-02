@@ -1,13 +1,14 @@
 name: Deploy to beta
 
-# Pushes to main go to the beta copy of the app (/opt/amogus-beta, port 5002).
+# Puts main on the beta copy of the app (/opt/amogus-beta, port 5002).
+# Manual only: Actions tab > "Deploy to beta" > Run workflow (branch main). Merging to main
+# no longer deploys, so several PRs can merge without each one waiting on a full beta deploy;
+# every PR is already tested by "Check a change" before it merges.
 # Open https://susparty.com/?beta=1 to use it, ?beta=0 to go back to prod.
 # The "Promote beta to prod" workflow copies what is on beta into prod.
 
 on:
-  push:
-    branches: [main]
-  workflow_dispatch:  # Allow manual trigger
+  workflow_dispatch:
 
 concurrency:
   group: droplet
@@ -20,6 +21,13 @@ jobs:
     runs-on: ubuntu-24.04
     
     steps:
+      # Promote copies beta into prod, so beta only ever runs merged code.
+      - name: Only deploy main
+        if: github.ref != 'refs/heads/main'
+        run: |
+          echo "Beta only takes main (this run is on ${{ github.ref_name }}). Run it again on main." >&2
+          exit 1
+
       - name: Checkout code
         uses: actions/checkout@v4
 
