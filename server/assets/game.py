@@ -1113,9 +1113,14 @@ class Game:
                     and self.numCrew == 1 and self.numIntruders == 1):
                 self._begin_last_stand_locked()
                 return
-            if self.numIntruders > 0 and self.numCrew <= self.numIntruders:
+            # A crew-only test game (one tester) has no intruders to outnumber anyone, so it ends
+            # when the last crewmate dies. Without this the round sat in limbo: everyone dead,
+            # nothing left to vote, no end screen (beta, 2026-11-02).
+            everyone_dead = self.numCrew <= 0
+            if (self.numIntruders > 0 and self.numCrew <= self.numIntruders) or everyone_dead:
                 self.end_state = 'sus_victory'
-                self.stats['win_condition'] = 'last_stand_kill' if self.last_stand else 'crew_outnumbered'
+                self.stats['win_condition'] = ('last_stand_kill' if self.last_stand
+                                               else 'crew_outnumbered' if self.numIntruders > 0 else 'crew_eliminated')
                 self.end_time = time.time()
                 self.round_ended_monotonic = time.monotonic()
                 self.cancel_meltdown()
