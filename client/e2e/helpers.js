@@ -310,11 +310,13 @@ async function callMeeting(caller, phones) {
     await readyUp(phones);
 }
 
+// Every phone slides at once, like a real room. One at a time, eleven Safari phones can take
+// longer than the server's 90 s fallback, which then opens voting before the last ones slide.
 async function readyUp(phones) {
-    for (const phone of phones) {
+    await Promise.all(phones.map(async (phone) => {
         await expect(phone.getByText('Go to the meeting spot', { exact: false })).toBeVisible();
         await slideUntilGone(phone);
-    }
+    }));
 }
 
 // Each voter taps a name and confirms.
