@@ -22,6 +22,8 @@ import GameNightPage from './pages/seo/GameNightPage';
 import FamilyCleanupPage from './pages/seo/FamilyCleanupPage';
 import TraitorsAtHomePage from './pages/seo/TraitorsAtHomePage';
 import PhonePartyPage from './pages/seo/PhonePartyPage';
+import QuickPage from './pages/seo/QuickPage';
+import { QUICK_PAGE_PATHS } from './pages/seo/quickPages';
 import SleepoverPage from './pages/seo/SleepoverPage';
 import FamilyReunionPage from './pages/seo/FamilyReunionPage';
 import RoleGeneratorPage from './pages/seo/RoleGeneratorPage';
@@ -171,6 +173,9 @@ function getRoute() {
     return 'holiday-party';
   }
 
+  const quickPath = QUICK_PAGE_PATHS.find(path => normalizedPath === path || normalizedPath.startsWith(`${path}/`));
+  if (quickPath) return `quick:${quickPath}`;
+
   if (normalizedPath === '/' || normalizedPath === '/index.html') {
     return 'landing';
   }
@@ -260,6 +265,8 @@ function App() {
   if (route === 'youth-groups') return <YouthGroupsPage />;
   if (route === 'printable-cards') return <PrintableTaskCardsPage />;
   if (route === 'holiday-party') return <HolidayPartyPage />;
+
+  if (route.startsWith('quick:')) return <QuickPage path={route.slice(6)} />;
 
   if (route === 'not-found') return <NotFoundPage />;
   return <LandingPage />;

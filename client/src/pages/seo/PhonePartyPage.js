@@ -15,7 +15,7 @@ const SCHEMA = {
 
 export default function PhonePartyPage() {
     usePageMeta({
-        title: 'Party Games on Your Phone to Play Together | Sus Party',
+        title: 'Party Games With Phones: Play Together in Person | Sus Party',
         description: DESCRIPTION, canonical: 'https://susparty.com/party-games-on-your-phone', schema: SCHEMA,
     });
     return (
@@ -24,9 +24,9 @@ export default function PhonePartyPage() {
                 <p className="seo-eyebrow">Party games on your phone · Together in person</p>
                 <h1 className="seo-h1">A phone party game with real-life alibis</h1>
                 <p className="seo-lead">
-                    Give every phone in the room a secret. Then see who can keep theirs. Sus Party is a free
-                    browser party game where your friends complete real tasks while hidden intruders try to
-                    blend in. Your phones hold the roles. Your home supplies the places to look suspicious.
+                    Sus Party is a free party game you play with your phones, together in the same room. It is like
+                    Among Us in real life: phones hand out secret roles, the crew does small real tasks around the
+                    house, and everyone votes out whoever they think is the intruder.
                 </p>
                 <div className="seo-actions">
                     <a href="/play" className="seo-btn--primary">Play together on your phones →</a>
