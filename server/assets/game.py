@@ -112,8 +112,6 @@ class Game:
         self.is_open = False  # Room not open until creator configures it
         self.creator_sid = None  # Track who created the room (socket id, can change on reconnect)
         self.creator_player_id = None  # Track who created the room (player id, persistent)
-        # The room's own host. A stand-in takes over only after a long absence, and hands it back.
-        self.home_host_player_id = None
         # Secret handed to the creating socket, so a host who reconnects or reloads during
         # setup (before they have a player) can take the room back.
         self.host_token = None
