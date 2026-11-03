@@ -112,6 +112,8 @@ class Game:
         self.is_open = False  # Room not open until creator configures it
         self.creator_sid = None  # Track who created the room (socket id, can change on reconnect)
         self.creator_player_id = None  # Track who created the room (player id, persistent)
+        # The room's own host. A stand-in takes over only after a long absence, and hands it back.
+        self.home_host_player_id = None
         # Secret handed to the creating socket, so a host who reconnects or reloads during
         # setup (before they have a player) can take the room back.
         self.host_token = None
@@ -460,7 +462,8 @@ class Game:
             own = viewer is player
             show_role = (own or bool(self.end_state) or not player.alive
                          or (player.sus and (viewer_is_intruder or self.intruders_revealed)))
-            view.append(player.to_json(show_role=show_role, show_secrets=own))
+            view.append(player.to_json(show_role=show_role, show_secrets=own,
+                                       is_host=player.player_id == self.creator_player_id))
         return view
 
     def emit_player_list(self, action='player_list'):

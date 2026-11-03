@@ -1006,6 +1006,20 @@ export default function GameContext({ children }) {
                     setIsRoomCreator(data.is_creator);
                     sessionStorage.setItem('is_room_creator', data.is_creator.toString());
                 }
+                // The host role moved: whoever holds it now has to know, or nobody starts the game.
+                if (data.host_change === 'you_are_host') {
+                    setDialog({
+                        title: "You're the host now",
+                        body: data.stand_in
+                            ? `${data.previous_host || 'The host'} has been offline for a while, so you can start the game and run the room. If they come back, they get the host role back.`
+                            : `${data.previous_host || 'The host'} left, so you start the game and run the room now.`,
+                    });
+                } else if (data.host_change === 'host_returned') {
+                    setDialog({
+                        title: 'The host is back',
+                        body: `${data.host_name || 'The host'} is back and runs the room again.`,
+                    });
+                }
             }
         });
 

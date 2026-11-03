@@ -74,8 +74,11 @@ last_drop_by_sid = {}
 entry_attempts_by_sid = {}
 metric_counts_by_sid = {}
 # How long a player can be offline before the room stops waiting for them: meetings and Play Again
-# go on without them, the host role moves on, and they aren't dealt into the next round.
+# go on without them, and they aren't dealt into the next round.
 ABSENT_AFTER_SECONDS = 20
+# The host keeps the role much longer: hosts switch apps to send the invite, and moving the role
+# after 20 s left a room with a host who didn't know it (YMXA, Nov 3 2026).
+HOST_HANDOFF_AFTER_SECONDS = 300
 # Sockets from the automated end-to-end run. Their rooms stay out of usage stats and logs.
 synthetic_sids = set()
 
@@ -350,24 +353,29 @@ def is_sid_connected_to_room(sid, room_code):
     return bool(sid and game_manager.sid_to_game.get(sid) == room_code)
 
 
-def set_room_creator(game, room_code, player, notify=False):
+def set_room_creator(game, room_code, player, notify=False, previous_host=None):
     """Assign the persistent room creator to a connected player."""
     game.creator_player_id = player.player_id
     game.creator_sid = player.sid
+    if game.home_host_player_id is None:
+        game.home_host_player_id = player.player_id
     logger.info(f"Set creator_player_id to {player.player_id} for room {room_code}")
     if notify:
-        socketio.emit(
-            'player_id',
-            {'player_id': player.player_id, 'pic': player.pic, 'is_creator': True},
-            to=player.sid,
-        )
+        # Their phone says so, or nobody knows they're the one to start the game.
+        socketio.emit('player_id', {
+            'player_id': player.player_id, 'pic': player.pic, 'is_creator': True,
+            'host_change': 'you_are_host', 'previous_host': previous_host.username if previous_host else None,
+            # A stand-in gives the role back when the room's own host returns.
+            'stand_in': player.player_id != game.home_host_player_id,
+        }, to=player.sid)
 
 
 def reassign_room_creator(game, room_code):
     """Promote a remaining connected player when the current host leaves."""
+    previous_host = game.getPlayerById(game.creator_player_id) if game.creator_player_id else None
     for player in game.players:
         if is_sid_connected_to_room(player.sid, room_code):
-            set_room_creator(game, room_code, player, notify=True)
+            set_room_creator(game, room_code, player, notify=True, previous_host=previous_host)
             logger.info(f"Reassigned room creator to {player.player_id} for room {room_code}")
             return player
 
@@ -376,6 +384,21 @@ def reassign_room_creator(game, room_code):
         game.creator_sid = None
     logger.info(f"Room {room_code} has no connected player available for host reassignment")
     return None
+
+
+def restore_home_host(game, room_code, player):
+    """The room's own host is back: they get the role again from whoever stood in."""
+    if (not player or player.player_id != game.home_host_player_id
+            or game.creator_player_id == player.player_id):
+        return False
+    stand_in = game.getPlayerById(game.creator_player_id) if game.creator_player_id else None
+    set_room_creator(game, room_code, player)
+    logger.info(f"Host {player.player_id} is back; host role returned in room {room_code}")
+    if stand_in and stand_in.sid:
+        socketio.emit('player_id', {'player_id': stand_in.player_id, 'pic': stand_in.pic, 'is_creator': False,
+                                    'host_change': 'host_returned', 'host_name': player.username},
+                      to=stand_in.sid)
+    return True
 
 
 def admin_required(handler):
@@ -601,6 +624,8 @@ def handle_join_game(data):
     
     # Check if this player is the creator (for reconnecting players)
     is_creator = False
+    if player_id:
+        restore_home_host(game, room_code, game.getPlayerById(player_id))
     if player_id and game.creator_player_id == player_id:
         is_creator = True
         game.creator_sid = sid  # Update the socket ID
@@ -825,6 +850,7 @@ def handleRejoin(data):
         return {'ok': True, 'state': room_state(game, player, request.sid)}
     
     # Check if this player is the creator
+    restore_home_host(game, room_code, player)
     is_creator = (player_id == game.creator_player_id)
     if is_creator:
         game.creator_sid = request.sid  # Update the socket ID
@@ -926,6 +952,8 @@ def handle_disconnect(reason=None):
             count_play_again(game, room_code)
         sendPlayerList(game, room_code)
         socketio.start_background_task(absence_timer, room_code, player.player_id, player.disconnected_at)
+        if player.player_id == game.creator_player_id:
+            socketio.start_background_task(host_handoff_timer, room_code, player.player_id, player.disconnected_at)
     # Last, so the cleanup above is still recognised as end-to-end traffic
     synthetic_sids.discard(sid)
 
@@ -933,6 +961,30 @@ def handle_disconnect(reason=None):
 def absence_timer(room_code, player_id, disconnected_at):
     socketio.sleep(ABSENT_AFTER_SECONDS)
     mark_absent_if_still_gone(room_code, player_id, disconnected_at)
+
+
+def host_handoff_timer(room_code, player_id, disconnected_at):
+    socketio.sleep(HOST_HANDOFF_AFTER_SECONDS)
+    hand_off_host_if_still_gone(room_code, player_id, disconnected_at)
+
+
+def hand_off_host_if_still_gone(room_code, player_id, disconnected_at):
+    """Pass the host role on once the host has been offline for HOST_HANDOFF_AFTER_SECONDS."""
+    game = game_manager.get_game(room_code)
+    if not game:
+        return False
+    with game.state_lock:
+        player = game.getPlayerById(player_id)
+        if (game_manager.get_game(room_code) is not game or not player or player.active
+                or player.disconnected_at != disconnected_at or game.creator_player_id != player_id):
+            return False
+        logger.info(f"Host {player_id} in room {room_code} has been offline {HOST_HANDOFF_AFTER_SECONDS}s; passing the host role on")
+        new_host = reassign_room_creator(game, room_code)
+        if new_host:
+            record_usage('host_handed_off', game, new_host.player_id, resolve_game=False,
+                         offline_seconds=HOST_HANDOFF_AFTER_SECONDS)
+            sendPlayerList(game, room_code)
+        return bool(new_host)
 
 
 def mark_absent_if_still_gone(room_code, player_id, disconnected_at):
@@ -952,8 +1004,6 @@ def mark_absent_if_still_gone(room_code, player_id, disconnected_at):
             game.emit_waiting_list()
             return True
         logger.info(f"Player {player_id} in room {room_code} is offline; the room stops waiting for them")
-        if player.player_id == game.creator_player_id:
-            reassign_room_creator(game, room_code)
         if game.meeting and not game.end_state:
             if game.meeting.stage == 'waiting':
                 game.try_start_voting()
@@ -976,6 +1026,8 @@ def remove_players(game, room_code, players):
         if player.pic not in game.backgrounds and not any(other.pic == player.pic for other in game.players):
             game.backgrounds.append(player.pic)
         game_manager.unregister_player(player.player_id)
+        if player.player_id == game.home_host_player_id:
+            game.home_host_player_id = game.creator_player_id if game.creator_player_id != player.player_id else None
         logger.info(f"Removed {player.player_id} from room {room_code} (left={player.left}, absent={player.absent})")
 
 
@@ -1423,6 +1475,9 @@ def leave_room_handler(data):
         player.sid = None
         game_manager.unregister_player(player_id)
 
+        if player_id == game.home_host_player_id:
+            # They quit, so whoever takes over is the room's host from now on.
+            game.home_host_player_id = None
         if was_creator_player:
             reassign_room_creator(game, room_code)
     
