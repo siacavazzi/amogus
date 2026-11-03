@@ -75,7 +75,7 @@ test('phones in five languages play a round with an English host', async ({ brow
     await Promise.all(phones.map(async (phone) => {
         await expect(phone.getByText(say(phone, 'Go to the meeting spot, then slide ready'), { exact: false })).toBeVisible();
         await snap(phone, '5-meeting');
-        await h.swipe(phone);
+        await h.slideUntilGone(phone);
     }));
 
     // Everyone votes the intruder out (the intruder votes for the caller).
