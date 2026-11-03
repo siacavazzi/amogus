@@ -75,9 +75,9 @@ entry_attempts_by_sid = {}
 metric_counts_by_sid = {}
 # How long a player can be offline before the room stops waiting for them: meetings and Play Again
 # go on without them, and they aren't dealt into the next round.
-ABSENT_AFTER_SECONDS = 20
+ABSENT_AFTER_SECONDS = 30
 # The host keeps the role much longer: hosts switch apps to send the invite, and moving the role
-# after 20 s left a room with a host who didn't know it (YMXA, Nov 3 2026).
+# after the absence timer left a room with a host who didn't know it (YMXA, Nov 3 2026).
 HOST_HANDOFF_AFTER_SECONDS = 300
 # Sockets from the automated end-to-end run. Their rooms stay out of usage stats and logs.
 synthetic_sids = set()

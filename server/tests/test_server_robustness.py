@@ -142,7 +142,7 @@ class ServerRobustnessTests(SocketGameTestCase):
         sleeper = next(p for p in game.players if p is not caller)
         sleeper_client = self.client_for_player(clients, ids, sleeper)
         sleeper_client.emit('ready', {'player_id': sleeper.player_id})
-        sleeper_client.disconnect()  # still inside the 20 s grace, so the room still counts them
+        sleeper_client.disconnect()  # still inside the 30 s grace, so the room still counts them
         for player in game.players:
             if player is not sleeper:
                 self.client_for_player(clients, ids, player).emit('ready', {'player_id': player.player_id})
@@ -266,7 +266,7 @@ class ServerRobustnessTests(SocketGameTestCase):
         stamp = self.go_offline(clients, ids, host)
         self.assertTrue(self.grace_period_passes(room, host, stamp))
         self.assertEqual(ids[0], game.creator_player_id,
-                         'hosts switch apps to send the invite; 20 s offline keeps the role')
+                         'hosts switch apps to send the invite; 30 s offline keeps the role')
 
     def test_host_passes_on_when_the_host_phone_stays_offline_for_minutes(self):
         clients, room, ids, game = self.setup_lobby(4)
