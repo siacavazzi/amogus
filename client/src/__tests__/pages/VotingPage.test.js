@@ -130,6 +130,14 @@ describe('VotingPage', () => {
             renderWithContext(<VotingPage tutorialMode />, votingContext);
             expect(screen.queryByRole('button', { name: /I've Been Killed/i })).not.toBeInTheDocument();
         });
+
+        it('never shows the death control to an intruder, who cannot be killed', () => {
+            renderWithContext(<VotingPage />, {
+                ...votingContext, playerState: { ...votingContext.playerState, sus: true },
+            });
+            expect(screen.queryByRole('button', { name: /I've Been Killed/i })).not.toBeInTheDocument();
+            expect(screen.queryByTestId('im-dead')).not.toBeInTheDocument();
+        });
     });
 
     describe('Rendering', () => {

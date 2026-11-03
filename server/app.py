@@ -1748,6 +1748,10 @@ def handleDeath(data):
     game, player = current_phase_player(data)
     if not game:
         return command_error('This death report belongs to an inactive player or round.')
+    # Intruders can't be killed. In prod room TREM (2026-11-03) an intruder tapped the meeting
+    # screen's death button by mistake and handed the crew the round, so a stale phone can't either.
+    if player.sus:
+        return command_error("Intruders can't be killed.")
     meeting_id = data.get('meeting_id')
     if meeting_id and (not game.meeting or game.meeting.id != meeting_id):
         return command_error('This death report belongs to an earlier meeting.')
