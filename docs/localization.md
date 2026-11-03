@@ -53,6 +53,10 @@ Cards:
 | Remote Sabotage | Sabotage à distance | Sabotaje remoto | Fernsabotage | Sabotaj de la distanță | Sabotagem remota |
 | Shorten Meltdown | Fusion accélérée | Fusión acelerada | Schnelle Kernschmelze | Topire rapidă | Fusão acelerada |
 
+### Spanish is neutral
+
+The Spanish works for Spain and Latin America: "ustedes" for groups (never "vosotros"), "teléfono" (not "móvil"), "computadora" (not "ordenador"), and no slang only Spain uses ("pillar", "cargarse", "nevera", "mando").
+
 ### "sus" in each language
 
 - French and German players already say "sus", so it stays in the game text.
