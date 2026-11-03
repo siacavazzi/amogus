@@ -25,7 +25,7 @@ const RELATED = [
     ['/game-night-app', 'Game night app'],
     ['/sus-games', 'Sus games'],
     ['/among-us-party-game', 'Among Us party game'],
-    ['/online-party-games', 'Online party game for one room'],
+    ['/online-party-games', 'Online party game played in person'],
     ['/mafia-game-app', 'Mafia game app'],
     ['/in-person-party-games', 'In-person party games'],
     ['/chore-game-app', 'Chore game app'],

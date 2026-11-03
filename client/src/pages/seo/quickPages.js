@@ -5,7 +5,7 @@ const gen = query => `/among-us-irl-task-generator?${query}`;
 const QUICK_PAGES = {
     '/game-night-app': {
         title: 'Game Night App: Free Party Game on Your Phones | Sus Party',
-        description: 'Sus Party is a free game night app for groups in the same room. It plays like Among Us in real life: phones hand out secret roles, you do real tasks, then vote out the intruder.',
+        description: 'Sus Party is a free game night app for groups playing in person. It plays like Among Us in real life: phones hand out secret roles, you do real tasks, then vote out the intruder.',
         eyebrow: 'Game night app · Free · No download',
         h1: 'A game night app that gets everyone off the couch',
         lead: 'Sus Party is Among Us in real life, run from your phones. Everyone gets a secret role, does small real tasks around the house, and tries to catch the intruder before it is too late.',
@@ -93,10 +93,10 @@ const QUICK_PAGES = {
     },
 
     '/online-party-games': {
-        title: 'Online Party Game for Friends in the Same Room | Sus Party',
+        title: 'Online Party Game You Play Together in Person | Sus Party',
         description: 'Sus Party is a free online party game you play together in person. Join from any phone browser, get a secret role, and find the intruder among your friends.',
         eyebrow: 'Online party game · Played in person',
-        h1: 'An online party game for friends in the same room',
+        h1: 'An online party game you play together in person',
         lead: 'Most online party games keep everyone staring at one screen. Sus Party uses your phones to get people up and moving. It plays like Among Us in real life: secret roles, real tasks, and a vote.',
         pack: { href: gen('venue=apartment&players=6&style=50'), label: 'Start with the 6-player apartment pack' },
         sections: [
@@ -104,7 +104,7 @@ const QUICK_PAGES = {
                 h2: 'Online setup, real-life game',
                 body: [
                     'The game runs in the browser. One person opens a room at susparty.com and shares a four-letter code. Everyone else types it in on their own phone. No app store, no account, no console.',
-                    'What happens next is offline in the best way. People split up around the room to do small tasks while an intruder tries to blend in and take them out. Meetings happen face to face. Phones are only there for roles, tasks and votes.',
+                    'What happens next is offline in the best way. People split up around the house or venue to do small tasks while an intruder tries to blend in and take them out. Meetings happen face to face. Phones are only there for roles, tasks and votes.',
                 ],
             },
             {

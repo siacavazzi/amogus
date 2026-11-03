@@ -24,7 +24,7 @@ export default function PhonePartyPage() {
                 <p className="seo-eyebrow">Party games on your phone · Together in person</p>
                 <h1 className="seo-h1">A phone party game with real-life alibis</h1>
                 <p className="seo-lead">
-                    Sus Party is a free party game you play with your phones, together in the same room. It is like
+                    Sus Party is a free party game you play with your phones, together in person. It is like
                     Among Us in real life: phones hand out secret roles, the crew does small real tasks around the
                     house, and everyone votes out whoever they think is the intruder.
                 </p>

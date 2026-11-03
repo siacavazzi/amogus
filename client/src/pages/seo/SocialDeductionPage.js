@@ -27,7 +27,7 @@ function SocialDeductionPage() {
                 <p className="seo-lead">
                     Social deduction games give a few players a secret, and everyone else has to work out who they are.
                     Sus Party is a free one you play in person on your phones, like Among Us in real life or Mafia where
-                    everyone walks around. Below are the best options for a room full of friends.
+                    everyone walks around. Below are the best options for a group playing in person.
                 </p>
                 <div className="seo-actions">
                     <a href="/among-us-irl-task-generator?venue=house&players=8&movement=normal" className="seo-btn--primary">Set up a free Sus Party game →</a>
