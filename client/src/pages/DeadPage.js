@@ -77,7 +77,7 @@ const DeadPage = () => {
               {alivePlayers.map(player => (
                 <div key={player.player_id} className="flex flex-col items-center gap-1">
                   <ProfilePicture imageCode={player.pic} selfie={player.selfie} size="small" />
-                  <span style={{ fontWeight: 700, fontSize: 13 }}>{player.username}</span>
+                  <span style={{ fontWeight: 700, fontSize: 13 }} translate="no">{player.username}</span>
                 </div>
               ))}
             </div>

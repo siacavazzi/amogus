@@ -115,6 +115,7 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
             key={isLowTime ? timeLeft : 'clock'}
             className={`sg-big sg-num ${isLowTime ? 'sg-tick' : ''}`}
             style={{ fontSize: 'clamp(40px, 12vw, 60px)', color: isLowTime ? 'var(--sg-out)' : 'inherit' }}
+            translate="no"
           >
             {timeLeft}s
           </span>
@@ -163,7 +164,7 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
                 }}
               >
                 <Face player={player} size={64} dead={isDead} />
-                <span style={{ fontWeight: 900, fontSize: 15, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textDecoration: isDead ? 'line-through' : 'none' }}>
+                <span style={{ fontWeight: 900, fontSize: 15, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textDecoration: isDead ? 'line-through' : 'none' }} translate="no">
                   {player.username}
                 </span>
                 {isMe && <span style={{ fontWeight: 700, fontSize: 11, opacity: 0.7, marginTop: -4 }}>You</span>}

@@ -43,7 +43,7 @@ const IntrudersRevealedDisplay = ({ intruderNames = [], isIntruder = false, play
               ) : (
                 <Skull size={96} />
               )}
-              <b>{player.username}</b>
+              <b translate="no">{player.username}</b>
             </div>
           ))}
         </div>

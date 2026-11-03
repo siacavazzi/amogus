@@ -894,7 +894,7 @@ function GameConfigPage() {
             <div className={`hs-wrap ${showContent ? 'sg-a sg-rise' : ''}`} key={step}>
                 <div className="hs-bar">
                     <div className="hs-bar__left">
-                        <span className="hs-roompill">Room <b>{roomCode}</b></span>
+                        <span className="hs-roompill">Room <b translate="no">{roomCode}</b></span>
                         <button type="button" onClick={copyRoomCode} className="hs-round" title="Copy room code" aria-label="Copy room code">
                             {copied ? <Check size={18} /> : <Copy size={18} />}
                         </button>

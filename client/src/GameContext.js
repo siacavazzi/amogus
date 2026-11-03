@@ -7,7 +7,8 @@ import { markHasPlayedGame } from './tutorial/tutorialStorage';
 import { parseCards } from './utils/cardCopy';
 import { isMobile as isMobileDevice } from 'react-device-detect';
 import { getRoomCodeFromSearch, getEntryMethodFromSearch, clearRoomCodeFromUrl } from './utils/inviteLinks';
-import { createDropTracker, installErrorReporting } from './utils/clientMetrics';
+import { createDropTracker, installErrorReporting, sendClientMetric } from './utils/clientMetrics';
+import { translateConflicts, translatedTo, watchForTranslation } from './utils/translateGuard';
 import { createRequestId, emitVolatileWithAck, SOCKET_COMMAND_TIMEOUT_MS } from './utils/socketCommand';
 
 // Allow URL param override for testing: ?mobile=true or ?mobile=false
@@ -505,6 +506,8 @@ export default function GameContext({ children }) {
                 utc_offset_minutes: -new Date().getTimezoneOffset(),
                 // After a dropped socket: was the page hidden (phone locked) or offline when it dropped.
                 last_drop: dropTracker.report(),
+                // Set when a browser translator rewrote the page, so errors can be tied to it.
+                ...(translatedTo() ? { translated_to: translatedTo() } : {}),
                 // Browser end-to-end tests set this so their rooms stay out of usage stats.
                 ...(isTestTraffic() ? { synthetic: true } : {}),
             }),
@@ -512,6 +515,15 @@ export default function GameContext({ children }) {
             reconnectionAttempts: 10,
             reconnectionDelay: 2000,
             transports: ['websocket'],
+        });
+
+        // Once per page load: tells us how many phones lean on browser translation, and into what.
+        const stopTranslateWatch = watchForTranslation(lang => {
+            const report = () => sendClientMetric(socketRef.current, {
+                kind: 'page_translated', lang, dom_conflicts: translateConflicts(),
+            });
+            if (socketRef.current?.connected) report();
+            else socketRef.current?.once('connect', report);
         });
 
         socketRef.current.on('connect', () => {
@@ -1080,6 +1092,7 @@ export default function GameContext({ children }) {
         return () => {
             dropTracker.stop();
             stopErrorReporting();
+            stopTranslateWatch();
             if (socketRef.current) {
                 socketRef.current.disconnect();
             }
