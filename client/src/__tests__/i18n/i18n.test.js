@@ -14,6 +14,7 @@ describe('detectLanguage', () => {
     it('uses the first supported browser language', () => {
         expect(detectLanguage({ search: '', stored: null, browser: ['fr-CA', 'en'], headless: false })).toBe('fr');
         expect(detectLanguage({ search: '', stored: null, browser: ['ja', 'ro-RO'], headless: false })).toBe('ro');
+        expect(detectLanguage({ search: '', stored: null, browser: ['pt-BR'], headless: false })).toBe('pt');
     });
 
     it('keeps English-first browsers in English', () => {
@@ -54,6 +55,9 @@ describe('t and tn', () => {
         expect(tn(20, '{count} task', '{count} tasks')).toBe('20 de sarcini');
         setLanguageForTesting('fr');
         expect(tn(0, '{count} task', '{count} tasks')).toBe('0 tâche');
+        setLanguageForTesting('pt');
+        expect(tn(0, '{count} task', '{count} tasks')).toBe('0 tarefas');
+        expect(tn(1, '{count} task', '{count} tasks')).toBe('1 tarefa');
     });
 
     it('translates server messages that carry values', () => {

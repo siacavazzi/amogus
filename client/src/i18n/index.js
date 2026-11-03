@@ -9,6 +9,7 @@ import fr from './locales/fr.json';
 import es from './locales/es.json';
 import de from './locales/de.json';
 import ro from './locales/ro.json';
+import pt from './locales/pt.json';
 
 export const LANGUAGES = [
     { code: 'en', name: 'English' },
@@ -16,9 +17,10 @@ export const LANGUAGES = [
     { code: 'es', name: 'Español' },
     { code: 'de', name: 'Deutsch' },
     { code: 'ro', name: 'Română' },
+    { code: 'pt', name: 'Português (Brasil)' },
 ];
 
-const CATALOGS = { en: {}, fr, es, de, ro };
+const CATALOGS = { en: {}, fr, es, de, ro, pt };
 const STORAGE_KEY = 'sus_language';
 
 function supported(code) {
@@ -134,7 +136,8 @@ export function t(text, vars) {
 const pluralRules = {};
 function pluralCategory(lang, count) {
     try {
-        pluralRules[lang] = pluralRules[lang] || new Intl.PluralRules(lang);
+        // Brazilian rules treat 0 as singular ("0 tarefa"); "0 tarefas" is what people write.
+        pluralRules[lang] = pluralRules[lang] || new Intl.PluralRules(lang === 'pt' ? 'pt-PT' : lang);
         return pluralRules[lang].select(count);
     } catch (_) {
         return count === 1 ? 'one' : 'other';
