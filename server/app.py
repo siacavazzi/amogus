@@ -1783,7 +1783,7 @@ def handle_get_my_task_lists(data):
         return
     
     lists = task_list_manager.get_player_task_lists(player_id)
-    starter_template = task_list_manager.get_default_task_list_template()
+    starter_template = task_list_manager.get_default_task_list_template(data.get('lang'))
     emit('my_task_lists', {'lists': lists, 'starter_template': starter_template})
 
 
@@ -1840,7 +1840,7 @@ def handle_create_task_list(data):
         return
     
     if from_default:
-        code = task_list_manager.import_from_default(player_id, name)
+        code = task_list_manager.import_from_default(player_id, name, data.get('lang'))
     else:
         # Validate locations before creating
         if not locations or len(locations) < 2:
@@ -2101,7 +2101,7 @@ def handle_add_example_tasks(data):
         return command_error('Only the host can add the example list.', game, player, reason='not_host')
     if game.game_running:
         return command_error('Cannot change tasks while the game is running.', game, player, reason='round_running')
-    tasks, example_locations = task_list_manager.example_tasks()
+    tasks, example_locations = task_list_manager.example_tasks(data.get('lang'))
     if not tasks:
         return command_error('The example list is missing.', game, player, reason='no_example_list')
 
@@ -2119,7 +2119,7 @@ def handle_add_example_tasks(data):
     game.task_list_applied = True
     if not had:
         game.collaborative_task_list_code = None
-        game.collaborative_task_list_name = task_list_manager.get_default_task_list_template()['name']
+        game.collaborative_task_list_name = task_list_manager.get_default_task_list_template(data.get('lang'))['name']
     from assets.card import CardDeck
     game.card_deck = CardDeck(game.locations, game.socket, game)
     record_usage('example_tasks_added', game, player.player_id if player else None,
