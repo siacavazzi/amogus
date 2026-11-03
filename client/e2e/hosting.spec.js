@@ -23,6 +23,9 @@ test('in a room made on the reactor, host passes on when the host leaves and the
     await expect(host.getByText('Create New Game')).toBeVisible();
     await expect(reactor.getByText('4 players connected')).toBeVisible();
     await expect(reactor.getByTestId('reactor-host-hint')).toHaveText('Alex is the host. Start the game from their phone.');
+    await expect(next.getByText("You're the host now")).toBeVisible();
+    await next.getByText('Got it').click();
+    await expect(next.getByTestId('host-mark')).toBeVisible();
     await expect(next.getByText('Start Game')).toBeVisible();
     for (const phone of rest) await expect(phone.getByText('Waiting for host to start the game...')).toBeVisible();
 
@@ -128,14 +131,25 @@ test('a room short on tasks is told how many to add, and everyone can help', asy
     h.expectNoPageErrors(phones);
 });
 
-test('when the host phone drops out of the lobby, someone else can start', async ({ browser }) => {
+test('a host whose phone drops out of the lobby stays the host and gets Start back on return', async ({ browser }) => {
     const phones = await h.openPhones(browser, ['Sam', 'Alex', 'Jules', 'Riley']);
     const [host, ...rest] = phones;
     await h.gatherRoom({ host, phones });
 
-    await closeWithoutLeaving(host);
-    const startButtons = () => Promise.all(rest.map(phone => phone.getByText('Start Game').count()));
-    await expect.poll(async () => (await startButtons()).reduce((a, b) => a + b, 0), { timeout: 30000 }).toBe(1);
+    // The tab is killed while the host shares the invite from another app, past the 30 s offline timer.
+    const context = host.context();
+    await host.close();
+    await h.sleep(35000);
+    for (const phone of rest) {
+        await expect(phone.getByText('Start Game'), phone.person).toHaveCount(0);
+        await expect(phone.getByText('Waiting for host to start the game...'), phone.person).toBeVisible();
+    }
+
+    const reopened = await context.newPage();
+    reopened.person = host.person;
+    await reopened.goto('/play');
+    await expect(reopened.getByText('Start Game')).toBeVisible();
+    h.expectNoPageErrors(rest);
 });
 
 test('a phone that closed the page in the lobby is not dealt into the round', async ({ browser }) => {

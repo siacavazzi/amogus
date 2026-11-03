@@ -45,6 +45,8 @@ test('when the host leaves the lobby, someone else can start', async ({ browser 
     await h.tapAndConfirm(host.getByRole('button', { name: 'Leave room' }));
     await expect(host.getByText('Create New Game')).toBeVisible();
     for (const phone of rest) await expect(phone.getByText('Sam', { exact: true })).toHaveCount(0);
+    await expect(rest[0].getByText("You're the host now")).toBeVisible();
+    await rest[0].getByText('Got it').click();
     await expect(rest[0].getByText('Start Game')).toBeVisible();
     await rest[0].getByText('Start Game').click();
     await h.revealRoles(rest).catch(() => {});
