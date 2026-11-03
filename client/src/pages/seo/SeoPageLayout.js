@@ -7,7 +7,7 @@ import './SeoPage.css';
  * Uses the shared dark theme, navigation, and footer.
  * Individual pages supply their own hero + content as children.
  */
-function SeoPageLayout({ children, className = '' }) {
+function SeoPageLayout({ children, className = '', languagePage }) {
     useEffect(() => {
         const html = document.documentElement;
         const body = document.body;
@@ -25,7 +25,7 @@ function SeoPageLayout({ children, className = '' }) {
 
             {children}
 
-            <SiteFooter />
+            <SiteFooter languagePage={languagePage} />
         </div>
     );
 }

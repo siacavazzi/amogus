@@ -65,3 +65,7 @@ The Spanish works for Spain and Latin America: "ustedes" for groups (never "voso
 - In Brazil "SUS" is the public health system (Sistema Único de Saúde), so a lone "sus" can read that way. The game text says "suspeito" instead. Brazilian players also use "sus" from Among Us, so the name itself is fine.
 
 Tone: informal "you" everywhere (tu / tú / du / tu / você).
+
+## Translated website pages
+
+The homepage and the Among Us IRL page also exist at `/fr`, `/es`, `/de`, `/ro`, `/pt` and `/<lang>/among-us-irl`. The path sets the language, so a French page always renders (and prerenders) in French. Their copy is in `client/src/pages/seo/translated/content.js`, and `client/src/seo/translatedPages.js` builds the hreflang links that tie each page to its other languages (`pt-BR` for Portuguese, English as `x-default`). Every footer links to the same page in each language. `scripts/check-seo.js` checks `<html lang>` and the hreflang links on every page. Starting a game from one of these pages keeps the game in that language.

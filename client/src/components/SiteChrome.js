@@ -1,5 +1,6 @@
 import React from 'react';
 import '../styles/SitePage.css';
+import { LanguageLinks } from '../pages/seo/translated/TranslatedPage';
 
 export function SiteNav() {
     return (
@@ -14,9 +15,10 @@ export function SiteNav() {
     );
 }
 
-export function SiteFooter() {
+export function SiteFooter({ languagePage = 'home' }) {
     return (
         <footer className="site-footer">
+            <LanguageLinks page={languagePage} />
             <nav className="site-footer__links" aria-label="Footer links">
                 <div>
                     <a href="/">Home</a>

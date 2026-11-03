@@ -3,6 +3,7 @@ import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
 import GameplayScreenshots from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
+import { alternatesFor } from '../../seo/translatedPages';
 
 const FAQS = [
     {
@@ -63,10 +64,11 @@ function AmongUsIrlPage() {
         canonical: 'https://susparty.com/among-us-irl',
         ogImage: 'https://susparty.com/og-image.jpg',
         schema: SCHEMA,
+        alternates: alternatesFor('irl'),
     });
 
     return (
-        <SeoPageLayout>
+        <SeoPageLayout languagePage="irl">
             <div className="seo-hero">
                 <p className="seo-eyebrow">Sus Party · Free browser game</p>
                 <h1 className="seo-h1">Play Among Us in real life with Sus Party</h1>

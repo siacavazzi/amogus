@@ -30,6 +30,13 @@ describe('detectLanguage', () => {
     it('keeps the prerender in English', () => {
         expect(detectLanguage({ search: '', stored: null, browser: ['fr'], headless: true })).toBe('en');
     });
+
+    it('uses the language of a translated page, even in the prerender', () => {
+        expect(detectLanguage({ pathname: '/fr', search: '?lang=de', stored: 'es', browser: ['en'], headless: true })).toBe('fr');
+        expect(detectLanguage({ pathname: '/pt/among-us-irl', stored: null, browser: [], headless: true })).toBe('pt');
+        expect(detectLanguage({ pathname: '/faq', stored: null, browser: ['de'], headless: false })).toBe('de');
+        expect(detectLanguage({ pathname: '/en', stored: null, browser: ['de'], headless: false })).toBe('de');
+    });
 });
 
 describe('t and tn', () => {

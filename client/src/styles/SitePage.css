@@ -170,6 +170,10 @@
 .site-footer__links > div { display: flex; flex-direction: column; gap: 8px; }
 .site-footer__links a { color: rgba(255, 255, 255, .72); font-size: .9rem; font-weight: 600; text-decoration: none; width: fit-content; }
 .site-footer__links a:hover { color: #fff; text-decoration: underline; }
+.site-footer__langs { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 0 0 24px; font-size: .9rem; font-weight: 600; }
+.site-footer__langs a { color: rgba(255, 255, 255, .72); text-decoration: none; }
+.site-footer__langs a:hover { color: #fff; text-decoration: underline; }
+.site-footer__langs [aria-current] { color: #fff; }
 .site-footer__note { margin: 32px 0 0; color: rgba(255, 255, 255, .5); font-size: .8rem; line-height: 1.6; max-width: 78ch; }
 
 @media (max-width: 700px) {

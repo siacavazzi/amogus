@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './Landing.css';
 import { usePageMeta } from '../../seo/usePageMeta';
+import { alternatesFor } from '../../seo/translatedPages';
 import { SiteNav, SiteFooter } from '../../components/SiteChrome';
 import { Home, Speaker, Cards, Radiation, ArrowRight } from '../../signal/icons';
 import { ROOM_QUERY_PARAM, VIA_QUERY_PARAM } from '../../utils/inviteLinks';
@@ -153,6 +154,7 @@ function LandingPage() {
         title: 'Sus Party | Free Among Us IRL Game for 3 to 20+ Players',
         description: 'Play Among Us in real life, free in your phone browser. Real tasks, secret roles, meetings and votes for 3 to 20+ players at parties, youth groups and classes.',
         canonical: 'https://susparty.com/',
+        alternates: alternatesFor('home'),
     });
     const [tagIdx, setTagIdx] = useState(0);
 

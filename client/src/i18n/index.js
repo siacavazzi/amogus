@@ -32,12 +32,23 @@ function readStorage() {
     try { return localStorage.getItem(STORAGE_KEY); } catch (_) { return null; }
 }
 
+/** The translated marketing pages live under /fr, /es, ...: their path decides the language. */
+export function languageFromPath(pathname) {
+    const match = /^\/([a-z]{2})(?:\/|$)/.exec(pathname || '');
+    const lang = match && supported(match[1]);
+    return lang && lang !== 'en' ? lang : null;
+}
+
 export function detectLanguage({
+    pathname = typeof window !== 'undefined' ? window.location.pathname : '',
     search = typeof window !== 'undefined' ? window.location.search : '',
     stored = readStorage(),
     browser = typeof navigator !== 'undefined' ? (navigator.languages?.length ? navigator.languages : [navigator.language]) : [],
     headless = typeof navigator !== 'undefined' && /HeadlessChrome/.test(navigator.userAgent || ''),
 } = {}) {
+    // Before the prerender rule: /fr pages must snapshot in French.
+    const fromPath = languageFromPath(pathname);
+    if (fromPath) return fromPath;
     const fromUrl = supported(new URLSearchParams(search).get('lang'));
     if (fromUrl) return fromUrl;
     const fromStorage = supported(stored);
