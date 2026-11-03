@@ -9,7 +9,7 @@ import { isMobile as isMobileDevice } from 'react-device-detect';
 import { getRoomCodeFromSearch, getEntryMethodFromSearch, clearRoomCodeFromUrl } from './utils/inviteLinks';
 import { createDropTracker, installErrorReporting, sendClientMetric } from './utils/clientMetrics';
 import { translateConflicts, translatedTo, watchForTranslation } from './utils/translateGuard';
-import { t } from './i18n';
+import { getLanguage, t } from './i18n';
 import './i18n/serverMessages';
 import { createRequestId, emitVolatileWithAck, SOCKET_COMMAND_TIMEOUT_MS } from './utils/socketCommand';
 
@@ -510,6 +510,9 @@ export default function GameContext({ children }) {
                 last_drop: dropTracker.report(),
                 // Set when a browser translator rewrote the page, so errors can be tied to it.
                 ...(translatedTo() ? { translated_to: translatedTo() } : {}),
+                // The phone's own language and the one the game picked, to see which languages players use.
+                device_lang: typeof navigator !== 'undefined' ? navigator.language : undefined,
+                game_lang: getLanguage(),
                 // Browser end-to-end tests set this so their rooms stay out of usage stats.
                 ...(isTestTraffic() ? { synthetic: true } : {}),
             }),

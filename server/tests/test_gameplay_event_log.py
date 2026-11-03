@@ -224,6 +224,17 @@ class JoinAndConnectionEventTests(EventLogTestCase):
                           'seconds_since_drop': 33.0}, row['last_drop'])
         client.disconnect()
 
+    def test_connections_carry_the_phone_and_game_language(self):
+        client = self.socketio.test_client(self.flask_app, auth={'device_lang': 'pt-BR', 'game_lang': 'pt'})
+        row = self.tracker.named('connection_opened')[-1]
+        self.assertEqual(('pt-BR', 'pt'), (row['device_lang'], row['game_lang']))
+        client.disconnect()
+        client = self.socketio.test_client(self.flask_app, auth={'device_lang': '<b>zh</b>', 'game_lang': 5})
+        row = self.tracker.named('connection_opened')[-1]
+        self.assertNotIn('device_lang', row)
+        self.assertNotIn('game_lang', row)
+        client.disconnect()
+
     def test_connections_carry_browser_and_os_family(self):
         ua = ('Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 '
               '(KHTML, like Gecko) Mobile/15E148 Instagram 300.0')
