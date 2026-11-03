@@ -1,5 +1,6 @@
 import React from "react";
 import Avatar, { AVATARS, AVATAR_COUNT, describeAvatar } from "./Avatar";
+import { t } from '../i18n';
 
 // Map of avatar index -> username for avatars other players in the room already have.
 export const takenAvatars = (players = [], myPlayerId = null) => {
@@ -24,7 +25,7 @@ export const randomFreeAvatar = (takenBy = {}, exclude = null) => {
 };
 
 const AvatarPicker = ({ selected, onSelect, takenBy = {} }) => (
-  <div role="radiogroup" aria-label="Avatar" className="grid grid-cols-6 gap-2">
+  <div role="radiogroup" aria-label={t('Avatar')} className="grid grid-cols-6 gap-2">
     {AVATARS.map((avatar, index) => {
       const owner = takenBy[index];
       const locked = isAvatarLocked(index, takenBy);
@@ -35,7 +36,7 @@ const AvatarPicker = ({ selected, onSelect, takenBy = {} }) => (
           type="button"
           role="radio"
           aria-checked={isSelected}
-          aria-label={owner ? `${describeAvatar(avatar)}, taken by ${owner}` : describeAvatar(avatar)}
+          aria-label={owner ? t('{avatar}, taken by {owner}', { avatar: describeAvatar(avatar), owner }) : describeAvatar(avatar)}
           disabled={locked}
           onClick={() => onSelect(index)}
           className={`relative aspect-square rounded-full transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 ${

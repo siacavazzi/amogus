@@ -13,6 +13,7 @@ import select from './audio/select.wav';
 import complete_task from './audio/task_complete.mp3';
 import hack from './audio/hack.mp3';
 import theme from './audio/theme.mp3';
+import { t } from './i18n';
 
 // Remote audio base URL for sounds not bundled locally
 const REMOTE_AUDIO_BASE = 'https://raw.githubusercontent.com/siacavazzi/amogus_assets/main/audio/';
@@ -307,14 +308,14 @@ export const AudioHandler = () => {
         >
           <Volume2 size={28} className="flex-shrink-0" />
           <div className="flex-1">
-            <p style={{ fontWeight: 900, fontSize: 17, lineHeight: 1.1, margin: 0 }}>Turn off silent mode</p>
-            <p style={{ fontWeight: 700, fontSize: 13, opacity: 0.75, margin: '2px 0 0' }}>Unmute your device for the best experience</p>
+            <p style={{ fontWeight: 900, fontSize: 17, lineHeight: 1.1, margin: 0 }}>{t('Turn off silent mode')}</p>
+            <p style={{ fontWeight: 700, fontSize: 13, opacity: 0.75, margin: '2px 0 0' }}>{t('Unmute your device for the best experience')}</p>
           </div>
           <button
             onClick={dismissReminder}
             className="flex-shrink-0"
             style={{ width: 40, height: 40, borderRadius: 20, border: 0, background: 'rgba(0,0,0,0.1)', color: 'inherit', display: 'grid', placeItems: 'center', cursor: 'pointer' }}
-            aria-label="Dismiss"
+            aria-label={t('Dismiss')}
           >
             <X size={18} />
           </button>

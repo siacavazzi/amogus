@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { t } from '../i18n';
 import EndGameButtons from '../components/EndGameButtons';
 import DeathSummary from '../components/DeathSummary';
 import GameStats from '../components/GameStats';
@@ -18,7 +19,7 @@ export default function VictoryScreen({ tone, kicker, title, line, winners, winn
       <div className="flex flex-col items-center text-center" style={{ minHeight: '78vh', justifyContent: 'center', gap: 14, position: 'relative' }}>
         {kicker && <p className="sg-lede sg-a sg-rise" style={{ animationDelay: '300ms' }}>{kicker}</p>}
         <h1 className="sg-big sg-a sg-rise" style={{ fontSize: 'clamp(54px, 17vw, 88px)', animationDelay: '400ms', animationDuration: '520ms' }}>
-          {title}
+          {t(title)}
         </h1>
         <p className="sg-lede sg-a sg-fade" style={{ opacity: 0.9, maxWidth: '26ch', animationDelay: '700ms' }}>{line}</p>
         {winners.length > 0 && (

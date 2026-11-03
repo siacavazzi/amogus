@@ -36,6 +36,7 @@ import NotFoundPage from './pages/info/NotFoundPage';
 import { getRoomCodeFromSearch } from './utils/inviteLinks';
 import { captureAcquisition, noteVisit } from './seo/discovery';
 import { usePageMeta } from './seo/usePageMeta';
+import { applyDocumentLanguage } from './i18n';
 
 const StylePreview = lazy(() => import('./preview/StylePreview'));
 
@@ -185,6 +186,7 @@ function GamePage() {
     canonical: 'https://susparty.com/play',
     documentClass: 'game-document',
   });
+  useEffect(() => { applyDocumentLanguage(); }, []);
   return <GameContext><PageController /></GameContext>;
 }
 
