@@ -601,6 +601,7 @@ function PreGamePage() {
                                     <Face player={player} size={84} className="hs-roll__face" />
                                     <span className="hs-roll__name">{player.username}</span>
                                     {player.player_id === playerId && <span className="hs-roll__you">You</span>}
+                                    {player.is_host && <span className="hs-roll__you" data-testid="host-mark">Host</span>}
                                 </li>
                             ))}
                             {Array.from({ length: openSeats }, (_, i) => (

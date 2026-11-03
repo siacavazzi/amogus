@@ -1006,6 +1006,13 @@ export default function GameContext({ children }) {
                     setIsRoomCreator(data.is_creator);
                     sessionStorage.setItem('is_room_creator', data.is_creator.toString());
                 }
+                // The host left and the role moved: the new host has to know, or nobody starts the game.
+                if (data.host_change === 'you_are_host') {
+                    setDialog({
+                        title: "You're the host now",
+                        body: `${data.previous_host || 'The host'} left, so you start the game and run the room now.`,
+                    });
+                }
             }
         });
 

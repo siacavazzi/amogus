@@ -158,7 +158,7 @@ class Player:
     def remove_card(self, card):
         self.cards.remove(card)
 
-    def to_json(self, show_role=True, show_secrets=True):
+    def to_json(self, show_role=True, show_secrets=True, is_host=False):
         """Serialize the player. Other phones get show_role only when the role is known to
         them, and show_secrets (cards, meltdown code) only for the player's own phone."""
         return json.dumps({
@@ -175,7 +175,8 @@ class Player:
             "cards": [card.export() for card in self.cards if hasattr(card, 'export')] if show_secrets else [],
             "ready": self.ready,
             "death_cause": self.death_cause,
-            "death_message": self.death_message
+            "death_message": self.death_message,
+            "is_host": is_host,
         })
 
     def __str__(self):

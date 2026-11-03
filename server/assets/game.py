@@ -460,7 +460,8 @@ class Game:
             own = viewer is player
             show_role = (own or bool(self.end_state) or not player.alive
                          or (player.sus and (viewer_is_intruder or self.intruders_revealed)))
-            view.append(player.to_json(show_role=show_role, show_secrets=own))
+            view.append(player.to_json(show_role=show_role, show_secrets=own,
+                                       is_host=player.player_id == self.creator_player_id))
         return view
 
     def emit_player_list(self, action='player_list'):

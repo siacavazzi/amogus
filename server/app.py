@@ -74,8 +74,10 @@ last_drop_by_sid = {}
 entry_attempts_by_sid = {}
 metric_counts_by_sid = {}
 # How long a player can be offline before the room stops waiting for them: meetings and Play Again
-# go on without them, the host role moves on, and they aren't dealt into the next round.
-ABSENT_AFTER_SECONDS = 20
+# go on without them, and they aren't dealt into the next round. The host stays the host however
+# long they are gone: a host who switched apps to send the invite lost the role after 20 s, and
+# nobody knew who could start (YMXA, Nov 3 2026). Only tapping Leave hands the room on.
+ABSENT_AFTER_SECONDS = 30
 # Sockets from the automated end-to-end run. Their rooms stay out of usage stats and logs.
 synthetic_sids = set()
 
@@ -350,24 +352,24 @@ def is_sid_connected_to_room(sid, room_code):
     return bool(sid and game_manager.sid_to_game.get(sid) == room_code)
 
 
-def set_room_creator(game, room_code, player, notify=False):
+def set_room_creator(game, room_code, player, notify=False, previous_host=None):
     """Assign the persistent room creator to a connected player."""
     game.creator_player_id = player.player_id
     game.creator_sid = player.sid
     logger.info(f"Set creator_player_id to {player.player_id} for room {room_code}")
     if notify:
-        socketio.emit(
-            'player_id',
-            {'player_id': player.player_id, 'pic': player.pic, 'is_creator': True},
-            to=player.sid,
-        )
+        # Their phone says so, or nobody knows they're the one to start the game.
+        socketio.emit('player_id', {
+            'player_id': player.player_id, 'pic': player.pic, 'is_creator': True,
+            'host_change': 'you_are_host', 'previous_host': previous_host.username if previous_host else None,
+        }, to=player.sid)
 
 
-def reassign_room_creator(game, room_code):
+def reassign_room_creator(game, room_code, previous_host=None):
     """Promote a remaining connected player when the current host leaves."""
     for player in game.players:
         if is_sid_connected_to_room(player.sid, room_code):
-            set_room_creator(game, room_code, player, notify=True)
+            set_room_creator(game, room_code, player, notify=True, previous_host=previous_host)
             logger.info(f"Reassigned room creator to {player.player_id} for room {room_code}")
             return player
 
@@ -952,8 +954,6 @@ def mark_absent_if_still_gone(room_code, player_id, disconnected_at):
             game.emit_waiting_list()
             return True
         logger.info(f"Player {player_id} in room {room_code} is offline; the room stops waiting for them")
-        if player.player_id == game.creator_player_id:
-            reassign_room_creator(game, room_code)
         if game.meeting and not game.end_state:
             if game.meeting.stage == 'waiting':
                 game.try_start_voting()
@@ -1424,7 +1424,7 @@ def leave_room_handler(data):
         game_manager.unregister_player(player_id)
 
         if was_creator_player:
-            reassign_room_creator(game, room_code)
+            reassign_room_creator(game, room_code, previous_host=player)
     
     if is_reactor:
         game.drop_reactor(sid, left=True)

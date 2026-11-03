@@ -3,6 +3,7 @@
 Tests marked expectedFailure reproduce a bug that is not fixed yet. They pass while the bug is
 there; once it is fixed, unittest reports an unexpected success, so drop the marker with the fix.
 """
+import json
 import unittest
 
 import eventlet
@@ -141,7 +142,7 @@ class ServerRobustnessTests(SocketGameTestCase):
         sleeper = next(p for p in game.players if p is not caller)
         sleeper_client = self.client_for_player(clients, ids, sleeper)
         sleeper_client.emit('ready', {'player_id': sleeper.player_id})
-        sleeper_client.disconnect()  # still inside the 20 s grace, so the room still counts them
+        sleeper_client.disconnect()  # still inside the 30 s grace, so the room still counts them
         for player in game.players:
             if player is not sleeper:
                 self.client_for_player(clients, ids, player).emit('ready', {'player_id': player.player_id})
@@ -256,20 +257,30 @@ class ServerRobustnessTests(SocketGameTestCase):
         self.assertTrue(gone.active)
         self.assertTrue(gone.alive)
 
-    def test_host_passes_on_when_the_host_phone_stays_offline_in_the_lobby(self):
+    def test_host_stays_host_however_long_their_phone_is_offline(self):
         clients, room, ids, game = self.setup_lobby(4)
         host = game.getPlayerById(ids[0])
         stamp = self.go_offline(clients, ids, host)
-        self.assertEqual(ids[0], game.creator_player_id, 'a short drop keeps the host')
-        self.drain_all(clients[1:])
         self.assertTrue(self.grace_period_passes(room, host, stamp))
-        self.assertNotEqual(ids[0], game.creator_player_id)
-        new_host = clients[ids.index(game.creator_player_id)]
-        notice = self.first_event(self.drain(new_host), 'player_id')
+        self.assertEqual(ids[0], game.creator_player_id,
+                         'hosts switch apps to send the invite; only Leave hands the room on')
+        returning = self.make_client()
+        returning.emit('rejoin', {'player_id': host.player_id})
+        self.assertTrue(self.first_event(returning.get_received(), 'game_joined')['is_creator'])
+
+    def test_host_who_taps_leave_hands_the_room_on_and_the_new_host_is_told(self):
+        clients, room, ids, game = self.setup_lobby(4)
+        host_name = game.getPlayerById(ids[0]).username
+        self.drain_all(clients[1:])
+        clients[0].emit('leave_room', {'player_id': ids[0], 'room_code': room})
+        new_host_id = game.creator_player_id
+        self.assertNotEqual(ids[0], new_host_id)
+        notice = self.first_event(self.drain(clients[ids.index(new_host_id)]), 'player_id')
         self.assertTrue(notice['is_creator'])
-        self.add_tasks(new_host, room, 12)
-        new_host.emit('start_game', {'player_id': game.creator_player_id})
-        self.assertTrue(game.game_running)
+        self.assertEqual('you_are_host', notice['host_change'])
+        self.assertEqual(host_name, notice['previous_host'])
+        hosts = [p for p in game.player_view() if json.loads(p)['is_host']]
+        self.assertEqual([new_host_id], [json.loads(p)['player_id'] for p in hosts], 'the lobby marks the new host')
 
     def test_phone_gone_from_the_lobby_is_not_dealt_into_the_round(self):
         clients, room, ids, game = self.setup_lobby(5)
