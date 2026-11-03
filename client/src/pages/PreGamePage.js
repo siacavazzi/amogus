@@ -600,11 +600,8 @@ function PreGamePage() {
                                 <li key={player.player_id || player.id || index} className="sg-a sg-pop" style={{ animationDelay: `${Math.min(index, 8) * 60}ms` }}>
                                     <Face player={player} size={84} className="hs-roll__face" />
                                     <span className="hs-roll__name">{player.username}</span>
-                                    {(player.player_id === playerId || player.is_host) && (
-                                        <span className="hs-roll__you">
-                                            {[player.player_id === playerId && 'You', player.is_host && 'Host'].filter(Boolean).join(' · ')}
-                                        </span>
-                                    )}
+                                    {player.player_id === playerId && <span className="hs-roll__you">You</span>}
+                                    {player.is_host && <span className="hs-roll__you" data-testid="host-mark">Host</span>}
                                 </li>
                             ))}
                             {Array.from({ length: openSeats }, (_, i) => (
