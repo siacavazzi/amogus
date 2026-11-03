@@ -268,6 +268,16 @@ class SetupAndClientMetricTests(EventLogTestCase):
         self.assertEqual(2, len([row for row in self.tracker.events if row['event'].startswith('client')
                                  and row['event'] != 'connection_opened']))
 
+    def test_translated_pages_tag_later_events_with_the_language(self):
+        client = self.make_client()
+        client.emit('client_metric', {'kind': 'page_translated', 'lang': 'fr', 'dom_conflicts': 3})
+        client.emit('client_metric', {'kind': 'client_error', 'error_type': 'NotFoundError'})
+        client.emit('client_metric', {'kind': 'page_translated', 'lang': '<script>', 'dom_conflicts': 'x'})
+        rows = self.tracker.named('page_translated')
+        self.assertEqual(['fr', 'unknown'], [row['lang'] for row in rows])
+        self.assertEqual([3, None], [row['dom_conflicts'] for row in rows])
+        self.assertEqual('fr', self.tracker.named('client_error')[-1]['translated_to'])
+
     def test_client_metrics_are_capped_per_socket(self):
         client = self.make_client()
         for _ in range(server_app.CLIENT_METRICS_PER_SOCKET + 5):

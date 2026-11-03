@@ -148,7 +148,7 @@ export const PlayerCardCompact = ({
       />
       <div className="flex-1 min-w-0 text-left">
         <div className="flex items-center gap-2">
-          <span className="truncate" style={{ fontWeight: 900, fontSize: 17 }}>
+          <span className="truncate" style={{ fontWeight: 900, fontSize: 17 }} translate="no">
             {player.username}
           </span>
           {player.sus && (
@@ -181,7 +181,7 @@ export const PlayerBadge = ({
         isDead={!player.alive}
         deathCause={player.death_cause}
       />
-      <span style={{ fontWeight: 700, fontSize: 15 }}>
+      <span style={{ fontWeight: 700, fontSize: 15 }} translate="no">
         {player.username}
       </span>
       {player.sus && variant !== "intruder" && (
@@ -301,7 +301,7 @@ const PlayerCard = ({
           }}
         />
 
-        <p className="text-sm font-bold text-white truncate leading-tight text-center">
+        <p className="text-sm font-bold text-white truncate leading-tight text-center" translate="no">
           {player.username}
           {isMe && <span className="text-indigo-400 font-normal text-xs"> · me</span>}
         </p>

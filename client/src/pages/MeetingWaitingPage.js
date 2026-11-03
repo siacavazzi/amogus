@@ -107,7 +107,7 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
                     </span>
                   )}
                 </div>
-                <span style={{ fontWeight: 700, fontSize: 13, maxWidth: 64, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', opacity: ready ? 1 : 0.6 }}>
+                <span style={{ fontWeight: 700, fontSize: 13, maxWidth: 64, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', opacity: ready ? 1 : 0.6 }} translate="no">
                   {player.username}
                 </span>
                 {player.active === false && (

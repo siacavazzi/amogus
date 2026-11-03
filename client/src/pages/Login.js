@@ -140,7 +140,7 @@ function LoginPage() {
                         <div className="sg-join__me">
                             <div className="sg-join__face"><Avatar id={pic} className="w-full h-full" /></div>
                             <div style={{ minWidth: 0 }}>
-                                <h1 className="sg-big sg-h2 sg-join__who">{username}</h1>
+                                <h1 className="sg-big sg-h2 sg-join__who" translate="no">{username}</h1>
                                 <p className="sg-lede" style={{ opacity: 0.85 }}>{avatar?.name}</p>
                                 <p className="sg-small" style={{ opacity: 0.6 }}>Room {roomCode}</p>
                             </div>

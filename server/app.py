@@ -760,6 +760,13 @@ def handle_client_metric(data=None):
                      screen=clean_label(data.get('screen'), 60), where=clean_label(data.get('where'), 80),
                      client_version=clean_label(data.get('client_version'), 40),
                      unhandled_rejection=data.get('unhandled_rejection') is True)
+    elif kind == 'page_translated':
+        # A browser translator rewrote this phone's page; later events from it carry the language.
+        lang = clean_label(data.get('lang'), 12, r'[A-Za-z-]+') or 'unknown'
+        conflicts = data.get('dom_conflicts')
+        client_metrics_by_sid.setdefault(request.sid, {})['translated_to'] = lang
+        record_usage('page_translated', game, lang=lang,
+                     dom_conflicts=min(conflicts, 10000) if type(conflicts) is int and conflicts >= 0 else None)
 
 
 # ============ CONNECTION HANDLING ============
@@ -776,6 +783,9 @@ def handle_connect(auth=None):
         **client_info.describe(request.headers.get('User-Agent', '')),
         'utc_offset_minutes': offset if type(offset) is int and -840 <= offset <= 840 else None,
     }
+    translated_to = clean_label(auth.get('translated_to'), 12, r'[A-Za-z-]+') if isinstance(auth, dict) else None
+    if translated_to:
+        client_metrics_by_sid[request.sid]['translated_to'] = translated_to
     last_drop = clean_last_drop(auth.get('last_drop') if isinstance(auth, dict) else None)
     if last_drop:
         last_drop_by_sid[request.sid] = last_drop

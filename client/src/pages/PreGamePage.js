@@ -564,7 +564,7 @@ function PreGamePage() {
                     <div style={{ display: 'grid', gap: 14 }}>
                         <button type="button" onClick={copyRoomCode} className="hs-code" title="Copy room code" aria-label="Copy room code">
                             <span className="hs-label">Room code</span>
-                            <span className="hs-code__value" data-testid="room-code">{roomCode}</span>
+                            <span className="hs-code__value" data-testid="room-code" translate="no">{roomCode}</span>
                             <span className="hs-code__tap" aria-live="polite">
                                 {roomCodeCopied ? <><Check size={16} /> Copied</> : <><Copy size={16} /> Tap to copy</>}
                             </span>
@@ -599,7 +599,7 @@ function PreGamePage() {
                             {players.map((player, index) => (
                                 <li key={player.player_id || player.id || index} className="sg-a sg-pop" style={{ animationDelay: `${Math.min(index, 8) * 60}ms` }}>
                                     <Face player={player} size={84} className="hs-roll__face" />
-                                    <span className="hs-roll__name">{player.username}</span>
+                                    <span className="hs-roll__name" translate="no">{player.username}</span>
                                     {player.player_id === playerId && <span className="hs-roll__you">You</span>}
                                     {player.is_host && <span className="hs-roll__you" data-testid="host-mark">Host</span>}
                                 </li>

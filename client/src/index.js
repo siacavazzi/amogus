@@ -5,6 +5,10 @@ import './signal/signal.css';
 import App from './App';
 import BetaBadge from './components/BetaBadge';
 import { CLIENT_VERSION } from './version';
+import { installTranslateGuard } from './utils/translateGuard';
+
+// Before React touches the DOM: browser translators must not be able to crash the game.
+installTranslateGuard();
 
 console.info(`Sus Party ${CLIENT_VERSION.version}${CLIENT_VERSION.commit ? ` (${CLIENT_VERSION.commit})` : ''}`);
 

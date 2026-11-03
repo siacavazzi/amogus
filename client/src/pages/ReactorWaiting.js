@@ -69,7 +69,7 @@ function ReactorWaiting() {
             <div className="sg-rx__joincode">
               <p className="sg-rx__label sg-a sg-rise">Room code</p>
               <div className="sg-rx__codebox">
-                <h1 className="sg-rx__code sg-a sg-slam" aria-label={`Room code ${roomCode}`} data-testid="room-code">{roomCode}</h1>
+                <h1 className="sg-rx__code sg-a sg-slam" aria-label={`Room code ${roomCode}`} data-testid="room-code" translate="no">{roomCode}</h1>
                 <button type="button" onClick={copyRoomCode} className="sg-rx__copy" title="Copy room code" aria-label="Copy room code">
                   {copied ? <Check size={28} strokeWidth={3} /> : <Copy size={26} />}
                 </button>
@@ -102,7 +102,7 @@ function ReactorWaiting() {
             joined.map((player) => (
               <div key={player.player_id || player.id || player.username} className="sg-rx__face sg-a sg-pop">
                 <Face player={player} size={many ? 56 : 88} className="sg-rx__face-ring" />
-                <span>{player.username}</span>
+                <span translate="no">{player.username}</span>
                 {player === host && <span className="sg-rx__host-tag">Host</span>}
               </div>
             ))

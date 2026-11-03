@@ -227,7 +227,7 @@ const CrewmemberPage = ({
             {intrudersRevealed?.intruder_names?.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {intrudersRevealed.intruder_names.map((name, i) => (
-                  <span key={i} className="sg-pill" style={{ background: '#fff', color: 'var(--sg-out)', fontSize: 18, padding: '9px 16px' }}>
+                  <span key={i} className="sg-pill" style={{ background: '#fff', color: 'var(--sg-out)', fontSize: 18, padding: '9px 16px' }} translate="no">
                     {name}
                   </span>
                 ))}

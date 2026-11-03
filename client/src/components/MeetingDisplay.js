@@ -58,7 +58,7 @@ const MeetingDisplay = ({ message = "Meeting called", stage = 'waiting', callerN
                         </span>
                       )}
                     </div>
-                    <span style={{ opacity: ready ? 1 : 0.6 }}>{player.username}</span>
+                    <span style={{ opacity: ready ? 1 : 0.6 }} translate="no">{player.username}</span>
                   </div>
                 );
               })}
