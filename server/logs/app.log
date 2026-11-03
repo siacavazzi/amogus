@@ -8865,3 +8865,67 @@
 2026-10-31 19:01:34,910 - app_logger - dev-5f91f39 - INFO -  * Running with HTTP at: http://192.0.2.2:5001
 2026-10-31 19:01:34,910 - app_logger - dev-5f91f39 - INFO -  * For HTTPS, generate certificates with:
 2026-10-31 19:01:34,910 - app_logger - dev-5f91f39 - INFO -    openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365
+2026-11-03 21:24:27,996 - app_logger - dev-2997fc4 - INFO - Starting Sus Party prod server version dev-2997fc4 (commit 2997fc4, built None)
+2026-11-03 21:24:28,002 - app_logger - dev-2997fc4 - INFO - Starting server...
+2026-11-03 21:24:28,002 - app_logger - dev-2997fc4 - INFO -  * Running with HTTP at: http://192.0.2.2:5001
+2026-11-03 21:24:28,002 - app_logger - dev-2997fc4 - INFO -  * For HTTPS, generate certificates with:
+2026-11-03 21:24:28,002 - app_logger - dev-2997fc4 - INFO -    openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365
+2026-11-03 21:24:49,138 - app_logger - dev-2997fc4 - INFO - Starting Sus Party prod server version dev-2997fc4 (commit 2997fc4, built None)
+2026-11-03 21:24:49,145 - app_logger - dev-2997fc4 - INFO - Starting server...
+2026-11-03 21:24:49,145 - app_logger - dev-2997fc4 - INFO -  * Running with HTTP at: http://192.0.2.2:5001
+2026-11-03 21:24:49,146 - app_logger - dev-2997fc4 - INFO -  * For HTTPS, generate certificates with:
+2026-11-03 21:24:49,146 - app_logger - dev-2997fc4 - INFO -    openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365
+2026-11-03 21:25:52,642 - app_logger - dev-2997fc4 - WARNING - [e2e] Meltdown started in room WEXM (triggered by sid: dCQeeG6lDyiTvpqoAAAS)
+2026-11-03 21:25:57,087 - app_logger - dev-2997fc4 - INFO - Player e4a75c5e-f567-4277-a818-29062ec9332e in room AXAR is offline; the room stops waiting for them
+2026-11-03 21:25:57,088 - app_logger - dev-2997fc4 - INFO - Game AXAR: Reset vote from None. 0/0 votes.
+2026-11-03 21:25:57,319 - app_logger - dev-2997fc4 - INFO - Player d665b65f-8685-4976-b1ca-28f537aefd57 in room AXAR is offline; the room stops waiting for them
+2026-11-03 21:25:57,320 - app_logger - dev-2997fc4 - INFO - Game AXAR: Reset vote from None. 0/0 votes.
+2026-11-03 21:25:57,349 - app_logger - dev-2997fc4 - INFO - Player e8b58721-da6d-4b38-9480-51e210405d7d in room AXAR is offline; the room stops waiting for them
+2026-11-03 21:25:57,349 - app_logger - dev-2997fc4 - INFO - Game AXAR: Reset vote from None. 0/0 votes.
+2026-11-03 21:25:57,617 - app_logger - dev-2997fc4 - INFO - Player f4d91aba-1d1b-46e8-87d6-383a7e07fc71 in room AXAR is offline; the room stops waiting for them
+2026-11-03 21:25:57,617 - app_logger - dev-2997fc4 - INFO - Game AXAR: Reset vote from None. 0/0 votes.
+2026-11-03 21:26:56,054 - app_logger - dev-2997fc4 - INFO - Player 9a9a48c4-2a73-47db-9cb1-2b33737ad447 in room WEXM is offline; the room stops waiting for them
+2026-11-03 21:26:56,055 - app_logger - dev-2997fc4 - INFO - Game WEXM: Reset vote from None. 0/0 votes.
+2026-11-03 21:26:56,341 - app_logger - dev-2997fc4 - INFO - Player a95e260b-41c1-4f1d-af72-4ca649892d02 in room WEXM is offline; the room stops waiting for them
+2026-11-03 21:26:56,341 - app_logger - dev-2997fc4 - INFO - Game WEXM: Reset vote from None. 0/0 votes.
+2026-11-03 21:26:56,475 - app_logger - dev-2997fc4 - INFO - Player 88e827b6-bd04-42e1-b8ce-f2ae768c1d43 in room WEXM is offline; the room stops waiting for them
+2026-11-03 21:26:56,475 - app_logger - dev-2997fc4 - INFO - Game WEXM: Reset vote from None. 0/0 votes.
+2026-11-03 21:26:56,662 - app_logger - dev-2997fc4 - INFO - Player 712841cd-41e9-41d9-96d6-0c0d99343242 in room WEXM is offline; the room stops waiting for them
+2026-11-03 21:26:56,662 - app_logger - dev-2997fc4 - INFO - Game WEXM: Reset vote from None. 0/0 votes.
+2026-11-03 21:27:52,117 - app_logger - dev-2997fc4 - INFO - Player 9c6809ab-a6bf-4aa1-b102-f4129210ee0b in room HERR is offline; the room stops waiting for them
+2026-11-03 21:27:52,458 - app_logger - dev-2997fc4 - INFO - Player fae30493-19da-4f84-bd08-02564d97d180 in room HERR is offline; the room stops waiting for them
+2026-11-03 21:27:52,575 - app_logger - dev-2997fc4 - INFO - Player 8eba581d-b6d9-46bb-9e79-6ca4281533ce in room HERR is offline; the room stops waiting for them
+2026-11-03 21:27:52,694 - app_logger - dev-2997fc4 - INFO - Player dd4497e4-f53f-44ad-a07d-3d6265e679d0 in room HERR is offline; the room stops waiting for them
+2026-11-03 21:28:54,310 - app_logger - dev-2997fc4 - INFO - Player b7fc85a2-60c6-4d4a-8896-b9643814326e in room YAEM is offline; the room stops waiting for them
+2026-11-03 21:28:54,466 - app_logger - dev-2997fc4 - INFO - Player d44f00a1-8d8c-45eb-8aa6-a784b4b95373 in room YAEM is offline; the room stops waiting for them
+2026-11-03 21:28:54,687 - app_logger - dev-2997fc4 - INFO - Player 5fd77051-976b-4fb1-9139-79f4f3d67a51 in room YAEM is offline; the room stops waiting for them
+2026-11-03 21:28:54,777 - app_logger - dev-2997fc4 - INFO - Player 0c97d869-9b79-4224-8dd9-a62ce3af7829 in room YAEM is offline; the room stops waiting for them
+2026-11-03 21:28:54,941 - app_logger - dev-2997fc4 - INFO - Player 6c96f382-82a7-4337-b2b0-6d0cc12b0134 in room YAEM is offline; the room stops waiting for them
+2026-11-03 21:28:54,964 - app_logger - dev-2997fc4 - INFO - Player 3182150e-3128-4c23-9305-037e4e9d30bb in room YAEM is offline; the room stops waiting for them
+2026-11-03 21:29:44,385 - app_logger - dev-2997fc4 - INFO - Player 6a84c1ee-70a6-4866-9bac-fe4c4fd46150 in room AATM is offline; the room stops waiting for them
+2026-11-03 21:29:44,617 - app_logger - dev-2997fc4 - INFO - Player 9a06d801-291f-4469-acdf-cc4f9d1790cf in room AATM is offline; the room stops waiting for them
+2026-11-03 21:29:44,876 - app_logger - dev-2997fc4 - INFO - Player 670f31bb-ec8e-4464-8608-64603329b14b in room AATM is offline; the room stops waiting for them
+2026-11-03 21:29:44,983 - app_logger - dev-2997fc4 - INFO - Player ab57762f-d0b7-4fd4-a1b9-c21a103135b8 in room AATM is offline; the room stops waiting for them
+2026-11-03 21:29:45,113 - app_logger - dev-2997fc4 - INFO - Player bb93525e-d158-4f1e-9382-f2eb83357af7 in room AATM is offline; the room stops waiting for them
+2026-11-03 21:29:45,176 - app_logger - dev-2997fc4 - INFO - Player 4ee0c6a4-a8c9-4f48-beb4-f5bccc901ed3 in room AATM is offline; the room stops waiting for them
+2026-11-03 21:29:45,276 - app_logger - dev-2997fc4 - INFO - Player 2b185863-951f-4ab8-b719-435ff401806c in room AATM is offline; the room stops waiting for them
+2026-11-03 21:29:45,374 - app_logger - dev-2997fc4 - INFO - Player db9621af-02ec-413b-88c2-2b35058b9e62 in room AATM is offline; the room stops waiting for them
+2026-11-03 21:30:16,235 - app_logger - dev-2997fc4 - INFO - Player dfe30e68-2ed7-47fd-8d46-6ab208ec9734 in room YHTR is offline; the room stops waiting for them
+2026-11-03 21:30:16,352 - app_logger - dev-2997fc4 - INFO - Player f5398b8d-885b-4542-9866-4c7ab946382b in room YHTR is offline; the room stops waiting for them
+2026-11-03 21:30:16,464 - app_logger - dev-2997fc4 - INFO - Player 16ab36e0-c27d-4b9e-a238-69c76831ef7e in room YHTR is offline; the room stops waiting for them
+2026-11-03 21:30:16,690 - app_logger - dev-2997fc4 - INFO - Player ab4650aa-0ee3-4d78-b3f0-eb9d15795cbf in room YHTR is offline; the room stops waiting for them
+2026-11-03 21:30:55,492 - app_logger - dev-2997fc4 - INFO - Player 2d166090-8442-43cc-ac54-9a7367ece334 in room WYYA is offline; the room stops waiting for them
+2026-11-03 21:30:55,493 - app_logger - dev-2997fc4 - INFO - Game WYYA: Reset vote from None. 0/0 votes.
+2026-11-03 21:30:55,674 - app_logger - dev-2997fc4 - INFO - Player 75ea84d0-f7f2-4512-9d20-5d6b7153b017 in room WYYA is offline; the room stops waiting for them
+2026-11-03 21:30:55,675 - app_logger - dev-2997fc4 - INFO - Game WYYA: Reset vote from None. 0/0 votes.
+2026-11-03 21:30:55,778 - app_logger - dev-2997fc4 - INFO - Player 0cfa4638-66b6-424c-9c08-99bee3f89f44 in room WYYA is offline; the room stops waiting for them
+2026-11-03 21:30:55,778 - app_logger - dev-2997fc4 - INFO - Game WYYA: Reset vote from None. 0/0 votes.
+2026-11-03 21:30:55,891 - app_logger - dev-2997fc4 - INFO - Player 531bc234-acbc-4f25-a4a7-5ae8324848ed in room WYYA is offline; the room stops waiting for them
+2026-11-03 21:30:55,891 - app_logger - dev-2997fc4 - INFO - Game WYYA: Reset vote from None. 0/0 votes.
+2026-11-03 21:30:56,014 - app_logger - dev-2997fc4 - INFO - Player 4a75222c-fb8a-4025-a635-e45ffea20adc in room WYYA is offline; the room stops waiting for them
+2026-11-03 21:30:56,014 - app_logger - dev-2997fc4 - INFO - Game WYYA: Reset vote from None. 0/0 votes.
+2026-11-03 21:31:55,944 - app_logger - dev-2997fc4 - INFO - Player cb9594a5-41de-4cbc-a716-9970b58ac45b in room WRMM is offline; the room stops waiting for them
+2026-11-03 21:31:56,084 - app_logger - dev-2997fc4 - INFO - Player 4bf7b0d9-0389-47da-972e-4d8d102f5011 in room WRMM is offline; the room stops waiting for them
+2026-11-03 21:31:56,216 - app_logger - dev-2997fc4 - INFO - Player 166881b6-244d-41f3-b440-f693c44c21cd in room WRMM is offline; the room stops waiting for them
+2026-11-03 21:31:56,424 - app_logger - dev-2997fc4 - INFO - Player c1b874e1-f738-469b-b335-735202a2c0e8 in room WRMM is offline; the room stops waiting for them
+2026-11-03 21:32:23,459 - app_logger - dev-2997fc4 - INFO - Player 5faa498e-d5d3-4be9-8960-ae06f7da10cd in room ATAX is offline; the room stops waiting for them
