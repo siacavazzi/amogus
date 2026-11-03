@@ -92,10 +92,43 @@ function fill(text, vars) {
 /** Marks English text for the catalogs without translating it yet (lookup tables, defaults). Pass it to t() when shown. */
 export const tk = text => text;
 
+// Server text with values in it ("Need at least 5 players for 2 intruder(s).") matched back to its template.
+const TEMPLATES = [];
+
+function escapeRegExp(text) {
+    return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/** Teach t() to recognise filled-in English templates, e.g. server messages that quote a task. */
+export function registerTemplates(templates) {
+    for (const template of templates) {
+        const names = [...template.matchAll(/\{(\w+)\}/g)].map(m => m[1]);
+        if (!names.length) continue;
+        const source = escapeRegExp(template).replace(/\\\{\w+\\\}/g, '(.+?)');
+        TEMPLATES.push({ template, names, pattern: new RegExp(`^${source}$`) });
+    }
+}
+
+function fromTemplate(catalog, text) {
+    for (const { template, names, pattern } of TEMPLATES) {
+        const entry = catalog[template];
+        if (typeof entry !== 'string' || !entry) continue;
+        const match = text.match(pattern);
+        if (match) return fill(entry, Object.fromEntries(names.map((name, i) => [name, match[i + 1]])));
+    }
+    return null;
+}
+
 /** Translate `text`, filling {placeholders} from `vars`. */
 export function t(text, vars) {
-    const entry = CATALOGS[getLanguage()]?.[text];
-    return fill(typeof entry === 'string' && entry ? entry : text, vars);
+    const catalog = CATALOGS[getLanguage()];
+    const entry = catalog?.[text];
+    if (typeof entry === 'string' && entry) return fill(entry, vars);
+    if (!vars && typeof text === 'string' && catalog && TEMPLATES.length) {
+        const matched = fromTemplate(catalog, text);
+        if (matched) return matched;
+    }
+    return fill(text, vars);
 }
 
 const pluralRules = {};

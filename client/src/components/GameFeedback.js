@@ -59,7 +59,7 @@ export default function GameFeedback() {
                 rating, comment: comment.trim(),
             });
             if (response?.ok !== true) {
-                setError(response?.error || 'Feedback did not save. Try again.');
+                setError(t(response?.error || 'Feedback did not save. Try again.'));
                 return;
             }
             sendClientMetric(socket, { kind: 'end_screen_action', action: 'feedback_sent' });

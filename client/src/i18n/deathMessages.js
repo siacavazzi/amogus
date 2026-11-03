@@ -1,7 +1,7 @@
 // The server picks a death message in English (server/assets/player.py). Phones show it in their
 // own language: fixed lines are catalog keys, and the lines that quote a task are matched back to
 // their template so the task text stays as the host wrote it. Keep this list in sync with the server.
-import { t, tk } from './index';
+import { registerTemplates, t, tk } from './index';
 
 export const DEATH_MESSAGES = [
     tk('was yeeted into the cold vacuum of space by popular demand'),
@@ -46,7 +46,7 @@ export const DEATH_MESSAGES = [
     tk('ceased to exist for reasons unknown'),
 ];
 
-const TASK_TEMPLATES = [
+export const TASK_TEMPLATES = [
     tk("was brutally murdered while trying to '{task}'"),
     tk("got killed mid-way through '{task}' like a true martyr"),
     tk("died attempting to complete '{task}' - so close, yet so dead"),
@@ -54,22 +54,9 @@ const TASK_TEMPLATES = [
     tk("never got to finish '{task}' because someone chose violence"),
 ];
 
-function escapeRegExp(text) {
-    return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
+registerTemplates(TASK_TEMPLATES);
 
-const TASK_PATTERNS = TASK_TEMPLATES.map(template => ({
-    template,
-    pattern: new RegExp(`^${escapeRegExp(template).replace('\\{task\\}', '(.+)')}$`),
-}));
-
+/** The death message in this phone's language (see registerTemplates for the ones that quote a task). */
 export function localizeDeathMessage(message) {
-    if (!message) return message;
-    const direct = t(message);
-    if (direct !== message) return direct;
-    for (const { template, pattern } of TASK_PATTERNS) {
-        const match = message.match(pattern);
-        if (match) return t(template, { task: match[1] });
-    }
-    return message;
+    return message ? t(message) : message;
 }

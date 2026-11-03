@@ -10,6 +10,7 @@ import { getRoomCodeFromSearch, getEntryMethodFromSearch, clearRoomCodeFromUrl }
 import { createDropTracker, installErrorReporting, sendClientMetric } from './utils/clientMetrics';
 import { translateConflicts, translatedTo, watchForTranslation } from './utils/translateGuard';
 import { t } from './i18n';
+import './i18n/serverMessages';
 import { createRequestId, emitVolatileWithAck, SOCKET_COMMAND_TIMEOUT_MS } from './utils/socketCommand';
 
 // Allow URL param override for testing: ?mobile=true or ?mobile=false
