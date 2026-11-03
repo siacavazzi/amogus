@@ -182,13 +182,6 @@
     "prerender": true
   },
   {
-    "path": "/game-night-app",
-    "canonical": "https://susparty.com/game-night-app",
-    "priority": "0.8",
-    "changefreq": "monthly",
-    "prerender": true
-  },
-  {
     "path": "/sus-games",
     "canonical": "https://susparty.com/sus-games",
     "priority": "0.8",
@@ -203,22 +196,8 @@
     "prerender": true
   },
   {
-    "path": "/online-party-games",
-    "canonical": "https://susparty.com/online-party-games",
-    "priority": "0.8",
-    "changefreq": "monthly",
-    "prerender": true
-  },
-  {
     "path": "/mafia-game-app",
     "canonical": "https://susparty.com/mafia-game-app",
-    "priority": "0.8",
-    "changefreq": "monthly",
-    "prerender": true
-  },
-  {
-    "path": "/in-person-party-games",
-    "canonical": "https://susparty.com/in-person-party-games",
     "priority": "0.8",
     "changefreq": "monthly",
     "prerender": true

@@ -5,7 +5,7 @@ import GameplayScreenshots from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const SETUP_URL = '/among-us-irl-task-generator?venue=apartment&players=6&movement=normal&style=mix';
-const DESCRIPTION = 'Play a free phone party game together in person. Sus Party puts secret roles on your phones and real tasks around your home. No download, account, or TV required.';
+const DESCRIPTION = 'A free online party game you play in person, with your phones. Sus Party puts secret roles on your phones and real tasks around your home. No download, account, or TV required.';
 const SCHEMA = {
     '@context': 'https://schema.org', '@type': 'Article',
     headline: 'A phone party game with real-life alibis', description: DESCRIPTION,
@@ -15,7 +15,7 @@ const SCHEMA = {
 
 export default function PhonePartyPage() {
     usePageMeta({
-        title: 'Party Games With Phones: Play Together in Person | Sus Party',
+        title: 'Party Games With Phones: Free Online Game, Played in Person | Sus Party',
         description: DESCRIPTION, canonical: 'https://susparty.com/party-games-on-your-phone', schema: SCHEMA,
     });
     return (

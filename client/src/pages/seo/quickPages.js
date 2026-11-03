@@ -3,36 +3,6 @@
 const gen = query => `/among-us-irl-task-generator?${query}`;
 
 const QUICK_PAGES = {
-    '/game-night-app': {
-        title: 'Game Night App: Free Party Game on Your Phones | Sus Party',
-        description: 'Sus Party is a free game night app for groups playing in person. It plays like Among Us in real life: phones hand out secret roles, you do real tasks, then vote out the intruder.',
-        eyebrow: 'Game night app · Free · No download',
-        h1: 'A game night app that gets everyone off the couch',
-        lead: 'Sus Party is Among Us in real life, run from your phones. Everyone gets a secret role, does small real tasks around the house, and tries to catch the intruder before it is too late.',
-        pack: { href: gen('venue=apartment&players=8&style=50'), label: 'Start with the 8-player game night pack' },
-        sections: [
-            {
-                h2: 'Why use an app for game night?',
-                body: [
-                    'Hidden-role games are great until someone has to run them. With Mafia or Werewolf, one friend sits out to narrate. Sus Party does that job: it deals roles, gives out tasks, runs meetings, and counts votes. The host plays too.',
-                    'Everyone uses the phone they already have. There is nothing to install and no account to make. A TV or laptop can show the shared game screen, but you do not need one.',
-                ],
-            },
-            {
-                h2: 'What a round looks like',
-                body: [
-                    'Eight friends spread out around the apartment. One counts the mugs in the kitchen. Another folds a paper plane in the hallway. The intruder pretends to do the same, waits until someone is alone, and quietly taps them out.',
-                    'When the body is found, everyone meets in the living room, compares stories, and votes. A round takes about 10 to 20 minutes, so you can play several in one night.',
-                ],
-            },
-        ],
-        faqs: [
-            { q: 'How many people can play?', a: 'From 3 to 20+. Four to ten is the sweet spot for a home game night.' },
-            { q: 'Does everyone need a phone?', a: 'Yes. Each player needs a phone with a browser and internet, because roles are secret.' },
-            { q: 'Is it free?', a: 'Yes. No ads, no account, no download.' },
-        ],
-    },
-
     '/sus-games': {
         title: 'Sus Games: A Free "Who\'s Sus?" Party Game | Sus Party',
         description: 'Looking for a sus game to play with friends? Sus Party is a free in-person game like Among Us IRL or Mafia: secret roles on your phones, real tasks, and one big vote.',
@@ -92,35 +62,6 @@ const QUICK_PAGES = {
         ],
     },
 
-    '/online-party-games': {
-        title: 'Online Party Game You Play Together in Person | Sus Party',
-        description: 'Sus Party is a free online party game you play together in person. Join from any phone browser, get a secret role, and find the intruder among your friends.',
-        eyebrow: 'Online party game · Played in person',
-        h1: 'An online party game you play together in person',
-        lead: 'Most online party games keep everyone staring at one screen. Sus Party uses your phones to get people up and moving. It plays like Among Us in real life: secret roles, real tasks, and a vote.',
-        pack: { href: gen('venue=apartment&players=6&style=50'), label: 'Start with the 6-player apartment pack' },
-        sections: [
-            {
-                h2: 'Online setup, real-life game',
-                body: [
-                    'The game runs in the browser. One person opens a room at susparty.com and shares a four-letter code. Everyone else types it in on their own phone. No app store, no account, no console.',
-                    'What happens next is offline in the best way. People split up around the house or venue to do small tasks while an intruder tries to blend in and take them out. Meetings happen face to face. Phones are only there for roles, tasks and votes.',
-                ],
-            },
-            {
-                h2: 'Is it for remote groups?',
-                body: [
-                    'No. Sus Party needs everyone in the same place, because the tasks and the eliminations happen in person. For a party, a dorm floor, an office or a youth group night, that is the point.',
-                ],
-            },
-        ],
-        faqs: [
-            { q: 'What do we need?', a: 'A phone with a browser and internet for each player, and a few rooms or areas to spread out in.' },
-            { q: 'How many players?', a: 'From 3 to 20+.' },
-            { q: 'Is it really free?', a: 'Yes. There are no ads, no accounts and nothing to buy.' },
-        ],
-    },
-
     '/mafia-game-app': {
         title: 'Mafia Game App: Play Mafia With Phones, No Narrator | Sus Party',
         description: 'Sus Party is a free Mafia-style game app for in-person groups. Phones deal the roles and count the votes, so nobody has to narrate. Everyone moves around and plays.',
@@ -147,35 +88,6 @@ const QUICK_PAGES = {
             { q: 'How many players?', a: 'At least 3, and it works well for 20+. On Auto, the game picks one intruder for every five players.' },
             { q: 'Do we need cards?', a: 'No. Roles, tasks and votes are all on the phones. You just need some rooms to spread out in.' },
             { q: 'Can I still run classic Mafia with it?', a: 'No. Sus Party has its own rules built around real tasks and moving around.' },
-        ],
-    },
-
-    '/in-person-party-games': {
-        title: 'In-Person Party Game for Big Groups, With Phones | Sus Party',
-        description: 'A free in-person party game for 3 to 20+ people. Sus Party plays like Among Us in real life: secret roles on phones, real tasks around the venue, and a group vote.',
-        eyebrow: 'In-person party game · 3 to 20+ players',
-        h1: 'An in-person party game that uses the whole venue',
-        lead: 'Sus Party is a free party game for people in the same place. Think Among Us in real life, or Mafia where everyone walks around. Easy to learn, and built for real parties and events.',
-        pack: { href: gen('venue=house&players=15&style=75'), label: 'Start with the 15-player house pack' },
-        sections: [
-            {
-                h2: 'Made for physical events',
-                body: [
-                    'Parties, game nights, dorm floors, office socials, library programs, youth groups and camps. If you have a group and a few rooms, you can play. The host picks a task pack for the space, opens a room, and shares the code.',
-                    'Big groups work well. More players means more intruders, more alibis and louder meetings. A laptop or TV in the meeting spot can show the shared game screen so everyone sees the vote.',
-                ],
-            },
-            {
-                h2: 'Easy to explain',
-                body: [
-                    'Crew members do the tasks on their phone, like straightening the cushions or writing the time on a sticky note. Intruders fake tasks and tap people out when nobody is watching. Find a body, call a meeting, vote someone out. That is it. A short tutorial in the app covers the rest.',
-                ],
-            },
-        ],
-        faqs: [
-            { q: 'What is the most players you can have?', a: 'It is built for 20+ players. The task generator makes packs for groups of up to 30.' },
-            { q: 'Do people need to download anything?', a: 'No. Everyone joins at susparty.com in a phone browser.' },
-            { q: 'Is it safe for kids and schools?', a: 'Yes. Eliminations are a tap and a quiet "you\'re out". Leaders can see the <a href="/among-us-irl-for-youth-groups">guide for youth groups and libraries</a>.' },
         ],
     },
 

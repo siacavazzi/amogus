@@ -131,11 +131,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://susparty.com/game-night-app</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://susparty.com/sus-games</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -146,17 +141,7 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://susparty.com/online-party-games</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://susparty.com/mafia-game-app</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://susparty.com/in-person-party-games</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

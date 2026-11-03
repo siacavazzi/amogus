@@ -22,12 +22,10 @@ const RELATED = [
     ['/among-us-irl-task-ideas', 'Task ideas by room'],
     ['/social-deduction-games', 'Social deduction games to play in person'],
     ['/party-games-on-your-phone', 'Party games with phones'],
-    ['/game-night-app', 'Game night app'],
+    ['/game-night-ideas', 'Game night with no moderator'],
     ['/sus-games', 'Sus games'],
     ['/among-us-party-game', 'Among Us party game'],
-    ['/online-party-games', 'Online party game played in person'],
     ['/mafia-game-app', 'Mafia game app'],
-    ['/in-person-party-games', 'In-person party games'],
     ['/chore-game-app', 'Chore game app'],
 ];
 

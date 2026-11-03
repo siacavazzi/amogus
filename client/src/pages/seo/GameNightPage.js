@@ -15,7 +15,7 @@ const SCHEMA = {
 
 function GameNightPage() {
     usePageMeta({
-        title: 'Game Night Ideas with No Moderator | Sus Party',
+        title: 'Game Night App and Ideas, No Moderator Needed | Sus Party',
         description: 'Want a game like Mafia or Werewolf without a dedicated moderator? Play Sus Party with secret roles, real tasks, and app-counted votes. The host plays too.',
         canonical: 'https://susparty.com/game-night-ideas', schema: SCHEMA,
     });
@@ -26,10 +26,9 @@ function GameNightPage() {
                 <p className="seo-eyebrow">Game night ideas · Host it, then get into it</p>
                 <h1 className="seo-h1">A game night where the host gets to play, too</h1>
                 <p className="seo-lead">
-                    You picked the date, invited the friends, and supplied the snacks. You deserve a secret
-                    role too. Sus Party is a free game-night idea that turns your home into a map of tasks
-                    and suspicious encounters. The app assigns roles and counts votes, so you can join
-                    the round and try to get away with a terrible alibi.
+                    Sus Party is a free game night app for groups playing in person. It is like Among Us in real
+                    life, or Mafia where everyone walks around: phones deal the secret roles and count the votes,
+                    so the host plays too. Your home becomes the map.
                 </p>
                 <div className="seo-actions">
                     <a href="/play" className="seo-btn--primary">Play Sus Party free →</a>

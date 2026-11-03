@@ -95,7 +95,7 @@ class StatsTracker:
                  '/party-games-for-adults', '/murder-mystery-party-game',
                  '/birthday-party-games-for-adults', '/game-night-ideas',
                  '/make-cleaning-fun-for-kids', '/traitors-at-home', '/party-games-on-your-phone',
-                 '/sleepover-games-for-teens', '/indoor-family-reunion-games', '/among-us-role-generator', '/among-us-chores', '/chore-games-for-kids', '/family-cleaning-routine', '/among-us-party-for-kids', '/among-us-irl-for-youth-groups', '/among-us-task-cards-printable', '/holiday-party-games-for-adults', '/game-night-app', '/sus-games', '/among-us-party-game', '/online-party-games', '/mafia-game-app', '/in-person-party-games', '/chore-game-app', '/how-to-play', '/faq', '/about'}
+                 '/sleepover-games-for-teens', '/indoor-family-reunion-games', '/among-us-role-generator', '/among-us-chores', '/chore-games-for-kids', '/family-cleaning-routine', '/among-us-party-for-kids', '/among-us-irl-for-youth-groups', '/among-us-task-cards-printable', '/holiday-party-games-for-adults', '/sus-games', '/among-us-party-game', '/mafia-game-app', '/chore-game-app', '/how-to-play', '/faq', '/about'}
         source = value.get('source')
         page = value.get('landing_page')
         return {
