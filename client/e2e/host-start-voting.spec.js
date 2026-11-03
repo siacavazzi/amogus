@@ -41,7 +41,7 @@ test('the host starts the vote while two people never slide ready', async ({ bro
 
     // One tap only arms it; the second starts the vote.
     await button.click();
-    await expect(button).toHaveText('Tap again to vote without 2');
+    await expect(button).toHaveText('Tap again to vote without 2 players');
     await expect(host.getByTestId('ready-count')).toHaveText('3 of 5 ready');
     await button.click();
 
