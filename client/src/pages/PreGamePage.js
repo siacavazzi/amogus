@@ -4,7 +4,7 @@ import { Plus, X, Check, Send, MapPin, Copy, Save, Play, LogOut, ToggleLeft, Tog
 import { Face } from '../signal';
 import '../signal/host.css';
 import { buildRoomInviteUrl } from '../utils/inviteLinks';
-import { t, tn } from '../i18n';
+import { getLanguage, t, tn } from '../i18n';
 
 function sameLocations(left, right) {
     return left.length === right.length && left.every((location, index) => location === right[index]);
@@ -520,7 +520,7 @@ function PreGamePage() {
         : !hasEnoughTotalTasks);
 
     const handleUseExampleTasks = () => {
-        socket?.emit('add_example_tasks', { room_code: roomCode, player_id: playerId });
+        socket?.emit('add_example_tasks', { room_code: roomCode, player_id: playerId, lang: getLanguage() });
     };
 
     // Calculate what's missing

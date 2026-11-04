@@ -94,3 +94,31 @@ describe('cleanup chores', () => {
         for (const pool of Object.values(CLEANUP_TASKS)) expect(new Set(pool).size).toBe(pool.length);
     });
 });
+
+describe('task languages', () => {
+    const { TASK_LOCALES } = require('./taskPools');
+    const fs = require('fs');
+    const path = require('path');
+    const source = ['taskPools.js', 'cleanupTasks.js'].map(file => fs.readFileSync(path.join(__dirname, file), 'utf8')).join('\n');
+    const { TASKS: pools, VENUE_ROOMS: venues } = require('./taskPools');
+    const { CLEANUP_TASKS, CLEANUP_ROOMS } = require('./cleanupTasks');
+    const english = new Set([...Object.values(pools).flat().map(entry => entry.task), ...Object.values(CLEANUP_TASKS).flat()]);
+    const rooms = new Set([...Object.values(venues).flat(), ...CLEANUP_ROOMS]);
+
+    it.each(Object.keys(TASK_LOCALES))('%s has every task and room', lang => {
+        const { tasks, rooms: roomNames } = TASK_LOCALES[lang];
+        expect([...english].filter(task => !tasks[task])).toEqual([]);
+        expect([...rooms].filter(room => !roomNames[room])).toEqual([]);
+        expect(Object.keys(tasks).filter(task => !english.has(task))).toEqual([]);
+        expect(source.length).toBeGreaterThan(0);
+    });
+
+    it('builds a whole pack in the chosen language', () => {
+        const pack = generateTasks({ venue: 'house', playerCount: 8, selectedRooms: ['Kitchen', 'Hallway'], taskLanguage: 'fr', random: () => 0.42 });
+        expect(pack.rooms).toEqual(['Cuisine', 'Couloir']);
+        expect(pack.tasks.every(task => pack.rooms.includes(task.location))).toBe(true);
+        expect(pack.tasks.every(task => TASK_LOCALES.fr.tasks[[...english].find(en => TASK_LOCALES.fr.tasks[en] === task.task)] === task.task)).toBe(true);
+        const custom = generateTasks({ venue: 'house', playerCount: 8, selectedRooms: ['Attic', 'Kitchen'], taskLanguage: 'de' });
+        expect(custom.rooms).toEqual(['Attic', 'Küche']);
+    });
+});

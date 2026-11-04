@@ -10,6 +10,18 @@ STARTER_TEMPLATE_CODE = "STARTER"
 STARTER_TEMPLATE_KEY = "starter_house"
 STARTER_TEMPLATE_NAME = "Example List"
 STARTER_TEMPLATE_DESCRIPTION = "A ready-to-run example you can edit. Add, remove, or tweak tasks to fit your space."
+# The Example List also comes as tasks.<lang>.json; a phone in another language gets English.
+STARTER_LANGUAGES = ("fr", "es", "de", "ro", "pt")
+STARTER_TEMPLATE_NAMES = {
+    "fr": "Liste d'exemple", "es": "Lista de ejemplo", "de": "Beispielliste",
+    "ro": "Listă de exemplu", "pt": "Lista de exemplo",
+}
+
+
+def starter_language(lang):
+    """The Example List language for a phone's language code ("en" when we have no translation)."""
+    base = lang.lower().split("-")[0] if isinstance(lang, str) else ""
+    return base if base in STARTER_LANGUAGES else "en"
 
 
 class TaskListManager:
@@ -61,13 +73,17 @@ class TaskListManager:
         """Get the file path for a task list."""
         return os.path.join(self.storage_dir, f"{code}.json")
 
-    def _get_default_task_list_path(self):
-        """Get the absolute path to the shared starter task template."""
-        return os.path.join(os.path.dirname(os.path.dirname(__file__)), "tasks.json")
+    def _get_default_task_list_path(self, lang="en"):
+        """Get the absolute path to the shared starter task template (tasks.json, or tasks.fr.json...)."""
+        lang = starter_language(lang)
+        name = "tasks.json" if lang == "en" else f"tasks.{lang}.json"
+        return os.path.join(os.path.dirname(os.path.dirname(__file__)), name)
 
-    def _load_default_tasks(self):
-        """Load the shared starter task template from disk."""
-        default_file = self._get_default_task_list_path()
+    def _load_default_tasks(self, lang="en"):
+        """Load the shared starter task template from disk, in English when a language has none."""
+        default_file = self._get_default_task_list_path(lang)
+        if not os.path.exists(default_file):
+            default_file = self._get_default_task_list_path("en")
         if not os.path.exists(default_file):
             return None
 
@@ -423,14 +439,14 @@ class TaskListManager:
             locations=original["locations"].copy()
         )
 
-    def import_from_default(self, player_id, name="My Task List"):
+    def import_from_default(self, player_id, name="My Task List", lang="en"):
         """
         Create a new task list from the default tasks.json file.
         
         Returns:
             The new task list code, or None on failure
         """
-        tasks = self._load_default_tasks()
+        tasks = self._load_default_tasks(lang)
         if not tasks:
             return None
 
@@ -444,14 +460,14 @@ class TaskListManager:
             source_template=STARTER_TEMPLATE_KEY
         )
 
-    def example_tasks(self):
+    def example_tasks(self, lang="en"):
         """The starter template's tasks and locations, for a lobby that needs tasks right now."""
-        tasks = self._load_default_tasks() or []
+        tasks = self._load_default_tasks(lang) or []
         return [task.copy() for task in tasks], self._extract_locations(tasks)
 
-    def get_default_task_list_template(self):
+    def get_default_task_list_template(self, lang="en"):
         """Return metadata for the shared starter task template."""
-        tasks = self._load_default_tasks()
+        tasks = self._load_default_tasks(lang)
         if not tasks:
             return None
 
@@ -461,7 +477,7 @@ class TaskListManager:
         return {
             "code": STARTER_TEMPLATE_CODE,
             "template_key": STARTER_TEMPLATE_KEY,
-            "name": STARTER_TEMPLATE_NAME,
+            "name": STARTER_TEMPLATE_NAMES.get(starter_language(lang), STARTER_TEMPLATE_NAME),
             "description": STARTER_TEMPLATE_DESCRIPTION,
             "task_count": len(tasks),
             "locations": locations,

@@ -5,7 +5,7 @@ import { readGeneratedSetup, clearGameDraft } from './seo/gameDraft';
 import { AUTO_INTRUDERS_SUMMARY, AUTO_TASKS_SUMMARY, TASKS_PER_CREWMATE, playersForIntruders } from '../utils/intruders';
 import { sendClientMetric } from '../utils/clientMetrics';
 import '../signal/host.css';
-import { t, tk } from '../i18n';
+import { getLanguage, t, tk } from '../i18n';
 
 const DEFAULT_CARD_DECK_COUNTS = {
     self_report: 4,
@@ -168,7 +168,7 @@ function GameConfigPage() {
             socket.emit('get_game_config', { room_code: roomCode });
         }
         if (socket && deviceId) {
-            socket.emit('get_my_task_lists', { player_id: deviceId });
+            socket.emit('get_my_task_lists', { player_id: deviceId, lang: getLanguage() });
         }
     }, [socket, roomCode, deviceId]);
 
@@ -245,14 +245,14 @@ function GameConfigPage() {
                 url.searchParams.delete('setup');
                 window.history.replaceState(null, '', url.pathname + url.search + url.hash);
             }
-            socket.emit('get_my_task_lists', { player_id: deviceId });
+            socket.emit('get_my_task_lists', { player_id: deviceId, lang: getLanguage() });
         };
 
         const handleTaskListUpdated = (data) => {
             console.log('Task list updated:', data);
             setCurrentTaskList(data.task_list);
             setTaskListLoading(false);
-            socket.emit('get_my_task_lists', { player_id: deviceId });
+            socket.emit('get_my_task_lists', { player_id: deviceId, lang: getLanguage() });
         };
 
         const handleTaskListApplied = (data) => {
@@ -270,7 +270,7 @@ function GameConfigPage() {
         const handleTaskListDeleted = (data) => {
             console.log('Task list deleted:', data);
             setCurrentTaskList(prev => prev && prev.code === data.code ? null : prev);
-            socket.emit('get_my_task_lists', { player_id: deviceId });
+            socket.emit('get_my_task_lists', { player_id: deviceId, lang: getLanguage() });
         };
 
         const handleError = (data) => {
@@ -387,6 +387,7 @@ function GameConfigPage() {
             player_id: deviceId,
             name: starterTemplate.name,
             from_default: true,
+            lang: getLanguage(),
         });
     };
 
