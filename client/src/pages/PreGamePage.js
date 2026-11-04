@@ -4,6 +4,7 @@ import { Plus, X, Check, Send, MapPin, Copy, Save, Play, LogOut, ToggleLeft, Tog
 import { Face } from '../signal';
 import '../signal/host.css';
 import { buildRoomInviteUrl } from '../utils/inviteLinks';
+import { t, tn } from '../i18n';
 
 function sameLocations(left, right) {
     return left.length === right.length && left.every((location, index) => location === right[index]);
@@ -111,7 +112,7 @@ function PreGamePage() {
     const isHost = isRoomCreator;
     
     const playerId = localStorage.getItem('player_id');
-    const playerName = players.find(p => p.player_id === playerId)?.username || 'You';
+    const playerName = players.find(p => p.player_id === playerId)?.username || t('You');
     
     // Real locations are user-added ones (excluding 'Other')
     const realLocations = localLocations.filter(l => l !== 'Other');
@@ -316,7 +317,7 @@ function PreGamePage() {
 
     // Helper to get task count for a location
     const getTaskCountForLocation = (loc) => {
-        return tasks.filter(t => t.location === loc).length;
+        return tasks.filter(task => task.location === loc).length;
     };
     
     // Check if a location can be removed (no tasks and more than 2 real locations)
@@ -387,7 +388,7 @@ function PreGamePage() {
     const handleSaveTaskList = () => {
         if (tasks.length === 0) return;
         if (!taskListName.trim() && !taskListCode) {
-            alert('Please enter a name for your task list');
+            alert(t('Please enter a name for your task list'));
             return;
         }
         setIsSaving(true);
@@ -401,7 +402,7 @@ function PreGamePage() {
     // Save as new copy (for when user doesn't own the current list)
     const handleSaveAsNew = () => {
         if (tasks.length === 0) return;
-        const newName = prompt('Enter a name for your copy of this task list:', taskListName ? `${taskListName} (Copy)` : 'My Task List');
+        const newName = prompt(t('Enter a name for your copy of this task list:'), taskListName ? t('{name} (Copy)', { name: taskListName }) : t('My Task List'));
         if (!newName || !newName.trim()) return;
         
         setIsSaving(true);
@@ -445,8 +446,8 @@ function PreGamePage() {
         if (!inviteUrl) return;
 
         const shareData = {
-            title: 'Join my Sus Party room',
-            text: `Join my Sus Party room ${roomCode}`,
+            title: t('Join my Sus Party room'),
+            text: t('Join my Sus Party room {roomCode}', { roomCode }),
             url: inviteUrl,
         };
 
@@ -524,14 +525,14 @@ function PreGamePage() {
 
     // Calculate what's missing
     const getTasksNeededMessage = () => {
-        if (serverLobbyState?.start_error) return serverLobbyState.start_error;
+        if (serverLobbyState?.start_error) return t(serverLobbyState.start_error);
         if (realLocations.length < 2) {
-            return `Add at least ${2 - realLocations.length} more location${2 - realLocations.length !== 1 ? 's' : ''} first`;
+            return tn(2 - realLocations.length, 'Add at least {count} more location first', 'Add at least {count} more locations first');
         }
         if (!hasEnoughTotalTasks) {
-            return `Add ${missingTotalTasks} more task${missingTotalTasks !== 1 ? 's' : ''} to start.`;
+            return tn(missingTotalTasks, 'Add {count} more task to start.', 'Add {count} more tasks to start.');
         }
-        if (players.length < 3) return 'Need at least 3 players for one intruder.';
+        if (players.length < 3) return t('Need at least 3 players for one intruder.');
         return '';
     };
 
@@ -540,7 +541,7 @@ function PreGamePage() {
             <div className="sg-screen sg-round">
                 <div className="sg-center">
                     <span className="hs-dot" style={{ width: 16, height: 16, background: '#fff' }} aria-hidden="true" />
-                    <p className="sg-big sg-h3">Waiting for players...</p>
+                    <p className="sg-big sg-h3">{t('Waiting for players...')}</p>
                 </div>
             </div>
         );
@@ -553,8 +554,8 @@ function PreGamePage() {
         <div className="sg-screen sg-round hs hs-lobby">
             <div className={`hs-wrap hs-lobby__scroll ${showContent ? 'sg-a sg-rise' : ''}`}>
                 <div className="hs-bar">
-                    <span className="hs-live"><span className="hs-dot" aria-hidden="true" />Live</span>
-                    <button type="button" onClick={handleLeaveRoom} className="hs-round" title="Leave room" aria-label="Leave room">
+                    <span className="hs-live"><span className="hs-dot" aria-hidden="true" />{t('Live')}</span>
+                    <button type="button" onClick={handleLeaveRoom} className="hs-round" title={t('Leave room')} aria-label={t('Leave room')}>
                         <LogOut size={20} />
                     </button>
                 </div>
@@ -562,32 +563,32 @@ function PreGamePage() {
                 {/* Room code: tap to copy, invite to share */}
                 {roomCode && (
                     <div style={{ display: 'grid', gap: 14 }}>
-                        <button type="button" onClick={copyRoomCode} className="hs-code" title="Copy room code" aria-label="Copy room code">
-                            <span className="hs-label">Room code</span>
+                        <button type="button" onClick={copyRoomCode} className="hs-code" title={t('Copy room code')} aria-label={t('Copy room code')}>
+                            <span className="hs-label">{t('Room code')}</span>
                             <span className="hs-code__value" data-testid="room-code" translate="no">{roomCode}</span>
                             <span className="hs-code__tap" aria-live="polite">
-                                {roomCodeCopied ? <><Check size={16} /> Copied</> : <><Copy size={16} /> Tap to copy</>}
+                                {roomCodeCopied ? <><Check size={16} /> {t('Copied')}</> : <><Copy size={16} /> {t('Tap to copy')}</>}
                             </span>
                         </button>
-                        <button type="button" onClick={shareInviteLink} className="sg-btn sg-btn-ghost" aria-label="Invite players to room">
-                            {inviteShared ? <><Check size={22} /> Link copied!</> : <><Share2 size={22} /> Invite Players</>}
+                        <button type="button" onClick={shareInviteLink} className="sg-btn sg-btn-ghost" aria-label={t('Invite players to room')}>
+                            {inviteShared ? <><Check size={22} /> {t('Link copied!')}</> : <><Share2 size={22} /> {t('Invite Players')}</>}
                         </button>
                     </div>
                 )}
 
-                <div className="hs-tabs" role="group" aria-label="Lobby view">
+                <div className="hs-tabs" role="group" aria-label={t('Lobby view')}>
                     <button type="button" className="hs-tab" aria-pressed={activeTab === 'players'} onClick={() => setActiveTab('players')}
-                        aria-label={`Players (${players.length})`}>
-                        <span className="hs-tab__label">Players</span>
+                        aria-label={t('Players ({count})', { count: players.length })}>
+                        <span className="hs-tab__label">{t('Players')}</span>
                         <span className="hs-tab__num">{players.length}</span>
-                        <span className="hs-tab__go" aria-hidden="true">See players <ChevronRight size={16} /></span>
+                        <span className="hs-tab__go" aria-hidden="true">{t('See players')} <ChevronRight size={16} /></span>
                     </button>
                     <button type="button" className="hs-tab" aria-pressed={activeTab === 'tasks'} onClick={() => setActiveTab('tasks')}
-                        aria-label={`Tasks (${tasks.length})`}>
-                        <span className="hs-tab__label">Tasks</span>
+                        aria-label={t('Tasks ({count})', { count: tasks.length })}>
+                        <span className="hs-tab__label">{t('Tasks')}</span>
                         <span className="hs-tab__num">{tasks.length}</span>
                         <span className="hs-tab__go" aria-hidden="true" data-testid="tasks-tab-cue">
-                            {canAddTasks ? <><Pencil size={14} /> View &amp; edit</> : 'See tasks'} <ChevronRight size={16} />
+                            {canAddTasks ? <><Pencil size={14} /> {t('View & edit')}</> : t('See tasks')} <ChevronRight size={16} />
                         </span>
                     </button>
                 </div>
@@ -595,34 +596,33 @@ function PreGamePage() {
                 {/* ========== PLAYERS TAB ========== */}
                 {activeTab === 'players' && (
                     <>
-                        <ul className="hs-roll" aria-label="Players in the room">
+                        <ul className="hs-roll" aria-label={t('Players in the room')}>
                             {players.map((player, index) => (
                                 <li key={player.player_id || player.id || index} className="sg-a sg-pop" style={{ animationDelay: `${Math.min(index, 8) * 60}ms` }}>
                                     <Face player={player} size={84} className="hs-roll__face" />
                                     <span className="hs-roll__name" translate="no">{player.username}</span>
-                                    {player.player_id === playerId && <span className="hs-roll__you">You</span>}
-                                    {player.is_host && <span className="hs-roll__you" data-testid="host-mark">Host</span>}
+                                    {player.player_id === playerId && <span className="hs-roll__you">{t('You')}</span>}
+                                    {player.is_host && <span className="hs-roll__you" data-testid="host-mark">{t('Host')}</span>}
                                 </li>
                             ))}
                             {Array.from({ length: openSeats }, (_, i) => (
                                 <li key={`open-${i}`} aria-hidden="true">
                                     <span className="hs-roll__empty"><Plus size={26} /></span>
-                                    <span className="hs-roll__emptyname">Open seat</span>
+                                    <span className="hs-roll__emptyname">{t('Open seat')}</span>
                                 </li>
                             ))}
                         </ul>
 
                         {players.length < 4 && (
-                            <p className="hs-hint hs-muted">Waiting for more players to join...</p>
+                            <p className="hs-hint hs-muted">{t('Waiting for more players to join...')}</p>
                         )}
 
                         {/* 3-player rounds use last-stand rules (server: Game.assignRoles) */}
                         {players.length === 3 && (
                             <div data-testid="small-group-note" className="hs-panel hs-panel--tight">
-                                <p className="hs-title" style={{ fontSize: 20 }}>Best with 4 or more players</p>
+                                <p className="hs-title" style={{ fontSize: 20 }}>{t('Best with 4 or more players')}</p>
                                 <p className="sg-small" style={{ opacity: 0.85, fontWeight: 600, fontSize: 15, lineHeight: 1.35 }}>
-                                    With 3, it&rsquo;s a last stand: once it&rsquo;s down to one crewmate and the intruder, there are no more meetings.
-                                    The crewmate wins by finishing 3 more tasks. The intruder wins by eliminating them.
+                                    {t('With 3, it’s a last stand: once it’s down to one crewmate and the intruder, there are no more meetings. The crewmate wins by finishing 3 more tasks. The intruder wins by eliminating them.')}
                                 </p>
                             </div>
                         )}
@@ -641,8 +641,8 @@ function PreGamePage() {
                                             type="text"
                                             value={taskListName}
                                             onChange={(e) => setTaskListName(e.target.value)}
-                                            placeholder="Name your task list…"
-                                            aria-label="Task list name"
+                                            placeholder={t('Name your task list…')}
+                                            aria-label={t('Task list name')}
                                             className="hs-input"
                                         />
                                         <button
@@ -650,22 +650,22 @@ function PreGamePage() {
                                             onClick={handleSaveTaskList}
                                             disabled={isSaving || !taskListName.trim() || tasks.length === 0}
                                             className="sg-btn sg-btn-line hs-btn-sm"
-                                            title={tasks.length === 0 ? 'Add tasks first' : !taskListName.trim() ? 'Enter a name first' : 'Save and get a code'}
+                                            title={tasks.length === 0 ? t('Add tasks first') : !taskListName.trim() ? t('Enter a name first') : t('Save and get a code')}
                                         >
                                             <Save size={18} />
-                                            <span>{isSaving ? '…' : 'Save'}</span>
+                                            <span>{isSaving ? '…' : t('Save')}</span>
                                         </button>
                                     </div>
                                 )}
                                 {taskListCode && !isEditingName && (
                                     <>
-                                        <span className="hs-listhead__name">{taskListName || 'Untitled list'}</span>
+                                        <span className="hs-listhead__name">{taskListName || t('Untitled list')}</span>
                                         {canSaveTaskList && isTaskListOwner && (
-                                            <button type="button" onClick={() => setIsEditingName(true)} className="hs-round" style={{ width: 40, height: 40 }} title="Rename" aria-label="Rename task list">
+                                            <button type="button" onClick={() => setIsEditingName(true)} className="hs-round" style={{ width: 40, height: 40 }} title={t('Rename')} aria-label={t('Rename task list')}>
                                                 <Pencil size={16} />
                                             </button>
                                         )}
-                                        {!isTaskListOwner && <span className="hs-tag">copy</span>}
+                                        {!isTaskListOwner && <span className="hs-tag">{t('copy')}</span>}
                                     </>
                                 )}
                                 {taskListCode && isEditingName && canSaveTaskList && (
@@ -674,7 +674,7 @@ function PreGamePage() {
                                             type="text"
                                             value={taskListName}
                                             autoFocus
-                                            aria-label="Task list name"
+                                            aria-label={t('Task list name')}
                                             onChange={(e) => setTaskListName(e.target.value)}
                                             onKeyDown={(e) => {
                                                 if (e.key === 'Enter') { setIsEditingName(false); handleSaveTaskList(); }
@@ -682,27 +682,27 @@ function PreGamePage() {
                                             }}
                                             className="hs-input"
                                         />
-                                        <button type="button" onClick={() => { setIsEditingName(false); handleSaveTaskList(); }} className="sg-btn sg-btn-line hs-btn-sm" title="Done">
-                                            <Check size={18} /> <span>Done</span>
+                                        <button type="button" onClick={() => { setIsEditingName(false); handleSaveTaskList(); }} className="sg-btn sg-btn-line hs-btn-sm" title={t('Done')}>
+                                            <Check size={18} /> <span>{t('Done')}</span>
                                         </button>
                                     </div>
                                 )}
                                 {taskListCode && (
-                                    <button type="button" onClick={copyTaskListCode} className="hs-chipbtn" title="Copy task list code">
+                                    <button type="button" onClick={copyTaskListCode} className="hs-chipbtn" title={t('Copy task list code')}>
                                         <span>{taskListCode}</span>
                                         {codeCopied ? <Check size={16} /> : <Copy size={16} />}
                                     </button>
                                 )}
                                 {taskListCode && !isTaskListOwner && (
-                                    <button type="button" onClick={handleSaveAsNew} disabled={isSaving || tasks.length === 0} className="sg-btn sg-btn-line hs-btn-sm hs-btn-auto" title="Save as your own copy">
+                                    <button type="button" onClick={handleSaveAsNew} disabled={isSaving || tasks.length === 0} className="sg-btn sg-btn-line hs-btn-sm hs-btn-auto" title={t('Save as your own copy')}>
                                         <Save size={18} />
-                                        <span>{isSaving ? '…' : 'Save copy'}</span>
+                                        <span>{isSaving ? '…' : t('Save copy')}</span>
                                     </button>
                                 )}
                             </div>
                             {taskListCode && isTaskListOwner && (
                                 <p className="sg-small" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                                    {isSaving ? 'Saving…' : <><Check size={14} /> Auto-saved</>}
+                                    {isSaving ? t('Saving…') : <><Check size={14} /> {t('Auto-saved')}</>}
                                 </p>
                             )}
                         </div>
@@ -714,14 +714,14 @@ function PreGamePage() {
                                 onClick={handleToggleCollaborativeMode}
                                 className="hs-switch"
                                 aria-pressed={collaborativeMode}
-                                title={collaborativeMode ? 'Tap to make host-only' : 'Tap to let everyone add tasks'}
+                                title={collaborativeMode ? t('Tap to make host-only') : t('Tap to let everyone add tasks')}
                             >
                                 <span className="hs-switch__text">
-                                    <b>Collaborative mode</b>
-                                    <span>{collaborativeMode ? 'Everyone can add tasks' : 'Only the host can add tasks'}</span>
+                                    <b>{t('Collaborative mode')}</b>
+                                    <span>{collaborativeMode ? t('Everyone can add tasks') : t('Only the host can add tasks')}</span>
                                 </span>
                                 <span className="hs-switch__state">
-                                    {collaborativeMode ? <><ToggleRight size={18} /> On</> : <><ToggleLeft size={18} /> Off</>}
+                                    {collaborativeMode ? <><ToggleRight size={18} /> {t('On')}</> : <><ToggleLeft size={18} /> {t('Off')}</>}
                                 </span>
                             </button>
                         )}
@@ -730,15 +730,15 @@ function PreGamePage() {
                         {showLocationSetup && canEditLocations && (
                             <div className="hs-panel">
                                 <div className="hs-bar" style={{ minHeight: 0 }}>
-                                    <h3 className="hs-title">{needsLocationSetup ? 'Set up locations' : 'Edit locations'}</h3>
+                                    <h3 className="hs-title">{needsLocationSetup ? t('Set up locations') : t('Edit locations')}</h3>
                                     {!needsLocationSetup && (
-                                        <button type="button" onClick={() => setShowLocationSetup(false)} className="hs-round" title="Done" aria-label="Done">
+                                        <button type="button" onClick={() => setShowLocationSetup(false)} className="hs-round" title={t('Done')} aria-label={t('Done')}>
                                             <X size={18} />
                                         </button>
                                     )}
                                 </div>
                                 <p className="sg-small" style={{ opacity: 0.85, fontWeight: 600, fontSize: 15, lineHeight: 1.35 }}>
-                                    Add at least 2 locations where tasks happen (for example, "Kitchen" and "Backyard"). Recommended: {MIN_TASKS_PER_LOCATION} tasks per location.
+                                    {t('Add at least 2 locations where tasks happen (for example, "Kitchen" and "Backyard"). Recommended: {MIN_TASKS_PER_LOCATION} tasks per location.', { MIN_TASKS_PER_LOCATION })}
                                 </p>
 
                                 {realLocations.length > 0 && (
@@ -752,7 +752,7 @@ function PreGamePage() {
                                                     {taskCount > 0 && <small style={{ opacity: 0.7 }}>({taskCount})</small>}
                                                     {realLocations.length > 2 && (
                                                         <button type="button" onClick={() => removeLocation(loc)} disabled={!removable}
-                                                            title={!removable && taskCount > 0 ? 'Remove tasks first' : 'Remove'} aria-label={`Remove ${loc}`}>
+                                                            title={!removable && taskCount > 0 ? t('Remove tasks first') : t('Remove')} aria-label={t('Remove {location}', { location: loc })}>
                                                             <X size={14} />
                                                         </button>
                                                     )}
@@ -768,22 +768,22 @@ function PreGamePage() {
                                         value={newLocationInput}
                                         onChange={(e) => setNewLocationInput(e.target.value)}
                                         onKeyPress={(e) => e.key === 'Enter' && addLocation()}
-                                        placeholder="Add a location…"
-                                        aria-label="New location"
+                                        placeholder={t('Add a location…')}
+                                        aria-label={t('New location')}
                                         className="hs-input"
                                     />
-                                    <button type="button" onClick={addLocation} disabled={!newLocationInput.trim()} className="sg-btn sg-btn-line hs-btn-sm" title="Add location" aria-label="Add location">
+                                    <button type="button" onClick={addLocation} disabled={!newLocationInput.trim()} className="sg-btn sg-btn-line hs-btn-sm" title={t('Add location')} aria-label={t('Add location')}>
                                         <Plus size={20} />
                                     </button>
                                 </div>
                                 {realLocations.length >= 2 && needsLocationSetup && (
                                     <button type="button" onClick={confirmLocations} className="sg-btn sg-btn-white hs-btn-sm">
-                                        <Check size={20} /> Done
+                                        <Check size={20} /> {t('Done')}
                                     </button>
                                 )}
                                 {realLocations.length < 2 && (
                                     <p className="hs-hint" style={{ color: 'var(--sg-meet)' }}>
-                                        Add {2 - realLocations.length} more location{2 - realLocations.length !== 1 ? 's' : ''} to continue
+                                        {tn(2 - realLocations.length, 'Add {count} more location to continue', 'Add {count} more locations to continue')}
                                     </p>
                                 )}
                             </div>
@@ -792,15 +792,15 @@ function PreGamePage() {
                         {needsLocationSetup && !canEditLocations && (
                             <div className="hs-panel" style={{ textAlign: 'center', justifyItems: 'center' }}>
                                 <MapPin size={30} />
-                                <p className="hs-title" style={{ fontSize: 20 }}>Waiting for host to set up locations…</p>
-                                <p className="sg-small">They need to add at least 2 locations before tasks can be created.</p>
+                                <p className="hs-title" style={{ fontSize: 20 }}>{t('Waiting for host to set up locations…')}</p>
+                                <p className="sg-small">{t('They need to add at least 2 locations before tasks can be created.')}</p>
                             </div>
                         )}
 
                         {/* Add a task: location, text, send */}
                         {!showLocationSetup && canAddTasks && realLocations.length > 0 && (
                             <div className="hs-panel hs-panel--tight">
-                                <label className="hs-label" htmlFor="new-task-text">Add a task</label>
+                                <label className="hs-label" htmlFor="new-task-text">{t('Add a task')}</label>
                                 <input
                                     id="new-task-text"
                                     ref={inputRef}
@@ -808,7 +808,7 @@ function PreGamePage() {
                                     value={newTaskText}
                                     onChange={(e) => setNewTaskText(e.target.value)}
                                     onKeyPress={(e) => e.key === 'Enter' && handleAddTask()}
-                                    placeholder="Add a task… (e.g. 10 jumping jacks)"
+                                    placeholder={t('Add a task… (e.g. 10 jumping jacks)')}
                                     className="hs-input"
                                     disabled={isSubmitting}
                                 />
@@ -818,8 +818,8 @@ function PreGamePage() {
                                         onChange={(e) => setSelectedLocation(e.target.value)}
                                         className="hs-select"
                                         style={{ flex: 1, maxWidth: 'none' }}
-                                        title="Choose a location for this task"
-                                        aria-label="Location for this task"
+                                        title={t('Choose a location for this task')}
+                                        aria-label={t('Location for this task')}
                                     >
                                         {locations.map(loc => (
                                             <option key={loc} value={loc}>{loc}</option>
@@ -830,9 +830,9 @@ function PreGamePage() {
                                         onClick={handleAddTask}
                                         disabled={!newTaskText.trim() || isSubmitting}
                                         className="sg-btn sg-btn-line hs-btn-sm"
-                                        title="Add task"
+                                        title={t('Add task')}
                                     >
-                                        <Send size={18} /> Add
+                                        <Send size={18} /> {t('Add')}
                                     </button>
                                 </div>
                             </div>
@@ -840,8 +840,8 @@ function PreGamePage() {
 
                         {!showLocationSetup && !canAddTasks && (
                             <div className="hs-panel hs-panel--tight" style={{ textAlign: 'center' }}>
-                                <p className="hs-title" style={{ fontSize: 19 }}>Only the host can add tasks right now</p>
-                                <p className="sg-small">Ask the host to turn on collaborative mode if you want to help.</p>
+                                <p className="hs-title" style={{ fontSize: 19 }}>{t('Only the host can add tasks right now')}</p>
+                                <p className="sg-small">{t('Ask the host to turn on collaborative mode if you want to help.')}</p>
                             </div>
                         )}
 
@@ -858,13 +858,13 @@ function PreGamePage() {
                                         <span className="hs-loc__name">{location}</span>
                                         <span className={`hs-loc__count ${!isOther && !enough ? 'hs-loc__count--short' : ''}`}>
                                             {isOther
-                                                ? `${locationTasks.length} task${locationTasks.length === 1 ? '' : 's'}`
+                                                ? tn(locationTasks.length, '{count} task', '{count} tasks')
                                                 : `${locationTasks.length}/${MIN_TASKS_PER_LOCATION}`}
                                             {enough && <Check size={16} />}
                                         </span>
                                         {canDelete && (
-                                            <button type="button" onClick={() => removeLocation(location)} className="hs-loc__del" title="Delete this location">
-                                                <X size={14} /> Delete
+                                            <button type="button" onClick={() => removeLocation(location)} className="hs-loc__del" title={t('Delete this location')}>
+                                                <X size={14} /> {t('Delete')}
                                             </button>
                                         )}
                                     </div>
@@ -874,10 +874,10 @@ function PreGamePage() {
                                                 <li key={task.originalIndex} className="hs-task">
                                                     <div className="hs-task__body">
                                                         <p className="hs-task__text">{task.task}</p>
-                                                        {task.added_by && <p className="hs-task__by">Added by {task.added_by}</p>}
+                                                        {task.added_by && <p className="hs-task__by">{t('Added by {added_by}', { added_by: task.added_by })}</p>}
                                                     </div>
                                                     {canShowRemove && (
-                                                        <button type="button" onClick={() => handleRemoveTask(task.originalIndex)} className="hs-task__x" title="Remove task" aria-label="Remove task">
+                                                        <button type="button" onClick={() => handleRemoveTask(task.originalIndex)} className="hs-task__x" title={t('Remove task')} aria-label={t('Remove task')}>
                                                             <X size={18} />
                                                         </button>
                                                     )}
@@ -885,7 +885,7 @@ function PreGamePage() {
                                             ))}
                                         </ul>
                                     ) : (
-                                        <p className="hs-empty">{isOther ? 'Optional. Tasks that fit anywhere.' : 'No tasks here yet'}</p>
+                                        <p className="hs-empty">{isOther ? t('Optional. Tasks that fit anywhere.') : t('No tasks here yet')}</p>
                                     )}
                                 </section>
                             );
@@ -894,7 +894,7 @@ function PreGamePage() {
                         {/* Add a new location (host only), at the end and out of the way */}
                         {!showLocationSetup && canEditLocations && realLocations.length > 0 && (
                             <div className="hs-panel hs-panel--tight">
-                                <label className="hs-label" htmlFor="new-location">Add a new location</label>
+                                <label className="hs-label" htmlFor="new-location">{t('Add a new location')}</label>
                                 <div className="hs-inline">
                                     <input
                                         id="new-location"
@@ -902,11 +902,11 @@ function PreGamePage() {
                                         value={newLocationInput}
                                         onChange={(e) => setNewLocationInput(e.target.value)}
                                         onKeyPress={(e) => e.key === 'Enter' && addLocation()}
-                                        placeholder="e.g. Garage, Backyard…"
+                                        placeholder={t('e.g. Garage, Backyard…')}
                                         className="hs-input"
                                     />
-                                    <button type="button" onClick={addLocation} disabled={!newLocationInput.trim()} className="sg-btn sg-btn-line hs-btn-sm" title="Add location">
-                                        <Plus size={18} /> Add
+                                    <button type="button" onClick={addLocation} disabled={!newLocationInput.trim()} className="sg-btn sg-btn-line hs-btn-sm" title={t('Add location')}>
+                                        <Plus size={18} /> {t('Add')}
                                     </button>
                                 </div>
                             </div>
@@ -922,17 +922,17 @@ function PreGamePage() {
                         {canStartGame ? (
                             <>
                                 <button type="button" onClick={handleStartGame} className="sg-btn sg-btn-white hs-start">
-                                    <Play size={26} /> <span>Start Game</span>
+                                    <Play size={26} /> <span>{t('Start Game')}</span>
                                 </button>
                                 {isHost && !canStartTestGame && Number.isInteger(serverLobbyState?.intruder_count) && (
                                     <p className="hs-hint" data-testid="lobby-intruder-count">
-                                        {serverLobbyState.intruder_count} intruder{serverLobbyState.intruder_count !== 1 ? 's' : ''} this round
-                                        {serverLobbyState.auto_intruders ? ' (Auto: 1 per 5 players)' : ''}
+                                        {tn(serverLobbyState.intruder_count, '{count} intruder this round', '{count} intruders this round')}
+                                        {serverLobbyState.auto_intruders ? t(' (Auto: 1 per 5 players)') : ''}
                                     </p>
                                 )}
                                 {canStartTestGame && (
                                     <p className="hs-hint">
-                                        Only {players.length} player{players.length !== 1 ? 's' : ''} so far. Starting now runs a test game.
+                                        {tn(players.length, 'Only {count} player so far. Starting now runs a test game.', 'Only {count} players so far. Starting now runs a test game.')}
                                     </p>
                                 )}
                             </>
@@ -943,16 +943,16 @@ function PreGamePage() {
                                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
                                         {/* One tap to a startable room: big lobbies stalled writing 40+ tasks by hand. */}
                                         <button type="button" data-testid="use-example-tasks" onClick={handleUseExampleTasks} className="sg-btn sg-btn-blue hs-btn-sm" style={{ flex: '1 1 100%', whiteSpace: 'nowrap' }}>
-                                            <span>{tasks.length ? 'Add the example tasks' : 'Use the example list'}</span>
+                                            <span>{tasks.length ? t('Add the example tasks') : t('Use the example list')}</span>
                                         </button>
                                         {activeTab !== 'tasks' && (
                                             <button type="button" onClick={() => setActiveTab('tasks')} className="sg-btn sg-btn-line hs-btn-sm" style={{ flex: '1 1 auto', whiteSpace: 'nowrap' }}>
-                                                <Plus size={18} /> <span>Add tasks</span>
+                                                <Plus size={18} /> <span>{t('Add tasks')}</span>
                                             </button>
                                         )}
                                         {!collaborativeMode && (
                                             <button type="button" onClick={() => { handleToggleCollaborativeMode(); setActiveTab('tasks'); }} className="sg-btn sg-btn-line hs-btn-sm" style={{ flex: '1 1 auto', whiteSpace: 'nowrap' }}>
-                                                <span>Let everyone help</span>
+                                                <span>{t('Let everyone help')}</span>
                                             </button>
                                         )}
                                     </div>
@@ -961,18 +961,18 @@ function PreGamePage() {
                         ) : needsMoreTasks && collaborativeMode ? (
                             <>
                                 <p className="hs-notice" style={{ textAlign: 'center' }}>
-                                    The room needs {tasksMissing} more task{tasksMissing !== 1 ? 's' : ''} before the host can start. Everyone can add some.
+                                    {tn(tasksMissing, 'The room needs {count} more task before the host can start. Everyone can add some.', 'The room needs {count} more tasks before the host can start. Everyone can add some.')}
                                 </p>
                                 {activeTab !== 'tasks' && (
                                     <button type="button" onClick={() => setActiveTab('tasks')} className="sg-btn sg-btn-line hs-btn-sm">
-                                        <Plus size={18} /> <span>Add tasks</span>
+                                        <Plus size={18} /> <span>{t('Add tasks')}</span>
                                     </button>
                                 )}
                             </>
                         ) : (
                             <p className="hs-notice hs-wait">
                                 <span className="hs-dot hs-dot--still" style={{ background: '#fff' }} aria-hidden="true" />
-                                Waiting for host to start the game...
+                                {t('Waiting for host to start the game...')}
                             </p>
                         )}
                     </div>
@@ -983,18 +983,18 @@ function PreGamePage() {
             {showTestConfirm && (
                 <div className="sg-sheet-scrim" role="dialog" aria-modal="true" aria-labelledby="test-game-title">
                     <div className="sg-sheet sg-a sg-rise">
-                        <h2 id="test-game-title" className="sg-big sg-h3">Not enough players for a real game</h2>
+                        <h2 id="test-game-title" className="sg-big sg-h3">{t('Not enough players for a real game')}</h2>
                         <p style={{ margin: 0, fontWeight: 600, fontSize: 16, lineHeight: 1.4 }}>
-                            Sus Party needs at least 3 players. We'll start a test game anyway so you can see how it plays.
+                            {t('Sus Party needs at least 3 players. We\'ll start a test game anyway so you can see how it plays.')}
                         </p>
                         <p style={{ margin: 0, fontWeight: 600, fontSize: 15, lineHeight: 1.4, opacity: 0.7 }}>
-                            In a test game anyone can switch between crewmate and intruder from the top of their screen. Test games don't count toward stats.
+                            {t('In a test game anyone can switch between crewmate and intruder from the top of their screen. Test games don\'t count toward stats.')}
                         </p>
                         <button type="button" onClick={handleStartTestGame} className="sg-btn sg-btn-blue">
-                            <Play size={22} /> Start test game
+                            <Play size={22} /> {t('Start test game')}
                         </button>
                         <button type="button" onClick={() => setShowTestConfirm(false)} className="sg-btn sg-btn-soft">
-                            Wait for more players
+                            {t('Wait for more players')}
                         </button>
                     </div>
                 </div>

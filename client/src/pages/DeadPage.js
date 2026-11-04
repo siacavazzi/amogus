@@ -6,6 +6,8 @@ import LeaveGameButton from '../components/LeaveGameButton';
 import HostStartVoting from '../components/HostStartVoting';
 import { ProfilePicture, getDeathInfo } from '../components/PlayerCard';
 import { Skull, Eye, EyeOff } from '../signal/icons';
+import { t } from '../i18n';
+import { localizeDeathMessage } from '../i18n/deathMessages';
 
 // Get a readable death cause label
 const getDeathLabel = (cause) => {
@@ -13,16 +15,16 @@ const getDeathLabel = (cause) => {
     case 'voted_out':
     case 'voted_out_intruder':
     case 'voted_out_innocent':
-      return 'Ejected';
+      return t('Ejected');
     case 'murdered':
     case 'murdered_during_task':
-      return 'Murdered';
+      return t('Murdered');
     case 'meltdown':
-      return 'Irradiated';
+      return t('Irradiated');
     case 'left_game':
-      return 'Disconnected';
+      return t('Disconnected');
     default:
-      return 'Eliminated';
+      return t('Eliminated');
   }
 };
 
@@ -31,7 +33,7 @@ const DeadPage = () => {
   const [showSpectate, setShowSpectate] = useState(false);
   
   // Get the death message from player state, fallback to default
-  const deathMessage = playerState?.death_message || "You have been eliminated";
+  const deathMessage = playerState?.death_message ? localizeDeathMessage(playerState.death_message) : t('You have been eliminated');
   const deathCause = playerState?.death_cause;
   const DeathIcon = getDeathInfo(deathCause)?.icon || Skull;
   const deathLabel = getDeathLabel(deathCause);
@@ -57,10 +59,10 @@ const DeadPage = () => {
             deathCause={deathCause}
           />
         </div>
-        <p className="sg-lede" style={{ opacity: 0.8 }}>{playerState?.username || 'Player'}</p>
-        <h1 className="sg-big sg-h1 sg-a sg-slam" style={{ animationDelay: '300ms' }}>You're out</h1>
+        <p className="sg-lede" style={{ opacity: 0.8 }}>{playerState?.username || t('Player')}</p>
+        <h1 className="sg-big sg-h1 sg-a sg-slam" style={{ animationDelay: '300ms' }}>{t('You\'re out')}</h1>
         <p className="sg-lede" style={{ maxWidth: '24ch', opacity: 0.85 }}>"{deathMessage}"</p>
-        <p className="sg-small" style={{ maxWidth: '28ch' }}>Stay quiet and keep watching. You can still cheer at the end.</p>
+        <p className="sg-small" style={{ maxWidth: '28ch' }}>{t('Stay quiet and keep watching. You can still cheer at the end.')}</p>
 
         {/* A dead host still runs the room: the meeting may be stuck on them */}
         <HostStartVoting dark />
@@ -68,7 +70,7 @@ const DeadPage = () => {
         <div className="w-full max-w-sm" style={{ marginTop: 10 }}>
           <button type="button" className="sg-btn sg-btn-ghost" onClick={() => setShowSpectate(!showSpectate)} style={{ background: 'rgba(255,255,255,0.12)' }}>
             {showSpectate ? <EyeOff size={18} /> : <Eye size={18} />}
-            <span>{showSpectate ? 'Hide Survivors' : 'View Survivors'}</span>
+            <span>{showSpectate ? t('Hide Survivors') : t('View Survivors')}</span>
             <span className="sg-num" style={{ background: '#fff', color: 'var(--sg-dark)', borderRadius: 999, padding: '1px 9px', fontSize: 14 }}>{alivePlayers.length}</span>
           </button>
 

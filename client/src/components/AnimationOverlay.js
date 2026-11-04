@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Confetti } from '../signal';
+import { t } from '../i18n';
 
 // Task done: a white wipe follows the swipe, a check draws itself, then the wipe moves on
 // and the next task drops in underneath. Crewmates and intruders see the same thing.
@@ -49,7 +50,7 @@ const AnimationOverlay = ({ onComplete }) => {
           />
         </svg>
         <p className="sg-big sg-h2 sg-a sg-pop" style={{ animationDelay: '420ms', animationDuration: '360ms' }}>
-          Done
+          {t('Done')}
         </p>
       </div>
       <Confetti colors={['#1b4fd8', '#ffc21a', '#18171d', '#1b4fd8']} />

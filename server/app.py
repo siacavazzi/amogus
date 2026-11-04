@@ -786,6 +786,11 @@ def handle_connect(auth=None):
     translated_to = clean_label(auth.get('translated_to'), 12, r'[A-Za-z-]+') if isinstance(auth, dict) else None
     if translated_to:
         client_metrics_by_sid[request.sid]['translated_to'] = translated_to
+    # The phone's browser language and the language the game chose ("en" when we have no translation).
+    for key in ('device_lang', 'game_lang'):
+        lang = clean_label(auth.get(key), 12, r'[A-Za-z-]+') if isinstance(auth, dict) else None
+        if lang:
+            client_metrics_by_sid[request.sid][key] = lang
     last_drop = clean_last_drop(auth.get('last_drop') if isinstance(auth, dict) else None)
     if last_drop:
         last_drop_by_sid[request.sid] = last_drop

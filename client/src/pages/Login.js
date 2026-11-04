@@ -7,6 +7,8 @@ import AvatarPicker, { takenAvatars, isAvatarLocked, randomFreeAvatar } from '..
 import RoomEntryNotice from '../components/RoomEntryNotice';
 import { clearRoomCodeFromUrl } from '../utils/inviteLinks';
 import LeaveGameButton from '../components/LeaveGameButton';
+import { t } from '../i18n';
+import LanguagePicker from '../components/LanguagePicker';
 
 function LoginPage() {
     const [username, setUsername] = useState('');
@@ -87,7 +89,7 @@ function LoginPage() {
                         onClick={() => setStep(step === 'camera' ? 'avatar' : 'username')}
                         className="sg-btn sg-btn-ghost sg-join__back"
                     >
-                        <ChevronLeft size={20} /> Back
+                        <ChevronLeft size={20} /> {t('Back')}
                     </button>
                 ) : <span />}
                 {step !== 'joining' && <LeaveGameButton />}
@@ -107,30 +109,31 @@ function LoginPage() {
                 {/* Step 1: name */}
                 {step === 'username' && (
                     <form onSubmit={handleUsernameSubmit} className="sg-join__form">
-                        <p className="sg-pill">Join the Game · Room {roomCode}</p>
+                        <p className="sg-pill">{t('Join the Game · Room {roomCode}', { roomCode })}</p>
                         {roundRunningAtEntry && (
                             <p className="sg-lede" data-testid="round-on-notice" style={{ opacity: 0.9 }}>
                                 {lateJoinLive
-                                    ? "A round is on right now. Join and you'll be dealt in, as crew or intruder."
-                                    : "A round is on right now. Join and you'll be dealt in at the next round."}
+                                    ? t('A round is on right now. Join and you\'ll be dealt in, as crew or intruder.')
+                                    : t('A round is on right now. Join and you\'ll be dealt in at the next round.')}
                             </p>
                         )}
-                        <label htmlFor="username" className="sg-big sg-h1 sg-join__ask">What should we call you?</label>
+                        <label htmlFor="username" className="sg-big sg-h1 sg-join__ask">{t('What should we call you?')}</label>
                         <input
                             type="text"
                             id="username"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             className="sg-join__name"
-                            placeholder="Enter your name"
+                            placeholder={t('Enter your name')}
                             required
                             autoFocus
                             autoComplete="nickname"
                             maxLength={24}
                         />
                         <button type="submit" className="sg-btn sg-btn-white" disabled={!username.trim()}>
-                            Next: Choose Avatar <ArrowRight size={22} />
+                            {t('Next: Choose Avatar')} <ArrowRight size={22} />
                         </button>
+                        <LanguagePicker style={{ alignSelf: 'center', opacity: 0.85 }} />
                     </form>
                 )}
 
@@ -142,7 +145,7 @@ function LoginPage() {
                             <div style={{ minWidth: 0 }}>
                                 <h1 className="sg-big sg-h2 sg-join__who" translate="no">{username}</h1>
                                 <p className="sg-lede" style={{ opacity: 0.85 }}>{avatar?.name}</p>
-                                <p className="sg-small" style={{ opacity: 0.6 }}>Room {roomCode}</p>
+                                <p className="sg-small" style={{ opacity: 0.6 }}>{t('Room {roomCode}', { roomCode })}</p>
                             </div>
                         </div>
 
@@ -156,19 +159,19 @@ function LoginPage() {
                                 className="sg-btn sg-btn-ghost"
                                 style={{ width: 64, flex: 'none', padding: 0 }}
                                 onClick={() => setPic(randomFreeAvatar(takenBy, pic))}
-                                aria-label="Pick a random avatar"
-                                title="Pick a random avatar"
+                                aria-label={t('Pick a random avatar')}
+                                title={t('Pick a random avatar')}
                             >
                                 <Shuffle size={24} />
                             </button>
                             <button type="button" className="sg-btn sg-btn-white" onClick={() => joinGame(null)}>
-                                <span>Join Game</span> <ArrowRight size={22} />
+                                <span>{t('Join Game')}</span> <ArrowRight size={22} />
                             </button>
                         </div>
 
                         <button type="button" onClick={() => setStep('camera')} className="sg-link" style={{ alignSelf: 'center', display: 'inline-flex', gap: 8, alignItems: 'center' }}>
                             <Camera size={18} />
-                            <span>Take a selfie instead</span>
+                            <span>{t('Take a selfie instead')}</span>
                         </button>
                     </div>
                 )}
@@ -176,8 +179,8 @@ function LoginPage() {
                 {/* Step 2b: camera (only after the player asks for it) */}
                 {step === 'camera' && (
                     <div className="sg-join__form">
-                        <h1 className="sg-big sg-h2">Take a selfie</h1>
-                        <p className="sg-small" style={{ opacity: 0.75 }}>Other players see it on their phones during the game.</p>
+                        <h1 className="sg-big sg-h2">{t('Take a selfie')}</h1>
+                        <p className="sg-small" style={{ opacity: 0.75 }}>{t('Other players see it on their phones during the game.')}</p>
                         <CameraCapture
                             onCapture={handleCameraCapture}
                             onCancel={() => setStep('avatar')}
@@ -189,8 +192,8 @@ function LoginPage() {
                 {step === 'joining' && (
                     <div className="sg-center" style={{ gap: 14, minHeight: '60vh' }}>
                         <div className="sg-join__face sg-a sg-bounce"><Avatar id={pic} className="w-full h-full" /></div>
-                        <h2 className="sg-big sg-h2">Joining game...</h2>
-                        <p className="sg-lede" style={{ opacity: 0.8 }}>Get ready to be sus!</p>
+                        <h2 className="sg-big sg-h2">{t('Joining game...')}</h2>
+                        <p className="sg-lede" style={{ opacity: 0.8 }}>{t('Get ready to be sus!')}</p>
                     </div>
                 )}
             </div>

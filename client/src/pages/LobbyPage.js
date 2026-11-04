@@ -9,6 +9,8 @@ import { getAcquisition } from '../seo/discovery';
 import RoomEntryNotice from '../components/RoomEntryNotice';
 import { getRoomCodeFromSearch, clearRoomCodeFromUrl } from '../utils/inviteLinks';
 import { readGeneratedSetup, claimGeneratedRoomCreation } from './seo/gameDraft';
+import { t } from '../i18n';
+import LanguagePicker from '../components/LanguagePicker';
 
 function LobbyPage() {
     const [inputRoomCode, setInputRoomCode] = useState(getRoomCodeFromSearch);
@@ -133,7 +135,7 @@ function LobbyPage() {
     const connectedLine = (
         <p className="sg-small" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, opacity: 0.7 }}>
             {socket?.connected ? <Wifi size={14} /> : <WifiOff size={14} />}
-            {socket?.connected ? 'Connected to server' : 'Connecting...'}
+            {socket?.connected ? t('Connected to server') : t('Connecting...')}
         </p>
     );
 
@@ -142,8 +144,8 @@ function LobbyPage() {
             <div className="sg-screen sg-round sg-home">
                 <div className="sg-home__top sg-a sg-rise">
                     <h1 className="sg-big sg-home__mark">Sus Party</h1>
-                    <p className="sg-lede">The real-life social deduction game</p>
-                    <p className="sg-small" style={{ marginTop: 6 }}>3 to 20+ players · Real-time · Physical Tasks</p>
+                    <p className="sg-lede">{t('The real-life social deduction game')}</p>
+                    <p className="sg-small" style={{ marginTop: 6 }}>{t('3 to 20+ players · Real-time · Physical Tasks')}</p>
                 </div>
 
                 <div className="sg-home__body sg-a sg-rise" style={{ animationDelay: '120ms' }}>
@@ -153,7 +155,7 @@ function LobbyPage() {
                     )}
 
                     <form onSubmit={handleJoinGame} className="sg-home__join">
-                        <label htmlFor="game-entry-code" className="sg-lede">Room code</label>
+                        <label htmlFor="game-entry-code" className="sg-lede">{t('Room code')}</label>
                         <input
                             type="text"
                             id="game-entry-code"
@@ -167,20 +169,21 @@ function LobbyPage() {
                             spellCheck="false"
                         />
                         <button type="submit" className="sg-btn sg-btn-white" disabled={inputRoomCode.length !== 4 || isJoining}>
-                            {isJoining ? 'Joining...' : <>Join Game <ArrowRight size={22} /></>}
+                            {isJoining ? t('Joining...') : <>{t('Join Game')} <ArrowRight size={22} /></>}
                         </button>
                     </form>
 
-                    <p className="sg-small sg-home__or">or start one</p>
+                    <p className="sg-small sg-home__or">{t('or start one')}</p>
                     <button type="button" className="sg-btn sg-btn-ink" onClick={handleCreateGame} disabled={isCreating}>
-                        {isCreating ? 'Creating Room...' : <><Plus size={22} /> Create New Game</>}
+                        {isCreating ? t('Creating Room...') : <><Plus size={22} /> {t('Create New Game')}</>}
                     </button>
                 </div>
 
                 <div className="sg-home__foot">
                     <p style={{ display: 'flex', justifyContent: 'center', gap: 22 }}>
-                        <a href="/how-to-play" className="sg-link">How to Play</a>
-                        <a href={tutorialHref} className="sg-link">Tutorial</a>
+                        <a href="/how-to-play" className="sg-link">{t('How to Play')}</a>
+                        <a href={tutorialHref} className="sg-link">{t('Tutorial')}</a>
+                        <LanguagePicker />
                     </p>
                     {connectedLine}
                 </div>
@@ -188,18 +191,18 @@ function LobbyPage() {
                 {showTutorialPrompt && (
                     <div className="sg-home__scrim" role="dialog" aria-modal="true" aria-labelledby="tutorial-prompt-title">
                         <div className="sg-home__sheet sg-a sg-rise">
-                            <p className="sg-pill" style={{ background: 'var(--sg-meet)', color: 'var(--sg-ink)' }}>First game?</p>
-                            <h2 id="tutorial-prompt-title" className="sg-big sg-h2" style={{ margin: '12px 0 8px' }}>Try the tutorial first</h2>
+                            <p className="sg-pill" style={{ background: 'var(--sg-meet)', color: 'var(--sg-ink)' }}>{t('First game?')}</p>
+                            <h2 id="tutorial-prompt-title" className="sg-big sg-h2" style={{ margin: '12px 0 8px' }}>{t('Try the tutorial first')}</h2>
                             <p className="sg-small" style={{ opacity: 0.75 }}>
-                                Sus Party moves quickly once the round starts. A short tutorial walks you through it before anyone joins a real room.
+                                {t('Sus Party moves quickly once the round starts. A short tutorial walks you through it before anyone joins a real room.')}
                             </p>
                             <ul className="sg-home__learn">
-                                <li><GraduationCap size={22} /> <span><b>Crew basics</b> Tasks and slide-to-complete</span></li>
-                                <li><Megaphone size={22} /> <span><b>Meetings</b> When to call one and how voting works</span></li>
-                                <li><Zap size={22} /> <span><b>Intruder tools</b> Log a kill, open the vent and play your cards</span></li>
+                                <li><GraduationCap size={22} /> <span><b>{t('Crew basics')}</b> {t('Tasks and slide-to-complete')}</span></li>
+                                <li><Megaphone size={22} /> <span><b>{t('Meetings')}</b> {t('When to call one and how voting works')}</span></li>
+                                <li><Zap size={22} /> <span><b>{t('Intruder tools')}</b> {t('Log a kill, open the vent and play your cards')}</span></li>
                             </ul>
-                            <a href={tutorialHref} className="sg-btn sg-btn-blue">Start tutorial</a>
-                            <button type="button" className="sg-btn sg-btn-flat" onClick={handleSkipTutorialPrompt}>Skip for now</button>
+                            <a href={tutorialHref} className="sg-btn sg-btn-blue">{t('Start tutorial')}</a>
+                            <button type="button" className="sg-btn sg-btn-flat" onClick={handleSkipTutorialPrompt}>{t('Skip for now')}</button>
                         </div>
                     </div>
                 )}
@@ -214,8 +217,8 @@ function LobbyPage() {
             <div className="sg-rx-lobby__grid">
                 <div className="sg-a sg-rise">
                     <h1 className="sg-big sg-rx-lobby__mark">Sus Party</h1>
-                    <p className="sg-rx__lede">The real-life social deduction game</p>
-                    <p className="sg-small" style={{ marginTop: 8 }}>3 to 20+ players · Real-time · Physical Tasks</p>
+                    <p className="sg-rx__lede">{t('The real-life social deduction game')}</p>
+                    <p className="sg-small" style={{ marginTop: 8 }}>{t('3 to 20+ players · Real-time · Physical Tasks')}</p>
 
                     <div className="sg-rx-lobby__form">
                         <RoomEntryNotice status={roomEntryStatus} busy={isJoining} onRetry={() => handleJoinGame()} onChangeCode={changeCode} />
@@ -223,7 +226,7 @@ function LobbyPage() {
                             <p className="sg-home__error" role="alert"><AlertTriangle size={18} /> {error}</p>
                         )}
                         <form onSubmit={handleJoinGame} className="sg-home__join">
-                            <label htmlFor="game-entry-code" className="sg-lede">Enter Room Code</label>
+                            <label htmlFor="game-entry-code" className="sg-lede">{t('Enter Room Code')}</label>
                             <input
                                 type="text"
                                 id="game-entry-code"
@@ -237,12 +240,12 @@ function LobbyPage() {
                                 spellCheck="false"
                             />
                             <button type="submit" className="sg-btn sg-btn-white" disabled={inputRoomCode.length !== 4 || isJoining}>
-                                {isJoining ? 'Joining...' : <>Join Game <ArrowRight size={22} /></>}
+                                {isJoining ? t('Joining...') : <>{t('Join Game')} <ArrowRight size={22} /></>}
                             </button>
                         </form>
-                        <p className="sg-small sg-home__or">or start one</p>
+                        <p className="sg-small sg-home__or">{t('or start one')}</p>
                         <button type="button" className="sg-btn sg-btn-ink" onClick={handleCreateGame} disabled={isCreating}>
-                            {isCreating ? 'Creating Room...' : <><Plus size={22} /> Create New Game</>}
+                            {isCreating ? t('Creating Room...') : <><Plus size={22} /> {t('Create New Game')}</>}
                         </button>
                     </div>
                 </div>
@@ -252,8 +255,9 @@ function LobbyPage() {
 
             <div className="sg-rx-lobby__foot">
                 <p style={{ display: 'flex', justifyContent: 'center', gap: 22 }}>
-                    <a href="/how-to-play" className="sg-link">How to Play</a>
-                    <a href={tutorialHref} className="sg-link">Tutorial</a>
+                    <a href="/how-to-play" className="sg-link">{t('How to Play')}</a>
+                    <a href={tutorialHref} className="sg-link">{t('Tutorial')}</a>
+                    <LanguagePicker />
                 </p>
                 {connectedLine}
             </div>

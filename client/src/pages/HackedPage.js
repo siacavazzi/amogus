@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import LeaveGameButton from "../components/LeaveGameButton";
 import { vibrate } from "../signal";
+import { t } from '../i18n';
 
 const STATIC_MS = 900;
 
@@ -67,10 +68,10 @@ const HackedPage = ({ hackTime }) => {
       <LeaveGameButton className="sg-corner" />
 
       <div className="sg-center" style={{ gap: 10, opacity: staticDone ? 1 : 0, transition: 'opacity .25s .15s' }}>
-        <p className="sg-pill" style={{ background: 'rgba(255,255,255,0.12)' }}>HACKED</p>
-        <h1 className="sg-big sg-h1">Devices down</h1>
-        <p className="sg-lede" style={{ opacity: 0.7 }}>An intruder played EMP</p>
-        <p className="sg-small" style={{ marginTop: 18 }}>Back in</p>
+        <p className="sg-pill" style={{ background: 'rgba(255,255,255,0.12)' }}>{t('HACKED')}</p>
+        <h1 className="sg-big sg-h1">{t('Devices down')}</h1>
+        <p className="sg-lede" style={{ opacity: 0.7 }}>{t('An intruder played EMP')}</p>
+        <p className="sg-small" style={{ marginTop: 18 }}>{t('Back in')}</p>
         <p
           key={hackTime <= 10 ? hackTime : 'steady'}
           className={`sg-big sg-num ${hackTime <= 10 ? 'sg-tick' : ''}`}

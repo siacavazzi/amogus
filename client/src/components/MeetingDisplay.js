@@ -5,10 +5,11 @@ import { Check } from '../signal/icons';
 import { Face, Words } from '../signal';
 import '../signal/reactor.css';
 import { readyNeeded } from '../utils/meetingQuorum';
+import { t, tk } from '../i18n';
 
 // The reactor's meeting screen: the same yellow flood the phones get, with the roll call big
 // enough to read from across the room. The moving stripes are the one thing in motion.
-const MeetingDisplay = ({ message = "Meeting called", stage = 'waiting', callerName, hostName, meeting, players = [], children }) => {
+const MeetingDisplay = ({ message = tk('Meeting called'), stage = 'waiting', callerName, hostName, meeting, players = [], children }) => {
   const alive = players.filter((p) => p.alive !== false);
   // Someone offline past the server's grace period isn't waited for.
   const present = alive.filter((p) => !p.absent);
@@ -29,17 +30,17 @@ const MeetingDisplay = ({ message = "Meeting called", stage = 'waiting', callerN
         <div className="sg-stripes" />
         <div className="sg-rx__main">
           <h1 className="sg-rx__meet">
-            <Words text="EMERGENCY" delay={380} />
+            <Words text={t('EMERGENCY')} delay={380} />
             <br />
-            <Words text="MEETING" delay={520} />
+            <Words text={t('MEETING')} delay={520} />
           </h1>
 
           <div className="sg-a sg-rise" style={{ display: 'flex', alignItems: 'center', gap: 18, animationDelay: '800ms' }}>
             {caller && <Face player={caller} size={84} className="sg-a sg-pop" style={{ animationDelay: '820ms' }} />}
             <div style={{ textAlign: caller ? 'left' : 'center' }}>
-              <p className="sg-rx__lede">{callerName ? `${callerName} called it` : message}</p>
+              <p className="sg-rx__lede">{callerName ? t('{name} called it', { name: callerName }) : t(message)}</p>
               <p className="sg-rx__note">
-                {voting ? 'Voting is open' : 'Everyone to the meeting spot, then slide ready'}
+                {voting ? t('Voting is open') : t('Everyone to the meeting spot, then slide ready')}
               </p>
             </div>
           </div>
@@ -67,23 +68,23 @@ const MeetingDisplay = ({ message = "Meeting called", stage = 'waiting', callerN
 
           {voting && (
             <p className="sg-rx__alert sg-a sg-pop" style={{ background: 'var(--sg-ink)', color: 'var(--sg-meet)', fontSize: 'clamp(20px, 2.4vw, 34px)', padding: '14px 28px' }}>
-              VOTE ON YOUR PHONES
+              {t('VOTE ON YOUR PHONES')}
             </p>
           )}
 
           {!voting && alive.length > 0 && (
             <p className="sg-rx__lede sg-num" data-testid="reactor-ready-count">
-              {readyCount >= needed ? 'Everyone is here. Voting opens.' : `${readyCount} of ${present.length} ready`}
+              {readyCount >= needed ? t('Everyone is here. Voting opens.') : t('{ready} of {total} ready', { ready: readyCount, total: present.length })}
             </p>
           )}
 
           {!voting && readyCount < needed && needed < present.length && (
-            <p className="sg-rx__note" data-testid="reactor-ready-needed">Voting opens at {needed} ready</p>
+            <p className="sg-rx__note" data-testid="reactor-ready-needed">{t('Voting opens at {needed} ready', { needed })}</p>
           )}
 
           {!voting && hostName && readyCount < needed && (
             <p className="sg-rx__note" data-testid="reactor-host-can-start">
-              Stuck? {hostName} is the host and can start the vote from their phone.
+              {t('Stuck? {hostName} is the host and can start the vote from their phone.', { hostName })}
             </p>
           )}
         </div>

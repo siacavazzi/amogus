@@ -3,6 +3,7 @@ import './signal.css';
 import { DataContext } from '../GameContext';
 import { ENDPOINT } from '../ENDPOINT';
 import Avatar, { getAvatar } from '../components/Avatar';
+import { t } from '../i18n';
 
 // Android phones buzz on shared moments. iPhones can't, so the colour has to do the work.
 export function vibrate(pattern) {
@@ -112,7 +113,7 @@ export function Face({ player, size = 96, className = '', style, dead = false })
     return (
       <img
         src={url}
-        alt={player?.username || 'Player'}
+        alt={player?.username || t('Player')}
         referrerPolicy="no-referrer"
         className={className}
         style={{ ...box, ...look, borderRadius: '50%', objectFit: 'cover', display: 'block' }}

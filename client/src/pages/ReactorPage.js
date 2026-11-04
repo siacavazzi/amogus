@@ -9,6 +9,7 @@ import { isBetaChannel } from "../components/BetaBadge";
 import { buildRoomQrUrl } from "../utils/inviteLinks";
 import { Face } from "../signal";
 import "../signal/reactor.css";
+import { t } from '../i18n';
 
 const ARM_MS = 3000;
 
@@ -34,11 +35,11 @@ function ReactorNormal() {
 
     useEffect(() => {
         if (!showAverted) return undefined;
-        const t = setTimeout(() => {
+        const timer = setTimeout(() => {
             clearMeltdownAverted();
             setShowAverted(false);
         }, 3600);
-        return () => clearTimeout(t);
+        return () => clearTimeout(timer);
     }, [showAverted]);
 
     // Count the three seconds down on screen while the sabotage arms.
@@ -55,8 +56,8 @@ function ReactorNormal() {
 
     useEffect(() => {
         if (!sabotageError) return undefined;
-        const t = setTimeout(() => setSabotageError(null), 6000);
-        return () => clearTimeout(t);
+        const timer = setTimeout(() => setSabotageError(null), 6000);
+        return () => clearTimeout(timer);
     }, [sabotageError]);
 
     const handleSabotage = () => {
@@ -92,14 +93,14 @@ function ReactorNormal() {
     percentage = Math.max(0, Math.min(percentage, 100));
 
     const disabled = isDisabled();
-    const reason = meeting ? "Cannot sabotage during meeting" :
-        hackTime > 0 ? "Sabotage in progress..." :
-        endState ? "Game has ended" : "";
+    const reason = meeting ? t("Cannot sabotage during meeting") :
+        hackTime > 0 ? t("Sabotage in progress...") :
+        endState ? t("Game has ended") : "";
 
     const leave = (corner = true) => (
-        <button type="button" onClick={handleLeaveRoom} className={`sg-rx__leave${corner ? " sg-rx__corner" : ""}`} title="Leave Room">
+        <button type="button" onClick={handleLeaveRoom} className={`sg-rx__leave${corner ? " sg-rx__corner" : ""}`} title={t('Leave Room')}>
             <LogOut size={18} />
-            <span>Leave Room</span>
+            <span>{t('Leave Room')}</span>
         </button>
     );
 
@@ -114,12 +115,12 @@ function ReactorNormal() {
                 {isSabotaging ? (
                     <>
                         <AlertTriangle size={40} />
-                        <span>INITIATING...</span>
+                        <span>{t('INITIATING...')}</span>
                     </>
                 ) : (
                     <>
                         <Radiation size={40} />
-                        <span>SABOTAGE CORE</span>
+                        <span>{t('SABOTAGE CORE')}</span>
                     </>
                 )}
             </button>
@@ -134,7 +135,7 @@ function ReactorNormal() {
                 <MeetingDisplay
                     stage={meetingState.stage}
                     callerName={meetingState.trigger === 'tasks_complete' ? undefined : meetingState.player_who_started_it}
-                    message={meetingState.trigger === 'tasks_complete' ? 'Tasks complete: intruders revealed' : undefined}
+                    message={meetingState.trigger === 'tasks_complete' ? t('Tasks complete: intruders revealed') : undefined}
                     hostName={meetingState.host_name}
                     meeting={meetingState}
                     players={players || []}
@@ -150,9 +151,9 @@ function ReactorNormal() {
         return (
             <div className="sg sg-screen sg-rx sg-rx--arming" role="alert">
                 <div className="sg-rx__main">
-                    <p className="sg-rx__label">Overloading core...</p>
+                    <p className="sg-rx__label">{t('Overloading core...')}</p>
                     <p key={armLeft} className="sg-rx__count sg-a sg-slam" aria-live="assertive">{armLeft}</p>
-                    <p className="sg-rx__lede">Meltdown incoming</p>
+                    <p className="sg-rx__lede">{t('Meltdown incoming')}</p>
                 </div>
                 <div className="sg-rx__foot">{sabotage('sg-btn-ink sg-rx__sabotage--armed')}</div>
             </div>
@@ -177,13 +178,13 @@ function ReactorNormal() {
     return (
         <div className="sg sg-screen sg-round sg-rx">
             <div className="sg-rx__bar">
-                <p className="sg-rx__brand">Sus Party <span style={{ opacity: 0.7, fontWeight: 700 }}>· Room {roomCode}</span></p>
+                <p className="sg-rx__brand">Sus Party <span style={{ opacity: 0.7, fontWeight: 700 }}>{t('· Room {roomCode}', { roomCode })}</span></p>
                 {leave(false)}
             </div>
 
             <div className="sg-rx__main">
-                <p className="sg-rx__label">Tasks done</p>
-                <p className="sg-rx__pct" aria-label={`Tasks ${percentage}% done`}>
+                <p className="sg-rx__label">{t('Tasks done')}</p>
+                <p className="sg-rx__pct" aria-label={t('Tasks {percentage}% done', { percentage })}>
                     {percentage}<small>%</small>
                 </p>
                 <div
@@ -192,11 +193,11 @@ function ReactorNormal() {
                     aria-valuenow={percentage}
                     aria-valuemin="0"
                     aria-valuemax="100"
-                    aria-label={`Progress: ${percentage}%`}
+                    aria-label={t('Progress: {percentage}%', { percentage })}
                 >
                     <div className="sg-rx__fill" style={{ width: `${percentage}%` }} />
                 </div>
-                <p className="sg-rx__lede">At 100% the intruders are revealed</p>
+                <p className="sg-rx__lede">{t('At 100% the intruders are revealed')}</p>
             </div>
 
             <div className="sg-rx__foot">{sabotage('sg-btn-red')}</div>
@@ -216,13 +217,13 @@ export function LateJoin({ roomCode, waitingPlayers, live = false }) {
         <aside className="sg-rx__late" data-testid="reactor-late-join">
             {qrUrl && (
                 <figure className="sg-rx__late-qr">
-                    <RoomQrCode value={qrUrl} title={`QR code to join room ${roomCode} for the next round`} />
-                    <figcaption>{live ? 'Late? Scan to join' : 'Late? Scan to join the next round'}</figcaption>
+                    <RoomQrCode value={qrUrl} title={t('QR code to join room {roomCode} for the next round', { roomCode })} />
+                    <figcaption>{live ? t('Late? Scan to join') : t('Late? Scan to join the next round')}</figcaption>
                 </figure>
             )}
             {waiting.length > 0 && (
                 <div className="sg-rx__late-list" data-testid="reactor-waiting-list">
-                    <p className="sg-num">+{waiting.length} {live ? 'waiting to join' : 'joining next round'}</p>
+                    <p className="sg-num">{live ? t('+{count} waiting to join', { count: waiting.length }) : t('+{count} joining next round', { count: waiting.length })}</p>
                     <div className="sg-rx__late-faces">
                         {waiting.slice(0, 8).map((player) => (
                             <Face key={player.player_id} player={player} size={40} className="sg-rx__face-ring" />

@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { DataContext } from '../GameContext';
 import { LogOut } from '../signal/icons';
 import '../signal/signal.css';
+import { t } from '../i18n';
 
 function LeaveGameButton({ className = '' }) {
     const { socket, roomCode, running, waitingForNextRound } = useContext(DataContext);
@@ -37,31 +38,31 @@ function LeaveGameButton({ className = '' }) {
                 onClick={handleLeaveClick}
                 className={`sg flex items-center justify-center gap-2 rounded-full transition-opacity hover:opacity-100 ${className}`}
                 style={{ minWidth: 40, height: 40, padding: '0 11px', background: 'rgba(0,0,0,0.18)', color: 'inherit', opacity: 0.85, fontWeight: 700, fontSize: 14 }}
-                title="Leave Game"
-                aria-label="Leave game"
+                title={t('Leave Game')}
+                aria-label={t('Leave game')}
             >
                 <LogOut size={17} strokeWidth={2.5} />
-                <span className="hidden sm:inline">Leave</span>
+                <span className="hidden sm:inline">{t('Leave')}</span>
             </button>
 
             {/* Confirmation */}
             {showConfirm && (
                 <div className="sg fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.55)' }}>
                     <div className="sg-a sg-rise w-full max-w-sm" style={{ background: '#fff', color: 'var(--sg-ink)', borderRadius: 24, padding: 22 }}>
-                        <h2 className="sg-big" style={{ fontSize: 30, marginBottom: 10 }}>Leave game?</h2>
+                        <h2 className="sg-big" style={{ fontSize: 30, marginBottom: 10 }}>{t('Leave game?')}</h2>
                         <p style={{ fontWeight: 500, fontSize: 16, lineHeight: 1.4, marginBottom: 20, opacity: 0.8 }}>
                             {running && !waitingForNextRound
-                                ? "You'll be marked as eliminated and can't rejoin this game."
-                                : "You'll leave this room."
+                                ? t('You\'ll be marked as eliminated and can\'t rejoin this game.')
+                                : t('You\'ll leave this room.')
                             }
                         </p>
                         <div className="flex gap-3">
                             <button onClick={handleCancel} className="sg-btn" style={{ background: '#eceae4', color: 'var(--sg-ink)' }}>
-                                Stay
+                                {t('Stay')}
                             </button>
                             <button onClick={handleConfirmLeave} className="sg-btn" style={{ background: 'var(--sg-out)', color: '#fff' }}>
                                 <LogOut size={18} />
-                                Leave
+                                {t('Leave')}
                             </button>
                         </div>
                     </div>

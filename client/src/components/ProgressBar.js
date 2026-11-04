@@ -3,6 +3,7 @@ import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { DataContext } from '../GameContext';
 import '../signal/signal.css';
+import { t } from '../i18n';
 
 // The crew's task progress across the top of every game screen. Crewmates and intruders
 // see exactly the same bar, so a glance at a phone never gives a role away.
@@ -26,7 +27,7 @@ const ProgressBar = ({ score, goalScore }) => {
       style={{ right: 64, paddingTop: 'calc(env(safe-area-inset-top, 0px) + 22px)', paddingLeft: 20, color: fg }}
     >
       <div className="max-w-lg flex items-center gap-2.5" style={{ fontWeight: 700, fontSize: 14 }}>
-        <span>Tasks</span>
+        <span>{t('Tasks')}</span>
         <div
           className="flex-grow overflow-hidden"
           style={{ height: 8, borderRadius: 8, background: onYellow ? 'rgba(26,20,0,0.18)' : 'rgba(255,255,255,0.25)' }}
@@ -34,7 +35,7 @@ const ProgressBar = ({ score, goalScore }) => {
           aria-valuenow={score}
           aria-valuemin="0"
           aria-valuemax={goalScore}
-          aria-label={`Progress: ${percentage}%`}
+          aria-label={t('Progress: {percentage}%', { percentage })}
         >
           <div
             className="h-full"

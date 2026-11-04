@@ -2,6 +2,7 @@ import React from 'react';
 import { Skull, ShieldAlert } from '../signal/icons';
 import { Face, Words } from '../signal';
 import '../signal/reactor.css';
+import { t } from '../i18n';
 
 /**
  * IntrudersRevealedDisplay - the red moment when tasks reach 100% and the intruders are named.
@@ -14,11 +15,11 @@ const IntrudersRevealedDisplay = ({ intruderNames = [], isIntruder = false, play
       <div className="sg sg-screen sg-out sg-rx sg-flood" role="status">
         <div className="sg-rx__main">
           <ShieldAlert size={120} className="sg-a sg-pop" style={{ animationDelay: '300ms' }} />
-          <h1 className="sg-rx__meet"><Words text="LOCKED OUT" delay={400} /></h1>
-          <p className="sg-rx__lede">All systems compromised. Eliminate remaining crew immediately!</p>
+          <h1 className="sg-rx__meet"><Words text={t('LOCKED OUT')} delay={400} /></h1>
+          <p className="sg-rx__lede">{t('All systems compromised. Eliminate remaining crew immediately!')}</p>
           <div className="sg-row">
-            <span className="sg-pill">VENTS DISABLED</span>
-            <span className="sg-pill">IDENTITY EXPOSED</span>
+            <span className="sg-pill">{t('VENTS DISABLED')}</span>
+            <span className="sg-pill">{t('IDENTITY EXPOSED')}</span>
           </div>
         </div>
         {children && <div className="sg-rx__foot">{children}</div>}
@@ -31,9 +32,9 @@ const IntrudersRevealedDisplay = ({ intruderNames = [], isIntruder = false, play
   return (
     <div className="sg sg-screen sg-out sg-rx sg-flood" role="status">
       <div className="sg-rx__main">
-        <p className="sg-rx__label sg-a sg-rise" style={{ animationDelay: '250ms' }}>Tasks complete</p>
+        <p className="sg-rx__label sg-a sg-rise" style={{ animationDelay: '250ms' }}>{t('Tasks complete')}</p>
         <h1 className="sg-rx__meet sg-rx__reveal-title">
-          <Words text={intruderNames.length > 1 ? 'THE INTRUDERS ARE' : 'THE INTRUDER IS'} delay={380} />
+          <Words text={intruderNames.length > 1 ? t('THE INTRUDERS ARE') : t('THE INTRUDER IS')} delay={380} />
         </h1>
         <div className="sg-rx__names" style={{ marginTop: 'clamp(6px, 2vh, 24px)' }}>
           {faces.map((player, index) => (
@@ -48,7 +49,7 @@ const IntrudersRevealedDisplay = ({ intruderNames = [], isIntruder = false, play
           ))}
         </div>
         <p className="sg-rx__lede sg-a sg-rise" style={{ animationDelay: '1300ms' }}>
-          Find them and vote them out!
+          {t('Find them and vote them out!')}
         </p>
       </div>
       {children && <div className="sg-rx__foot">{children}</div>}
