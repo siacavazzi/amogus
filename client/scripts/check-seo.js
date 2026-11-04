@@ -38,6 +38,20 @@ async function main() {
             assert.ok(!/noindex|none/i.test(meta.content), `${route.path}: index blocked by meta tag`);
         }
         assert.ok(document.querySelector('#root')?.textContent.trim().length > 40, `${route.path}: missing rendered content`);
+        // Translated pages: right <html lang>, and hreflang links that name every language, itself included.
+        const langPrefix = /^\/(fr|es|de|ro|pt)(\/|$)/.exec(route.path)?.[1];
+        assert.equal(document.documentElement.getAttribute('lang'), langPrefix || 'en', `${route.path}: wrong <html lang>`);
+        const alternates = [...document.querySelectorAll('link[rel="alternate"][hreflang]')];
+        const translated = langPrefix || route.path === '/' || route.path === '/among-us-irl';
+        if (translated) {
+            assert.equal(alternates.length, 7, `${route.path}: expected 6 languages plus x-default in hreflang links`);
+            assert.ok(alternates.some(link => link.href === route.canonical), `${route.path}: hreflang links must include the page itself`);
+            for (const link of alternates) {
+                assert.ok(routes.some(r => r.canonical === link.href), `${route.path}: hreflang ${link.getAttribute('hreflang')} points at an unknown page`);
+            }
+        } else {
+            assert.equal(alternates.length, 0, `${route.path}: unexpected hreflang links`);
+        }
         for (const link of document.querySelectorAll('a[href]')) {
             const url = new URL(link.getAttribute('href'), route.canonical);
             if (url.origin === 'https://susparty.com') linkedPaths.add(url.pathname);

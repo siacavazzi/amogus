@@ -140,6 +140,7 @@ ol.seo-list { list-style: decimal; }
     text-wrap: balance;
 }
 .seo-launch p { color: #fff; font-size: 1.1rem; line-height: 1.55; margin: 0 0 28px; max-width: 46ch; }
+.seo-hero .seo-launch__note { color: var(--site-body); font-size: .9rem; font-weight: 600; margin: 20px 0 0; }
 .seo-launch .seo-launch__note { color: rgba(255, 255, 255, .78); font-size: .9rem; font-weight: 600; margin: 24px 0 0; }
 .site-page .seo-launch .seo-btn--primary { background: #fff; color: var(--sg-round); }
 .site-page .seo-launch .seo-btn--primary:hover { background: #fff; color: var(--sg-round-d); }
