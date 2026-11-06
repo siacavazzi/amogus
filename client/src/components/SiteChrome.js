@@ -59,6 +59,9 @@ export function SiteFooter({ languagePage = 'home' }) {
                     <a href="/holiday-party-games-for-adults">Holiday party game</a>
                 </div>
             </nav>
+            <p className="site-footer__contact">
+                Questions or a problem? Email <a href="mailto:support@susparty.com">support@susparty.com</a>
+            </p>
             <p className="site-footer__note">
                 Sus Party is an independent social deduction party game. It is not affiliated with,
                 endorsed by, or sponsored by Innersloth or Among Us.
