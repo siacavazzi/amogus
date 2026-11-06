@@ -289,6 +289,15 @@ class SetupAndClientMetricTests(EventLogTestCase):
         self.assertEqual([3, None], [row['dom_conflicts'] for row in rows])
         self.assertEqual('fr', self.tracker.named('client_error')[-1]['translated_to'])
 
+    def test_in_app_browser_pop_up_is_counted_with_labels_only(self):
+        client = self.make_client()
+        client.emit('client_metric', {'kind': 'in_app_browser', 'app': 'reddit', 'os': 'ios', 'action': 'shown'})
+        client.emit('client_metric', {'kind': 'in_app_browser', 'app': '<b>', 'os': 'beos', 'action': 'copy_link'})
+        client.emit('client_metric', {'kind': 'in_app_browser', 'app': 'reddit', 'action': 'clicked_ad'})
+        rows = self.tracker.named('in_app_browser')
+        self.assertEqual([('reddit', 'ios', 'shown'), ('unknown', 'unknown', 'copy_link')],
+                         [(row['app'], row['os'], row['action']) for row in rows])
+
     def test_client_metrics_are_capped_per_socket(self):
         client = self.make_client()
         for _ in range(server_app.CLIENT_METRICS_PER_SOCKET + 5):
@@ -331,6 +340,9 @@ class PureHelperTests(unittest.TestCase):
             'Mozilla/5.0 (iPhone; CPU iPhone OS 17_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Mobile/15E148 Safari/604.1': ('ios', 'safari'),
             'Mozilla/5.0 (iPhone; CPU iPhone OS 17_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/119 Mobile/15E148 Safari/604.1': ('ios', 'chrome'),
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119 Safari/537.36 Edg/119': ('windows', 'edge'),
+            'Mozilla/5.0 (iPhone; CPU iPhone OS 17_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Reddit/Version 2024.45.0/Build 123': ('ios', 'reddit_app'),
+            'Mozilla/5.0 (iPhone; CPU iPhone OS 17_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 [FBAN/MessengerForiOS;FBAV/440.0]': ('ios', 'messenger_app'),
+            'Mozilla/5.0 (Linux; Android 14; Pixel 8; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/119 Mobile Safari/537.36': ('android', 'android_webview'),
             '': ('unknown', 'unknown'),
         }
         for ua, expected in cases.items():

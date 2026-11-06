@@ -6,6 +6,7 @@ import LoginPage from "./pages/Login";
 import ConnectingPage from "./pages/ConnectingPage";
 import PreGamePage from "./pages/PreGamePage";
 import Modal from "./components/Modal";
+import InAppBrowserWarning from "./components/InAppBrowserWarning";
 import IntruderPage from "./pages/IntruderPage";
 import CrewmemberPage from "./pages/CrewPage";
 import ProgressBar from "./components/ProgressBar";
@@ -234,6 +235,8 @@ const PageController = () => {
 
     return (
         <div>
+            {/* Facebook, Reddit, X... built-in browsers can drop the game: ask to move to Safari or Chrome. */}
+            <InAppBrowserWarning />
             {/* Round pop-ups (meltdown over, last stand...) aren't for phones that are not in the round */}
             {currentPage !== "waitingNextRound" && !(currentPage === "login" && roundRunningAtEntry) && <Modal />}
             {running && isMobile && !endState && currentPage !== "waitingNextRound" && (
