@@ -3,118 +3,130 @@ import './Landing.css';
 import { usePageMeta } from '../../seo/usePageMeta';
 import { alternatesFor } from '../../seo/translatedPages';
 import { SiteNav, SiteFooter } from '../../components/SiteChrome';
-import { Home, Speaker, Cards, Radiation, ArrowRight } from '../../signal/icons';
+import Avatar from '../../components/Avatar';
+import { ArrowRight } from '../../signal/icons';
 import { ROOM_QUERY_PARAM, VIA_QUERY_PARAM } from '../../utils/inviteLinks';
 
-const TAGLINE_WORDS = ['Gaslight.', 'Sneak.', 'Vote.', 'Repeat.'];
+// Screens captured from a real 8-phone game on the current build (public/images/landing).
+const img = (name) => `/images/landing/${name}.webp`;
 
-const STEPS = [
+// The hero plays one round: each step swaps the phone and the reactor behind it.
+const ROUND = [
     {
-        n: '01',
-        title: 'Open susparty.com',
-        body: 'Host from your phone. Friends join in their browsers with your room code. Add a laptop or TV for the optional reactor. No signup or downloads.',
+        label: 'Do tasks',
+        phone: 'crew-task',
+        phoneAlt: 'A crewmate’s phone showing their task: flip a plastic bottle until it lands upright, in the kitchen',
+        tv: 'reactor',
+        tvAlt: 'The reactor on a laptop showing 13% of tasks done',
     },
     {
-        n: '02',
-        title: 'Customize tasks for your venue',
-        body: 'Generate a task pack for your rooms, then review it in host setup. Count coasters, read a book title, or sort cards. Use places your group can share.',
+        label: 'Meeting',
+        phone: 'meeting-ready',
+        phoneAlt: 'Every phone turns yellow: emergency meeting, Maya called it',
+        tv: 'reactor-meeting',
+        tvAlt: 'The reactor showing the emergency meeting and who is ready',
     },
     {
-        n: '03',
-        title: 'Gaslight. Sneak. Vote. Repeat.',
-        body: 'Crewmates rush real-life tasks. Intruders pick people off and stir chaos. Meetings decide who walks the plank.',
+        label: 'Vote',
+        phone: 'vote-selected',
+        phoneAlt: 'Voting screen with each player’s face, Jules selected',
+        tv: 'reactor-meeting',
+        tvAlt: '',
+    },
+    {
+        label: 'Caught',
+        phone: 'vote-result',
+        phoneAlt: 'Red screen: Jules was ejected. They were an intruder.',
+        tv: 'reactor-victory',
+        tvAlt: 'The reactor announcing that the crewmates win',
     },
 ];
 
-const FEATURES = [
-    {
-        Icon: Home,
-        title: 'Custom tasks for your venue',
-        body: 'Generate a pack for your rooms or write your own tasks. Review the list, import it, and open the room for friends.',
-    },
-    {
-        Icon: Speaker,
-        title: 'Sonos integration',
-        body: 'Pipe meeting bells and reactor alarms through your speakers for full house-wide chaos.',
-    },
-    {
-        Icon: Cards,
-        title: 'Sabotage cards',
-        body: 'Intruders draw cards mid-game. Hack phones, force votes, mess with the room.',
-    },
-    {
-        Icon: Radiation,
-        title: 'Reactor meltdown',
-        body: 'A panic-mode minigame the whole group has to scramble to stop. Or not.',
-    },
+const STEPS = [
+    { shot: 'role-crew', alt: 'Phone showing your secret role: Crewmate', title: 'Get a secret role', body: 'Crewmate or intruder. Only you know.' },
+    { shot: 'next-task', alt: 'Phone showing a task: walk up a flight of stairs and back down', title: 'Spread out and do tasks', body: 'Your phone sends you around the house to do real things.' },
+    { shot: 'meeting-ready', alt: 'Emergency meeting screen on a phone', title: 'Find a body? Call a meeting', body: 'Every phone goes yellow and everyone heads to the meeting spot.' },
+    { shot: 'vote-selected', alt: 'Voting screen with player faces', title: 'Argue and vote', body: 'Vote out the intruders before they get everyone.' },
+];
+
+// The suspects in the "who did it" mini game, with what each one would say for themselves.
+const SUSPECTS = [
+    { pic: 1, name: 'Maya', alibi: 'Called the meeting. Says they saw Kai near the body.' },
+    { pic: 2, name: 'Alex', alibi: 'Was “in the kitchen” the whole time. Nobody saw them.' },
+    { pic: 3, name: 'Jules', alibi: 'Finished zero tasks. Says the stairs one is hard.' },
+    { pic: 7, name: 'Nora', alibi: 'Very quiet. Keeps checking their phone.' },
+    { pic: 5, name: 'Kai', alibi: 'Says Maya is lying. Was alone in the hallway.' },
+    { pic: 6, name: 'Theo', alibi: 'Wants to skip the vote. Suspiciously calm.' },
 ];
 
 const FAQS = [
-    { q: 'Can you play Among Us in real life?', a: 'Yes. Sus Party brings the social deduction setup into your house: secret roles, real tasks, sabotage, meetings, and votes. Everyone plays together in person, with a phone as their controller.' },
-    { q: 'Is there a free Among Us IRL app?', a: 'Sus Party is a free browser app for an Among Us-inspired party game. Open it on iPhone, Android, or a laptop. No install or account required.' },
-    { q: 'What are good Among Us IRL tasks at home?', a: 'Count coasters at the dining table, read a title from a shared shelf, or sort host-provided cards. Use short tasks in different areas so players have reasons to split up.' },
-    { q: 'How do Among Us IRL room codes work?', a: 'The host creates a Sus Party game and shares its four-character room code. Friends open susparty.com/play and enter that code to join the same game.' },
-    { q: 'Can we play online from different homes?', a: 'Sus Party connects your phones online, but the group plays together in the same physical space. The tasks, secret eliminations, and meetings happen in real life.' },
-    { q: 'How many players?', a: 'Anywhere from 3 to 20+. The game needs at least two crew members per intruder, so add intruders as the group grows. The task generator builds packs for 3–30 players.' },
-    { q: 'How does a big group join at once?', a: 'Open susparty.com/play on a laptop or TV first and create the room there. It becomes the big screen (the Reactor) and shows the room code to the whole group. Players type susparty.com on their phones and enter the code; the first phone in is the host. No download or sign-up.' },
-    { q: 'Does it cost anything?', a: 'No. It\u2019s free, open source, and ad-free.' },
-    { q: 'Where do we play?', a: 'Use shared areas in a house, apartment, dorm, office, or vacation rental. Choose at least two task locations so players have a route. Each phone needs internet.' },
+    { q: 'Is it free?', a: 'Yes. No app, no account, no ads. Everyone opens susparty.com in their phone’s browser.' },
+    { q: 'How many people can play?', a: '3 to 20+. Bigger groups get more intruders, and the task generator builds packs for up to 30 players.' },
+    { q: 'Where do you play?', a: 'Anywhere people can walk around: a house, apartment, dorm, office, library or camp. Tasks are spread across rooms so people split up.' },
+    { q: 'Do we need to be together?', a: 'Yes. The phones connect online, but everyone plays in the same place. Kills, bodies and meetings happen in real life.' },
+    { q: 'What are the tasks?', a: 'Short real things, like flipping a bottle, counting fridge magnets or walking up the stairs. Pick a pack for your place or write your own.' },
+    { q: 'Do I need a TV or laptop?', a: 'No. It’s optional. A laptop or TV in the middle shows the room code, task progress and the meltdown. Phones work on their own.' },
 ];
 
-// The hero phone plays the game's big moments in order, each one flooding over the last.
-const SHOTS = [
-    { src: '/images/signal/task.webp', alt: 'A player’s phone during a round: blue screen with their current task and a slider to complete it' },
-    { src: '/images/signal/meeting.webp', alt: 'Every phone floods yellow when someone calls an emergency meeting' },
-    { src: '/images/signal/vote.webp', alt: 'Voting screen with each player’s face to tap' },
-    { src: '/images/signal/caught.webp', alt: 'Red screen after the group votes out an intruder' },
-];
+function Phone({ name, alt, className = '', loading = 'lazy' }) {
+    return (
+        <div className={`sl-phone ${className}`}>
+            <img src={img(name)} alt={alt} width="390" height="845" loading={loading} />
+        </div>
+    );
+}
 
-const MOMENTS = [
-    {
-        tone: 'round',
-        tag: 'The round',
-        title: 'Real tasks in real rooms.',
-        body: 'Your phone shows one job and where to do it. Go to the kitchen, do the thing, slide to finish. Everyone’s screen looks the same, intruders included.',
-        shot: 0,
-    },
-    {
-        tone: 'meet',
-        tag: 'The meeting',
-        title: 'One button stops the whole house.',
-        body: 'Find a body or catch someone acting strange? Call a meeting. Every phone floods yellow at once and everyone heads to the meeting spot.',
-        shot: 1,
-    },
-    {
-        tone: 'out',
-        tag: 'The vote',
-        title: 'Argue. Accuse. Vote someone out.',
-        body: 'Tap who you think it is. When the group gets it right, every screen goes red. Get it wrong and the intruder keeps going.',
-        shot: 3,
-    },
-];
-
-function HeroPhone() {
-    const [idx, setIdx] = useState(0);
+function HeroScene() {
+    const [step, setStep] = useState(0);
+    const [auto, setAuto] = useState(true);
     useEffect(() => {
         const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
-        if (reduce) return undefined;
-        const id = setInterval(() => setIdx((i) => (i + 1) % SHOTS.length), 2600);
+        if (reduce || !auto) return undefined;
+        const id = setInterval(() => setStep((i) => (i + 1) % ROUND.length), 2800);
         return () => clearInterval(id);
-    }, []);
+    }, [auto]);
+    const pick = (i) => { setAuto(false); setStep(i); };
+    const prev = (step + ROUND.length - 1) % ROUND.length;
+    const tvs = [...new Set(ROUND.map((r) => r.tv))];
+
     return (
-        <div className="sl-phone sl-phone--hero">
-            {SHOTS.map((s, i) => (
-                <img
-                    key={s.src}
-                    src={s.src}
-                    alt={i === 0 ? s.alt : ''}
-                    aria-hidden={i === 0 ? undefined : true}
-                    className={`sl-phone__shot ${i === idx ? 'is-on' : ''} ${i === (idx + SHOTS.length - 1) % SHOTS.length ? 'is-under' : ''}`}
-                    width="390"
-                    height="844"
-                    loading={i === 0 ? 'eager' : 'lazy'}
-                />
-            ))}
+        <div className="sl-scene">
+            <div className="sl-scene__stage">
+                <div className="sl-tv" aria-hidden="true">
+                    <div className="sl-tv__screen">
+                        {tvs.map((tv) => (
+                            <img key={tv} src={img(tv)} alt="" width="1200" height="900"
+                                className={ROUND[step].tv === tv ? 'is-on' : ''} />
+                        ))}
+                    </div>
+                </div>
+                <div className="sl-phone sl-phone--hero">
+                    {ROUND.map((r, i) => (
+                        <img
+                            key={r.label}
+                            src={img(r.phone)}
+                            alt={i === 0 ? r.phoneAlt : ''}
+                            aria-hidden={i === 0 ? undefined : true}
+                            className={`sl-phone__shot ${i === step ? 'is-on' : ''} ${i === prev ? 'is-under' : ''}`}
+                            width="390"
+                            height="845"
+                            loading={i === 0 ? 'eager' : 'lazy'}
+                        />
+                    ))}
+                </div>
+                <span className="sl-scene__note sl-scene__note--tv">the big screen (optional)</span>
+                <span className="sl-scene__note sl-scene__note--phone">everyone’s phone</span>
+            </div>
+            <ol className="sl-scene__steps" aria-label="A round of Sus Party">
+                {ROUND.map((r, i) => (
+                    <li key={r.label}>
+                        <button type="button" onClick={() => pick(i)} aria-pressed={i === step}
+                            className={i === step ? 'is-on' : ''}>
+                            <span>{i + 1}</span>{r.label}
+                        </button>
+                    </li>
+                ))}
+            </ol>
         </div>
     );
 }
@@ -128,7 +140,7 @@ function JoinForm() {
     };
     return (
         <form className="sl-join" onSubmit={submit} aria-label="Join a game">
-            <label className="sl-join__label" htmlFor="sl-code">Got a room code?</label>
+            <label className="sl-join__label" htmlFor="sl-code">Friend already started one? Enter the code</label>
             <div className="sl-join__row">
                 <input
                     id="sl-code"
@@ -144,8 +156,63 @@ function JoinForm() {
                 />
                 <button type="submit" className="sl-btn sl-btn--ink">Join</button>
             </div>
-            <a href="/play" className="sl-btn sl-btn--line sl-join__host">Host a new game</a>
         </form>
+    );
+}
+
+// A tiny taste of the meeting: pick who you think did it.
+function WhoDidIt() {
+    const [intruder, setIntruder] = useState(null);
+    const [vote, setVote] = useState(null);
+    const choose = (i) => {
+        if (vote !== null) return;
+        // Decided on the first tap, so every suspect is a fair guess.
+        setIntruder(Math.floor(Math.random() * SUSPECTS.length));
+        setVote(i);
+    };
+    const reset = () => { setVote(null); setIntruder(null); };
+    const done = vote !== null;
+    const right = done && vote === intruder;
+
+    return (
+        <section className="sl-band sl-band--meet sl-who" aria-labelledby="sl-who-h">
+            <div className="sl-wrap">
+                <h2 id="sl-who-h" className="sl-h2">Riley’s been killed. Who did it?</h2>
+                <p className="sl-body">Tap who you’d vote out.</p>
+                <ul className="sl-who__grid">
+                    {SUSPECTS.map((s, i) => {
+                        const state = !done ? '' : i === intruder ? 'is-intruder' : i === vote ? 'is-wrong' : 'is-dim';
+                        return (
+                            <li key={s.name}>
+                                <button type="button" className={`sl-suspect ${state}`} onClick={() => choose(i)}
+                                    disabled={done} aria-label={`Vote for ${s.name}`}>
+                                    <span className="sl-suspect__face"><Avatar id={s.pic} decorative /></span>
+                                    <strong>{s.name}</strong>
+                                    <span className="sl-suspect__alibi">{s.alibi}</span>
+                                    {done && i === intruder && <span className="sl-suspect__tag">Intruder</span>}
+                                </button>
+                            </li>
+                        );
+                    })}
+                </ul>
+                <div className="sl-who__result" aria-live="polite">
+                    {done && (
+                        <>
+                            <p className="sl-h3">
+                                {right
+                                    ? `You got ${SUSPECTS[intruder].name}. Crew wins.`
+                                    : `${SUSPECTS[vote].name} was innocent. It was ${SUSPECTS[intruder].name}.`}
+                            </p>
+                            <p className="sl-body">It’s a lot more fun when it’s your actual friends lying to you.</p>
+                            <div className="sl-who__actions">
+                                <a href="/play" className="sl-btn sl-btn--ink">Start a game <ArrowRight size="1em" /></a>
+                                <button type="button" className="sl-btn sl-btn--line" onClick={reset}>Try again</button>
+                            </div>
+                        </>
+                    )}
+                </div>
+            </div>
+        </section>
     );
 }
 
@@ -156,72 +223,46 @@ function LandingPage() {
         canonical: 'https://susparty.com/',
         alternates: alternatesFor('home'),
     });
-    const [tagIdx, setTagIdx] = useState(0);
-
-    useEffect(() => {
-        const id = setInterval(() => setTagIdx((i) => (i + 1) % TAGLINE_WORDS.length), 1400);
-        return () => clearInterval(id);
-    }, []);
 
     return (
         <div className="site-page sl">
+            {/* HERO */}
             <div className="sl-band sl-band--meet sl-hero">
                 <SiteNav />
                 <div className="sl-wrap sl-hero__grid">
                     <div className="sl-hero__text">
-                        <p className="sl-eyebrow">Sus Party · Free · No app download</p>
-                        <h1 className="sl-title">Among us IRL</h1>
-                        <p className="sl-rotator" aria-live="polite">
-                            {TAGLINE_WORDS.map((w, i) => (
-                                <span key={w} className={`sl-rotator__word ${i === tagIdx ? 'is-active' : ''}`}>{w}</span>
-                            ))}
-                        </p>
+                        <h1 className="sl-title">Among Us IRL</h1>
                         <p className="sl-lede">
-                            Play Among Us in real life with Sus Party. Your house becomes the board.
-                            Open your phone’s browser and
-                            move room to room: complete real tasks, survive sabotage, call
-                            meetings, and vote out the secret saboteur.
+                            Like Among Us or Mafia, but at your party. Everyone gets a secret role on their
+                            phone, spreads out to do real tasks, and tries to catch the intruder.
                         </p>
-                        <JoinForm />
-                        <p className="sl-footnote">
-                            3 to 20+ players · One host phone runs the room ·{' '}
-                            <a href="/how-to-play">How to play</a>
-                        </p>
+                        <div className="sl-hero__cta">
+                            <a href="/play" className="sl-btn sl-btn--ink sl-btn--big">Start a game <ArrowRight size="1em" /></a>
+                            <p className="sl-hero__facts">Free in the browser, for 3 to 20+ players.</p>
+                        </div>
                     </div>
-                    <HeroPhone />
+                    <HeroScene />
+                    <JoinForm />
                 </div>
-                <ul className="sl-wrap sl-mix" aria-label="Game ingredients">
-                    <li><strong>Real rooms</strong><span>The house is the map</span></li>
-                    <li><strong>Secret roles</strong><span>Trust gets expensive</span></li>
-                    <li><strong>Phones guide it</strong><span>No install, no signup</span></li>
-                </ul>
             </div>
 
-            {MOMENTS.map((m, i) => (
-                <section key={m.tag} className={`sl-band sl-band--${m.tone}`} aria-label={m.tag}>
-                    <div className={`sl-wrap sl-split ${i % 2 ? 'sl-split--flip' : ''}`}>
-                        <div>
-                            <p className="sl-tag">{m.tag}</p>
-                            <h2 className="sl-h2">{m.title}</h2>
-                            <p className="sl-body">{m.body}</p>
-                        </div>
-                        <div className="sl-phone">
-                            <img src={SHOTS[m.shot].src} alt={SHOTS[m.shot].alt} width="390" height="844" loading="lazy" />
-                        </div>
-                    </div>
-                </section>
-            ))}
+            {/* PROOF: real numbers from the server, said plainly */}
+            <section className="sl-band sl-band--dark sl-proof" aria-label="Sus Party so far">
+                <p className="sl-wrap sl-proof__line">
+                    Since December 2025, <strong>265 groups</strong> have hosted a game.
+                    In one month <strong>869 people</strong> played, and the biggest game had <strong>41 phones</strong>.
+                </p>
+            </section>
 
-            {/* HOW IT WORKS */}
-            <section className="sl-band sl-band--white" aria-label="How it works">
+            {/* HOW A ROUND GOES */}
+            <section className="sl-band sl-band--white" aria-labelledby="sl-round-h">
                 <div className="sl-wrap">
-                    <p className="sl-tag">How it works</p>
-                    <h2 className="sl-h2">How to play Among Us IRL at home.</h2>
-                    <ol className="sl-steps">
-                        {STEPS.map((s) => (
-                            <li key={s.n}>
-                                <span className="sl-steps__num">{s.n}</span>
-                                <h3 className="sl-h3">{s.title}</h3>
+                    <h2 id="sl-round-h" className="sl-h2">How a round goes</h2>
+                    <ol className="sl-round">
+                        {STEPS.map((s, i) => (
+                            <li key={s.title}>
+                                <Phone name={s.shot} alt={s.alt} />
+                                <h3 className="sl-h3"><span className="sl-round__n">{i + 1}</span>{s.title}</h3>
                                 <p className="sl-body">{s.body}</p>
                             </li>
                         ))}
@@ -229,71 +270,98 @@ function LandingPage() {
                 </div>
             </section>
 
-            {/* FEATURE HIGHLIGHTS */}
-            <section className="sl-band sl-band--round" aria-label="Features">
-                <div className="sl-wrap">
-                    <p className="sl-tag">What’s in the box</p>
-                    <h2 className="sl-h2">Built for the chaos of a real-life party.</h2>
-                    <div className="sl-features">
-                        {FEATURES.map((f) => (
-                            <div className="sl-feature" key={f.title}>
-                                <span className="sl-feature__icon" aria-hidden="true"><f.Icon size={30} /></span>
-                                <h3 className="sl-h3">{f.title}</h3>
-                                <p className="sl-body">{f.body}</p>
-                            </div>
-                        ))}
+            {/* INTRUDER */}
+            <section className="sl-band sl-band--dark sl-intruder" aria-labelledby="sl-intruder-h">
+                <div className="sl-wrap sl-split">
+                    <div>
+                        <h2 id="sl-intruder-h" className="sl-h2">Unless you’re the intruder.</h2>
+                        <p className="sl-body">
+                            Your phone looks just like everyone else’s. Get people alone, then slip into the vent and
+                            play sabotage cards: fake a task, taunt someone, set off a meltdown.
+                        </p>
+                        <p className="sl-body">Then act shocked at the meeting.</p>
+                    </div>
+                    <div className="sl-pair">
+                        <Phone name="intruder-cards" alt="Intruder’s phone in the vent: kill ready, sabotage cards to play" />
+                        <Phone name="phone-meltdown" alt="Meltdown screen: 58 seconds to type a code in at the reactor" className="sl-phone--back" />
                     </div>
                 </div>
             </section>
 
-            {/* QUICK FAQ */}
-            <section className="sl-band sl-band--meet" aria-label="Quick FAQ">
-                <div className="sl-wrap">
-                    <p className="sl-tag">Quick answers</p>
-                    <h2 className="sl-h2">The stuff people always ask.</h2>
-                    <dl className="sl-faq">
-                        {FAQS.map((item) => (
-                            <div className="sl-faq__item" key={item.q}>
-                                <dt className="sl-h3">{item.q}</dt>
-                                <dd className="sl-body">{item.a}</dd>
-                            </div>
-                        ))}
-                    </dl>
-                    <p className="sl-more">
-                        <a href="/faq">More FAQs <ArrowRight size="1em" /></a>
-                    </p>
+            {/* REACTOR */}
+            <section className="sl-band sl-band--round" aria-labelledby="sl-reactor-h">
+                <div className="sl-wrap sl-split sl-split--flip">
+                    <div>
+                        <h2 id="sl-reactor-h" className="sl-h2">Got a TV? Make it the reactor.</h2>
+                        <p className="sl-body">
+                            Put a laptop or TV where everyone passes by. It shows the code to join, how close the crew
+                            is to winning, and the meltdown everyone has to run back to stop.
+                        </p>
+                        <p className="sl-body sl-dim">Optional. Phones are enough.</p>
+                    </div>
+                    <div className="sl-tv sl-tv--solo">
+                        <div className="sl-tv__screen">
+                            <img src={img('reactor-lobby')} alt="The reactor lobby on a laptop: room code, QR code and eight players" width="1200" height="900" loading="lazy" />
+                        </div>
+                    </div>
                 </div>
             </section>
 
-            {/* SEO content section, below the fold, indexable */}
+            <WhoDidIt />
+
+            {/* SETUP */}
+            <section className="sl-band sl-band--white" aria-labelledby="sl-setup-h">
+                <div className="sl-wrap sl-split">
+                    <div>
+                        <h2 id="sl-setup-h" className="sl-h2">Two minutes to set up</h2>
+                        <ol className="sl-setup">
+                            <li><strong>Start a game</strong> on your phone.</li>
+                            <li><strong>Pick a task pack</strong> for your place, or <a href="/among-us-irl-task-generator">make one</a>.</li>
+                            <li><strong>Friends join</strong> by scanning the code or typing it in.</li>
+                        </ol>
+                        <a href="/play" className="sl-btn sl-btn--ink">Start a game <ArrowRight size="1em" /></a>
+                    </div>
+                    <Phone name="party-lobby" alt="Host’s phone in the lobby: room code AYRX, 8 players, 96 tasks, Start Game" />
+                </div>
+            </section>
+
+            {/* FAQ */}
+            <section className="sl-band sl-band--meet" aria-labelledby="sl-faq-h">
+                <div className="sl-wrap sl-faq-wrap">
+                    <h2 id="sl-faq-h" className="sl-h2">Questions</h2>
+                    <div className="sl-faq">
+                        {FAQS.map((item) => (
+                            <details className="sl-faq__item" key={item.q}>
+                                <summary className="sl-h3">{item.q}</summary>
+                                <p className="sl-body">{item.a}</p>
+                            </details>
+                        ))}
+                        <p className="sl-more"><a href="/faq">All questions <ArrowRight size="1em" /></a></p>
+                    </div>
+                </div>
+            </section>
+
+            {/* SEO links, below the fold, indexable */}
             <section className="sl-band sl-band--dark" aria-labelledby="sl-seo-heading">
                 <div className="sl-wrap sl-seo">
-                    <h2 id="sl-seo-heading" className="sl-h2">Choose the game for your group.</h2>
+                    <h2 id="sl-seo-heading" className="sl-h2 sl-h2--small">Plan your game</h2>
                     <p className="sl-body">
-                        Sus Party is a free browser app for an Among Us-inspired party game in real life. Open
-                        <a href="https://susparty.com"> susparty.com</a> on your phones, gather anywhere from 3 to 20+ people, and
-                        turn your house into the board. Players move room to room, complete real tasks,
-                        survive sabotage, call meetings, and vote out the secret saboteur. No app to install,
-                        no signup, no ads.
-                    </p>
-                    <p className="sl-body">
-                        Want a game night built around bluffing and accusations? Compare
-                        {' '}<a href="/social-deduction-games">social deduction games to play in person</a>,
-                        plan an <a href="/among-us-birthday-party">Among Us birthday game</a>,
-                        or choose <a href="/party-games-for-10-people">party games for ten friends</a>.
-                        When you pick Sus Party, the task generator carries your setup into a new room.
+                        Sus Party is a free browser app for playing Among Us in real life with 3 to 20+ people.
+                        Compare <a href="/social-deduction-games">social deduction games to play in person</a>,
+                        plan an <a href="/among-us-birthday-party">Among Us birthday party</a>, or
+                        find <a href="/party-games-for-10-people">party games for ten friends</a>.
                     </p>
                     <ul className="sl-links">
-                        <li><a href="/party-games-for-adults">Play at your next house party</a></li>
-                        <li><a href="/murder-mystery-party-game">Make your friends the murder suspects</a></li>
-                        <li><a href="/birthday-party-games-for-adults">Give birthday guests secret roles</a></li>
-                        <li><a href="/game-night-ideas">Host a Sus Party game night</a></li>
                         <li><a href="/among-us-irl">Free Among Us IRL app</a></li>
+                        <li><a href="/how-to-play">How to play</a></li>
                         <li><a href="/among-us-irl-task-ideas">Task ideas at home</a></li>
                         <li><a href="/among-us-irl-task-generator">Task generator</a></li>
                         <li><a href="/among-us-role-generator">Role generator</a></li>
+                        <li><a href="/party-games-for-adults">House parties</a></li>
+                        <li><a href="/birthday-party-games-for-adults">Adult birthdays</a></li>
+                        <li><a href="/murder-mystery-party-game">Murder mystery alternative</a></li>
+                        <li><a href="/game-night-ideas">Game night</a></li>
                         <li><a href="/among-us-irl-for-youth-groups">Youth groups and big groups</a></li>
-                        <li><a href="/how-to-play">How to play</a></li>
                     </ul>
                 </div>
             </section>
@@ -301,8 +369,8 @@ function LandingPage() {
             {/* CLOSING CTA */}
             <section className="sl-band sl-band--out sl-cta" aria-label="Play Sus Party">
                 <div className="sl-wrap">
-                    <h2 className="sl-title sl-title--cta">Ready to find the saboteur?</h2>
-                    <a href="/play" className="sl-btn sl-btn--white">Play now <ArrowRight size="1em" /></a>
+                    <h2 className="sl-title sl-title--cta">Someone at your party is sus.</h2>
+                    <a href="/play" className="sl-btn sl-btn--white sl-btn--big">Start a game <ArrowRight size="1em" /></a>
                 </div>
             </section>
             <div className="sl-band sl-band--dark sl-foot"><SiteFooter /></div>
