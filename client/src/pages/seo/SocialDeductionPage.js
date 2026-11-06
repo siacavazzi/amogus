@@ -25,8 +25,9 @@ function SocialDeductionPage() {
                 <p className="seo-eyebrow">Game night · Hidden roles and very suspicious friends</p>
                 <h1 className="seo-h1">Social deduction games to play in person</h1>
                 <p className="seo-lead">
-                    A friend gives a perfect explanation for being in the kitchen. Someone else saw them in the hallway.
-                    Now the whole room has to decide which story holds up. Choose a game that gives your group something to argue about.
+                    Social deduction games give a few players a secret, and everyone else has to work out who they are.
+                    Sus Party is a free one you play in person on your phones, like Among Us in real life or Mafia where
+                    everyone walks around. Below are the best options for a group playing in person.
                 </p>
                 <div className="seo-actions">
                     <a href="/among-us-irl-task-generator?venue=house&players=8&movement=normal" className="seo-btn--primary">Set up a free Sus Party game →</a>

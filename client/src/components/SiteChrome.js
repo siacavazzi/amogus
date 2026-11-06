@@ -57,6 +57,12 @@ export function SiteFooter({ languagePage = 'home' }) {
                     <a href="/among-us-task-cards-printable">Printable task cards</a>
                     <a href="/holiday-party-games-for-adults">Holiday party game</a>
                 </div>
+                <div>
+                    <a href="/sus-games">Sus games</a>
+                    <a href="/among-us-party-game">Among Us party game</a>
+                    <a href="/mafia-game-app">Mafia game app</a>
+                    <a href="/chore-game-app">Chore game app</a>
+                </div>
             </nav>
             <p className="site-footer__note">
                 Sus Party is an independent social deduction party game. It is not affiliated with,
