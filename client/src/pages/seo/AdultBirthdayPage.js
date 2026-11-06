@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
-import GameplayScreenshots from './GameplayScreenshots';
+import GameplayScreenshots, { GameTour } from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const SETUP_URL = '/among-us-irl-task-generator?venue=house&players=10&movement=normal&style=mix';
@@ -36,6 +36,7 @@ function AdultBirthdayPage() {
                     <a href={SETUP_URL} className="seo-btn--secondary">Prepare the birthday game</a>
                 </div>
             </header>
+            <GameTour />
             <main className="seo-content">
                 <section className="seo-section">
                     <h2>Give friends from different circles a shared secret</h2>
@@ -50,7 +51,7 @@ function AdultBirthdayPage() {
                         table something to talk about, including the friends who just met.
                     </p>
                 </section>
-                <GameplayScreenshots screens={['party-lobby', 'vote']} />
+                <GameplayScreenshots screens={['party-lobby', 'vote-result']} />
 
                 <section className="seo-section">
                     <h2>Prepare before the doorbell rings</h2>

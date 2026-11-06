@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
-import GameplayScreenshots from './GameplayScreenshots';
+import GameplayScreenshots, { GameTour } from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const CANONICAL = 'https://susparty.com/among-us-irl-for-youth-groups';
@@ -35,6 +35,7 @@ export default function YouthGroupsPage() {
                     <a href="#program-plan" className="seo-btn--secondary">See the 60 to 90 minute plan</a>
                 </div>
             </header>
+            <GameTour />
             <main className="seo-content">
                 <section className="seo-section">
                     <h2>How the game works in a group setting</h2>
@@ -54,7 +55,7 @@ export default function YouthGroupsPage() {
                     <h2>Group size and devices</h2>
                     <p>
                         One game room can hold the whole group, even with 20 or more players.
-                        With 20 or more players, open the game on a laptop, TV or projector first so the room code and every meeting show on a big screen,
+                        With 20 or more players, open the game on a laptop first so the room code and every meeting show on its screen,
                         and use three or four intruders. If you have several leaders and separate spaces, two smaller games side by side also work
                         and give each player more tasks.
                     </p>
@@ -72,7 +73,8 @@ export default function YouthGroupsPage() {
                     </p>
                 </section>
 
-                <GameplayScreenshots screens={['join-room', 'meeting-ready']} />
+                <GameplayScreenshots screens={['join-room', 'party-lobby']} />
+                <GameplayScreenshots screens={['reactor-lobby', 'reactor-meltdown']} />
 
                 <section className="seo-section" id="program-plan">
                     <h2>A 60 to 90 minute program plan</h2>

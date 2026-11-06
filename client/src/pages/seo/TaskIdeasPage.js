@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
-import GameplayScreenshots from './GameplayScreenshots';
+import GameplayScreenshots, { GameTour } from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const TASK_SECTIONS = [
@@ -234,6 +234,8 @@ function TaskIdeasPage() {
                     </a>
                 </div>
             </div>
+
+            <GameTour />
 
             <div className="seo-content">
                 <div className="seo-highlight">

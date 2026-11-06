@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
-import GameplayScreenshots from './GameplayScreenshots';
+import GameplayScreenshots, { GameTour } from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const CANONICAL = 'https://susparty.com/among-us-party-for-kids';
@@ -63,6 +63,7 @@ export default function KidsPartyPage() {
                     <a href="#timeline" className="seo-btn--secondary">See the 2-hour timeline</a>
                 </div>
             </header>
+            <GameTour />
             <main className="seo-content">
                 <section className="seo-section">
                     <h2>How the game works for kids</h2>
@@ -118,7 +119,7 @@ export default function KidsPartyPage() {
                     </div>
                 </section>
 
-                <GameplayScreenshots screens={['crew-task', 'meeting-ready']} />
+                <GameplayScreenshots screens={['next-task', 'crew-victory']} />
 
                 <section className="seo-section">
                     <h2>Kid-safe task ideas</h2>
@@ -176,7 +177,7 @@ export default function KidsPartyPage() {
                     </div>
                 </section>
 
-                <GameplayScreenshots screens={['eliminated-player', 'vote']} />
+                <GameplayScreenshots screens={['eliminated-player', 'vote-result']} />
 
                 <section className="seo-section">
                     <h2>Among Us party ideas: decorations and food</h2>
@@ -194,7 +195,7 @@ export default function KidsPartyPage() {
                     <p>
                         Sus Party is a free, browser-based Among Us IRL game. No accounts and no install. Build a task list,
                         create a room, and share the four-letter code. Each device gets a private role, a task list, and a vote button.
-                        A TV or laptop can show the optional Reactor screen so kids see crew progress. Read <a href="/how-to-play">how to play</a> before the party
+                        A laptop can show the optional Reactor screen so kids see crew progress. Read <a href="/how-to-play">how to play</a> before the party
                         so you can teach it in five minutes. Sus Party is not affiliated with Among Us or Innersloth.
                     </p>
                 </section>

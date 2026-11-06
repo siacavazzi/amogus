@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
-import GameplayScreenshots from './GameplayScreenshots';
+import GameplayScreenshots, { GameTour } from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const SETUP_URL = '/among-us-irl-task-generator?venue=apartment&players=6&movement=normal&style=mix';
@@ -33,6 +33,7 @@ export default function PhonePartyPage() {
                     <a href={SETUP_URL} className="seo-btn--secondary">Prepare a six-player game</a>
                 </div>
             </header>
+            <GameTour />
             <main className="seo-content">
                 <section className="seo-section">
                     <h2>One room code gets everyone into the same game</h2>
@@ -48,7 +49,7 @@ export default function PhonePartyPage() {
                         everyone was before the elimination.
                     </p>
                 </section>
-                <GameplayScreenshots screens={['join-room', 'crew-task']} />
+                <GameplayScreenshots screens={['join-room', 'name-screen']} />
 
                 <section className="seo-section">
                     <h2>Give the crew a reason to leave the sofa</h2>

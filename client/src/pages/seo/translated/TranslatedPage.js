@@ -3,6 +3,7 @@ import { usePageMeta } from '../../../seo/usePageMeta';
 import { alternatesFor, pagePath, pageUrl, LANGUAGE_NAMES, PAGE_LANGUAGES } from '../../../seo/translatedPages';
 import { applyDocumentLanguage, chooseLanguage } from '../../../i18n';
 import { TRANSLATED_CONTENT } from './content';
+import { GameTour, TOUR_STEPS } from '../GameplayScreenshots';
 import '../../../styles/SitePage.css';
 import '../SeoPage.css';
 
@@ -104,6 +105,9 @@ function TranslatedPage({ lang, page }) {
                 {actions}
                 <p className="seo-launch__note">{common.note}</p>
             </div>
+
+            <GameTour title={common.tour.title} lang={lang}
+                steps={TOUR_STEPS.map(([name], i) => [name, ...common.tour.steps[i]])} />
 
             <div className="seo-content">
                 {page === 'home' ? (

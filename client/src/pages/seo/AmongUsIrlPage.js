@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
-import GameplayScreenshots from './GameplayScreenshots';
+import GameplayScreenshots, { GameTour } from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 import { alternatesFor } from '../../seo/translatedPages';
 
@@ -87,6 +87,8 @@ function AmongUsIrlPage() {
                     </a>
                 </div>
             </div>
+
+            <GameTour />
 
             <div className="seo-content">
                 <nav className="seo-links" aria-label="Jump to a setup guide">
@@ -179,7 +181,7 @@ function AmongUsIrlPage() {
                     </p>
                 </section>
 
-                <GameplayScreenshots screens={['crew-task', 'intruder-cards']} />
+                <GameplayScreenshots screens={['role-intruder', 'eliminated-player']} />
 
                 <GameSetupCta title="See the task pack before you invite anyone"
                     href="/among-us-irl-task-generator?venue=house&players=8&movement=normal" label="Preview an eight-player house game">
@@ -258,7 +260,7 @@ function AmongUsIrlPage() {
                         A few things keep a big game moving:
                     </p>
                     <ul className="seo-list">
-                        <li>Open susparty.com/play on a laptop, TV, or projector and create the room there. It becomes the big screen and shows the room code to everyone.</li>
+                        <li>Open susparty.com/play on a laptop or desktop and create the room there. It becomes the Reactor and shows the room code to everyone.</li>
                         <li>Players type susparty.com on their phones and enter the code. The first phone to join is the host and starts the game.</li>
                         <li>Use more intruders as the group grows, and plan more tasks than players so nobody stands around.</li>
                         <li>Pick a meeting point with room for everyone, and spread tasks across several areas.</li>
@@ -267,6 +269,7 @@ function AmongUsIrlPage() {
                         Running it for a youth group, library, or school? See the <a href="/among-us-irl-for-youth-groups">youth group and classroom guide</a>.
                     </p>
                 </section>
+                <GameplayScreenshots screens={['reactor-lobby', 'reactor-meeting']} />
 
                 <section className="seo-section">
                     <p className="seo-section__kicker">FAQ</p>
