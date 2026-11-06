@@ -237,7 +237,7 @@ function LandingPage() {
                             phone, spreads out to do real tasks, and tries to catch the intruder.
                         </p>
                         <div className="sl-hero__cta">
-                            <a href="/play" className="sl-btn sl-btn--ink sl-btn--big">Start a game <ArrowRight size="1em" /></a>
+                            <a href="/play" className="sl-btn sl-btn--ink sl-btn--big sl-hero__start">Start a game <ArrowRight size="1em" /></a>
                             <p className="sl-hero__facts">Free in the browser, for 3 to 20+ players.</p>
                         </div>
                     </div>
