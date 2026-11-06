@@ -246,11 +246,11 @@ function LandingPage() {
                 </div>
             </div>
 
-            {/* PROOF: real numbers from the server, said plainly */}
+            {/* PROOF: real numbers from the server, rounded */}
             <section className="sl-band sl-band--dark sl-proof" aria-label="Sus Party so far">
                 <p className="sl-wrap sl-proof__line">
-                    Since December 2025, <strong>265 groups</strong> have hosted a game.
-                    In one month <strong>869 people</strong> played, and the biggest game had <strong>41 phones</strong>.
+                    <strong>Hundreds of groups</strong> have hosted a game, <strong>nearly 900 people</strong> played
+                    last month, and the biggest game had <strong>over 40 phones</strong>.
                 </p>
             </section>
 
