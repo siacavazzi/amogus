@@ -62,7 +62,7 @@ function AmongUsIrlPage() {
         description:
             'Play Among Us in real life for free. Phones deal secret roles, real tasks, meetings and votes for 3 to 20+ players at home, at school, or at a youth group. No install.',
         canonical: 'https://susparty.com/among-us-irl',
-        ogImage: 'https://susparty.com/og-image.jpg',
+        ogImage: 'https://susparty.com/og-image.jpg?v=2',
         schema: SCHEMA,
         alternates: alternatesFor('irl'),
     });
