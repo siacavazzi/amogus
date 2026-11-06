@@ -237,6 +237,7 @@ class StatsTracker:
                 'meeting_quorum': getattr(game, 'meeting_quorum', None),
                 'auto_intruders': getattr(game, 'auto_intruders', None),
                 'task_source': game.task_source() if hasattr(game, 'task_source') else None,
+                'task_list_via': getattr(game, 'task_list_via', None) if getattr(game, 'task_list_applied', False) else None,
                 'setup_origin': getattr(game, 'setup_origin', None),
                 'acquisition': self.normalize_acquisition(getattr(game, 'acquisition', None)),
                 'first_task_seconds': None, 'last_gameplay_at': game.round_started_at,
@@ -369,6 +370,7 @@ class StatsTracker:
                           last_setup_step=getattr(game, 'last_setup_step', None),
                           setup_origin=getattr(game, 'setup_origin', None),
                           task_source=game.task_source() if hasattr(game, 'task_source') else None,
+                          task_list_via=getattr(game, 'task_list_via', None) if getattr(game, 'task_list_applied', False) else None,
                           has_reactor=bool(getattr(game, 'reactor_sid', None) or getattr(game, 'has_reactor', False)))
 
     # ---- end-of-round feedback ----

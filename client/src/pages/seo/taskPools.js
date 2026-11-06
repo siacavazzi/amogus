@@ -74,6 +74,14 @@ const practical = [
     'Find a plant or a picture here and straighten it or turn it to face the room.',
     'Walk heel to toe in a straight line from the door to the far wall.',
     'Move one chair to the other side of this area, then move it back.',
+    'Wait here quietly for 25 seconds.',
+    'Carry a cup of water across the room without spilling, then pour it back.',
+    'Ring a bell, press a doorbell, or knock three times on a door.',
+    'Shuffle a deck of cards and put it back.',
+    'Walk up three stairs and back down, three times.',
+    'Open and shut a cupboard door three times without a sound.',
+    'Sweep or brush a small patch of floor for 20 seconds.',
+    'Plug a charger into a socket, then unplug it.',
 ];
 
 const playful = [
@@ -129,9 +137,108 @@ const playful = [
     'Give the nearest door a polite knock and say "Room service".',
 ];
 
+// Party vibe: loud, silly, on the move. Hosts' own party lists lean on sport (shots, flips,
+// tricks), dares between players, and showing off.
+const party = [
+    'Shout "Not me!" as loud as you can, then walk away calmly.',
+    'Do 10 jumping jacks while counting out loud.',
+    'Beat another player at rock paper scissors twice in a row.',
+    'Start a slow clap and keep it going for ten seconds.',
+    'Do the worm, or your best try at it.',
+    'Do a cartwheel, a forward roll, or a handstand against a wall.',
+    'Land a bottle flip three times in a row.',
+    'Bounce a ball ten times without losing it.',
+    'Balance a spoon on your nose for five seconds.',
+    'Wait up to 20 seconds and jump-scare the next player who walks in.',
+    'Swap a hat, sock, or bracelet with another player until the next meeting.',
+    'Teach another player a dance move and do it together.',
+    'Fall onto a sofa or bed in dramatic slow motion.',
+    'Play the loudest air-drum solo of your life for ten seconds.',
+    'Do a celebrity impression until someone guesses who it is.',
+    'Rap four lines about the room you are in.',
+    'Do a runway walk across this area and strike a pose at the end.',
+    'Cheer the name of the next player you see like a sports crowd.',
+    'Do 5 burpees.',
+    'Hold a squat while you sing "Twinkle, Twinkle, Little Star".',
+    'Have a ten-second dance battle with another player.',
+    'Balance a cushion on your head and turn around once.',
+    'Do three karate kicks in the air, with sound effects.',
+    'Make your loudest animal noise, then leave like nothing happened.',
+    'Play air piano on a table for ten seconds like a concert star.',
+    'Strike three superhero poses and hold each for three seconds.',
+    'Arm-wrestle another player. Best of three.',
+    'Do a lap of this area with high knees.',
+    'Do a perfectly timed jump together with another player.',
+    'Sing the chorus of any song as loudly as you dare.',
+    'Run a victory lap of this area, waving to the crowd.',
+    'Get another player to laugh without touching them.',
+    'Do ten seconds of stand-up comedy for whoever is here.',
+    'Make three shots into a bin with a ball or balled-up paper.',
+    'Kick a ball or balled-up sock into a goal made of two shoes.',
+    'Celebrate for ten seconds like you just won the lottery.',
+    'Do the floss, the robot, or any video game dance for ten seconds.',
+    'Talk in an accent until you reach your next task.',
+    'Give 15 seconds of sports commentary on another player.',
+    'Throw and catch a ball against a wall ten times.',
+    'Walk like a penguin until you leave this area.',
+    'Hold a plank while another player tells you a joke.',
+    'Announce the next player who walks in like a boxing champion.',
+    'Do your best Tarzan yell.',
+];
+
+// Chill vibe: calm jobs a player can do sitting or slowly: reading, drawing, small puzzles,
+// tidying one thing, a breather.
+const chill = [
+    'Sit somewhere comfy and take five slow, deep breaths.',
+    'Lie on the floor or a sofa and look at the ceiling for 20 seconds.',
+    'Read the first paragraph of any book here.',
+    'Doodle something you can see here, then bin it or keep it.',
+    'Make up a three-word poem about this room and say it quietly.',
+    'Build a card tower with at least three cards, then take it down.',
+    'Make up a riddle and tell it to the next player you meet.',
+    'Close your eyes for 15 seconds and name three sounds you hear.',
+    'Stretch your arms, neck, and back for 20 seconds.',
+    'Hold one easy yoga pose for 20 seconds.',
+    'Sit down and have a sip of water.',
+    'Water a plant here, or check if it needs water.',
+    'Tidy one shelf or table so it looks nice.',
+    'Fold a paper plane, fly it once, then bin it.',
+    'Look out of a window for 20 seconds and find something new.',
+    'Say the alphabet backwards from Z to P.',
+    'Hum your favourite song quietly for 15 seconds.',
+    'Name five things here that start with the letter S.',
+    'Shuffle a deck of cards, deal four small piles, then stack it again.',
+    'Arrange the cushions or pillows here from smallest to biggest.',
+    'Sit back to back with another player for ten seconds without talking.',
+    'Play one quiet game of tic-tac-toe with another player.',
+    'Spell your full name backwards out loud.',
+    'Make a tiny sculpture from three objects here, then put them back.',
+    'Draw a quick map of this area on scrap paper, then bin it.',
+    'Flip through a book or magazine until you find a picture of an animal.',
+    'Find your pulse and feel it for 15 seconds.',
+    'Turn off the light and sit in the dark for ten seconds.',
+    'Close your eyes and touch your nose with each hand in turn.',
+    'Write a word with your finger on a table and let another player guess it.',
+    'Walk slowly around a table without making a sound.',
+    'Sit on the floor and reach for your toes for 15 seconds.',
+    'Pick the comfiest seat here and sit in it for 20 seconds.',
+    'Quietly name three things you are grateful for.',
+    'Coil the loose cables or chargers here into neat bundles.',
+    'Line up every remote, phone, or charger here neatly.',
+    'Fix your hair or clothes in a mirror.',
+    'Watch a clock or timer for 20 seconds without looking away.',
+    'Do ten slow shoulder rolls.',
+    'Find a book and read its back cover.',
+    'Balance a coin or bottle cap on its edge.',
+    'Smell three different things here, like soap, a plant, or a candle.',
+    'Whisper a secret to the quietest corner of this area.',
+];
+
 const TASKS = {
     any: practical.map(task => ({ task })),
     funny: playful.map(task => ({ task, funny: true })),
+    party: party.map(task => ({ task, funny: true })),
+    chill: chill.map(task => ({ task })),
     kitchen: [
         'Pour a glass of water and drink it.',
         'Wash and dry one cup, then put it away.',
@@ -217,6 +324,14 @@ const TASKS = {
         'Sit at the teacher\'s desk for ten seconds.',
         'Open the blinds, then close them again.',
     ].map(task => ({ task })),
+    gym: [
+        'Make one basket from the free-throw line.',
+        'Run one lap of the court.',
+        'Do ten sit-ups on a mat.',
+        'Dribble a ball from one end of the court to the other.',
+        'Touch the basketball hoop pole or a goal post, then come back.',
+        'Kick a ball against the wall five times.',
+    ].map(task => ({ task })),
     outdoor: [
         'Walk one lap around the garden or yard.',
         'Collect three sticks longer than your hand, then put them down where you found them.',
@@ -232,11 +347,13 @@ const TASKS = {
 
 const VENUE_ROOMS = {
     apartment: ['Kitchen', 'Living Room', 'Hallway', 'Bedroom', 'Bathroom'],
-    house: ['Kitchen', 'Living Room', 'Hallway', 'Bedroom', 'Bathroom', 'Garage / Utility', 'Garden / Outdoor'],
+    house: ['Kitchen', 'Living Room', 'Hallway', 'Upstairs', 'Bedroom', 'Bathroom', 'Basement', 'Garage / Utility', 'Garden / Outdoor'],
+    big_house: ['Kitchen', 'Living Room', 'Dining Room', 'Hallway', 'Upstairs Landing', 'Bedroom', 'Bathroom', 'Basement', 'Garage / Utility', 'Garden / Outdoor', 'Pool / Hot tub'],
+    hall: ['Main Hall', 'Kitchen', 'Classroom', 'Hallway', 'Foyer', 'Chapel', 'Gym', 'Stage', 'Outdoor'],
     dorm: ['Common Room', 'Hallway', 'Bedroom', 'Bathroom', 'Outdoors'],
     office: ['Kitchen / Break Room', 'Open Plan', 'Meeting Room', 'Hallway', 'Outdoor'],
     airbnb: ['Kitchen', 'Living Room', 'Hallway', 'Bedroom', 'Bathroom', 'Garden / Outdoor'],
-    school: ['Classroom', 'Hallway', 'Common Room', 'Kitchen', 'Outdoor'],
+    school: ['Classroom', 'Hallway', 'Common Room', 'Kitchen', 'Gym', 'Library', 'Outdoor'],
     other: ['Room A', 'Room B', 'Room C', 'Hallway', 'Outdoor'],
 };
 const roomKeys = {
@@ -245,6 +362,8 @@ const roomKeys = {
     'Garage / Utility': 'garage', Classroom: 'classroom',
     'Garden / Outdoor': 'outdoor', Outdoor: 'outdoor', Outdoors: 'outdoor',
     'Open Plan': 'office', 'Meeting Room': 'office',
+    'Dining Room': 'living_room', 'Main Hall': 'living_room', 'Upstairs Landing': 'hallway',
+    Foyer: 'hallway', Basement: 'garage', Upstairs: 'hallway', Gym: 'gym', 'Pool / Hot tub': 'outdoor',
 };
 const SABOTAGE_IDEAS = { other: [
     'Fake Task: send a decoy task through your intruder cards. Fake completions do not help the crew.',
@@ -257,6 +376,11 @@ export function taskStyleValue(value) {
     if (Object.hasOwn(aliases, value)) return aliases[value];
     const number = Number(value);
     return Number.isFinite(number) ? Math.max(0, Math.min(100, Math.round(number))) : 50;
+}
+
+// A location's name in a task language. Areas the host typed stay as typed.
+export function roomLabel(room, taskLanguage = 'en') {
+    return TASK_LOCALES[taskLanguage]?.rooms[room] || room;
 }
 
 function shuffled(values, random) {
@@ -279,9 +403,12 @@ function generateTasks({ venue = 'apartment', playerCount = 8, taskStyle = 'stan
         .filter(room => typeof room === 'string').map(room => room.trim())
         .filter(room => room && room.length <= 60))].slice(0, 12);
     const candidates = Object.fromEntries(rooms.map(location => {
+        const here = TASKS[roomKeys[location]] || [];
         const entries = preset === 'cleanup'
             ? [...(CLEANUP_TASKS[location] || []), ...CLEANUP_TASKS.any].map(task => ({ task }))
-            : [...(TASKS[roomKeys[location]] || []), ...TASKS.any, ...TASKS.funny];
+            : preset === 'party' ? [...here, ...TASKS.party, ...TASKS.funny]
+            : preset === 'chill' ? [...here, ...TASKS.chill]
+            : [...here, ...TASKS.any, ...TASKS.funny];
         const label = sayRoom(location);
         const unique = new Map(entries.map(task => [task.task, { ...task, task: sayTask(task.task), location: label }]));
         return [label, shuffled([...unique.values()], random)];
@@ -289,7 +416,9 @@ function generateTasks({ venue = 'apartment', playerCount = 8, taskStyle = 'stan
     if (!rooms.length) return { tasks: [], rooms: [], candidates, sabotages: [], recommendations: {} };
     const labels = rooms.map(sayRoom);
     const count = Math.max(24, players * 3);
-    const playfulCount = preset === 'cleanup' ? 0 : Math.round(count * taskStyleValue(taskStyle) / 100);
+    // Vibes set their own mix: a party is mostly playful, chill and cleanup none.
+    const playfulShare = { cleanup: 0, chill: 0, party: 75 }[preset] ?? taskStyleValue(taskStyle);
+    const playfulCount = Math.round(count * playfulShare / 100);
     const styles = shuffled(Array.from({ length: count }, (_, index) => index < playfulCount), random);
     const queues = Object.fromEntries(labels.map(room => [room, {
         practical: candidates[room].filter(task => !task.funny),
