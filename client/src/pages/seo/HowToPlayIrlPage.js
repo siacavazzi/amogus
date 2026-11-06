@@ -68,7 +68,7 @@ function HowToPlayIrlPage() {
         description:
             'Learn how to play Among Us in real life with Sus Party: prepare tasks, create a room, invite friends, run meetings, and follow the app’s vote and win rules.',
         canonical: 'https://susparty.com/how-to-play-among-us-irl',
-        ogImage: 'https://susparty.com/og-image.jpg',
+        ogImage: 'https://susparty.com/og-image.jpg?v=2',
         schema: SCHEMA,
     });
 

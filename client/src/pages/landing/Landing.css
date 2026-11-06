@@ -30,7 +30,7 @@
 
 /* ---------- nav (shared SiteNav, recoloured for the yellow hero) ---------- */
 .sl .site-nav { width: 100%; max-width: 1160px; padding: 18px 20px; border-bottom: 0; }
-.sl .site-brand { color: var(--sg-ink); font-weight: 900; font-size: 1.35rem; letter-spacing: -0.03em; text-decoration: none; }
+.sl .site-brand { display: inline-flex; align-items: center; gap: 10px; color: var(--sg-ink); font-weight: 900; font-size: 1.35rem; letter-spacing: -0.03em; text-decoration: none; }
 .sl .site-nav__links > a:not(.site-button) { color: var(--sg-ink); font-weight: 700; }
 .sl .site-nav__links > a:not(.site-button):hover { color: var(--sg-ink); text-decoration: underline; }
 .sl .site-nav .site-button {

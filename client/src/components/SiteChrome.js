@@ -1,11 +1,12 @@
 import React from 'react';
 import '../styles/SitePage.css';
+import SusMark from './SusMark';
 import { LanguageLinks } from '../pages/seo/translated/TranslatedPage';
 
 export function SiteNav() {
     return (
         <nav className="site-nav" aria-label="Site navigation">
-            <a href="/" className="site-brand">Sus Party</a>
+            <a href="/" className="site-brand"><SusMark className="site-brand__mark" />Sus Party</a>
             <div className="site-nav__links">
                 <a href="/how-to-play">How to play</a>
                 <a href="/among-us-irl-task-generator">Task generator</a>

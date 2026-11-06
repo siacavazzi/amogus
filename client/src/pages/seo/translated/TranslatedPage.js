@@ -6,6 +6,7 @@ import { TRANSLATED_CONTENT } from './content';
 import { GameTour, TOUR_STEPS } from '../GameplayScreenshots';
 import '../../../styles/SitePage.css';
 import '../SeoPage.css';
+import SusMark from '../../../components/SusMark';
 
 function Steps({ steps }) {
     return (
@@ -49,7 +50,7 @@ function TranslatedPage({ lang, page }) {
         title: body.title,
         description: body.description,
         canonical: pageUrl(lang, page),
-        ogImage: 'https://susparty.com/og-image.jpg',
+        ogImage: 'https://susparty.com/og-image.jpg?v=2',
         alternates: alternatesFor(page),
         schema: {
             '@context': 'https://schema.org',
@@ -91,7 +92,7 @@ function TranslatedPage({ lang, page }) {
     return (
         <div className="site-page seo-shell" lang={lang}>
             <nav className="site-nav" aria-label="Sus Party">
-                <a href={pagePath(lang, 'home')} className="site-brand">Sus Party</a>
+                <a href={pagePath(lang, 'home')} className="site-brand"><SusMark className="site-brand__mark" />Sus Party</a>
                 <div className="site-nav__links">
                     <a href={pagePath(lang, 'irl')}>{copy.nav.irl}</a>
                     <a href={playHref} className="site-button" onClick={keepLanguage}>{copy.nav.play} →</a>

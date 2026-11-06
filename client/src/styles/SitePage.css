@@ -55,6 +55,9 @@
     z-index: 2;
 }
 .site-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
     color: var(--site-ink);
     font-size: 1.35rem;
     font-weight: 900;
@@ -62,6 +65,7 @@
     text-decoration: none;
     white-space: nowrap;
 }
+.site-brand__mark { width: 1.6em; height: 1.6em; flex: none; border-radius: 22%; }
 .site-nav__links { display: flex; align-items: center; gap: 28px; }
 .site-nav__links > a:not(.site-button) {
     color: var(--site-ink);
