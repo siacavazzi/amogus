@@ -65,7 +65,7 @@ const FAQS = [
     { q: 'Where do you play?', a: 'Anywhere people can walk around: a house, apartment, dorm, office, library or camp. Tasks are spread across rooms so people split up.' },
     { q: 'Do we need to be together?', a: 'Yes. The phones connect online, but everyone plays in the same place. Kills, bodies and meetings happen in real life.' },
     { q: 'What are the tasks?', a: 'Short real things, like flipping a bottle, counting fridge magnets or walking up the stairs. Pick a pack for your place or write your own.' },
-    { q: 'Do I need a TV or laptop?', a: 'No. It’s optional. A laptop or TV in the middle shows the room code, task progress and the meltdown. Phones work on their own.' },
+    { q: 'Do I need a laptop?', a: 'No. It’s optional. A laptop or desktop in the middle becomes the reactor: it shows the room code, task progress and the meltdown. Phones work on their own.' },
 ];
 
 function Phone({ name, alt, className = '', loading = 'lazy' }) {
@@ -114,7 +114,7 @@ function HeroScene() {
                         />
                     ))}
                 </div>
-                <span className="sl-scene__note sl-scene__note--tv">the big screen (optional)</span>
+                <span className="sl-scene__note sl-scene__note--tv">a laptop as the reactor (optional)</span>
                 <span className="sl-scene__note sl-scene__note--phone">everyone’s phone</span>
             </div>
             <ol className="sl-scene__steps" aria-label="A round of Sus Party">
@@ -292,9 +292,9 @@ function LandingPage() {
             <section className="sl-band sl-band--round" aria-labelledby="sl-reactor-h">
                 <div className="sl-wrap sl-split sl-split--flip">
                     <div>
-                        <h2 id="sl-reactor-h" className="sl-h2">Got a TV? Make it the reactor.</h2>
+                        <h2 id="sl-reactor-h" className="sl-h2">Bring a laptop. It’s the reactor.</h2>
                         <p className="sl-body">
-                            Put a laptop or TV where everyone passes by. It shows the code to join, how close the crew
+                            Open it on a laptop or desktop where everyone passes by. It shows the code to join, how close the crew
                             is to winning, and the meltdown everyone has to run back to stop.
                         </p>
                         <p className="sl-body sl-dim">Optional. Phones are enough.</p>
