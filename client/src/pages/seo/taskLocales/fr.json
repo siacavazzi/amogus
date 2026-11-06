@@ -16,7 +16,12 @@
     "Classroom": "Salle de classe",
     "Room A": "Pièce A",
     "Room B": "Pièce B",
-    "Room C": "Pièce C"
+    "Room C": "Pièce C",
+    "Dining Room": "Salle à manger",
+    "Upstairs Landing": "Palier",
+    "Basement": "Sous-sol",
+    "Main Hall": "Grande salle",
+    "Foyer": "Entrée"
   },
   "tasks": {
     "Fold one blanket, towel, or jacket and set it down neatly.": "Plie une couverture, une serviette ou une veste et pose-la proprement.",

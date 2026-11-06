@@ -85,6 +85,7 @@ The restart timestamp does not prove when play stopped.
 - `host_entered` carries `setup_origin` (`generator` when "Use this pack" created the room) and the visit: `seconds_since_landing`, `pages_viewed` and `tools_used` (task generator, role generator, task ideas, how to play) in that browser session.
 - `task_completed` carries `task_seconds` (assigned to done) and `task_key`: the first 16 hex digits of SHA-256 over `lowercased task words|lowercased location`, with runs of spaces collapsed. It is unsalted so the same task matches across rooms; hash a site-written task the same way to name it.
 - Round summaries carry `meeting_quorum`, `auto_intruders`, `task_source` (`generator`, `saved_list`, `group`, `typed`, `builtin`) and `setup_origin`; the round end adds `median_task_seconds`, `slowest_task_seconds` and `tasks_held_over_5_min_at_end` (there is no skip button, so a task held that long is the abandoned-task signal).
+- When a saved list was applied, round summaries and `room_closed` also carry `task_list_via`: how the host picked it on the setup screen (`preset` for a list made from where they play, `example`, `saved` for one of their own lists, `code` for a list loaded by code, `generator`).
 - `room_closed` carries `was_opened`, `last_setup_step`, `setup_origin`, `task_source` and `has_reactor`, so rooms that never started show how far the host got.
 - Source tracking now reads `utm_source=chatgpt.com` (and similar domain-style tags) as its channel. Before this, those rooms were filed as `direct`.
 

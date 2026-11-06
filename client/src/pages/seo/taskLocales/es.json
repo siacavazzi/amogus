@@ -16,7 +16,12 @@
     "Classroom": "Aula",
     "Room A": "Sala A",
     "Room B": "Sala B",
-    "Room C": "Sala C"
+    "Room C": "Sala C",
+    "Dining Room": "Comedor",
+    "Upstairs Landing": "Rellano de arriba",
+    "Basement": "Sótano",
+    "Main Hall": "Salón principal",
+    "Foyer": "Vestíbulo"
   },
   "tasks": {
     "Fold one blanket, towel, or jacket and set it down neatly.": "Dobla una manta, una toalla o una chaqueta y déjala bien colocada.",

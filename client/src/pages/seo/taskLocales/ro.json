@@ -16,7 +16,12 @@
     "Classroom": "Clasă",
     "Room A": "Încăperea A",
     "Room B": "Încăperea B",
-    "Room C": "Încăperea C"
+    "Room C": "Încăperea C",
+    "Dining Room": "Sufragerie",
+    "Upstairs Landing": "Palierul de sus",
+    "Basement": "Subsol",
+    "Main Hall": "Sala mare",
+    "Foyer": "Hol de intrare"
   },
   "tasks": {
     "Fold one blanket, towel, or jacket and set it down neatly.": "Împăturește o pătură, un prosop sau o geacă și pune-o frumos jos.",

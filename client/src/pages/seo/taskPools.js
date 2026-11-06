@@ -233,6 +233,8 @@ const TASKS = {
 const VENUE_ROOMS = {
     apartment: ['Kitchen', 'Living Room', 'Hallway', 'Bedroom', 'Bathroom'],
     house: ['Kitchen', 'Living Room', 'Hallway', 'Bedroom', 'Bathroom', 'Garage / Utility', 'Garden / Outdoor'],
+    big_house: ['Kitchen', 'Living Room', 'Dining Room', 'Hallway', 'Upstairs Landing', 'Bedroom', 'Bathroom', 'Basement', 'Garage / Utility', 'Garden / Outdoor'],
+    hall: ['Main Hall', 'Kitchen', 'Classroom', 'Hallway', 'Foyer', 'Outdoor'],
     dorm: ['Common Room', 'Hallway', 'Bedroom', 'Bathroom', 'Outdoors'],
     office: ['Kitchen / Break Room', 'Open Plan', 'Meeting Room', 'Hallway', 'Outdoor'],
     airbnb: ['Kitchen', 'Living Room', 'Hallway', 'Bedroom', 'Bathroom', 'Garden / Outdoor'],
@@ -245,6 +247,8 @@ const roomKeys = {
     'Garage / Utility': 'garage', Classroom: 'classroom',
     'Garden / Outdoor': 'outdoor', Outdoor: 'outdoor', Outdoors: 'outdoor',
     'Open Plan': 'office', 'Meeting Room': 'office',
+    'Dining Room': 'living_room', 'Main Hall': 'living_room', 'Upstairs Landing': 'hallway',
+    Foyer: 'hallway', Basement: 'garage',
 };
 const SABOTAGE_IDEAS = { other: [
     'Fake Task: send a decoy task through your intruder cards. Fake completions do not help the crew.',
@@ -257,6 +261,11 @@ export function taskStyleValue(value) {
     if (Object.hasOwn(aliases, value)) return aliases[value];
     const number = Number(value);
     return Number.isFinite(number) ? Math.max(0, Math.min(100, Math.round(number))) : 50;
+}
+
+// A location's name in a task language. Areas the host typed stay as typed.
+export function roomLabel(room, taskLanguage = 'en') {
+    return TASK_LOCALES[taskLanguage]?.rooms[room] || room;
 }
 
 function shuffled(values, random) {
