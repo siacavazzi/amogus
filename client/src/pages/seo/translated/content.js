@@ -7,6 +7,16 @@ const fr = {
     nav: { play: 'Jouer', irl: 'Among Us en vrai' },
     footerNote: "Sus Party est un jeu de soirée indépendant. Il n'est ni affilié à Innersloth ni à Among Us, ni approuvé par eux.",
     common: {
+        tour: {
+            title: "Une manche en images",
+            steps: [
+                ["Chacun reçoit un rôle secret.", "Écran de téléphone montrant un rôle secret."],
+                ["L'équipage fait de vraies tâches dans la maison.", "Écran avec une vraie tâche et la pièce où la faire."],
+                ["Les intrus font semblant et jouent des cartes de sabotage.", "Écran d'un intrus dans le conduit, avec une carte de sabotage."],
+                ["Un corps ? Tout le monde se retrouve.", "Écran de réunion d'urgence montrant qui est arrivé."],
+                ["On discute, puis on vote.", "Écran de vote avec le visage de chaque joueur."],
+            ],
+        },
         eyebrow: 'Sus Party · Jeu gratuit dans le navigateur',
         start: 'Lancer une partie',
         generator: 'Créer une liste de tâches',
@@ -64,6 +74,16 @@ const es = {
     nav: { play: 'Jugar', irl: 'Among Us en la vida real' },
     footerNote: 'Sus Party es un juego de fiesta independiente. No está afiliado, respaldado ni patrocinado por Innersloth ni por Among Us.',
     common: {
+        tour: {
+            title: "Así se ve una ronda",
+            steps: [
+                ["Cada jugador recibe un rol secreto.", "Pantalla del teléfono con un rol secreto."],
+                ["La tripulación hace tareas reales por la casa.", "Pantalla con una tarea real y el lugar donde se hace."],
+                ["Los intrusos fingen y juegan cartas de sabotaje.", "Pantalla de un intruso en el conducto, con una carta de sabotaje."],
+                ["¿Encontraron un cuerpo? Todos se reúnen.", "Pantalla de reunión de emergencia que muestra quién ya llegó."],
+                ["Lo discuten y luego votan.", "Pantalla de votación con la cara de cada jugador."],
+            ],
+        },
         eyebrow: 'Sus Party · Juego gratis en el navegador',
         start: 'Empezar una partida',
         generator: 'Crear una lista de tareas',
@@ -121,6 +141,16 @@ const de = {
     nav: { play: 'Spielen', irl: 'Among Us im echten Leben' },
     footerNote: 'Sus Party ist ein unabhängiges Partyspiel. Es steht in keiner Verbindung zu Innersloth oder Among Us und wird von ihnen weder unterstützt noch gesponsert.',
     common: {
+        tour: {
+            title: "So sieht eine Runde aus",
+            steps: [
+                ["Alle bekommen eine geheime Rolle.", "Handybildschirm mit einer geheimen Rolle."],
+                ["Die Crew erledigt echte Aufgaben im ganzen Haus.", "Bildschirm mit einer echten Aufgabe und dem Raum, in dem sie stattfindet."],
+                ["Eindringlinge tun nur so und spielen Sabotagekarten.", "Bildschirm eines Eindringlings im Schacht mit einer Sabotagekarte."],
+                ["Eine Leiche gefunden? Alle treffen sich.", "Bildschirm eines Notfall-Meetings, der zeigt, wer schon da ist."],
+                ["Diskutieren, dann abstimmen.", "Abstimmungsbildschirm mit dem Gesicht aller Mitspielenden."],
+            ],
+        },
         eyebrow: 'Sus Party · Kostenloses Browserspiel',
         start: 'Spiel starten',
         generator: 'Aufgabenliste erstellen',
@@ -178,6 +208,16 @@ const ro = {
     nav: { play: 'Joacă', irl: 'Among Us în viața reală' },
     footerNote: 'Sus Party este un joc de petrecere independent. Nu este afiliat, susținut sau sponsorizat de Innersloth sau Among Us.',
     common: {
+        tour: {
+            title: "Cum arată o rundă",
+            steps: [
+                ["Fiecare primește un rol secret.", "Ecran de telefon cu un rol secret."],
+                ["Echipajul face sarcini reale prin casă.", "Ecran cu o sarcină reală și camera în care se face."],
+                ["Intrușii se prefac și joacă cărți de sabotaj.", "Ecranul unui intrus în ventilație, cu o carte de sabotaj."],
+                ["Ați găsit un corp? Toată lumea se adună.", "Ecran de ședință de urgență care arată cine a ajuns."],
+                ["Discutați, apoi votați.", "Ecran de vot cu fața fiecărui jucător."],
+            ],
+        },
         eyebrow: 'Sus Party · Joc gratuit în browser',
         start: 'Începe un joc',
         generator: 'Creează o listă de sarcini',
@@ -235,6 +275,16 @@ const pt = {
     nav: { play: 'Jogar', irl: 'Among Us na vida real' },
     footerNote: 'Sus Party é um jogo de festa independente. Não é afiliado, endossado nem patrocinado pela Innersloth ou por Among Us.',
     common: {
+        tour: {
+            title: "Como é uma rodada",
+            steps: [
+                ["Cada pessoa recebe um papel secreto.", "Tela do celular com um papel secreto."],
+                ["A tripulação faz tarefas reais pela casa.", "Tela com uma tarefa real e o cômodo onde ela acontece."],
+                ["Os intrusos disfarçam e jogam cartas de sabotagem.", "Tela de um intruso no duto, com uma carta de sabotagem."],
+                ["Achou um corpo? Todo mundo se reúne.", "Tela de reunião de emergência mostrando quem já chegou."],
+                ["Conversem e depois votem.", "Tela de votação com o rosto de cada jogador."],
+            ],
+        },
         eyebrow: 'Sus Party · Jogo grátis no navegador',
         start: 'Começar um jogo',
         generator: 'Criar uma lista de tarefas',

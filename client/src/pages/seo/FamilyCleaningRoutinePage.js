@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
-import GameplayScreenshots from './GameplayScreenshots';
+import GameplayScreenshots, { GameTour } from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const CANONICAL = 'https://susparty.com/family-cleaning-routine';
@@ -34,6 +34,7 @@ export default function FamilyCleaningRoutinePage() {
                     <a href={CLEANUP_URL} className="seo-btn--secondary">Open the cleanup game template</a>
                 </div>
             </header>
+            <GameTour variant="chores" />
             <main className="seo-content">
                 <section className="seo-section">
                     <h2>Why short, fixed routines work better than big clean-ups</h2>

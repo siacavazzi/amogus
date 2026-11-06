@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
-import GameplayScreenshots from './GameplayScreenshots';
+import GameplayScreenshots, { GameTour } from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const SCHEMA = {
@@ -33,6 +33,7 @@ function SocialDeductionPage() {
                     <a href="#choose-a-game" className="seo-btn--secondary">Compare the games</a>
                 </div>
             </header>
+            <GameTour />
             <main className="seo-content">
                 <section className="seo-section">
                     <h2>What makes a game a social deduction game?</h2>
@@ -77,7 +78,7 @@ function SocialDeductionPage() {
                         the crew still has to vote them out. Read the <a href="/how-to-play-among-us-irl">round and vote rules</a> before your first game.
                     </p>
                 </section>
-                <GameplayScreenshots screens={['intruder-cards', 'vote']} />
+                <GameplayScreenshots screens={['intruder-objective', 'vote-result']} />
 
                 <GameSetupCta title="Turn the rooms you already have into a game"
                     href="/among-us-irl-task-generator?venue=house&players=8&movement=normal" label="Build an eight-player house setup">

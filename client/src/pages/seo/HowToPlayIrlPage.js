@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
-import GameplayScreenshots from './GameplayScreenshots';
+import GameplayScreenshots, { GameTour } from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const SCHEMA = {
@@ -97,6 +97,8 @@ function HowToPlayIrlPage() {
                 </div>
             </div>
 
+            <GameTour />
+
             <div className="seo-content">
                 <section className="seo-section" id="before-play">
                     <p className="seo-section__kicker">Before the game</p>
@@ -179,7 +181,7 @@ function HowToPlayIrlPage() {
                     </p>
                 </section>
 
-                <GameplayScreenshots screens={['crew-task', 'intruder-objective']} />
+                <GameplayScreenshots screens={['role-crew', 'role-intruder']} />
 
                 <section className="seo-section" id="sample-round">
                     <p className="seo-section__kicker">Sample round</p>

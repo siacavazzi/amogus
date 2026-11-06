@@ -112,7 +112,7 @@ function HowToPlayPage() {
                 <RoleCard key={card.label} {...card} />
               ))}
             </CardGrid>
-            <GameplayScreenshots screens={['crew-task', 'intruder-objective']} />
+            <GameplayScreenshots screens={['role-crew', 'role-intruder']} />
           </Section>
 
           <Section

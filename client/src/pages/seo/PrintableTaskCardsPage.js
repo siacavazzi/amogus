@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
-import GameplayScreenshots from './GameplayScreenshots';
+import GameplayScreenshots, { GameTour } from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 import { TASKS, VENUE_ROOMS } from './taskPools';
 import './PrintableTaskCards.css';
@@ -56,6 +56,7 @@ export default function PrintableTaskCardsPage() {
                     <a href="#how-to-play-paper" className="seo-btn--secondary">How to run a paper game</a>
                 </div>
             </header>
+            <GameTour />
             <main className="seo-content">
                 <section className="ptc-sheet" aria-labelledby="ptc-sheet-title">
                     <div className="ptc-sheet__head">
@@ -160,7 +161,7 @@ export default function PrintableTaskCardsPage() {
                     </p>
                 </section>
 
-                <GameplayScreenshots screens={['crew-task', 'vote-result']} />
+                <GameplayScreenshots screens={['next-task', 'vote-result']} />
 
                 <section className="seo-section">
                     <h2>When the phone version is easier</h2>

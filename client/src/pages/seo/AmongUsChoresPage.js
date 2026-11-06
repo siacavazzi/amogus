@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
-import GameplayScreenshots from './GameplayScreenshots';
+import GameplayScreenshots, { GameTour } from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const CANONICAL = 'https://susparty.com/among-us-chores';
@@ -102,6 +102,7 @@ export default function AmongUsChoresPage() {
                     <a href="#chore-list" className="seo-btn--secondary">See the chore list</a>
                 </div>
             </header>
+            <GameTour variant="chores" />
             <main className="seo-content">
                 <section className="seo-section">
                     <h2>How an Among Us chore game works</h2>
