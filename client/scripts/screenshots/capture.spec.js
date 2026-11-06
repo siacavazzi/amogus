@@ -225,3 +225,34 @@ test('capture the intruder role screen', async ({ browser }) => {
         await phone.getByText('Got it').click();
     }
 });
+
+// A family cleanup game: four phones, chores written in the lobby.
+const CHORES = [
+    'Fold a blanket and put it back on the couch', 'Put three cups in the dishwasher', 'Match five pairs of socks',
+    'Put every shoe by the door in pairs', 'Wipe the kitchen table', 'Put ten toys back in their bin',
+    'Make your bed', 'Water one plant', 'Stack the books on the coffee table', 'Empty one small trash can',
+    'Put the remote controls in one place', 'Hang up one coat or towel',
+];
+test('capture a family cleanup game', async ({ browser }) => {
+    fs.mkdirSync(OUT, { recursive: true });
+    const phones = [];
+    for (const name of ['Mom', 'Ella', 'Max', 'Dad']) phones.push(await h.openPhone(browser, name, PHONE));
+    const [host] = phones;
+    await h.gatherRoom({ host, phones, settings: { groupTasks: true, intruders: 1 } });
+    await host.getByRole('button', { name: /^Tasks \(/ }).click();
+    for (const text of CHORES) {
+        await host.locator('#new-task-text').fill(text);
+        const form = host.locator('#new-task-text').locator('xpath=ancestor::*[.//button[@title="Add task"]][1]');
+        await form.getByTitle('Add task').click();
+        await expect(host.getByText(text)).toBeVisible();
+    }
+    await host.getByRole('button', { name: /^Players \(/ }).click();
+    await shot(host, 'family-lobby');
+    await host.getByText('Start Game').click();
+    const intruder = await h.revealRoles(phones);
+    const crewmate = phones.find(phone => phone !== intruder);
+    await shot(crewmate, 'cleanup-task');
+    await h.swipe(crewmate);
+    await h.sleep(1500);
+    await shot(crewmate, 'cleanup-next-task');
+});
