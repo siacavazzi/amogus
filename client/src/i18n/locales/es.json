@@ -803,5 +803,21 @@
   "{count} player voting": {
     "one": "{count} jugador vota",
     "other": "{count} jugadores votan"
-  }
+  },
+  "Open this in Safari": "Abre el juego en Safari",
+  "Open this in Chrome": "Abre el juego en Chrome",
+  "Open this in your browser": "Abre el juego en tu navegador",
+  "You're in {app}'s built-in browser.": "Estás en el navegador integrado de {app}.",
+  "You're in an app's built-in browser.": "Estás en el navegador integrado de una app.",
+  "It can drop your game when your phone locks or you switch apps.": "Puede perder tu partida cuando se bloquea el teléfono o cambias de app.",
+  "Open in Safari": "Abrir en Safari",
+  "Open in Chrome": "Abrir en Chrome",
+  "Copy link": "Copiar enlace",
+  "Link copied. Paste it into Safari.": "Enlace copiado. Pégalo en Safari.",
+  "Link copied. Paste it into Chrome.": "Enlace copiado. Pégalo en Chrome.",
+  "Link copied. Paste it into your browser.": "Enlace copiado. Pégalo en tu navegador.",
+  "Or tap ⋯ or the share button, then Open in Safari.": "O toca ⋯ o el botón de compartir y luego Abrir en Safari.",
+  "Or tap ⋮, then Open in Chrome.": "O toca ⋮ y luego Abrir en Chrome.",
+  "Keep playing here": "Seguir aquí",
+  "Copy this link:": "Copia este enlace:"
 }
