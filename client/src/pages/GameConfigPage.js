@@ -7,9 +7,9 @@ import { sendClientMetric } from '../utils/clientMetrics';
 import '../signal/host.css';
 import { getLanguage, t, tk } from '../i18n';
 import PresetAreas from './setup/PresetAreas';
-import { PLACES, buildPresetList, placeByKey, taskMakerUrl } from './setup/taskPresets';
+import { PLACES, buildPresetList, placeByKey, taskMakerUrl, vibeByKey } from './setup/taskPresets';
 
-const PLACE_ICONS = { apartment: Sofa, house: Home, big_house: Home, school: GraduationCap, hall: Users, office: Monitor, dorm: DoorOpen, other: MapPin, chores: Sparkles };
+const PLACE_ICONS = { apartment: Sofa, house: Home, big_house: Home, school: GraduationCap, hall: Users, office: Monitor, dorm: DoorOpen, other: MapPin };
 
 const DEFAULT_CARD_DECK_COUNTS = {
     self_report: 4,
@@ -410,23 +410,23 @@ function GameConfigPage() {
         });
     };
 
-    const makePresetList = (areas) => {
+    const makePresetList = (areas, vibe) => {
         if (!socket || !presetPlace || taskListLoading) return;
-        const { tasks, locations } = buildPresetList(presetPlace, areas, getLanguage());
+        const { tasks, locations } = buildPresetList(presetPlace, areas, vibe, getLanguage());
         pickedViaRef.current = 'preset';
         setTaskListLoading(true);
         setTaskListApplied(false);
         socket.emit('create_task_list', {
             player_id: deviceId,
-            name: t('{place} tasks', { place: t(presetPlace.label) }),
+            name: t('{place} · {vibe}', { place: t(presetPlace.label), vibe: t(vibeByKey(vibe).label) }),
             tasks,
             locations,
         });
     };
 
     // The full task maker makes its own room, so this unopened one is closed first.
-    const openTaskMaker = (areas) => {
-        const url = taskMakerUrl(presetPlace, areas);
+    const openTaskMaker = (areas, vibe) => {
+        const url = taskMakerUrl(presetPlace, areas, vibe);
         localStorage.removeItem('player_id');
         localStorage.removeItem('room_code');
         sessionStorage.removeItem('is_room_creator');

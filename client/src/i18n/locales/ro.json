@@ -813,7 +813,6 @@
     "few": "{count} jucători votează",
     "other": "{count} de jucători votează"
   },
-  "{place} tasks": "Sarcini: {place}",
   "Pick a different list": "Alege altă listă",
   "Pick where you are playing and we will write the tasks.": "Alege unde jucați și scriem noi sarcinile.",
   "Where are you playing?": "Unde jucați?",
@@ -836,6 +835,15 @@
   "Church or hall": "Biserică sau sală",
   "Office": "Birou",
   "Dorm": "Cămin",
-  "Chores at home": "Treburi prin casă",
-  "Other place": "Alt loc"
+  "Other place": "Alt loc",
+  "{place} · {vibe}": "{place} · {vibe}",
+  "Pick a vibe": "Alege atmosfera",
+  "Mixed": "Amestec",
+  "Real jobs with some silly ones": "Sarcini reale și câteva prostii",
+  "Party": "Petrecere",
+  "Loud, silly, and on the move": "Gălăgios, trăsnit și în mișcare",
+  "Chill": "Relaxat",
+  "Calm tasks, no running or shouting": "Sarcini calme, fără alergat sau țipat",
+  "Clean up": "Curățenie",
+  "Real chores that get the place tidy": "Treburi reale care fac locul ordonat"
 }

@@ -226,15 +226,26 @@ describe('GameConfigPage task list picker', () => {
         fireEvent.click(screen.getByRole('button', { name: /Make my task list/ }));
 
         const create = contextValue.socket.emit.mock.calls.find(([event]) => event === 'create_task_list')[1];
-        expect(create.name).toBe('House tasks');
+        expect(create.name).toBe('House · Mixed');
         expect(create.tasks).toHaveLength(60);
         expect(create.locations).toEqual(['Kitchen', 'Living Room', 'Hallway', 'Bathroom', 'Attic']);
         for (const location of create.locations) expect(create.tasks.some(task => task.location === location)).toBe(true);
 
-        receiver(contextValue)('task_list_created', { task_list: { code: 'HOUSE1', name: 'House tasks', tasks: create.tasks, locations: [...create.locations, 'Other'] } });
-        expect(screen.getByRole('heading', { name: 'House tasks' })).toBeInTheDocument();
+        receiver(contextValue)('task_list_created', { task_list: { code: 'HOUSE1', name: 'House · Mixed', tasks: create.tasks, locations: [...create.locations, 'Other'] } });
+        expect(screen.getByRole('heading', { name: 'House · Mixed' })).toBeInTheDocument();
         fireEvent.click(screen.getByRole('button', { name: /Use This Task List/ }));
         expect(applied(contextValue)).toEqual({ room_code: 'ROOM6', task_list_code: 'HOUSE1', picked_via: 'preset' });
+    });
+
+    it('writes the list in the vibe the host picks', () => {
+        const { contextValue } = renderWithContext(<GameConfigPage />, { roomCode: 'ROOM10' });
+        fireEvent.click(screen.getByRole('button', { name: 'Apartment' }));
+        expect(screen.getByRole('button', { name: /^Mixed/ })).toHaveAttribute('aria-pressed', 'true');
+        fireEvent.click(screen.getByRole('button', { name: /^Clean up/ }));
+        fireEvent.click(screen.getByRole('button', { name: /Make my task list/ }));
+        const create = contextValue.socket.emit.mock.calls.find(([event]) => event === 'create_task_list')[1];
+        expect(create.name).toBe('Apartment · Clean up');
+        expect(create.tasks.length).toBeGreaterThanOrEqual(40);
     });
 
     it('needs two areas and can go back to every place', () => {

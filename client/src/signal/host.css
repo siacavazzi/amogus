@@ -246,3 +246,4 @@
 }
 .hs-area[aria-pressed='true'] { background: #fff; color: var(--sg-round); }
 .hs-back { justify-self: start; display: inline-flex; align-items: center; gap: 6px; }
+.hs-presets--two { grid-template-columns: 1fr 1fr; }

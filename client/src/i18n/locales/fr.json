@@ -800,7 +800,6 @@
     "one": "{count} joueur vote",
     "other": "{count} joueurs votent"
   },
-  "{place} tasks": "Tâches : {place}",
   "Pick a different list": "Choisir une autre liste",
   "Pick where you are playing and we will write the tasks.": "Dites où vous jouez et on écrit les tâches.",
   "Where are you playing?": "Où jouez-vous ?",
@@ -823,6 +822,15 @@
   "Church or hall": "Église ou salle",
   "Office": "Bureau",
   "Dorm": "Résidence étudiante",
-  "Chores at home": "Corvées à la maison",
-  "Other place": "Autre lieu"
+  "Other place": "Autre lieu",
+  "{place} · {vibe}": "{place} · {vibe}",
+  "Pick a vibe": "Choisis l'ambiance",
+  "Mixed": "Mélange",
+  "Real jobs with some silly ones": "De vraies tâches et quelques bêtises",
+  "Party": "Fête",
+  "Loud, silly, and on the move": "Bruyant, déjanté et en mouvement",
+  "Chill": "Tranquille",
+  "Calm tasks, no running or shouting": "Des tâches calmes, sans courir ni crier",
+  "Clean up": "Ménage",
+  "Real chores that get the place tidy": "De vraies corvées pour ranger les lieux"
 }

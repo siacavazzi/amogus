@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { ArrowLeft, ArrowRight, Check, Plus } from '../../signal/icons';
 import { getLanguage, t } from '../../i18n';
 import { roomLabel } from '../seo/taskPools';
-import { MAX_AREAS, PRESET_TASK_COUNT, defaultAreas } from './taskPresets';
+import { MAX_AREAS, PRESET_TASK_COUNT, VIBES, defaultAreas } from './taskPresets';
 
-// Second question of the ready-made list: which areas of the place are in play.
+// Second step of the ready-made list: which areas of the place are in play, and the vibe.
 export default function PresetAreas({ place, busy, onBack, onMake, onOpenTaskMaker }) {
     const [areas, setAreas] = useState(() => defaultAreas(place));
     const [extra, setExtra] = useState([]);
     const [newArea, setNewArea] = useState('');
+    const [vibe, setVibe] = useState('mixed');
     const language = getLanguage();
     const choices = [...place.rooms, ...extra];
     const enough = areas.length >= 2;
@@ -69,11 +70,23 @@ export default function PresetAreas({ place, busy, onBack, onMake, onOpenTaskMak
                 </p>
             </div>
 
+            <div className="hs-panel">
+                <h2 className="hs-title">{t('Pick a vibe')}</h2>
+                <div className="hs-presets hs-presets--two" role="group" aria-label={t('Pick a vibe')}>
+                    {VIBES.map((option) => (
+                        <button key={option.key} type="button" className="hs-preset" aria-pressed={vibe === option.key} onClick={() => setVibe(option.key)}>
+                            <b>{t(option.label)}</b>
+                            <span>{t(option.description)}</span>
+                        </button>
+                    ))}
+                </div>
+            </div>
+
             <div style={{ display: 'grid', gap: 10 }}>
-                <button type="button" onClick={() => onMake(areas)} disabled={!enough || busy} className="sg-btn sg-btn-white" style={{ minHeight: 68, fontSize: 19 }}>
+                <button type="button" onClick={() => onMake(areas, vibe)} disabled={!enough || busy} className="sg-btn sg-btn-white" style={{ minHeight: 68, fontSize: 19 }}>
                     {busy ? <span>{t('Writing your tasks…')}</span> : <><span>{t('Make my task list')}</span><ArrowRight size={24} /></>}
                 </button>
-                <button type="button" onClick={() => onOpenTaskMaker(areas)} disabled={!enough || busy} className="sg-link">
+                <button type="button" onClick={() => onOpenTaskMaker(areas, vibe)} disabled={!enough || busy} className="sg-link">
                     {t('Pick every task yourself in the task maker')}
                 </button>
             </div>
