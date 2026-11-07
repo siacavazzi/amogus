@@ -62,7 +62,7 @@ function audit(lang) {
     return { missing, broken: [...new Set(broken)], unused };
 }
 
-module.exports = { collectKeys, audit, LANGS: ['fr', 'es', 'de', 'ro', 'pt'] };
+module.exports = { collectKeys, audit, LANGS: ['fr', 'es', 'de', 'ro', 'pt', 'no', 'sv'] };
 
 if (require.main === module) {
     const [cmd, lang] = process.argv.slice(2);

@@ -1,6 +1,8 @@
 # Localization
 
-The game screens come in English, French, Spanish, German, Romanian and Brazilian Portuguese (`pt`, also used for phones set to Portugal Portuguese).
+The game screens come in English, French, Spanish, German, Romanian, Brazilian Portuguese (`pt`, also used for phones set to Portugal Portuguese), Norwegian Bokmål (`no`) and Swedish (`sv`).
+
+Norwegian phones report `nb` (Bokmål), `nn` (Nynorsk) or `no`. All three map to the game's one Norwegian, `no`, which is also the page path (`/no`) and hreflang.
 
 **Every translation is a machine draft.** None of it has been checked by a native speaker yet. Have someone fluent read through each `client/src/i18n/locales/<lang>.json` before relying on it.
 
@@ -26,32 +28,32 @@ The game screens come in English, French, Spanish, German, Romanian and Brazilia
 
 Keep these the same everywhere. The name **Sus Party** is never translated.
 
-| English | Français | Español | Deutsch | Română | Português (BR) |
-|---|---|---|---|---|---|
-| crew / crewmate | équipage / membre d'équipage | tripulación / tripulante | Crew / Crewmitglied | echipaj / membru al echipajului | tripulação / tripulante |
-| intruder | intrus | intruso | Eindringling | intrus | intruso |
-| meeting | réunion | reunión | Meeting | ședință | reunião |
-| vent | conduit | conducto | Schacht | ventilație | duto |
-| task | tâche | tarea | Aufgabe | sarcină | tarefa |
-| room (game) | salon | sala | Raum | cameră | sala |
-| host | hôte | anfitrión | Host | gazdă | anfitrião |
-| round | manche | ronda | Runde | rundă | rodada |
-| meltdown | fusion | fusión | Kernschmelze | topire | fusão |
-| card | carte | carta | Karte | carte | carta |
-| ENTER VENT | ENTRER DANS LE CONDUIT | ENTRAR AL CONDUCTO | IN DEN SCHACHT | INTRĂ ÎN VENTILAȚIE | ENTRAR NO DUTO |
-| CALL MEETING | LANCER UNE RÉUNION | CONVOCAR REUNIÓN | MEETING EINBERUFEN | CONVOACĂ ȘEDINȚA | CHAMAR REUNIÃO |
+| English | Français | Español | Deutsch | Română | Português (BR) | Norsk | Svenska |
+|---|---|---|---|---|---|---|---|
+| crew / crewmate | équipage / membre d'équipage | tripulación / tripulante | Crew / Crewmitglied | echipaj / membru al echipajului | tripulação / tripulante | mannskap / mannskapsmedlem | besättning / besättningsmedlem |
+| intruder | intrus | intruso | Eindringling | intrus | intruso | inntrenger | inkräktare |
+| meeting | réunion | reunión | Meeting | ședință | reunião | møte | möte |
+| vent | conduit | conducto | Schacht | ventilație | duto | ventil | ventil |
+| task | tâche | tarea | Aufgabe | sarcină | tarefa | oppgave | uppgift |
+| room (game) | salon | sala | Raum | cameră | sala | rom | rum |
+| host | hôte | anfitrión | Host | gazdă | anfitrião | vert | värd |
+| round | manche | ronda | Runde | rundă | rodada | runde | omgång |
+| meltdown | fusion | fusión | Kernschmelze | topire | fusão | nedsmelting | härdsmälta |
+| card | carte | carta | Karte | carte | carta | kort | kort |
+| ENTER VENT | ENTRER DANS LE CONDUIT | ENTRAR AL CONDUCTO | IN DEN SCHACHT | INTRĂ ÎN VENTILAȚIE | ENTRAR NO DUTO | GÅ I VENTILEN | GÅ IN I VENTILEN |
+| CALL MEETING | LANCER UNE RÉUNION | CONVOCAR REUNIÓN | MEETING EINBERUFEN | CONVOACĂ ȘEDINȚA | CHAMAR REUNIÃO | KALL INN MØTE | KALLA TILL MÖTE |
 
 Cards:
 
-| English | Français | Español | Deutsch | Română | Português (BR) |
-|---|---|---|---|---|---|
-| Emergency Meeting | Réunion d'urgence | Reunión de emergencia | Notfall-Meeting | Ședință de urgență | Reunião de emergência |
-| EMP | IEM | PEM | EMP | EMP | PEM |
-| Area Denial | Zone interdite | Zona prohibida | Sperrzone | Zonă interzisă | Zona proibida |
-| Fake Task | Fausse tâche | Tarea falsa | Falsche Aufgabe | Sarcină falsă | Tarefa falsa |
-| Taunt Message | Message moqueur | Mensaje burlón | Spott-Nachricht | Mesaj batjocoritor | Mensagem provocadora |
-| Remote Sabotage | Sabotage à distance | Sabotaje remoto | Fernsabotage | Sabotaj de la distanță | Sabotagem remota |
-| Shorten Meltdown | Fusion accélérée | Fusión acelerada | Schnelle Kernschmelze | Topire rapidă | Fusão acelerada |
+| English | Français | Español | Deutsch | Română | Português (BR) | Norsk | Svenska |
+|---|---|---|---|---|---|---|---|
+| Emergency Meeting | Réunion d'urgence | Reunión de emergencia | Notfall-Meeting | Ședință de urgență | Reunião de emergência | Nødmøte | Nödmöte |
+| EMP | IEM | PEM | EMP | EMP | PEM | EMP | EMP |
+| Area Denial | Zone interdite | Zona prohibida | Sperrzone | Zonă interzisă | Zona proibida | Sperret område | Avspärrat område |
+| Fake Task | Fausse tâche | Tarea falsa | Falsche Aufgabe | Sarcină falsă | Tarefa falsa | Falsk oppgave | Falsk uppgift |
+| Taunt Message | Message moqueur | Mensaje burlón | Spott-Nachricht | Mesaj batjocoritor | Mensagem provocadora | Ertemelding | Hånmeddelande |
+| Remote Sabotage | Sabotage à distance | Sabotaje remoto | Fernsabotage | Sabotaj de la distanță | Sabotagem remota | Fjernsabotasje | Fjärrsabotage |
+| Shorten Meltdown | Fusion accélérée | Fusión acelerada | Schnelle Kernschmelze | Topire rapidă | Fusão acelerada | Raskere nedsmelting | Snabbare härdsmälta |
 
 ### Spanish is neutral
 
@@ -59,13 +61,15 @@ The Spanish works for Spain and Latin America: "ustedes" for groups (never "voso
 
 ### "sus" in each language
 
-- French and German players already say "sus", so it stays in the game text.
+- French, German, Norwegian and Swedish players already say "sus", so it stays in the game text.
 - Spanish "sus" means "their", so "be sus" reads as broken grammar. The game text says "sospechoso" instead.
 - Romanian "sus" means "up", so "too sus" would read as "too high up". The game text says "suspect" instead.
 - In Brazil "SUS" is the public health system (Sistema Único de Saúde), so a lone "sus" can read that way. The game text says "suspeito" instead. Brazilian players also use "sus" from Among Us, so the name itself is fine.
 
-Tone: informal "you" everywhere (tu / tú / du / tu / você).
+Tone: informal "you" everywhere (tu / tú / du / tu / você / du / du).
+
+In Norwegian and Swedish a long role name ("Mannskapsmedlem", "Besättningsmedlem") would not fit the role card or the win screen at full size, so both shrink long words to fit (German "Crewmitglied" benefits too).
 
 ## Translated website pages
 
-The homepage and the Among Us IRL page also exist at `/fr`, `/es`, `/de`, `/ro`, `/pt` and `/<lang>/among-us-irl`. The path sets the language, so a French page always renders (and prerenders) in French. Their copy is in `client/src/pages/seo/translated/content.js`, and `client/src/seo/translatedPages.js` builds the hreflang links that tie each page to its other languages (`pt-BR` for Portuguese, English as `x-default`). Every footer links to the same page in each language. `scripts/check-seo.js` checks `<html lang>` and the hreflang links on every page. Starting a game from one of these pages keeps the game in that language.
+The homepage and the Among Us IRL page also exist at `/fr`, `/es`, `/de`, `/ro`, `/pt`, `/no`, `/sv` and `/<lang>/among-us-irl`. The path sets the language, so a French page always renders (and prerenders) in French. Their copy is in `client/src/pages/seo/translated/content.js`, and `client/src/seo/translatedPages.js` builds the hreflang links that tie each page to its other languages (`pt-BR` for Portuguese, English as `x-default`). Every footer links to the same page in each language. `scripts/check-seo.js` checks `<html lang>` and the hreflang links on every page. Starting a game from one of these pages keeps the game in that language.
