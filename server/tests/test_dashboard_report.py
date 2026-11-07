@@ -66,7 +66,7 @@ class DashboardReportTests(unittest.TestCase):
         day = NOW - 2 * 86400
         self.log.room('room-a', day, device='mobile')
         for n in range(4):
-            self.log.join('room-a', day + 10 + n, f'p{n}', browser='facebook_app' if n == 0 else 'safari')
+            self.log.join('room-a', day + 10 + n, f'p{n}', browser={0: 'facebook_app', 1: 'messenger_app'}.get(n, 'safari'))
         self.log.round('room-a', 'r1', day + 100, 4)
         self.log.round('room-a', 'r2', day + 900, 4, end_state='victory', win='tasks')
         self.log.round('room-a', 'r3', day + 1700, 4, end_state='sus_victory', win='last_stand_kill')
@@ -86,7 +86,7 @@ class DashboardReportTests(unittest.TestCase):
         self.assertEqual((1, 1, 1, 1), (endings['crew_vote'], endings['crew_tasks'], endings['intruders'], endings['abandoned']))
         hosts = {row['key']: (row['created'], row['played']) for row in week['hosts']}
         self.assertEqual({'phone': (1, 1), 'desktop': (1, 0)}, hosts)
-        self.assertEqual({'phones': 1, 'of': 4}, week['in_app'])
+        self.assertEqual({'phones': 2, 'of': 4}, week['in_app'])   # Messenger counts too (#47's names)
         self.assertEqual([{'key': 'no', 'count': 4}], week['languages'])   # nb counts as Norwegian
         self.assertEqual([2, 0, 1, 1], [row['count'] for row in week['funnel']])
         # Rounds start at 12:00 UTC + 100 s on a UTC+1 host clock: the 13:00 hour.

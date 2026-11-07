@@ -29,7 +29,10 @@ _EVENTS = (
 )
 _WANTED = re.compile(r'"event": ?"(' + '|'.join(_EVENTS) + r')"')
 
-IN_APP_BROWSERS = {'facebook_app', 'instagram', 'snapchat_app', 'tiktok_app', 'google_app', 'line_app'}
+# The in-app browser families server/assets/client_info.py names (Messenger, Reddit, X... since #47).
+IN_APP_BROWSERS = {'facebook_app', 'messenger_app', 'instagram', 'threads_app', 'snapchat_app', 'tiktok_app',
+                   'reddit_app', 'twitter_app', 'linkedin_app', 'pinterest_app', 'wechat_app', 'google_app',
+                   'line_app', 'android_webview'}
 
 SIZE_BUCKETS = ((3, 4, '3–4'), (5, 6, '5–6'), (7, 9, '7–9'), (10, 14, '10–14'), (15, 19, '15–19'), (20, 10 ** 6, '20+'))
 ROUND_BUCKETS = ((1, 1, '1'), (2, 2, '2'), (3, 4, '3–4'), (5, 9, '5–9'), (10, 10 ** 6, '10+'))

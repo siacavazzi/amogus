@@ -5,12 +5,14 @@ const NAMES = {
     direct: 'No referrer',
     unknown: 'Not recorded',
     google: 'Google', bing: 'Bing', chatgpt: 'ChatGPT', facebook: 'Facebook', instagram: 'Instagram',
-    snapchat: 'Snapchat', reddit: 'Reddit', youtube: 'YouTube', 'shared-link': 'Shared link', other: 'Other site',
+    snapchat: 'Snapchat', reddit: 'Reddit', youtube: 'YouTube', 'shared-link': 'Shared link', 'saved-game': 'Saved game link', other: 'Other site',
   },
   browser: {
     safari: 'Safari', chrome: 'Chrome', firefox: 'Firefox', edge: 'Edge', opera: 'Opera',
     samsung: 'Samsung Internet', facebook_app: 'Facebook app', instagram: 'Instagram app',
     snapchat_app: 'Snapchat app', tiktok_app: 'TikTok app', google_app: 'Google app', line_app: 'LINE app',
+    messenger_app: 'Messenger app', wechat_app: 'WeChat app', threads_app: 'Threads app', reddit_app: 'Reddit app',
+    twitter_app: 'X app', linkedin_app: 'LinkedIn app', pinterest_app: 'Pinterest app', android_webview: 'Android in-app browser',
     other: 'Other', unknown: 'Not recorded (older version)',
   },
   task_source: {
@@ -30,7 +32,9 @@ const NAMES = {
   feedback: { fun: 'Fun', okay: 'Okay', needs_work: 'Needs work', comment_only: 'Comment only' },
 };
 
-export const IN_APP = new Set(['facebook_app', 'instagram', 'snapchat_app', 'tiktok_app', 'google_app', 'line_app']);
+// Keep in step with server/assets/client_info.py and IN_APP_BROWSERS in dashboard_report.py.
+export const IN_APP = new Set(['facebook_app', 'messenger_app', 'instagram', 'threads_app', 'snapchat_app', 'tiktok_app',
+    'reddit_app', 'twitter_app', 'linkedin_app', 'pinterest_app', 'wechat_app', 'google_app', 'line_app', 'android_webview']);
 
 function humanize(key) {
   const text = String(key || 'unknown').replace(/[_-]+/g, ' ');
