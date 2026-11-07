@@ -80,7 +80,6 @@ const practical = [
     'Carry a cup of water across the room without spilling, then pour it back.',
     'Ring a bell, press a doorbell, or knock three times on a door.',
     'Shuffle a deck of cards and put it back.',
-    'Walk up three stairs and back down, three times.',
     'Open and shut a cupboard door three times without a sound.',
     'Sweep or brush a small patch of floor for 20 seconds.',
     'Plug a charger into a socket, then unplug it.',
