@@ -803,5 +803,21 @@
   "{count} player voting": {
     "one": "{count} spelare röstar",
     "other": "{count} spelare röstar"
-  }
+  },
+  "Open this in Safari": "Öppna det här i Safari",
+  "Open this in Chrome": "Öppna det här i Chrome",
+  "Open this in your browser": "Öppna det här i din webbläsare",
+  "You're in {app}'s built-in browser.": "Du är i den inbyggda webbläsaren i {app}.",
+  "You're in an app's built-in browser.": "Du är i en apps inbyggda webbläsare.",
+  "It can drop your game when your phone locks or you switch apps.": "Den kan tappa spelet när mobilen låses eller du byter app.",
+  "Open in Safari": "Öppna i Safari",
+  "Open in Chrome": "Öppna i Chrome",
+  "Copy link": "Kopiera länken",
+  "Link copied. Paste it into Safari.": "Länken är kopierad. Klistra in den i Safari.",
+  "Link copied. Paste it into Chrome.": "Länken är kopierad. Klistra in den i Chrome.",
+  "Link copied. Paste it into your browser.": "Länken är kopierad. Klistra in den i din webbläsare.",
+  "Or tap ⋯ or the share button, then Open in Safari.": "Eller tryck på ⋯ eller delningsknappen och sedan Öppna i Safari.",
+  "Or tap ⋮, then Open in Chrome.": "Eller tryck på ⋮ och sedan Öppna i Chrome.",
+  "Keep playing here": "Fortsätt spela här",
+  "Copy this link:": "Kopiera den här länken:"
 }

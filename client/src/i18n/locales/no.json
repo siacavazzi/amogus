@@ -803,5 +803,21 @@
   "{count} player voting": {
     "one": "{count} spiller stemmer",
     "other": "{count} spillere stemmer"
-  }
+  },
+  "Open this in Safari": "Åpne dette i Safari",
+  "Open this in Chrome": "Åpne dette i Chrome",
+  "Open this in your browser": "Åpne dette i nettleseren din",
+  "You're in {app}'s built-in browser.": "Du er i den innebygde nettleseren i {app}.",
+  "You're in an app's built-in browser.": "Du er i den innebygde nettleseren i en app.",
+  "It can drop your game when your phone locks or you switch apps.": "Den kan miste spillet når telefonen låses eller du bytter app.",
+  "Open in Safari": "Åpne i Safari",
+  "Open in Chrome": "Åpne i Chrome",
+  "Copy link": "Kopier lenken",
+  "Link copied. Paste it into Safari.": "Lenken er kopiert. Lim den inn i Safari.",
+  "Link copied. Paste it into Chrome.": "Lenken er kopiert. Lim den inn i Chrome.",
+  "Link copied. Paste it into your browser.": "Lenken er kopiert. Lim den inn i nettleseren din.",
+  "Or tap ⋯ or the share button, then Open in Safari.": "Eller trykk på ⋯ eller deleknappen, og så Åpne i Safari.",
+  "Or tap ⋮, then Open in Chrome.": "Eller trykk på ⋮, og så Åpne i Chrome.",
+  "Keep playing here": "Fortsett å spille her",
+  "Copy this link:": "Kopier denne lenken:"
 }
