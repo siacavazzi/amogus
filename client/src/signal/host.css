@@ -50,6 +50,7 @@
   display: grid; justify-items: center; gap: 4px; font-family: var(--sg-font);
 }
 .hs-code__value { font-weight: 900; font-size: clamp(64px, 24vw, 128px); line-height: 0.9; letter-spacing: 0.04em; text-indent: 0.04em; max-width: 100%; font-variant-numeric: tabular-nums; }
+.hs-code--small .hs-code__value { font-size: clamp(44px, 15vw, 76px); }
 .hs-code__tap { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; font-size: 15px; opacity: 0.8; }
 .hs-code:focus-visible { outline: 3px solid #fff; outline-offset: 6px; border-radius: 16px; }
 

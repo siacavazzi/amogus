@@ -521,16 +521,12 @@
   "Enter a name for your copy of this task list:": "Nombre para tu copia de esta lista:",
   "{name} (Copy)": "{name} (copia)",
   "My Task List": "Mi lista de tareas",
-  "Join my Sus Party room": "Únete a mi sala de Sus Party",
-  "Join my Sus Party room {roomCode}": "Únete a mi sala de Sus Party {roomCode}",
   "Need at least 3 players for one intruder.": "Hacen falta al menos 3 jugadores para un intruso.",
   "Waiting for players...": "Esperando jugadores...",
   "Live": "En directo",
   "Copied": "Copiado",
   "Tap to copy": "Toca para copiar",
-  "Invite players to room": "Invitar jugadores a la sala",
   "Link copied!": "¡Enlace copiado!",
-  "Invite Players": "Invitar jugadores",
   "Lobby view": "Vista de la sala",
   "Players ({count})": "Jugadores ({count})",
   "Players": "Jugadores",
@@ -825,5 +821,8 @@
   "Play your game from {date} again, with the same {count} tasks.": "Vuelve a jugar tu partida del {date}, con las mismas {count} tareas.",
   "Play your game from {date} again, with the same tasks.": "Vuelve a jugar tu partida del {date}, con las mismas tareas.",
   "Host it again": "Organizarla otra vez",
-  "Not now": "Ahora no"
+  "Not now": "Ahora no",
+  "Sus Party tonight. Tap to join room {roomCode}:": "Sus Party esta noche. Toca para unirte a la sala {roomCode}:",
+  "Send to the group chat": "Enviar al chat del grupo",
+  "Friends tap to join, and the chat keeps the game for next time.": "Tus amigos tocan para unirse, y el chat guarda la partida para la próxima vez."
 }

@@ -446,8 +446,8 @@ function PreGamePage() {
         if (!inviteUrl) return;
 
         const shareData = {
-            title: t('Join my Sus Party room'),
-            text: t('Join my Sus Party room {roomCode}', { roomCode }),
+            title: 'Sus Party',
+            text: t('Sus Party tonight. Tap to join room {roomCode}:', { roomCode }),
             url: inviteUrl,
         };
 
@@ -560,18 +560,24 @@ function PreGamePage() {
                     </button>
                 </div>
 
-                {/* Room code: tap to copy, invite to share */}
+                {/* The group chat link first: it is how friends join, and the chat keeps it for the next
+                    party. The code stays for anyone standing next to the host. */}
                 {roomCode && (
                     <div style={{ display: 'grid', gap: 14 }}>
-                        <button type="button" onClick={copyRoomCode} className="hs-code" title={t('Copy room code')} aria-label={t('Copy room code')}>
+                        <div style={{ display: 'grid', gap: 6 }}>
+                            <button type="button" onClick={shareInviteLink} className="sg-btn sg-btn-ink">
+                                {inviteShared ? <><Check size={22} /> {t('Link copied!')}</> : <><Share2 size={22} /> {t('Send to the group chat')}</>}
+                            </button>
+                            <p className="sg-small" style={{ textAlign: 'center', margin: 0, fontWeight: 700, opacity: 0.85 }}>
+                                {t('Friends tap to join, and the chat keeps the game for next time.')}
+                            </p>
+                        </div>
+                        <button type="button" onClick={copyRoomCode} className="hs-code hs-code--small" title={t('Copy room code')} aria-label={t('Copy room code')}>
                             <span className="hs-label">{t('Room code')}</span>
                             <span className="hs-code__value" data-testid="room-code" translate="no">{roomCode}</span>
                             <span className="hs-code__tap" aria-live="polite">
                                 {roomCodeCopied ? <><Check size={16} /> {t('Copied')}</> : <><Copy size={16} /> {t('Tap to copy')}</>}
                             </span>
-                        </button>
-                        <button type="button" onClick={shareInviteLink} className="sg-btn sg-btn-ghost" aria-label={t('Invite players to room')}>
-                            {inviteShared ? <><Check size={22} /> {t('Link copied!')}</> : <><Share2 size={22} /> {t('Invite Players')}</>}
                         </button>
                     </div>
                 )}

@@ -521,16 +521,12 @@
   "Enter a name for your copy of this task list:": "Numele copiei tale a acestei liste:",
   "{name} (Copy)": "{name} (copie)",
   "My Task List": "Lista mea de sarcini",
-  "Join my Sus Party room": "Intră în camera mea de Sus Party",
-  "Join my Sus Party room {roomCode}": "Intră în camera mea de Sus Party {roomCode}",
   "Need at least 3 players for one intruder.": "E nevoie de cel puțin 3 jucători pentru un intrus.",
   "Waiting for players...": "Așteptăm jucători...",
   "Live": "Live",
   "Copied": "Copiat",
   "Tap to copy": "Atinge ca să copiezi",
-  "Invite players to room": "Invită jucători în cameră",
   "Link copied!": "Link copiat!",
-  "Invite Players": "Invită jucători",
   "Lobby view": "Vizualizare lobby",
   "Players ({count})": "Jucători ({count})",
   "Players": "Jucători",
@@ -838,5 +834,8 @@
   "Play your game from {date} again, with the same {count} tasks.": "Joacă din nou jocul din {date}, cu aceleași {count} sarcini.",
   "Play your game from {date} again, with the same tasks.": "Joacă din nou jocul din {date}, cu aceleași sarcini.",
   "Host it again": "Găzduiește-l din nou",
-  "Not now": "Nu acum"
+  "Not now": "Nu acum",
+  "Sus Party tonight. Tap to join room {roomCode}:": "Sus Party diseară. Atinge ca să intri în camera {roomCode}:",
+  "Send to the group chat": "Trimite în chatul grupului",
+  "Friends tap to join, and the chat keeps the game for next time.": "Prietenii ating ca să intre, iar chatul păstrează jocul pentru data viitoare."
 }
