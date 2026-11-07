@@ -13,6 +13,7 @@ import { rememberSavedGame, keepSavedGame } from '../utils/savedGame';
 import { t } from '../i18n';
 import LanguagePicker from '../components/LanguagePicker';
 import WelcomeBackCard from '../components/WelcomeBackCard';
+import { readLastGame } from '../utils/lastGame';
 
 function LobbyPage() {
     const [inputRoomCode, setInputRoomCode] = useState(getRoomCodeFromSearch);
@@ -29,7 +30,9 @@ function LobbyPage() {
     const [savedGameCode] = useState(() => rememberSavedGame());
 
     useEffect(() => {
-        if (roomEntryStatus?.room_code) setInputRoomCode(roomEntryStatus.room_code);
+        // A game that has ended is not a code to retry, so its code stays out of the box.
+        if (roomEntryStatus?.code === 'game_ended') setInputRoomCode('');
+        else if (roomEntryStatus?.room_code) setInputRoomCode(roomEntryStatus.room_code);
     }, [roomEntryStatus]);
 
     // Resolve effective device mode (matches GameContext / PageController logic)
@@ -40,7 +43,8 @@ function LobbyPage() {
     const tutorialHref = '/tutorial?returnTo=play';
 
     useEffect(() => {
-        setShowTutorialPrompt(isMobile && !generatedSetup && !savedGameCode && !getRoomCodeFromSearch() && !roomEntryStatus && shouldRecommendTutorial());
+        // A phone that has finished a game has played, so it gets its welcome back card instead.
+        setShowTutorialPrompt(isMobile && !generatedSetup && !savedGameCode && !readLastGame() && !getRoomCodeFromSearch() && !roomEntryStatus && shouldRecommendTutorial());
     }, [isMobile, roomEntryStatus, generatedSetup, savedGameCode]);
 
     // Listen for errors and success to reset the button states

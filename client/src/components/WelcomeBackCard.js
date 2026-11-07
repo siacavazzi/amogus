@@ -18,12 +18,12 @@ export default function WelcomeBackCard({ style }) {
     if (!game) return null;
     const dismiss = () => { dismissLastGame(); setGame(null); };
     return (
-        <section aria-labelledby="welcome-back-title" style={{
+        <section className="sg-welcome-back" aria-labelledby="welcome-back-title" style={{
             background: '#fff', color: '#14161a', borderRadius: 18, padding: '14px 16px',
             boxShadow: '0 6px 18px rgba(0, 0, 0, 0.12)', textAlign: 'left', maxWidth: 420, width: '100%', ...style,
         }}>
-            <h2 id="welcome-back-title" style={{ margin: 0, fontSize: 19, fontWeight: 900 }}>{t('Welcome back')}</h2>
-            <p style={{ margin: '4px 0 12px', fontSize: 15, fontWeight: 600, lineHeight: 1.35 }}>
+            <h2 id="welcome-back-title" style={{ margin: 0, fontSize: 19, fontWeight: 900, color: '#14161a' }}>{t('Welcome back')}</h2>
+            <p style={{ margin: '4px 0 12px', fontSize: 15, fontWeight: 600, lineHeight: 1.35, color: '#14161a' }}>
                 {game.taskCount
                     ? t('Play your game from {date} again, with the same {count} tasks.', { date: playedOn(game.playedAt), count: game.taskCount })
                     : t('Play your game from {date} again, with the same tasks.', { date: playedOn(game.playedAt) })}
