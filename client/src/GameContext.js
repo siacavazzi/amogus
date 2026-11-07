@@ -8,10 +8,16 @@ import { parseCards } from './utils/cardCopy';
 import { isMobile as isMobileDevice } from 'react-device-detect';
 import { getRoomCodeFromSearch, getEntryMethodFromSearch, clearRoomCodeFromUrl } from './utils/inviteLinks';
 import { createDropTracker, installErrorReporting, sendClientMetric } from './utils/clientMetrics';
+import { readAnonDeviceId } from './utils/anonDeviceId';
 import { translateConflicts, translatedTo, watchForTranslation } from './utils/translateGuard';
 import { getLanguage, t } from './i18n';
 import './i18n/serverMessages';
 import { createRequestId, emitVolatileWithAck, SOCKET_COMMAND_TIMEOUT_MS } from './utils/socketCommand';
+
+function anonDeviceAuth() {
+    const { id, status } = readAnonDeviceId();
+    return { anon_device_id: id, anon_device_status: status };
+}
 
 // Allow URL param override for testing: ?mobile=true or ?mobile=false
 const urlParams = new URLSearchParams(window.location.search);
@@ -506,6 +512,8 @@ export default function GameContext({ children }) {
         socketRef.current = io(ENDPOINT, {
             auth: (callback) => callback({
                 utc_offset_minutes: -new Date().getTimezoneOffset(),
+                // A random ID this browser keeps, so stats can count returning devices. See anonDeviceId.js.
+                ...anonDeviceAuth(),
                 // After a dropped socket: was the page hidden (phone locked) or offline when it dropped.
                 last_drop: dropTracker.report(),
                 // Set when a browser translator rewrote the page, so errors can be tied to it.

@@ -202,12 +202,41 @@ def record_usage(event, game=None, player_id=None, resolve_game=True, **fields):
             game, _ = game_manager.get_game_by_sid(sid)
         if sid in synthetic_sids or getattr(game, 'synthetic', False):
             return
+        if event in OWN_DEVICE_EVENTS and game and player_id:
+            remember_anon_device(game, player_id, sid)
         game_manager.stats_tracker.record_event(
             event, game, player_id, connection_id=sid,
             phase='ended' if game and game.end_state else 'round' if game and game.game_running else 'lobby',
             **client_metrics_by_sid.get(sid, {}), **fields)
     except Exception:
         logger.exception('Usage event write failed')
+
+
+ANON_DEVICE_ID = re.compile(r'[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}')
+ANON_DEVICE_STATUSES = {'created', 'stored', 'unsaved'}
+# Events where the socket that sent them is the player's own phone, so the player can take its device ID.
+OWN_DEVICE_EVENTS = {'player_joined', 'player_reconnected', 'session_resumed'}
+
+
+def remember_anon_device(game, player_id, sid):
+    """Keep the phone's device ID on the player, so round summaries can list who played."""
+    device_id = client_metrics_by_sid.get(sid, {}).get('anon_device_id')
+    player = game.getPlayerById(player_id) or game.get_waiting_player(player_id)
+    if device_id and player:
+        player.anon_device_id = device_id
+
+
+def clean_anon_device(auth):
+    """The random ID the browser keeps for usage stats (client/src/utils/anonDeviceId.js).
+
+    Only a well-formed random UUID is kept, so nothing a person typed can arrive this way.
+    """
+    value = auth.get('anon_device_id') if isinstance(auth, dict) else None
+    if not isinstance(value, str) or not ANON_DEVICE_ID.fullmatch(value):
+        return {}
+    status = auth.get('anon_device_status')
+    return {'anon_device_id': value,
+            'anon_device_status': status if status in ANON_DEVICE_STATUSES else None}
 
 
 def clean_last_drop(value):
@@ -791,6 +820,7 @@ def handle_connect(auth=None):
         lang = clean_label(auth.get(key), 12, r'[A-Za-z-]+') if isinstance(auth, dict) else None
         if lang:
             client_metrics_by_sid[request.sid][key] = lang
+    client_metrics_by_sid[request.sid].update(clean_anon_device(auth))
     last_drop = clean_last_drop(auth.get('last_drop') if isinstance(auth, dict) else None)
     if last_drop:
         last_drop_by_sid[request.sid] = last_drop

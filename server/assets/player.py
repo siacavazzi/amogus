@@ -92,6 +92,8 @@ class Player:
         self.selfie = selfie  # Filename of selfie image (e.g., "abc123.jpg")
         self.active = True
         self.disconnected_at = None
+        # Random ID the phone's browser keeps for usage stats (never shown to anyone); None for old pages.
+        self.anon_device_id = None
         # Offline long enough that the room stops waiting for them (see app.mark_absent_if_still_gone)
         self.absent = False
         # Tapped Leave mid-round: kept until the round ends so the result counts them, then removed

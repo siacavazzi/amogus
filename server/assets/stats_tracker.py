@@ -240,6 +240,7 @@ class StatsTracker:
                 'setup_origin': getattr(game, 'setup_origin', None),
                 'acquisition': self.normalize_acquisition(getattr(game, 'acquisition', None)),
                 'first_task_seconds': None, 'last_gameplay_at': game.round_started_at,
+                **self.anon_devices(game),
             }
             self.data['round_history'].append({**game._round_metrics, 'outcome': 'in_progress'})
             self.data['round_history'] = self.data['round_history'][-1000:]
@@ -315,6 +316,22 @@ class StatsTracker:
             self._save_locked()
 
     @staticmethod
+    def anon_devices(game, known=()):
+        """Which devices played: the random IDs browsers keep, so a returning phone or host is countable
+        across rooms. Players on old cached pages have none and are only counted."""
+        players = list(getattr(game, 'players', []))
+        ids = set(known)
+        ids.update(player.anon_device_id for player in players if getattr(player, 'anon_device_id', None))
+        host_id = getattr(game, 'creator_player_id', None)
+        host = next((player for player in players
+                     if host_id is not None and getattr(player, 'player_id', None) == host_id), None)
+        return {
+            'anon_device_ids': sorted(ids),
+            'host_anon_device_id': getattr(host, 'anon_device_id', None),
+            'players_without_anon_device_id': sum(not getattr(player, 'anon_device_id', None) for player in players),
+        }
+
+    @staticmethod
     def _duration(game, ended_at):
         start = getattr(game, 'round_started_monotonic', None)
         if start is not None:
@@ -332,6 +349,8 @@ class StatsTracker:
                       player_count_at_end=len(players),
                       active_player_count_at_end=sum(bool(getattr(player, 'active', False)) for player in players),
                       crew_score=getattr(game, 'crew_score', None), task_goal=getattr(game, 'taskGoal', None),
+                      # Everyone who played some of the round: the start roster plus late joiners.
+                      **self.anon_devices(game, previous.get('anon_device_ids') or record.get('anon_device_ids') or ()),
                       **(game.task_summary() if hasattr(game, 'task_summary') else {}))
         # Keep the event summary free of the legacy record's names and task text.
         summary = {key: value for key, value in record.items() if key not in ('fake_tasks_sent', 'fake_tasks_completed', 'taunts_sent')}
