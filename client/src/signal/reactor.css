@@ -344,3 +344,19 @@
   .sg-rx__late-qr { display: none; }
   .sg-rx__late { max-width: none; }
 }
+
+/* Laptop "Create New Game": you still play on a phone (LaptopHostPrompt). */
+.sg-rx-prompt { position: fixed; inset: 0; z-index: 60; background: rgba(0, 0, 0, 0.55); display: flex; align-items: center; justify-content: center; padding: 16px; }
+.sg-rx-prompt__card { position: relative; width: 100%; max-width: 520px; max-height: calc(100vh - 32px); overflow-y: auto; background: #fff; color: var(--sg-ink); border-radius: 28px; padding: 30px 28px 24px; display: grid; gap: 14px; text-align: left; }
+/* .sg-setup h2 forces white with !important; this card is white. */
+.sg-rx-prompt__card .sg-h2 { color: var(--sg-ink) !important; font-size: clamp(28px, 4vw, 38px); line-height: 1; padding-right: 36px; }
+.sg-rx-prompt__card p { margin: 0; font-weight: 600; font-size: 17px; line-height: 1.4; }
+.sg-rx-prompt__card .sg-small { font-size: 14px; opacity: 0.75; }
+.sg-rx-prompt__close { position: absolute; top: 16px; right: 16px; background: none; border: 0; color: inherit; cursor: pointer; padding: 6px; border-radius: 50%; }
+.sg-rx-prompt__actions { display: grid; gap: 6px; margin-top: 6px; }
+.sg-rx-prompt__actions .sg-btn { width: 100%; }
+.sg-rx-prompt__phone { display: flex; gap: 20px; align-items: center; }
+.sg-rx-prompt__phone > div { display: grid; gap: 10px; }
+.sg-rx-prompt__qr { width: 168px; height: 168px; flex: none; }
+@media (max-width: 520px) { .sg-rx-prompt__phone { flex-direction: column; align-items: flex-start; } }
+.sg-rx__wait--nudge { background: rgba(0, 0, 0, 0.22); border-radius: 18px; padding: 10px 18px; }

@@ -1,4 +1,5 @@
 import React from 'react';
+import { act } from '@testing-library/react';
 import { renderWithContext, screen, fireEvent, mockPlayers } from '../../test-utils';
 import ReactorWaiting from '../../pages/ReactorWaiting';
 import ReactorPage from '../../pages/ReactorPage';
@@ -23,9 +24,27 @@ describe('Reactor waiting screen', () => {
         expect(screen.getByText('Host')).toBeInTheDocument();
     });
 
-    it('says the first phone to join hosts when nobody has joined', () => {
+    it('tells the laptop to join on a phone when nobody has joined', () => {
         renderWithContext(<ReactorWaiting />, { roomCode: 'ABCD', players: [] });
-        expect(screen.getByTestId('reactor-host-hint')).toHaveTextContent('The first phone to join will be the host');
+        expect(screen.getByTestId('reactor-host-hint')).toHaveTextContent('Now join on your phone. The first phone in is the host and starts the game.');
+    });
+
+    it('says the screen cannot start the game when no phone joins for a minute', () => {
+        jest.useFakeTimers();
+        try {
+            renderWithContext(<ReactorWaiting />, { roomCode: 'ABCD', players: [] });
+            act(() => { jest.advanceTimersByTime(59 * 1000); });
+            expect(screen.getByTestId('reactor-host-hint')).not.toHaveTextContent('No phones yet');
+            act(() => { jest.advanceTimersByTime(2 * 1000); });
+            expect(screen.getByTestId('reactor-host-hint')).toHaveTextContent("No phones yet. Everyone joins on a phone, including you. This screen can't start the game.");
+        } finally {
+            jest.useRealTimers();
+        }
+    });
+
+    it('remembers that this laptop has had phones join', () => {
+        renderWithContext(<ReactorWaiting />, { roomCode: 'ABCD', players: mockPlayers });
+        expect(localStorage.setItem).toHaveBeenCalledWith('sus_party_laptop_hosted_v1', '1');
     });
 });
 

@@ -1,12 +1,16 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { DataContext } from '../GameContext';
 import { Copy, Check, Speaker, ExternalLink, Volume2, LogOut } from '../signal/icons';
 import { Face } from '../signal';
 import RoomQrCode from '../components/RoomQrCode';
 import { isBetaChannel } from '../components/BetaBadge';
 import { buildRoomQrUrl } from '../utils/inviteLinks';
+import { rememberLaptopHosted } from '../components/LaptopHostPrompt';
 import '../signal/reactor.css';
 import { t, tn } from '../i18n';
+
+// No phone has joined after this long: say plainly that the screen itself can't start the game.
+const NUDGE_AFTER_MS = 60 * 1000;
 
 // The room's big screen before the game: the code huge enough to read from across the room,
 // and the faces of everyone who has joined. The blinking dot is the one thing that moves.
@@ -45,6 +49,18 @@ function ReactorWaiting() {
   };
 
   const joined = players || [];
+  // No phone yet after a minute: say plainly that this screen can't start the game.
+  const [nudge, setNudge] = useState(false);
+  useEffect(() => {
+    if (joined.length > 0) {
+      rememberLaptopHosted();
+      setNudge(false);
+      return undefined;
+    }
+    const timer = setTimeout(() => setNudge(true), NUDGE_AFTER_MS);
+    return () => clearTimeout(timer);
+  }, [joined.length]);
+
   // Only the host's phone has Start, so a big group needs to know whose phone that is.
   const host = joined.find((p) => p.player_id && p.player_id === lobbyState?.host_player_id);
   // A big group shrinks the faces so the room code, the host line and everyone still fit.
@@ -89,13 +105,15 @@ function ReactorWaiting() {
           </div>
         )}
 
-        <p className="sg-rx__lede sg-rx__wait" data-testid="reactor-host-hint">
+        <p className={`sg-rx__lede sg-rx__wait${nudge ? ' sg-rx__wait--nudge' : ''}`} data-testid="reactor-host-hint">
           <span className="sg-rx__blink" aria-hidden="true" />
           {host
             ? <span>{t('{name} is the host. Start the game from their phone.', { name: host.username })}</span>
             : joined.length > 0
               ? t('Waiting for the host to start')
-              : t('The first phone to join will be the host')}
+              : nudge
+                ? t('No phones yet. Everyone joins on a phone, including you. This screen can\'t start the game.')
+                : t('Now join on your phone. The first phone in is the host and starts the game.')}
         </p>
 
         <div className={`sg-rx__faces${many ? ' sg-rx__faces--many' : ''}`} style={{ marginTop: 'clamp(8px, 2vh, 24px)' }}>
