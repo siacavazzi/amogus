@@ -12,14 +12,18 @@ export default function VictoryScreen({ tone, kicker, title, line, winners, winn
   }, []);
   const crew = tone === 'round';
   const big = winners.length <= 2;
+  // Long words ("Besättningen", "Mannskapet") shrink to fit a phone instead of running off it.
+  const heading = t(title);
+  const longest = Math.max(0, ...String(heading).split(/\s+/).map((word) => word.length));
+  const headingSize = longest > 9 ? `clamp(36px, ${Math.floor(1450 / longest) / 10}vw, 88px)` : 'clamp(54px, 17vw, 88px)';
 
   return (
     <div className={`sg-screen sg-split ${crew ? 'sg-round' : tone === 'hazard' ? 'sg-ink' : 'sg-out'}`} style={{ paddingBottom: 40 }}>
       {tone === 'hazard' && <div className="sg-hazard" style={{ opacity: 0.35 }} />}
       <div className="flex flex-col items-center text-center" style={{ minHeight: '78vh', justifyContent: 'center', gap: 14, position: 'relative' }}>
         {kicker && <p className="sg-lede sg-a sg-rise" style={{ animationDelay: '300ms' }}>{kicker}</p>}
-        <h1 className="sg-big sg-a sg-rise" style={{ fontSize: 'clamp(54px, 17vw, 88px)', animationDelay: '400ms', animationDuration: '520ms' }}>
-          {t(title)}
+        <h1 className="sg-big sg-a sg-rise" style={{ fontSize: headingSize, animationDelay: '400ms', animationDuration: '520ms' }}>
+          {heading}
         </h1>
         <p className="sg-lede sg-a sg-fade" style={{ opacity: 0.9, maxWidth: '26ch', animationDelay: '700ms' }}>{line}</p>
         {winners.length > 0 && (

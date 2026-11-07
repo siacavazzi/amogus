@@ -4,6 +4,11 @@ import { Face, vibrate } from './index';
 import { listCardNames } from '../utils/cardCopy';
 import { t } from '../i18n';
 
+// The role card is about 170px wide: a long role name ("Mannskapsmedlem", "Crewmitglied") shrinks to fit.
+function roleFontSize(label) {
+  return Math.min(40, Math.floor(330 / Math.max(1, String(label).length)));
+}
+
 // Role reveal. Both roles see the same blue screen and hold the card to peek; letting go
 // hides it again, so nobody reads a role over a shoulder. Intruders also see which cards
 // they hold, since most never found them in the vent on their own.
@@ -65,7 +70,7 @@ export function RoleReveal({ title, sus, otherIntruders = [], cards = [], onClos
                 animation: 'sg-pop .22s ease-out both',
               }}
             >
-              <span className="sg-big" style={{ fontSize: 40 }}>{sus ? t('Intruder') : t('Crewmate')}</span>
+              <span className="sg-big" style={{ fontSize: roleFontSize(sus ? t('Intruder') : t('Crewmate')) }}>{sus ? t('Intruder') : t('Crewmate')}</span>
               <span style={{ fontWeight: 700, fontSize: 14, opacity: 0.75, padding: '0 14px' }}>
                 {sus
                   ? otherIntruders.length

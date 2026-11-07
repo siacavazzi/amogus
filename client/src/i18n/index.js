@@ -10,6 +10,8 @@ import es from './locales/es.json';
 import de from './locales/de.json';
 import ro from './locales/ro.json';
 import pt from './locales/pt.json';
+import no from './locales/no.json';
+import sv from './locales/sv.json';
 
 export const LANGUAGES = [
     { code: 'en', name: 'English' },
@@ -18,13 +20,18 @@ export const LANGUAGES = [
     { code: 'de', name: 'Deutsch' },
     { code: 'ro', name: 'Română' },
     { code: 'pt', name: 'Português (Brasil)' },
+    { code: 'no', name: 'Norsk' },
+    { code: 'sv', name: 'Svenska' },
 ];
 
-const CATALOGS = { en: {}, fr, es, de, ro, pt };
+const CATALOGS = { en: {}, fr, es, de, ro, pt, no, sv };
+// Norwegian phones report Bokmål as nb (or nn for Nynorsk); the game has one Norwegian, "no".
+const ALIASES = { nb: 'no', nn: 'no' };
 const STORAGE_KEY = 'sus_language';
 
 function supported(code) {
-    const base = typeof code === 'string' ? code.toLowerCase().split(/[-_]/)[0] : '';
+    const raw = typeof code === 'string' ? code.toLowerCase().split(/[-_]/)[0] : '';
+    const base = ALIASES[raw] || raw;
     return Object.prototype.hasOwnProperty.call(CATALOGS, base) ? base : null;
 }
 
@@ -57,9 +64,9 @@ export function detectLanguage({
     if (headless) return 'en';
     // First browser language we have; an English-first browser stays English even if French is second.
     for (const code of browser || []) {
-        const base = typeof code === 'string' ? code.toLowerCase().split(/[-_]/)[0] : '';
-        if (supported(base)) return base;
-        if (base === 'en') return 'en';
+        const base = supported(code);
+        if (base) return base;
+        if (typeof code === 'string' && code.toLowerCase().split(/[-_]/)[0] === 'en') return 'en';
     }
     return 'en';
 }
