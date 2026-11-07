@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import AdminDashboard from '../../pages/admin/AdminDashboard';
 
 const NOW = 1794052800;
@@ -64,11 +64,11 @@ describe('AdminDashboard', () => {
 
   test('shows rooms in use apart from idle ones, and the period totals', async () => {
     render(<AdminDashboard />);
-    await waitFor(() => expect(screen.getByText('Right now')).toBeInTheDocument());
-    expect(screen.getByText('room playing a round').previousSibling).toHaveTextContent('1');
+    const live = await screen.findByRole('region', { name: 'Right now' });
+    expect(live).toHaveTextContent(/1room playing a round/);
     expect(screen.getByText(/2 more rooms are idle/)).toBeInTheDocument();
     expect(screen.getByText('Idle rooms (2)')).toBeInTheDocument();
-    expect(screen.getByText('Rounds played').nextSibling).toHaveTextContent('8');
+    expect(screen.getByRole('region', { name: 'Totals for the period' })).toHaveTextContent(/Rounds played8▲/);
     expect(screen.getByText(/\+4 vs previous 7 days/)).toBeInTheDocument();
     expect(screen.getByText('35% of phones played inside an app\'s browser.')).toBeInTheDocument();
     expect(screen.getByText(/needs the anonymous device ID/)).toBeInTheDocument();
@@ -76,13 +76,13 @@ describe('AdminDashboard', () => {
     expect(screen.getByText('Loved it')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('radio', { name: 'Last 28 days' }));
-    expect(screen.getByText('Rounds played').nextSibling).toHaveTextContent('40');
+    expect(screen.getByRole('region', { name: 'Totals for the period' })).toHaveTextContent(/Rounds played40▲/);
   });
 
   test('still shows live rooms when the event log cannot be read', async () => {
     global.fetch = jest.fn(() => Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve({ ...stats, report: null }) }));
     render(<AdminDashboard />);
-    await waitFor(() => expect(screen.getByText(/event log could not be read/)).toBeInTheDocument());
+    expect(await screen.findByText(/event log could not be read/)).toBeInTheDocument();
     expect(screen.getByText('PLAY')).toBeInTheDocument();
   });
 });
