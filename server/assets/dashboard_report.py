@@ -487,7 +487,9 @@ def _window(index, start, end, feedback):
                           key=lambda r: (r['key'] == 'unknown', -r['played'], -r['created'])),
         'funnel': [{'key': key, 'label': label, 'count': count} for key, label, count in funnel],
         'browsers': _ranked(browsers),
-        'in_app': {'phones': sum(v for k, v in browsers.items() if k in IN_APP_BROWSERS), 'of': sum(browsers.values())},
+        # Share of phones whose browser is known; joins from builds before Oct 31 have none.
+        'in_app': {'phones': sum(v for k, v in browsers.items() if k in IN_APP_BROWSERS),
+                   'of': sum(v for k, v in browsers.items() if k != 'unknown')},
         'languages': _ranked(langs, 12),
         'translated': _ranked(translated),
         'task_sources': _ranked(task_sources),
@@ -543,6 +545,9 @@ def build_report(index, now, feedback=()):
         start = now - days * DAY
         windows[str(days)] = _window(index, start, now, feedback)
         windows[str(days)]['previous'] = _window(index, start - days * DAY, start, feedback)['totals']
+        # A comparison with a period the log only partly covers would read as growth.
+        windows[str(days)]['previous']['complete'] = (index.first_event_at is not None
+                                                      and index.first_event_at <= start - days * DAY)
 
     return {
         'built_at': now,

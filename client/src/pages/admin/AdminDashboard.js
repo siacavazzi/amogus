@@ -226,7 +226,7 @@ function LiveNow({ live }) {
         <div><p className="adm-hero">{live.players_in_games ?? 0}</p><p className="adm-live__label">phones online in those rooms</p></div>
       </div>
       <p className="adm-muted">
-        {idle.length} more {idle.length === 1 ? 'room is' : 'rooms are'} idle: still open, but nobody has done anything for {minutes} minutes.
+        {idle.length}{inUse.length ? ' more' : ''} {idle.length === 1 ? 'room is' : 'rooms are'} idle: still open, but nobody has done anything for {minutes} minutes.
         Rooms close 3 hours after their last activity.
       </p>
       {inUse.length > 0 && <LiveTable rooms={inUse} />}
@@ -343,6 +343,17 @@ function Trend({ report }) {
   );
 }
 
+// Rows from builds that didn't log a field yet stay out of the bars and the percentages.
+function known(rows) {
+  return rows.filter(row => row.key !== 'unknown');
+}
+
+function NotRecorded({ rows, what }) {
+  const row = rows.find(r => r.key === 'unknown');
+  if (!row || !row.count) return null;
+  return <p className="adm-note">Left out: {formatNumber(row.count)} {what} from older versions that didn't record this.</p>;
+}
+
 function Card({ title, children, lead, span }) {
   const id = `adm-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
   return (
@@ -385,7 +396,8 @@ function Devices({ report, w }) {
 function Report({ report, feedback }) {
   const [range, setRange] = useState(() => readStored(localStorage, RANGE_KEY, '7'));
   const w = report.windows[range] || report.windows['7'];
-  const prev = w.previous || {};
+  // No comparison when the event log doesn't reach back over the whole previous period.
+  const prev = w.previous && w.previous.complete !== false ? w.previous : {};
   const period = range === '7' ? 'previous 7 days' : 'previous 28 days';
   const t = w.totals;
 
@@ -504,11 +516,12 @@ function Report({ report, feedback }) {
 
         <Card title="Phone browsers" lead={w.in_app.of ? `${percent(w.in_app.phones, w.in_app.of)} of phones played inside an app's browser.` : null}>
           <BarList
-            rows={w.browsers.slice(0, 9).map(b => ({ key: b.key, label: nameOf('browser', b.key), value: b.count, emphasis: IN_APP.has(b.key) }))}
+            rows={known(w.browsers).slice(0, 9).map(b => ({ key: b.key, label: nameOf('browser', b.key), value: b.count, emphasis: IN_APP.has(b.key) }))}
             total={w.in_app.of}
             emphasize
             empty="No phones in this period."
           />
+          <NotRecorded rows={w.browsers} what="phones" />
           <p className="adm-note">Blue bars are in-app browsers (Facebook, Instagram, Snapchat and others). Phones in rooms that played.</p>
         </Card>
 
@@ -523,12 +536,14 @@ function Report({ report, feedback }) {
         </Card>
 
         <Card title="Task lists">
-          <BarList rows={w.task_sources.map(s => ({ key: s.key, label: nameOf('task_source', s.key), value: s.count }))} empty="No rounds in this period." />
+          <BarList rows={known(w.task_sources).map(s => ({ key: s.key, label: nameOf('task_source', s.key), value: s.count }))} empty="No rounds in this period." />
+          <NotRecorded rows={w.task_sources} what="rooms" />
           <p className="adm-note">Where each played room's first round got its tasks.</p>
         </Card>
 
         <Card title="How phones joined">
-          <BarList rows={w.entry_methods.map(e => ({ key: e.key, label: nameOf('entry', e.key), value: e.count }))} empty="No joins in this period." />
+          <BarList rows={known(w.entry_methods).map(e => ({ key: e.key, label: nameOf('entry', e.key), value: e.count }))} empty="No joins in this period." />
+          <NotRecorded rows={w.entry_methods} what="joins" />
           {w.join_rejections.length > 0 && (
             <>
               <h3 className="adm-h3">Failed tries</h3>

@@ -7,7 +7,7 @@ import { formatNumber, percent } from './labels';
 function niceMax(value) {
   if (value <= 4) return 4;
   const step = 10 ** Math.floor(Math.log10(value));
-  for (const m of [1, 2, 2.5, 5, 10]) {
+  for (const m of [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]) {
     if (m * step >= value) return m * step;
   }
   return 10 * step;
