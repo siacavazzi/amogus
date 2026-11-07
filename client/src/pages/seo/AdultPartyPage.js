@@ -61,7 +61,7 @@ function AdultPartyPage() {
                     <p>
                         Carry your pack into a new game and import it in host setup. Friends join with the
                         four-letter room code. Everyone needs a phone browser and internet, with no account
-                        or app download. You can host and play from your phone; a TV is optional.
+                        or app download. You can host and play from your phone; a laptop for the big screen is optional.
                     </p>
                 </section>
                 <GameSetupCta title="Let your most convincing friend be suspicious"

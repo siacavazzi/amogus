@@ -256,7 +256,7 @@ function AmongUsIrlPage() {
                         A few things keep a big game moving:
                     </p>
                     <ul className="seo-list">
-                        <li>Open susparty.com/play on a laptop, TV, or projector and create the room there. It becomes the big screen and shows the room code to everyone.</li>
+                        <li>Open susparty.com/play on a laptop or desktop and create the room there. It becomes the big screen and shows the room code to everyone.</li>
                         <li>Players type susparty.com on their phones and enter the code. The first phone to join is the host and starts the game.</li>
                         <li>Use more intruders as the group grows, and plan more tasks than players so nobody stands around.</li>
                         <li>Pick a meeting point with room for everyone, and spread tasks across several areas.</li>

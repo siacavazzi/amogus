@@ -50,7 +50,7 @@ const QUICK_PAGES = {
             {
                 h2: 'Make it feel like a party',
                 body: [
-                    'Put a laptop or TV in the meeting room to show the shared game screen. Use party cups and plates as task props. Hand the winning team the first slice of cake. Keep rounds short so new guests can rotate in.',
+                    'Put a laptop or desktop in the meeting room to show the shared game screen. Use party cups and plates as task props. Hand the winning team the first slice of cake. Keep rounds short so new guests can rotate in.',
                     'Throwing it for a birthday? See the guides for an <a href="/among-us-birthday-party">Among Us birthday party</a> and an <a href="/among-us-party-for-kids">Among Us party for kids</a>.',
                 ],
             },

@@ -54,7 +54,7 @@ export default function YouthGroupsPage() {
                     <h2>Group size and devices</h2>
                     <p>
                         One game room can hold the whole group, even with 20 or more players.
-                        With 20 or more players, open the game on a laptop, TV or projector first so the room code and every meeting show on a big screen,
+                        With 20 or more players, open the game on a laptop or desktop first so the room code and every meeting show on a big screen,
                         and use three or four intruders. If you have several leaders and separate spaces, two smaller games side by side also work
                         and give each player more tasks.
                     </p>

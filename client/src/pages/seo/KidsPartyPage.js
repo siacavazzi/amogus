@@ -194,7 +194,7 @@ export default function KidsPartyPage() {
                     <p>
                         Sus Party is a free, browser-based Among Us IRL game. No accounts and no install. Build a task list,
                         create a room, and share the four-letter code. Each device gets a private role, a task list, and a vote button.
-                        A TV or laptop can show the optional Reactor screen so kids see crew progress. Read <a href="/how-to-play">how to play</a> before the party
+                        A laptop or desktop can show the optional Reactor screen so kids see crew progress. Read <a href="/how-to-play">how to play</a> before the party
                         so you can teach it in five minutes. Sus Party is not affiliated with Among Us or Innersloth.
                     </p>
                 </section>

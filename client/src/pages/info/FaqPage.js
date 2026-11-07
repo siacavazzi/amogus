@@ -62,8 +62,8 @@ const FAQS = [
         href: '/among-us-irl-task-generator?venue=other&players=8', linkLabel: 'Choose your task locations',
     },
     {
-        q: 'Do we need a TV or laptop?',
-        a: 'No. A phone-only game works. Larger devices act as the Reactor display rather than as players. Add one if you want the shared meltdown mini-game; each player still uses a phone.',
+        q: 'Do we need a laptop?',
+        a: 'No. A phone-only game works. A laptop or desktop acts as the Reactor display rather than as players. Add one if you want the shared meltdown mini-game; each player still uses a phone.',
     },
     {
         q: 'Does completing tasks win the game?',

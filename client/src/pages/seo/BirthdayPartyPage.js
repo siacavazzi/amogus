@@ -44,7 +44,7 @@ function BirthdayPartyPage() {
                     </p>
                     <p>
                         Choose shared areas such as the living room, dining table, and an open hallway.
-                        Keep one meeting point. A laptop or TV can supply the optional Reactor display, but a phone-only game works too.
+                        Keep one meeting point. A laptop or desktop can supply the optional Reactor display, but a phone-only game works too.
                     </p>
                 </section>
                 <GameplayScreenshots screens={['family-lobby', 'crew-task']} />

@@ -5,7 +5,7 @@ import GameplayScreenshots from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const SETUP_URL = '/among-us-irl-task-generator?venue=apartment&players=6&movement=normal&style=mix';
-const DESCRIPTION = 'A free online party game you play in person, with your phones. Sus Party puts secret roles on your phones and real tasks around your home. No download, account, or TV required.';
+const DESCRIPTION = 'A free online party game you play in person, with your phones. Sus Party puts secret roles on your phones and real tasks around your home. No download, account, or big screen required.';
 const SCHEMA = {
     '@context': 'https://schema.org', '@type': 'Article',
     headline: 'A phone party game with real-life alibis', description: DESCRIPTION,
@@ -39,7 +39,7 @@ export default function PhonePartyPage() {
                     <p>
                         One person creates a room and prepares its tasks. Open the room, share the four-letter
                         code, and have each friend join on their own phone. There is no account or app to install.
-                        Everyone needs internet, but a TV or console is optional. The host can take a role and play too.
+                        Everyone needs internet, but a laptop for the big screen is optional. The host can take a role and play too.
                     </p>
                     <p>
                         This is a game for people together in the same place. Your phone shows your private role

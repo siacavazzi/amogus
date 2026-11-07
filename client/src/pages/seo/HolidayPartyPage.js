@@ -99,7 +99,7 @@ export default function HolidayPartyPage() {
                         </div></li>
                     </ol>
                     <p>
-                        An old laptop or the TV can show the optional Reactor display, which tracks crew progress for the room. It is a nice touch but not required.
+                        An old laptop or a desktop can show the optional Reactor display, which tracks crew progress for the room. It is a nice touch but not required.
                     </p>
                 </section>
 
