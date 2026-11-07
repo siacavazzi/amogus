@@ -112,6 +112,21 @@ class DashboardReportTests(unittest.TestCase):
         self.assertEqual(6, week['totals']['devices'])
         self.assertEqual(1, week['totals']['returning_devices'])
 
+    def test_without_devices_a_quick_new_room_on_the_same_clock_and_language_continues_the_session(self):
+        day = NOW - 86400
+        self.log.room('room-a', day, offset=60)
+        for n in range(3):
+            self.log.join('room-a', day + n, f'a{n}', lang='nb-NO')
+        self.log.round('room-a', 'r1', day + 60, 3)                 # ends at +660
+        self.log.room('room-b', day + 900, offset=60)
+        for n in range(3):
+            self.log.join('room-b', day + 900 + n, f'b{n}', lang='nb-NO')
+        self.log.round('room-b', 'r2', day + 1000, 3)               # 340 s after room-a's last round
+        self.log.room('room-c', day + 900, offset=-300)             # another group, another clock
+        self.log.round('room-c', 'r3', day + 1000, 3)
+        week = self.report()['windows']['7']
+        self.assertEqual(2, week['totals']['sessions'])
+
     def test_reads_only_new_lines_and_follows_rotation(self):
         self.log.room('room-a', NOW - HOUR)
         self.log.round('room-a', 'r1', NOW - HOUR + 60, 5)

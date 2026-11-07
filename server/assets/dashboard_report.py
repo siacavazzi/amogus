@@ -19,6 +19,7 @@ from threading import Lock
 DAY = 86400
 KEEP_SECONDS = 70 * DAY          # events older than this drop out of memory
 SESSION_GAP = 2 * 3600           # rounds further apart than this are separate sessions
+ROOM_HOP_GAP = 30 * 60           # a new room this soon after a room's last round may be the same group
 REPORT_TTL = 60                  # seconds a built report is reused
 
 _EVENTS = (
@@ -329,6 +330,26 @@ def _sessions(rooms, rounds_in):
                 if b_start - a_end <= SESSION_GAP and a_start - b_end <= SESSION_GAP:
                     parent[find(a['id'])] = find(b['id'])
 
+    # Before device IDs: a room started soon after another room's last round, by a host on the same
+    # clock and with the same main language, is taken as the same group making a fresh room.
+    def last_end(room):
+        last = rounds_in[room['id']][-1]
+        return last['end'] or last['start'] + (last['duration'] or 0)
+
+    def main_language(room):
+        return (room['langs'].most_common(1) or [[None]])[0][0]
+
+    blind = sorted((room for room in played if not room['anon']), key=lambda r: rounds_in[r['id']][0]['start'])
+    for i, b in enumerate(blind):
+        for a in reversed(blind[:i]):
+            gap = rounds_in[b['id']][0]['start'] - last_end(a)
+            if gap > ROOM_HOP_GAP:
+                continue
+            if (gap >= -60 and a['host_offset'] is not None and a['host_offset'] == b['host_offset']
+                    and main_language(a) == main_language(b)):
+                parent[find(b['id'])] = find(a['id'])
+                break
+
     groups = defaultdict(list)
     for room in played:
         groups[find(room['id'])].append(room)
@@ -343,6 +364,14 @@ def _sessions(rooms, rounds_in):
             current.append(rnd)
         sessions.append(current)
     return sessions
+
+
+def _players(rounds):
+    """Each room's biggest round, added up. Unlike seats, a phone that rejoins with a new ID adds nothing."""
+    biggest = {}
+    for rnd in rounds:
+        biggest[rnd['room']] = max(biggest.get(rnd['room'], 0), rnd['players'])
+    return sum(biggest.values())
 
 
 def _local_hours(rounds, rooms):
@@ -436,7 +465,7 @@ def _window(index, start, end, feedback):
         'start': start, 'end': end,
         'totals': {
             'rounds': len(rounds), 'rooms_played': len(played_rooms), 'rooms_created': len(rooms),
-            'seats': seats, 'devices': len(devices), 'returning_devices': len(returning),
+            'seats': seats, 'players': _players(rounds), 'devices': len(devices), 'returning_devices': len(returning),
             'biggest_round': max((r['players'] for r in rounds), default=0),
             'median_round_seconds': round(statistics.median(durations)) if durations else None,
             'sessions': len(sessions), 'in_progress': in_progress,
@@ -499,6 +528,10 @@ def build_report(index, now, feedback=()):
                 'start': start, 'label': _day(start), 'rounds': len(rounds), 'rooms_played': len(rooms_played),
                 'rooms_created': created,
                 'seats': sum(len(index.rooms[rs]['participants']) for rs in rooms_played if rs in index.rooms),
+                'players': _players(rounds),
+                # Before the log's first event there is no data, which is not the same as no play.
+                'no_data': index.first_event_at is None or end <= index.first_event_at,
+                'partial_start': index.first_event_at is not None and start < index.first_event_at < end,
                 'big_rounds': sum(1 for r in rounds if r['players'] >= 7),
                 'devices': len(devices), 'returning_devices': returning, 'new_devices': len(devices) - returning,
                 'partial': end > now,

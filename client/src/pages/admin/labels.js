@@ -11,19 +11,20 @@ const NAMES = {
     safari: 'Safari', chrome: 'Chrome', firefox: 'Firefox', edge: 'Edge', opera: 'Opera',
     samsung: 'Samsung Internet', facebook_app: 'Facebook app', instagram: 'Instagram app',
     snapchat_app: 'Snapchat app', tiktok_app: 'TikTok app', google_app: 'Google app', line_app: 'LINE app',
-    other: 'Other', unknown: 'Unknown',
+    other: 'Other', unknown: 'Not recorded (older version)',
   },
   task_source: {
     generator: 'Task generator pack', saved_list: 'Saved or loaded list', group: 'Written together in the lobby',
-    typed: 'Typed by the host', builtin: 'Built-in tasks', unknown: 'Not recorded',
+    typed: 'Typed by the host', builtin: 'Built-in tasks', unknown: 'Not recorded (older version)',
   },
   entry: {
     typed: 'Typed the code', qr: 'Scanned the QR code', share_link: 'Share link', invite_link: 'Room link',
-    host_return: 'Host coming back', unknown: 'Not recorded',
+    host_return: 'Host coming back', unknown: 'Not recorded (older version)',
   },
   rejection: {
     room_not_found: 'Code matched no room', room_not_open: 'Room not open yet',
     username_required: 'No name entered', round_running: 'Round already running',
+    round_in_progress: 'Round already running',
   },
   host: { phone: 'Phone', desktop: 'Laptop or desktop', tablet: 'Tablet', unknown: 'Not recorded' },
   feedback: { fun: 'Fun', okay: 'Okay', needs_work: 'Needs work', comment_only: 'Comment only' },

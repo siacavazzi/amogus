@@ -263,7 +263,7 @@ const TREND_METRICS = [
   { key: 'rounds', label: 'Rounds' },
   { key: 'rooms_played', label: 'Rooms that played' },
   { key: 'rooms_created', label: 'Rooms created' },
-  { key: 'seats', label: 'Player seats' },
+  { key: 'players', label: 'Players' },
 ];
 
 function Segmented({ options, value, onChange, label }) {
@@ -288,19 +288,20 @@ function Segmented({ options, value, onChange, label }) {
 function Trend({ report }) {
   const [metric, setMetric] = useState('rounds');
   const [grain, setGrain] = useState('daily');
-  const rows = report[grain] || [];
+  const rows = (report[grain] || []).filter(row => !row.no_data);
   const metricLabel = TREND_METRICS.find(m => m.key === metric).label;
   const columns = rows.map(row => ({
     key: row.label,
     label: grain === 'daily' ? `${weekdayLabel(row.start)} ${dayLabel(row.start)}${row.partial ? ' (so far)' : ''}`
-      : `Week of ${dayLabel(row.start)}${row.partial ? ' (so far)' : ''}`,
+      : `Week of ${dayLabel(row.start)}${row.partial ? ' (so far)' : row.partial_start ? ' (log starts mid-week)' : ''}`,
     tick: dayLabel(row.start),
-    partial: row.partial,
+    partial: row.partial || row.partial_start,
     segments: [{ series: 'main', value: row[metric] }],
     tooltip: [
       [metricLabel.toLowerCase(), formatNumber(row[metric])],
       ...TREND_METRICS.filter(m => m.key !== metric).map(m => [m.label.toLowerCase(), formatNumber(row[m.key])]),
       ['rounds with 7+ players', formatNumber(row.big_rounds)],
+      ['player seats', formatNumber(row.seats)],
     ],
   }));
   return (
@@ -319,18 +320,19 @@ function Trend({ report }) {
         tickEvery={grain === 'daily' ? 7 : 1}
         ariaLabel={`${metricLabel} per ${grain === 'daily' ? 'day' : 'week'}`}
       />
-      <p className="adm-note">The last {grain === 'daily' ? 'day' : 'week'} is still filling in. A player seat is one phone in one room, so a phone in three rooms counts three times.</p>
+      <p className="adm-note">Paler columns are incomplete. Players adds up each room's biggest round, so a group that makes three rooms counts three times. Player seats (in the table) counts every phone that joined a room, including rejoins.</p>
       <details className="adm-details">
         <summary>Show as a table</summary>
         <div className="adm-scroll">
           <table className="adm-table">
-            <thead><tr><th>{grain === 'daily' ? 'Day' : 'Week of'}</th>{TREND_METRICS.map(m => <th key={m.key} className="adm-num">{m.label}</th>)}<th className="adm-num">7+ player rounds</th></tr></thead>
+            <thead><tr><th>{grain === 'daily' ? 'Day' : 'Week of'}</th>{TREND_METRICS.map(m => <th key={m.key} className="adm-num">{m.label}</th>)}<th className="adm-num">7+ player rounds</th><th className="adm-num">Player seats</th></tr></thead>
             <tbody>
               {[...rows].reverse().map(row => (
                 <tr key={row.label}>
                   <td>{grain === 'daily' ? `${weekdayLabel(row.start)} ${dayLabel(row.start)}` : dayLabel(row.start)}</td>
                   {TREND_METRICS.map(m => <td key={m.key} className="adm-num">{formatNumber(row[m.key])}</td>)}
                   <td className="adm-num">{formatNumber(row.big_rounds)}</td>
+                  <td className="adm-num">{formatNumber(row.seats)}</td>
                 </tr>
               ))}
             </tbody>
@@ -360,7 +362,7 @@ function Devices({ report, w }) {
       </Card>
     );
   }
-  const weeks = (report.weekly || []).filter(row => row.start + 7 * 86400 > report.devices_since);
+  const weeks = (report.weekly || []).filter(row => !row.no_data && row.start + 7 * 86400 > report.devices_since);
   const columns = weeks.map(row => ({
     key: row.label,
     label: `Week of ${dayLabel(row.start)}${row.partial ? ' (so far)' : ''}`,
@@ -410,7 +412,7 @@ function Report({ report, feedback }) {
       <section className="adm-kpis" aria-label="Totals for the period">
         <Stat label="Rounds played" value={t.rounds} previous={prev.rounds} period={period} />
         <Stat label="Rooms that played" value={t.rooms_played} previous={prev.rooms_played} period={period} note={`of ${formatNumber(t.rooms_created)} rooms created`} />
-        <Stat label="Player seats" value={t.seats} previous={prev.seats} period={period} note="One per phone per room" />
+        <Stat label="Players" value={t.players} previous={prev.players} period={period} note="Each room's biggest round, added up" />
         {report.devices_since
           ? <Stat label="Phones" value={t.devices} previous={prev.devices || undefined} period={period} note={`${formatNumber(t.returning_devices)} returning · since ${dayLabel(report.devices_since)}`} />
           : <Stat label="Biggest round" value={t.biggest_round} note="players at the start" />}
@@ -466,7 +468,7 @@ function Report({ report, feedback }) {
           />
           <p className="adm-note">
             A session is one group's rounds with no gap over 2 hours.
-            {report.devices_since ? ' Rooms that share 2+ phones count as one session, since groups often make a new room instead of replaying.' : ' Until device IDs are logged, each room is its own session, so groups that make a new room count twice.'}
+            {report.devices_since ? ' Rooms that share 2+ phones count as one session, since groups often make a new room instead of replaying.' : ' Until device IDs are logged, a room started within 30 minutes of another room\'s last round, by a host on the same clock with the same main language, counts as the same session. That is an estimate.'}
           </p>
         </Card>
 
