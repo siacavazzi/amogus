@@ -9,6 +9,10 @@ const FAQS = [
         a: 'Your selfie is optional. A current room connection is required to view it. Photos expire after 24 hours. The server deletes expired photos at startup and during its five-minute cleanup cycle. It also deletes your photo when you leave the room or when the room closes. A temporary disconnect keeps your photo available for your return, within the same 24-hour limit.',
     },
     {
+        q: 'Does Sus Party know who I am?',
+        a: 'No. There are no accounts, and we never ask for an email or phone number. So we can count how many players come back, your browser keeps a random code made up the first time you open a game. It is not linked to your name, photo, or anything else about you. We never use it for ads or share it. Clearing your browser\u2019s site data gives you a new one.',
+    },
+    {
         q: 'Is Sus Party free?',
         a: 'Yes. Sus Party is free, with no account, ads, or app-store purchase. Open it in your browser, prepare a task pack, and invite friends with your room code.',
         href: '/among-us-irl-task-generator', linkLabel: 'Prepare your first task pack',

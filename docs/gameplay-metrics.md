@@ -92,12 +92,30 @@ Repeated task commands return the cached result and do not add another completio
 The card count includes accepted actions. Earlier card counts also included rejected attempts.
 The app log records socket exception tracebacks without the request payload.
 
+## Anonymous device ID (added 2026-11-07)
+
+Room-scoped `participant_id` cannot follow a phone from one room to the next. To count new and returning players, and players who later host, each browser keeps a random UUID v4 in local storage under `sp_anon_device_id` (`client/src/utils/anonDeviceId.js`). It holds no name, account, or fingerprint. Clearing site data, a private tab, or another browser on the same phone gives a new ID, so counts are devices (browsers), not people.
+
+The phone sends the ID in the socket handshake. The server keeps it only if it is a well-formed v4 UUID.
+
+| Field | Where | Meaning |
+| --- | --- | --- |
+| `anon_device_id` | Every event sent from a socket | The device of the connection that sent the event (`connection_id`), like `os_family`. Read it from `host_entered` (the host's device) and `player_joined`, `player_reconnected`, `session_resumed` (the player's own device). In `player_died` or other events about someone else, it is the sender's device, not the subject's. |
+| `anon_device_status` | Every event sent from a socket | `created`: no ID was stored, so this page load made one (a new browser, or one whose storage was wiped). `stored`: read back from storage, a returning browser. `unsaved`: storage is blocked, so the ID lasts only for this page load. Compare `created` rates by `browser_family` to see in-app browsers losing storage. |
+| `anon_device_ids` | `round_started`, `round_ended`, `round_history` in `stats.json` | Sorted unique device IDs of the round's players: the start roster, plus late joiners at the end |
+| `host_anon_device_id` | Same | The host player's device |
+| `players_without_anon_device_id` | Same | Players on pages loaded before this change |
+
+Events before 2026-11 have no device fields. Treat those rooms as unknown, not as new devices.
+This is not the `device_id` in local storage that owns saved task lists: that one acts as a key and stays out of the logs.
+The device ID is used only to count usage. It is not used for ads, shared, or joined to names.
+
 ## Identity and limits
 
 New structured events and round history exclude names, photos, messages, raw task text, and IP addresses.
 The existing completed-game record retains its legacy fields for compatibility.
 Participant IDs use a hash with a room-specific salt. Connection IDs use a hash with a server-run salt.
-These IDs support analysis within a room and do not count distinct people across rooms.
+These IDs support analysis within a room. Use `anon_device_id` to count devices across rooms.
 The existing lifetime player-ID count also does not count distinct people.
 
 Connection metadata contains a coarse device class, OS family, browser family and the browser UTC offset, if available. Raw user agents are not stored.
