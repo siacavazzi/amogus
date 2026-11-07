@@ -22,14 +22,14 @@ const puppeteer = require('puppeteer');
             await page.goto(`http://127.0.0.1:${server.address().port}/`, { waitUntil: 'networkidle0' });
             assert.deepEqual(errors, [], 'Landing startup errors');
             await page.waitForSelector('.sl-phone--hero .sl-phone__shot.is-on', { visible: true, timeout: 5000 });
-            const shots = await page.$$eval('.sl-split .sl-phone img', imgs => imgs.length);
+            const shots = await page.$$eval('.sl-band:not(.sl-hero) .sl-phone img', imgs => imgs.length);
             assert.ok(shots >= 3, `Expected the game screenshots on the home page, found ${shots}`);
             for (let i = 0; i < shots; i++) {
-                await page.$$eval('.sl-split .sl-phone img', (imgs, index) => {
+                await page.$$eval('.sl-band:not(.sl-hero) .sl-phone img', (imgs, index) => {
                     imgs[index].scrollIntoView({ block: 'center', behavior: 'instant' });
                 }, i);
                 await page.waitForFunction(index => {
-                    const img = document.querySelectorAll('.sl-split .sl-phone img')[index];
+                    const img = document.querySelectorAll('.sl-band:not(.sl-hero) .sl-phone img')[index];
                     return img.complete && img.naturalWidth > 0;
                 }, { timeout: 5000 }, i);
             }
@@ -43,7 +43,7 @@ const puppeteer = require('puppeteer');
             await page.goto(`http://127.0.0.1:${server.address().port}/`, { waitUntil: 'networkidle0' });
             await Promise.all([
                 page.waitForNavigation({ waitUntil: 'domcontentloaded' }),
-                page.click('a.sl-join__host[href="/play"]'),
+                page.click('a.sl-hero__start[href="/play"]'),
             ]);
             await page.waitForFunction(() => !document.querySelector('.sl-hero') &&
                 document.querySelector('#root').textContent.trim().length > 0);

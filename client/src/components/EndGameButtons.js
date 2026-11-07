@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { DataContext } from '../GameContext';
 import { RotateCcw, LogOut, Check } from '../signal/icons';
 import GameFeedback from './GameFeedback';
+import { t } from '../i18n';
 
 function EndGameButtons() {
     const { socket, roomCode, resetVotes, isMobile, roundId } = useContext(DataContext);
@@ -55,7 +56,7 @@ function EndGameButtons() {
         <div className="sg flex flex-col gap-2.5 w-full">
             {votesInProgress && (
                 <p className="sg-num text-center" style={{ fontWeight: 700, fontSize: 15 }}>
-                    {resetVotes.current} / {resetVotes.needed} players ready
+                    {t('{current} / {needed} players ready', { current: resetVotes.current, needed: resetVotes.needed })}
                 </p>
             )}
             <button
@@ -64,11 +65,11 @@ function EndGameButtons() {
                 className="sg-btn"
                 style={{ background: hasVoted ? '#eceae4' : 'var(--sg-ink)', color: hasVoted ? 'var(--sg-ink)' : '#fff', opacity: 1 }}
             >
-                {hasVoted ? <><Check size={20} strokeWidth={3} /> Ready!</> : <><RotateCcw size={20} strokeWidth={3} /> Play Again</>}
+                {hasVoted ? <><Check size={20} strokeWidth={3} /> {t('Ready!')}</> : <><RotateCcw size={20} strokeWidth={3} /> {t('Play Again')}</>}
             </button>
             <button onClick={handleLeaveRoom} className="sg-btn" style={{ background: 'transparent', color: 'var(--sg-ink)', minHeight: 48, padding: 10, fontWeight: 700, fontSize: 16 }}>
                 <LogOut size={18} />
-                <span>Leave</span>
+                <span>{t('Leave')}</span>
             </button>
             {!hasVoted && skipFeedbackRound !== roundId && <GameFeedback key={roundId} />}
         </div>

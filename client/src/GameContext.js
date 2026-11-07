@@ -7,7 +7,10 @@ import { markHasPlayedGame } from './tutorial/tutorialStorage';
 import { parseCards } from './utils/cardCopy';
 import { isMobile as isMobileDevice } from 'react-device-detect';
 import { getRoomCodeFromSearch, getEntryMethodFromSearch, clearRoomCodeFromUrl } from './utils/inviteLinks';
-import { createDropTracker, installErrorReporting } from './utils/clientMetrics';
+import { createDropTracker, installErrorReporting, sendClientMetric } from './utils/clientMetrics';
+import { translateConflicts, translatedTo, watchForTranslation } from './utils/translateGuard';
+import { getLanguage, t } from './i18n';
+import './i18n/serverMessages';
 import { createRequestId, emitVolatileWithAck, SOCKET_COMMAND_TIMEOUT_MS } from './utils/socketCommand';
 
 // Allow URL param override for testing: ?mobile=true or ?mobile=false
@@ -375,19 +378,19 @@ export default function GameContext({ children }) {
 
         setTaskCompletionError(null);
         if (!socket?.connected || !connected) {
-            return fail('You are offline. Reconnect before you complete this task.');
+            return fail(t('You are offline. Reconnect before you complete this task.'));
         }
         if (!running) {
-            return fail('No game is running. Rejoin the active room before you complete a task.');
+            return fail(t('No game is running. Rejoin the active room before you complete a task.'));
         }
         if (!playerId) {
-            return fail('Your player session is missing. Rejoin the room before you complete this task.');
+            return fail(t('Your player session is missing. Rejoin the room before you complete this task.'));
         }
         if (!assignmentId || !assignmentRoundId) {
-            return fail('This task has no current assignment. Wait for a new task, then try again.');
+            return fail(t('This task has no current assignment. Wait for a new task, then try again.'));
         }
         if (roundId && assignmentRoundId !== roundId) {
-            return fail('This task belongs to an earlier round. Wait for a current task assignment.');
+            return fail(t('This task belongs to an earlier round. Wait for a current task assignment.'));
         }
 
         const request = {
@@ -419,21 +422,21 @@ export default function GameContext({ children }) {
 
             if (commandError) {
                 await requestRoomState(socket, roomVersionRef.current.roomCode || roomCode, playerId);
-                return fail('Task completion is unconfirmed. Reconnect to refresh your task. Try again.');
+                return fail(t('Task completion is unconfirmed. Reconnect to refresh your task. Try again.'));
             }
 
             if (response?.state) applyRoomSnapshot(response.state);
             if (response?.ok !== true) {
                 return fail(response?.error
-                    ? `Task was not recorded: ${response.error}`
-                    : 'Task was not recorded. Check your connection and try again.');
+                    ? t('Task was not recorded: {reason}', { reason: t(response.error) })
+                    : t('Task was not recorded. Check your connection and try again.'));
             }
             if (response.request_id !== request.request_id) {
                 await requestRoomState(socket, roomVersionRef.current.roomCode || roomCode, playerId);
-                return fail('The server did not confirm this task request. Refresh the room state. Try again.');
+                return fail(t('The server did not confirm this task request. Refresh the room state. Try again.'));
             }
             if (roomVersionRef.current.roundId && roomVersionRef.current.roundId !== request.round_id) {
-                return fail('This task belongs to an earlier round. Wait for a current task assignment.');
+                return fail(t('This task belongs to an earlier round. Wait for a current task assignment.'));
             }
             return true;
         })();
@@ -505,6 +508,11 @@ export default function GameContext({ children }) {
                 utc_offset_minutes: -new Date().getTimezoneOffset(),
                 // After a dropped socket: was the page hidden (phone locked) or offline when it dropped.
                 last_drop: dropTracker.report(),
+                // Set when a browser translator rewrote the page, so errors can be tied to it.
+                ...(translatedTo() ? { translated_to: translatedTo() } : {}),
+                // The phone's own language and the one the game picked, to see which languages players use.
+                device_lang: typeof navigator !== 'undefined' ? navigator.language : undefined,
+                game_lang: getLanguage(),
                 // Browser end-to-end tests set this so their rooms stay out of usage stats.
                 ...(isTestTraffic() ? { synthetic: true } : {}),
             }),
@@ -512,6 +520,15 @@ export default function GameContext({ children }) {
             reconnectionAttempts: 10,
             reconnectionDelay: 2000,
             transports: ['websocket'],
+        });
+
+        // Once per page load: tells us how many phones lean on browser translation, and into what.
+        const stopTranslateWatch = watchForTranslation(lang => {
+            const report = () => sendClientMetric(socketRef.current, {
+                kind: 'page_translated', lang, dom_conflicts: translateConflicts(),
+            });
+            if (socketRef.current?.connected) report();
+            else socketRef.current?.once('connect', report);
         });
 
         socketRef.current.on('connect', () => {
@@ -656,7 +673,7 @@ export default function GameContext({ children }) {
             sessionStorage.removeItem('is_room_creator');
             resetGameState();
             setRoomEntryStatus({ code: 'session_not_found', room_code: previousRoomCode,
-                message: data.message || 'Your previous session is no longer available. Ask the host for a new invite.' });
+                message: data.message || t('Your previous session is no longer available. Ask the host for a new invite.') });
         });
 
         socketRef.current.on('error', (data) => {
@@ -676,14 +693,14 @@ export default function GameContext({ children }) {
                 resetGameState();
                 if (previousRoomCode) {
                     setRoomEntryStatus({ code: 'room_not_found', room_code: previousRoomCode,
-                        message: 'Your room is no longer available. Ask the host for a new invite.' });
+                        message: t('Your room is no longer available. Ask the host for a new invite.') });
                 }
             }
             // Only show the error dialog if we're actually still in a room.
             // Suppresses spurious "Game not found" errors that fire after the
             // client has already left (the game may have been deleted on the server).
             if (isMobile && inRoomRef.current) {
-                setDialog({ title: "Error", body: data.message });
+                setDialog({ title: t("Error"), body: data.message });
             }
         });
 
@@ -725,13 +742,13 @@ export default function GameContext({ children }) {
 
         socketRef.current.on('message', (data) => {
             if(data.player === localStorage.getItem("player_id")) {
-                isMobile && setDialog({ title: "Message", body: data.message });
+                isMobile && setDialog({ title: t("Message"), body: data.message });
             }
         });
 
         socketRef.current.on('taunt_received', (data) => {
             isMobile && setDialog({
-                title: "You've received a message...",
+                title: t("You've received a message..."),
                 kind: 'taunt',
                 message: data.message || "",
             });
@@ -741,7 +758,7 @@ export default function GameContext({ children }) {
         socketRef.current.on('last_stand', (data) => {
             if (!acceptRoomData(data)) return;
             setLastStand(true);
-            isMobile && setDialog({ title: data?.title || "Last stand", body: data?.message || "", lastStand: true });
+            isMobile && setDialog({ title: data?.title || t("Last stand"), body: data?.message || "", lastStand: true });
         });
 
         socketRef.current.on('end_game', (data) => {
@@ -769,7 +786,7 @@ export default function GameContext({ children }) {
             
             // Same full-screen moment on every phone, intruders included.
             isMobile && setDialog({
-                title: isIntruder ? "Exposed" : "Tasks complete",
+                title: isIntruder ? t("Exposed") : t("Tasks complete"),
                 kind: 'revealed',
                 intruderNames: data.intruder_names || [],
             });
@@ -783,7 +800,7 @@ export default function GameContext({ children }) {
             setCodesNeeded(undefined);
             setMeltdownTimer(undefined);
             setMeltdownCode(undefined);
-            isMobile && setDialog({ title: "Meltdown averted", body: "The reactor is safe. Back to your tasks." });
+            isMobile && setDialog({ title: t("Meltdown averted"), body: t("The reactor is safe. Back to your tasks.") });
         });
 
         socketRef.current.on('reset', () => {
@@ -1009,8 +1026,8 @@ export default function GameContext({ children }) {
                 // The host left and the role moved: the new host has to know, or nobody starts the game.
                 if (data.host_change === 'you_are_host') {
                     setDialog({
-                        title: "You're the host now",
-                        body: `${data.previous_host || 'The host'} left, so you start the game and run the room now.`,
+                        title: t("You're the host now"),
+                        body: t('{name} left, so you start the game and run the room now.', { name: data.previous_host || t('The host') }),
                     });
                 }
             }
@@ -1065,7 +1082,7 @@ export default function GameContext({ children }) {
                     setRunning(true);
                     setTaskCreationMode(false);  // Exit task creation mode
                     
-                    isMobile && setDialog({ title: data.late_join ? "You're in this round" : "The game has started",
+                    isMobile && setDialog({ title: data.late_join ? t("You're in this round") : t("The game has started"),
                         kind: 'role', sus: !!me.sus, otherIntruders, cards: parseCards(me.cards) });
 
                 } else if (data.action === "start_game") {
@@ -1080,6 +1097,7 @@ export default function GameContext({ children }) {
         return () => {
             dropTracker.stop();
             stopErrorReporting();
+            stopTranslateWatch();
             if (socketRef.current) {
                 socketRef.current.disconnect();
             }
@@ -1101,7 +1119,7 @@ export default function GameContext({ children }) {
         socket.emit('test_switch_role', { player_id: playerId }, (response) => {
             if (!response?.ok) return;
             setShowSusPage(false);
-            isMobile && setDialog({ title: "Role switched", kind: 'role', sus: !!response.sus, otherIntruders: [] });
+            isMobile && setDialog({ title: t("Role switched"), kind: 'role', sus: !!response.sus, otherIntruders: [] });
         });
     }, [playerState]);
 

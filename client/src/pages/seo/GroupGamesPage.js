@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
-import GameplayScreenshots from './GameplayScreenshots';
+import GameplayScreenshots, { GameTour } from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const SCHEMA = {
@@ -33,6 +33,7 @@ function GroupGamesPage() {
                     <a href="/among-us-irl-task-generator?venue=house&players=10&movement=normal" className="seo-btn--secondary">Set up Sus Party</a>
                 </div>
             </header>
+            <GameTour />
             <main className="seo-content">
                 <section className="seo-section" id="pick-a-game">
                     <h2>What do you want the group to do?</h2>
@@ -64,7 +65,7 @@ function GroupGamesPage() {
                     </p>
                     <p>Read the <a href="/how-to-play-among-us-irl">Sus Party round rules</a> before you start. Task completion reveals intruders; the crew still needs to vote them out.</p>
                 </section>
-                <GameplayScreenshots screens={['party-lobby', 'vote']} />
+                <GameplayScreenshots screens={['party-lobby', 'round-stats']} />
 
                 <section className="seo-section" id="charades">
                     <h2>Charades: start before anyone opens a phone</h2>

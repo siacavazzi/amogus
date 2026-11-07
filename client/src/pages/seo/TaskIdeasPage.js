@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
-import GameplayScreenshots from './GameplayScreenshots';
+import GameplayScreenshots, { GameTour } from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const TASK_SECTIONS = [
@@ -205,7 +205,7 @@ function TaskIdeasPage() {
         description:
             `A free list of ${TASK_COUNT} easy Among Us tasks to do in real life at home, in a classroom, or at a vacation house, for kids and adults. Copy them or build your own task list.`,
         canonical: 'https://susparty.com/among-us-irl-task-ideas',
-        ogImage: 'https://susparty.com/og-image.jpg',
+        ogImage: 'https://susparty.com/og-image.jpg?v=2',
         schema: SCHEMA,
     });
 
@@ -234,6 +234,8 @@ function TaskIdeasPage() {
                     </a>
                 </div>
             </div>
+
+            <GameTour />
 
             <div className="seo-content">
                 <div className="seo-highlight">

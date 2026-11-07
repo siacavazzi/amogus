@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
-import GameplayScreenshots from './GameplayScreenshots';
+import GameplayScreenshots, { GameTour } from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const SETUP_URL = '/among-us-irl-task-generator?venue=house&players=10&movement=normal&style=standard&room=Living+Room&room=Kitchen&room=Hallway';
@@ -35,6 +35,7 @@ export default function FamilyReunionPage() {
                     <a href={NEARBY_LOCATIONS_URL} className="seo-btn--secondary">Use two nearby locations</a>
                 </div>
             </header>
+            <GameTour />
             <main className="seo-content">
                 <section className="seo-section">
                     <h2>Give relatives something to do, then something to explain</h2>
@@ -51,7 +52,7 @@ export default function FamilyReunionPage() {
                         This setup suits teens and adults who can use their own phones and follow the secret-role rules.
                     </p>
                 </section>
-                <GameplayScreenshots screens={['party-lobby', 'meeting-ready']} />
+                <GameplayScreenshots screens={['party-lobby', 'crew-victory']} />
 
                 <section className="seo-section">
                     <h2>Fit the game to the family home</h2>

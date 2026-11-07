@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
-import GameplayScreenshots from './GameplayScreenshots';
+import GameplayScreenshots, { GameTour } from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const TEMPLATE_URL = '/among-us-irl-task-generator?preset=cleanup&players=4';
@@ -33,6 +33,7 @@ export default function FamilyCleanupPage() {
                     <a href="/how-to-play" className="seo-btn--secondary">Learn how to play</a>
                 </div>
             </header>
+            <GameTour variant="chores" />
             <main className="seo-content">
                 <section className="seo-section">
                     <h2>Your house already has the missions</h2>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { t } from '../i18n';
 
 /**
  * FakeTaskReveal - A dramatic reveal animation when a player completes a fake task
@@ -27,7 +28,7 @@ const FakeTaskReveal = ({ task, location, onComplete }) => {
       }, 3000),
     ];
 
-    return () => timers.forEach(t => clearTimeout(t));
+    return () => timers.forEach(id => clearTimeout(id));
   }, []);
 
   // A private moment: the phone stays blue, the task gets struck out and the phone shakes.
@@ -45,10 +46,10 @@ const FakeTaskReveal = ({ task, location, onComplete }) => {
         )}
         {location && <p className="sg-small">{location}</p>}
         <h1 className="sg-big sg-h1" style={{ marginTop: 18, opacity: phase === 'glitch' ? 0 : 1, transform: phase === 'glitch' ? 'scale(1.6)' : 'none', transition: 'all .28s cubic-bezier(.5,0,.2,1)' }}>
-          FAKE TASK!
+          {t('FAKE TASK!')}
         </h1>
         <p className="sg-lede" style={{ opacity: phase === 'glitch' ? 0 : 0.9, transition: 'opacity .3s .2s' }}>
-          An intruder sent you on that one. No points awarded.
+          {t('An intruder sent you on that one. No points awarded.')}
         </p>
       </div>
     </div>

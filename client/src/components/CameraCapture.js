@@ -1,6 +1,7 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { Camera, RotateCcw, Check, X } from '../signal/icons';
 import { CircleIconButton, SecondaryButton, ButtonGroup } from './ui';
+import { t } from '../i18n';
 
 function CameraCapture({ onCapture, onCancel }) {
     const videoRef = useRef(null);
@@ -137,7 +138,7 @@ function CameraCapture({ onCapture, onCancel }) {
                     <p className="text-red-400">{error}</p>
                 </div>
                 <SecondaryButton onClick={skipPhoto} fullWidth={false}>
-                    Skip Photo
+                    {t('Skip Photo')}
                 </SecondaryButton>
             </div>
         );
@@ -146,8 +147,7 @@ function CameraCapture({ onCapture, onCancel }) {
     return (
         <div className="flex flex-col items-center">
             <p className="text-gray-400 text-xs text-center mb-3">
-                Photos are optional. Room participants can view them during play. Photos expire after 24 hours
-                and are deleted when you leave or the host closes the room.
+                {t('Photos are optional. Room participants can view them during play. Photos expire after 24 hours and are deleted when you leave or the host closes the room.')}
             </p>
             {/* Hidden canvas for capturing */}
             <canvas ref={canvasRef} className="hidden" />
@@ -182,7 +182,7 @@ function CameraCapture({ onCapture, onCancel }) {
                         <CircleIconButton
                             onClick={toggleCamera}
                             variant="gray"
-                            title="Switch Camera"
+                            title={t('Switch Camera')}
                         >
                             <RotateCcw size={24} />
                         </CircleIconButton>
@@ -190,19 +190,19 @@ function CameraCapture({ onCapture, onCancel }) {
                             onClick={capturePhoto}
                             variant="primary"
                             size="large"
-                            title="Take Photo"
+                            title={t('Take Photo')}
                         >
                             <Camera size={32} />
                         </CircleIconButton>
                         <CircleIconButton
                             onClick={skipPhoto}
                             variant="gray"
-                            title="Skip"
+                            title={t('Skip')}
                         >
                             <X size={24} />
                         </CircleIconButton>
                     </ButtonGroup>
-                    <p className="text-gray-500 text-xs text-center">Position your face in the frame</p>
+                    <p className="text-gray-500 text-xs text-center">{t('Position your face in the frame')}</p>
                 </>
             ) : (
                 <>
@@ -210,7 +210,7 @@ function CameraCapture({ onCapture, onCancel }) {
                     <div className="relative w-full aspect-square rounded-2xl overflow-hidden border-2 border-green-500/60 shadow-xl shadow-green-500/10 mb-4">
                         <img
                             src={capturedImage}
-                            alt="Captured selfie"
+                            alt={t('Captured selfie')}
                             className="absolute inset-0 w-full h-full object-cover"
                             style={{ transform: facingMode === 'user' ? 'scaleX(-1)' : 'none' }}
                         />
@@ -230,14 +230,14 @@ function CameraCapture({ onCapture, onCancel }) {
                     <ButtonGroup className="mb-3">
                         <SecondaryButton onClick={retakePhoto} fullWidth={false}>
                             <RotateCcw size={20} />
-                            <span>Retake</span>
+                            <span>{t('Retake')}</span>
                         </SecondaryButton>
                         <SecondaryButton onClick={confirmPhoto} variant="cyan" fullWidth={false}>
                             <Check size={20} />
-                            <span>Use Photo</span>
+                            <span>{t('Use Photo')}</span>
                         </SecondaryButton>
                     </ButtonGroup>
-                    <p className="text-gray-500 text-xs text-center">Looking good!</p>
+                    <p className="text-gray-500 text-xs text-center">{t('Looking good!')}</p>
                 </>
             )}
         </div>

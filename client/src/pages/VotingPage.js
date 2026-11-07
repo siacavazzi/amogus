@@ -4,6 +4,7 @@ import LeaveGameButton from "../components/LeaveGameButton";
 import { Face } from "../signal";
 import { Skull } from "../signal/icons";
 import { emitVolatileWithAck } from "../utils/socketCommand";
+import { t, tn } from '../i18n';
 
 export default function VotingPage({ tutorialMode = false, tutorialHighlightTarget = null }) {
   const { players, socket, setMessage, meetingState, vetoVotes, votes, playerState, roundId, connected } = useContext(DataContext);
@@ -55,11 +56,11 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
         round_id: meetingState?.round_id || roundId,
         meeting_id: meetingState?.id || meetingState?.meeting_id,
       });
-      setMessage({ text: `You voted for ${selectedPlayer.username}`, status: "success" });
+      setMessage({ text: t('You voted for {name}', { name: selectedPlayer.username }), status: "success" });
       setHasVoted(true);
       setVotedFor(selectedPlayer);
     } else {
-      setMessage({ text: "Please select a player to vote for.", status: "warning" });
+      setMessage({ text: t('Please select a player to vote for.'), status: "warning" });
     }
   };
 
@@ -70,7 +71,7 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
       round_id: meetingState?.round_id || roundId,
       meeting_id: meetingState?.id || meetingState?.meeting_id,
     });
-    setMessage({ text: "You voted to veto.", status: "info" });
+    setMessage({ text: t('You voted to veto.'), status: "info" });
     setSelectedPlayer(null);
     setHasVoted(true);
     setVotedFor('veto');
@@ -78,7 +79,7 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
 
   const handleImDead = async () => {
     if (!canVote || deathPendingRef.current || tutorialMode || playerState?.sus) return;
-    if (!window.confirm('Are you sure you want to mark yourself as dead?')) return;
+    if (!window.confirm(t('Are you sure you want to mark yourself as dead?'))) return;
     deathPendingRef.current = true;
     setDeathPending(true);
     try {
@@ -87,12 +88,12 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
         round_id: meetingState?.round_id || roundId,
         meeting_id: meetingState?.id || meetingState?.meeting_id,
       });
-      if (!result?.ok) throw new Error(result?.error || 'The death report failed. Try again.');
+      if (!result?.ok) throw new Error(result?.error ? t(result.error) : t('The death report failed. Try again.'));
     } catch (error) {
       if (!mountedRef.current) return;
       deathPendingRef.current = false;
       setDeathPending(false);
-      setMessage({ text: error.message, status: 'error' });
+      setMessage({ text: t(error.message), status: 'error' });
     }
   };
 
@@ -101,8 +102,8 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
   const isLowTime = timeLeft <= 10;
   const alivePlayers = players.filter(p => p.alive);
   const voteLabel = hasVoted
-    ? (votedFor === 'veto' ? 'You voted to VETO' : `Voted for ${votedFor?.username}`)
-    : 'Tap who you think it is';
+    ? (votedFor === 'veto' ? t('You voted to VETO') : t('Voted for {name}', { name: votedFor?.username }))
+    : t('Tap who you think it is');
 
   return (
     <div className="sg-screen sg-meet" style={{ padding: 0 }}>
@@ -111,11 +112,12 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
       {/* Header: the word, the clock, what you did */}
       <div style={{ padding: 'calc(env(safe-area-inset-top, 0px) + 56px) 20px 10px' }}>
         <div className="flex items-end justify-between gap-3">
-          <h1 className="sg-big sg-h1 sg-a sg-slam">VOTE</h1>
+          <h1 className="sg-big sg-h1 sg-a sg-slam">{t('VOTE')}</h1>
           <span
             key={isLowTime ? timeLeft : 'clock'}
             className={`sg-big sg-num ${isLowTime ? 'sg-tick' : ''}`}
             style={{ fontSize: 'clamp(40px, 12vw, 60px)', color: isLowTime ? 'var(--sg-out)' : 'inherit' }}
+            translate="no"
           >
             {timeLeft}s
           </span>
@@ -125,8 +127,8 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
         </div>
         <p className="sg-lede" style={{ marginTop: 14 }}>{voteLabel}</p>
         <p className="sg-small" style={{ marginTop: 2 }}>
-          {alivePlayers.length} players voting
-          {meetingState?.started_by_host && meetingState?.host_name ? ` · ${meetingState.host_name} started it early` : ''}
+          {tn(alivePlayers.length, '{count} player voting', '{count} players voting')}
+          {meetingState?.started_by_host && meetingState?.host_name ? ` · ${t('{name} started it early', { name: meetingState.host_name })}` : ''}
         </p>
       </div>
 
@@ -164,10 +166,10 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
                 }}
               >
                 <Face player={player} size={64} dead={isDead} />
-                <span style={{ fontWeight: 900, fontSize: 15, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textDecoration: isDead ? 'line-through' : 'none' }}>
+                <span style={{ fontWeight: 900, fontSize: 15, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textDecoration: isDead ? 'line-through' : 'none' }} translate="no">
                   {player.username}
                 </span>
-                {isMe && <span style={{ fontWeight: 700, fontSize: 11, opacity: 0.7, marginTop: -4 }}>You</span>}
+                {isMe && <span style={{ fontWeight: 700, fontSize: 11, opacity: 0.7, marginTop: -4 }}>{t('You')}</span>}
                 {count > 0 && (
                   <span
                     key={count}
@@ -190,16 +192,16 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
           style={highlightActions ? { borderRadius: 22, outline: '4px solid var(--sg-ink)', outlineOffset: 6 } : {}}
         >
           <button type="button" className="sg-btn sg-btn-ink" onClick={handleVote} disabled={!selectedPlayer || !canVote}>
-            {selectedPlayer ? `Vote for ${selectedPlayer.username}` : "Select a Player"}
+            {selectedPlayer ? t('Vote for {name}', { name: selectedPlayer.username }) : t('Select a Player')}
           </button>
           <button type="button" className="sg-btn sg-btn-line" onClick={handleVeto} disabled={!canVote} style={{ minHeight: 52, padding: '12px 18px' }}>
-            Veto Meeting
+            {t('Veto Meeting')}
             <span className="sg-num" style={{ background: 'var(--sg-ink)', color: 'var(--sg-meet)', borderRadius: 999, padding: '2px 9px', fontSize: 14 }}>{vetoVotes}</span>
           </button>
           {showDeathReport && (
             <button type="button" data-testid="im-dead" className="sg-btn sg-btn-line sg-dead-btn" onClick={handleImDead} disabled={!canVote}>
               <Skull size={24} />
-              {deathPending ? 'Confirm death...' : "I've Been Killed"}
+              {deathPending ? t('Confirm death...') : t('I\'ve Been Killed')}
             </button>
           )}
         </div>

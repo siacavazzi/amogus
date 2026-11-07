@@ -2,6 +2,8 @@ import React, { useEffect, useState, useContext } from "react";
 import { DataContext } from "../GameContext";
 import LeaveGameButton from "../components/LeaveGameButton";
 import { Face, Letters, vibrate } from "../signal";
+import { t, tn } from '../i18n';
+import { localizeDeathMessage } from '../i18n/deathMessages';
 
 // The votes are in: the screen holds on yellow, then floods red if an intruder was caught
 // or drains to dark if the crew threw out one of their own.
@@ -47,23 +49,23 @@ export default function MeetingResultPage({ tutorialMode = false, tutorialHighli
     if (meetingState?.reason === "veto") {
       return (
         <>
-          <h1 className="sg-big sg-h1 sg-a sg-slam">Meeting Vetoed</h1>
-          <p className="sg-lede sg-a sg-rise" style={{ animationDelay: '250ms' }}>The crew decided to skip the vote</p>
+          <h1 className="sg-big sg-h1 sg-a sg-slam">{t('Meeting Vetoed')}</h1>
+          <p className="sg-lede sg-a sg-rise" style={{ animationDelay: '250ms' }}>{t('The crew decided to skip the vote')}</p>
         </>
       );
     }
     if (!meetingState?.voted_out) {
       return (
         <>
-          <h1 className="sg-big sg-h1 sg-a sg-slam">No one was ejected</h1>
-          <p className="sg-lede sg-a sg-rise" style={{ animationDelay: '250ms' }}>No Consensus</p>
-          <p className="sg-small sg-a sg-rise" style={{ animationDelay: '350ms' }}>No one got enough votes. The intruders are still out there.</p>
+          <h1 className="sg-big sg-h1 sg-a sg-slam">{t('No one was ejected')}</h1>
+          <p className="sg-lede sg-a sg-rise" style={{ animationDelay: '250ms' }}>{t('No Consensus')}</p>
+          <p className="sg-small sg-a sg-rise" style={{ animationDelay: '350ms' }}>{t('No one got enough votes. The intruders are still out there.')}</p>
         </>
       );
     }
     return (
       <>
-        <p className="sg-lede">{revealed ? 'Ejected' : 'The votes are in'}</p>
+        <p className="sg-lede">{revealed ? t('Ejected') : t('The votes are in')}</p>
         <div style={{ height: 150, display: 'grid', placeItems: 'center' }}>
           <Face
             player={votedOutPlayer}
@@ -73,11 +75,11 @@ export default function MeetingResultPage({ tutorialMode = false, tutorialHighli
           />
         </div>
         <h1 className="sg-big sg-h2">{votedOutPlayer?.username}</h1>
-        <p className="sg-lede">was ejected</p>
+        <p className="sg-lede">{t('was ejected')}</p>
         <p className="sg-big sg-h3" style={{ minHeight: '2.2em', maxWidth: '13ch', lineHeight: 1.05, letterSpacing: '-0.02em' }}>
           {revealed && (
             <Letters
-              text={wasIntruder ? 'They were an intruder.' : 'They were not an intruder.'}
+              text={wasIntruder ? t('They were an intruder.') : t('They were not an intruder.')}
               delay={wasIntruder ? 500 : 900}
               step={wasIntruder ? 30 : 55}
             />
@@ -86,13 +88,13 @@ export default function MeetingResultPage({ tutorialMode = false, tutorialHighli
         {phase === 'complete' && wasIntruder && (
           <p className="sg-lede sg-a sg-fade">
             {intrudersHidden
-              ? 'Intruders are still among you'
-              : intrudersLeft === 0 ? 'No intruders left' : `${intrudersLeft} ${intrudersLeft === 1 ? 'intruder' : 'intruders'} left`}
+              ? t('Intruders are still among you')
+              : intrudersLeft === 0 ? t('No intruders left') : tn(intrudersLeft, '{count} intruder left', '{count} intruders left')}
           </p>
         )}
         {phase === 'complete' && votedOutPlayer?.death_message && (
           <p className="sg-small sg-a sg-fade" style={{ maxWidth: '28ch', fontStyle: 'italic' }}>
-            "{votedOutPlayer.death_message}"
+            "{localizeDeathMessage(votedOutPlayer.death_message)}"
           </p>
         )}
       </>
@@ -149,7 +151,7 @@ export default function MeetingResultPage({ tutorialMode = false, tutorialHighli
             onClick={() => setMeetingState(undefined)}
             style={onDark ? { background: '#fff', color: wasIntruder ? 'var(--sg-out)' : 'var(--sg-dark)' } : { background: 'var(--sg-ink)', color: 'var(--sg-meet)' }}
           >
-            Continue
+            {t('Continue')}
           </button>
         </div>
       </div>

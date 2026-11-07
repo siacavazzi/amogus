@@ -3,6 +3,7 @@ import { DataContext } from "../GameContext";
 import { X, Volume2 } from "../signal/icons";
 import { RoleReveal, RevealedMoment, TauntToast } from "../signal/Moments";
 import "../signal/signal.css";
+import { t } from '../i18n';
 
 // Pop-ups during the game. Shared moments (role reveal, intruders revealed) take the whole
 // screen; a taunt drops in as a card; everything else is a plain white sheet.
@@ -88,12 +89,12 @@ const Modal = () => {
           style={{ background: '#fff', color: 'var(--sg-ink)', borderRadius: 26, padding: '22px 20px 18px', position: 'relative' }}
         >
           <h2 id="modal-title" className="sg-big" style={{ fontSize: 30, paddingRight: 36, lineHeight: 1 }}>
-            {dialog?.title || "Notification"}
+            {dialog?.title ? t(dialog.title) : t('Notification')}
           </h2>
           {!isAudioModal && (
             <button
               onClick={() => setOpen(false)}
-              aria-label="Close"
+              aria-label={t('Close')}
               className="absolute"
               style={{ right: 14, top: 14, width: 36, height: 36, borderRadius: 18, background: '#eceae4', display: 'grid', placeItems: 'center' }}
             >
@@ -103,7 +104,7 @@ const Modal = () => {
 
           <div id="modal-description" style={{ fontWeight: 500, fontSize: 17, lineHeight: 1.4, marginTop: 12 }}>
             {typeof dialog?.body === "string" ? (
-              <p>{dialog.body}</p>
+              <p>{t(dialog.body)}</p>
             ) : (
               dialog?.body || null
             )}
@@ -113,11 +114,11 @@ const Modal = () => {
             {isAudioModal ? (
               <button className="sg-btn" style={{ background: 'var(--sg-round)', color: '#fff' }} onClick={() => closeModal()}>
                 <Volume2 size={20} />
-                Enable Audio
+                {t('Enable Audio')}
               </button>
             ) : (
               <button className="sg-btn" style={{ background: 'var(--sg-ink)', color: '#fff' }} onClick={() => closeModal()}>
-                Got it
+                {t('Got it')}
               </button>
             )}
           </div>

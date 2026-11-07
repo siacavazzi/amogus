@@ -760,6 +760,13 @@ def handle_client_metric(data=None):
                      screen=clean_label(data.get('screen'), 60), where=clean_label(data.get('where'), 80),
                      client_version=clean_label(data.get('client_version'), 40),
                      unhandled_rejection=data.get('unhandled_rejection') is True)
+    elif kind == 'page_translated':
+        # A browser translator rewrote this phone's page; later events from it carry the language.
+        lang = clean_label(data.get('lang'), 12, r'[A-Za-z-]+') or 'unknown'
+        conflicts = data.get('dom_conflicts')
+        client_metrics_by_sid.setdefault(request.sid, {})['translated_to'] = lang
+        record_usage('page_translated', game, lang=lang,
+                     dom_conflicts=min(conflicts, 10000) if type(conflicts) is int and conflicts >= 0 else None)
 
 
 # ============ CONNECTION HANDLING ============
@@ -776,6 +783,14 @@ def handle_connect(auth=None):
         **client_info.describe(request.headers.get('User-Agent', '')),
         'utc_offset_minutes': offset if type(offset) is int and -840 <= offset <= 840 else None,
     }
+    translated_to = clean_label(auth.get('translated_to'), 12, r'[A-Za-z-]+') if isinstance(auth, dict) else None
+    if translated_to:
+        client_metrics_by_sid[request.sid]['translated_to'] = translated_to
+    # The phone's browser language and the language the game chose ("en" when we have no translation).
+    for key in ('device_lang', 'game_lang'):
+        lang = clean_label(auth.get(key), 12, r'[A-Za-z-]+') if isinstance(auth, dict) else None
+        if lang:
+            client_metrics_by_sid[request.sid][key] = lang
     last_drop = clean_last_drop(auth.get('last_drop') if isinstance(auth, dict) else None)
     if last_drop:
         last_drop_by_sid[request.sid] = last_drop
@@ -1772,7 +1787,7 @@ def handle_get_my_task_lists(data):
         return
     
     lists = task_list_manager.get_player_task_lists(player_id)
-    starter_template = task_list_manager.get_default_task_list_template()
+    starter_template = task_list_manager.get_default_task_list_template(data.get('lang'))
     emit('my_task_lists', {'lists': lists, 'starter_template': starter_template})
 
 
@@ -1829,7 +1844,7 @@ def handle_create_task_list(data):
         return
     
     if from_default:
-        code = task_list_manager.import_from_default(player_id, name)
+        code = task_list_manager.import_from_default(player_id, name, data.get('lang'))
     else:
         # Validate locations before creating
         if not locations or len(locations) < 2:
@@ -2090,7 +2105,7 @@ def handle_add_example_tasks(data):
         return command_error('Only the host can add the example list.', game, player, reason='not_host')
     if game.game_running:
         return command_error('Cannot change tasks while the game is running.', game, player, reason='round_running')
-    tasks, example_locations = task_list_manager.example_tasks()
+    tasks, example_locations = task_list_manager.example_tasks(data.get('lang'))
     if not tasks:
         return command_error('The example list is missing.', game, player, reason='no_example_list')
 
@@ -2108,7 +2123,7 @@ def handle_add_example_tasks(data):
     game.task_list_applied = True
     if not had:
         game.collaborative_task_list_code = None
-        game.collaborative_task_list_name = task_list_manager.get_default_task_list_template()['name']
+        game.collaborative_task_list_name = task_list_manager.get_default_task_list_template(data.get('lang'))['name']
     from assets.card import CardDeck
     game.card_deck = CardDeck(game.locations, game.socket, game)
     record_usage('example_tasks_added', game, player.player_id if player else None,

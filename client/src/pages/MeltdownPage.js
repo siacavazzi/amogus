@@ -3,6 +3,7 @@ import { DataContext } from "../GameContext";
 import { AlertTriangle, Check, Radiation } from "../signal/icons";
 import { markMeltdownAverted } from "../components/MeltdownAverted";
 import "../signal/reactor.css";
+import { t, tn } from '../i18n';
 
 function ReactorMeltdown() {
     const {
@@ -196,13 +197,13 @@ function ReactorMeltdown() {
                 <div className={`sg-rx__slab${slabTone}`}>
                     <p className="sg-rx__alert">
                         <Radiation size={24} />
-                        <span>MELTDOWN IN PROGRESS</span>
+                        <span>{t('MELTDOWN IN PROGRESS')}</span>
                     </p>
 
-                    <h1 className="sg-rx__melt-title">CORE MELTDOWN</h1>
+                    <h1 className="sg-rx__melt-title">{t('CORE MELTDOWN')}</h1>
 
                     {/* Timer */}
-                    <p className={`sg-rx__timer${hot ? " sg-rx__timer--hot" : ""}`} aria-label={`${meltdownTimer} seconds until meltdown`}>
+                    <p className={`sg-rx__timer${hot ? " sg-rx__timer--hot" : ""}`} aria-label={t('{seconds} seconds until meltdown', { seconds: meltdownTimer })}>
                         <span key={hot ? meltdownTimer : "calm"} className={hot ? "sg-tick" : ""} style={{ display: "inline-block" }}>
                             {meltdownTimer}<small>s</small>
                         </span>
@@ -210,14 +211,14 @@ function ReactorMeltdown() {
                     {hot ? (
                         <p className="sg-rx__msg">
                             <AlertTriangle size={30} />
-                            <span>CRITICAL - MELTDOWN IMMINENT!</span>
+                            <span>{t('CRITICAL - MELTDOWN IMMINENT!')}</span>
                         </p>
                     ) : (
-                        <p className="sg-rx__lede">until meltdown</p>
+                        <p className="sg-rx__lede">{t('until meltdown')}</p>
                     )}
 
                     {/* PIN Entry Section */}
-                    <p className="sg-rx__lede" style={{ marginTop: 6 }}>Enter shutdown code</p>
+                    <p className="sg-rx__lede" style={{ marginTop: 6 }}>{t('Enter shutdown code')}</p>
                     <div className={`sg-rx__pins${codesNeededChanged ? " sg-tick" : ""}`}>
                         {pin.map((digit, index) => (
                             <input
@@ -228,7 +229,7 @@ function ReactorMeltdown() {
                                 inputMode="numeric"
                                 maxLength="1"
                                 value={digit}
-                                aria-label={`Code digit ${index + 1}`}
+                                aria-label={t('Code digit {number}', { number: index + 1 })}
                                 onChange={(e) => handleInputChange(e, index)}
                                 onClick={() => handleInputClick(index)}
                                 onKeyDown={(e) => handleKeyDown(e, index)}
@@ -241,7 +242,7 @@ function ReactorMeltdown() {
                     {isIncorrect && (
                         <p className="sg-rx__msg">
                             <AlertTriangle size={26} />
-                            <span>Incorrect code. Cooldown active...</span>
+                            <span>{t('Incorrect code. Cooldown active...')}</span>
                         </p>
                     )}
 
@@ -249,7 +250,7 @@ function ReactorMeltdown() {
                     {codesNeeded !== undefined && codesNeeded > 0 && (
                         <div className="sg-rx__codes">
                             <p key={codesNeeded} className="sg-rx__codes-text sg-a sg-pop">
-                                {codesNeeded} More Code{codesNeeded !== 1 ? 's' : ''} Needed!
+                                {tn(codesNeeded, '{count} More Code Needed!', '{count} More Codes Needed!')}
                             </p>
                             {totalCodesNeeded > 1 && (
                                 <span className="sg-rx__pips" aria-hidden="true">
@@ -265,7 +266,7 @@ function ReactorMeltdown() {
                     {isAllCodesEntered && (
                         <p className="sg-rx__msg">
                             <Check size={30} strokeWidth={4} />
-                            <span>All Codes Entered!</span>
+                            <span>{t('All Codes Entered!')}</span>
                         </p>
                     )}
                 </div>

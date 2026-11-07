@@ -1,8 +1,10 @@
+import { tk } from '../i18n';
+
 export const SOCKET_COMMAND_TIMEOUT_MS = 5000;
 
 export function emitVolatileWithAck(socket, eventName, payload, timeoutMs = SOCKET_COMMAND_TIMEOUT_MS) {
     if (!socket?.connected) {
-        return Promise.reject(new Error('Socket is disconnected.'));
+        return Promise.reject(new Error(tk('Socket is disconnected.')));
     }
 
     const volatileSocket = socket.volatile || socket;
@@ -13,7 +15,7 @@ export function emitVolatileWithAck(socket, eventName, payload, timeoutMs = SOCK
     return new Promise((resolve, reject) => {
         let timer;
         if (typeof volatileSocket.timeout !== 'function') {
-            timer = setTimeout(() => reject(new Error('Socket command timed out.')), timeoutMs);
+            timer = setTimeout(() => reject(new Error(tk('Socket command timed out.'))), timeoutMs);
         }
 
         try {

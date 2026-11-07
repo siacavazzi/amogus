@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { DataContext } from '../GameContext';
+import { t, tn } from '../i18n';
 
 // A big room never gets every phone to slide ready. After a short wait the host
 // (and only the host) can open voting without the stragglers. Everyone else is
@@ -43,7 +44,7 @@ const HostStartVoting = ({ dark = false }) => {
     if (secondsLeft > 0 || !hostName) return null;
     return (
       <p data-testid="host-can-start-voting" className="sg-small" style={{ maxWidth: '28ch' }}>
-        Stuck? {hostName} is the host and can start the vote.
+        {t('Stuck? {hostName} is the host and can start the vote.', { hostName })}
       </p>
     );
   }
@@ -68,10 +69,10 @@ const HostStartVoting = ({ dark = false }) => {
   };
 
   const waiting = secondsLeft > 0;
-  let label = 'Start voting now';
-  if (waiting) label = `Start voting in ${secondsLeft}s`;
-  else if (sent) label = 'Starting the vote...';
-  else if (confirming) label = `Tap again to vote without ${waitingOn}`;
+  let label = t('Start voting now');
+  if (waiting) label = t('Start voting in {seconds}s', { seconds: secondsLeft });
+  else if (sent) label = t('Starting the vote...');
+  else if (confirming) label = tn(waitingOn, 'Tap again to vote without {count} player', 'Tap again to vote without {count} players');
 
   return (
     <div className="w-full max-w-sm" style={{ display: 'grid', gap: 6, justifyItems: 'center' }}>
@@ -86,7 +87,7 @@ const HostStartVoting = ({ dark = false }) => {
         {label}
       </button>
       <span className="sg-small" style={{ opacity: 0.75 }}>
-        Host only. Starts the vote even if some people haven't slid to ready.
+        {t('Host only. Starts the vote even if some people haven\'t slid to ready.')}
       </span>
     </div>
   );

@@ -18,6 +18,7 @@ import {
 import { markTutorialCompleted } from '../../tutorial/tutorialStorage';
 import '../../signal/signal.css';
 import '../../signal/host.css';
+import { t, applyDocumentLanguage } from '../../i18n';
 
 function clonePlayers(players) {
   return players.map((player) => ({ ...player }));
@@ -48,7 +49,7 @@ function TutorialCoach({ title, body, step, modal = false, safeBottom = 12, chil
   const exitLink = (
     <a href={returnTo} className="hs-coach__exit">
       <ArrowLeft size={14} />
-      <span>Exit</span>
+      <span>{t('Exit')}</span>
     </a>
   );
 
@@ -98,12 +99,13 @@ function StatusBullet({ done, children }) {
   return (
     <div className={`hs-bullet ${done ? 'hs-bullet--done' : ''}`}>
       {done ? <CheckCircle2 size={16} /> : null}
-      <span>{done ? 'Done' : 'Next'}: {children}</span>
+      <span>{done ? t('Done') : t('Next')}: {children}</span>
     </div>
   );
 }
 
 function TutorialPage() {
+  useEffect(() => { applyDocumentLanguage(); }, []);
   const [phase, setPhase] = useState('intro');
   const [players, setPlayers] = useState(() => clonePlayers(crewTutorialPlayers));
   const [meetingState, setMeetingStateState] = useState(undefined);
@@ -209,7 +211,7 @@ function TutorialPage() {
   const me = useMemo(() => (
     players.find((player) => player.player_id === TUTORIAL_PLAYER_ID) || {
       player_id: TUTORIAL_PLAYER_ID,
-      username: 'You',
+      username: t('You'),
       alive: true,
       ready: false,
       sus: isIntruderSurface,
@@ -221,7 +223,7 @@ function TutorialPage() {
     setMeetingStateState({
       stage: 'waiting',
       time_left: 30,
-      player_who_started_it: 'You',
+      player_who_started_it: t('You'),
       voted_out: null,
       reason: null,
     });
@@ -464,7 +466,7 @@ function TutorialPage() {
           }}
           className="sg-btn sg-btn-blue"
         >
-          Start crew training
+          {t('Start crew training')}
         </button>
       );
     }
@@ -476,7 +478,7 @@ function TutorialPage() {
           onClick={() => setPhase('intruderKill')}
           className="sg-btn sg-btn-blue"
         >
-          Start intruder training
+          {t('Start intruder training')}
         </button>
       );
     }
@@ -484,7 +486,7 @@ function TutorialPage() {
     if (phase === 'intruderCooldown') {
       return (
         <div className="hs-bullet" style={{ fontSize: 17 }}>
-          Cooldown remaining: {killCooldown}s
+          {t('Cooldown remaining: {killCooldown}s', { killCooldown })}
         </div>
       );
     }
@@ -492,8 +494,8 @@ function TutorialPage() {
     if (phase === 'intruderCards') {
       return (
         <>
-          <StatusBullet done={cardLessonPhase !== 'swipe'}>Swipe left past the EMP card</StatusBullet>
-          <StatusBullet done={areaDenialDone}>Tap Area Denial to play it</StatusBullet>
+          <StatusBullet done={cardLessonPhase !== 'swipe'}>{t('Swipe left past the EMP card')}</StatusBullet>
+          <StatusBullet done={areaDenialDone}>{t('Tap Area Denial to play it')}</StatusBullet>
         </>
       );
     }
@@ -503,7 +505,7 @@ function TutorialPage() {
         <>
           <div className="hs-bullet hs-bullet--done">
             <CheckCircle2 size={18} />
-            Tutorial completion saved locally
+            {t('Tutorial completion saved locally')}
           </div>
           <button
             type="button"
@@ -515,19 +517,19 @@ function TutorialPage() {
             }}
             className="sg-btn sg-btn-soft"
           >
-            Replay tutorial
+            {t('Replay tutorial')}
           </button>
           <a
             href="/how-to-play"
             className="sg-btn sg-btn-soft"
           >
-            How to Play
+            {t('How to Play')}
           </a>
           <a
             href={returnTo}
             className="sg-btn sg-btn-blue"
           >
-            Play now
+            {t('Play now')}
           </a>
         </>
       );

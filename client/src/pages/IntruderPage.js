@@ -5,6 +5,7 @@ import LeaveGameButton from '../components/LeaveGameButton';
 import { LogOut, Zap, MapPin, AlertTriangle, X, Send, FileText, MessageSquare } from '../signal/icons';
 import CardCarousel from '../components/CardCarousel';
 import { cardName, cardCopy, parseCards } from '../utils/cardCopy';
+import { t } from '../i18n';
 
 // ActionCard component defined OUTSIDE to prevent re-creation on every render
 function ActionCard({ action, text, location, duration, id, time_left, active = false, countdown, requires_input, onPlay }) {
@@ -24,7 +25,7 @@ function ActionCard({ action, text, location, duration, id, time_left, active = 
     <button onClick={() => onPlay(id, requires_input, action)} type="button" className="sg-effect">
       <span className="sg-effect__row">
         <span className="sg-effect__name">{formattedAction}</span>
-        {active && <span className="sg-pill" style={{ background: 'var(--sg-ink)', color: '#fff', padding: '2px 10px' }}>Active</span>}
+        {active && <span className="sg-pill" style={{ background: 'var(--sg-ink)', color: '#fff', padding: '2px 10px' }}>{t('Active')}</span>}
         {durationLabel && <span className="sg-effect__time">{durationLabel}</span>}
       </span>
       <span className="sg-effect__text">{cardCopy({ action, text, location, duration }).does || text}</span>
@@ -42,13 +43,13 @@ function CardSheet({ title, icon: Icon, onClose, children, actionLabel, onSend, 
           <h3 className="sg-big sg-sheet__title">
             <Icon size={26} /> {title}
           </h3>
-          <button type="button" className="sg-sheet__close" onClick={onClose} aria-label="Close">
+          <button type="button" className="sg-sheet__close" onClick={onClose} aria-label={t('Close')}>
             <X size={20} />
           </button>
         </div>
         {children}
         <div className="sg-sheet__actions">
-          <button type="button" className="sg-btn sg-btn-soft" style={{ width: 'auto', flex: 'none', padding: '18px 22px' }} onClick={onClose}>Cancel</button>
+          <button type="button" className="sg-btn sg-btn-soft" style={{ width: 'auto', flex: 'none', padding: '18px 22px' }} onClick={onClose}>{t('Cancel')}</button>
           <button type="button" className="sg-btn sg-btn-red" style={{ flex: 1, whiteSpace: 'nowrap' }} onClick={onSend} disabled={!canSend}>
             <Send size={20} /> {actionLabel}
           </button>
@@ -61,14 +62,14 @@ function CardSheet({ title, icon: Icon, onClose, children, actionLabel, onSend, 
 function TargetField({ value, onChange, crewmates }) {
   return (
     <label className="sg-field">
-      Who gets it
+      {t('Who gets it')}
       <select value={value} onChange={(e) => onChange(e.target.value)}>
-        <option value="">Choose a crewmate...</option>
+        <option value="">{t('Choose a crewmate...')}</option>
         {crewmates.map((player) => (
           <option key={player.player_id} value={player.player_id}>{player.username}</option>
         ))}
       </select>
-      {crewmates.length === 0 && <span style={{ color: 'var(--sg-out)' }}>No alive crewmates to target!</span>}
+      {crewmates.length === 0 && <span style={{ color: 'var(--sg-out)' }}>{t('No alive crewmates to target!')}</span>}
     </label>
   );
 }
@@ -190,27 +191,27 @@ const IntruderPage = ({
 
       {showFakeTaskModal && (
         <CardSheet
-          title="Send Fake Task"
+          title={t('Send Fake Task')}
           icon={FileText}
           onClose={() => setShowFakeTaskModal(false)}
-          actionLabel="Send Task"
+          actionLabel={t('Send Task')}
           onSend={sendFakeTask}
           canSend={!!targetPlayerId && !!fakeTaskText.trim()}
         >
           <TargetField value={targetPlayerId} onChange={setTargetPlayerId} crewmates={aliveCrewmates} />
           <label className="sg-field">
-            The fake task
+            {t('The fake task')}
             <textarea
               value={fakeTaskText}
               onChange={(e) => setFakeTaskText(e.target.value)}
-              placeholder="e.g., Go stand in the corner and count to 100..."
+              placeholder={t('e.g., Go stand in the corner and count to 100...')}
               rows={3}
               maxLength={200}
             />
             <small>{fakeTaskText.length}/200</small>
           </label>
           <label className="sg-field">
-            Where
+            {t('Where')}
             <select value={fakeTaskLocation} onChange={(e) => setFakeTaskLocation(e.target.value)}>
               {availableLocations.map((loc) => (
                 <option key={loc} value={loc}>{loc}</option>
@@ -222,20 +223,20 @@ const IntruderPage = ({
 
       {showTauntModal && (
         <CardSheet
-          title="Send Taunt"
+          title={t('Send Taunt')}
           icon={MessageSquare}
           onClose={() => setShowTauntModal(false)}
-          actionLabel="Send Taunt"
+          actionLabel={t('Send Taunt')}
           onSend={sendTaunt}
           canSend={!!targetPlayerId && !!tauntMessage.trim()}
         >
           <TargetField value={targetPlayerId} onChange={setTargetPlayerId} crewmates={aliveCrewmates} />
           <label className="sg-field">
-            Your message
+            {t('Your message')}
             <textarea
               value={tauntMessage}
               onChange={(e) => setTauntMessage(e.target.value)}
-              placeholder="e.g., You walked right past me."
+              placeholder={t('e.g., You walked right past me.')}
               rows={3}
               maxLength={200}
             />
@@ -248,20 +249,20 @@ const IntruderPage = ({
         {isCompromised ? (
           <>
             <p className="sg-pill" style={{ justifySelf: 'start', background: '#fff', color: 'var(--sg-out)' }}>
-              <AlertTriangle size={16} /> Position compromised
+              <AlertTriangle size={16} /> {t('Position compromised')}
             </p>
-            <h1 className="sg-big sg-h1" style={{ margin: '8px 0 0' }}>You've been found out</h1>
-            <p className="sg-lede">Vents are locked. Everyone knows. Take out the rest of the crew.</p>
+            <h1 className="sg-big sg-h1" style={{ margin: '8px 0 0' }}>{t('You\'ve been found out')}</h1>
+            <p className="sg-lede">{t('Vents are locked. Everyone knows. Take out the rest of the crew.')}</p>
           </>
         ) : (
           <>
             <p className="sg-pill" style={{ justifySelf: 'start', background: 'var(--sg-out)', color: '#fff' }}>
-              <span className="sg-vent__dot" /> Vent network active
+              <span className="sg-vent__dot" /> {t('Vent network active')}
             </p>
             <p data-testid="kill-cooldown" className={`sg-vent__kill sg-num ${killCooldown > 0 ? '' : 'sg-vent__kill--ready'}`}>
               {killCooldown > 0
-                ? <>{killCooldown}s <span className="sg-vent__killnote">until your next kill</span></>
-                : 'Kill ready'}
+                ? <>{killCooldown}s <span className="sg-vent__killnote">{t('until your next kill')}</span></>
+                : t('Kill ready')}
             </p>
           </>
         )}
@@ -269,7 +270,7 @@ const IntruderPage = ({
 
       {activeCardsList.length > 0 && (
         <div className="sg-vent__effects">
-          <p className="sg-small" style={{ opacity: 1 }}>Active Effects</p>
+          <p className="sg-small" style={{ opacity: 1 }}>{t('Active Effects')}</p>
           {activeCardsList.map((card) => {
             const { action, text, location, duration, id, time_left, countdown, requires_input } = card;
             return (
@@ -295,8 +296,8 @@ const IntruderPage = ({
         {cards.length === 0 ? (
           <div className="sg-vent__empty">
             <Zap size={40} style={{ justifySelf: 'center', opacity: 0.5 }} />
-            <p className="sg-lede">No cards right now</p>
-            <p className="sg-small">You draw a new card after each meeting.</p>
+            <p className="sg-lede">{t('No cards right now')}</p>
+            <p className="sg-small">{t('You draw a new card after each meeting.')}</p>
           </div>
         ) : (
           <div
@@ -316,7 +317,7 @@ const IntruderPage = ({
       <div className="sg-vent__exit">
         {isCompromised ? (
           <div className="sg-btn sg-btn-ghost" style={{ cursor: 'default' }}>
-            <AlertTriangle size={22} /> <span style={{ textDecoration: 'line-through' }}>Vents locked</span>
+            <AlertTriangle size={22} /> <span style={{ textDecoration: 'line-through' }}>{t('Vents locked')}</span>
           </div>
         ) : (
           <div
@@ -324,7 +325,7 @@ const IntruderPage = ({
             style={highlightExit ? { borderRadius: 22, outline: '4px solid var(--sg-meet)', outlineOffset: '4px' } : {}}
           >
             <button onClick={() => setShowSusPage(false)} type="button" className="sg-btn sg-btn-white" style={{ color: 'var(--sg-ink)' }}>
-              <LogOut size={24} /> Close vent
+              <LogOut size={24} /> {t('Close vent')}
             </button>
           </div>
         )}

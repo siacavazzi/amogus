@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
-import GameplayScreenshots from './GameplayScreenshots';
+import GameplayScreenshots, { GameTour } from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const SETUP_URL = '/among-us-irl-task-generator?venue=house&players=8&movement=normal&style=standard&room=Kitchen&room=Living+Room&room=Hallway';
@@ -33,6 +33,7 @@ export default function TraitorsAtHomePage() {
                     <a href="/play" className="seo-btn--secondary">Play Sus Party free</a>
                 </div>
             </header>
+            <GameTour />
             <main className="seo-content">
                 <section className="seo-section">
                     <h2>The person on a mission might be the intruder</h2>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
-import GameplayScreenshots from './GameplayScreenshots';
+import GameplayScreenshots, { GameTour } from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const SCHEMA = {
@@ -34,6 +34,7 @@ function BirthdayPartyPage() {
                     <a href="#host-plan" className="seo-btn--secondary">Read the host plan</a>
                 </div>
             </header>
+            <GameTour />
             <main className="seo-content">
                 <section className="seo-section">
                     <h2>Check the guest list before you plan the tasks</h2>
@@ -44,10 +45,10 @@ function BirthdayPartyPage() {
                     </p>
                     <p>
                         Choose shared areas such as the living room, dining table, and an open hallway.
-                        Keep one meeting point. A laptop or TV can supply the optional Reactor display, but a phone-only game works too.
+                        Keep one meeting point. A laptop can supply the optional Reactor display, but a phone-only game works too.
                     </p>
                 </section>
-                <GameplayScreenshots screens={['family-lobby', 'crew-task']} />
+                <GameplayScreenshots screens={['family-lobby', 'crew-victory']} />
 
                 <section className="seo-section" id="host-plan">
                     <h2>Prepare the game, then bring out the cake</h2>

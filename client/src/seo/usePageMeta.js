@@ -50,8 +50,9 @@ function setLinkCanonical(href) {
  * @param {string} [opts.ogImage]      - og:image and twitter:image (defaults to base value)
  * @param {object} [opts.schema]       - JSON-LD schema object, injected into <head>
  * @param {string} [opts.documentClass] - CSS class for the page theme
+ * @param {Array<{hreflang: string, href: string}>} [opts.alternates] - the same page in other languages
  */
-export function usePageMeta({ title, description, canonical, ogImage, schema, documentClass = 'lp-document' }) {
+export function usePageMeta({ title, description, canonical, ogImage, schema, documentClass = 'lp-document', alternates }) {
     useEffect(() => {
         const prevTitle = document.title;
         const prevDesc = setMetaByName('description', description);
@@ -75,6 +76,16 @@ export function usePageMeta({ title, description, canonical, ogImage, schema, do
 
         // Replace the snapshot schema when the browser mounts the same page.
         document.querySelectorAll('script#page-schema').forEach(script => script.remove());
+        // Same for the language alternates: the snapshot already carries them.
+        document.querySelectorAll('link[rel="alternate"][hreflang]').forEach(link => link.remove());
+        const alternateLinks = (alternates || []).map(({ hreflang, href }) => {
+            const link = document.createElement('link');
+            link.setAttribute('rel', 'alternate');
+            link.setAttribute('hreflang', hreflang);
+            link.setAttribute('href', href);
+            document.head.appendChild(link);
+            return link;
+        });
         let schemaScript = null;
         if (schema) {
             schemaScript = document.createElement('script');
@@ -98,10 +109,11 @@ export function usePageMeta({ title, description, canonical, ogImage, schema, do
             if (themeMeta && prevTheme) themeMeta.setAttribute('content', prevTheme);
             html.classList.remove(documentClass);
             body.classList.remove(documentClass);
+            alternateLinks.forEach(link => link.remove());
             if (schemaScript && document.head.contains(schemaScript)) {
                 document.head.removeChild(schemaScript);
             }
         };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [title, description, canonical, ogImage, documentClass]);
+    }, [title, description, canonical, ogImage, documentClass, JSON.stringify(alternates || [])]);
 }

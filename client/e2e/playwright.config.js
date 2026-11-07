@@ -59,6 +59,8 @@ module.exports = defineConfig({
     ],
     use: {
         baseURL: process.env.E2E_BASE_URL || 'http://localhost:3000',
+        // Specs read English copy; keep phones English even when the machine running them is not.
+        locale: 'en-US',
         actionTimeout: 15 * 1000,
         screenshot: 'only-on-failure',
         trace: 'retain-on-failure',

@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
-import GameplayScreenshots from './GameplayScreenshots';
+import GameplayScreenshots, { GameTour } from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const CANONICAL = 'https://susparty.com/holiday-party-games-for-adults';
@@ -36,6 +36,7 @@ export default function HolidayPartyPage() {
                     <a href="#host-plan" className="seo-btn--secondary">Read the host plan</a>
                 </div>
             </header>
+            <GameTour />
             <main className="seo-content">
                 <section className="seo-section">
                     <h2>Why a moving-around game suits a holiday party</h2>
@@ -76,7 +77,7 @@ export default function HolidayPartyPage() {
                     </p>
                 </section>
 
-                <GameplayScreenshots screens={['party-lobby', 'meeting-ready']} />
+                <GameplayScreenshots screens={['party-lobby', 'phone-meltdown']} />
 
                 <section className="seo-section" id="host-plan">
                     <h2>Host plan for a holiday game night</h2>
@@ -99,7 +100,7 @@ export default function HolidayPartyPage() {
                         </div></li>
                     </ol>
                     <p>
-                        An old laptop or the TV can show the optional Reactor display, which tracks crew progress for the room. It is a nice touch but not required.
+                        An old laptop can show the optional Reactor display, which tracks crew progress for the room. It is a nice touch but not required.
                     </p>
                 </section>
 

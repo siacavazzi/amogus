@@ -140,6 +140,7 @@ ol.seo-list { list-style: decimal; }
     text-wrap: balance;
 }
 .seo-launch p { color: #fff; font-size: 1.1rem; line-height: 1.55; margin: 0 0 28px; max-width: 46ch; }
+.seo-hero .seo-launch__note { color: var(--site-body); font-size: .9rem; font-weight: 600; margin: 20px 0 0; }
 .seo-launch .seo-launch__note { color: rgba(255, 255, 255, .78); font-size: .9rem; font-weight: 600; margin: 24px 0 0; }
 .site-page .seo-launch .seo-btn--primary { background: #fff; color: var(--sg-round); }
 .site-page .seo-launch .seo-btn--primary:hover { background: #fff; color: var(--sg-round-d); }
@@ -159,6 +160,16 @@ ol.seo-list { list-style: decimal; }
 .seo-gameplay__figure figcaption { color: var(--site-ink); font-size: 1rem; font-weight: 700; line-height: 1.4; margin-top: 14px; }
 .seo-gameplay .seo-gameplay__note { color: var(--site-muted); margin: 14px 0 0; font-size: .85rem; line-height: 1.5; }
 
+/* ---------- round tour: five real phone screens under the headline ---------- */
+.seo-tour { width: calc(100% - 80px); max-width: 1120px; margin: 0 auto; padding: 40px 0 8px; }
+.seo-tour__title { color: var(--site-ink); font-size: 1rem; font-weight: 900; margin: 0 0 18px; }
+.seo-tour__steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 20px; }
+.seo-tour__step { min-width: 0; }
+.seo-tour__step a { display: block; border: 6px solid var(--sg-ink); border-radius: 28px; overflow: hidden; background: #000; }
+.seo-tour__step img { display: block; width: 100%; height: auto; }
+.seo-tour__step p { color: var(--site-ink); font-size: .95rem; font-weight: 700; line-height: 1.35; margin: 12px 0 0; }
+.seo-tour__num { display: inline-block; min-width: 1.5em; color: var(--sg-round); font-weight: 900; }
+
 /* ---------- small helpers ---------- */
 .seo-content button:disabled { opacity: 0.5; cursor: default; }
 .seo-room-picker { border: 0; padding: 0; min-width: 0; }
@@ -176,6 +187,10 @@ ol.seo-list { list-style: decimal; }
     .seo-step__num { font-size: 2.1rem; }
     .seo-table :is(th, td) { padding: 12px 12px 12px 0; }
     .seo-actions > * { flex: 1 1 100%; }
+    .seo-tour { width: 100%; padding: 28px 0 0; }
+    .seo-tour__title { padding: 0 16px; }
+    .seo-tour__steps { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 0 16px 12px; scroll-padding: 0 16px; }
+    .seo-tour__step { flex: 0 0 62%; scroll-snap-align: start; }
     .seo-gameplay__screens { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 12px; }
     .seo-gameplay__figure { flex: 0 0 min(250px, calc(100% - 40px)); scroll-snap-align: start; }
     .seo-gameplay__screens--single .seo-gameplay__figure { flex-basis: min(280px, 100%); }
