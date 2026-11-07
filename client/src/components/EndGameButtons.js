@@ -2,6 +2,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import { DataContext } from '../GameContext';
 import { RotateCcw, LogOut, Check } from '../signal/icons';
 import GameFeedback from './GameFeedback';
+import SaveGameButton from './SaveGameButton';
+import InstallPrompt from './InstallPrompt';
 import { t } from '../i18n';
 
 function EndGameButtons() {
@@ -67,6 +69,8 @@ function EndGameButtons() {
             >
                 {hasVoted ? <><Check size={20} strokeWidth={3} /> {t('Ready!')}</> : <><RotateCcw size={20} strokeWidth={3} /> {t('Play Again')}</>}
             </button>
+            {!isReactor && <SaveGameButton />}
+            {!isReactor && <InstallPrompt />}
             <button onClick={handleLeaveRoom} className="sg-btn" style={{ background: 'transparent', color: 'var(--sg-ink)', minHeight: 48, padding: 10, fontWeight: 700, fontSize: 16 }}>
                 <LogOut size={18} />
                 <span>{t('Leave')}</span>

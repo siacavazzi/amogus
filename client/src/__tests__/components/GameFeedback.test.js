@@ -16,6 +16,9 @@ beforeEach(() => {
 });
 afterEach(() => jest.useRealTimers());
 
+// The end screen asks for a "Save this game" code on its own; these tests are about the feedback prompt.
+const promptEmits = socket => socket.emit.mock.calls.filter(([event]) => event !== 'save_game_link');
+
 function resultScreen(overrides = {}) {
     return renderWithContext(<EndGameButtons />, { endState: 'victory', isMobile: true, ...overrides });
 }
@@ -39,7 +42,7 @@ test('waits three seconds before it shows the three choices and X', () => {
     for (const name of ['Give feedback', 'Maybe later', "Don't ask again", 'Dismiss feedback']) {
         expect(screen.getByRole('button', { name })).toBeEnabled();
     }
-    expect(contextValue.socket.emit).not.toHaveBeenCalled();
+    expect(promptEmits(contextValue.socket)).toEqual([]);
 });
 
 test.each([['Play Again', 'reset'], ['Leave', 'leave_room']])('%s acts immediately and cancels the delayed popup', (button, event) => {
@@ -58,7 +61,7 @@ test.each(['Maybe later', 'Dismiss feedback'])('%s dismisses only the current ga
         expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
         act(() => jest.advanceTimersByTime(5000));
         expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-        expect(result.contextValue.socket.emit).not.toHaveBeenCalled();
+        expect(promptEmits(result.contextValue.socket)).toEqual([]);
         result.unmount();
     }
 });
@@ -80,7 +83,7 @@ test('Escape works like Maybe later without a reset or departure', () => {
     const { contextValue } = showPrompt();
     fireEvent(screen.getByRole('dialog'), new Event('cancel', { bubbles: false, cancelable: true }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    expect(contextValue.socket.emit).not.toHaveBeenCalled();
+    expect(promptEmits(contextValue.socket)).toEqual([]);
 });
 
 test('sends a rating and comment and waits for acceptance before it closes', async () => {

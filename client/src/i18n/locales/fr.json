@@ -803,5 +803,16 @@
   "{count} player voting": {
     "one": "{count} joueur vote",
     "other": "{count} joueurs votent"
-  }
+  },
+  "Save this game": "Garder cette partie",
+  "Link copied": "Lien copié",
+  "Send yourself the link to host it later with these tasks": "Envoie-toi le lien pour l’organiser plus tard avec ces tâches",
+  "Send yourself the link to play again later": "Envoie-toi le lien pour rejouer plus tard",
+  "Our Sus Party game. Open it to host it again with the same tasks.": "Notre partie de Sus Party. Ouvre-la pour l’organiser à nouveau avec les mêmes tâches.",
+  "Sus Party: the real-life social deduction game": "Sus Party : le jeu de déduction sociale en vrai",
+  "Keep Sus Party on your home screen": "Garde Sus Party sur ton écran d’accueil",
+  "Tap the Share button, then \"Add to Home Screen\", so your next game is one tap away.": "Touche le bouton Partager, puis « Sur l’écran d’accueil » : ta prochaine partie sera à un geste.",
+  "Your next game is one tap away.": "Ta prochaine partie à un geste.",
+  "Add to Home Screen": "Ajouter à l’écran d’accueil",
+  "Saved game ready. Create a new game to host it with the same tasks.": "Partie gardée prête. Touche « Créer une partie » pour l’organiser avec les mêmes tâches."
 }
