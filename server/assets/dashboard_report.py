@@ -26,7 +26,7 @@ _EVENTS = (
     'room_entered', 'join_rejected', 'round_started', 'round_ended', 'round_interrupted',
     'room_closed', 'client_error', 'socket_error', 'page_translated',
 )
-_WANTED = re.compile(r'"event":"(' + '|'.join(_EVENTS) + r')"')
+_WANTED = re.compile(r'"event": ?"(' + '|'.join(_EVENTS) + r')"')
 
 IN_APP_BROWSERS = {'facebook_app', 'instagram', 'snapchat_app', 'tiktok_app', 'google_app', 'line_app'}
 
