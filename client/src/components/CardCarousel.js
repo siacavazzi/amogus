@@ -31,6 +31,7 @@ import {
     Radiation, ClipboardX, Megaphone, Volume2, Ban, RefreshCw, FastForward,
     Skull, MessageSquare,
 } from '../signal/icons';
+import { t } from '../i18n';
 
 const SWIPE_THRESHOLD_RATIO = 0.15; // fraction of width before commit
 const FLICK_VELOCITY = 0.3;          // px/ms over the last moments of the drag
@@ -144,7 +145,7 @@ function CarouselCard({
                 <>
                     <div className="sg-card__fill" style={{ height: `${Math.min(100, playProgress * 100)}%` }} />
                     <div className="sg-card__pending" role="status" aria-live="polite">
-                        Playing… tap to cancel
+                        {t('Playing… tap to cancel')}
                     </div>
                 </>
             )}
@@ -390,7 +391,7 @@ export default function CardCarousel({ cards, onPlayCard, compact = false, onAct
                 same info. */}
             {!compact && (
                 <div className="flex items-center justify-between mb-2 px-1" style={{ fontWeight: 800 }}>
-                    <span>Your cards</span>
+                    <span>{t('Your cards')}</span>
                     <span className="sg-num">{activeIndex + 1} / {cards.length}</span>
                 </div>
             )}
@@ -433,7 +434,7 @@ export default function CardCarousel({ cards, onPlayCard, compact = false, onAct
                             key={card.id || i}
                             type="button"
                             onClick={() => settleTo(i)}
-                            aria-label={`Go to card ${i + 1}`}
+                            aria-label={t('Go to card {number}', { number: i + 1 })}
                             className={`h-2 rounded-full transition-all ${i === activeIndex ? 'w-7' : 'w-2'}`}
                             style={{ background: i === activeIndex ? activeTheme.bg : 'rgba(255,255,255,0.3)' }}
                         />
@@ -444,7 +445,7 @@ export default function CardCarousel({ cards, onPlayCard, compact = false, onAct
             {!compact && (
                 <p className="text-center mt-2 flex items-center justify-center gap-1.5" style={{ fontWeight: 700, fontSize: 14, opacity: 0.7 }}>
                     <Hand size={16} />
-                    {cards.length > 1 ? 'Swipe to browse · Tap a card to play it' : 'Tap the card to play it'}
+                    {cards.length > 1 ? t('Swipe to browse · Tap a card to play it') : t('Tap the card to play it')}
                 </p>
             )}
         </div>

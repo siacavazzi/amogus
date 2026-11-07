@@ -35,9 +35,12 @@ import YouthGroupsPage from './pages/seo/YouthGroupsPage';
 import PrintableTaskCardsPage from './pages/seo/PrintableTaskCardsPage';
 import HolidayPartyPage from './pages/seo/HolidayPartyPage';
 import NotFoundPage from './pages/info/NotFoundPage';
+import TranslatedPage from './pages/seo/translated/TranslatedPage';
+import { matchTranslatedPath } from './seo/translatedPages';
 import { getRoomCodeFromSearch } from './utils/inviteLinks';
 import { captureAcquisition, noteVisit } from './seo/discovery';
 import { usePageMeta } from './seo/usePageMeta';
+import { applyDocumentLanguage } from './i18n';
 
 const StylePreview = lazy(() => import('./preview/StylePreview'));
 
@@ -179,6 +182,9 @@ function getRoute() {
   if (normalizedPath === '/' || normalizedPath === '/index.html') {
     return 'landing';
   }
+  if (matchTranslatedPath(normalizedPath)) {
+    return 'translated';
+  }
 
   return 'not-found';
 }
@@ -190,6 +196,7 @@ function GamePage() {
     canonical: 'https://susparty.com/play',
     documentClass: 'game-document',
   });
+  useEffect(() => { applyDocumentLanguage(); }, []);
   return <GameContext><PageController /></GameContext>;
 }
 
@@ -245,6 +252,10 @@ function App() {
     return <VersionPage />;
   }
 
+  if (route === 'translated') {
+    const { lang, page } = matchTranslatedPath(window.location.pathname.replace(/\/+$/, ''));
+    return <TranslatedPage lang={lang} page={page} />;
+  }
   if (route === 'social-deduction-games') return <SocialDeductionPage />;
   if (route === 'birthday-party') return <BirthdayPartyPage />;
   if (route === 'group-games') return <GroupGamesPage />;

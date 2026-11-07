@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
-import GameplayScreenshots from './GameplayScreenshots';
+import GameplayScreenshots, { GameTour } from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const SETUP_URL = '/among-us-irl-task-generator?venue=apartment&players=8&movement=normal&style=mix';
@@ -35,6 +35,7 @@ function GameNightPage() {
                     <a href={SETUP_URL} className="seo-btn--secondary">Prepare your game night</a>
                 </div>
             </header>
+            <GameTour />
             <main className="seo-content">
                 <section className="seo-section">
                     <h2>A game like Mafia or Werewolf without a dedicated moderator</h2>
@@ -49,7 +50,7 @@ function GameNightPage() {
                         gives the group something to question when it is time to vote.
                     </p>
                 </section>
-                <GameplayScreenshots screens={['crew-task', 'vote']} />
+                <GameplayScreenshots screens={['reactor-lobby', 'reactor-meeting']} />
 
                 <section className="seo-section">
                     <h2>Set up the spaces before friends arrive</h2>

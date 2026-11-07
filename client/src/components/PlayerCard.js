@@ -3,6 +3,8 @@ import { ENDPOINT } from "../ENDPOINT";
 import { DataContext } from '../GameContext';
 import Avatar, { getAvatar } from './Avatar';
 import { Skull, Vote, Radiation, DoorOpen, UserX, Shield } from '../signal/icons';
+import { t } from '../i18n';
+import { localizeDeathMessage } from '../i18n/deathMessages';
 
 function getSelfieUrl(filename, access) {
   if (!filename || !access?.sid || !access?.token) return null;
@@ -105,7 +107,7 @@ export const ProfilePicture = ({
         <img
           src={selfieUrl}
           referrerPolicy="no-referrer"
-          alt="Player"
+          alt={t('Player')}
           className={`${sizeClasses} rounded-full object-cover ${isDead ? 'grayscale opacity-70' : ''}`}
           onError={onSelfieError}
         />
@@ -148,18 +150,18 @@ export const PlayerCardCompact = ({
       />
       <div className="flex-1 min-w-0 text-left">
         <div className="flex items-center gap-2">
-          <span className="truncate" style={{ fontWeight: 900, fontSize: 17 }}>
+          <span className="truncate" style={{ fontWeight: 900, fontSize: 17 }} translate="no">
             {player.username}
           </span>
           {player.sus && (
             <span style={{ fontSize: 11, fontWeight: 900, padding: '2px 8px', borderRadius: 999, background: '#fff', color: 'var(--sg-out)' }}>
-              Intruder
+              {t('Intruder')}
             </span>
           )}
         </div>
         {showDeathInfo && player.death_message && (
           <p className="break-words whitespace-normal" style={{ fontWeight: 500, fontSize: 14, opacity: 0.85, marginTop: 2 }}>
-            {player.death_message}
+            {localizeDeathMessage(player.death_message)}
           </p>
         )}
       </div>
@@ -181,11 +183,11 @@ export const PlayerBadge = ({
         isDead={!player.alive}
         deathCause={player.death_cause}
       />
-      <span style={{ fontWeight: 700, fontSize: 15 }}>
+      <span style={{ fontWeight: 700, fontSize: 15 }} translate="no">
         {player.username}
       </span>
       {player.sus && variant !== "intruder" && (
-        <span style={{ fontSize: 11, fontWeight: 900, padding: '1px 7px', borderRadius: 999, background: '#fff', color: 'var(--sg-out)' }}>Intruder</span>
+        <span style={{ fontSize: 11, fontWeight: 900, padding: '1px 7px', borderRadius: 999, background: '#fff', color: 'var(--sg-out)' }}>{t('Intruder')}</span>
       )}
     </div>
   );
@@ -272,7 +274,7 @@ const PlayerCard = ({
         {isDead && DeathIcon && (
           <div className={`absolute top-2.5 left-1/2 -translate-x-1/2 flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider ${deathInfo.bg} ${deathInfo.border} border ${deathInfo.color} backdrop-blur-sm`}>
             <DeathIcon size={9} />
-            <span>Eliminated</span>
+            <span>{t('Eliminated')}</span>
           </div>
         )}
 
@@ -301,13 +303,13 @@ const PlayerCard = ({
           }}
         />
 
-        <p className="text-sm font-bold text-white truncate leading-tight text-center">
+        <p className="text-sm font-bold text-white truncate leading-tight text-center" translate="no">
           {player.username}
-          {isMe && <span className="text-indigo-400 font-normal text-xs"> · me</span>}
+          {isMe && <span className="text-indigo-400 font-normal text-xs"> {t('· me')}</span>}
         </p>
 
         <p className={`text-[10px] font-semibold tracking-widest uppercase text-center ${isDead ? 'text-red-400' : 'text-green-400'}`}>
-          {isDead ? '● ELIMINATED' : '● ACTIVE'}
+          {isDead ? t('● ELIMINATED') : t('● ACTIVE')}
         </p>
       </div>
     </div>

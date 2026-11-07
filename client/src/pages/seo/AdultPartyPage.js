@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
-import GameplayScreenshots from './GameplayScreenshots';
+import GameplayScreenshots, { GameTour } from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const SETUP_URL = '/among-us-irl-task-generator?venue=house&players=8&movement=normal&style=mix';
@@ -35,6 +35,7 @@ function AdultPartyPage() {
                     <a href={SETUP_URL} className="seo-btn--secondary">Prepare the party tasks</a>
                 </div>
             </header>
+            <GameTour />
             <main className="seo-content">
                 <section className="seo-section">
                     <h2>Give everyone a reason to leave the couch</h2>
@@ -49,7 +50,7 @@ function AdultPartyPage() {
                         when every intruder gets voted out.
                     </p>
                 </section>
-                <GameplayScreenshots screens={['crew-task', 'intruder-objective']} />
+                <GameplayScreenshots screens={['role-intruder', 'phone-meltdown']} />
 
                 <section className="seo-section">
                     <h2>Use the home you already have</h2>
@@ -61,7 +62,7 @@ function AdultPartyPage() {
                     <p>
                         Carry your pack into a new game and import it in host setup. Friends join with the
                         four-letter room code. Everyone needs a phone browser and internet, with no account
-                        or app download. You can host and play from your phone; a laptop for the big screen is optional.
+                        or app download. You can host and play from your phone; a laptop is optional.
                     </p>
                 </section>
                 <GameSetupCta title="Let your most convincing friend be suspicious"

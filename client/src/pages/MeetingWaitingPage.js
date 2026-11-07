@@ -6,6 +6,7 @@ import HostStartVoting from '../components/HostStartVoting';
 import { readyNeeded } from '../utils/meetingQuorum';
 import { Check, Skull } from '../signal/icons';
 import { Face, Words, takeOrigin, vibrate } from '../signal';
+import { t } from '../i18n';
 
 // Every phone floods yellow at once: the meeting is the loudest moment in the game.
 const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = null }) => {
@@ -74,19 +75,19 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
 
       <div className="sg-shake sg-center" style={{ animationDelay: '700ms', gap: 16, paddingTop: 12 }}>
         <h1 className="sg-big sg-h1">
-          <Words text="EMERGENCY" delay={420} />
+          <Words text={t('EMERGENCY')} delay={420} />
           <br />
-          <Words text="MEETING" delay={560} />
+          <Words text={t('MEETING')} delay={560} />
         </h1>
 
         {caller && !tasksDone ? (
           <Face player={caller} size={104} className="sg-a sg-pop" style={{ animationDelay: '820ms' }} />
         ) : null}
         <p className="sg-lede sg-a sg-rise" style={{ animationDelay: '1000ms' }}>
-          {tasksDone ? 'Every task is done. The intruders are revealed.' : `${meetingState?.player_who_started_it} called it`}
+          {tasksDone ? t('Every task is done. The intruders are revealed.') : t('{name} called it', { name: meetingState?.player_who_started_it })}
         </p>
         <p className="sg-small sg-a sg-rise" style={{ animationDelay: '1090ms' }}>
-          Go to the meeting spot, then slide ready
+          {t('Go to the meeting spot, then slide ready')}
         </p>
 
         {/* Roll call: everyone alive, filling in as they get there */}
@@ -107,11 +108,11 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
                     </span>
                   )}
                 </div>
-                <span style={{ fontWeight: 700, fontSize: 13, maxWidth: 64, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', opacity: ready ? 1 : 0.6 }}>
+                <span style={{ fontWeight: 700, fontSize: 13, maxWidth: 64, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', opacity: ready ? 1 : 0.6 }} translate="no">
                   {player.username}
                 </span>
                 {player.active === false && (
-                  <span style={{ fontWeight: 700, fontSize: 11, opacity: 0.6 }}>Offline</span>
+                  <span style={{ fontWeight: 700, fontSize: 11, opacity: 0.6 }}>{t('Offline')}</span>
                 )}
               </div>
             );
@@ -119,13 +120,13 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
         </div>
 
         <p data-testid="ready-count" className="sg-lede sg-num" style={{ marginTop: 4 }}>
-          {allReady ? 'Everyone is here. Voting opens.' : `${readyCount} of ${totalAlive} ready`}
+          {allReady ? t('Everyone is here. Voting opens.') : t('{ready} of {total} ready', { ready: readyCount, total: totalAlive })}
         </p>
         {!allReady && needed < totalAlive && (
-          <p data-testid="ready-needed" className="sg-small">Voting opens at {needed} ready</p>
+          <p data-testid="ready-needed" className="sg-small">{t('Voting opens at {needed} ready', { needed })}</p>
         )}
 
-        {meReady && <p className="sg-small">You're ready</p>}
+        {meReady && <p className="sg-small">{t('You\'re ready')}</p>}
 
         {!tutorialMode && <HostStartVoting />}
       </div>
@@ -135,14 +136,14 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
       <div data-testid="meeting-dock" className="sg-meet-dock">
         <button type="button" data-testid="im-dead" className="sg-btn sg-btn-line sg-dead-btn" onClick={handleImDead}>
           <Skull size={24} />
-          I've Been Killed
+          {t('I\'ve Been Killed')}
         </button>
         {!playerState.ready && (
           <div
             className={highlightReadySlider ? 'animate-pulse' : ''}
             style={highlightReadySlider ? { borderRadius: 999, outline: '4px solid var(--sg-ink)', outlineOffset: -8 } : {}}
           >
-            <MUECustomSlider text="Slide when you're there" tone="meet" onSuccess={handleReadyUp} disabled={!connected} />
+            <MUECustomSlider text={t('Slide when you\'re there')} tone="meet" onSuccess={handleReadyUp} disabled={!connected} />
           </div>
         )}
       </div>

@@ -10,6 +10,7 @@ import {
     MessageSquare,
     Send
 } from '../signal/icons';
+import { t } from '../i18n';
 
 const StatItem = ({ icon: Icon, label, value }) => (
     <div className="flex items-center gap-3" style={{ padding: '9px 0' }}>
@@ -33,43 +34,43 @@ const GameStats = ({ showFakeTasks = true }) => {
     return (
         <div className="sg w-full max-w-md mx-auto text-left">
             <h3 className="sg-big" style={{ fontSize: 26, marginBottom: 12 }}>
-                Game Stats
+                {t('Game Stats')}
             </h3>
             <div style={{ background: 'rgba(0,0,0,0.18)', borderRadius: 20, padding: '8px 16px 12px', color: '#fff' }}>
                 <div>
                     <StatItem 
                         icon={CheckCircle} 
-                        label="Tasks Completed" 
+                        label={t('Tasks Completed')} 
                         value={gameStats.tasks_completed || 0}
                     />
                     <StatItem 
                         icon={Users} 
-                        label="Meetings Called" 
+                        label={t('Meetings Called')} 
                         value={gameStats.meetings_called || 0}
                     />
                     <StatItem 
                         icon={Vote} 
-                        label="Players Voted Out" 
+                        label={t('Players Voted Out')} 
                         value={gameStats.players_voted_out || 0}
                     />
                     <StatItem 
                         icon={Zap} 
-                        label="Cards Played" 
+                        label={t('Cards Played')} 
                         value={gameStats.cards_played || 0}
                     />
                     <StatItem 
                         icon={Radiation} 
-                        label="Meltdowns Triggered" 
+                        label={t('Meltdowns Triggered')} 
                         value={gameStats.meltdowns_triggered || 0}
                     />
                     <StatItem 
                         icon={Send} 
-                        label="Fake Tasks Sent" 
+                        label={t('Fake Tasks Sent')} 
                         value={fakeTasksSent.length}
                     />
                     <StatItem 
                         icon={MessageSquare} 
-                        label="Taunts Sent" 
+                        label={t('Taunts Sent')} 
                         value={tauntsSent.length}
                     />
                 </div>
@@ -80,7 +81,7 @@ const GameStats = ({ showFakeTasks = true }) => {
                         <div className="flex items-center gap-2 mb-3">
                             <Send size={18} className="" />
                             <span style={{ fontWeight: 700 }}>
-                                Fake Tasks Sent ({fakeTasksSent.length})
+                                {t('Fake Tasks Sent ({count})', { count: fakeTasksSent.length })}
                             </span>
                         </div>
                         <div className="space-y-2 max-h-40 overflow-y-auto">
@@ -90,10 +91,10 @@ const GameStats = ({ showFakeTasks = true }) => {
                                     className="rounded-xl p-2.5" style={{ background: 'rgba(255,255,255,0.12)' }}
                                 >
                                     <div className="text-sm  font-medium">
-                                        {fakeTask.sender_name} to {fakeTask.target_name}
+                                        {t('{sender_name} to {target_name}', { sender_name: fakeTask.sender_name, target_name: fakeTask.target_name })}
                                     </div>
                                     <div className="text-xs  truncate">
-                                        "{fakeTask.task_text}" at {fakeTask.task_location || 'Unknown'}
+                                        {t('"{task}" at {location}', { task: fakeTask.task_text, location: fakeTask.task_location || t('Unknown') })}
                                     </div>
                                 </div>
                             ))}
@@ -107,7 +108,7 @@ const GameStats = ({ showFakeTasks = true }) => {
                         <div className="flex items-center gap-2 mb-3">
                             <AlertTriangle size={18} className="" />
                             <span style={{ fontWeight: 700 }}>
-                                Fake Tasks Completed ({fakeTasksCompleted.length})
+                                {t('Fake Tasks Completed ({count})', { count: fakeTasksCompleted.length })}
                             </span>
                         </div>
                         <div className="space-y-2 max-h-40 overflow-y-auto">
@@ -134,7 +135,7 @@ const GameStats = ({ showFakeTasks = true }) => {
                         <div className="flex items-center gap-2 mb-3">
                             <MessageSquare size={18} className="" />
                             <span style={{ fontWeight: 700 }}>
-                                Taunts Sent ({tauntsSent.length})
+                                {t('Taunts Sent ({count})', { count: tauntsSent.length })}
                             </span>
                         </div>
                         <div className="space-y-2 max-h-40 overflow-y-auto">
@@ -144,7 +145,7 @@ const GameStats = ({ showFakeTasks = true }) => {
                                     className="rounded-xl p-2.5" style={{ background: 'rgba(255,255,255,0.12)' }}
                                 >
                                     <div className="text-sm  font-medium">
-                                        {taunt.sender_name} to {taunt.target_name}
+                                        {t('{sender_name} to {target_name}', { sender_name: taunt.sender_name, target_name: taunt.target_name })}
                                     </div>
                                     <div className="text-xs  truncate">
                                         "{taunt.message}"

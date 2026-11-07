@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Beforeunload } from 'react-beforeunload';
 import { ChevronRight, Check } from "../signal/icons";
+import { t, tk } from '../i18n';
 
 // Dimensions and styling constants
 const SLIDER_HEIGHT = '4.5rem';
@@ -12,7 +13,7 @@ const SUCCESS_THRESHOLD = 0.85; // 85% threshold
 const MUECustomSlider = ({
   onSuccess,
   onReset,
-  text = "Slide to unlock",
+  text = tk("Slide to unlock"),
   sus = false,
   tone = "round",
   backgroundColor = "transparent",
@@ -261,7 +262,7 @@ const MUECustomSlider = ({
             aria-valuemin={0}
             aria-valuemax={containerWidth.current}
             aria-valuenow={sliderPos}
-            aria-label="Slide to unlock"
+            aria-label={t('Slide to unlock')}
             className={`absolute flex items-center justify-center ${isDisabled ? 'cursor-not-allowed' : 'cursor-grab active:cursor-grabbing'} focus:outline-none z-10`}
             style={{
               top: '50%',
@@ -290,7 +291,7 @@ const MUECustomSlider = ({
             className="absolute inset-0 flex items-center justify-center pointer-events-none"
             style={{ opacity: Math.max(0, 1 - (progressPercent / 60)), paddingLeft: SLIDER_HANDLE_SIZE }}
           >
-            <span style={{ fontWeight: 700, fontSize: 17 }}>{text}</span>
+            <span style={{ fontWeight: 700, fontSize: 17 }}>{t(text)}</span>
           </div>
         </div>
         </div>

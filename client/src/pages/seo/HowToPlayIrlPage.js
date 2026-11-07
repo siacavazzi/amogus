@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
-import GameplayScreenshots from './GameplayScreenshots';
+import GameplayScreenshots, { GameTour } from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 
 const SCHEMA = {
@@ -68,7 +68,7 @@ function HowToPlayIrlPage() {
         description:
             'Learn how to play Among Us in real life with Sus Party: prepare tasks, create a room, invite friends, run meetings, and follow the app’s vote and win rules.',
         canonical: 'https://susparty.com/how-to-play-among-us-irl',
-        ogImage: 'https://susparty.com/og-image.jpg',
+        ogImage: 'https://susparty.com/og-image.jpg?v=2',
         schema: SCHEMA,
     });
 
@@ -96,6 +96,8 @@ function HowToPlayIrlPage() {
                     </a>
                 </div>
             </div>
+
+            <GameTour />
 
             <div className="seo-content">
                 <section className="seo-section" id="before-play">
@@ -179,7 +181,7 @@ function HowToPlayIrlPage() {
                     </p>
                 </section>
 
-                <GameplayScreenshots screens={['crew-task', 'intruder-objective']} />
+                <GameplayScreenshots screens={['role-crew', 'role-intruder']} />
 
                 <section className="seo-section" id="sample-round">
                     <p className="seo-section__kicker">Sample round</p>

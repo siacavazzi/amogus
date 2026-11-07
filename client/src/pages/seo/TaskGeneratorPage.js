@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { ArrowRight, Check, ChevronDown, Copy, DoorOpen, Home, MapPin, Pencil, Plus, Printer, RefreshCw, Share2, Shuffle, Sofa, Utensils, X } from '../../signal/icons';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
-import { MAX_PLAYERS, VENUE_ROOMS, generateTasks, taskStyleValue } from './taskPools';
+import { MAX_PLAYERS, TASK_LANGUAGES, VENUE_ROOMS, generateTasks, taskStyleValue } from './taskPools';
+import { LANGUAGES, getLanguage } from '../../i18n';
 import { saveGameDraft } from './gameDraft';
 import { CLEANUP_ROOMS } from './cleanupTasks';
 import './TaskGeneratorPage.css';
@@ -20,6 +21,8 @@ function initialSetup() {
         playerCount: Math.max(3, Math.min(MAX_PLAYERS, Math.floor(Number(params.get('players')) || (preset === 'cleanup' ? 4 : 8)))),
         taskStyle: preset === 'cleanup' ? 0 : taskStyleValue(params.get('style') ?? 50),
         selectedRooms: requestedRooms.length >= 2 ? requestedRooms : preset === 'cleanup' ? CLEANUP_ROOMS : defaultRooms(venue),
+        // Tasks come in the phone's language unless the link asks for one.
+        taskLanguage: TASK_LANGUAGES.includes(params.get('task_lang')) ? params.get('task_lang') : getLanguage(),
     };
     return { options, pack: generateTasks({ ...options, random: () => 0.42 }) };
 }
@@ -79,7 +82,8 @@ export default function TaskGeneratorPage() {
                 playerCount: value === 'cleanup' ? 4 : 8,
                 selectedRooms: value === 'cleanup' ? CLEANUP_ROOMS : defaultRooms('apartment'),
             });
-            return { options: next, pack: rebuildPack(next, key === 'preset' ? [] : previous.pack.tasks) };
+            // A new language renames every location, so earlier edits have nowhere to go.
+            return { options: next, pack: rebuildPack(next, key === 'preset' || key === 'taskLanguage' ? [] : previous.pack.tasks) };
         });
     };
     const toggleRoom = room => update('selectedRooms', options.selectedRooms.includes(room)
@@ -130,6 +134,7 @@ export default function TaskGeneratorPage() {
         url.searchParams.set('venue', options.venue);
         url.searchParams.set('players', options.playerCount);
         url.searchParams.set('style', options.taskStyle);
+        if (options.taskLanguage !== 'en') url.searchParams.set('task_lang', options.taskLanguage);
         url.searchParams.set('utm_source', 'shared-link');
         options.selectedRooms.forEach(room => url.searchParams.append('room', room));
         copy(url.href, 'Setup link copied. Task edits stay in this browser.');
@@ -167,6 +172,9 @@ export default function TaskGeneratorPage() {
                             <label htmlFor="gen-players">Players</label>
                             <div className="task-builder__players"><span>3</span><input id="gen-players" type="range" min="3" max={MAX_PLAYERS} step="1" value={options.playerCount} onChange={event => update('playerCount', Number(event.target.value))} style={{ '--range-fill': `${(options.playerCount - 3) / (MAX_PLAYERS - 3) * 100}%` }} /><span>{MAX_PLAYERS}</span><output htmlFor="gen-players">{options.playerCount}</output></div>
                         </div>
+                        <fieldset className="task-builder__field"><legend>Task language</legend>
+                            <div className="task-builder__venues">{LANGUAGES.filter(({ code }) => TASK_LANGUAGES.includes(code)).map(({ code, name }) => <button key={code} type="button" lang={code} className="task-builder__choice" aria-pressed={options.taskLanguage === code} onClick={() => update('taskLanguage', code)}>{name}</button>)}</div>
+                        </fieldset>
                         {!isCleanup && <div className="task-builder__field">
                             <label htmlFor="gen-style">Task style <span className="task-builder__current-style">{styleText}</span></label>
                             <input id="gen-style" type="range" min="0" max="100" step="5" value={options.taskStyle} aria-valuetext={styleText} onChange={event => update('taskStyle', Number(event.target.value))} style={{ '--range-fill': `${options.taskStyle}%` }} />

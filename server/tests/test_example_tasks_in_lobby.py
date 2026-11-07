@@ -41,3 +41,36 @@ class ExampleTasksInLobbyTests(SocketGameTestCase):
         result = clients[0].emit('add_example_tasks', {'room_code': room, 'player_id': ids[0]}, callback=True)
         self.assertFalse(result['ok'])
         self.assertEqual(before, game.collaborative_tasks)
+
+    def test_a_french_phone_gets_the_french_example_list(self):
+        clients, room, ids, game = self.setup_lobby(5)
+        clients[0].emit('add_example_tasks', {'room_code': room, 'player_id': ids[0], 'lang': 'fr'})
+        self.assertIn('Cuisine', game.locations)
+        self.assertEqual("Ouvre le frigo et trouve le truc le plus vieux à l'intérieur", game.collaborative_tasks[0]['task'])
+        self.assertEqual('Other', game.locations[-1])
+
+    def test_a_language_without_a_list_gets_english(self):
+        clients, room, ids, game = self.setup_lobby(5)
+        clients[0].emit('add_example_tasks', {'room_code': room, 'player_id': ids[0], 'lang': 'ja'})
+        self.assertIn('Kitchen', game.locations)
+
+
+class TranslatedExampleListTests(SocketGameTestCase):
+    def test_every_translation_matches_the_english_list(self):
+        import json
+        from pathlib import Path
+        from server.assets.task_list_manager import STARTER_LANGUAGES, TaskListManager
+        root = Path(__file__).resolve().parents[1]
+        english = json.loads((root / 'tasks.json').read_text())
+        for lang in STARTER_LANGUAGES:
+            tasks = json.loads((root / f'tasks.{lang}.json').read_text(encoding='utf-8'))
+            self.assertEqual(len(english), len(tasks), lang)
+            self.assertEqual(len(tasks), len({task['task'] for task in tasks}), lang)
+            # "Other" is a key the game treats specially, so it stays in English.
+            self.assertEqual([t['location'] == 'Other' for t in english], [t['location'] == 'Other' for t in tasks], lang)
+            self.assertEqual(4, len({task['location'] for task in tasks}), lang)
+        import tempfile
+        with tempfile.TemporaryDirectory() as storage:
+            template = TaskListManager(storage).get_default_task_list_template('ro-RO')
+        self.assertEqual('Listă de exemplu', template['name'])
+        self.assertEqual('starter_house', template['template_key'])

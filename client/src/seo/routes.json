@@ -229,5 +229,75 @@
     "priority": "0.5",
     "changefreq": "yearly",
     "prerender": true
+  },
+  {
+    "path": "/fr",
+    "canonical": "https://susparty.com/fr",
+    "priority": "0.8",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
+    "path": "/es",
+    "canonical": "https://susparty.com/es",
+    "priority": "0.8",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
+    "path": "/de",
+    "canonical": "https://susparty.com/de",
+    "priority": "0.8",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
+    "path": "/ro",
+    "canonical": "https://susparty.com/ro",
+    "priority": "0.8",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
+    "path": "/pt",
+    "canonical": "https://susparty.com/pt",
+    "priority": "0.8",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
+    "path": "/fr/among-us-irl",
+    "canonical": "https://susparty.com/fr/among-us-irl",
+    "priority": "0.75",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
+    "path": "/es/among-us-irl",
+    "canonical": "https://susparty.com/es/among-us-irl",
+    "priority": "0.75",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
+    "path": "/de/among-us-irl",
+    "canonical": "https://susparty.com/de/among-us-irl",
+    "priority": "0.75",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
+    "path": "/ro/among-us-irl",
+    "canonical": "https://susparty.com/ro/among-us-irl",
+    "priority": "0.75",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
+    "path": "/pt/among-us-irl",
+    "canonical": "https://susparty.com/pt/among-us-irl",
+    "priority": "0.75",
+    "changefreq": "monthly",
+    "prerender": true
   }
 ]

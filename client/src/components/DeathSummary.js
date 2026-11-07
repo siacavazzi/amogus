@@ -1,8 +1,9 @@
 import React, { useContext } from 'react';
 import { DataContext } from '../GameContext';
 import { PlayerCardCompact, PlayerBadge } from './PlayerCard';
+import { t, tk } from '../i18n';
 
-const DeathSummary = ({ title = "Fallen Players", showSurvivors = false, theme = "default" }) => {
+const DeathSummary = ({ title = tk('Fallen Players'), showSurvivors = false, theme = "default" }) => {
     const { players } = useContext(DataContext);
 
     const deadPlayers = players.filter(p => !p.alive && p.death_message);
@@ -17,7 +18,7 @@ const DeathSummary = ({ title = "Fallen Players", showSurvivors = false, theme =
             {/* Dead Players */}
             {deadPlayers.length > 0 && (
                 <div className="mb-6">
-                    <h3 className="sg-big" style={{ fontSize: 26, marginBottom: 12 }}>{title}</h3>
+                    <h3 className="sg-big" style={{ fontSize: 26, marginBottom: 12 }}>{t(title)}</h3>
                     <div className="space-y-2">
                         {deadPlayers.map((player) => (
                             <PlayerCardCompact 
@@ -34,7 +35,7 @@ const DeathSummary = ({ title = "Fallen Players", showSurvivors = false, theme =
             {/* Survivors */}
             {showSurvivors && survivors.length > 0 && (
                 <div>
-                    <h3 className="sg-big" style={{ fontSize: 26, marginBottom: 12 }}>Survivors</h3>
+                    <h3 className="sg-big" style={{ fontSize: 26, marginBottom: 12 }}>{t('Survivors')}</h3>
                     <div className="flex flex-wrap gap-2">
                         {survivors.map((player) => (
                             <PlayerBadge 

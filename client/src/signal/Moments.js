@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { DataContext } from '../GameContext';
 import { Face, vibrate } from './index';
 import { listCardNames } from '../utils/cardCopy';
+import { t } from '../i18n';
 
 // Role reveal. Both roles see the same blue screen and hold the card to peek; letting go
 // hides it again, so nobody reads a role over a shoulder. Intruders also see which cards
@@ -20,7 +21,7 @@ export function RoleReveal({ title, sus, otherIntruders = [], cards = [], onClos
     <div className="sg-screen sg-round sg-a sg-fade" style={{ zIndex: 60 }}>
       <div className="sg-center" style={{ gap: 18 }}>
         <p className="sg-lede" style={{ opacity: 0.85 }} id="modal-title">{title}</p>
-        <p className="sg-big sg-h1 sg-a sg-rise">Your role</p>
+        <p className="sg-big sg-h1 sg-a sg-rise">{t('Your role')}</p>
         <button
           type="button"
           onPointerDown={show}
@@ -47,7 +48,7 @@ export function RoleReveal({ title, sus, otherIntruders = [], cards = [], onClos
             cursor: 'pointer',
           }}
         >
-          Hold to see it
+          {t('Hold to see it')}
           {peeking && (
             <span
               style={{
@@ -64,27 +65,27 @@ export function RoleReveal({ title, sus, otherIntruders = [], cards = [], onClos
                 animation: 'sg-pop .22s ease-out both',
               }}
             >
-              <span className="sg-big" style={{ fontSize: 40 }}>{sus ? 'Intruder' : 'Crewmate'}</span>
+              <span className="sg-big" style={{ fontSize: 40 }}>{sus ? t('Intruder') : t('Crewmate')}</span>
               <span style={{ fontWeight: 700, fontSize: 14, opacity: 0.75, padding: '0 14px' }}>
                 {sus
                   ? otherIntruders.length
-                    ? `With ${otherIntruders.map((p) => p.username).join(', ')}`
-                    : 'Get them before they finish their tasks'
-                  : 'Finish your tasks. Find the intruders.'}
+                    ? t('With {names}', { names: otherIntruders.map((p) => p.username).join(', ') })
+                    : t('Get them before they finish their tasks')
+                  : t('Finish your tasks. Find the intruders.')}
               </span>
               {sus && cards.length > 0 && (
                 <span data-testid="role-cards" style={{ fontWeight: 700, fontSize: 13, opacity: 0.75, padding: '0 14px', lineHeight: 1.3 }}>
-                  Your cards: {listCardNames(cards)}. Tap ENTER VENT to play them.
+                  {t('Your cards: {cards}. Tap ENTER VENT to play them.', { cards: listCardNames(cards) })}
                 </span>
               )}
             </span>
           )}
         </button>
-        <p className="sg-small" style={{ maxWidth: '26ch' }}>Every player sees this same screen.</p>
+        <p className="sg-small" style={{ maxWidth: '26ch' }}>{t('Every player sees this same screen.')}</p>
       </div>
       <div style={{ width: '100%', maxWidth: 420, margin: '0 auto' }}>
         <button type="button" className="sg-btn sg-btn-white" onClick={onClose} disabled={!seen}>
-          {seen ? 'Got it' : 'Hold the card first'}
+          {seen ? t('Got it') : t('Hold the card first')}
         </button>
       </div>
     </div>
@@ -106,9 +107,9 @@ export function RevealedMoment({ intruderNames = [], onClose }) {
         style={{ position: 'fixed', inset: 0, zIndex: -1, background: 'var(--sg-out)', animation: 'sg-flood .52s cubic-bezier(.7,0,.2,1) both, sg-bright 1.4s ease-in-out .6s 2', '--fx': '50%', '--fy': '50%' }}
       />
       <div className="sg-center" style={{ gap: 16 }}>
-        <p className="sg-lede sg-a sg-rise" style={{ animationDelay: '300ms' }}>Every task is done</p>
+        <p className="sg-lede sg-a sg-rise" style={{ animationDelay: '300ms' }}>{t('Every task is done')}</p>
         <h1 id="modal-title" className="sg-big sg-h2 sg-a sg-slam" style={{ animationDelay: '450ms' }}>
-          {faces.length > 1 ? 'The intruders are' : 'The intruder is'}
+          {faces.length > 1 ? t('The intruders are') : t('The intruder is')}
         </h1>
         <div className="sg-row" style={{ gap: 18 }}>
           {faces.map((p, i) => (
@@ -119,12 +120,12 @@ export function RevealedMoment({ intruderNames = [], onClose }) {
           ))}
         </div>
         <p className="sg-lede sg-a sg-fade" style={{ maxWidth: '24ch', opacity: 0.9, animationDelay: '1400ms' }}>
-          Find them and vote them out before they get you.
+          {t('Find them and vote them out before they get you.')}
         </p>
       </div>
       <div style={{ width: '100%', maxWidth: 420, margin: '0 auto' }}>
         <button type="button" className="sg-btn sg-btn-white sg-a sg-fade" style={{ color: 'var(--sg-out)', animationDelay: '1600ms' }} onClick={onClose}>
-          Got it
+          {t('Got it')}
         </button>
       </div>
     </div>
@@ -135,8 +136,8 @@ export function RevealedMoment({ intruderNames = [], onClose }) {
 export function TauntToast({ message, onClose }) {
   useEffect(() => {
     vibrate(60);
-    const t = setTimeout(onClose, 6000);
-    return () => clearTimeout(t);
+    const timer = setTimeout(onClose, 6000);
+    return () => clearTimeout(timer);
   }, [onClose]);
   return (
     <button
@@ -159,9 +160,9 @@ export function TauntToast({ message, onClose }) {
       }}
     >
       <span className="sg-nudge" style={{ display: 'block', animationDelay: '420ms' }}>
-        <b id="modal-title" style={{ display: 'block', fontSize: 13, opacity: 0.6, fontWeight: 700 }}>Anonymous message</b>
+        <b id="modal-title" style={{ display: 'block', fontSize: 13, opacity: 0.6, fontWeight: 700 }}>{t('Anonymous message')}</b>
         <span style={{ display: 'block', fontWeight: 900, fontSize: 21, lineHeight: 1.15, marginTop: 4 }}>{message}</span>
-        <span style={{ display: 'block', fontSize: 12, opacity: 0.5, fontWeight: 700, marginTop: 8 }}>Tap to dismiss</span>
+        <span style={{ display: 'block', fontSize: 12, opacity: 0.5, fontWeight: 700, marginTop: 8 }}>{t('Tap to dismiss')}</span>
       </span>
     </button>
   );

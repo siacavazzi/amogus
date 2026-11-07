@@ -7,6 +7,7 @@ import LeaveGameButton from "../components/LeaveGameButton";
 import TestModeBar from "../components/TestModeBar";
 import { MapPin } from "../signal/icons";
 import { rememberOrigin } from "../signal";
+import { t, tn } from '../i18n';
 
 // Crewmates and intruders share this blue screen. Only a card lets an intruder call a meeting,
 // so their button opens the vent instead, and they see their objective rather than a task.
@@ -189,7 +190,7 @@ const CrewmemberPage = ({
     setShowAnimation(false);
   };
 
-  const buttonLabel = meetingsOff ? "I WAS ELIMINATED" : sus ? "ENTER VENT" : "CALL MEETING";
+  const buttonLabel = meetingsOff ? t("I WAS ELIMINATED") : sus ? t("ENTER VENT") : t("CALL MEETING");
   const showSlider = !(tasksComplete && !sus);
 
   return (
@@ -207,7 +208,7 @@ const CrewmemberPage = ({
         />
         {meetingsOff && (
           <p data-testid="last-stand-tasks-left" className="sg-lede">
-            Last stand: {lastStandTasksLeft} {lastStandTasksLeft === 1 ? 'task' : 'tasks'} to win
+            {tn(lastStandTasksLeft, 'Last stand: {count} task to win', 'Last stand: {count} tasks to win')}
           </p>
         )}
         <TestModeBar />
@@ -216,38 +217,38 @@ const CrewmemberPage = ({
       <div className="flex-1 flex flex-col justify-center w-full max-w-xl mx-auto" style={{ paddingTop: 28 }}>
         {peekRole ? (
           <div className="sg-a sg-pop" style={{ background: '#fff', color: 'var(--sg-round)', borderRadius: 24, padding: '34px 22px', textAlign: 'center' }}>
-            <p className="sg-small" style={{ opacity: 0.6 }}>Your role</p>
-            <p className="sg-big sg-h2" style={{ marginTop: 8 }}>Crewmate</p>
-            <p className="sg-small" style={{ marginTop: 12, opacity: 0.6 }}>Let go to hide it</p>
+            <p className="sg-small" style={{ opacity: 0.6 }}>{t('Your role')}</p>
+            <p className="sg-big sg-h2" style={{ marginTop: 8 }}>{t('Crewmate')}</p>
+            <p className="sg-small" style={{ marginTop: 12, opacity: 0.6 }}>{t('Let go to hide it')}</p>
           </div>
         ) : tasksComplete && !sus ? (
           <div key="hunt" className="sg-a sg-rise">
-            <p className="sg-small">Every task is done</p>
-            <h3 className="sg-big sg-h2" style={{ margin: '10px 0 18px' }}>Find the intruders</h3>
+            <p className="sg-small">{t('Every task is done')}</p>
+            <h3 className="sg-big sg-h2" style={{ margin: '10px 0 18px' }}>{t('Find the intruders')}</h3>
             {intrudersRevealed?.intruder_names?.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {intrudersRevealed.intruder_names.map((name, i) => (
-                  <span key={i} className="sg-pill" style={{ background: '#fff', color: 'var(--sg-out)', fontSize: 18, padding: '9px 16px' }}>
+                  <span key={i} className="sg-pill" style={{ background: '#fff', color: 'var(--sg-out)', fontSize: 18, padding: '9px 16px' }} translate="no">
                     {name}
                   </span>
                 ))}
               </div>
             )}
-            <p className="sg-lede" style={{ marginTop: 18, opacity: 0.85 }}>Call a meeting and vote them out.</p>
+            <p className="sg-lede" style={{ marginTop: 18, opacity: 0.85 }}>{t('Call a meeting and vote them out.')}</p>
           </div>
         ) : sus ? (
           <div key="objective" className="sg-a sg-drop" style={{ animationDelay: '120ms' }}>
-            <p className="sg-small">Current objective</p>
+            <p className="sg-small">{t('Current objective')}</p>
             <h3 className="sg-big" style={{ fontSize: 'clamp(32px, 10.5vw, 46px)', margin: '12px 0 18px', lineHeight: 1 }}>
-              {killCooldown > 0 ? 'Lie low' : 'Eliminate the crew'}
+              {killCooldown > 0 ? t('Lie low') : t('Eliminate the crew')}
             </h3>
             {killCooldown > 0 && (
-              <span className="sg-pill sg-num" data-testid="crew-kill-cooldown">Next kill in {killCooldown}s</span>
+              <span className="sg-pill sg-num" data-testid="crew-kill-cooldown">{t('Next kill in {killCooldown}s', { killCooldown })}</span>
             )}
           </div>
         ) : task?.task ? (
           <div key={task.assignment_id || task.task} data-testid="current-task" className="sg-a sg-drop" style={{ animationDelay: '120ms' }}>
-            <p className="sg-small">Current task</p>
+            <p className="sg-small">{t('Current task')}</p>
             <h3 className="sg-big" style={{ fontSize: 'clamp(32px, 10.5vw, 46px)', margin: '12px 0 18px', lineHeight: 1 }}>
               {task.task}
             </h3>
@@ -260,8 +261,8 @@ const CrewmemberPage = ({
           </div>
         ) : (
           <div>
-            <p className="sg-small">Current task</p>
-            <h3 className="sg-big sg-h3" style={{ marginTop: 12, opacity: 0.8 }}>Awaiting task assignment…</h3>
+            <p className="sg-small">{t('Current task')}</p>
+            <h3 className="sg-big sg-h3" style={{ marginTop: 12, opacity: 0.8 }}>{t('Awaiting task assignment…')}</h3>
           </div>
         )}
       </div>
@@ -275,12 +276,12 @@ const CrewmemberPage = ({
             <MUECustomSlider
               text={
                 sus
-                  ? killCooldown > 0 ? "Cooldown active" : "Slide to eliminate"
+                  ? killCooldown > 0 ? t('Cooldown active') : t('Slide to eliminate')
                   : taskCompletionPending
-                  ? "Confirming task…"
+                  ? t('Confirming task…')
                   : task?.task
-                  ? "Slide to complete task"
-                  : "No task assigned"
+                  ? t('Slide to complete task')
+                  : t('No task assigned')
               }
               onSuccess={handleCompleteTask}
               disabled={sus ? killCooldown > 0 : !connected || taskCompletionPending || !task}

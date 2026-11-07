@@ -1,6 +1,16 @@
 /** Location-based missions for the task generator. */
 import { CLEANUP_TASKS } from './cleanupTasks';
 import { autoIntruderCount } from '../../utils/intruders';
+import fr from './taskLocales/fr.json';
+import es from './taskLocales/es.json';
+import de from './taskLocales/de.json';
+import ro from './taskLocales/ro.json';
+import pt from './taskLocales/pt.json';
+
+// The same pools in the game's other languages (machine drafts, keyed by the English text).
+// Room names the host typed stay as typed.
+const TASK_LOCALES = { fr, es, de, ro, pt };
+const TASK_LANGUAGES = ['en', ...Object.keys(TASK_LOCALES)];
 
 // Pools follow the task lists hosts write for real games: short, physical jobs that keep a
 // player at the location for 10 to 40 seconds, then reset so the next player can redo them.
@@ -260,7 +270,10 @@ function shuffled(values, random) {
 
 const MAX_PLAYERS = 30;
 
-function generateTasks({ venue = 'apartment', playerCount = 8, taskStyle = 'standard', preset = 'standard', selectedRooms, random = Math.random }) {
+function generateTasks({ venue = 'apartment', playerCount = 8, taskStyle = 'standard', preset = 'standard', selectedRooms, taskLanguage = 'en', random = Math.random }) {
+    const locale = TASK_LOCALES[taskLanguage];
+    const sayTask = task => locale?.tasks[task] || task;
+    const sayRoom = room => locale?.rooms[room] || room;
     const players = Math.max(3, Math.min(MAX_PLAYERS, Math.floor(Number(playerCount) || 8)));
     const rooms = [...new Set((selectedRooms || VENUE_ROOMS[venue] || VENUE_ROOMS.other)
         .filter(room => typeof room === 'string').map(room => room.trim())
@@ -269,21 +282,23 @@ function generateTasks({ venue = 'apartment', playerCount = 8, taskStyle = 'stan
         const entries = preset === 'cleanup'
             ? [...(CLEANUP_TASKS[location] || []), ...CLEANUP_TASKS.any].map(task => ({ task }))
             : [...(TASKS[roomKeys[location]] || []), ...TASKS.any, ...TASKS.funny];
-        const unique = new Map(entries.map(task => [task.task, { ...task, location }]));
-        return [location, shuffled([...unique.values()], random)];
+        const label = sayRoom(location);
+        const unique = new Map(entries.map(task => [task.task, { ...task, task: sayTask(task.task), location: label }]));
+        return [label, shuffled([...unique.values()], random)];
     }));
     if (!rooms.length) return { tasks: [], rooms: [], candidates, sabotages: [], recommendations: {} };
+    const labels = rooms.map(sayRoom);
     const count = Math.max(24, players * 3);
     const playfulCount = preset === 'cleanup' ? 0 : Math.round(count * taskStyleValue(taskStyle) / 100);
     const styles = shuffled(Array.from({ length: count }, (_, index) => index < playfulCount), random);
-    const queues = Object.fromEntries(rooms.map(room => [room, {
+    const queues = Object.fromEntries(labels.map(room => [room, {
         practical: candidates[room].filter(task => !task.funny),
         playful: candidates[room].filter(task => task.funny),
     }]));
     const tasks = [];
     const used = new Set();
     for (let index = 0; index < count; index++) {
-        const room = rooms[index % rooms.length];
+        const room = labels[index % labels.length];
         const preferred = queues[room][styles[index] ? 'playful' : 'practical'];
         // A big group in few rooms can run one style dry. Fall back to the other style.
         const queue = preferred.length ? preferred : queues[room][styles[index] ? 'practical' : 'playful'];
@@ -295,9 +310,9 @@ function generateTasks({ venue = 'apartment', playerCount = 8, taskStyle = 'stan
         }
     }
     return {
-        tasks, rooms, candidates, sabotages: SABOTAGE_IDEAS.other,
+        tasks, rooms: labels, candidates, sabotages: SABOTAGE_IDEAS.other,
         recommendations: { intruderCount: autoIntruderCount(players), meetingSeconds: 90, taskGoalPerCrewmate: preset === 'cleanup' ? 2 : 5 },
     };
 }
 
-export { TASKS, VENUE_ROOMS, SABOTAGE_IDEAS, MAX_PLAYERS, generateTasks };
+export { TASKS, VENUE_ROOMS, SABOTAGE_IDEAS, MAX_PLAYERS, TASK_LOCALES, TASK_LANGUAGES, generateTasks };
