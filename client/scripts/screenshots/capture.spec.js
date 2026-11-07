@@ -11,7 +11,7 @@ const PHONE = { ...h.PHONE, viewport: { width: 430, height: 932 } };
 const REACTOR = { viewport: { width: 1024, height: 768 }, deviceScaleFactor: 2 };
 
 // "Dismiss" in every language, for the sound reminder's close button.
-const DISMISS = new RegExp(`^(${['Dismiss', ...['fr', 'es', 'de', 'ro', 'pt'].map(code => require(`../../src/i18n/locales/${code}.json`).Dismiss)].filter(Boolean).join('|')})$`);
+const DISMISS = new RegExp(`^(${['Dismiss', ...['fr', 'es', 'de', 'ro', 'pt', 'no', 'sv'].map(code => require(`../../src/i18n/locales/${code}.json`).Dismiss)].filter(Boolean).join('|')})$`);
 
 const shot = async (page, name) => {
     // The "Turn off silent mode" reminder covers the top of the screen; a player closes it once.
@@ -29,7 +29,7 @@ const shot = async (page, name) => {
 
 // The five tour screens are also shot in each site language, for the /fr, /es, ... pages.
 // The phone switches language the way the picker does (stored choice, then a reload).
-const LANGS = (process.env.SHOT_LANGS || 'fr,es,de,ro,pt').split(',').filter(Boolean);
+const LANGS = (process.env.SHOT_LANGS || 'fr,es,de,ro,pt,no,sv').split(',').filter(Boolean);
 const setLanguage = async (page, lang) => {
     await page.evaluate(code => localStorage.setItem('sus_language', code), lang);
     await page.reload();

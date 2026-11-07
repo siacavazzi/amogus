@@ -39,12 +39,12 @@ async function main() {
         }
         assert.ok(document.querySelector('#root')?.textContent.trim().length > 40, `${route.path}: missing rendered content`);
         // Translated pages: right <html lang>, and hreflang links that name every language, itself included.
-        const langPrefix = /^\/(fr|es|de|ro|pt)(\/|$)/.exec(route.path)?.[1];
+        const langPrefix = /^\/(fr|es|de|ro|pt|no|sv)(\/|$)/.exec(route.path)?.[1];
         assert.equal(document.documentElement.getAttribute('lang'), langPrefix || 'en', `${route.path}: wrong <html lang>`);
         const alternates = [...document.querySelectorAll('link[rel="alternate"][hreflang]')];
         const translated = langPrefix || route.path === '/' || route.path === '/among-us-irl';
         if (translated) {
-            assert.equal(alternates.length, 7, `${route.path}: expected 6 languages plus x-default in hreflang links`);
+            assert.equal(alternates.length, 9, `${route.path}: expected 8 languages plus x-default in hreflang links`);
             assert.ok(alternates.some(link => link.href === route.canonical), `${route.path}: hreflang links must include the page itself`);
             for (const link of alternates) {
                 assert.ok(routes.some(r => r.canonical === link.href), `${route.path}: hreflang ${link.getAttribute('hreflang')} points at an unknown page`);

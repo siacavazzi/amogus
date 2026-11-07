@@ -6,10 +6,12 @@ import es from './taskLocales/es.json';
 import de from './taskLocales/de.json';
 import ro from './taskLocales/ro.json';
 import pt from './taskLocales/pt.json';
+import no from './taskLocales/no.json';
+import sv from './taskLocales/sv.json';
 
 // The same pools in the game's other languages (machine drafts, keyed by the English text).
 // Room names the host typed stay as typed.
-const TASK_LOCALES = { fr, es, de, ro, pt };
+const TASK_LOCALES = { fr, es, de, ro, pt, no, sv };
 const TASK_LANGUAGES = ['en', ...Object.keys(TASK_LOCALES)];
 
 // Pools follow the task lists hosts write for real games: short, physical jobs that keep a
