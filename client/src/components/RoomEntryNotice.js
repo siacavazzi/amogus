@@ -11,8 +11,36 @@ const TITLES = {
     connection_timeout: tk('No response from the room'),
 };
 
-export default function RoomEntryNotice({ status, onRetry, onChangeCode, busy = false }) {
+function playedOn(seconds) {
+    try {
+        return new Date(seconds * 1000).toLocaleDateString(undefined, { month: 'long', day: 'numeric' });
+    } catch (_) {
+        return '';
+    }
+}
+
+// An invite link to a game that is over. Its own tasks come back when the link carried the game's token.
+function GameEnded({ status, onStartNew, onChangeCode, busy }) {
+    const saved = status.saved_game;
+    return (
+        <section className="hs-entry sg sg-a sg-rise" role="status" aria-live="polite" aria-atomic="true">
+            <h2>{t('This game has ended')}</h2>
+            <p>{saved
+                ? t('It was played on {date}. Start a new game to play it again with the same {count} tasks.', { date: playedOn(saved.played_at), count: saved.task_count })
+                : t('Start a new game, or enter the code for a game that is on now.')}</p>
+            <div className="hs-entry__actions">
+                <button type="button" onClick={onStartNew} disabled={busy} className="sg-btn sg-btn-blue">
+                    {saved ? t('Play it again') : t('Start a new game')}
+                </button>
+                <button type="button" onClick={onChangeCode} disabled={busy} className="sg-link">{t('Enter a code')}</button>
+            </div>
+        </section>
+    );
+}
+
+export default function RoomEntryNotice({ status, onRetry, onChangeCode, onStartNew, busy = false }) {
     if (!status) return null;
+    if (status.code === 'game_ended' && onStartNew) return <GameEnded status={status} onStartNew={onStartNew} onChangeCode={onChangeCode} busy={busy} />;
     // The server holds a phone that came before the host opened the room and joins it on Open.
     const waiting = status.code === 'room_not_open' && status.waiting;
     return (

@@ -4,6 +4,7 @@ import json
 import logging
 from collections import OrderedDict
 from uuid import uuid4
+from assets.game_links import new_link_token
 from assets.player import Player
 from assets.taskHandler import *
 from assets.meltdown import *
@@ -115,6 +116,8 @@ class Game:
         # Secret handed to the creating socket, so a host who reconnects or reloads during
         # setup (before they have a player) can take the room back.
         self.host_token = None
+        # Rides on invite links and QR codes, so an old link finds this game's tasks after the room is gone.
+        self.link_token = new_link_token()
         
         # Reactor (desktop) support - must be set before CardDeck is created
         self.has_reactor = False

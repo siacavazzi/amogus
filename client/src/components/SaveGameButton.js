@@ -2,13 +2,14 @@ import React, { useContext, useEffect, useState } from 'react';
 import { DataContext } from '../GameContext';
 import { Share2, Check } from '../signal/icons';
 import { savedGameUrl, shareLink } from '../utils/savedGame';
+import { rememberLastGame } from '../utils/lastGame';
 import { sendClientMetric } from '../utils/clientMetrics';
 import { t } from '../i18n';
 
 // Most players never host, and the ones who did started from an empty task list. This gives
 // every phone the night's game to keep. The code is fetched up front so the tap can open the
 // share sheet straight away (iOS refuses it after a network wait).
-function SaveGameButton() {
+function SaveGameButton({ onDone }) {
     const { socket, roomCode, roundId } = useContext(DataContext);
     const [code, setCode] = useState(undefined);
     const [result, setResult] = useState(null);
@@ -17,7 +18,10 @@ function SaveGameButton() {
         if (!socket || !roomCode) return;
         let live = true;
         socket.emit('save_game_link', { room_code: roomCode, player_id: localStorage.getItem('player_id') || undefined },
-            (response) => { if (live) setCode(response?.ok ? response.code : null); });
+            (response) => {
+                if (response?.ok && response.code) rememberLastGame({ code: response.code, taskCount: response.task_count });
+                if (live) setCode(response?.ok ? response.code : null);
+            });
         return () => { live = false; };
     }, [socket, roomCode, roundId]);
 
@@ -28,6 +32,7 @@ function SaveGameButton() {
             text: code ? t('Our Sus Party game. Open it to host it again with the same tasks.') : t('Sus Party: the real-life social deduction game'),
         });
         setResult(outcome);
+        if (outcome !== 'failed') onDone?.();
         if (outcome === 'shared' || outcome === 'copied') {
             sendClientMetric(socket, { kind: 'end_screen_action', action: outcome === 'shared' ? 'save_game_shared' : 'save_game_copied' });
         }

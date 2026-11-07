@@ -9,9 +9,10 @@ import { getAcquisition } from '../seo/discovery';
 import RoomEntryNotice from '../components/RoomEntryNotice';
 import { getRoomCodeFromSearch, clearRoomCodeFromUrl } from '../utils/inviteLinks';
 import { readGeneratedSetup, claimGeneratedRoomCreation } from './seo/gameDraft';
-import { rememberSavedGame } from '../utils/savedGame';
+import { rememberSavedGame, keepSavedGame } from '../utils/savedGame';
 import { t } from '../i18n';
 import LanguagePicker from '../components/LanguagePicker';
+import WelcomeBackCard from '../components/WelcomeBackCard';
 
 function LobbyPage() {
     const [inputRoomCode, setInputRoomCode] = useState(getRoomCodeFromSearch);
@@ -116,6 +117,13 @@ function LobbyPage() {
         }, 10000);
     };
 
+    // An old invite link: start a new room, with that game's tasks when the link brought them back.
+    const startFromEndedGame = () => {
+        keepSavedGame(roomEntryStatus?.saved_game?.code);
+        setInputRoomCode('');
+        handleCreateGame();
+    };
+
     const changeCode = () => {
         setRoomEntryStatus(null);
         setError('');
@@ -152,7 +160,7 @@ function LobbyPage() {
                 </div>
 
                 <div className="sg-home__body sg-a sg-rise" style={{ animationDelay: '120ms' }}>
-                    <RoomEntryNotice status={roomEntryStatus} busy={isJoining} onRetry={() => handleJoinGame()} onChangeCode={changeCode} />
+                    <RoomEntryNotice status={roomEntryStatus} busy={isJoining || isCreating} onRetry={() => handleJoinGame()} onChangeCode={changeCode} onStartNew={startFromEndedGame} />
                     {error && (
                         <p className="sg-home__error" role="alert"><AlertTriangle size={18} /> {error}</p>
                     )}
@@ -176,6 +184,7 @@ function LobbyPage() {
                         </button>
                     </form>
 
+                    {!savedGameCode && !generatedSetup && !roomEntryStatus && !getRoomCodeFromSearch() && <WelcomeBackCard style={{ margin: '0 auto' }} />}
                     {savedGameCode && (
                         <p className="sg-small" role="status" style={{ background: '#fff', color: 'var(--sg-ink)', borderRadius: 14, padding: '10px 12px', fontWeight: 700 }}>
                             {t('Saved game ready. Create a new game to host it with the same tasks.')}
@@ -229,7 +238,7 @@ function LobbyPage() {
                     <p className="sg-small" style={{ marginTop: 8 }}>{t('3 to 20+ players · Real-time · Physical Tasks')}</p>
 
                     <div className="sg-rx-lobby__form">
-                        <RoomEntryNotice status={roomEntryStatus} busy={isJoining} onRetry={() => handleJoinGame()} onChangeCode={changeCode} />
+                        <RoomEntryNotice status={roomEntryStatus} busy={isJoining || isCreating} onRetry={() => handleJoinGame()} onChangeCode={changeCode} onStartNew={startFromEndedGame} />
                         {error && (
                             <p className="sg-home__error" role="alert"><AlertTriangle size={18} /> {error}</p>
                         )}

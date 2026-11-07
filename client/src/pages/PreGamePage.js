@@ -442,7 +442,7 @@ function PreGamePage() {
     };
 
     const shareInviteLink = async () => {
-        const inviteUrl = buildRoomInviteUrl(roomCode, window.location.origin, 'share');
+        const inviteUrl = buildRoomInviteUrl(roomCode, window.location.origin, 'share', lobbyState?.link_token);
         if (!inviteUrl) return;
 
         const shareData = {

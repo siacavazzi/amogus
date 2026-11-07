@@ -827,5 +827,16 @@
   "Tap the Share button, then \"Add to Home Screen\", so your next game is one tap away.": "Atinge butonul Partajează, apoi „Adaugă pe ecranul principal”, ca următorul joc să fie la o atingere distanță.",
   "Your next game is one tap away.": "Următorul joc e la o atingere distanță.",
   "Add to Home Screen": "Adaugă pe ecranul de pornire",
-  "Saved game ready. Create a new game to host it with the same tasks.": "Joc salvat, gata. Atinge „Creează un joc nou” ca să-l organizezi cu aceleași sarcini."
+  "Saved game ready. Create a new game to host it with the same tasks.": "Joc salvat, gata. Atinge „Creează un joc nou” ca să-l organizezi cu aceleași sarcini.",
+  "This game has ended": "Acest joc s-a încheiat",
+  "It was played on {date}. Start a new game to play it again with the same {count} tasks.": "A fost jucat pe {date}. Începe un joc nou ca să-l joci din nou cu aceleași {count} sarcini.",
+  "Start a new game, or enter the code for a game that is on now.": "Începe un joc nou sau introdu codul unui joc în desfășurare.",
+  "Play it again": "Joacă-l din nou",
+  "Start a new game": "Începe un joc nou",
+  "Enter a code": "Introdu un cod",
+  "Welcome back": "Bine ai revenit",
+  "Play your game from {date} again, with the same {count} tasks.": "Joacă din nou jocul din {date}, cu aceleași {count} sarcini.",
+  "Play your game from {date} again, with the same tasks.": "Joacă din nou jocul din {date}, cu aceleași sarcini.",
+  "Host it again": "Găzduiește-l din nou",
+  "Not now": "Nu acum"
 }

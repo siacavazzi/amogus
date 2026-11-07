@@ -814,5 +814,16 @@
   "Tap the Share button, then \"Add to Home Screen\", so your next game is one tap away.": "Toque no botão Compartilhar e depois em \"Adicionar à Tela de Início\": sua próxima partida fica a um toque.",
   "Your next game is one tap away.": "Sua próxima partida a um toque.",
   "Add to Home Screen": "Adicionar à tela de início",
-  "Saved game ready. Create a new game to host it with the same tasks.": "Partida salva pronta. Toque em \"Criar partida\" para organizar com as mesmas tarefas."
+  "Saved game ready. Create a new game to host it with the same tasks.": "Partida salva pronta. Toque em \"Criar partida\" para organizar com as mesmas tarefas.",
+  "This game has ended": "Esta partida acabou",
+  "It was played on {date}. Start a new game to play it again with the same {count} tasks.": "Ela foi jogada em {date}. Comece uma nova partida para jogar de novo com as mesmas {count} tarefas.",
+  "Start a new game, or enter the code for a game that is on now.": "Comece uma nova partida ou digite o código de uma partida em andamento.",
+  "Play it again": "Jogar de novo",
+  "Start a new game": "Começar uma nova partida",
+  "Enter a code": "Digitar um código",
+  "Welcome back": "Bem-vindo de volta",
+  "Play your game from {date} again, with the same {count} tasks.": "Jogue de novo sua partida de {date}, com as mesmas {count} tarefas.",
+  "Play your game from {date} again, with the same tasks.": "Jogue de novo sua partida de {date}, com as mesmas tarefas.",
+  "Host it again": "Organizar de novo",
+  "Not now": "Agora não"
 }
