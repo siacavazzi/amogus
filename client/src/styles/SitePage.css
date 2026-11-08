@@ -178,6 +178,9 @@
 .site-footer__langs a { color: rgba(255, 255, 255, .72); text-decoration: none; }
 .site-footer__langs a:hover { color: #fff; text-decoration: underline; }
 .site-footer__langs [aria-current] { color: #fff; }
+.site-footer__contact { margin: 32px 0 0; color: rgba(255, 255, 255, .72); font-size: .9rem; line-height: 1.6; }
+.site-footer__contact a { color: #fff; font-weight: 600; }
+.site-footer__contact + .site-footer__note { margin-top: 8px; }
 .site-footer__note { margin: 32px 0 0; color: rgba(255, 255, 255, .5); font-size: .8rem; line-height: 1.6; max-width: 78ch; }
 
 @media (max-width: 700px) {

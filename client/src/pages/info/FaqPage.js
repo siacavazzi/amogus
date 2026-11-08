@@ -76,6 +76,11 @@ const FAQS = [
         href: '/social-deduction-games', linkLabel: 'Compare social deduction formats',
     },
     {
+        q: 'How do I contact you?',
+        a: 'Email support@susparty.com with questions, bugs, or anything that went wrong in a game.',
+        href: 'mailto:support@susparty.com', linkLabel: 'Email support@susparty.com',
+    },
+    {
         q: 'Is Sus Party affiliated with Innersloth or Among Us?',
         a: 'No. Sus Party is an independent social deduction party game and is not affiliated with, endorsed by, or sponsored by Innersloth or Among Us.',
     },
