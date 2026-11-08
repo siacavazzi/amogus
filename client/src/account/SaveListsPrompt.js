@@ -39,8 +39,8 @@ export default function SaveListsPrompt({ moment, onDismiss }) {
 
     return (
         <div className="sp-acct__card" data-testid="save-lists-prompt">
-            <p className="sp-acct__cardtitle">{t('Keep your lists for good')}</p>
-            <p className="sp-acct__lede">{t('This list is only saved in this browser and can get lost. Sign in to keep your lists on any phone or laptop.')}</p>
+            <p className="sp-acct__cardtitle">{t("Don't lose your lists")}</p>
+            <p className="sp-acct__lede">{t('Lists saved only in this browser can get lost if you switch phones or clear your browser. Sign in to keep them safe.')}</p>
             <SignInForm compact onSignedIn={() => setDone(true)} />
             <button type="button" className="sp-acct__link sp-acct__notnow" onClick={notNow}>{t('Not now')}</button>
         </div>
