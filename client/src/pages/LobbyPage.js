@@ -210,7 +210,7 @@ function LobbyPage() {
         );
     }
 
-    // The reactor (a laptop or TV): the same blue home screen, laid out wide, with a note on
+    // The reactor (a laptop or desktop): the same blue home screen, laid out wide, with a note on
     // what this screen becomes once a room is open.
     return (
         <div className="sg-screen sg-round sg-rx sg-rx-lobby">

@@ -170,7 +170,7 @@
     z-index: 1;
     color: #fff;
 }
-.site-footer__links { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+.site-footer__links { display: grid; grid-template-columns: repeat(5, 1fr); gap: 24px; }
 .site-footer__links > div { display: flex; flex-direction: column; gap: 8px; }
 .site-footer__links a { color: rgba(255, 255, 255, .72); font-size: .9rem; font-weight: 600; text-decoration: none; width: fit-content; }
 .site-footer__links a:hover { color: #fff; text-decoration: underline; }
