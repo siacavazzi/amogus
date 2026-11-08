@@ -1964,6 +1964,9 @@ def handle_duplicate_task_list(data):
         emit('error', {'message': 'Failed to duplicate task list'})
 
 
+TASK_LIST_VIA = ('preset', 'example', 'saved', 'code', 'generator')
+
+
 @socketio.on('apply_task_list_to_game')
 @room_event()
 def handle_apply_task_list_to_game(data):
@@ -1999,6 +2002,9 @@ def handle_apply_task_list_to_game(data):
     game.task_handler.locations = game.locations
     game.task_handler.tasks = [task.copy() for task in task_list['tasks']]
     game.task_list_applied = True  # Mark that a task list was explicitly applied
+    # How the host picked it, for the round stats (see docs/gameplay-metrics.md).
+    picked_via = data.get('picked_via')
+    game.task_list_via = picked_via if picked_via in TASK_LIST_VIA else 'saved'
     
     # Also populate collaborative tasks so they show in the task editor
     game.collaborative_tasks = [dict(task, task_id=str(uuid4())) for task in task_list['tasks']]
