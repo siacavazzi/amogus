@@ -33,7 +33,7 @@ async function openPage(browser, name, { feedbackPrompt = false, ...options } = 
     openContexts.add(context);
     // Runs in every document, including the blank page a new tab starts on, where storage is off.
     await context.addInitScript(() => { try { localStorage.setItem('sus_e2e', '1'); } catch (_) { /* about:blank */ } });
-    // The "How was this game?" prompt covers the result screen after 3 s. Tests that aren't about it
+    // The "How was this game?" prompt covers the result screen after 20 s. Tests that aren't about it
     // start snoozed, the way "Don't ask again" leaves a phone, so their taps on Play Again aren't blocked.
     if (!feedbackPrompt) {
         await context.addInitScript(() => {
