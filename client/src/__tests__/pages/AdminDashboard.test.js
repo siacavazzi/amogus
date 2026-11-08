@@ -71,7 +71,7 @@ describe('AdminDashboard', () => {
     expect(screen.getByRole('region', { name: 'Totals for the period' })).toHaveTextContent(/Rounds played8▲/);
     expect(screen.getByText(/\+4 vs previous 7 days/)).toBeInTheDocument();
     expect(screen.getByText('35% of phones played inside an app\'s browser.')).toBeInTheDocument();
-    expect(screen.getByText(/needs the anonymous device ID/)).toBeInTheDocument();
+    expect(screen.getByText(/needs a lasting device ID, which is on hold/)).toBeInTheDocument();
     expect(screen.getByText('YTXE')).toBeInTheDocument();
     expect(screen.getByText('Loved it')).toBeInTheDocument();
 

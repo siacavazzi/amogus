@@ -369,7 +369,7 @@ function Devices({ report, w }) {
   if (!report.devices_since) {
     return (
       <Card title="New and returning players">
-        <p className="adm-muted">This needs the anonymous device ID, which isn't logged yet. Once it ships, this shows how many phones are new each week and how many came back.</p>
+        <p className="adm-muted">Not measured. Telling a returning phone from a new one needs a lasting device ID, which is on hold. This panel fills in if one is ever logged.</p>
       </Card>
     );
   }
@@ -480,7 +480,7 @@ function Report({ report, feedback }) {
           />
           <p className="adm-note">
             A session is one group's rounds with no gap over 2 hours.
-            {report.devices_since ? ' Rooms that share 2+ phones count as one session, since groups often make a new room instead of replaying.' : ' Until device IDs are logged, a room started within 30 minutes of another room\'s last round, by a host on the same clock with the same main language, counts as the same session. That is an estimate.'}
+            {report.devices_since ? ' Rooms that share 2+ phones count as one session, since groups often make a new room instead of replaying.' : ' Without device IDs, a room started within 30 minutes of another room\'s last round, by a host on the same clock with the same main language, counts as the same session. That is an estimate.'}
           </p>
         </Card>
 
