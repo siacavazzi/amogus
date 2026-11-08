@@ -8865,3 +8865,8 @@
 2026-10-31 19:01:34,910 - app_logger - dev-5f91f39 - INFO -  * Running with HTTP at: http://192.0.2.2:5001
 2026-10-31 19:01:34,910 - app_logger - dev-5f91f39 - INFO -  * For HTTPS, generate certificates with:
 2026-10-31 19:01:34,910 - app_logger - dev-5f91f39 - INFO -    openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365
+2026-11-08 01:11:39,419 - app_logger - dev-8506800 - INFO - Starting Sus Party prod server version dev-8506800 (commit 8506800, built None)
+2026-11-08 01:11:39,623 - app_logger - dev-8506800 - INFO - Starting server...
+2026-11-08 01:11:39,624 - app_logger - dev-8506800 - INFO -  * Running with HTTP at: http://192.0.2.2:5001
+2026-11-08 01:11:39,624 - app_logger - dev-8506800 - INFO -  * For HTTPS, generate certificates with:
+2026-11-08 01:11:39,624 - app_logger - dev-8506800 - INFO -    openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365

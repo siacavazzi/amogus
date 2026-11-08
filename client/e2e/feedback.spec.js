@@ -1,4 +1,4 @@
-// "How was this game?": a few seconds after the result screen, every phone (never the big screen)
+// "How was this game?": 20 seconds after the result screen (2 s after Save), every phone (never the big screen)
 // asks for optional feedback, and what a player sends is saved.
 const { test, expect } = require('@playwright/test');
 const h = require('./helpers');
@@ -16,7 +16,7 @@ test('after a game each phone asks for feedback, sends it, and can say not now',
 
     const [sender, later, snoozer, leaver] = phones;
     for (const phone of phones) {
-        await expect(phone.getByRole('dialog', { name: 'How was this game?' }), phone.person).toBeVisible({ timeout: 10000 });
+        await expect(phone.getByRole('dialog', { name: 'How was this game?' }), phone.person).toBeVisible({ timeout: 30000 });
     }
 
     // One player rates the game and writes a comment; the phone thanks them only once it's saved.
