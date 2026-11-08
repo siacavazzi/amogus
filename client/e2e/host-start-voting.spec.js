@@ -66,12 +66,24 @@ test('a host who is killed can still start the vote from the dead screen', async
         await release();
         await phone.getByText('Got it').click();
     }
-    const caller = await crewCaller(phones, host);
+    let caller = await crewCaller(phones, host);
 
-    await caller.getByText('CALL MEETING').click();
-    await expect(host.getByText('Go to the meeting spot', { exact: false })).toBeVisible();
-    await host.getByRole('button', { name: "I've Been Killed" }).click();
-    await expect(host.getByText("You're out")).toBeVisible();
+    if (await host.getByText('ENTER VENT').isVisible()) {
+        // Intruders can't be killed (they don't get I've Been Killed), so an intruder host is
+        // voted out instead, and the next meeting finds them on the dead screen.
+        await h.callMeeting(caller, phones);
+        await h.vote(phones.map(phone => [phone, phone === host ? caller : host]));
+        await h.continueAfterResults(phones);
+        await expect(caller.getByText('CALL MEETING')).toBeVisible({ timeout: 30000 });
+        await expect(host.getByRole('button', { name: "I've Been Killed" })).toHaveCount(0);
+        caller = await crewCaller(phones, host);
+        await caller.getByText('CALL MEETING').click();
+    } else {
+        await caller.getByText('CALL MEETING').click();
+        await expect(host.getByText('Go to the meeting spot', { exact: false })).toBeVisible();
+        await host.getByRole('button', { name: "I've Been Killed" }).click();
+        await expect(host.getByText("You're out")).toBeVisible();
+    }
     await h.readyUp([caller]);
 
     const button = host.getByTestId('host-start-voting');
