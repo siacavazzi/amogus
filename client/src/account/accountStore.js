@@ -9,6 +9,10 @@ import { useEffect, useState } from 'react';
 import { ENDPOINT } from '../ENDPOINT';
 
 const API = typeof window !== 'undefined' && window.location.port === '3000' ? ENDPOINT : '';
+// The dev server (port 3000) talks to Flask on another origin, which can't take the session
+// cookie, so sign-in stays off there. Skipping the check also keeps Safari from logging a CORS
+// error on every page.
+const SIGN_IN_OFF_HERE = API !== '';
 const SNOOZE_KEY = 'sp_signin_snoozed_until';
 const SNOOZE_DAYS = 30;
 
@@ -69,6 +73,10 @@ export function getAccountState() {
 export function loadAccount({ force = false } = {}) {
     if (loading && !force) return loading;
     loading = (async () => {
+        if (SIGN_IN_OFF_HERE) {
+            setState({ loaded: true });
+            return state;
+        }
         try {
             const reply = await call('/api/account');
             setState({ loaded: true, account: reply.account || null, google: Boolean(reply.google), email: Boolean(reply.email) });
