@@ -88,7 +88,7 @@ class StatsTracker:
     def normalize_acquisition(value):
         value = value if isinstance(value, dict) else {}
         sources = {'direct', 'google', 'bing', 'chatgpt', 'facebook', 'instagram',
-                   'snapchat', 'reddit', 'youtube', 'shared-link', 'other', 'unknown'}
+                   'snapchat', 'reddit', 'youtube', 'shared-link', 'saved-game', 'other', 'unknown'}
         pages = {'/', '/play', '/among-us-irl', '/how-to-play-among-us-irl',
                  '/among-us-irl-task-ideas', '/among-us-irl-task-generator',
                  '/social-deduction-games', '/among-us-birthday-party', '/party-games-for-10-people',

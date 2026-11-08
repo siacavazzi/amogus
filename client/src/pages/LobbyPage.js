@@ -9,6 +9,7 @@ import { getAcquisition } from '../seo/discovery';
 import RoomEntryNotice from '../components/RoomEntryNotice';
 import { getRoomCodeFromSearch, clearRoomCodeFromUrl } from '../utils/inviteLinks';
 import { readGeneratedSetup, claimGeneratedRoomCreation } from './seo/gameDraft';
+import { rememberSavedGame } from '../utils/savedGame';
 import { t } from '../i18n';
 import LanguagePicker from '../components/LanguagePicker';
 
@@ -23,6 +24,8 @@ function LobbyPage() {
     // Arriving from "Use this pack": open the room straight away, the pack loads in host setup.
     const [generatedSetup] = useState(readGeneratedSetup);
     const autoCreated = useRef(false);
+    // A "Save this game" link: the tasks wait on this phone until it next creates a room.
+    const [savedGameCode] = useState(() => rememberSavedGame());
 
     useEffect(() => {
         if (roomEntryStatus?.room_code) setInputRoomCode(roomEntryStatus.room_code);
@@ -36,8 +39,8 @@ function LobbyPage() {
     const tutorialHref = '/tutorial?returnTo=play';
 
     useEffect(() => {
-        setShowTutorialPrompt(isMobile && !generatedSetup && !getRoomCodeFromSearch() && !roomEntryStatus && shouldRecommendTutorial());
-    }, [isMobile, roomEntryStatus, generatedSetup]);
+        setShowTutorialPrompt(isMobile && !generatedSetup && !savedGameCode && !getRoomCodeFromSearch() && !roomEntryStatus && shouldRecommendTutorial());
+    }, [isMobile, roomEntryStatus, generatedSetup, savedGameCode]);
 
     // Listen for errors and success to reset the button states
     useEffect(() => {
@@ -173,6 +176,11 @@ function LobbyPage() {
                         </button>
                     </form>
 
+                    {savedGameCode && (
+                        <p className="sg-small" role="status" style={{ background: '#fff', color: 'var(--sg-ink)', borderRadius: 14, padding: '10px 12px', fontWeight: 700 }}>
+                            {t('Saved game ready. Create a new game to host it with the same tasks.')}
+                        </p>
+                    )}
                     <p className="sg-small sg-home__or">{t('or start one')}</p>
                     <button type="button" className="sg-btn sg-btn-ink" onClick={handleCreateGame} disabled={isCreating}>
                         {isCreating ? t('Creating Room...') : <><Plus size={22} /> {t('Create New Game')}</>}

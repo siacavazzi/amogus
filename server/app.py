@@ -5,6 +5,8 @@ import os
 import secrets
 import sys
 import copy
+import hashlib
+import json
 import re
 import time
 from functools import wraps
@@ -729,7 +731,8 @@ def handle_register_reactor(data):
 # ============ PHONE-SIDE METRICS ============
 
 SETUP_STEPS = {'tasklist', 'settings'}
-END_SCREEN_ACTIONS = {'host_your_own', 'play_again', 'feedback_open', 'feedback_sent', 'how_to_play'}
+END_SCREEN_ACTIONS = {'host_your_own', 'play_again', 'feedback_open', 'feedback_sent', 'how_to_play',
+                      'save_game_shared', 'save_game_copied', 'install_shown', 'install_added', 'install_dismissed'}
 IN_APP_ACTIONS = {'shown', 'already_dismissed', 'open_browser', 'copy_link', 'keep_playing'}
 IN_APP_APPS = {'wechat', 'messenger', 'instagram', 'facebook', 'threads', 'tiktok', 'snapchat', 'reddit',
                'twitter', 'linkedin', 'pinterest', 'line', 'google_app', 'webview'}
@@ -1962,6 +1965,41 @@ def handle_duplicate_task_list(data):
         logger.info(f"Task list duplicated: {code} -> {new_code} by player {player_id}")
     else:
         emit('error', {'message': 'Failed to duplicate task list'})
+
+
+def saved_game_list_code(game):
+    """A task list code that holds this room's tasks, made once per task set, or None for built-in tasks."""
+    code = game.collaborative_task_list_code
+    if code and task_list_manager.get_task_list(code):
+        return code
+    tasks = [{'task': task.get('task'), 'location': task.get('location')}
+             for task in game.collaborative_tasks if isinstance(task, dict) and task.get('task')]
+    if not tasks:
+        return None
+    fingerprint = hashlib.sha256(json.dumps(tasks, sort_keys=True).encode()).hexdigest()
+    if getattr(game, 'saved_game_fingerprint', None) == fingerprint and task_list_manager.get_task_list(game.saved_game_code):
+        return game.saved_game_code
+    # The places the tasks use, topped up from the room's own when they use fewer than two.
+    used = [task['location'] for task in tasks if task['location'] and task['location'] != 'Other']
+    locations = list(dict.fromkeys(used if len(set(used)) >= 2 else used + [l for l in game.locations if l != 'Other']))
+    now = time.gmtime()
+    name = f"Game from {time.strftime('%b', now)} {now.tm_mday}"
+    code = task_list_manager.create_task_list('saved_game', name, tasks, locations, source_template='saved_game')
+    if code:
+        game.saved_game_code, game.saved_game_fingerprint = code, fingerprint
+    return code
+
+
+@socketio.on('save_game_link')
+@room_event(mutate=False)
+def handle_save_game_link(data):
+    """The end screen's "Save this game": a list code so any player can host these tasks later."""
+    game, _, _ = get_game_and_player(data.get('player_id'))
+    if not game:
+        game, _ = game_manager.get_game_by_sid(request.sid)
+    if not game:
+        return command_error('Game session not found.')
+    return {'ok': True, 'code': saved_game_list_code(game)}
 
 
 TASK_LIST_VIA = ('preset', 'example', 'saved', 'code', 'generator')

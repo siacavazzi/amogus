@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect, useRef } from 'react';
 import { DataContext } from '../GameContext';
 import { Users, Play, ChevronDown, ChevronUp, List, Download, Trash2, Check, LogOut, MapPin, Settings, ArrowRight, ArrowLeft, X, Zap, Copy, Sparkles, Minus, Plus, Home, Sofa, GraduationCap, DoorOpen, Monitor, ClipboardList } from '../signal/icons';
 import { readGeneratedSetup, clearGameDraft } from './seo/gameDraft';
+import { readPendingSavedGame, clearPendingSavedGame } from '../utils/savedGame';
 import { AUTO_INTRUDERS_SUMMARY, AUTO_TASKS_SUMMARY, TASKS_PER_CREWMATE, playersForIntruders } from '../utils/intruders';
 import { sendClientMetric } from '../utils/clientMetrics';
 import '../signal/host.css';
@@ -364,6 +365,18 @@ function GameConfigPage() {
         if (generatedDraft && socket && !generatedImportRef.current && !generatedImportError) importGeneratedTasks();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [socket, generatedDraft]);
+
+    // A "Save this game" link opened earlier on this phone: its tasks load like a typed list code.
+    useEffect(() => {
+        const code = readPendingSavedGame();
+        if (!socket || !code || generatedDraft) return;
+        clearPendingSavedGame();
+        setTaskListLoading(true);
+        setTaskListApplied(false);
+        socket.emit('load_task_list', { code });
+        socket.emit('save_task_list_to_user', { player_id: deviceId, code });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [socket]);
 
     const loadTaskListByCode = () => {
         if (!loadTaskListCode.trim()) return;

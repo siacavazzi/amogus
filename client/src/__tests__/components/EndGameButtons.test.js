@@ -10,8 +10,8 @@ describe('Play Again', () => {
         const button = screen.getByRole('button', { name: /Play Again/ });
         fireEvent.click(button);
         fireEvent.click(button);
-        expect(contextValue.socket.emit).toHaveBeenCalledTimes(1);
-        expect(contextValue.socket.emit).toHaveBeenCalledWith('reset', { player_id: 'p1', room_code: 'ABCD' });
+        const resets = contextValue.socket.emit.mock.calls.filter(([event]) => event === 'reset');
+        expect(resets).toEqual([['reset', { player_id: 'p1', room_code: 'ABCD' }]]);
     });
 
     it('takes the room back to the lobby from the reactor, which has no vote', () => {
