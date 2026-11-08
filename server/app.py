@@ -21,6 +21,8 @@ from assets.sonosHandler import SonosController
 from assets.utils import *
 from assets.taskHandler import *
 from assets.task_list_manager import TaskListManager
+from assets.accounts import AccountStore, owner_key
+from assets.auth_routes import AuthRoutes
 from assets.selfie_store import SelfieStore
 from assets.version import VERSION, VERSION_INFO
 from config import (
@@ -66,6 +68,36 @@ game_manager = GameManager(socketio, speaker, game_config, selfie_store=selfie_s
 
 # Task list manager for persistent task lists
 task_list_manager = TaskListManager()
+
+# Optional host accounts (Google or an email code) so saved lists follow the host to any device.
+# Players never sign in. The socket learns who is signed in from the cookie on its handshake,
+# or from a ticket after signing in on a page that's already connected.
+account_store = AccountStore(os.path.join(os.path.dirname(__file__), 'data'))
+account_by_sid = {}
+
+
+def unbind_account_sids(account_id):
+    for sid in [sid for sid, owner in account_by_sid.items() if owner == account_id]:
+        account_by_sid.pop(sid, None)
+
+
+auth_routes = AuthRoutes(app, account_store, task_list_manager, channel=VERSION_INFO.get('channel', 'prod'),
+                         on_account_deleted=unbind_account_sids)
+
+
+def list_owner(data, key='player_id'):
+    """Who owns task lists for this socket: the signed-in account, else the browser's device_id.
+
+    A signed-in socket ignores the id the browser sends, so the server, not the page, decides
+    whose lists these are. Signed-out browsers keep working with their device_id as before.
+    """
+    account_id = account_by_sid.get(request.sid)
+    if account_id:
+        return owner_key(account_id)
+    value = data.get(key) if isinstance(data, dict) else None
+    if not isinstance(value, str) or not value or value.startswith('acct:') or len(value) > 80:
+        return None
+    return value
 
 client_metrics_by_sid = {}
 # What the phone said about its last dropped connection, kept for the rejoin that follows.
@@ -794,6 +826,9 @@ def handle_connect(auth=None):
     last_drop = clean_last_drop(auth.get('last_drop') if isinstance(auth, dict) else None)
     if last_drop:
         last_drop_by_sid[request.sid] = last_drop
+    account = auth_routes.account_from_cookie_header(request.cookies)
+    if account:
+        account_by_sid[request.sid] = account['id']
     record_usage('connection_opened', **({'last_drop': last_drop} if last_drop else {}))
     logger.info(f'Client connected: {request.sid}')
     # Don't auto-join any room on connect - client must create or join
@@ -922,6 +957,7 @@ def handle_disconnect(reason=None):
     metric_counts_by_sid.pop(sid, None)
     client_metrics_by_sid.pop(sid, None)
     selfie_tokens_by_sid.pop(sid, None)
+    account_by_sid.pop(sid, None)
     game_manager.unregister_sid(sid)
     if game:
         game.drop_reactor(sid)
@@ -1774,10 +1810,27 @@ def handleDeath(data):
 
 # ============ TASK LIST MANAGEMENT ============
 
+@socketio.on('bind_account')
+def handle_bind_account(data):
+    """Sign in the socket that's already open, with a ticket from POST /api/account/ticket."""
+    account_id = account_store.redeem_ticket(data.get('ticket') if isinstance(data, dict) else None)
+    if not account_id or not account_store.get(account_id):
+        return {'ok': False}
+    account_by_sid[request.sid] = account_id
+    return {'ok': True}
+
+
+@socketio.on('unbind_account')
+def handle_unbind_account(data=None):
+    """After signing out: this socket goes back to the browser's own lists."""
+    account_by_sid.pop(request.sid, None)
+    return {'ok': True}
+
+
 @socketio.on('get_my_task_lists')
 def handle_get_my_task_lists(data):
     """Get all task lists created by the current player."""
-    player_id = data.get('player_id')
+    player_id = list_owner(data)
     if not player_id:
         emit('error', {'message': 'Player ID required'})
         return
@@ -1806,7 +1859,7 @@ def handle_load_task_list(data):
 @socketio.on('save_task_list_to_user')
 def handle_save_task_list_to_user(data):
     """Save an external task list to the user's saved lists (without duplicating)."""
-    player_id = data.get('player_id')
+    player_id = list_owner(data)
     code = data.get('code', '').upper()
     
     if not player_id:
@@ -1821,7 +1874,7 @@ def handle_save_task_list_to_user(data):
     if success:
         lists = task_list_manager.get_player_task_lists(player_id)
         emit('my_task_lists', {'lists': lists})
-        logger.info(f"Task list {code} saved to player {player_id}'s list")
+        logger.info(f"Task list {code} saved to a host's lists")
     else:
         emit('error', {'message': f'Task list not found: {code}'})
 
@@ -1829,7 +1882,7 @@ def handle_save_task_list_to_user(data):
 @socketio.on('create_task_list')
 def handle_create_task_list(data):
     """Create a new task list."""
-    player_id = data.get('player_id')
+    player_id = list_owner(data)
     name = data.get('name', 'My Task List')
     tasks = data.get('tasks', [])
     locations = data.get('locations')
@@ -1851,7 +1904,7 @@ def handle_create_task_list(data):
     if code:
         task_list = task_list_manager.get_task_list(code)
         emit('task_list_created', {'task_list': task_list})
-        logger.info(f"Task list created: {code} by player {player_id}")
+        logger.info(f"Task list created: {code}")
     else:
         emit('error', {'message': 'Failed to create task list'})
 
@@ -1859,11 +1912,11 @@ def handle_create_task_list(data):
 @socketio.on('update_task_list')
 def handle_update_task_list(data):
     """Update a task list (name, tasks, or locations)."""
-    player_id = data.get('player_id')
+    player_id = list_owner(data)
     code = data.get('code', '').upper()
     updates = data.get('updates', {})
     
-    if not code:
+    if not code or not player_id:
         emit('error', {'message': 'Task list code required'})
         return
     
@@ -1878,11 +1931,11 @@ def handle_update_task_list(data):
 @socketio.on('add_task_to_list')
 def handle_add_task_to_list(data):
     """Add a single task to a task list."""
-    player_id = data.get('player_id')
+    player_id = list_owner(data)
     code = data.get('code', '').upper()
     task_obj = data.get('task')
     
-    if not code or not task_obj:
+    if not code or not task_obj or not player_id:
         emit('error', {'message': 'Code and task required'})
         return
     
@@ -1897,11 +1950,11 @@ def handle_add_task_to_list(data):
 @socketio.on('remove_task_from_list')
 def handle_remove_task_from_list(data):
     """Remove a task from a task list by index."""
-    player_id = data.get('player_id')
+    player_id = list_owner(data)
     code = data.get('code', '').upper()
     task_index = data.get('task_index')
     
-    if not code or task_index is None:
+    if not code or task_index is None or not player_id:
         emit('error', {'message': 'Code and task index required'})
         return
     
@@ -1916,7 +1969,7 @@ def handle_remove_task_from_list(data):
 @socketio.on('delete_task_list')
 def handle_delete_task_list(data):
     """Remove a task list from the player's saved lists (does not delete the file)."""
-    player_id = data.get('player_id')
+    player_id = list_owner(data)
     code = data.get('code', '').upper()
     
     if not player_id or not code:
@@ -1927,7 +1980,7 @@ def handle_delete_task_list(data):
     success = task_list_manager.remove_from_player_list(code, player_id)
     if success:
         emit('task_list_deleted', {'code': code})
-        logger.info(f"Task list {code} removed from player {player_id}'s saved lists")
+        logger.info(f"Task list {code} removed from a host's saved lists")
     else:
         emit('error', {'message': 'Task list not in your saved lists.'})
 
@@ -1935,7 +1988,7 @@ def handle_delete_task_list(data):
 @socketio.on('duplicate_task_list')
 def handle_duplicate_task_list(data):
     """Duplicate a task list (for sharing/copying)."""
-    player_id = data.get('player_id')
+    player_id = list_owner(data)
     code = data.get('code', '').upper()
     new_name = data.get('new_name')
     
@@ -1947,7 +2000,7 @@ def handle_duplicate_task_list(data):
     if new_code:
         task_list = task_list_manager.get_task_list(new_code)
         emit('task_list_created', {'task_list': task_list})
-        logger.info(f"Task list duplicated: {code} -> {new_code} by player {player_id}")
+        logger.info(f"Task list duplicated: {code} -> {new_code}")
     else:
         emit('error', {'message': 'Failed to duplicate task list'})
 
@@ -2054,7 +2107,7 @@ def handle_toggle_task_creation_mode(data):
 def handle_get_collaborative_tasks(data):
     """Get current collaborative tasks for a room."""
     room_code = game_manager.resolve_room_code(data.get('room_code'))
-    device_id = data.get('device_id')  # To check ownership
+    device_id = list_owner(data, 'device_id')  # To check ownership
     
     game = game_manager.get_game(room_code)
     if not game:
@@ -2068,7 +2121,7 @@ def handle_get_collaborative_tasks(data):
         if task_list:
             stored_creator = task_list.get('creator_id')
             is_owner = (stored_creator == device_id)
-            logger.info(f"Ownership check for {game.collaborative_task_list_code}: stored_creator={stored_creator}, device_id={device_id}, is_owner={is_owner}")
+            logger.info(f"Ownership check for {game.collaborative_task_list_code}: is_owner={is_owner}")
     elif game.collaborative_task_list_code and not device_id:
         # No device_id provided - can't determine ownership
         is_owner = False
@@ -2304,10 +2357,10 @@ def handle_save_collaborative_tasks(data):
     """Save the current collaborative tasks as a new or updated task list."""
     room_code = game_manager.resolve_room_code(data.get('room_code'))
     name = data.get('name', 'Collaborative Task List')
-    device_id = data.get('device_id')  # Use device_id for ownership
+    device_id = list_owner(data, 'device_id')  # The account when signed in, else this browser's device_id
     force_new = data.get('force_new', False)  # Explicitly create a new list
     
-    logger.info(f"save_collaborative_tasks called: room={room_code}, device_id={device_id}, force_new={force_new}")
+    logger.info(f"save_collaborative_tasks called: room={room_code}, force_new={force_new}")
     
     game = game_manager.get_game(room_code)
     if not game:
@@ -2330,7 +2383,7 @@ def handle_save_collaborative_tasks(data):
         existing_list = task_list_manager.get_task_list(game.collaborative_task_list_code)
         if existing_list:
             stored_creator = existing_list.get('creator_id')
-            logger.info(f"Existing list found: stored_creator={stored_creator}, device_id={device_id}, match={stored_creator == device_id}")
+            logger.info(f"Existing list found: owner_match={stored_creator == device_id}")
             
             if stored_creator == device_id:
                 # We own it - update it

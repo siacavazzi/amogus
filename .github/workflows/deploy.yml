@@ -151,9 +151,15 @@ jobs:
       - name: Restart beta
         env:
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          # Host sign-in (server/assets/auth_routes.py). Each one is optional: Google sign-in
+          # stays hidden without both Google values, email codes without the Resend key.
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
         run: |
           ADMIN_PASSWORD_B64="$(printf '%s' "$ADMIN_PASSWORD" | base64 -w 0)"
-          ssh root@${{ secrets.DROPLET_IP }} "ADMIN_PASSWORD_B64='$ADMIN_PASSWORD_B64' bash -s" << 'EOF'
+          AUTH_ENV_B64="$(printf 'GOOGLE_CLIENT_ID=%s\nGOOGLE_CLIENT_SECRET=%s\nRESEND_API_KEY=%s\n' "$GOOGLE_CLIENT_ID" "$GOOGLE_CLIENT_SECRET" "$RESEND_API_KEY" | base64 -w 0)"
+          ssh root@${{ secrets.DROPLET_IP }} "ADMIN_PASSWORD_B64='$ADMIN_PASSWORD_B64' AUTH_ENV_B64='$AUTH_ENV_B64' bash -s" << 'EOF'
             set -e
             # The beta service is a copy of the prod unit pointed at /opt/amogus-beta
             # and port 5002. It shares prod's Python virtualenv.
@@ -171,6 +177,17 @@ jobs:
               for unit in amogus amogus-beta; do
                 install -d -m 0755 /etc/systemd/system/$unit.service.d
                 printf '[Service]\nEnvironment="ADMIN_PASSWORD=%s"\n' "$ADMIN_PASSWORD" > /etc/systemd/system/$unit.service.d/admin-password.conf
+              done
+            fi
+            # Sign-in keys go in a root-only file both services read. Prod picks them up when
+            # "Promote beta to prod" restarts it.
+            if [ -n "${AUTH_ENV_B64:-}" ]; then
+              install -d -m 0755 /etc/amogus
+              printf '%s' "$AUTH_ENV_B64" | base64 -d > /etc/amogus/auth.env
+              chmod 600 /etc/amogus/auth.env
+              for unit in amogus amogus-beta; do
+                install -d -m 0755 /etc/systemd/system/$unit.service.d
+                printf '[Service]\nEnvironmentFile=-/etc/amogus/auth.env\n' > /etc/systemd/system/$unit.service.d/auth.conf
               done
             fi
             # Match the prod unit's run-as user, if it has one

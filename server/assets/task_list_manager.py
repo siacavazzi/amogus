@@ -387,6 +387,49 @@ class TaskListManager:
             print(f"Deleted task list {code}")
             return True
 
+    def adopt_lists(self, from_owner, to_owner):
+        """Move every list saved under one owner (a browser's device_id) to another (an account).
+
+        Lists that owner created become the account's to edit; lists it only saved by code
+        stay the original maker's but show up in the account. Returns how many lists moved.
+        """
+        if not from_owner or not to_owner or from_owner == to_owner:
+            return 0
+        with self.lock:
+            codes = self.index["player_lists"].pop(from_owner, [])
+            if not codes:
+                return 0
+            mine = self.index["player_lists"].setdefault(to_owner, [])
+            for code in codes:
+                if code not in mine:
+                    mine.append(code)
+                task_list = self.get_task_list(code)
+                if task_list and task_list.get("creator_id") == from_owner:
+                    task_list["creator_id"] = to_owner
+                    try:
+                        with open(self._get_list_path(code), "w") as f:
+                            json.dump(task_list, f, indent=2)
+                    except IOError as e:
+                        print(f"Failed to move task list {code}: {e}")
+            self._save_index()
+            return len(codes)
+
+    def release_owner(self, owner):
+        """Forget an owner (a deleted account): its lists stay playable by code, owned by nobody."""
+        with self.lock:
+            codes = self.index["player_lists"].pop(owner, [])
+            for code in codes:
+                task_list = self.get_task_list(code)
+                if task_list and task_list.get("creator_id") == owner:
+                    task_list["creator_id"] = None
+                    try:
+                        with open(self._get_list_path(code), "w") as f:
+                            json.dump(task_list, f, indent=2)
+                    except IOError as e:
+                        print(f"Failed to release task list {code}: {e}")
+            self._save_index()
+            return len(codes)
+
     def save_to_player_list(self, code, player_id):
         """
         Add an existing task list to a player's saved lists (without duplicating).

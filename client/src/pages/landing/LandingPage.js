@@ -60,7 +60,7 @@ const SUSPECTS = [
 ];
 
 const FAQS = [
-    { q: 'Is it free?', a: 'Yes. No app, no account, no ads. Everyone opens susparty.com in their phone’s browser.' },
+    { q: 'Is it free?', a: 'Yes. No app, no ads, and players never need an account. Everyone opens susparty.com in their phone’s browser.' },
     { q: 'How many people can play?', a: '3 to 20+. Bigger groups get more intruders, and the task generator builds packs for up to 30 players.' },
     { q: 'Where do you play?', a: 'Anywhere people can walk around: a house, apartment, dorm, office, library or camp. Tasks are spread across rooms so people split up.' },
     { q: 'Do we need to be together?', a: 'Yes. The phones connect online, but everyone plays in the same place. Kills, bodies and meetings happen in real life.' },

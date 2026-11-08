@@ -6,6 +6,9 @@ import { AUTO_INTRUDERS_SUMMARY, AUTO_TASKS_SUMMARY, TASKS_PER_CREWMATE, players
 import { sendClientMetric } from '../utils/clientMetrics';
 import '../signal/host.css';
 import { getLanguage, t, tk } from '../i18n';
+import AccountButton from '../account/AccountButton';
+import SaveListsPrompt from '../account/SaveListsPrompt';
+import { useAccount } from '../account/accountStore';
 
 const DEFAULT_CARD_DECK_COUNTS = {
     self_report: 4,
@@ -156,6 +159,10 @@ function GameConfigPage() {
     const deviceId = useRef(getDeviceId()).current;
     const pendingSettingsStepRef = useRef(false);
     const pendingRoomOpenRef = useRef(false);
+    // When to suggest signing in: right after a list is made, loaded by code, or picked from
+    // this browser's saved lists (see SaveListsPrompt).
+    const [signInMoment, setSignInMoment] = useState(null);
+    const { listsVersion } = useAccount();
 
     useEffect(() => {
         const timer = setTimeout(() => setShowContent(true), 100);
@@ -171,6 +178,13 @@ function GameConfigPage() {
             socket.emit('get_my_task_lists', { player_id: deviceId, lang: getLanguage() });
         }
     }, [socket, roomCode, deviceId]);
+
+    // Signing in or out changes whose lists these are.
+    useEffect(() => {
+        if (socket && deviceId && listsVersion > 0) {
+            socket.emit('get_my_task_lists', { player_id: deviceId, lang: getLanguage() });
+        }
+    }, [socket, deviceId, listsVersion]);
 
     // Listen for config updates from server
     useEffect(() => {
@@ -233,6 +247,7 @@ function GameConfigPage() {
             console.log('Task list created:', data);
             setCurrentTaskList(data.task_list);
             setTaskListLoading(false);
+            setSignInMoment('created');
             if (generatedImportRef.current) {
                 generatedImportRef.current = false;
                 const settings = generatedDraft?.recommendations;
@@ -361,6 +376,7 @@ function GameConfigPage() {
         setTaskListApplied(false);
         const code = loadTaskListCode.trim().toUpperCase();
         socket.emit('load_task_list', { code });
+        setSignInMoment('code');
         // Auto-save to user's list when loading by code
         socket.emit('save_task_list_to_user', { player_id: deviceId, code });
         setLoadTaskListCode('');
@@ -552,6 +568,7 @@ function GameConfigPage() {
                                             setTaskListLoading(true);
                                             setTaskListApplied(false);
                                             socket.emit('load_task_list', { code: list.code });
+                                            setSignInMoment('saved');
                                         }}
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter' || e.key === ' ') {
@@ -616,6 +633,8 @@ function GameConfigPage() {
                     )}
                 </div>
             )}
+
+            {currentTaskList && <SaveListsPrompt moment={signInMoment} key={signInMoment} />}
 
             <div style={{ display: 'grid', gap: 10 }}>
                 <button type="button" onClick={proceedToSettings} disabled={taskListLoading || !connected} className="sg-btn sg-btn-white" style={{ minHeight: 68, fontSize: 19 }}>
@@ -901,9 +920,12 @@ function GameConfigPage() {
                             {copied ? <Check size={18} /> : <Copy size={18} />}
                         </button>
                     </div>
-                    <button type="button" onClick={handleLeaveRoom} className="hs-round" title={t('Leave room')} aria-label={t('Leave room')}>
-                        <LogOut size={20} />
-                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <AccountButton />
+                        <button type="button" onClick={handleLeaveRoom} className="hs-round" title={t('Leave room')} aria-label={t('Leave room')}>
+                            <LogOut size={20} />
+                        </button>
+                    </div>
                 </div>
 
                 <p className="hs-steps">{t('Step {step} of 2', { step: step === 'tasklist' ? 1 : 2 })}</p>

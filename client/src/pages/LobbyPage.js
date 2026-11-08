@@ -11,6 +11,7 @@ import { getRoomCodeFromSearch, clearRoomCodeFromUrl } from '../utils/inviteLink
 import { readGeneratedSetup, claimGeneratedRoomCreation } from './seo/gameDraft';
 import { t } from '../i18n';
 import LanguagePicker from '../components/LanguagePicker';
+import AccountButton from '../account/AccountButton';
 
 function LobbyPage() {
     const [inputRoomCode, setInputRoomCode] = useState(getRoomCodeFromSearch);
@@ -142,6 +143,7 @@ function LobbyPage() {
     if (!isReactorDevice) {
         return (
             <div className="sg-screen sg-round sg-home">
+                <AccountButton className="sp-acct__corner" />
                 <div className="sg-home__top sg-a sg-rise">
                     <h1 className="sg-big sg-home__mark">Sus Party</h1>
                     <p className="sg-lede">{t('The real-life social deduction game')}</p>
@@ -214,6 +216,7 @@ function LobbyPage() {
     // what this screen becomes once a room is open.
     return (
         <div className="sg-screen sg-round sg-rx sg-rx-lobby">
+            <AccountButton className="sp-acct__corner" />
             <div className="sg-rx-lobby__grid">
                 <div className="sg-a sg-rise">
                     <h1 className="sg-big sg-rx-lobby__mark">Sus Party</h1>
