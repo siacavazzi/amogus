@@ -34,8 +34,7 @@ test('a host who signs in after making a list finds it on another phone', async 
     await signInWithCode(first, prompt, email);
     await expect(first.getByTestId('save-lists-done')).toBeVisible();
     await expect(first.getByRole('button', { name: 'Account' })).toBeVisible();
-    const meta = await first.locator('.hs-listrow__meta').first().textContent();
-    const listCode = meta.split('·').pop().trim();
+    const listCode = await h.savedListCode(first, 'Example List');
 
     // Another phone: no lists, no prompt (nothing picked yet), then the same account.
     await startSetup(second);
