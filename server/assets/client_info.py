@@ -28,10 +28,14 @@ def os_family(user_agent):
 
 
 # In-app browsers first: they also carry Safari/Chrome tokens, and they drop sockets differently.
+# Keep in step with client/src/utils/inAppBrowser.js, which shows the "open in Safari/Chrome" pop-up.
 _BROWSERS = (
-    ('instagram', 'instagram'), ('fban', 'facebook_app'), ('fbav', 'facebook_app'),
-    ('snapchat', 'snapchat_app'), ('tiktok', 'tiktok_app'), ('musical_ly', 'tiktok_app'),
-    ('gsa/', 'google_app'), ('line/', 'line_app'),
+    ('micromessenger', 'wechat_app'), ('messengerforios', 'messenger_app'), ('orca-android', 'messenger_app'),
+    ('instagram', 'instagram'), ('fban', 'facebook_app'), ('fbav', 'facebook_app'), ('fb_iab', 'facebook_app'),
+    ('barcelona', 'threads_app'), ('snapchat', 'snapchat_app'), ('tiktok', 'tiktok_app'),
+    ('musical_ly', 'tiktok_app'), ('bytedancewebview', 'tiktok_app'), ('reddit', 'reddit_app'),
+    ('twitter', 'twitter_app'), ('linkedinapp', 'linkedin_app'), ('pinterest', 'pinterest_app'),
+    ('gsa/', 'google_app'), ('line/', 'line_app'), ('; wv)', 'android_webview'),
     ('samsungbrowser', 'samsung'), ('edg', 'edge'), ('opr/', 'opera'),
     ('firefox', 'firefox'), ('fxios', 'firefox'), ('crios', 'chrome'), ('chrome', 'chrome'),
     ('safari', 'safari'),

@@ -120,3 +120,20 @@ Feedback rows hold the rating, comment, result, submission time and a test-room 
 player IDs, room codes or round IDs, and nothing about feedback goes into the gameplay event log except the
 `end_screen_action` taps `feedback_open` and `feedback_sent`. The server keeps the latest 500 rows in `stats.json`;
 the private dashboard shows the latest 25.
+
+## Private dashboard
+
+`/dashboard` (password: `ADMIN_PASSWORD`) reads `/api/admin/stats`. Its history comes from the event log through
+`server/assets/dashboard_report.py`, which reads the log and its rotated copies once and then only new lines, and rebuilds
+the numbers at most once a minute. Days and weeks are UTC; weeks start Monday.
+
+- **Right now.** A room is *playing* while a round runs and a phone is connected or something happened in the last
+  15 minutes; *lobby* when a screen is connected and something happened in the last 15 minutes; *idle* otherwise (still
+  open until the 3-hour timeout). The old "active games" counted every open room.
+- **Rounds** are rounds that started with 3+ players. **Players** adds up each room's biggest round. **Player seats**
+  counts every phone that joined a room, including a rejoin that got a new ID, so it runs higher.
+- **Sessions** are one group's rounds with no gap over 2 hours. Rooms that share 2+ anonymous device IDs join one
+  session. Before device IDs, a room whose first round starts within 30 minutes of another room's last round, with the
+  host on the same UTC offset and the same main phone language, joins that session. That fallback is an estimate.
+- Values that older builds didn't log ("unknown") stay out of the bars and percentages and are listed as left out.
+- To print the same report from a copy of the log: `cd server && python3 -m assets.dashboard_report path/to/gameplay-events.jsonl`.

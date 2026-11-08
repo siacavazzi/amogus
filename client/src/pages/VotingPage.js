@@ -20,7 +20,8 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
   const mountedRef = useRef(true);
   const playerId = playerState?.player_id || playerState?.playerId || localStorage.getItem('player_id');
   const canVote = connected && playerState?.alive !== false && !deathPending && meetingState.stage === 'voting';
-  const showDeathReport = !tutorialMode && playerState?.alive !== false && meetingState.stage === 'voting';
+  // Intruders can't be killed, so they never get the button (on prod one tapped it by mistake).
+  const showDeathReport = !tutorialMode && !playerState?.sus && playerState?.alive !== false && meetingState.stage === 'voting';
 
   useEffect(() => {
     mountedRef.current = true;
@@ -77,7 +78,7 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
   };
 
   const handleImDead = async () => {
-    if (!canVote || deathPendingRef.current || tutorialMode) return;
+    if (!canVote || deathPendingRef.current || tutorialMode || playerState?.sus) return;
     if (!window.confirm(t('Are you sure you want to mark yourself as dead?'))) return;
     deathPendingRef.current = true;
     setDeathPending(true);

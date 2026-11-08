@@ -19,6 +19,7 @@ With GITHUB_OUTPUT set, also writes scope, the browser job matrix, and the specs
 import fnmatch
 import json
 import os
+import re
 import subprocess
 import sys
 
@@ -82,10 +83,33 @@ SITE_ONLY = [
     # Scripts that make site screenshots and icons, and the site checks the fast job runs
     'client/scripts/screenshots/*',
     'client/scripts/gen-brand-assets.js',
+    'client/scripts/gen-icons.sh',
     'client/scripts/check-seo.js',
     'client/scripts/check-built-app.js',
     'client/e2e/site.spec.js',
 ]
+
+
+# client/public/index.html loads the whole app, so it is full, except when every changed line is
+# one of these head tags: icons, social preview meta, and the structured-data image.
+INDEX_HTML = 'client/public/index.html'
+INDEX_HEAD_ONLY_LINES = re.compile(
+    r'^\s*(<link rel="(icon|apple-touch-icon|manifest)"[^>]*>'
+    r'|<meta (property="og:[a-z:_]+"|name="twitter:[a-z:_]+") content="[^"<>]*" ?/?>'
+    r'|"image": "https://susparty\.com/[^"]*",?'
+    r'|)\s*$')
+
+
+def index_head_only(base, head):
+    """True when the index.html diff only touches icon links, og/twitter meta or the ld+json image."""
+    try:
+        diff = subprocess.run(['git', 'diff', '-U0', f'{base}...{head}', '--', INDEX_HTML],
+                              check=True, capture_output=True, text=True).stdout
+    except subprocess.CalledProcessError:
+        return False
+    changed = [line[1:] for line in diff.splitlines()
+               if line[:1] in '+-' and not line.startswith(('+++', '---'))]
+    return bool(changed) and all(INDEX_HEAD_ONLY_LINES.match(line) for line in changed)
 
 
 def is_site_only(path):
@@ -94,11 +118,12 @@ def is_site_only(path):
     return any(fnmatch.fnmatchcase(path, p) for p in SITE_ONLY)
 
 
-def scope(paths):
+def scope(paths, base=None, head=None):
     paths = [p for p in paths if p]
     if not paths:
         return 'full', []
-    game = [p for p in paths if not is_site_only(p)]
+    game = [p for p in paths if not is_site_only(p)
+            and not (p == INDEX_HTML and base and index_head_only(base, head))]
     return ('full' if game else 'site'), game
 
 
@@ -129,11 +154,13 @@ def main(argv):
         write_github_output('full')
         print('full')
         return
+    base = head = None
     if argv[:1] == ['--files']:
         paths = argv[1:]
     elif len(argv) == 2:
+        base, head = argv
         try:
-            paths = changed_files(*argv)
+            paths = changed_files(base, head)
         except subprocess.CalledProcessError as e:
             print(f'Could not list the changed files ({e.stderr.strip().splitlines()[0] if e.stderr.strip() else e}), running everything.', file=sys.stderr)
             write_github_output('full')
@@ -142,7 +169,7 @@ def main(argv):
     else:
         print(__doc__, file=sys.stderr)
         sys.exit(2)
-    result, game = scope(paths)
+    result, game = scope(paths, base, head)
     print(f'{len(paths)} changed files.', file=sys.stderr)
     if result == 'full':
         shown = game[:20]
