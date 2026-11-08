@@ -11,6 +11,7 @@ import { createDropTracker, installErrorReporting, sendClientMetric } from './ut
 import { translateConflicts, translatedTo, watchForTranslation } from './utils/translateGuard';
 import { getLanguage, t } from './i18n';
 import './i18n/serverMessages';
+import { attachAccountSocket } from './account/accountStore';
 import { createRequestId, emitVolatileWithAck, SOCKET_COMMAND_TIMEOUT_MS } from './utils/socketCommand';
 
 // Allow URL param override for testing: ?mobile=true or ?mobile=false
@@ -521,6 +522,8 @@ export default function GameContext({ children }) {
             reconnectionDelay: 2000,
             transports: ['websocket'],
         });
+        // A host who signs in with the room open hands the sign-in to this socket (see account/).
+        attachAccountSocket(socketRef.current);
 
         // Once per page load: tells us how many phones lean on browser translation, and into what.
         const stopTranslateWatch = watchForTranslation(lang => {

@@ -8,6 +8,8 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import VersionPage from './pages/version/VersionPage';
 import FaqPage from './pages/info/FaqPage';
 import AboutPage from './pages/info/AboutPage';
+import PrivacyPage from './pages/info/PrivacyPage';
+import AccountPage from './pages/account/AccountPage';
 import AmongUsIrlPage from './pages/seo/AmongUsIrlPage';
 import HowToPlayIrlPage from './pages/seo/HowToPlayIrlPage';
 import TaskIdeasPage from './pages/seo/TaskIdeasPage';
@@ -79,6 +81,9 @@ function getRoute() {
   if (normalizedPath === '/about' || normalizedPath.startsWith('/about/')) {
     return 'about';
   }
+
+  if (normalizedPath === '/privacy') return 'privacy';
+  if (normalizedPath === '/account') return 'account';
 
   if (normalizedPath === '/among-us-irl' || normalizedPath.startsWith('/among-us-irl/')) {
     return 'among-us-irl';
@@ -227,6 +232,9 @@ function App() {
   if (route === 'about') {
     return <AboutPage />;
   }
+
+  if (route === 'privacy') return <PrivacyPage />;
+  if (route === 'account') return <AccountPage />;
 
   if (route === 'among-us-irl') {
     return <AmongUsIrlPage />;
