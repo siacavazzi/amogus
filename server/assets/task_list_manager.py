@@ -11,16 +11,20 @@ STARTER_TEMPLATE_KEY = "starter_house"
 STARTER_TEMPLATE_NAME = "Example List"
 STARTER_TEMPLATE_DESCRIPTION = "A ready-to-run example you can edit. Add, remove, or tweak tasks to fit your space."
 # The Example List also comes as tasks.<lang>.json; a phone in another language gets English.
-STARTER_LANGUAGES = ("fr", "es", "de", "ro", "pt")
+STARTER_LANGUAGES = ("fr", "es", "de", "ro", "pt", "no", "sv")
 STARTER_TEMPLATE_NAMES = {
     "fr": "Liste d'exemple", "es": "Lista de ejemplo", "de": "Beispielliste",
     "ro": "Listă de exemplu", "pt": "Lista de exemplo",
+    "no": "Eksempelliste", "sv": "Exempellista",
 }
+# Norwegian phones report Bokmål as nb (or nn for Nynorsk); the game has one Norwegian, "no".
+STARTER_ALIASES = {"nb": "no", "nn": "no"}
 
 
 def starter_language(lang):
     """The Example List language for a phone's language code ("en" when we have no translation)."""
-    base = lang.lower().split("-")[0] if isinstance(lang, str) else ""
+    base = lang.lower().replace("_", "-").split("-")[0] if isinstance(lang, str) else ""
+    base = STARTER_ALIASES.get(base, base)
     return base if base in STARTER_LANGUAGES else "en"
 
 

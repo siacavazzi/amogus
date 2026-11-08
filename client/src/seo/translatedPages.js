@@ -1,10 +1,10 @@
 // The pages that exist in every language, and the hreflang links that tie each set together.
-// Paths: English at the root (/, /among-us-irl), other languages under /fr, /es, /de, /ro, /pt.
+// Paths: English at the root (/, /among-us-irl), other languages under /fr, /es, /de, /ro, /pt, /no, /sv.
 
 export const ORIGIN = 'https://susparty.com';
-export const PAGE_LANGUAGES = ['fr', 'es', 'de', 'ro', 'pt'];
-export const HREFLANG = { en: 'en', fr: 'fr', es: 'es', de: 'de', ro: 'ro', pt: 'pt-BR' };
-export const LANGUAGE_NAMES = { en: 'English', fr: 'Français', es: 'Español', de: 'Deutsch', ro: 'Română', pt: 'Português (Brasil)' };
+export const PAGE_LANGUAGES = ['fr', 'es', 'de', 'ro', 'pt', 'no', 'sv'];
+export const HREFLANG = { en: 'en', fr: 'fr', es: 'es', de: 'de', ro: 'ro', pt: 'pt-BR', no: 'no', sv: 'sv' };
+export const LANGUAGE_NAMES = { en: 'English', fr: 'Français', es: 'Español', de: 'Deutsch', ro: 'Română', pt: 'Português (Brasil)', no: 'Norsk', sv: 'Svenska' };
 export const PAGES = { home: '', irl: '/among-us-irl' };
 
 export function pagePath(lang, page) {

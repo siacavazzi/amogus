@@ -5,8 +5,9 @@ const path = require('path');
 const { test, expect } = require('@playwright/test');
 const h = require('./helpers');
 
-const LANGS = ['fr', 'es', 'de', 'ro', 'pt'];
-const LOCALES = { fr: 'fr-FR', es: 'es-ES', de: 'de-DE', ro: 'ro-RO', pt: 'pt-BR' };
+const LANGS = ['fr', 'es', 'de', 'ro', 'pt', 'no', 'sv'];
+// Norwegian phones report Bokmål as nb-NO; the game maps it to its one Norwegian, "no".
+const LOCALES = { fr: 'fr-FR', es: 'es-ES', de: 'de-DE', ro: 'ro-RO', pt: 'pt-BR', no: 'nb-NO', sv: 'sv-SE' };
 const catalogs = Object.fromEntries(LANGS.map(lang => [lang,
     JSON.parse(fs.readFileSync(path.join(__dirname, '../src/i18n/locales', `${lang}.json`), 'utf8'))]));
 // The phone's text for an English string (English for the host).
@@ -33,7 +34,7 @@ async function joinInLanguage(page, code) {
 
 test.afterEach(h.closeAll);
 
-test('phones in five languages play a round with an English host', async ({ browser }) => {
+test('phones in seven languages play a round with an English host', async ({ browser }) => {
     test.setTimeout(240 * 1000);
     const host = await h.openPhone(browser, 'Sam');
     const phones = [host];
