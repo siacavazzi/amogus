@@ -816,7 +816,6 @@
   "Welcome back": "Bon retour",
   "Play your game from {date} again, with the same {count} tasks.": "Rejoue ta partie du {date}, avec les mêmes {count} tâches.",
   "Play your game from {date} again, with the same tasks.": "Rejoue ta partie du {date}, avec les mêmes tâches.",
-  "Host it again": "L’organiser à nouveau",
   "Not now": "Pas maintenant",
   "Sus Party tonight. Tap to join room {roomCode}:": "Sus Party ce soir. Touche pour rejoindre le salon {roomCode} :",
   "Send to the group chat": "Envoyer au groupe",
@@ -917,5 +916,12 @@
   "Delete my account": "Supprimer mon compte",
   "This deletes your email and sign-in for good. Your lists will still open with their code, but you won't see them here any more.": "Cela supprime ton e-mail et ta connexion pour de bon. Tes listes s'ouvriront toujours avec leur code, mais tu ne les verras plus ici.",
   "Yes, delete my account": "Oui, supprimer mon compte",
-  "Keep my account": "Garder mon compte"
+  "Keep my account": "Garder mon compte",
+  "Your group so far": "Votre groupe jusqu'ici",
+  "Rounds": "Manches",
+  "Crew wins": "Victoires de l'équipage",
+  "Intruder wins": "Victoires des intrus",
+  "Your group is playing": "Votre groupe est en train de jouer",
+  "Your group is in room {room_code} right now.": "Votre groupe est dans la salle {room_code} en ce moment.",
+  "Join your group": "Rejoindre votre groupe"
 }

@@ -829,7 +829,6 @@
   "Welcome back": "Bine ai revenit",
   "Play your game from {date} again, with the same {count} tasks.": "Joacă din nou jocul din {date}, cu aceleași {count} sarcini.",
   "Play your game from {date} again, with the same tasks.": "Joacă din nou jocul din {date}, cu aceleași sarcini.",
-  "Host it again": "Găzduiește-l din nou",
   "Not now": "Nu acum",
   "Sus Party tonight. Tap to join room {roomCode}:": "Sus Party diseară. Atinge ca să intri în camera {roomCode}:",
   "Send to the group chat": "Trimite în chatul grupului",
@@ -930,5 +929,12 @@
   "Delete my account": "Șterge-mi contul",
   "This deletes your email and sign-in for good. Your lists will still open with their code, but you won't see them here any more.": "Asta îți șterge definitiv e-mailul și conectarea. Listele se vor deschide în continuare cu codul lor, dar nu le vei mai vedea aici.",
   "Yes, delete my account": "Da, șterge-mi contul",
-  "Keep my account": "Păstrează contul"
+  "Keep my account": "Păstrează contul",
+  "Your group so far": "Grupul vostru până acum",
+  "Rounds": "Runde",
+  "Crew wins": "Victorii ale echipajului",
+  "Intruder wins": "Victorii ale intrușilor",
+  "Your group is playing": "Grupul vostru joacă acum",
+  "Your group is in room {room_code} right now.": "Grupul vostru este acum în camera {room_code}.",
+  "Join your group": "Intră la grupul vostru"
 }

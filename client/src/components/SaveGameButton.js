@@ -12,6 +12,7 @@ import { t } from '../i18n';
 function SaveGameButton({ onDone }) {
     const { socket, roomCode, roundId } = useContext(DataContext);
     const [code, setCode] = useState(undefined);
+    const [group, setGroup] = useState('');
     const [result, setResult] = useState(null);
 
     useEffect(() => {
@@ -19,15 +20,18 @@ function SaveGameButton({ onDone }) {
         let live = true;
         socket.emit('save_game_link', { room_code: roomCode, player_id: localStorage.getItem('player_id') || undefined },
             (response) => {
-                if (response?.ok && response.code) rememberLastGame({ code: response.code, taskCount: response.task_count });
-                if (live) setCode(response?.ok ? response.code : null);
+                if (response?.ok && response.code) rememberLastGame({ code: response.code, taskCount: response.task_count, group: response.link_token });
+                if (live) {
+                    setCode(response?.ok ? response.code : null);
+                    setGroup(response?.ok ? response.link_token || '' : '');
+                }
             });
         return () => { live = false; };
     }, [socket, roomCode, roundId]);
 
     const handleSave = async () => {
         const outcome = await shareLink({
-            url: savedGameUrl(code),
+            url: savedGameUrl(code, window.location.origin, { group }),
             title: 'Sus Party',
             text: code ? t('Our Sus Party game. Open it to host it again with the same tasks.') : t('Sus Party: the real-life social deduction game'),
         });

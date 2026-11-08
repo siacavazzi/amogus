@@ -6,11 +6,12 @@ import { normalizeListCode } from './savedGame';
 const KEY = 'sus_last_game_v1';
 const MAX_AGE_MS = 120 * 24 * 60 * 60 * 1000;
 
-export function rememberLastGame({ code, taskCount }, now = Date.now()) {
+export function rememberLastGame({ code, taskCount, group }, now = Date.now()) {
     const listCode = normalizeListCode(code);
     if (!listCode) return;
+    const groupToken = typeof group === 'string' && /^[A-Za-z0-9_-]{8,32}$/.test(group) ? group : undefined;
     try {
-        localStorage.setItem(KEY, JSON.stringify({ code: listCode, taskCount: Number(taskCount) || 0, playedAt: now }));
+        localStorage.setItem(KEY, JSON.stringify({ code: listCode, taskCount: Number(taskCount) || 0, playedAt: now, group: groupToken }));
     } catch (_) { /* Storage can be unavailable. */ }
 }
 

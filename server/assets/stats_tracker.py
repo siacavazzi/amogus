@@ -7,6 +7,7 @@ import logging
 import os
 import re
 import time
+from assets.groups import group_log_id
 from logging.handlers import RotatingFileHandler
 from threading import Lock
 from uuid import uuid4
@@ -239,6 +240,7 @@ class StatsTracker:
                 'task_source': game.task_source() if hasattr(game, 'task_source') else None,
                 'task_list_via': getattr(game, 'task_list_via', None) if getattr(game, 'task_list_applied', False) else None,
                 'setup_origin': getattr(game, 'setup_origin', None),
+                **self._group_fields(game),
                 'acquisition': self.normalize_acquisition(getattr(game, 'acquisition', None)),
                 'first_task_seconds': None, 'last_gameplay_at': game.round_started_at,
             }
@@ -252,6 +254,18 @@ class StatsTracker:
                 bucket['rooms_started'] += 1
                 game._acquisition_room_started = True
             self._save_locked()
+
+    @staticmethod
+    def _group_fields(game):
+        """Which group played (a one-way hash, never the link token) and whether it came back."""
+        group_return = getattr(game, 'group_return', None) or {}
+        return {
+            'group': group_log_id(getattr(game, 'group_id', None)),
+            'group_via': getattr(game, 'group_via', None),
+            'group_return': group_return.get('returning'),
+            'group_rooms_before': group_return.get('rooms_before'),
+            'group_hours_since_last': group_return.get('hours_since_last'),
+        }
 
     def record_player_seen(self, player_id):
         if not player_id:

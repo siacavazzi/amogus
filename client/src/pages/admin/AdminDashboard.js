@@ -429,6 +429,8 @@ function Report({ report, feedback }) {
           ? <Stat label="Phones" value={t.devices} previous={prev.devices || undefined} period={period} note={`${formatNumber(t.returning_devices)} returning · since ${dayLabel(report.devices_since)}`} />
           : <Stat label="Biggest round" value={t.biggest_round} note="players at the start" />}
         <Stat label="Median round" value={formatDuration(t.median_round_seconds)} note="finished rounds" />
+        <Stat label="Groups back" value={t.returning_groups ?? 0} previous={prev.returning_groups} period={period}
+          note={`played again on another day · ${formatNumber(t.rooms_from_group_links ?? 0)} rooms from group links`} />
       </section>
 
       <div className="adm-grid">

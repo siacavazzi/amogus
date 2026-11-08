@@ -816,7 +816,6 @@
   "Welcome back": "Velkommen tilbake",
   "Play your game from {date} again, with the same {count} tasks.": "Spill spillet ditt fra {date} igjen, med de samme {count} oppgavene.",
   "Play your game from {date} again, with the same tasks.": "Spill spillet ditt fra {date} igjen, med de samme oppgavene.",
-  "Host it again": "Vær vert igjen",
   "Not now": "Ikke nå",
   "Sus Party tonight. Tap to join room {roomCode}:": "Sus Party i kveld. Trykk for å bli med i rom {roomCode}:",
   "Send to the group chat": "Send til gruppechatten",
@@ -917,5 +916,12 @@
   "Delete my account": "Slett kontoen min",
   "This deletes your email and sign-in for good. Your lists will still open with their code, but you won't see them here any more.": "Dette sletter e-posten og innloggingen din for godt. Listene dine åpnes fortsatt med koden sin, men du ser dem ikke her lenger.",
   "Yes, delete my account": "Ja, slett kontoen min",
-  "Keep my account": "Behold kontoen"
+  "Keep my account": "Behold kontoen",
+  "Your group so far": "Gruppen deres så langt",
+  "Rounds": "Runder",
+  "Crew wins": "Mannskapet vant",
+  "Intruder wins": "Inntrengerne vant",
+  "Your group is playing": "Gruppen deres spiller nå",
+  "Your group is in room {room_code} right now.": "Gruppen deres er i rom {room_code} akkurat nå.",
+  "Join your group": "Bli med gruppen"
 }

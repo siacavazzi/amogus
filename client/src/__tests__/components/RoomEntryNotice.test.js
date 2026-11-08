@@ -33,4 +33,25 @@ describe('RoomEntryNotice', () => {
         expect(screen.getByRole('button', { name: 'Start a new game' })).toBeInTheDocument();
         expect(screen.queryByText('Try again')).not.toBeInTheDocument();
     });
+
+    it("shows the group's score with the old link", () => {
+        render(<RoomEntryNotice status={{ code: 'game_ended', room_code: 'RSJO', saved_game: { code: 'ZN5QF2', played_at: 1, task_count: 24 },
+            group_recap: { rooms: 1, rounds: 6, crew_wins: 2, intruder_wins: 4 } }}
+            onRetry={() => {}} onChangeCode={() => {}} onStartNew={() => {}} />);
+        expect(screen.getByTestId('group-recap-rounds')).toHaveTextContent('6');
+        expect(screen.getByTestId('group-recap-intruders')).toHaveTextContent('4');
+        expect(screen.getByRole('button', { name: 'Play it again' })).toBeInTheDocument();
+    });
+
+    it('joins the room a friend already started instead of starting another', () => {
+        const onStartNew = jest.fn();
+        render(<RoomEntryNotice status={{ code: 'game_ended', room_code: 'RSJO', saved_game: { code: 'ZN5QF2', played_at: 1, task_count: 24 },
+            group_room: { room_code: 'HEMY', link_token: 'tokenBBBBBBB' } }}
+            onRetry={() => {}} onChangeCode={() => {}} onStartNew={onStartNew} />);
+        expect(screen.getByText('Your group is playing')).toBeInTheDocument();
+        const link = screen.getByRole('link', { name: 'Join your group' });
+        expect(link.getAttribute('href')).toContain('room=HEMY');
+        expect(link.getAttribute('href')).toContain('g=tokenBBBBBBB');
+        expect(screen.queryByRole('button', { name: 'Play it again' })).toBeNull();
+    });
 });

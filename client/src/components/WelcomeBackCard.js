@@ -1,7 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import GroupRecap from './GroupRecap';
+import { buildRoomInviteUrl } from '../utils/inviteLinks';
 import { readLastGame, dismissLastGame } from '../utils/lastGame';
 import { savedGameUrl } from '../utils/savedGame';
 import { t } from '../i18n';
+import { ENDPOINT } from '../ENDPOINT';
+
+// The dev server (port 3000) doesn't serve /api; the game server does.
+const API = typeof window !== 'undefined' && window.location.port === '3000' ? ENDPOINT : '';
 
 function playedOn(ms) {
     try {
@@ -15,7 +21,19 @@ function playedOn(ms) {
 // that remembers them. A phone that finished a game gets that game's tasks back in one tap.
 export default function WelcomeBackCard({ style }) {
     const [game, setGame] = useState(readLastGame);
+    const [group, setGroup] = useState(null);
+    const token = game?.group;
+    useEffect(() => {
+        if (!token || typeof fetch !== 'function') return undefined;
+        let live = true;
+        fetch(`${API}/api/group?g=${encodeURIComponent(token)}`, { credentials: 'omit' })
+            .then(response => (response.ok ? response.json() : null))
+            .then(body => { if (live && body) setGroup(body); })
+            .catch(() => { /* The card works without the score. */ });
+        return () => { live = false; };
+    }, [token]);
     if (!game) return null;
+    const room = group?.room;
     const dismiss = () => { dismissLastGame(); setGame(null); };
     return (
         <section className="sg-welcome-back" aria-labelledby="welcome-back-title" style={{
@@ -28,11 +46,18 @@ export default function WelcomeBackCard({ style }) {
                     ? t('Play your game from {date} again, with the same {count} tasks.', { date: playedOn(game.playedAt), count: game.taskCount })
                     : t('Play your game from {date} again, with the same tasks.', { date: playedOn(game.playedAt) })}
             </p>
+            <GroupRecap recap={group?.recap} style={{ margin: '0 0 12px' }} />
+            {room && (
+                <p data-testid="group-room-live" style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 700, color: '#14161a' }}>
+                    {t('Your group is in room {room_code} right now.', { room_code: room.room_code })}
+                </p>
+            )}
             <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
-                <a href={savedGameUrl(game.code)} style={{
+                <a href={room ? buildRoomInviteUrl(room.room_code, window.location.origin, null, room.link_token)
+                    : savedGameUrl(game.code, window.location.origin, { group: token, from: 'welcome' })} style={{
                     background: '#14161a', color: '#fff', borderRadius: 12, padding: '10px 16px',
                     fontWeight: 800, fontSize: 16, textDecoration: 'none',
-                }}>{t('Host it again')}</a>
+                }}>{room ? t('Join your group') : t('Play it again')}</a>
                 <button type="button" onClick={dismiss} style={{
                     background: 'none', border: 0, padding: 4, color: 'inherit', fontWeight: 700, fontSize: 15,
                     textDecoration: 'underline', cursor: 'pointer',
