@@ -7,6 +7,7 @@ const fr = {
     hreflang: 'fr',
     nav: { play: 'Jouer', irl: 'Among Us en vrai' },
     footerNote: "Sus Party est un jeu de soirée indépendant. Il n'est ni affilié à Innersloth ni à Among Us, ni approuvé par eux.",
+    footerContact: 'Une question ou un problème ? Écrivez à ',
     common: {
         tour: {
             title: "Une manche en images",
@@ -74,6 +75,7 @@ const es = {
     hreflang: 'es',
     nav: { play: 'Jugar', irl: 'Among Us en la vida real' },
     footerNote: 'Sus Party es un juego de fiesta independiente. No está afiliado, respaldado ni patrocinado por Innersloth ni por Among Us.',
+    footerContact: '¿Preguntas o algún problema? Escríbenos a ',
     common: {
         tour: {
             title: "Así se ve una ronda",
@@ -141,6 +143,7 @@ const de = {
     hreflang: 'de',
     nav: { play: 'Spielen', irl: 'Among Us im echten Leben' },
     footerNote: 'Sus Party ist ein unabhängiges Partyspiel. Es steht in keiner Verbindung zu Innersloth oder Among Us und wird von ihnen weder unterstützt noch gesponsert.',
+    footerContact: 'Fragen oder ein Problem? Schreibt uns an ',
     common: {
         tour: {
             title: "So sieht eine Runde aus",
@@ -208,6 +211,7 @@ const ro = {
     hreflang: 'ro',
     nav: { play: 'Joacă', irl: 'Among Us în viața reală' },
     footerNote: 'Sus Party este un joc de petrecere independent. Nu este afiliat, susținut sau sponsorizat de Innersloth sau Among Us.',
+    footerContact: 'Întrebări sau o problemă? Scrie-ne la ',
     common: {
         tour: {
             title: "Cum arată o rundă",
@@ -275,6 +279,7 @@ const pt = {
     hreflang: 'pt-BR',
     nav: { play: 'Jogar', irl: 'Among Us na vida real' },
     footerNote: 'Sus Party é um jogo de festa independente. Não é afiliado, endossado nem patrocinado pela Innersloth ou por Among Us.',
+    footerContact: 'Dúvidas ou algum problema? Escreva para ',
     common: {
         tour: {
             title: "Como é uma rodada",
@@ -342,6 +347,7 @@ const no = {
     hreflang: 'no',
     nav: { play: 'Spill', irl: 'Among Us i virkeligheten' },
     footerNote: 'Sus Party er et uavhengig selskapsspill. Det er ikke tilknyttet, godkjent eller sponset av Innersloth eller Among Us.',
+    footerContact: 'Spørsmål eller problemer? Skriv til ',
     common: {
         tour: {
             title: 'Slik ser en runde ut',
@@ -409,6 +415,7 @@ const sv = {
     hreflang: 'sv',
     nav: { play: 'Spela', irl: 'Among Us i verkligheten' },
     footerNote: 'Sus Party är ett fristående partyspel. Det är inte anknutet till, godkänt eller sponsrat av Innersloth eller Among Us.',
+    footerContact: 'Frågor eller problem? Skriv till ',
     common: {
         tour: {
             title: 'Så ser en omgång ut',

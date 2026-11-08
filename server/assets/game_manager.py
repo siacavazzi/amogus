@@ -6,12 +6,16 @@ from assets.game import Game
 from assets.taskHandler import TaskHandler
 from assets.sonosHandler import GameSpeaker
 from assets.stats_tracker import StatsTracker
+from assets.dashboard_report import EventLogIndex
 from assets.room_codes import random_room_code, clean_room_code, canonical_room_code
 
 
 # A room closes after 3 hours with no game activity (any command, broadcast or
 # round change refreshes it). A finished game closes 3 hours after it ended.
 ROOM_TIMEOUT_SECONDS = 3 * 60 * 60
+# A lobby or results screen counts as in use while a screen is connected and something
+# happened this recently. Older rooms are idle: still open, waiting for the 3-hour timeout.
+LIVE_ACTIVITY_SECONDS = 15 * 60
 
 
 class GameManager:
@@ -218,24 +222,12 @@ class GameManager:
         avg_duration = int(sum(durations) / len(durations)) if durations else None
         setup_times = [g['setup_seconds'] for g in snapshot['round_history'] if g.get('setup_seconds') is not None]
 
-        # Live games right now
-        live_games = []
-        with self.lock:
-            for code, game in self.games.items():
-                live_games.append({
-                    'room_code': code,
-                    'created_at': getattr(game, 'created_at', None),
-                    'last_activity': getattr(game, 'last_activity', None),
-                    'running': bool(getattr(game, 'game_running', False)),
-                    'in_meeting': bool(getattr(game, 'meeting', False)),
-                    'player_count': len(getattr(game, 'players', [])),
-                    'has_ended': bool(getattr(game, 'end_state', None)),
-                    'end_state': getattr(game, 'end_state', None),
-                    'task_list_applied': bool(getattr(game, 'task_list_applied', False)),
-                })
+        live_games = self.live_rooms(now)
+        in_use = [g for g in live_games if g['status'] != 'idle']
 
         return {
             'generated_at': now,
+            'report': self.dashboard_report(snapshot['game_feedback']),
             'totals': {
                 'games_created': snapshot['total_games_created'],
                 'games_completed': snapshot['total_games_completed'],
@@ -246,8 +238,13 @@ class GameManager:
                 'games_completed': len(completed_today),
             },
             'live': {
-                'active_games': len(live_games),
-                'players_in_games': sum(g['player_count'] for g in live_games),
+                # Rooms in use: a round going, or a lobby with a connected screen and recent activity.
+                'active_games': len(in_use),
+                'playing': sum(1 for g in live_games if g['status'] == 'playing'),
+                'lobby': sum(1 for g in live_games if g['status'] == 'lobby'),
+                'idle': sum(1 for g in live_games if g['status'] == 'idle'),
+                'players_in_games': sum(g['connected_players'] for g in in_use),
+                'activity_window_seconds': LIVE_ACTIVITY_SECONDS,
                 'games': live_games,
             },
             'averages': {
@@ -266,6 +263,59 @@ class GameManager:
                 'recent_rounds': list(reversed(snapshot['round_history'][-25:])),
             },
         }
+
+    def dashboard_report(self, feedback=()):
+        """Day, week and 7/28-day numbers from the gameplay event log. None if the log can't be read."""
+        path = self.stats_tracker.events_path
+        index = getattr(self, '_event_index', None)
+        if index is None or index.events_path != path:
+            index = self._event_index = EventLogIndex(path)
+        try:
+            return index.report(feedback=feedback)
+        except Exception:
+            logging.getLogger('app_logger').exception('Dashboard report failed')
+            return None
+
+    def live_rooms(self, now=None):
+        """Every open room, sorted playing, lobby, idle. Test rooms from the e2e runs stay out."""
+        now = now or time.time()
+        with self.lock:
+            rooms = [(code, game) for code, game in self.games.items() if not getattr(game, 'synthetic', False)]
+            sockets = {}
+            for room_code in self.sid_to_game.values():
+                sockets[room_code] = sockets.get(room_code, 0) + 1
+        live = []
+        for code, game in rooms:
+            players = list(getattr(game, 'players', []))
+            connected = sum(1 for player in players if getattr(player, 'active', False))
+            last_activity = max(getattr(game, 'last_activity', 0) or 0, getattr(game, 'last_gameplay_at', 0) or 0)
+            recent = now - last_activity < LIVE_ACTIVITY_SECONDS
+            running = bool(getattr(game, 'game_running', False)) and not getattr(game, 'end_state', None)
+            if running and (connected or recent):
+                status = 'playing'
+            elif sockets.get(code, 0) and recent:
+                status = 'lobby'
+            else:
+                status = 'idle'
+            live.append({
+                'room_code': code,
+                'status': status,
+                'created_at': getattr(game, 'created_at', None),
+                'last_activity': last_activity or None,
+                'running': running,
+                'in_meeting': bool(getattr(game, 'meeting', False)),
+                'player_count': len(players),
+                'connected_players': connected,
+                'connected_sockets': sockets.get(code, 0),
+                'has_reactor': bool(getattr(game, 'reactor_sids', None)),
+                'round_number': getattr(game, 'round_number', 0),
+                'has_ended': bool(getattr(game, 'end_state', None)),
+                'end_state': getattr(game, 'end_state', None),
+                'test_mode': bool(getattr(game, 'test_mode', False)),
+                'task_list_applied': bool(getattr(game, 'task_list_applied', False)),
+            })
+        order = {'playing': 0, 'lobby': 1, 'idle': 2}
+        return sorted(live, key=lambda g: (order[g['status']], -(g['last_activity'] or 0)))
 
     def _start_cleanup_thread(self):
         """Start a background thread to clean up inactive games."""

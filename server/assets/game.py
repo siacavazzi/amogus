@@ -128,6 +128,7 @@ class Game:
         self.collaborative_tasks = []
         self.task_creation_mode = False
         self.task_list_applied = False  # Track if a task list was explicitly applied
+        self.task_list_via = None  # preset, example, saved, code or generator (see app.TASK_LIST_VIA)
         self.collaborative_task_list_code = None  # Code if collaborative tasks have been saved
         self.collaborative_task_list_name = None  # Name of the task list
         self.collaborative_mode = False  # If True, all players can add tasks; if False, only host

@@ -3,7 +3,7 @@ import qrcode from 'qrcode-generator';
 
 // A QR code drawn as one SVG path, made in the browser (no image service sees the room code).
 // Dark modules on a white tile with the standard four-module quiet zone, so phone cameras
-// read it from across the room on a TV or projector.
+// read it from across the room on a laptop screen.
 // Low error correction: a screen doesn't get scuffed, and fewer, bigger modules scan from farther.
 export function qrPath(text, errorCorrection = 'L') {
   const qr = qrcode(0, errorCorrection);

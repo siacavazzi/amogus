@@ -733,6 +733,9 @@ def handle_register_reactor(data):
 SETUP_STEPS = {'tasklist', 'settings'}
 END_SCREEN_ACTIONS = {'host_your_own', 'play_again', 'feedback_open', 'feedback_sent', 'how_to_play',
                       'save_game_shared', 'save_game_copied', 'install_shown', 'install_added', 'install_dismissed'}
+IN_APP_ACTIONS = {'shown', 'already_dismissed', 'open_browser', 'copy_link', 'keep_playing'}
+IN_APP_APPS = {'wechat', 'messenger', 'instagram', 'facebook', 'threads', 'tiktok', 'snapchat', 'reddit',
+               'twitter', 'linkedin', 'pinterest', 'line', 'google_app', 'webview'}
 CLIENT_METRICS_PER_SOCKET = 60
 
 
@@ -763,6 +766,11 @@ def handle_client_metric(data=None):
                      screen=clean_label(data.get('screen'), 60), where=clean_label(data.get('where'), 80),
                      client_version=clean_label(data.get('client_version'), 40),
                      unhandled_rejection=data.get('unhandled_rejection') is True)
+    elif kind == 'in_app_browser' and data.get('action') in IN_APP_ACTIONS:
+        # The phone opened the game inside Facebook, Reddit, X...: the pop-up asks to move to a real browser.
+        record_usage('in_app_browser', game, action=data['action'],
+                     app=data.get('app') if data.get('app') in IN_APP_APPS else 'unknown',
+                     os=data.get('os') if data.get('os') in ('ios', 'android', 'other') else 'unknown')
     elif kind == 'page_translated':
         # A browser translator rewrote this phone's page; later events from it carry the language.
         lang = clean_label(data.get('lang'), 12, r'[A-Za-z-]+') or 'unknown'
@@ -1766,6 +1774,10 @@ def handleDeath(data):
     game, player = current_phase_player(data)
     if not game:
         return command_error('This death report belongs to an inactive player or round.')
+    # Intruders can't be killed. In prod room TREM (2026-11-03) an intruder tapped the meeting
+    # screen's death button by mistake and handed the crew the round, so a stale phone can't either.
+    if player.sus:
+        return command_error("Intruders can't be killed.")
     meeting_id = data.get('meeting_id')
     if meeting_id and (not game.meeting or game.meeting.id != meeting_id):
         return command_error('This death report belongs to an earlier meeting.')
@@ -1990,6 +2002,9 @@ def handle_save_game_link(data):
     return {'ok': True, 'code': saved_game_list_code(game)}
 
 
+TASK_LIST_VIA = ('preset', 'example', 'saved', 'code', 'generator')
+
+
 @socketio.on('apply_task_list_to_game')
 @room_event()
 def handle_apply_task_list_to_game(data):
@@ -2025,6 +2040,9 @@ def handle_apply_task_list_to_game(data):
     game.task_handler.locations = game.locations
     game.task_handler.tasks = [task.copy() for task in task_list['tasks']]
     game.task_list_applied = True  # Mark that a task list was explicitly applied
+    # How the host picked it, for the round stats (see docs/gameplay-metrics.md).
+    picked_via = data.get('picked_via')
+    game.task_list_via = picked_via if picked_via in TASK_LIST_VIA else 'saved'
     
     # Also populate collaborative tasks so they show in the task editor
     game.collaborative_tasks = [dict(task, task_id=str(uuid4())) for task in task_list['tasks']]

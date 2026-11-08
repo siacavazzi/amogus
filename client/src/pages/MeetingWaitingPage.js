@@ -48,7 +48,8 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
   };
 
   const handleImDead = () => {
-    if(!window.confirm('Are you sure you want to mark yourself as dead?')) {
+    if (playerState?.sus) return;
+    if(!window.confirm(t('Are you sure you want to mark yourself as dead?'))) {
       return;
     }
     if (socket) {
@@ -134,10 +135,13 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
       {/* The dock sits in the page's flow and sticks to the bottom, so the slider can never cover
           the death button (on prod it did, on short phones and on the host's longer screen). */}
       <div data-testid="meeting-dock" className="sg-meet-dock">
-        <button type="button" data-testid="im-dead" className="sg-btn sg-btn-line sg-dead-btn" onClick={handleImDead}>
-          <Skull size={24} />
-          {t('I\'ve Been Killed')}
-        </button>
+        {/* Intruders can't be killed: on prod one tapped this by mistake and lost the round. */}
+        {!playerState?.sus && (
+          <button type="button" data-testid="im-dead" className="sg-btn sg-btn-line sg-dead-btn" onClick={handleImDead}>
+            <Skull size={24} />
+            {t('I\'ve Been Killed')}
+          </button>
+        )}
         {!playerState.ready && (
           <div
             className={highlightReadySlider ? 'animate-pulse' : ''}
