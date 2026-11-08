@@ -62,7 +62,8 @@ function AboutPage() {
 
                     <h2>Get involved</h2>
                     <p>
-                        Bug reports, feature ideas, and "I played this with 14 people and here's what broke" stories are all welcome. Open an issue or PR on{' '}
+                        Bug reports, feature ideas, and "I played this with 14 people and here's what broke" stories are all welcome. Email{' '}
+                        <a href="mailto:support@susparty.com">support@susparty.com</a>, or open an issue or PR on{' '}
                         <a href="https://github.com/siacavazzi/amogus" target="_blank" rel="noopener noreferrer">GitHub</a>.
                     </p>
                 </section>

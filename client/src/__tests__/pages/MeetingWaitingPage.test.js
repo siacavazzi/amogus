@@ -57,6 +57,17 @@ describe('MeetingWaitingPage', () => {
         confirm.mockRestore();
     });
 
+    it('never shows I\'ve Been Killed to an intruder, who cannot be killed (prod room TREM)', () => {
+        renderWithContext(<MeetingWaitingPage />, {
+            ...meetingContext,
+            playerState: { ...meetingContext.playerState, sus: true },
+        });
+        expect(screen.queryByTestId('im-dead')).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /I've Been Killed/i })).not.toBeInTheDocument();
+        // The intruder still gets the ready slide.
+        expect(screen.getByRole('button', { name: /Ready up/i })).toBeInTheDocument();
+    });
+
     it('rejoins and slides again when the server says this socket must reconnect first', () => {
         const { contextValue } = renderWithContext(<MeetingWaitingPage />, meetingContext);
         const { socket } = contextValue;

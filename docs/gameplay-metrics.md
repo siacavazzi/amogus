@@ -85,6 +85,7 @@ The restart timestamp does not prove when play stopped.
 - `host_entered` carries `setup_origin` (`generator` when "Use this pack" created the room) and the visit: `seconds_since_landing`, `pages_viewed` and `tools_used` (task generator, role generator, task ideas, how to play) in that browser session.
 - `task_completed` carries `task_seconds` (assigned to done) and `task_key`: the first 16 hex digits of SHA-256 over `lowercased task words|lowercased location`, with runs of spaces collapsed. It is unsalted so the same task matches across rooms; hash a site-written task the same way to name it.
 - Round summaries carry `meeting_quorum`, `auto_intruders`, `task_source` (`generator`, `saved_list`, `group`, `typed`, `builtin`) and `setup_origin`; the round end adds `median_task_seconds`, `slowest_task_seconds` and `tasks_held_over_5_min_at_end` (there is no skip button, so a task held that long is the abandoned-task signal).
+- When a saved list was applied, round summaries and `room_closed` also carry `task_list_via`: how the host picked it on the setup screen (`preset` for a list made from where they play, `example`, `saved` for one of their own lists, `code` for a list loaded by code, `generator`).
 - `room_closed` carries `was_opened`, `last_setup_step`, `setup_origin`, `task_source` and `has_reactor`, so rooms that never started show how far the host got.
 - Source tracking now reads `utm_source=chatgpt.com` (and similar domain-style tags) as its channel. Before this, those rooms were filed as `direct`.
 
@@ -119,3 +120,20 @@ Feedback rows hold the rating, comment, result, submission time and a test-room 
 player IDs, room codes or round IDs, and nothing about feedback goes into the gameplay event log except the
 `end_screen_action` taps `feedback_open` and `feedback_sent`. The server keeps the latest 500 rows in `stats.json`;
 the private dashboard shows the latest 25.
+
+## Private dashboard
+
+`/dashboard` (password: `ADMIN_PASSWORD`) reads `/api/admin/stats`. Its history comes from the event log through
+`server/assets/dashboard_report.py`, which reads the log and its rotated copies once and then only new lines, and rebuilds
+the numbers at most once a minute. Days and weeks are UTC; weeks start Monday.
+
+- **Right now.** A room is *playing* while a round runs and a phone is connected or something happened in the last
+  15 minutes; *lobby* when a screen is connected and something happened in the last 15 minutes; *idle* otherwise (still
+  open until the 3-hour timeout). The old "active games" counted every open room.
+- **Rounds** are rounds that started with 3+ players. **Players** adds up each room's biggest round. **Player seats**
+  counts every phone that joined a room, including a rejoin that got a new ID, so it runs higher.
+- **Sessions** are one group's rounds with no gap over 2 hours. Rooms that share 2+ anonymous device IDs join one
+  session. Before device IDs, a room whose first round starts within 30 minutes of another room's last round, with the
+  host on the same UTC offset and the same main phone language, joins that session. That fallback is an estimate.
+- Values that older builds didn't log ("unknown") stay out of the bars and percentages and are listed as left out.
+- To print the same report from a copy of the log: `cd server && python3 -m assets.dashboard_report path/to/gameplay-events.jsonl`.

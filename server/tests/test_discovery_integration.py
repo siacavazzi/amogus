@@ -18,7 +18,7 @@ class DiscoveryIntegrationTests(SocketGameTestCase):
         server_app.task_list_manager = self.previous_lists
         self.folder.cleanup()
 
-    def _start_imported_pack(self, finalize=False):
+    def _start_imported_pack(self, finalize=False, picked_via=None):
         clients = [self.make_client() for _ in range(8)]
         host = clients[0]
         host.emit('create_game', {'acquisition': {'source': 'google', 'landing_page': '/among-us-irl-task-generator'}})
@@ -28,7 +28,10 @@ class DiscoveryIntegrationTests(SocketGameTestCase):
             'tasks': [{'task': f'Task {number}', 'location': 'Kitchen' if number % 2 else 'Hallway'} for number in range(24)],
         })
         task_list = self.first_event(self.drain(host), 'task_list_created')['task_list']
-        host.emit('apply_task_list_to_game', {'room_code': room, 'task_list_code': task_list['code']})
+        apply = {'room_code': room, 'task_list_code': task_list['code']}
+        if picked_via:
+            apply['picked_via'] = picked_via
+        host.emit('apply_task_list_to_game', apply)
         self.assertEqual(24, self.first_event(self.drain(host), 'task_list_applied')['task_count'])
         host.emit('open_room', {'room_code': room})
         self.drain(host)
@@ -42,9 +45,16 @@ class DiscoveryIntegrationTests(SocketGameTestCase):
         row = server_app.game_manager.get_admin_stats()['acquisition'][0]
         self.assertEqual(('google', '/among-us-irl-task-generator'), (row['source'], row['landing_page']))
         self.assertEqual((1, 1, 1), (row['rooms_created'], row['rooms_started'], row['rounds_started']))
+        return server_app.game_manager.stats_tracker.snapshot()['round_history'][-1]
 
     def test_imported_pack_starts_from_normal_lobby_and_counts_its_source(self):
         self._start_imported_pack()
 
     def test_imported_pack_starts_from_task_editor_and_counts_its_source(self):
         self._start_imported_pack(finalize=True)
+
+    def test_round_records_how_the_host_picked_the_list(self):
+        self.assertEqual('preset', self._start_imported_pack(picked_via='preset')['task_list_via'])
+
+    def test_unknown_pick_counts_as_a_saved_list(self):
+        self.assertEqual('saved', self._start_imported_pack(picked_via='<script>')['task_list_via'])

@@ -21,6 +21,7 @@ test('every page in the sitemap opens cleanly on a phone and a laptop', async ({
             expect(response.status(), `${url} on the ${page.person}`).toBeLessThan(400);
             await expect(page.locator('h1').first(), `${url} has a heading on the ${page.person}`).toBeVisible();
             await expect(page.getByText("This page isn't here"), `${url} is a real page`).toHaveCount(0);
+            await expect(page.locator('footer a[href="mailto:support@susparty.com"]'), `${url} shows the support email`).toHaveCount(1);
             const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
             expect(overflow, `${url} doesn't scroll sideways on the ${page.person}`).toBeLessThanOrEqual(1);
         }
