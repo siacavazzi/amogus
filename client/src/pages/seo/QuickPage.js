@@ -1,7 +1,7 @@
 import React from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
-import GameplayScreenshots from './GameplayScreenshots';
+import GameplayScreenshots, { GameTour } from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 import QUICK_PAGES from './quickPages';
 
@@ -62,6 +62,7 @@ function QuickPage({ path }) {
                     <a href="/play" className="seo-btn--secondary">Join a game</a>
                 </div>
             </header>
+            <GameTour />
             <main className="seo-content">
                 <section className="seo-section">
                     <p className="seo-section__kicker">How it works</p>
