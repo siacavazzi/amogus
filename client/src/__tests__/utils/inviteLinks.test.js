@@ -1,4 +1,4 @@
-import { buildRoomInviteUrl, buildRoomQrUrl, getRoomCodeFromSearch, normalizeRoomCode } from '../../utils/inviteLinks';
+import { buildRoomInviteUrl, buildRoomQrUrl, getRoomCodeFromSearch, getLinkTokenFromSearch, normalizeRoomCode } from '../../utils/inviteLinks';
 import { qrPath } from '../../components/RoomQrCode';
 
 describe('inviteLinks', () => {
@@ -21,6 +21,14 @@ describe('inviteLinks', () => {
     it('builds a play invite URL from the current origin', () => {
         expect(buildRoomInviteUrl('abcd', 'https://susparty.com')).toBe('https://susparty.com/play?room=ABCD');
         expect(buildRoomInviteUrl('wxyz', 'http://localhost:3000')).toBe('http://localhost:3000/play?room=WXYZ');
+    });
+
+    it("carries the game's token, so an old link finds that game and not a later room with the same code", () => {
+        expect(buildRoomInviteUrl('abcd', 'https://susparty.com', 'share', 'k7Qm2xP9vT4w')).toBe('https://susparty.com/play?room=ABCD&via=share&g=k7Qm2xP9vT4w');
+        expect(buildRoomQrUrl('xyrr', { origin: 'https://susparty.com', linkToken: 'k7Qm2xP9vT4w' })).toBe('https://susparty.com/play?room=XYRR&g=k7Qm2xP9vT4w&via=qr');
+        expect(buildRoomInviteUrl('abcd', 'https://susparty.com', null, 'bad token!')).toBe('https://susparty.com/play?room=ABCD');
+        expect(getLinkTokenFromSearch('?room=ABCD&g=k7Qm2xP9vT4w')).toBe('k7Qm2xP9vT4w');
+        expect(getLinkTokenFromSearch('?room=ABCD&g=<script>')).toBe('');
     });
 
     it('builds the reactor QR link: the invite link marked as a scan, on beta when the reactor is', () => {

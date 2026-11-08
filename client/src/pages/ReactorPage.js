@@ -27,6 +27,7 @@ function ReactorNormal() {
         intrudersRevealed,
         waitingPlayers,
         lateJoinLive,
+        lobbyState,
      } = useContext(DataContext);
     const meeting = meetingState && meetingState.stage !== 'over';
     const [isSabotaging, setIsSabotaging] = useState(false);
@@ -201,7 +202,7 @@ function ReactorNormal() {
             </div>
 
             <div className="sg-rx__foot">{sabotage('sg-btn-red')}</div>
-            <LateJoin roomCode={roomCode} waitingPlayers={waitingPlayers} live={lateJoinLive} />
+            <LateJoin roomCode={roomCode} waitingPlayers={waitingPlayers} live={lateJoinLive} linkToken={lobbyState?.link_token} />
             {showAverted && <MeltdownAvertedDisplay />}
         </div>
     );
@@ -209,9 +210,9 @@ function ReactorNormal() {
 
 // Bottom-left corner during a round: latecomers scan to get on the next-round waiting list,
 // and everyone sees who is joining next round. Nobody on it is part of this round.
-export function LateJoin({ roomCode, waitingPlayers, live = false }) {
+export function LateJoin({ roomCode, waitingPlayers, live = false, linkToken = '' }) {
     const waiting = waitingPlayers || [];
-    const qrUrl = roomCode ? buildRoomQrUrl(roomCode, { beta: isBetaChannel() }) : '';
+    const qrUrl = roomCode ? buildRoomQrUrl(roomCode, { beta: isBetaChannel(), linkToken }) : '';
     if (!qrUrl && waiting.length === 0) return null;
     return (
         <aside className="sg-rx__late" data-testid="reactor-late-join">

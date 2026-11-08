@@ -23,6 +23,13 @@ describe('Save this game', () => {
         await waitFor(() => expect(contextValue.socket.emit).toHaveBeenCalledWith('client_metric', { kind: 'end_screen_action', action: 'save_game_shared' }));
     });
 
+    it('remembers the game for the home page welcome back card', async () => {
+        const { contextValue } = renderWithContext(<EndGameButtons />, { roomCode: 'ABCD', isMobile: true });
+        const call = contextValue.socket.emit.mock.calls.find(([event]) => event === 'save_game_link');
+        call[2]({ ok: true, code: 'ZN5QF2', task_count: 33 });
+        await waitFor(() => expect(localStorage.setItem).toHaveBeenCalledWith('sus_last_game_v1', expect.stringContaining('"code":"ZN5QF2"')));
+    });
+
     it('is not on the reactor screen', () => {
         renderWithContext(<EndGameButtons />, { roomCode: 'ABCD', isMobile: false });
         expect(screen.queryByRole('button', { name: /Save this game/ })).toBeNull();

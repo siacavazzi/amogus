@@ -23,6 +23,7 @@ from assets.sonosHandler import SonosController
 from assets.utils import *
 from assets.taskHandler import *
 from assets.task_list_manager import TaskListManager
+from assets.game_links import GameLinks, clean_link_token
 from assets.selfie_store import SelfieStore
 from assets.version import VERSION, VERSION_INFO
 from config import (
@@ -68,6 +69,8 @@ game_manager = GameManager(socketio, speaker, game_config, selfie_store=selfie_s
 
 # Task list manager for persistent task lists
 task_list_manager = TaskListManager()
+# What finished games played, so their old invite links can start the next game.
+game_links = GameLinks(os.path.join(os.path.dirname(__file__), 'data', 'game_links.json'))
 
 client_metrics_by_sid = {}
 # What the phone said about its last dropped connection, kept for the rejoin that follows.
@@ -271,6 +274,33 @@ def entry_details(data, room_code):
 def waiting_room(room_code):
     """The socket.io room for phones that tried a code before the host opened it."""
     return f'waiting-to-open:{room_code}'
+
+
+LINK_ENTRY_METHODS = {'qr', 'share_link', 'invite_link'}
+
+
+def saved_game_for_link(token):
+    """The list an old invite link brings back: made on first use, then reused."""
+    entry = game_links.lookup(token)
+    if not entry:
+        return None
+    code = entry.get('list_code')
+    if not code or not task_list_manager.get_task_list(code):
+        played = time.gmtime(entry['played_at'])
+        name = f"Game from {time.strftime('%b', played)} {played.tm_mday}"
+        code = task_list_manager.create_task_list('saved_game', name, entry['tasks'], entry['locations'],
+                                                  source_template='saved_game')
+        if not code:
+            return None
+        game_links.set_list_code(token, code)
+    return {'code': code, 'played_at': entry['played_at'], 'task_count': len(entry['tasks'])}
+
+
+def game_ended_error(room_code, token, details):
+    """A link to a game that is over. With its token it offers that game's tasks for a new room."""
+    saved = saved_game_for_link(token) if token else None
+    room_entry_error('game_ended', room_code, 'This game has ended. Start a new one.',
+                     {**details, 'saved_game': bool(saved)}, extra={'saved_game': saved})
 
 
 def room_entry_error(code, room_code, message, details=None, extra=None):
@@ -573,11 +603,18 @@ def handle_join_game(data):
     room_code = game_manager.resolve_room_code(data.get('room_code'))
     player_id = data.get('player_id')  # Optional: for reconnecting players
     details = entry_details(data, room_code)
-    
+    link_token = clean_link_token(data.get('link_token'))
+
     game = game_manager.get_game(room_code)
+    if link_token and game and link_token != game.link_token:
+        # The code was reused by another group since this link was sent: never join strangers.
+        game = None
     if not game:
-        room_entry_error('room_not_found', room_code, room_not_found_message(room_code), details)
         logger.warning(f"Join attempt for non-existent room: {room_code}")
+        if link_token or details['entry_method'] in LINK_ENTRY_METHODS:
+            game_ended_error(room_code, link_token, details)
+        else:
+            room_entry_error('room_not_found', room_code, room_not_found_message(room_code), details)
         return
     
     # The host coming back to setup (a dropped connection or a reload) before they have a player.
@@ -1255,6 +1292,8 @@ def start_room(game, test_mode=False):
     game.test_mode = test_mode
     game.assignRoles()
     game_manager.stats_tracker.record_game_started(game)
+    if not test_mode:
+        game_links.remember(game.link_token, game.collaborative_tasks, game.locations, len(game.players))
     record_usage('round_host_started', game, game.creator_player_id, test_mode=test_mode)
     for player in game.players:
         if not player.sus:
@@ -1999,7 +2038,8 @@ def handle_save_game_link(data):
         game, _ = game_manager.get_game_by_sid(request.sid)
     if not game:
         return command_error('Game session not found.')
-    return {'ok': True, 'code': saved_game_list_code(game)}
+    code = saved_game_list_code(game)
+    return {'ok': True, 'code': code, **({'task_count': len(game.collaborative_tasks)} if code else {})}
 
 
 TASK_LIST_VIA = ('preset', 'example', 'saved', 'code', 'generator')

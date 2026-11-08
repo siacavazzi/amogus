@@ -19,7 +19,12 @@ export function savedGameUrl(code, origin = window.location.origin) {
 
 /** Keeps a saved game the page was opened with until this phone next creates a room. */
 export function rememberSavedGame(search = window.location.search, now = Date.now()) {
-    const code = normalizeListCode(new URLSearchParams(search || '').get(SAVED_GAME_PARAM));
+    return keepSavedGame(new URLSearchParams(search || '').get(SAVED_GAME_PARAM), now);
+}
+
+/** Keeps a list code an old invite link brought back, the same way as a saved game link. */
+export function keepSavedGame(value, now = Date.now()) {
+    const code = normalizeListCode(value);
     if (!code) return '';
     try { localStorage.setItem(KEY, JSON.stringify({ code, savedAt: now })); } catch (_) { /* Storage can be unavailable. */ }
     return code;

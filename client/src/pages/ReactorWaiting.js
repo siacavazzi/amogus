@@ -51,7 +51,7 @@ function ReactorWaiting() {
   const many = joined.length > 10;
   const joinAt = typeof window !== 'undefined' ? `${window.location.host}/play` : '';
   // Scanning opens the join page with the code filled in, so nobody types it (and mistypes it).
-  const qrUrl = roomCode ? buildRoomQrUrl(roomCode, { beta: isBetaChannel() }) : '';
+  const qrUrl = roomCode ? buildRoomQrUrl(roomCode, { beta: isBetaChannel(), linkToken: lobbyState?.link_token }) : '';
 
   return (
     <div className="sg sg-screen sg-round sg-rx">

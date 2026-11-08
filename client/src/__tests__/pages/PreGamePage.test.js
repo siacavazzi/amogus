@@ -105,7 +105,7 @@ describe('PreGamePage', () => {
         it('copies the invite URL when native share is unavailable', async () => {
             renderWithContext(<PreGamePage />, { ...defaultContext, roomCode: 'ABCD' });
 
-            fireEvent.click(screen.getByRole('button', { name: /invite players to room/i }));
+            fireEvent.click(screen.getByRole('button', { name: /send to the group chat/i }));
 
             await waitFor(() => {
                 expect(navigator.clipboard.writeText).toHaveBeenCalledWith('http://localhost/play?room=ABCD&via=share');
@@ -116,11 +116,12 @@ describe('PreGamePage', () => {
             navigator.share = jest.fn().mockResolvedValue(undefined);
             renderWithContext(<PreGamePage />, { ...defaultContext, roomCode: 'ABCD' });
 
-            fireEvent.click(screen.getByRole('button', { name: /invite players to room/i }));
+            fireEvent.click(screen.getByRole('button', { name: /send to the group chat/i }));
 
             await waitFor(() => {
                 expect(navigator.share).toHaveBeenCalledWith(expect.objectContaining({
-                    title: 'Join my Sus Party room',
+                    title: 'Sus Party',
+                    text: 'Sus Party tonight. Tap to join room ABCD:',
                     url: 'http://localhost/play?room=ABCD&via=share',
                 }));
             });

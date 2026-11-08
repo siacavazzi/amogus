@@ -3,6 +3,7 @@ import { act, fireEvent, waitFor } from '@testing-library/react';
 import { renderWithContext, screen } from '../../test-utils';
 import { configureTestStorage } from '../../testing/gameFlowHarness';
 import EndGameButtons from '../../components/EndGameButtons';
+import { PROMPT_DELAY_MS, PROMPT_AFTER_SAVE_MS } from '../../components/GameFeedback';
 
 beforeAll(() => {
     // JSDOM lacks native dialog methods. Browser QA covers the real dialog.
@@ -24,7 +25,7 @@ function resultScreen(overrides = {}) {
 }
 function showPrompt(overrides = {}) {
     const result = resultScreen(overrides);
-    act(() => jest.advanceTimersByTime(3000));
+    act(() => jest.advanceTimersByTime(PROMPT_DELAY_MS));
     return result;
 }
 function openForm() {
@@ -33,9 +34,9 @@ function openForm() {
     return result;
 }
 
-test('waits three seconds before it shows the three choices and X', () => {
+test('waits 20 seconds, so Save this game has the screen first, then shows the three choices and X', () => {
     const { contextValue } = resultScreen();
-    act(() => jest.advanceTimersByTime(2999));
+    act(() => jest.advanceTimersByTime(PROMPT_DELAY_MS - 1));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     act(() => jest.advanceTimersByTime(1));
     expect(screen.getByRole('dialog')).toBeVisible();
@@ -49,7 +50,7 @@ test.each([['Play Again', 'reset'], ['Leave', 'leave_room']])('%s acts immediate
     const { contextValue } = resultScreen();
     fireEvent.click(screen.getByRole('button', { name: button }));
     expect(contextValue.socket.emit).toHaveBeenCalledWith(event, expect.objectContaining({ player_id: 'test_player_id', room_code: 'TEST1' }));
-    act(() => jest.advanceTimersByTime(3000));
+    act(() => jest.advanceTimersByTime(PROMPT_DELAY_MS));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 });
 
@@ -59,7 +60,7 @@ test.each(['Maybe later', 'Dismiss feedback'])('%s dismisses only the current ga
         expect(screen.getByRole('dialog')).toBeVisible();
         fireEvent.click(screen.getByRole('button', { name: button }));
         expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-        act(() => jest.advanceTimersByTime(5000));
+        act(() => jest.advanceTimersByTime(PROMPT_DELAY_MS + 2000));
         expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
         expect(promptEmits(result.contextValue.socket)).toEqual([]);
         result.unmount();
@@ -123,12 +124,27 @@ test('does not send an empty form', () => {
 
 test('never shows on the big screen, which is not a player', () => {
     resultScreen({ isMobile: false });
-    act(() => jest.advanceTimersByTime(5000));
+    act(() => jest.advanceTimersByTime(PROMPT_DELAY_MS + 2000));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 });
 
 test('does not show before the round has ended', () => {
     resultScreen({ endState: null });
-    act(() => jest.advanceTimersByTime(5000));
+    act(() => jest.advanceTimersByTime(PROMPT_DELAY_MS + 2000));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+});
+
+test('comes 2 seconds after the player is done with Save this game', async () => {
+    navigator.share = jest.fn().mockResolvedValue();
+    try {
+        const { contextValue } = resultScreen();
+        const call = contextValue.socket.emit.mock.calls.find(([event]) => event === 'save_game_link');
+        act(() => call[2]({ ok: true, code: 'ZN5QF2' }));
+        await act(async () => { fireEvent.click(screen.getByRole('button', { name: /Save this game/ })); });
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        act(() => jest.advanceTimersByTime(PROMPT_AFTER_SAVE_MS));
+        expect(screen.getByRole('dialog')).toBeVisible();
+    } finally {
+        delete navigator.share;
+    }
 });
