@@ -131,6 +131,26 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://susparty.com/sus-games</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://susparty.com/among-us-party-game</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://susparty.com/mafia-game-app</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://susparty.com/chore-game-app</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://susparty.com/how-to-play</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

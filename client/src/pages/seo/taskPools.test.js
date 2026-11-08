@@ -68,6 +68,29 @@ describe('task packs that can start a game', () => {
     });
 });
 
+describe('vibes', () => {
+    const party = new Set(TASKS.party.map(task => task.task));
+    const chill = new Set(TASKS.chill.map(task => task.task));
+    const pack = preset => generateTasks({ venue: 'house', preset, playerCount: 20, selectedRooms: ['Kitchen', 'Living Room', 'Hallway'], random: () => 0.3 });
+
+    it('fills a big game with no repeats in every vibe', () => {
+        for (const preset of ['standard', 'party', 'chill']) {
+            const { tasks } = pack(preset);
+            expect(tasks).toHaveLength(60);
+            expect(new Set(tasks.map(task => task.task)).size).toBe(60);
+        }
+    });
+
+    it('makes a party mostly party tasks and keeps chill free of them', () => {
+        const partyTasks = pack('party').tasks;
+        expect(partyTasks.filter(task => task.funny).length).toBeGreaterThanOrEqual(40);
+        expect(partyTasks.some(task => party.has(task.task))).toBe(true);
+        const chillTasks = pack('chill').tasks;
+        expect(chillTasks.some(task => task.funny || party.has(task.task))).toBe(false);
+        expect(chillTasks.filter(task => chill.has(task.task)).length).toBeGreaterThanOrEqual(30);
+    });
+});
+
 describe('task pools follow how hosts write their own tasks', () => {
     const allTasks = Object.values(TASKS).flat().map(task => task.task);
 

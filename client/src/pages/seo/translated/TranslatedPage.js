@@ -152,6 +152,7 @@ function TranslatedPage({ lang, page }) {
 
             <footer className="site-footer">
                 <LanguageLinks page={page} current={lang} />
+                <p className="site-footer__contact">{copy.footerContact}<a href="mailto:support@susparty.com">support@susparty.com</a></p>
                 <p className="site-footer__note">{copy.footerNote}</p>
             </footer>
         </div>

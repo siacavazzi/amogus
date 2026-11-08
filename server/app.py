@@ -5,6 +5,8 @@ import os
 import secrets
 import sys
 import copy
+import hashlib
+import json
 import re
 import time
 from functools import wraps
@@ -23,6 +25,7 @@ from assets.taskHandler import *
 from assets.task_list_manager import TaskListManager
 from assets.accounts import AccountStore, owner_key
 from assets.auth_routes import AuthRoutes
+from assets.game_links import GameLinks, clean_link_token
 from assets.selfie_store import SelfieStore
 from assets.version import VERSION, VERSION_INFO
 from config import (
@@ -68,6 +71,8 @@ game_manager = GameManager(socketio, speaker, game_config, selfie_store=selfie_s
 
 # Task list manager for persistent task lists
 task_list_manager = TaskListManager()
+# What finished games played, so their old invite links can start the next game.
+game_links = GameLinks(os.path.join(os.path.dirname(__file__), 'data', 'game_links.json'))
 
 # Optional host accounts (Google or an email code) so saved lists follow the host to any device.
 # Players never sign in. The socket learns who is signed in from the cookie on its handshake,
@@ -301,6 +306,33 @@ def entry_details(data, room_code):
 def waiting_room(room_code):
     """The socket.io room for phones that tried a code before the host opened it."""
     return f'waiting-to-open:{room_code}'
+
+
+LINK_ENTRY_METHODS = {'qr', 'share_link', 'invite_link'}
+
+
+def saved_game_for_link(token):
+    """The list an old invite link brings back: made on first use, then reused."""
+    entry = game_links.lookup(token)
+    if not entry:
+        return None
+    code = entry.get('list_code')
+    if not code or not task_list_manager.get_task_list(code):
+        played = time.gmtime(entry['played_at'])
+        name = f"Game from {time.strftime('%b', played)} {played.tm_mday}"
+        code = task_list_manager.create_task_list('saved_game', name, entry['tasks'], entry['locations'],
+                                                  source_template='saved_game')
+        if not code:
+            return None
+        game_links.set_list_code(token, code)
+    return {'code': code, 'played_at': entry['played_at'], 'task_count': len(entry['tasks'])}
+
+
+def game_ended_error(room_code, token, details):
+    """A link to a game that is over. With its token it offers that game's tasks for a new room."""
+    saved = saved_game_for_link(token) if token else None
+    room_entry_error('game_ended', room_code, 'This game has ended. Start a new one.',
+                     {**details, 'saved_game': bool(saved)}, extra={'saved_game': saved})
 
 
 def room_entry_error(code, room_code, message, details=None, extra=None):
@@ -603,11 +635,18 @@ def handle_join_game(data):
     room_code = game_manager.resolve_room_code(data.get('room_code'))
     player_id = data.get('player_id')  # Optional: for reconnecting players
     details = entry_details(data, room_code)
-    
+    link_token = clean_link_token(data.get('link_token'))
+
     game = game_manager.get_game(room_code)
+    if link_token and game and link_token != game.link_token:
+        # The code was reused by another group since this link was sent: never join strangers.
+        game = None
     if not game:
-        room_entry_error('room_not_found', room_code, room_not_found_message(room_code), details)
         logger.warning(f"Join attempt for non-existent room: {room_code}")
+        if link_token or details['entry_method'] in LINK_ENTRY_METHODS:
+            game_ended_error(room_code, link_token, details)
+        else:
+            room_entry_error('room_not_found', room_code, room_not_found_message(room_code), details)
         return
     
     # The host coming back to setup (a dropped connection or a reload) before they have a player.
@@ -761,7 +800,11 @@ def handle_register_reactor(data):
 # ============ PHONE-SIDE METRICS ============
 
 SETUP_STEPS = {'tasklist', 'settings'}
-END_SCREEN_ACTIONS = {'host_your_own', 'play_again', 'feedback_open', 'feedback_sent', 'how_to_play'}
+END_SCREEN_ACTIONS = {'host_your_own', 'play_again', 'feedback_open', 'feedback_sent', 'how_to_play',
+                      'save_game_shared', 'save_game_copied', 'install_shown', 'install_added', 'install_dismissed'}
+IN_APP_ACTIONS = {'shown', 'already_dismissed', 'open_browser', 'copy_link', 'keep_playing'}
+IN_APP_APPS = {'wechat', 'messenger', 'instagram', 'facebook', 'threads', 'tiktok', 'snapchat', 'reddit',
+               'twitter', 'linkedin', 'pinterest', 'line', 'google_app', 'webview'}
 CLIENT_METRICS_PER_SOCKET = 60
 
 
@@ -792,6 +835,11 @@ def handle_client_metric(data=None):
                      screen=clean_label(data.get('screen'), 60), where=clean_label(data.get('where'), 80),
                      client_version=clean_label(data.get('client_version'), 40),
                      unhandled_rejection=data.get('unhandled_rejection') is True)
+    elif kind == 'in_app_browser' and data.get('action') in IN_APP_ACTIONS:
+        # The phone opened the game inside Facebook, Reddit, X...: the pop-up asks to move to a real browser.
+        record_usage('in_app_browser', game, action=data['action'],
+                     app=data.get('app') if data.get('app') in IN_APP_APPS else 'unknown',
+                     os=data.get('os') if data.get('os') in ('ios', 'android', 'other') else 'unknown')
     elif kind == 'page_translated':
         # A browser translator rewrote this phone's page; later events from it carry the language.
         lang = clean_label(data.get('lang'), 12, r'[A-Za-z-]+') or 'unknown'
@@ -1280,6 +1328,8 @@ def start_room(game, test_mode=False):
     game.test_mode = test_mode
     game.assignRoles()
     game_manager.stats_tracker.record_game_started(game)
+    if not test_mode:
+        game_links.remember(game.link_token, game.collaborative_tasks, game.locations, len(game.players))
     record_usage('round_host_started', game, game.creator_player_id, test_mode=test_mode)
     for player in game.players:
         if not player.sus:
@@ -1799,6 +1849,10 @@ def handleDeath(data):
     game, player = current_phase_player(data)
     if not game:
         return command_error('This death report belongs to an inactive player or round.')
+    # Intruders can't be killed. In prod room TREM (2026-11-03) an intruder tapped the meeting
+    # screen's death button by mistake and handed the crew the round, so a stale phone can't either.
+    if player.sus:
+        return command_error("Intruders can't be killed.")
     meeting_id = data.get('meeting_id')
     if meeting_id and (not game.meeting or game.meeting.id != meeting_id):
         return command_error('This death report belongs to an earlier meeting.')
@@ -2005,6 +2059,45 @@ def handle_duplicate_task_list(data):
         emit('error', {'message': 'Failed to duplicate task list'})
 
 
+def saved_game_list_code(game):
+    """A task list code that holds this room's tasks, made once per task set, or None for built-in tasks."""
+    code = game.collaborative_task_list_code
+    if code and task_list_manager.get_task_list(code):
+        return code
+    tasks = [{'task': task.get('task'), 'location': task.get('location')}
+             for task in game.collaborative_tasks if isinstance(task, dict) and task.get('task')]
+    if not tasks:
+        return None
+    fingerprint = hashlib.sha256(json.dumps(tasks, sort_keys=True).encode()).hexdigest()
+    if getattr(game, 'saved_game_fingerprint', None) == fingerprint and task_list_manager.get_task_list(game.saved_game_code):
+        return game.saved_game_code
+    # The places the tasks use, topped up from the room's own when they use fewer than two.
+    used = [task['location'] for task in tasks if task['location'] and task['location'] != 'Other']
+    locations = list(dict.fromkeys(used if len(set(used)) >= 2 else used + [l for l in game.locations if l != 'Other']))
+    now = time.gmtime()
+    name = f"Game from {time.strftime('%b', now)} {now.tm_mday}"
+    code = task_list_manager.create_task_list('saved_game', name, tasks, locations, source_template='saved_game')
+    if code:
+        game.saved_game_code, game.saved_game_fingerprint = code, fingerprint
+    return code
+
+
+@socketio.on('save_game_link')
+@room_event(mutate=False)
+def handle_save_game_link(data):
+    """The end screen's "Save this game": a list code so any player can host these tasks later."""
+    game, _, _ = get_game_and_player(data.get('player_id'))
+    if not game:
+        game, _ = game_manager.get_game_by_sid(request.sid)
+    if not game:
+        return command_error('Game session not found.')
+    code = saved_game_list_code(game)
+    return {'ok': True, 'code': code, **({'task_count': len(game.collaborative_tasks)} if code else {})}
+
+
+TASK_LIST_VIA = ('preset', 'example', 'saved', 'code', 'generator')
+
+
 @socketio.on('apply_task_list_to_game')
 @room_event()
 def handle_apply_task_list_to_game(data):
@@ -2040,6 +2133,9 @@ def handle_apply_task_list_to_game(data):
     game.task_handler.locations = game.locations
     game.task_handler.tasks = [task.copy() for task in task_list['tasks']]
     game.task_list_applied = True  # Mark that a task list was explicitly applied
+    # How the host picked it, for the round stats (see docs/gameplay-metrics.md).
+    picked_via = data.get('picked_via')
+    game.task_list_via = picked_via if picked_via in TASK_LIST_VIA else 'saved'
     
     # Also populate collaborative tasks so they show in the task editor
     game.collaborative_tasks = [dict(task, task_id=str(uuid4())) for task in task_list['tasks']]

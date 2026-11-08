@@ -88,14 +88,14 @@ class StatsTracker:
     def normalize_acquisition(value):
         value = value if isinstance(value, dict) else {}
         sources = {'direct', 'google', 'bing', 'chatgpt', 'facebook', 'instagram',
-                   'snapchat', 'reddit', 'youtube', 'shared-link', 'other', 'unknown'}
+                   'snapchat', 'reddit', 'youtube', 'shared-link', 'saved-game', 'other', 'unknown'}
         pages = {'/', '/play', '/among-us-irl', '/how-to-play-among-us-irl',
                  '/among-us-irl-task-ideas', '/among-us-irl-task-generator',
                  '/social-deduction-games', '/among-us-birthday-party', '/party-games-for-10-people',
                  '/party-games-for-adults', '/murder-mystery-party-game',
                  '/birthday-party-games-for-adults', '/game-night-ideas',
                  '/make-cleaning-fun-for-kids', '/traitors-at-home', '/party-games-on-your-phone',
-                 '/sleepover-games-for-teens', '/indoor-family-reunion-games', '/among-us-role-generator', '/among-us-chores', '/chore-games-for-kids', '/family-cleaning-routine', '/among-us-party-for-kids', '/among-us-irl-for-youth-groups', '/among-us-task-cards-printable', '/holiday-party-games-for-adults', '/how-to-play', '/faq', '/about'}
+                 '/sleepover-games-for-teens', '/indoor-family-reunion-games', '/among-us-role-generator', '/among-us-chores', '/chore-games-for-kids', '/family-cleaning-routine', '/among-us-party-for-kids', '/among-us-irl-for-youth-groups', '/among-us-task-cards-printable', '/holiday-party-games-for-adults', '/sus-games', '/among-us-party-game', '/mafia-game-app', '/chore-game-app', '/how-to-play', '/faq', '/about'}
         source = value.get('source')
         page = value.get('landing_page')
         return {
@@ -237,6 +237,7 @@ class StatsTracker:
                 'meeting_quorum': getattr(game, 'meeting_quorum', None),
                 'auto_intruders': getattr(game, 'auto_intruders', None),
                 'task_source': game.task_source() if hasattr(game, 'task_source') else None,
+                'task_list_via': getattr(game, 'task_list_via', None) if getattr(game, 'task_list_applied', False) else None,
                 'setup_origin': getattr(game, 'setup_origin', None),
                 'acquisition': self.normalize_acquisition(getattr(game, 'acquisition', None)),
                 'first_task_seconds': None, 'last_gameplay_at': game.round_started_at,
@@ -369,6 +370,7 @@ class StatsTracker:
                           last_setup_step=getattr(game, 'last_setup_step', None),
                           setup_origin=getattr(game, 'setup_origin', None),
                           task_source=game.task_source() if hasattr(game, 'task_source') else None,
+                          task_list_via=getattr(game, 'task_list_via', None) if getattr(game, 'task_list_applied', False) else None,
                           has_reactor=bool(getattr(game, 'reactor_sid', None) or getattr(game, 'has_reactor', False)))
 
     # ---- end-of-round feedback ----

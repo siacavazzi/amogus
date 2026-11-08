@@ -6,7 +6,7 @@ import FakeTaskReveal from './components/FakeTaskReveal';
 import { markHasPlayedGame } from './tutorial/tutorialStorage';
 import { parseCards } from './utils/cardCopy';
 import { isMobile as isMobileDevice } from 'react-device-detect';
-import { getRoomCodeFromSearch, getEntryMethodFromSearch, clearRoomCodeFromUrl } from './utils/inviteLinks';
+import { getRoomCodeFromSearch, getEntryMethodFromSearch, getLinkTokenFromSearch, clearRoomCodeFromUrl } from './utils/inviteLinks';
 import { createDropTracker, installErrorReporting, sendClientMetric } from './utils/clientMetrics';
 import { translateConflicts, translatedTo, watchForTranslation } from './utils/translateGuard';
 import { getLanguage, t } from './i18n';
@@ -566,6 +566,7 @@ export default function GameContext({ children }) {
                     room_code: inviteRoomCode,
                     player_id: undefined,
                     entry_method: inviteEntryMethod,
+                    link_token: getLinkTokenFromSearch() || undefined,
                 });
             } else if (playerId) {
                 socketRef.current.emit('rejoin', {

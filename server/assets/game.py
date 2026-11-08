@@ -4,6 +4,7 @@ import json
 import logging
 from collections import OrderedDict
 from uuid import uuid4
+from assets.game_links import new_link_token
 from assets.player import Player
 from assets.taskHandler import *
 from assets.meltdown import *
@@ -115,6 +116,8 @@ class Game:
         # Secret handed to the creating socket, so a host who reconnects or reloads during
         # setup (before they have a player) can take the room back.
         self.host_token = None
+        # Rides on invite links and QR codes, so an old link finds this game's tasks after the room is gone.
+        self.link_token = new_link_token()
         
         # Reactor (desktop) support - must be set before CardDeck is created
         self.has_reactor = False
@@ -128,6 +131,7 @@ class Game:
         self.collaborative_tasks = []
         self.task_creation_mode = False
         self.task_list_applied = False  # Track if a task list was explicitly applied
+        self.task_list_via = None  # preset, example, saved, code or generator (see app.TASK_LIST_VIA)
         self.collaborative_task_list_code = None  # Code if collaborative tasks have been saved
         self.collaborative_task_list_name = None  # Name of the task list
         self.collaborative_mode = False  # If True, all players can add tasks; if False, only host

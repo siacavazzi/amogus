@@ -182,6 +182,34 @@
     "prerender": true
   },
   {
+    "path": "/sus-games",
+    "canonical": "https://susparty.com/sus-games",
+    "priority": "0.8",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
+    "path": "/among-us-party-game",
+    "canonical": "https://susparty.com/among-us-party-game",
+    "priority": "0.8",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
+    "path": "/mafia-game-app",
+    "canonical": "https://susparty.com/mafia-game-app",
+    "priority": "0.8",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
+    "path": "/chore-game-app",
+    "canonical": "https://susparty.com/chore-game-app",
+    "priority": "0.8",
+    "changefreq": "monthly",
+    "prerender": true
+  },
+  {
     "path": "/how-to-play",
     "canonical": "https://susparty.com/how-to-play",
     "priority": "0.8",
