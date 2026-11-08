@@ -3,6 +3,7 @@ import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
 import GameplayScreenshots, { GameTour } from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
+import WelcomeBackCard from '../../components/WelcomeBackCard';
 import { alternatesFor } from '../../seo/translatedPages';
 
 const FAQS = [
@@ -86,6 +87,7 @@ function AmongUsIrlPage() {
                         Create or join a room
                     </a>
                 </div>
+                <WelcomeBackCard style={{ marginTop: 18 }} />
             </div>
 
             <GameTour />

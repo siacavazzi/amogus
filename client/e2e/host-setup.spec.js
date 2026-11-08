@@ -16,21 +16,40 @@ test('a saved task list loads on another phone from its code', async ({ browser 
     const [first, second] = await h.openPhones(browser, ['Sam', 'Alex']);
     await startSetup(first);
     await h.addExampleList(first);
-    const meta = await first.locator('.hs-listrow__meta').first().textContent();
-    const listCode = meta.split('·').pop().trim();
+    const listCode = await h.savedListCode(first, 'Example List');
     expect(listCode).toMatch(/^[A-Z0-9]{6}$/);
 
-    // A different phone has none of Sam's lists until it types the code.
+    // A different phone has none of Sam's lists until it types the code, behind a small link.
     await startSetup(second);
+    await expect(second.locator('#task-list-code')).toHaveCount(0);
+    await second.getByRole('button', { name: 'Have a list code?' }).click();
     await second.locator('#task-list-code').fill(listCode.toLowerCase());
     await second.getByRole('button', { name: 'Load task list' }).click();
     await expect(second.getByRole('heading', { name: 'Example List' })).toBeVisible();
-    await expect(second.locator('.hs-listrow__meta', { hasText: listCode })).toBeVisible();
     await second.getByText('Use This Task List').click();
     await expect(second.getByRole('heading', { name: 'Game settings' })).toBeVisible();
     await expect(second.getByText('Using: Example List')).toBeVisible();
 
     h.expectNoPageErrors([first, second]);
+});
+
+test('a host gets a ready-made list from where they play and the vibe, with no player count', async ({ browser }) => {
+    const host = await h.openPhone(browser, 'Sam');
+    await startSetup(host);
+    await host.getByRole('button', { name: 'Big house', exact: true }).click();
+    await expect(host.getByRole('heading', { name: 'Big house' })).toBeVisible();
+    await host.getByRole('button', { name: 'Basement' }).click();
+    await expect(host.getByText(/\d+ areas · 60 tasks/)).toBeVisible();
+    await host.getByRole('button', { name: /^Party/ }).click();
+    await host.getByRole('button', { name: /Make my task list/ }).click();
+    await expect(host.getByRole('heading', { name: 'Big house · Party' })).toBeVisible();
+    await expect(host.getByText(/^60 tasks/)).toBeVisible();
+    await host.getByText('Use This Task List').click();
+    await expect(host.getByText('Using: Big house · Party')).toBeVisible();
+    await host.getByText('Open Room').click();
+    await h.enterName(host);
+
+    h.expectNoPageErrors([host]);
 });
 
 test('an avatar someone has is locked for the next player', async ({ browser }) => {

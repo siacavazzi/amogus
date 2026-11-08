@@ -107,7 +107,7 @@ test("the host's Invite button shares a link that brings a friend straight in", 
     const code = await h.createRoomOnPhone(host);
     await h.enterName(host);
 
-    await host.getByRole('button', { name: 'Invite players to room' }).click();
+    await host.getByRole('button', { name: 'Send to the group chat' }).click();
     const shared = await host.waitForFunction(() => window.sharedInvite).then(handle => handle.jsonValue());
     expect(shared.url).toContain(`room=${code}`);
     expect(shared.text).toContain(code);

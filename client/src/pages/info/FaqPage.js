@@ -62,8 +62,8 @@ const FAQS = [
         href: '/among-us-irl-task-generator?venue=other&players=8', linkLabel: 'Choose your task locations',
     },
     {
-        q: 'Do we need a TV or laptop?',
-        a: 'No. A phone-only game works. Larger devices act as the Reactor display rather than as players. Add one if you want the shared meltdown mini-game; each player still uses a phone.',
+        q: 'Do we need a laptop?',
+        a: 'No. A phone-only game works. A laptop or desktop acts as the Reactor display rather than as players. Add one if you want the shared meltdown mini-game; each player still uses a phone.',
     },
     {
         q: 'Does completing tasks win the game?',
@@ -74,6 +74,11 @@ const FAQS = [
         q: 'Is Sus Party the imposter word game?',
         a: 'No. Sus Party uses physical tasks, sabotage, meetings, and votes. It does not use the shared-secret-word format. Both are social deduction formats, but they create different clues and need different setups.',
         href: '/social-deduction-games', linkLabel: 'Compare social deduction formats',
+    },
+    {
+        q: 'How do I contact you?',
+        a: 'Email support@susparty.com with questions, bugs, or anything that went wrong in a game.',
+        href: 'mailto:support@susparty.com', linkLabel: 'Email support@susparty.com',
     },
     {
         q: 'Is Sus Party affiliated with Innersloth or Among Us?',

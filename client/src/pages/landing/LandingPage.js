@@ -5,6 +5,7 @@ import { alternatesFor } from '../../seo/translatedPages';
 import { SiteNav, SiteFooter } from '../../components/SiteChrome';
 import Avatar from '../../components/Avatar';
 import { ArrowRight } from '../../signal/icons';
+import WelcomeBackCard from '../../components/WelcomeBackCard';
 import { ROOM_QUERY_PARAM, VIA_QUERY_PARAM } from '../../utils/inviteLinks';
 
 // Screens captured from a real 8-phone game on the current build (public/images/landing).
@@ -240,6 +241,7 @@ function LandingPage() {
                             <a href="/play" className="sl-btn sl-btn--ink sl-btn--big sl-hero__start">Start a game <ArrowRight size="1em" /></a>
                             <p className="sl-hero__facts">Free in the browser, for 3 to 20+ players.</p>
                         </div>
+                        <WelcomeBackCard style={{ marginTop: 18 }} />
                     </div>
                     <HeroScene />
                     <JoinForm />

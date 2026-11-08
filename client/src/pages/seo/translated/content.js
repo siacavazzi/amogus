@@ -1,11 +1,13 @@
 // Copy for the translated homepage and Among Us IRL page. Machine-drafted: a native speaker
 // should read each language before it is promoted. The name "Sus Party" is never translated.
 // Spanish is neutral (ustedes, teléfono). Romanian and Portuguese avoid "sus" in the copy.
+// Norwegian is Bokmål (code "no", which Norwegian phones also reach as nb or nn).
 
 const fr = {
     hreflang: 'fr',
     nav: { play: 'Jouer', irl: 'Among Us en vrai' },
     footerNote: "Sus Party est un jeu de soirée indépendant. Il n'est ni affilié à Innersloth ni à Among Us, ni approuvé par eux.",
+    footerContact: 'Une question ou un problème ? Écrivez à ',
     common: {
         tour: {
             title: "Une manche en images",
@@ -73,6 +75,7 @@ const es = {
     hreflang: 'es',
     nav: { play: 'Jugar', irl: 'Among Us en la vida real' },
     footerNote: 'Sus Party es un juego de fiesta independiente. No está afiliado, respaldado ni patrocinado por Innersloth ni por Among Us.',
+    footerContact: '¿Preguntas o algún problema? Escríbenos a ',
     common: {
         tour: {
             title: "Así se ve una ronda",
@@ -140,6 +143,7 @@ const de = {
     hreflang: 'de',
     nav: { play: 'Spielen', irl: 'Among Us im echten Leben' },
     footerNote: 'Sus Party ist ein unabhängiges Partyspiel. Es steht in keiner Verbindung zu Innersloth oder Among Us und wird von ihnen weder unterstützt noch gesponsert.',
+    footerContact: 'Fragen oder ein Problem? Schreibt uns an ',
     common: {
         tour: {
             title: "So sieht eine Runde aus",
@@ -207,6 +211,7 @@ const ro = {
     hreflang: 'ro',
     nav: { play: 'Joacă', irl: 'Among Us în viața reală' },
     footerNote: 'Sus Party este un joc de petrecere independent. Nu este afiliat, susținut sau sponsorizat de Innersloth sau Among Us.',
+    footerContact: 'Întrebări sau o problemă? Scrie-ne la ',
     common: {
         tour: {
             title: "Cum arată o rundă",
@@ -274,6 +279,7 @@ const pt = {
     hreflang: 'pt-BR',
     nav: { play: 'Jogar', irl: 'Among Us na vida real' },
     footerNote: 'Sus Party é um jogo de festa independente. Não é afiliado, endossado nem patrocinado pela Innersloth ou por Among Us.',
+    footerContact: 'Dúvidas ou algum problema? Escreva para ',
     common: {
         tour: {
             title: "Como é uma rodada",
@@ -337,4 +343,140 @@ const pt = {
     },
 };
 
-export const TRANSLATED_CONTENT = { fr, es, de, ro, pt };
+const no = {
+    hreflang: 'no',
+    nav: { play: 'Spill', irl: 'Among Us i virkeligheten' },
+    footerNote: 'Sus Party er et uavhengig selskapsspill. Det er ikke tilknyttet, godkjent eller sponset av Innersloth eller Among Us.',
+    footerContact: 'Spørsmål eller problemer? Skriv til ',
+    common: {
+        tour: {
+            title: 'Slik ser en runde ut',
+            steps: [
+                ['Alle får en hemmelig rolle.', 'Telefonskjerm med en hemmelig rolle.'],
+                ['Mannskapet gjør ekte oppgaver rundt i huset.', 'Skjerm med en ekte oppgave og rommet den skal gjøres i.'],
+                ['Inntrengerne later som og spiller sabotasjekort.', 'Skjerm med en inntrenger i ventilen og et sabotasjekort.'],
+                ['Funnet en eliminert spiller? Alle samles.', 'Skjerm for nødmøte som viser hvem som har kommet.'],
+                ['Diskuter, og stem.', 'Avstemningsskjerm med ansiktet til hver spiller.'],
+            ],
+        },
+        eyebrow: 'Sus Party · Gratis spill i nettleseren',
+        start: 'Start et spill',
+        generator: 'Lag en oppgaveliste',
+        note: 'Gratis · Ingen konto eller nedlasting · 3 til 20+ spillere',
+        faqTitle: 'Vanlige spørsmål',
+        readyTitle: 'Klare til å spille?',
+        readyText: 'Åpne Sus Party, lag et rom og del koden. Dere er i gang på to minutter.',
+    },
+    home: {
+        title: 'Sus Party: gratis selskapsspill på mobilen, som Among Us',
+        description: 'Et gratis selskapsspill inspirert av Among Us og Varulv. Alle spiller på mobilen og går rundt i huset. For 3 til 20+ spillere, uten app.',
+        h1: 'Selskapsspillet som Among Us, i virkeligheten',
+        lead: 'Sus Party ligner mye på Among Us i virkeligheten eller Varulv. Det er veldig enkelt å spille og perfekt for fester og samlinger. Alle får en hemmelig rolle på telefonen, gjør ekte oppgaver rundt i huset og prøver å avsløre inntrengerne.',
+        stepsTitle: 'Slik fungerer det',
+        steps: [
+            ['Lag spillet', 'En vert åpner susparty.com og lager et rom. De andre blir med med koden på fire bokstaver.'],
+            ['Få rollen din', 'De fleste er mannskap. En eller flere inntrengere gjemmer seg blant dem.'],
+            ['Gjør oppgaver, finn inntrengerne', 'Mannskapet går rundt i huset og gjør oppgaver. Inntrengerne eliminerer folk i det skjulte. Alle kan kalle inn et møte og la gruppen stemme.'],
+        ],
+        irlLink: 'Slik spiller dere Among Us i virkeligheten →',
+        faqs: [
+            ['Må vi laste ned en app?', 'Nei. Alt foregår i nettleseren på telefonen. Dere trenger bare internett.'],
+            ['Hvor mange spillere trengs?', '3 til 20+. Til første runde passer 5 til 8 spillere med én inntrenger fint.'],
+            ['Er det gratis?', 'Ja, uten reklame og uten konto.'],
+        ],
+    },
+    irl: {
+        title: 'Among Us i virkeligheten: spill hjemme med mobilene | Sus Party',
+        description: 'Spill Among Us i virkeligheten, gratis. Telefonene deler ut hemmelige roller, oppgaver, møter og avstemninger for 3 til 20+ spillere. Uten app.',
+        h1: 'Spill Among Us i virkeligheten med Sus Party',
+        lead: 'Hjemmet ditt blir kartet og vennene dine blir de mistenkte. Sus Party tar seg av roller, oppgaver og avstemninger på hver telefon. Resten gjør dere selv.',
+        rolesTitle: 'Rollene',
+        roles: [
+            ['Mannskap', 'Gjør ekte oppgaver rundt i huset og stem for å kaste ut inntrengerne.'],
+            ['Inntrengere', 'Later som de jobber, eliminerer mannskapet i det skjulte og prøver å ikke bli tatt.'],
+        ],
+        setupTitle: 'Gjør klart spillet',
+        steps: [
+            ['Velg rommene', 'Bruk fellesrommene og en møteplass. La private rom være utenfor spillet.'],
+            ['Gjør klar oppgavene', 'Bruk eksempellisten, eller lag en liste som passer hjemmet deres med generatoren.'],
+            ['Del koden', 'Alle blir med med romkoden. Verten starter spillet, og rollene deles ut.'],
+        ],
+        winTitle: 'Hvem vinner?',
+        win: 'Mannskapet vinner når de har stemt ut alle inntrengerne. Når mannskapet er ferdig med oppgavene, blir inntrengerne avslørt og et møte starter. Inntrengerne vinner hvis de eliminerer hele mannskapet.',
+        faqs: [
+            ['Trenger vi en app?', 'Nei. Alle åpner susparty.com i nettleseren på telefonen og blir med med romkoden.'],
+            ['Hvor mange spillere?', '3 til 20+. Det trengs minst to mannskapsmedlemmer per inntrenger.'],
+            ['Er Sus Party et offisielt Among Us-spill?', 'Nei. Sus Party er et uavhengig spill og har ingenting med Innersloth å gjøre.'],
+        ],
+    },
+};
+
+const sv = {
+    hreflang: 'sv',
+    nav: { play: 'Spela', irl: 'Among Us i verkligheten' },
+    footerNote: 'Sus Party är ett fristående partyspel. Det är inte anknutet till, godkänt eller sponsrat av Innersloth eller Among Us.',
+    footerContact: 'Frågor eller problem? Skriv till ',
+    common: {
+        tour: {
+            title: 'Så ser en omgång ut',
+            steps: [
+                ['Alla får en hemlig roll.', 'Mobilskärm med en hemlig roll.'],
+                ['Besättningen gör riktiga uppgifter runt om i huset.', 'Skärm med en riktig uppgift och rummet där den ska göras.'],
+                ['Inkräktarna låtsas och spelar sabotagekort.', 'Skärm med en inkräktare i ventilen och ett sabotagekort.'],
+                ['Hittat en eliminerad spelare? Alla samlas.', 'Skärm för nödmöte som visar vem som har kommit.'],
+                ['Diskutera, och rösta sedan.', 'Röstningsskärm med varje spelares ansikte.'],
+            ],
+        },
+        eyebrow: 'Sus Party · Gratis spel i webbläsaren',
+        start: 'Starta ett spel',
+        generator: 'Skapa en uppgiftslista',
+        note: 'Gratis · Inget konto eller nedladdning · 3 till 20+ spelare',
+        faqTitle: 'Vanliga frågor',
+        readyTitle: 'Redo att spela?',
+        readyText: 'Öppna Sus Party, skapa ett rum och dela koden. Ni är igång på två minuter.',
+    },
+    home: {
+        title: 'Sus Party: gratis partyspel i mobilen, som Among Us',
+        description: 'Ett gratis partyspel inspirerat av Among Us och Maffia. Alla spelar i mobilen och går runt i huset. För 3 till 20+ spelare, utan app.',
+        h1: 'Partyspelet som Among Us, i verkligheten',
+        lead: 'Sus Party är väldigt likt Among Us i verkligheten eller Maffia. Det är jättelätt att spela och perfekt för fester och träffar. Alla får en hemlig roll i mobilen, gör riktiga uppgifter runt om i huset och försöker avslöja inkräktarna.',
+        stepsTitle: 'Så funkar det',
+        steps: [
+            ['Skapa spelet', 'En värd öppnar susparty.com och skapar ett rum. De andra går med med koden på fyra bokstäver.'],
+            ['Få din roll', 'De flesta tillhör besättningen. En eller flera inkräktare gömmer sig bland dem.'],
+            ['Gör uppgifter, hitta inkräktarna', 'Besättningen går runt i huset och gör uppgifter. Inkräktarna eliminerar folk i hemlighet. Alla kan kalla till möte och låta gruppen rösta.'],
+        ],
+        irlLink: 'Så spelar ni Among Us i verkligheten →',
+        faqs: [
+            ['Behöver vi ladda ner en app?', 'Nej. Allt sker i mobilens webbläsare. Ni behöver bara internet.'],
+            ['Hur många spelare behövs?', '3 till 20+. Första gången passar 5 till 8 spelare med en inkräktare bra.'],
+            ['Är det gratis?', 'Ja, utan reklam och utan konto.'],
+        ],
+    },
+    irl: {
+        title: 'Among Us i verkligheten: spela hemma med mobilerna | Sus Party',
+        description: 'Spela Among Us i verkligheten, gratis. Mobilerna delar ut hemliga roller, uppgifter, möten och omröstningar för 3 till 20+ spelare. Utan app.',
+        h1: 'Spela Among Us i verkligheten med Sus Party',
+        lead: 'Ditt hem blir kartan och dina vänner blir de misstänkta. Sus Party sköter roller, uppgifter och omröstningar i varje mobil. Resten gör ni själva.',
+        rolesTitle: 'Rollerna',
+        roles: [
+            ['Besättning', 'Gör riktiga uppgifter runt om i huset och röstar för att kasta ut inkräktarna.'],
+            ['Inkräktare', 'Låtsas jobba, eliminerar besättningen i hemlighet och försöker att inte åka fast.'],
+        ],
+        setupTitle: 'Förbered spelet',
+        steps: [
+            ['Välj rummen', 'Använd de gemensamma rummen och en mötesplats. Håll privata rum utanför spelet.'],
+            ['Förbered uppgifterna', 'Använd exempellistan, eller skapa en lista som passar ert hem med generatorn.'],
+            ['Dela koden', 'Alla går med med rumskoden. Värden startar spelet och rollerna delas ut.'],
+        ],
+        winTitle: 'Vem vinner?',
+        win: 'Besättningen vinner när den har röstat ut alla inkräktare. När besättningen är klar med uppgifterna avslöjas inkräktarna och ett möte börjar. Inkräktarna vinner om de eliminerar hela besättningen.',
+        faqs: [
+            ['Behöver vi en app?', 'Nej. Alla öppnar susparty.com i mobilens webbläsare och går med med rumskoden.'],
+            ['Hur många spelare?', '3 till 20+. Det behövs minst två besättningsmedlemmar per inkräktare.'],
+            ['Är Sus Party ett officiellt Among Us-spel?', 'Nej. Sus Party är ett fristående spel och har ingenting med Innersloth att göra.'],
+        ],
+    },
+};
+
+export const TRANSLATED_CONTENT = { fr, es, de, ro, pt, no, sv };

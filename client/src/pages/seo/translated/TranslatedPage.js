@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { usePageMeta } from '../../../seo/usePageMeta';
-import { alternatesFor, pagePath, pageUrl, LANGUAGE_NAMES, PAGE_LANGUAGES } from '../../../seo/translatedPages';
+import { alternatesFor, pagePath, pageUrl, HREFLANG, LANGUAGE_NAMES, PAGE_LANGUAGES } from '../../../seo/translatedPages';
 import { applyDocumentLanguage, chooseLanguage } from '../../../i18n';
 import { TRANSLATED_CONTENT } from './content';
 import { GameTour, TOUR_STEPS } from '../GameplayScreenshots';
@@ -152,6 +152,7 @@ function TranslatedPage({ lang, page }) {
 
             <footer className="site-footer">
                 <LanguageLinks page={page} current={lang} />
+                <p className="site-footer__contact">{copy.footerContact}<a href="mailto:support@susparty.com">support@susparty.com</a></p>
                 <p className="site-footer__note">{copy.footerNote}</p>
             </footer>
         </div>
@@ -165,7 +166,7 @@ export function LanguageLinks({ page = 'home', current = 'en' }) {
             {['en', ...PAGE_LANGUAGES].map(code => (
                 code === current
                     ? <span key={code} aria-current="page">{LANGUAGE_NAMES[code]}</span>
-                    : <a key={code} href={pagePath(code, page)} hrefLang={code === 'pt' ? 'pt-BR' : code} lang={code}>{LANGUAGE_NAMES[code]}</a>
+                    : <a key={code} href={pagePath(code, page)} hrefLang={HREFLANG[code]} lang={code}>{LANGUAGE_NAMES[code]}</a>
             ))}
         </nav>
     );

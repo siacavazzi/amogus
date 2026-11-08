@@ -49,6 +49,13 @@ class ExampleTasksInLobbyTests(SocketGameTestCase):
         self.assertEqual("Ouvre le frigo et trouve le truc le plus vieux à l'intérieur", game.collaborative_tasks[0]['task'])
         self.assertEqual('Other', game.locations[-1])
 
+    def test_norwegian_and_swedish_phones_get_their_example_lists(self):
+        # Norwegian phones report Bokmål as nb-NO (or nn for Nynorsk); both get the Norwegian list.
+        for lang, kitchen in (('nb-NO', 'Kjøkken'), ('nn', 'Kjøkken'), ('no', 'Kjøkken'), ('sv-SE', 'Kök')):
+            clients, room, ids, game = self.setup_lobby(5)
+            clients[0].emit('add_example_tasks', {'room_code': room, 'player_id': ids[0], 'lang': lang})
+            self.assertIn(kitchen, game.locations, lang)
+
     def test_a_language_without_a_list_gets_english(self):
         clients, room, ids, game = self.setup_lobby(5)
         clients[0].emit('add_example_tasks', {'room_code': room, 'player_id': ids[0], 'lang': 'ja'})

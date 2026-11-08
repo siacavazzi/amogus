@@ -61,6 +61,8 @@ def lobby_state(game):
         'can_start_test': can_start_test(game), 'start_error': error, 'start_reason': reason,
         'tasks_missing': max(0, minimum_tasks(game) - len(game.collaborative_tasks)),
         'host_player_id': game.creator_player_id,
+        # Invite links and QR codes carry it, so an old link can find this game's tasks later.
+        'link_token': getattr(game, 'link_token', None),
         'intruder_count': game.intruder_count_for_start(), 'auto_intruders': game.auto_intruders,
     })
 

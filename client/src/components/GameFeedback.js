@@ -8,10 +8,13 @@ import { isFeedbackSnoozed, snoozeFeedback } from '../utils/feedbackPrompt';
 import { t, tk } from '../i18n';
 
 const RATINGS = [['fun', tk('Fun')], ['okay', tk('Okay')], ['needs_work', tk('Needs work')]];
-const PROMPT_DELAY_MS = 3000;
+// Half the phones leave within a minute of the night's last round, so "Save this game" gets the
+// screen first: the prompt waits 20 s, or comes 2 s after the player is done saving.
+export const PROMPT_DELAY_MS = 20000;
+export const PROMPT_AFTER_SAVE_MS = 2000;
 
-// "How was this game?" a few seconds after the result screen, on phones only. Every part of it is optional.
-export default function GameFeedback() {
+// "How was this game?" on the result screen, on phones only. Every part of it is optional.
+export default function GameFeedback({ delayMs = PROMPT_DELAY_MS }) {
     const { socket, roomCode, roundId, endState, isMobile } = useContext(DataContext);
     const [open, setOpen] = useState(false);
     const [writing, setWriting] = useState(false);
@@ -28,9 +31,9 @@ export default function GameFeedback() {
         if (!eligible) return undefined;
         const timer = setTimeout(() => {
             if (!isFeedbackSnoozed()) setOpen(true);
-        }, PROMPT_DELAY_MS);
+        }, delayMs);
         return () => clearTimeout(timer);
-    }, [eligible, roundId]);
+    }, [eligible, roundId, delayMs]);
 
     useEffect(() => {
         if (!open || !eligible) return undefined;

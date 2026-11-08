@@ -15,6 +15,16 @@ describe('detectLanguage', () => {
         expect(detectLanguage({ search: '', stored: null, browser: ['fr-CA', 'en'], headless: false })).toBe('fr');
         expect(detectLanguage({ search: '', stored: null, browser: ['ja', 'ro-RO'], headless: false })).toBe('ro');
         expect(detectLanguage({ search: '', stored: null, browser: ['pt-BR'], headless: false })).toBe('pt');
+        expect(detectLanguage({ search: '', stored: null, browser: ['sv-SE', 'en'], headless: false })).toBe('sv');
+    });
+
+    it('maps every Norwegian browser code to Norwegian', () => {
+        for (const code of ['nb-NO', 'nb', 'no', 'nn-NO', 'no_NO']) {
+            expect(detectLanguage({ search: '', stored: null, browser: [code], headless: false })).toBe('no');
+        }
+        expect(detectLanguage({ search: '?lang=nb', stored: null, browser: [], headless: false })).toBe('no');
+        expect(detectLanguage({ pathname: '/no/among-us-irl', stored: null, browser: [], headless: true })).toBe('no');
+        expect(detectLanguage({ pathname: '/sv', stored: null, browser: [], headless: true })).toBe('sv');
     });
 
     it('keeps English-first browsers in English', () => {
@@ -65,6 +75,12 @@ describe('t and tn', () => {
         setLanguageForTesting('pt');
         expect(tn(0, '{count} task', '{count} tasks')).toBe('0 tarefas');
         expect(tn(1, '{count} task', '{count} tasks')).toBe('1 tarefa');
+        setLanguageForTesting('no');
+        expect(tn(1, '{count} task', '{count} tasks')).toBe('1 oppgave');
+        expect(tn(0, '{count} task', '{count} tasks')).toBe('0 oppgaver');
+        setLanguageForTesting('sv');
+        expect(tn(1, '{count} task', '{count} tasks')).toBe('1 uppgift');
+        expect(tn(5, '{count} task', '{count} tasks')).toBe('5 uppgifter');
     });
 
     it('translates server messages that carry values', () => {

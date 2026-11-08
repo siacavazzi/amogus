@@ -1,5 +1,7 @@
 import json
+import shutil
 import sys
+import tempfile
 import unittest
 from uuid import uuid4
 from pathlib import Path
@@ -11,6 +13,7 @@ if str(SERVER_DIR) not in sys.path:
 
 import app as server_app  # noqa: E402
 from assets.card import Card  # noqa: E402
+from assets.game_links import GameLinks  # noqa: E402
 
 
 class NoopStatsTracker:
@@ -70,6 +73,10 @@ class SocketGameTestCase(unittest.TestCase):
         server_app.game_manager.player_to_game.clear()
         server_app.game_manager.sid_to_game.clear()
         server_app.game_manager.stats_tracker = NoopStatsTracker()
+        # Old-link records go to a scratch file, not server/data.
+        links_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, links_dir, True)
+        server_app.game_links = GameLinks(str(Path(links_dir) / 'game_links.json'))
 
     def make_client(self):
         return protocol_client(self.socketio.test_client(self.flask_app))
