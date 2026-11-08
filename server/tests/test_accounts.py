@@ -232,6 +232,15 @@ class GoogleTests(AccountTestCase):
         self.assertEqual('/account', self.routes.safe_return('https://evil.example'))
         self.assertEqual('/account', self.routes.safe_return('//evil.example'))
         self.assertEqual('/play?x=1', self.routes.safe_return('/play?x=1'))
+        self.assertEqual('/account', self.routes.safe_return('/</script><script>alert(1)</script>'))
+        self.assertEqual('/account', self.routes.safe_return('/play"onload'))
+
+    def test_the_return_page_cannot_be_broken_out_of(self):
+        browser = server_app.app.test_client()
+        browser.get('/api/auth/google/start?return=/%3C/script%3E%3Cscript%3Ealert(1)%3C/script%3E')
+        page = browser.get('/api/auth/google/callback?state=nope&code=abc')
+        self.assertNotIn(b'<script>alert', page.data)
+        self.assertIn(b'"/account"', page.data)
 
 
 class ListOwnershipTests(AccountTestCase):

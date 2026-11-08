@@ -44,6 +44,7 @@ GOOGLE_ISSUERS = {'accounts.google.com', 'https://accounts.google.com'}
 GOOGLE_STATE_TTL = 15 * 60
 DEVICE_ID_RE = re.compile(r'^device_[a-z0-9]{4,40}$')
 TEST_EMAIL_DOMAIN = '@example.com'
+SAFE_RETURN_RE = re.compile(r'^/[A-Za-z0-9/_.~%=&?-]*$')
 
 
 def google_configured():
@@ -136,10 +137,12 @@ class AuthRoutes:
 
     @staticmethod
     def safe_return(path):
-        """Only paths on this site, never another host."""
-        if not isinstance(path, str) or not path.startswith('/') or path.startswith('//') or '\\' in path:
+        """Only plain paths on this site: never another host, and nothing that could break out of
+        the script on the page Google sends the host back to."""
+        if (not isinstance(path, str) or len(path) > 300 or not SAFE_RETURN_RE.match(path)
+                or path.startswith('//')):
             return '/account'
-        return path[:300]
+        return path
 
     def _fetch_google_token(self, code, verifier):
         form = urllib.parse.urlencode({
@@ -168,7 +171,9 @@ class AuthRoutes:
     def finish_page(self, ok, return_to, popup):
         """The page the Google pop-up lands on: tell the setup screen and close."""
         message = json.dumps({'type': 'sus-sign-in', 'ok': bool(ok)})
-        target = json.dumps(return_to)
+        # safe_return already limits the characters; escaping < and > as well keeps the script
+        # block closed whatever it is given.
+        target = json.dumps(self.safe_return(return_to)).replace('<', '\\u003c').replace('>', '\\u003e')
         text = 'Signed in. You can close this window.' if ok else 'Sign-in did not finish. You can close this window and try again.'
         page = f'''<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Sus Party</title><meta name="robots" content="noindex"></head>
