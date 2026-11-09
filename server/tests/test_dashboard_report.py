@@ -40,9 +40,9 @@ class LogWriter:
         self.write('player_joined', ts, room_session_id=rs, participant_id=participant, device_class='mobile',
                    browser_family=browser, device_lang=lang, **({'anon_device_id': anon} if anon else {}))
 
-    def round(self, rs, rid, ts, players, end_state='victory', win='intruders_voted_out', outcome='completed', anon=()):
+    def round(self, rs, rid, ts, players, end_state='victory', win='intruders_voted_out', outcome='completed', anon=(), group=None):
         self.write('round_started', ts, room_session_id=rs, round_id=rid, started_at=ts,
-                   player_count_at_start=players, task_source='generator', anon_device_ids=list(anon))
+                   player_count_at_start=players, task_source='generator', anon_device_ids=list(anon), **(group or {}))
         if outcome:
             self.write('round_ended', ts + 600, room_session_id=rs, round_id=rid, outcome=outcome,
                        ended_at=ts + 600, end_state=end_state, win_condition=win, duration_seconds=600)
@@ -95,6 +95,21 @@ class DashboardReportTests(unittest.TestCase):
         self.assertEqual('2026-11-05', report['daily'][-3]['label'])
         room = week['recent_rooms'][0]
         self.assertEqual((4, 4, 2, 1, 1), (room['rounds'], room['max_players'], room['crew_wins'], room['intruder_wins'], room['unfinished']))
+
+    def test_counts_groups_that_came_back_from_their_links(self):
+        day = NOW - 2 * 86400
+        self.log.room('room-a', day)
+        self.log.round('room-a', 'a1', day + 60, 4, group={'group': 'g1', 'group_via': 'old_link', 'group_return': True})
+        self.log.round('room-a', 'a2', day + 900, 4, group={'group': 'g1', 'group_via': 'old_link', 'group_return': True})
+        self.log.room('room-b', day + 3000)
+        self.log.round('room-b', 'b1', day + 3060, 5, group={'group': 'g2', 'group_via': 'saved_link', 'group_return': False})
+        self.log.room('room-c', day + 5000)
+        self.log.round('room-c', 'c1', day + 5060, 5, group={'group': 'g3', 'group_via': None, 'group_return': False})
+
+        week = self.report()['windows']['7']
+        self.assertEqual(1, week['totals']['returning_groups'])
+        self.assertEqual(2, week['totals']['rooms_from_group_links'])
+        self.assertEqual({'old_link': 1, 'saved_link': 1}, {row['key']: row['count'] for row in week['group_links']})
 
     def test_rooms_sharing_devices_join_one_session_and_returning_devices_count(self):
         day = NOW - 86400

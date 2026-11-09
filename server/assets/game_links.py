@@ -41,7 +41,7 @@ class GameLinks:
         except (OSError, ValueError):
             pass
 
-    def remember(self, token, tasks, locations, player_count, now=None):
+    def remember(self, token, tasks, locations, player_count, now=None, group=None):
         """Called when a round starts: the room's tasks, so the link can bring them back later."""
         token = clean_link_token(token)
         tasks = [{'task': task.get('task'), 'location': task.get('location')}
@@ -53,6 +53,9 @@ class GameLinks:
             previous = self.links.get(token) or {}
             entry = {'played_at': now, 'tasks': tasks, 'locations': list(locations or []),
                      'player_count': max(player_count, previous.get('player_count', 0))}
+            group = clean_link_token(group)
+            if group and group != token:
+                entry['group'] = group
             # A list made from these same tasks can be handed out again.
             if previous.get('tasks') == tasks and previous.get('list_code'):
                 entry['list_code'] = previous['list_code']
@@ -68,6 +71,13 @@ class GameLinks:
             if not entry or now - entry.get('played_at', 0) > MAX_AGE_SECONDS:
                 return None
             return dict(entry)
+
+    def group_of(self, token, now=None):
+        """The group a link belongs to: the group its game was started from, else the game itself."""
+        entry = self.lookup(token, now=now)
+        if not entry:
+            return None
+        return entry.get('group') or clean_link_token(token)
 
     def set_list_code(self, token, code):
         with self.lock:

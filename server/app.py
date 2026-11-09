@@ -27,6 +27,7 @@ from assets.accounts import AccountStore, owner_key
 from assets.player_stats import PlayerStatsStore
 from assets.auth_routes import AuthRoutes
 from assets.game_links import GameLinks, clean_link_token
+from assets.groups import GroupBook, GROUP_VIA
 from assets.selfie_store import SelfieStore
 from assets.version import VERSION, VERSION_INFO
 from config import (
@@ -74,6 +75,47 @@ game_manager = GameManager(socketio, speaker, game_config, selfie_store=selfie_s
 task_list_manager = TaskListManager()
 # What finished games played, so their old invite links can start the next game.
 game_links = GameLinks(os.path.join(os.path.dirname(__file__), 'data', 'game_links.json'))
+# Groups that come back from those links, with their score so far. Counts only, no people.
+group_book = GroupBook(os.path.join(os.path.dirname(__file__), 'data', 'groups.json'))
+
+
+def counts_for_group(game):
+    """Real rounds only: no solo test games, at least 3 players (as in the stats). Automated test
+    rooms keep a score too, so the browser tests can check it; the gameplay log leaves them out."""
+    return not game.test_mode and len(game.players) >= 3
+
+
+def group_room_started(game):
+    """A room's first real round: count it for its group and note in the log whether the group is back."""
+    if getattr(game, '_group_counted', False) or not counts_for_group(game):
+        return
+    game._group_counted = True
+    game.group_return = group_book.room_started(game.group_id)
+    game.group_log = group_book.log_id(game.group_id)
+
+
+def group_round_ended(game):
+    if getattr(game, '_group_counted', False) and not game.test_mode:
+        group_book.round_ended(game.group_id, game.end_state)
+
+
+game_manager.round_end_listeners.append(lambda game: group_round_ended(game))
+
+
+def live_group_room(group, exclude=None):
+    """An open room this group is in right now, so a second friend's old link joins it instead of starting another."""
+    if not group:
+        return None
+    for game in list(game_manager.games.values()):
+        # An open room with someone still in it, or a room in setup for a few minutes (phones wait
+        # there until the host opens it). A room everyone has left is not where the group is.
+        if game.is_open:
+            live = any(player.active for player in game.players)
+        else:
+            live = time.time() - getattr(game, 'created_at', 0) < 15 * 60
+        if game.room_code != exclude and game.group_id == group and live:
+            return {'room_code': game.room_code, 'link_token': game.link_token}
+    return None
 
 # Optional host accounts (Google or an email code) so saved lists follow the host to any device.
 # Players never sign in. The socket learns who is signed in from the cookie on its handshake,
@@ -350,10 +392,15 @@ def saved_game_for_link(token):
 
 
 def game_ended_error(room_code, token, details):
-    """A link to a game that is over. With its token it offers that game's tasks for a new room."""
+    """A link to a game that is over. With its token it offers that game's tasks for a new room,
+    the group's score so far, and the group's room if a friend already started the next game."""
     saved = saved_game_for_link(token) if token else None
+    group = game_links.group_of(token) if saved else None
+    live = live_group_room(group, exclude=room_code if token else None)
     room_entry_error('game_ended', room_code, 'This game has ended. Start a new one.',
-                     {**details, 'saved_game': bool(saved)}, extra={'saved_game': saved})
+                     {**details, 'saved_game': bool(saved), 'group_room_live': bool(live)},
+                     extra={'saved_game': saved, 'group_link': token if saved else None,
+                            'group_recap': group_book.recap(group) if group else None, 'group_room': live})
 
 
 def room_entry_error(code, room_code, message, details=None, extra=None):
@@ -518,6 +565,19 @@ def health_check():
     }, 200
 
 
+@app.route('/api/group', methods=['POST'])
+def group_summary():
+    """The welcome back card's look-up: the group's score so far and a room it's playing in now.
+    Only counts come back. The token is the group's own secret from its link, so it comes in the
+    body: a query string would land in the web server's access log next to the IP address."""
+    body = request.get_json(silent=True)
+    token = clean_link_token(body.get('g') if isinstance(body, dict) else None)
+    group = game_links.group_of(token) if token else None
+    if not group:
+        return {'recap': None, 'room': None}, 200, {'Cache-Control': 'no-store'}
+    return {'recap': group_book.recap(group), 'room': live_group_room(group)}, 200, {'Cache-Control': 'no-store'}
+
+
 @app.route('/api/version')
 def version_info():
     """Which build of the server is running (shown on the /version page)."""
@@ -549,7 +609,12 @@ def handle_create_game(data=None):
     # "Use this pack" on the task generator creates the room with the pack already loaded.
     game.last_setup_step = 'created'
     game.setup_origin = 'generator' if isinstance(data, dict) and data.get('setup') == 'generated' else 'play_page'
-    record_usage('host_entered', game, flush=True, setup_origin=game.setup_origin,
+    # Started from a group's link (an old invite, a saved game link, the welcome back card): same group.
+    group = game_links.group_of(data.get('group_link')) if isinstance(data, dict) else None
+    if group:
+        game.group_id = group
+        game.group_via = data.get('group_via') if data.get('group_via') in GROUP_VIA else 'saved_link'
+    record_usage('host_entered', game, flush=True, setup_origin=game.setup_origin, group_via=game.group_via,
                  **StatsTracker.normalize_visit(acquisition))
     join_room(room_code)
     
@@ -1354,9 +1419,11 @@ def start_room(game, test_mode=False):
     game.assignRoles()
     for player in game.players:
         player.stat_tally = {}
+    group_room_started(game)
     game_manager.stats_tracker.record_game_started(game)
     if not test_mode:
-        game_links.remember(game.link_token, game.collaborative_tasks, game.locations, len(game.players))
+        game_links.remember(game.link_token, game.collaborative_tasks, game.locations, len(game.players),
+                            group=game.group_id)
     record_usage('round_host_started', game, game.creator_player_id, test_mode=test_mode)
     for player in game.players:
         if not player.sus:
@@ -2130,7 +2197,9 @@ def handle_save_game_link(data):
     if not game:
         return command_error('Game session not found.')
     code = saved_game_list_code(game)
-    return {'ok': True, 'code': code, **({'task_count': len(game.collaborative_tasks)} if code else {})}
+    # The game's token rides along so the saved link keeps the group (and its score) together.
+    return {'ok': True, 'code': code, **({'task_count': len(game.collaborative_tasks), 'link_token': game.link_token}
+                                         if code else {})}
 
 
 TASK_LIST_VIA = ('preset', 'example', 'saved', 'code', 'generator')

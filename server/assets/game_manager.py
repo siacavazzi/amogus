@@ -29,6 +29,7 @@ class GameManager:
         self.speaker = speaker
         self.config = config
         self.games = {}  # {room_code: Game}
+        self.round_end_listeners = []  # Called with the game after each round's end stats
         self.player_to_game = {}  # {player_id: room_code}
         self.sid_to_game = {}  # {socket_sid: room_code}
         self.lock = Lock()
@@ -38,8 +39,6 @@ class GameManager:
         if stats_path is None:
             stats_path = os.path.join(os.path.dirname(__file__), '..', 'stats.json')
         self.stats_tracker = StatsTracker(stats_path)
-        # Called with the game after the round's own records, e.g. signed-in players' stats.
-        self.round_end_listeners = []
 
         # Start cleanup thread for inactive games
         self._start_cleanup_thread()
@@ -100,14 +99,13 @@ class GameManager:
         return room_code, game
 
     def _round_ended(self, game):
-        try:
-            self.stats_tracker.record_game_ended(game)
-        finally:
-            for listener in self.round_end_listeners:
-                try:
-                    listener(game)
-                except Exception:
-                    logging.getLogger('app_logger').exception('Round end listener failed')
+        """End-of-round stats, then anything else that wants to know (the group score)."""
+        self.stats_tracker.record_game_ended(game)
+        for listener in list(self.round_end_listeners):
+            try:
+                listener(game)
+            except Exception:
+                logging.getLogger('app_logger').exception('Round end listener failed')
 
     def resolve_room_code(self, room_code):
         """The live room a typed code means: exact match first, then with look-alikes fixed."""

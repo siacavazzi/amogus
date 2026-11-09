@@ -9,7 +9,7 @@ import { getAcquisition } from '../seo/discovery';
 import RoomEntryNotice from '../components/RoomEntryNotice';
 import { getRoomCodeFromSearch, clearRoomCodeFromUrl } from '../utils/inviteLinks';
 import { readGeneratedSetup, claimGeneratedRoomCreation } from './seo/gameDraft';
-import { rememberSavedGame, keepSavedGame } from '../utils/savedGame';
+import { rememberSavedGame, keepSavedGame, readPendingGroup } from '../utils/savedGame';
 import { t } from '../i18n';
 import LanguagePicker from '../components/LanguagePicker';
 import LaptopHostPrompt, { laptopHasHosted } from '../components/LaptopHostPrompt';
@@ -87,7 +87,9 @@ function LobbyPage() {
         clearRoomCodeFromUrl();
         setIsCreating(true);
         setError('');
-        socket.emit('create_game', { acquisition: getAcquisition(), ...(generatedSetup ? { setup: 'generated' } : {}) });
+        // A game started from a group's link stays in that group, so the group's score carries on.
+        const group = generatedSetup ? null : readPendingGroup();
+        socket.emit('create_game', { acquisition: getAcquisition(), ...(generatedSetup ? { setup: 'generated' } : {}), ...(group || {}) });
         
         setTimeout(() => {
             setIsCreating(false);
@@ -133,7 +135,7 @@ function LobbyPage() {
 
     // An old invite link: start a new room, with that game's tasks when the link brought them back.
     const startFromEndedGame = () => {
-        keepSavedGame(roomEntryStatus?.saved_game?.code);
+        keepSavedGame(roomEntryStatus?.saved_game?.code, Date.now(), { group: roomEntryStatus?.group_link, via: 'old_link' });
         setInputRoomCode('');
         handleCreateGame();
     };

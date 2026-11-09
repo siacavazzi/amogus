@@ -23,12 +23,15 @@ describe('inviteLinks', () => {
         expect(buildRoomInviteUrl('wxyz', 'http://localhost:3000')).toBe('http://localhost:3000/play?room=WXYZ');
     });
 
-    it("carries the game's token, so an old link finds that game and not a later room with the same code", () => {
-        expect(buildRoomInviteUrl('abcd', 'https://susparty.com', 'share', 'k7Qm2xP9vT4w')).toBe('https://susparty.com/play?room=ABCD&via=share&g=k7Qm2xP9vT4w');
-        expect(buildRoomQrUrl('xyrr', { origin: 'https://susparty.com', linkToken: 'k7Qm2xP9vT4w' })).toBe('https://susparty.com/play?room=XYRR&g=k7Qm2xP9vT4w&via=qr');
+    it("carries the game's token after the #, so an old link finds that game and the token never reaches a server log", () => {
+        expect(buildRoomInviteUrl('abcd', 'https://susparty.com', 'share', 'k7Qm2xP9vT4w')).toBe('https://susparty.com/play?room=ABCD&via=share#g=k7Qm2xP9vT4w');
+        expect(buildRoomQrUrl('xyrr', { origin: 'https://susparty.com', linkToken: 'k7Qm2xP9vT4w' })).toBe('https://susparty.com/play?room=XYRR&via=qr#g=k7Qm2xP9vT4w');
         expect(buildRoomInviteUrl('abcd', 'https://susparty.com', null, 'bad token!')).toBe('https://susparty.com/play?room=ABCD');
-        expect(getLinkTokenFromSearch('?room=ABCD&g=k7Qm2xP9vT4w')).toBe('k7Qm2xP9vT4w');
-        expect(getLinkTokenFromSearch('?room=ABCD&g=<script>')).toBe('');
+        expect(getLinkTokenFromSearch('?room=ABCD', '#g=k7Qm2xP9vT4w')).toBe('k7Qm2xP9vT4w');
+        // Links sent before the move still work, and the # wins when both are there.
+        expect(getLinkTokenFromSearch('?room=ABCD&g=k7Qm2xP9vT4w', '')).toBe('k7Qm2xP9vT4w');
+        expect(getLinkTokenFromSearch('?room=ABCD&g=oldTokenAAAA', '#g=k7Qm2xP9vT4w')).toBe('k7Qm2xP9vT4w');
+        expect(getLinkTokenFromSearch('?room=ABCD&g=<script>', '#g=<b>')).toBe('');
     });
 
     it('builds the reactor QR link: the invite link marked as a scan, on beta when the reactor is', () => {
