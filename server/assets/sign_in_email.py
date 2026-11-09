@@ -91,5 +91,11 @@ def send_code(to, code, lang='en'):
         with urllib.request.urlopen(request, timeout=10) as response:
             return 200 <= response.status < 300
     except Exception as exc:  # network error or Resend said no
-        logger.warning(f'Sign-in email was not sent: {type(exc).__name__}: {getattr(exc, "code", "")}')
+        detail = ''
+        try:
+            # Resend's error body names the problem (say, an unverified domain). It never holds the key.
+            detail = json.loads(exc.read().decode()).get('message', '')[:200]
+        except Exception:
+            pass
+        logger.warning(f'Sign-in email was not sent: {type(exc).__name__} {getattr(exc, "code", "")} {detail}'.strip())
         return False
