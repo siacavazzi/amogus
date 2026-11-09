@@ -88,7 +88,9 @@ export function openInBrowserUrl(url, os) {
     if (os === 'android') {
         return `intent://${rest}#Intent;scheme=${parsed.protocol.slice(0, -1)};package=com.android.chrome;end`;
     }
-    if (os === 'ios') return `x-safari-${parsed.protocol}//${rest}`;
+    // Safari keeps the part after '#' (a game's link token lives there). Android's intent syntax
+    // uses '#' itself, so there the link opens without it, as a plain room link.
+    if (os === 'ios') return `x-safari-${parsed.protocol}//${rest}${parsed.hash}`;
     return null;
 }
 

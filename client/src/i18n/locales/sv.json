@@ -815,7 +815,6 @@
   "Welcome back": "Välkommen tillbaka",
   "Play your game from {date} again, with the same {count} tasks.": "Spela ditt spel från {date} igen, med samma {count} uppgifter.",
   "Play your game from {date} again, with the same tasks.": "Spela ditt spel från {date} igen, med samma uppgifter.",
-  "Host it again": "Var värd igen",
   "Not now": "Inte nu",
   "Sus Party tonight. Tap to join room {roomCode}:": "Sus Party i kväll. Tryck för att gå med i rum {roomCode}:",
   "Send to the group chat": "Skicka till gruppchatten",
@@ -927,5 +926,12 @@
   "Or type {address} on your phone.": "Eller skriv {address} i mobilen.",
   "Want this laptop as the shared screen too? Type the room code here once your phone has opened the room.": "Vill du ha den här datorn som gemensam skärm också? Skriv rumskoden här när mobilen har öppnat rummet.",
   "No phones yet. Everyone joins on a phone, including you. This screen can't start the game.": "Inga mobiler än. Alla går med i mobilen, du också. Den här skärmen kan inte starta spelet.",
-  "Now join on your phone. The first phone in is the host and starts the game.": "Gå med i mobilen nu. Den första mobilen som går med blir värd och startar spelet."
+  "Now join on your phone. The first phone in is the host and starts the game.": "Gå med i mobilen nu. Den första mobilen som går med blir värd och startar spelet.",
+  "Your group so far": "Er grupp hittills",
+  "Rounds": "Rundor",
+  "Crew wins": "Besättningen vann",
+  "Intruder wins": "Inkräktarna vann",
+  "Your group is playing": "Er grupp spelar nu",
+  "Your group is in room {room_code} right now.": "Er grupp är i rum {room_code} just nu.",
+  "Join your group": "Gå med i gruppen"
 }

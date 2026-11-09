@@ -828,7 +828,6 @@
   "Welcome back": "Bine ai revenit",
   "Play your game from {date} again, with the same {count} tasks.": "Joacă din nou jocul din {date}, cu aceleași {count} sarcini.",
   "Play your game from {date} again, with the same tasks.": "Joacă din nou jocul din {date}, cu aceleași sarcini.",
-  "Host it again": "Găzduiește-l din nou",
   "Not now": "Nu acum",
   "Sus Party tonight. Tap to join room {roomCode}:": "Sus Party diseară. Atinge ca să intri în camera {roomCode}:",
   "Send to the group chat": "Trimite în chatul grupului",
@@ -940,5 +939,12 @@
   "Or type {address} on your phone.": "Sau scrie {address} pe telefon.",
   "Want this laptop as the shared screen too? Type the room code here once your phone has opened the room.": "Vrei ca acest laptop să fie și ecranul comun? Scrie aici codul camerei după ce telefonul tău a deschis camera.",
   "No phones yet. Everyone joins on a phone, including you. This screen can't start the game.": "Încă niciun telefon. Toată lumea intră de pe telefon, și tu. Acest ecran nu poate porni jocul.",
-  "Now join on your phone. The first phone in is the host and starts the game.": "Acum intră de pe telefon. Primul telefon care intră e gazda și pornește jocul."
+  "Now join on your phone. The first phone in is the host and starts the game.": "Acum intră de pe telefon. Primul telefon care intră e gazda și pornește jocul.",
+  "Your group so far": "Grupul vostru până acum",
+  "Rounds": "Runde",
+  "Crew wins": "Victorii ale echipajului",
+  "Intruder wins": "Victorii ale intrușilor",
+  "Your group is playing": "Grupul vostru joacă acum",
+  "Your group is in room {room_code} right now.": "Grupul vostru este acum în camera {room_code}.",
+  "Join your group": "Intră la grupul vostru"
 }

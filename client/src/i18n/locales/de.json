@@ -815,7 +815,6 @@
   "Welcome back": "Willkommen zurück",
   "Play your game from {date} again, with the same {count} tasks.": "Spiel dein Spiel vom {date} noch einmal, mit denselben {count} Aufgaben.",
   "Play your game from {date} again, with the same tasks.": "Spiel dein Spiel vom {date} noch einmal, mit denselben Aufgaben.",
-  "Host it again": "Nochmal hosten",
   "Not now": "Nicht jetzt",
   "Sus Party tonight. Tap to join room {roomCode}:": "Heute Abend Sus Party. Tippe, um Raum {roomCode} beizutreten:",
   "Send to the group chat": "In den Gruppenchat senden",
@@ -927,5 +926,12 @@
   "Or type {address} on your phone.": "Oder gib {address} auf deinem Handy ein.",
   "Want this laptop as the shared screen too? Type the room code here once your phone has opened the room.": "Soll dieser Laptop trotzdem der gemeinsame Bildschirm sein? Gib hier den Raumcode ein, sobald dein Handy den Raum geöffnet hat.",
   "No phones yet. Everyone joins on a phone, including you. This screen can't start the game.": "Noch keine Handys. Alle treten auf dem Handy bei, du auch. Dieser Bildschirm kann das Spiel nicht starten.",
-  "Now join on your phone. The first phone in is the host and starts the game.": "Tritt jetzt auf dem Handy bei. Das erste Handy im Raum ist der Host und startet das Spiel."
+  "Now join on your phone. The first phone in is the host and starts the game.": "Tritt jetzt auf dem Handy bei. Das erste Handy im Raum ist der Host und startet das Spiel.",
+  "Your group so far": "Eure Gruppe bisher",
+  "Rounds": "Runden",
+  "Crew wins": "Siege der Crew",
+  "Intruder wins": "Siege der Eindringlinge",
+  "Your group is playing": "Eure Gruppe spielt gerade",
+  "Your group is in room {room_code} right now.": "Eure Gruppe ist gerade in Raum {room_code}.",
+  "Join your group": "Zu eurer Gruppe"
 }
