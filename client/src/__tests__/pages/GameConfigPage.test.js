@@ -201,89 +201,37 @@ describe('GameConfigPage task goal', () => {
 });
 });
 
-describe('GameConfigPage task list picker', () => {
+describe('GameConfigPage group tasks by default', () => {
     beforeEach(() => {
         localStorage.clear();
         sessionStorage.clear();
     });
 
-    const receiver = contextValue => (event, data) => act(() => {
-        contextValue.socket.on.mock.calls.filter(call => call[0] === event).slice(-1)[0][1](data);
-    });
-    const applied = contextValue => contextValue.socket.emit.mock.calls.filter(([event]) => event === 'apply_task_list_to_game').slice(-1)[0][1];
+    const openRoom = (contextValue, myLists) => {
+        const receive = (event, data) => act(() => {
+            contextValue.socket.on.mock.calls.filter(call => call[0] === event).slice(-1)[0][1](data);
+        });
+        receive('my_task_lists', { lists: myLists });
+        fireEvent.click(screen.getByRole('button', { name: /Create Tasks with Group/i }));
+        fireEvent.click(screen.getByRole('button', { name: /Open Room/i }));
+        receive('game_config', { vote_time: 180, num_intruders: 'auto', locations: [] });
+    };
 
-    it('makes a big list from a place and its areas, without asking for a player count', () => {
-        const { contextValue } = renderWithContext(<GameConfigPage />, { roomCode: 'ROOM6' });
-        expect(screen.queryByLabelText(/players/i)).not.toBeInTheDocument();
-        fireEvent.click(screen.getByRole('button', { name: 'House' }));
-        expect(screen.getByRole('heading', { name: 'House' })).toBeInTheDocument();
-        // The shared rooms start on, private ones off.
-        expect(screen.getByRole('button', { name: /Kitchen/ })).toHaveAttribute('aria-pressed', 'true');
-        expect(screen.getByRole('button', { name: /Bathroom/ })).toHaveAttribute('aria-pressed', 'false');
-        fireEvent.click(screen.getByRole('button', { name: /Bathroom/ }));
-        fireEvent.change(screen.getByLabelText('Add an area'), { target: { value: 'Attic' } });
-        fireEvent.click(screen.getByRole('button', { name: 'Add area' }));
-        fireEvent.click(screen.getByRole('button', { name: /Make my task list/ }));
-
-        const create = contextValue.socket.emit.mock.calls.find(([event]) => event === 'create_task_list')[1];
-        expect(create.name).toBe('House · Mixed');
-        expect(create.tasks).toHaveLength(60);
-        expect(create.locations).toEqual(['Kitchen', 'Living Room', 'Hallway', 'Bathroom', 'Attic']);
-        for (const location of create.locations) expect(create.tasks.some(task => task.location === location)).toBe(true);
-
-        receiver(contextValue)('task_list_created', { task_list: { code: 'HOUSE1', name: 'House · Mixed', tasks: create.tasks, locations: [...create.locations, 'Other'] } });
-        expect(screen.getByRole('heading', { name: 'House · Mixed' })).toBeInTheDocument();
-        fireEvent.click(screen.getByRole('button', { name: /Use This Task List/ }));
-        expect(applied(contextValue)).toEqual({ room_code: 'ROOM6', task_list_code: 'HOUSE1', picked_via: 'preset' });
+    it('says the list can be made together once everyone joins', () => {
+        renderWithContext(<GameConfigPage />, { roomCode: 'GRP0' });
+        expect(screen.getByText('Pick a list, or make one together once everyone joins')).toBeInTheDocument();
+        expect(screen.getByText(/Everyone adds tasks from their own phone in the lobby/)).toBeInTheDocument();
     });
 
-    it('writes the list in the vibe the host picks', () => {
-        const { contextValue } = renderWithContext(<GameConfigPage />, { roomCode: 'ROOM10' });
-        fireEvent.click(screen.getByRole('button', { name: 'Apartment' }));
-        expect(screen.getByRole('button', { name: /^Mixed/ })).toHaveAttribute('aria-pressed', 'true');
-        fireEvent.click(screen.getByRole('button', { name: /^Clean up/ }));
-        fireEvent.click(screen.getByRole('button', { name: /Make my task list/ }));
-        const create = contextValue.socket.emit.mock.calls.find(([event]) => event === 'create_task_list')[1];
-        expect(create.name).toBe('Apartment · Clean up');
-        expect(create.tasks.length).toBeGreaterThanOrEqual(40);
+    it('asks for group tasks when the host has no lists, or only the Example List', () => {
+        const { contextValue } = renderWithContext(<GameConfigPage />, { roomCode: 'GRP1' });
+        openRoom(contextValue, [{ code: 'EXMPL1', name: 'Example List', task_count: 30, source_template: 'starter' }]);
+        expect(contextValue.socket.emit).toHaveBeenCalledWith('open_room', { room_code: 'GRP1', group_tasks: true });
     });
 
-    it('needs two areas and can go back to every place', () => {
-        renderWithContext(<GameConfigPage />, { roomCode: 'ROOM7' });
-        fireEvent.click(screen.getByRole('button', { name: 'Apartment' }));
-        fireEvent.click(screen.getByRole('button', { name: /Kitchen/ }));
-        fireEvent.click(screen.getByRole('button', { name: /Living Room/ }));
-        expect(screen.getByText('Pick at least 2 areas.')).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: /Make my task list/ })).toBeDisabled();
-        fireEvent.click(screen.getByRole('button', { name: /All places/ }));
-        expect(screen.getByRole('heading', { name: 'Where are you playing?' })).toBeInTheDocument();
-    });
-
-    it('keeps the example list on screen and marks it as the example', () => {
-        const { contextValue } = renderWithContext(<GameConfigPage />, { roomCode: 'ROOM8' });
-        receiver(contextValue)('my_task_lists', { lists: [], starter_template: { name: 'Example List', template_key: 'starter_house', task_count: 96, locations: ['Kitchen', 'Bedroom', 'Other'] } });
-        expect(screen.queryByRole('button', { name: /Dismiss/ })).not.toBeInTheDocument();
-        fireEvent.click(screen.getByRole('button', { name: 'Example list' }));
-        expect(contextValue.socket.emit).toHaveBeenCalledWith('create_task_list', expect.objectContaining({ from_default: true }));
-        const tasks = [{ task: 'Wipe the counter', location: 'Kitchen' }];
-        receiver(contextValue)('task_list_created', { task_list: { code: 'EXAMPL', name: 'Example List', tasks, locations: ['Kitchen', 'Bedroom', 'Other'] } });
-        fireEvent.click(screen.getByRole('button', { name: /Use This Task List/ }));
-        expect(applied(contextValue).picked_via).toBe('example');
-
-        // Clearing it brings the whole picker back, example included.
-        fireEvent.click(screen.getByRole('button', { name: 'Pick a different list' }));
-        expect(screen.getByRole('button', { name: 'Example list' })).toBeInTheDocument();
-    });
-
-    it('tucks loading by code behind a link', () => {
-        const { contextValue } = renderWithContext(<GameConfigPage />, { roomCode: 'ROOM9' });
-        expect(screen.queryByLabelText('Load by code')).not.toBeInTheDocument();
-        fireEvent.click(screen.getByRole('button', { name: 'Have a list code?' }));
-        fireEvent.change(screen.getByLabelText('Load by code'), { target: { value: 'abc123' } });
-        fireEvent.click(screen.getByRole('button', { name: 'Load task list' }));
-        expect(contextValue.socket.emit).toHaveBeenCalledWith('load_task_list', { code: 'ABC123' });
-        receiver(contextValue)('task_list_loaded', { task_list: { code: 'ABC123', name: 'Church list', tasks: [{ task: 'Ring the bell', location: 'Hall' }], locations: ['Hall', 'Yard', 'Other'] } });
-        fireEvent.click(screen.getByRole('button', { name: /Use This Task List/ }));
-        expect(applied(contextValue).picked_via).toBe('code');
+    it('leaves it to the host when they have lists of their own', () => {
+        const { contextValue } = renderWithContext(<GameConfigPage />, { roomCode: 'GRP2' });
+        openRoom(contextValue, [{ code: 'MINE01', name: 'Our house', task_count: 40 }]);
+        expect(contextValue.socket.emit).toHaveBeenCalledWith('open_room', { room_code: 'GRP2', group_tasks: false });
     });
 });

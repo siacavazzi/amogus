@@ -9,7 +9,7 @@ import { CLEANUP_ROOMS } from './cleanupTasks';
 import './TaskGeneratorPage.css';
 
 const VENUES = { house: 'House', apartment: 'Apartment', dorm: 'Dorm', office: 'Office', airbnb: 'Vacation rental', school: 'School', other: 'Other' };
-const defaultRooms = venue => VENUE_ROOMS[venue].filter(room => !/Bedroom|Bathroom|Outdoor|Outdoors|Garage|Basement|Upstairs|Gym|Library/.test(room));
+const defaultRooms = venue => VENUE_ROOMS[venue].filter(room => !/Bedroom|Bathroom|Outdoor|Outdoors|Garage/.test(room));
 
 function initialSetup() {
     const params = new URLSearchParams(window.location.search);

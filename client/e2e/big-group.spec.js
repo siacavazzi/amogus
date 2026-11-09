@@ -82,7 +82,10 @@ test('thirty phones play a whole round with a meeting and vote, then start anoth
     if (await needed.isVisible()) {
         const [, want, have] = (await needed.textContent()).match(/(\d+) tasks\. The room has (\d+)/).map(Number);
         await host.getByRole('button', { name: /^Tasks \(/ }).click();
-        await host.getByTitle('Tap to let everyone add tasks').click();
+        // A host with no lists of their own already has everyone adding tasks.
+        await expect(host.getByTitle(/^Tap to (let everyone add tasks|make host-only)$/)).toBeVisible();
+        const turnOn = host.getByTitle('Tap to let everyone add tasks');
+        if (await turnOn.isVisible()) await turnOn.click();
         await host.getByRole('button', { name: /^Players \(/ }).click();
         const writers = guests.slice(0, 4);
         const each = Math.ceil((want - have) / writers.length);

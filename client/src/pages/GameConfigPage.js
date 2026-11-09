@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import { DataContext } from '../GameContext';
-import { Users, Play, ChevronDown, ChevronUp, List, Download, Trash2, Check, LogOut, MapPin, Settings, ArrowRight, ArrowLeft, X, Zap, Copy, Sparkles, Minus, Plus, Home, Sofa, GraduationCap, DoorOpen, Monitor, ClipboardList } from '../signal/icons';
+import { Users, Play, ChevronDown, ChevronUp, List, Download, Trash2, Check, LogOut, MapPin, Settings, ArrowRight, ArrowLeft, X, Zap, Copy, Sparkles, Minus, Plus } from '../signal/icons';
 import { readGeneratedSetup, clearGameDraft } from './seo/gameDraft';
 import { readPendingSavedGame, clearPendingSavedGame } from '../utils/savedGame';
 import { AUTO_INTRUDERS_SUMMARY, AUTO_TASKS_SUMMARY, TASKS_PER_CREWMATE, playersForIntruders } from '../utils/intruders';
@@ -10,10 +10,6 @@ import { getLanguage, t, tk } from '../i18n';
 import AccountButton from '../account/AccountButton';
 import SaveListsPrompt from '../account/SaveListsPrompt';
 import { useAccount } from '../account/accountStore';
-import PresetAreas from './setup/PresetAreas';
-import { PLACES, buildPresetList, placeByKey, taskMakerUrl, vibeByKey } from './setup/taskPresets';
-
-const PLACE_ICONS = { apartment: Sofa, house: Home, big_house: Home, school: GraduationCap, hall: Users, office: Monitor, dorm: DoorOpen, other: MapPin };
 
 const DEFAULT_CARD_DECK_COUNTS = {
     self_report: 4,
@@ -149,13 +145,16 @@ function GameConfigPage() {
     // Task list state
     const [myTaskLists, setMyTaskLists] = useState([]);
     const [starterTemplate, setStarterTemplate] = useState(null);
+    const [starterTemplateDismissed, setStarterTemplateDismissed] = useState(false);
     const [loadTaskListCode, setLoadTaskListCode] = useState('');
-    const [showCodeEntry, setShowCodeEntry] = useState(false);
-    // A ready-made list: the place picked, then its areas. Null shows the list picker.
-    const [presetPlace, setPresetPlace] = useState(null);
-    // How the host picked the list, for the round stats: preset, example, saved, code, generator.
+    // How the host picked the list, for the round stats: example, saved, code, generator.
     const pickedViaRef = useRef(null);
     const [currentTaskList, setCurrentTaskList] = useState(null);
+    // The Example List copy doesn't count: it's ours, not the host's.
+    const isExampleList = (list) => Boolean(list.source_template) && list.source_template !== 'saved_game';
+    const hasOwnLists = myTaskLists.some((list) => !isExampleList(list));
+    const hasOwnListsRef = useRef(hasOwnLists);
+    hasOwnListsRef.current = hasOwnLists;
     const [taskListLoading, setTaskListLoading] = useState(false);
     const [taskListApplied, setTaskListApplied] = useState(false);
     const [generatedDraft, setGeneratedDraft] = useState(readGeneratedSetup);
@@ -225,7 +224,8 @@ function GameConfigPage() {
 
             if (pendingRoomOpenRef.current) {
                 pendingRoomOpenRef.current = false;
-                socket.emit('open_room', { room_code: roomCode });
+                // A host with no lists of their own starts with everyone adding tasks (they can turn it off).
+                socket.emit('open_room', { room_code: roomCode, group_tasks: !hasOwnListsRef.current });
             }
         };
 
@@ -257,7 +257,6 @@ function GameConfigPage() {
             setCurrentTaskList(data.task_list);
             setTaskListLoading(false);
             setSignInMoment('created');
-            setPresetPlace(null);
             if (generatedImportRef.current) {
                 generatedImportRef.current = false;
                 const settings = generatedDraft?.recommendations;
@@ -410,6 +409,9 @@ function GameConfigPage() {
     const starterListCopy = starterTemplate
         ? myTaskLists.find((list) => list.source_template === starterTemplate.template_key)
         : null;
+    const starterLocationCount = (starterTemplate?.locations || []).filter((location) => location !== 'Other').length;
+    const showStarterTemplatePromo = starterTemplate && !starterListCopy && !starterTemplateDismissed;
+
     const useStarterTaskList = () => {
         if (!socket || !starterTemplate) return;
 
@@ -438,30 +440,6 @@ function GameConfigPage() {
             task_list_code: currentTaskList.code,
             picked_via: pickedViaRef.current || 'saved',
         });
-    };
-
-    const makePresetList = (areas, vibe) => {
-        if (!socket || !presetPlace || taskListLoading) return;
-        const { tasks, locations } = buildPresetList(presetPlace, areas, vibe, getLanguage());
-        pickedViaRef.current = 'preset';
-        setTaskListLoading(true);
-        setTaskListApplied(false);
-        socket.emit('create_task_list', {
-            player_id: deviceId,
-            name: t('{place} · {vibe}', { place: t(presetPlace.label), vibe: t(vibeByKey(vibe).label) }),
-            tasks,
-            locations,
-        });
-    };
-
-    // The full task maker makes its own room, so this unopened one is closed first.
-    const openTaskMaker = (areas, vibe) => {
-        const url = taskMakerUrl(presetPlace, areas, vibe);
-        localStorage.removeItem('player_id');
-        localStorage.removeItem('room_code');
-        sessionStorage.removeItem('is_room_creator');
-        socket.emit('leave_room', { room_code: roomCode });
-        window.location.assign(url);
     };
 
     const clearTaskListSelection = () => {
@@ -525,111 +503,12 @@ function GameConfigPage() {
 
     const realLocationsOf = (list) => (list?.locations || []).filter((l) => l !== 'Other');
 
-    const savedListRows = () => (
-        <div className="hs-lists">
-            {myTaskLists.map((list) => (
-                <div
-                    key={list.code}
-                    role="button"
-                    tabIndex={0}
-                    className="hs-listrow"
-                    onClick={() => {
-                        setTaskListLoading(true);
-                        setTaskListApplied(false);
-                        pickedViaRef.current = list.source_template ? 'example' : 'saved';
-                        socket.emit('load_task_list', { code: list.code });
-                        setSignInMoment('saved');
-                    }}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            e.currentTarget.click();
-                        }
-                    }}
-                >
-                    <div className="hs-listrow__body">
-                        <span className="hs-listrow__name">{list.name}</span>
-                        <span className="hs-listrow__meta">{t('{tasks} tasks · {code}', { tasks: list.task_count, code: list.code })}</span>
-                    </div>
-                    <button
-                        type="button"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            deleteTaskList(list.code);
-                        }}
-                        className="hs-round"
-                        title={t('Delete')}
-                        aria-label={t('Delete {name}', { name: list.name })}
-                    >
-                        <Trash2 size={18} />
-                    </button>
-                </div>
-            ))}
-        </div>
-    );
-
-    // The list that's picked: what's in it, and the button that uses it.
-    const renderPickedList = () => (
-        <>
-            <div className="hs-panel">
-                <div className="hs-bar" style={{ minHeight: 0, alignItems: 'flex-start' }}>
-                    <div style={{ display: 'grid', gap: 4, minWidth: 0 }}>
-                        <h2 className="hs-title" style={{ fontSize: 28 }}>{currentTaskList.name}</h2>
-                        <p className="sg-lede">
-                            {t('{tasks} tasks · {locations} locations', { tasks: currentTaskList.tasks.length, locations: realLocationsOf(currentTaskList).length })}
-                            {taskListApplied && <> · <Check size={16} style={{ display: 'inline', verticalAlign: '-2px' }} /> {t('Applied')}</>}
-                        </p>
-                    </div>
-                    <button type="button" onClick={clearTaskListSelection} className="hs-round" title={t('Clear selection')} aria-label={t('Clear selection')}>
-                        <X size={18} />
-                    </button>
-                </div>
-                {realLocationsOf(currentTaskList).length > 0 && (
-                    <p className="sg-small" style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', fontSize: 16, opacity: 0.9 }}>
-                        <MapPin size={16} /> {realLocationsOf(currentTaskList).join(' · ')}
-                    </p>
-                )}
-                <ul className="hs-preview">
-                    {currentTaskList.tasks.slice(0, 5).map((task, index) => (
-                        <li key={index}>{task.task}</li>
-                    ))}
-                </ul>
-                {currentTaskList.tasks.length > 5 && (
-                    <p className="sg-small" style={{ textAlign: 'center' }}>{t('+ {count} more', { count: currentTaskList.tasks.length - 5 })}</p>
-                )}
-            </div>
-
-            <SaveListsPrompt moment={signInMoment} key={signInMoment} />
-
-            <div style={{ display: 'grid', gap: 10 }}>
-                <button type="button" onClick={proceedToSettings} disabled={taskListLoading || !connected} className="sg-btn sg-btn-white" style={{ minHeight: 68, fontSize: 19 }}>
-                    {taskListLoading ? <span>{t('Applying Task List...')}</span> : <><span>{t('Use This Task List')}</span><ArrowRight size={24} /></>}
-                </button>
-                <p className="hs-hint hs-muted">{t('You can still add more tasks after opening the room')}</p>
-                <button type="button" onClick={clearTaskListSelection} className="sg-link">{t('Pick a different list')}</button>
-            </div>
-        </>
-    );
-
     // Step 1: Task List Selection
-    const renderTaskListStep = () => {
-        if (presetPlace && !currentTaskList) {
-            return (
-                <PresetAreas
-                    key={presetPlace.key}
-                    place={presetPlace}
-                    busy={taskListLoading}
-                    onBack={() => setPresetPlace(null)}
-                    onMake={makePresetList}
-                    onOpenTaskMaker={openTaskMaker}
-                />
-            );
-        }
-        return (
+    const renderTaskListStep = () => (
         <>
             <div style={{ display: 'grid', gap: 10 }}>
                 <h1 className="sg-big sg-h1">{t('Task list')}</h1>
-                {!currentTaskList && <p className="sg-lede hs-muted">{t('Pick where you are playing and we will write the tasks.')}</p>}
+                <p className="sg-lede hs-muted">{t('Pick a list, or make one together once everyone joins')}</p>
             </div>
 
             {generatedDraft && (
@@ -645,81 +524,162 @@ function GameConfigPage() {
                 </div>
             )}
 
-            {currentTaskList ? renderPickedList() : !generatedDraft && (
-                <>
-                    <div className="hs-panel">
-                        <h2 className="hs-title">{t('Where are you playing?')}</h2>
-                        <div className="hs-places">
-                            {PLACES.map((place) => {
-                                const Icon = PLACE_ICONS[place.key] || MapPin;
+            {showStarterTemplatePromo && !generatedDraft && !currentTaskList && (
+                <div className="hs-panel">
+                    <div className="hs-bar" style={{ minHeight: 0, alignItems: 'flex-start' }}>
+                        <div style={{ display: 'grid', gap: 4, minWidth: 0 }}>
+                            <h2 className="hs-title" style={{ fontSize: 28 }}>{starterTemplate.name}</h2>
+                            <p className="sg-lede">{t('{tasks} tasks · {locations} locations', { tasks: starterTemplate.task_count, locations: starterLocationCount })}</p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setStarterTemplateDismissed(true)}
+                            className="hs-round"
+                            title={t('Dismiss example list')}
+                            aria-label={t('Dismiss example list')}
+                        >
+                            <X size={18} />
+                        </button>
+                    </div>
+                    {starterTemplate.description && <p className="sg-small">{starterTemplate.description}</p>}
+                    <button type="button" onClick={useStarterTaskList} disabled={taskListLoading} className="sg-btn sg-btn-line">
+                        <Plus size={22} /> {t('Add Example List')}
+                    </button>
+                    <p className="sg-small">{t('A starting point you can fully edit. Add, remove, or rewrite tasks to fit your space.')}</p>
+                </div>
+            )}
+
+            {/* Load by code */}
+            <div className="hs-panel">
+                <label className="hs-label" htmlFor="task-list-code">{t('Load by code')}</label>
+                <div className="hs-inline">
+                    <input
+                        id="task-list-code"
+                        type="text"
+                        value={loadTaskListCode}
+                        onChange={(e) => setLoadTaskListCode(e.target.value.toUpperCase())}
+                        onKeyPress={(e) => e.key === 'Enter' && loadTaskListByCode()}
+                        placeholder={t('6-letter code')}
+                        maxLength={6}
+                        autoCapitalize="characters"
+                        spellCheck="false"
+                        className="hs-input hs-input--code"
+                    />
+                    <button
+                        type="button"
+                        onClick={loadTaskListByCode}
+                        disabled={taskListLoading || loadTaskListCode.length < 6}
+                        className="sg-btn sg-btn-line"
+                        style={{ width: 64, padding: 0 }}
+                        title={t('Load task list')}
+                        aria-label={t('Load task list')}
+                    >
+                        <Download size={24} />
+                    </button>
+                </div>
+
+                {myTaskLists.length > 0 && (
+                    <>
+                        <p className="hs-label" style={{ marginTop: 6 }}>{t('Your saved lists')}</p>
+                        <div className="hs-lists">
+                            {myTaskLists.map((list) => {
+                                const selected = currentTaskList?.code === list.code;
                                 return (
-                                    <button key={place.key} type="button" className="hs-place" onClick={() => setPresetPlace(placeByKey(place.key))} disabled={taskListLoading}>
-                                        <Icon size={22} />
-                                        <b>{t(place.label)}</b>
-                                    </button>
+                                    <div
+                                        key={list.code}
+                                        role="button"
+                                        tabIndex={0}
+                                        aria-current={selected}
+                                        className="hs-listrow"
+                                        onClick={() => {
+                                            setTaskListLoading(true);
+                                            setTaskListApplied(false);
+                                            pickedViaRef.current = isExampleList(list) ? 'example' : 'saved';
+                                            socket.emit('load_task_list', { code: list.code });
+                                            setSignInMoment('saved');
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' || e.key === ' ') {
+                                                e.preventDefault();
+                                                e.currentTarget.click();
+                                            }
+                                        }}
+                                    >
+                                        {selected && <Check size={22} />}
+                                        <div className="hs-listrow__body">
+                                            <span className="hs-listrow__name">{list.name}</span>
+                                            <span className="hs-listrow__meta">{t('{tasks} tasks · {code}', { tasks: list.task_count, code: list.code })}</span>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                deleteTaskList(list.code);
+                                            }}
+                                            className="hs-round"
+                                            style={{ background: selected ? 'rgba(0,0,0,0.07)' : undefined, color: 'inherit' }}
+                                            title={t('Delete')}
+                                            aria-label={t('Delete {name}', { name: list.name })}
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
+                                    </div>
                                 );
                             })}
-                            {starterTemplate && (
-                                <button type="button" className="hs-place" onClick={useStarterTaskList} disabled={taskListLoading}>
-                                    <ClipboardList size={22} />
-                                    <b>{t('Example list')}</b>
-                                </button>
-                            )}
                         </div>
-                    </div>
+                    </>
+                )}
+            </div>
 
-                    {myTaskLists.length > 0 && (
-                        <div className="hs-panel">
-                            <h2 className="hs-title">{t('Your saved lists')}</h2>
-                            {savedListRows()}
+            {/* The list that's loaded right now */}
+            {currentTaskList && (
+                <div className="hs-panel">
+                    <div className="hs-bar" style={{ minHeight: 0, alignItems: 'flex-start' }}>
+                        <div style={{ display: 'grid', gap: 4, minWidth: 0 }}>
+                            <h2 className="hs-title" style={{ fontSize: 28 }}>{currentTaskList.name}</h2>
+                            <p className="sg-lede">
+                                {t('{tasks} tasks · {locations} locations', { tasks: currentTaskList.tasks.length, locations: realLocationsOf(currentTaskList).length })}
+                                {taskListApplied && <> · <Check size={16} style={{ display: 'inline', verticalAlign: '-2px' }} /> {t('Applied')}</>}
+                            </p>
                         </div>
-                    )}
-
-                    <div style={{ display: 'grid', gap: 10 }}>
-                        <button type="button" onClick={proceedToSettings} disabled={taskListLoading || !connected} className="sg-btn sg-btn-line" style={{ minHeight: 60, fontSize: 18 }}>
-                            <Users size={22} /><span>{t('Create Tasks with Group')}</span>
+                        <button type="button" onClick={clearTaskListSelection} className="hs-round" title={t('Clear selection')} aria-label={t('Clear selection')}>
+                            <X size={18} />
                         </button>
-                        <p className="hs-hint hs-muted">{t('All players can add tasks together after joining')}</p>
                     </div>
-
-                    {showCodeEntry ? (
-                        <div className="hs-panel hs-panel--tight">
-                            <label className="hs-label" htmlFor="task-list-code">{t('Load by code')}</label>
-                            <div className="hs-inline">
-                                <input
-                                    id="task-list-code"
-                                    type="text"
-                                    value={loadTaskListCode}
-                                    onChange={(e) => setLoadTaskListCode(e.target.value.toUpperCase())}
-                                    onKeyDown={(e) => e.key === 'Enter' && loadTaskListByCode()}
-                                    placeholder={t('6-letter code')}
-                                    maxLength={6}
-                                    autoCapitalize="characters"
-                                    spellCheck="false"
-                                    autoFocus
-                                    className="hs-input hs-input--code"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={loadTaskListByCode}
-                                    disabled={taskListLoading || loadTaskListCode.length < 6}
-                                    className="sg-btn sg-btn-line"
-                                    style={{ width: 64, padding: 0 }}
-                                    title={t('Load task list')}
-                                    aria-label={t('Load task list')}
-                                >
-                                    <Download size={24} />
-                                </button>
-                            </div>
-                        </div>
-                    ) : (
-                        <button type="button" onClick={() => setShowCodeEntry(true)} className="sg-link">{t('Have a list code?')}</button>
+                    {realLocationsOf(currentTaskList).length > 0 && (
+                        <p className="sg-small" style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', fontSize: 16, opacity: 0.9 }}>
+                            <MapPin size={16} /> {realLocationsOf(currentTaskList).join(' · ')}
+                        </p>
                     )}
-                </>
+                    <ul className="hs-preview">
+                        {currentTaskList.tasks.slice(0, 5).map((task, index) => (
+                            <li key={index}>{task.task}</li>
+                        ))}
+                    </ul>
+                    {currentTaskList.tasks.length > 5 && (
+                        <p className="sg-small" style={{ textAlign: 'center' }}>{t('+ {count} more', { count: currentTaskList.tasks.length - 5 })}</p>
+                    )}
+                </div>
             )}
+
+            {currentTaskList && <SaveListsPrompt moment={signInMoment} key={signInMoment} />}
+
+            <div style={{ display: 'grid', gap: 10 }}>
+                <button type="button" onClick={proceedToSettings} disabled={taskListLoading || !connected} className="sg-btn sg-btn-white" style={{ minHeight: 68, fontSize: 19 }}>
+                    {currentTaskList
+                        ? (taskListLoading ? <span>{t('Applying Task List...')}</span> : <><span>{t('Use This Task List')}</span><ArrowRight size={24} /></>)
+                        : <><span>{t('Create Tasks with Group')}</span><ArrowRight size={24} /></>}
+                </button>
+                <p className="hs-hint hs-muted">
+                    {!currentTaskList
+                        ? t('Everyone adds tasks from their own phone in the lobby. You can turn this off.')
+                        : hasOwnLists
+                            ? t('You can still add more tasks after opening the room')
+                            : t('Everyone can add more tasks from their phone in the lobby. You can turn this off.')}
+                </p>
+            </div>
         </>
-        );
-    };
+    );
 
     // Step 2: Game Settings (Intruders + Advanced)
     const renderSettingsStep = () => (
