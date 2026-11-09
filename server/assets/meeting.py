@@ -262,6 +262,14 @@ class Meeting:
                 self.speaker.play_sound('veto')
             else:
                 print("Meeting over...")
+                # Signed-in players' stats: ballots cast, and ones that named an intruder. Counted
+                # before the ejection, which can end the round.
+                for voter_id, target_id in self.votes.items():
+                    voter, target = self.game.getPlayerById(voter_id), self.game.getPlayerById(target_id)
+                    if voter:
+                        voter.count_stat('votes')
+                        if target and target.sus:
+                            voter.count_stat('sharp_votes')
                 final_votes = self.compute_vote_counts()
                 self.final_votes = final_votes
                 self.voted_out = self.determine_voted_out(final_votes)

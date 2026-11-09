@@ -51,6 +51,7 @@ export default function AccountButton({ tone = 'light', className = '' }) {
             {menuOpen && (
                 <div className="sp-acct__menu" role="menu">
                     <p className="sp-acct__menuemail">{current.account.email || label}</p>
+                    <a role="menuitem" href="/account/stats" className="sp-acct__menuitem">{t('My stats')}</a>
                     <a role="menuitem" href="/account" className="sp-acct__menuitem">{t('My lists')}</a>
                     <button role="menuitem" type="button" className="sp-acct__menuitem" onClick={() => { setMenuOpen(false); signOut(); }}>
                         {t('Sign out')}

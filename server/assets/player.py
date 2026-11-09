@@ -115,7 +115,17 @@ class Player:
         self.cards = []
 
         self.ready = False
-        
+
+        # Signed-in players only: the account this phone is signed in to, and this round's counts
+        # for its stats page. Both stay empty for everyone else (see assets/player_stats.py).
+        self.account_id = None
+        self.stat_tally = {}
+
+    def count_stat(self, key, amount=1):
+        """Add to this round's count for the player's account stats. Nothing for signed-out players."""
+        if self.account_id:
+            self.stat_tally[key] = self.stat_tally.get(key, 0) + amount
+
     def disconnect(self):
         self.active = False
 
@@ -137,6 +147,7 @@ class Player:
         self.cards = []
         self.ready = False
         self.late_join = False
+        self.stat_tally = {}
     
     def set_death(self, cause, task_name=None):
         """Set the death cause and generate a death message."""

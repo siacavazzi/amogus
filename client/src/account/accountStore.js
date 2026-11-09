@@ -136,6 +136,11 @@ export function fetchAccountLists() {
     return call('/api/account/lists');
 }
 
+/** The signed-in player's game stats for My stats. */
+export function fetchAccountStats() {
+    return call('/api/account/stats');
+}
+
 export function googleStartUrl({ popup, returnTo }) {
     const params = new URLSearchParams({ return: returnTo || '/account' });
     if (popup) params.set('popup', '1');
