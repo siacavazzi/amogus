@@ -12,6 +12,7 @@ import { readGeneratedSetup, claimGeneratedRoomCreation } from './seo/gameDraft'
 import { rememberSavedGame, keepSavedGame, readPendingGroup } from '../utils/savedGame';
 import { t } from '../i18n';
 import LanguagePicker from '../components/LanguagePicker';
+import LaptopHostPrompt, { laptopHasHosted } from '../components/LaptopHostPrompt';
 import AccountButton from '../account/AccountButton';
 import WelcomeBackCard from '../components/WelcomeBackCard';
 import { readLastGame } from '../utils/lastGame';
@@ -23,6 +24,7 @@ function LobbyPage() {
     const [isJoining, setIsJoining] = useState(false);
     const [error, setError] = useState('');
     const [showTutorialPrompt, setShowTutorialPrompt] = useState(false);
+    const [showLaptopPrompt, setShowLaptopPrompt] = useState(false);
     const { socket, roomEntryStatus, setRoomEntryStatus } = useContext(DataContext);
     // Arriving from "Use this pack": open the room straight away, the pack loads in host setup.
     const [generatedSetup] = useState(readGeneratedSetup);
@@ -92,6 +94,13 @@ function LobbyPage() {
         setTimeout(() => {
             setIsCreating(false);
         }, 10000);
+    };
+
+    // On a laptop, say first that everyone (the host too) plays on a phone. A laptop that has
+    // already had phones join one of its rooms goes straight to setup.
+    const handleCreateClick = () => {
+        if (isReactorDevice && !laptopHasHosted()) setShowLaptopPrompt(true);
+        else handleCreateGame();
     };
 
     useEffect(() => {
@@ -270,7 +279,7 @@ function LobbyPage() {
                             </button>
                         </form>
                         <p className="sg-small sg-home__or">{t('or start one')}</p>
-                        <button type="button" className="sg-btn sg-btn-ink" onClick={handleCreateGame} disabled={isCreating}>
+                        <button type="button" className="sg-btn sg-btn-ink" onClick={handleCreateClick} disabled={isCreating}>
                             {isCreating ? t('Creating Room...') : <><Plus size={22} /> {t('Create New Game')}</>}
                         </button>
                     </div>
@@ -278,6 +287,13 @@ function LobbyPage() {
 
                 <ReactorModeBanner className="sg-a sg-rise" />
             </div>
+
+            {showLaptopPrompt && (
+                <LaptopHostPrompt
+                    onSetUpHere={() => { setShowLaptopPrompt(false); handleCreateGame(); }}
+                    onClose={() => setShowLaptopPrompt(false)}
+                />
+            )}
 
             <div className="sg-rx-lobby__foot">
                 <p style={{ display: 'flex', justifyContent: 'center', gap: 22 }}>

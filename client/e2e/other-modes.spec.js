@@ -56,7 +56,7 @@ for (const crewWins of [true, false]) {
             }
             for (const phone of phones) await expect(phone.getByText('Crewmates Win!'), phone.person).toBeVisible({ timeout: 20000 });
         } else {
-            await last.getByRole('button', { name: 'I WAS ELIMINATED' }).click();
+            await h.tapAndConfirm(last.getByRole('button', { name: 'I WAS ELIMINATED' }));
             for (const phone of phones) await expect(phone.getByText('Intruders Win!'), phone.person).toBeVisible({ timeout: 20000 });
         }
         h.expectNoPageErrors(phones);

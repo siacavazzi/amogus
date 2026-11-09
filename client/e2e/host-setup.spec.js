@@ -8,7 +8,7 @@ test.afterEach(h.closeAll);
 async function startSetup(page) {
     await page.goto('/play');
     await page.getByRole('button', { name: 'Skip for now' }).click({ timeout: 5000 }).catch(() => {});
-    await page.getByText('Create New Game').click();
+    await h.tapCreateNewGame(page);
     await expect(page.getByRole('heading', { name: 'Task list' })).toBeVisible();
 }
 
