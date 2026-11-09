@@ -1,4 +1,4 @@
-// "How was this game?": 20 seconds after the result screen (2 s after Save), every phone (never the big screen)
+// "How was this game?": 20 seconds after the result screen (2 s after Save this game), every phone (never the big screen)
 // asks for optional feedback, and what a player sends is saved.
 const { test, expect } = require('@playwright/test');
 const h = require('./helpers');

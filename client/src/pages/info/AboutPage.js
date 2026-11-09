@@ -49,7 +49,7 @@ function AboutPage() {
 
                     <h2>Why it's free</h2>
                     <p>
-                        Sus Party is free, with no accounts or ads. The server stores task lists, game records, and player IDs that support the game.
+                        Sus Party is free, with no ads, and players never need an account. Hosts can sign in to keep their task lists on any device. The server stores task lists, game records, and player IDs that support the game. Our <a href="/privacy">privacy page</a> lists what we keep.
                     </p>
                     <p>
                         The host browser supplies a source category and an entry page when it creates a room. Aggregate counters show which pages lead to playable games. These counters exclude raw referrer URLs, search terms, and third-party analytics scripts.

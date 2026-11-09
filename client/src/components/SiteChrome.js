@@ -2,6 +2,7 @@ import React from 'react';
 import '../styles/SitePage.css';
 import SusMark from './SusMark';
 import { LanguageLinks } from '../pages/seo/translated/TranslatedPage';
+import AccountButton from '../account/AccountButton';
 
 export function SiteNav() {
     return (
@@ -11,6 +12,7 @@ export function SiteNav() {
                 <a href="/how-to-play">How to play</a>
                 <a href="/among-us-irl-task-generator">Task generator</a>
                 <a href="/play" className="site-button">Play now →</a>
+                <AccountButton tone="dark" />
             </div>
         </nav>
     );
@@ -46,6 +48,7 @@ export function SiteFooter({ languagePage = 'home' }) {
                     <a href="/social-deduction-games">Social deduction games</a>
                     <a href="/faq">FAQ</a>
                     <a href="/about">About</a>
+                    <a href="/privacy">Privacy</a>
                     <a href="/play">Play Sus Party</a>
                 </div>
                 <div>

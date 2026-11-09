@@ -231,6 +231,13 @@
     "prerender": true
   },
   {
+    "path": "/privacy",
+    "canonical": "https://susparty.com/privacy",
+    "priority": "0.3",
+    "changefreq": "yearly",
+    "prerender": true
+  },
+  {
     "path": "/fr",
     "canonical": "https://susparty.com/fr",
     "priority": "0.8",

@@ -1,0 +1,150 @@
+/* Host accounts: the small top-right link, the sign-in sheet, and the setup-screen card.
+   Self-contained colours so it reads the same on the blue game screens and the light site. */
+
+.sp-acct__top {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-weight: 800;
+  font-size: 14px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+}
+.sp-acct__top--light { color: #fff; opacity: 0.85; }
+.sp-acct__top--dark { color: #141726; }
+.sp-acct__top:focus-visible, .sp-acct__avatar:focus-visible { outline: 3px solid currentColor; outline-offset: 2px; }
+
+.sp-acct__menuwrap { position: relative; }
+.sp-acct__avatar {
+  appearance: none;
+  border: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font: inherit;
+  font-weight: 900;
+  font-size: 16px;
+  cursor: pointer;
+}
+.sp-acct__avatar--light { background: rgba(255, 255, 255, 0.9); color: #1b4fd8; }
+.sp-acct__avatar--dark { background: #141726; color: #fff; }
+.sp-acct__menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 70;
+  min-width: 220px;
+  max-width: min(300px, calc(100vw - 32px));
+  background: #fff;
+  color: #141726;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  padding: 8px;
+  display: grid;
+}
+.sp-acct__menuemail { margin: 6px 10px 8px; font-size: 13px; color: #596079; overflow-wrap: anywhere; }
+.sp-acct__menuitem {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-weight: 700;
+  font-size: 16px;
+  color: #141726;
+  text-align: left;
+  text-decoration: none;
+  padding: 12px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.sp-acct__menuitem:hover, .sp-acct__menuitem:focus-visible { background: #eef1f8; }
+
+.sp-acct__scrim { position: fixed; inset: 0; z-index: 80; background: rgba(0, 0, 0, 0.55); display: flex; align-items: flex-end; justify-content: center; }
+.sp-acct__sheet {
+  width: 100%;
+  max-width: 480px;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: #fff;
+  color: #141726;
+  border-radius: 28px 28px 0 0;
+  padding: 22px 20px max(22px, env(safe-area-inset-bottom));
+  display: grid;
+  gap: 12px;
+  text-align: left;
+  font-family: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+}
+@media (min-width: 700px) {
+  .sp-acct__scrim { align-items: center; }
+  .sp-acct__sheet { border-radius: 24px; }
+}
+.sp-acct__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.sp-acct__title { margin: 0; font-size: 26px; font-weight: 900; color: #141726; }
+.sp-acct__close { appearance: none; border: 0; background: #eef1f8; color: #141726; width: 40px; height: 40px; border-radius: 50%; font-size: 24px; line-height: 1; cursor: pointer; flex: none; }
+
+.sp-acct__card {
+  background: #fff;
+  color: #141726;
+  border-radius: 22px;
+  padding: 18px;
+  display: grid;
+  gap: 10px;
+  text-align: left;
+}
+.sp-acct__cardtitle { margin: 0; font-size: 20px; font-weight: 900; }
+
+.sp-acct__form { display: grid; gap: 10px; }
+.sp-acct__lede { margin: 0; font-size: 15px; line-height: 1.4; color: #3c4260; }
+.sp-acct__label { font-size: 13px; font-weight: 800; color: #3c4260; }
+.sp-acct__input {
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  font-size: 18px;
+  padding: 14px 14px;
+  border-radius: 14px;
+  border: 2px solid #c9cfe0;
+  background: #fff;
+  color: #141726;
+}
+.sp-acct__input:focus { outline: none; border-color: #1b4fd8; }
+.sp-acct__input--code { font-size: 32px; font-weight: 900; letter-spacing: 0.5em; text-align: center; padding-left: calc(14px + 0.5em); }
+
+.sp-acct__btn {
+  appearance: none;
+  font: inherit;
+  font-weight: 900;
+  font-size: 17px;
+  min-height: 54px;
+  padding: 12px 18px;
+  border-radius: 16px;
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+.sp-acct__btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.sp-acct__btn--main { background: #1b4fd8; color: #fff; }
+.sp-acct__btn--google { background: #fff; color: #1f1f1f; border-color: #c9cfe0; }
+.sp-acct__btn--line { background: #fff; color: #1b4fd8; border-color: #1b4fd8; }
+.sp-acct__btn--danger { background: #fff; color: #c0182c; border-color: #c0182c; }
+
+.sp-acct__or { margin: 0; text-align: center; font-size: 13px; color: #596079; }
+.sp-acct__row { display: flex; flex-wrap: wrap; gap: 6px 16px; justify-content: center; }
+.sp-acct__link { appearance: none; border: 0; background: transparent; font: inherit; font-size: 15px; font-weight: 700; color: #1b4fd8; text-decoration: underline; text-underline-offset: 3px; padding: 6px 2px; cursor: pointer; }
+.sp-acct__notnow { justify-self: center; color: #596079; }
+.sp-acct__muted { margin: 0; font-size: 14px; color: #596079; }
+.sp-acct__error { margin: 0; font-size: 15px; font-weight: 700; color: #c0182c; }
+.sp-acct__fine { margin: 0; font-size: 12px; color: #596079; }
+.sp-acct__fine a { color: inherit; }
+
+/* Placement */
+.sp-acct__corner { position: absolute; top: max(10px, env(safe-area-inset-top)); right: 12px; z-index: 5; }

@@ -10,8 +10,13 @@ const FAQS = [
     },
     {
         q: 'Is Sus Party free?',
-        a: 'Yes. Sus Party is free, with no account, ads, or app-store purchase. Open it in your browser, prepare a task pack, and invite friends with your room code.',
+        a: 'Yes. Sus Party is free, with no ads or app-store purchase, and nobody needs an account to play. Open it in your browser, prepare a task pack, and invite friends with your room code.',
         href: '/among-us-irl-task-generator', linkLabel: 'Prepare your first task pack',
+    },
+    {
+        q: 'Do I need an account?',
+        a: 'No. Players never sign in. Hosts can sign in with Google or a code sent to their email, so their saved task lists show up on any phone or laptop instead of living in one browser. Accounts are for people 13 or older and keep only what we need to sign you in.',
+        href: '/privacy', linkLabel: 'What we keep',
     },
     {
         q: 'Do I need to install an app?',
