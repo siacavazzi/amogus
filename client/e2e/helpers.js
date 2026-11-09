@@ -74,18 +74,12 @@ async function skipTutorialPrompt(page) {
 //               groupTasks: true (no list; the room writes its tasks together in the lobby),
 //               meetingQuorum: false (big games wait for everyone to slide ready, not 80%),
 //               lateJoin: false (latecomers wait for the next round instead of joining the round) }
-// Picks the example list and waits until it is loaded and ready to use.
+// Adds the example list and waits for it to land in "Your saved lists". That list refreshes a
+// moment after the add and pushes "Use This Task List" down the page; a tap in that moment
+// (Safari, on the live beta) went down on the button and came up beside it, so nothing happened.
 async function addExampleList(page) {
-    await page.getByRole('button', { name: 'Example list', exact: true }).click();
-    await expect(page.getByRole('heading', { name: 'Example List' })).toBeVisible();
-}
-
-// Reads the code of the list that's picked from "Your saved lists".
-async function savedListCode(page, name) {
-    await page.getByRole('button', { name: 'Pick a different list' }).click();
-    const meta = page.locator('.hs-listrow', { hasText: name }).first().locator('.hs-listrow__meta');
-    await expect(meta).toHaveText(/\d+ tasks · [A-Z0-9]{6}/);
-    return (await meta.textContent()).split('·').pop().trim();
+    await page.getByText('Add Example List').first().click();
+    await expect(page.locator('.hs-listrow__meta').first()).toHaveText(/\d+ tasks · [A-Z0-9]{6}/);
 }
 
 async function setUpRoom(page, settings = {}) {
@@ -451,6 +445,6 @@ function expectNoPageErrors(pages) {
 }
 
 module.exports = {
-    lock, goOffline, goOnline, tapAndConfirm, expectTappable, PHONE, addExampleList, savedListCode, openPage, closeAll, skipTutorialPrompt, openPhones, openPhone, openReactor, createRoom, createRoomOnPhone, gatherRoom, readyUp, slideUntilGone, connectReactor, joinRoom, enterName, revealRoles, revealAllRoles, swipe, hold, callMeeting, vote,
+    lock, goOffline, goOnline, tapAndConfirm, expectTappable, PHONE, addExampleList, openPage, closeAll, skipTutorialPrompt, openPhones, openPhone, openReactor, createRoom, createRoomOnPhone, gatherRoom, readyUp, slideUntilGone, connectReactor, joinRoom, enterName, revealRoles, revealAllRoles, swipe, hold, callMeeting, vote,
     continueAfterResults, voteOutIntruder, roundButton, addTasks, openVent, playCard, dismissMessage, expectLobby, expectNoPageErrors, sleep,
 };

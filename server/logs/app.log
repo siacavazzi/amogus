@@ -8865,3 +8865,116 @@
 2026-10-31 19:01:34,910 - app_logger - dev-5f91f39 - INFO -  * Running with HTTP at: http://192.0.2.2:5001
 2026-10-31 19:01:34,910 - app_logger - dev-5f91f39 - INFO -  * For HTTPS, generate certificates with:
 2026-10-31 19:01:34,910 - app_logger - dev-5f91f39 - INFO -    openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365
+2026-11-09 01:41:07,886 - app_logger - dev-2952cd6 - INFO - Starting Sus Party prod server version dev-2952cd6 (commit 2952cd6, built None)
+2026-11-09 01:41:07,904 - app_logger - dev-2952cd6 - INFO - Starting server...
+2026-11-09 01:41:07,904 - app_logger - dev-2952cd6 - INFO -  * Running with HTTP at: http://192.0.2.2:5001
+2026-11-09 01:41:07,904 - app_logger - dev-2952cd6 - INFO -  * For HTTPS, generate certificates with:
+2026-11-09 01:41:07,904 - app_logger - dev-2952cd6 - INFO -    openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365
+2026-11-09 01:41:58,426 - app_logger - dev-2952cd6 - INFO - Starting Sus Party prod server version dev-2952cd6 (commit 2952cd6, built None)
+2026-11-09 01:41:58,444 - app_logger - dev-2952cd6 - INFO - Starting server...
+2026-11-09 01:41:58,444 - app_logger - dev-2952cd6 - INFO -  * Running with HTTP at: http://192.0.2.2:5001
+2026-11-09 01:41:58,444 - app_logger - dev-2952cd6 - INFO -  * For HTTPS, generate certificates with:
+2026-11-09 01:41:58,444 - app_logger - dev-2952cd6 - INFO -    openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365
+2026-11-09 01:42:14,919 - app_logger - dev-2952cd6 - INFO - Starting Sus Party prod server version dev-2952cd6 (commit 2952cd6, built None)
+2026-11-09 01:42:14,937 - app_logger - dev-2952cd6 - INFO - Starting server...
+2026-11-09 01:42:14,937 - app_logger - dev-2952cd6 - INFO -  * Running with HTTP at: http://192.0.2.2:5001
+2026-11-09 01:42:14,937 - app_logger - dev-2952cd6 - INFO -  * For HTTPS, generate certificates with:
+2026-11-09 01:42:14,937 - app_logger - dev-2952cd6 - INFO -    openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365
+2026-11-09 01:44:54,667 - app_logger - dev-2952cd6 - INFO - Player 3c9af364-6a8b-41e6-a693-5f6bc3a2ce6e in room YXTA is offline; the room stops waiting for them
+2026-11-09 01:44:54,677 - app_logger - dev-2952cd6 - INFO - Player 91776e4c-b417-4350-951a-7ca6256941e8 in room YXTA is offline; the room stops waiting for them
+2026-11-09 01:44:54,910 - app_logger - dev-2952cd6 - INFO - Player aeb3d748-9f8d-42ab-aa4f-3adfab86f039 in room YXTA is offline; the room stops waiting for them
+2026-11-09 01:44:54,935 - app_logger - dev-2952cd6 - INFO - Player 989a9a32-1808-41f6-8e7c-a2c072bb872e in room YXTA is offline; the room stops waiting for them
+2026-11-09 01:44:55,235 - app_logger - dev-2952cd6 - INFO - Player 78cfc086-609c-4350-b388-e08144f3a610 in room YXTA is offline; the room stops waiting for them
+2026-11-09 01:44:55,294 - app_logger - dev-2952cd6 - INFO - Player 5e720a29-6396-4d2a-8489-740e623d4cfb in room YXTA is offline; the room stops waiting for them
+2026-11-09 01:44:55,323 - app_logger - dev-2952cd6 - INFO - Player 7522a109-7aa0-4422-a6b6-50750d26f19a in room YXTA is offline; the room stops waiting for them
+2026-11-09 01:44:55,397 - app_logger - dev-2952cd6 - INFO - Player afec412f-183b-4dab-9658-c4d7b5d4942d in room YXTA is offline; the room stops waiting for them
+2026-11-09 01:44:55,478 - app_logger - dev-2952cd6 - INFO - Player a92b80ae-c42d-44dc-8427-fa62ea661058 in room YXTA is offline; the room stops waiting for them
+2026-11-09 01:44:55,555 - app_logger - dev-2952cd6 - INFO - Player b049e82f-69cc-4a49-a91d-617ce17ce2a9 in room YXTA is offline; the room stops waiting for them
+2026-11-09 01:44:55,629 - app_logger - dev-2952cd6 - INFO - Player 3041cc6e-13d2-4ab7-a492-ab100d7abaf4 in room YXTA is offline; the room stops waiting for them
+2026-11-09 01:44:55,812 - app_logger - dev-2952cd6 - INFO - Player 2a713fb2-f2c0-4732-9883-b79b727a8e81 in room YXTA is offline; the room stops waiting for them
+2026-11-09 01:44:55,838 - app_logger - dev-2952cd6 - INFO - Player f31d403d-bf4f-4c84-a4ff-6b19850cd1c2 in room YXTA is offline; the room stops waiting for them
+2026-11-09 01:44:55,861 - app_logger - dev-2952cd6 - INFO - Player 2dda9d4d-1d8b-45f4-9d9d-bf5505ddf165 in room YXTA is offline; the room stops waiting for them
+2026-11-09 01:44:55,894 - app_logger - dev-2952cd6 - INFO - Player 4879333e-b939-4358-b083-20cec18cba9f in room YXTA is offline; the room stops waiting for them
+2026-11-09 01:44:55,920 - app_logger - dev-2952cd6 - INFO - Player 0a8fb06a-3371-460f-b60d-dcc69915082a in room YXTA is offline; the room stops waiting for them
+2026-11-09 01:44:55,932 - app_logger - dev-2952cd6 - INFO - Player b8747713-497c-42ba-8a2b-6f5e8a1a0957 in room YXTA is offline; the room stops waiting for them
+2026-11-09 01:44:56,092 - app_logger - dev-2952cd6 - INFO - Player bf8b3e33-d8de-4cc3-8384-6aaddc3be403 in room YXTA is offline; the room stops waiting for them
+2026-11-09 01:44:56,127 - app_logger - dev-2952cd6 - INFO - Player 97c3ab0a-5a75-4940-96eb-d1c72a53badd in room YXTA is offline; the room stops waiting for them
+2026-11-09 01:44:56,145 - app_logger - dev-2952cd6 - INFO - Player 0e67cca4-7e12-435a-b635-df27d583e2c3 in room YXTA is offline; the room stops waiting for them
+2026-11-09 01:45:31,801 - app_logger - dev-2952cd6 - INFO - Player 7913b436-e01d-4ea6-9bc8-d8f2975b1ded in room YYXA is offline; the room stops waiting for them
+2026-11-09 01:45:31,847 - app_logger - dev-2952cd6 - INFO - Player 5f94bc27-5ad8-4c80-987f-dab07692ac07 in room YYXA is offline; the room stops waiting for them
+2026-11-09 01:45:31,913 - app_logger - dev-2952cd6 - INFO - Player 9cb149ca-6496-48c1-a60d-4f30c86101ce in room YYXA is offline; the room stops waiting for them
+2026-11-09 01:45:31,923 - app_logger - dev-2952cd6 - INFO - Player 5f9fcc16-54e3-498d-9c8c-17626f94ef6f in room YYXA is offline; the room stops waiting for them
+2026-11-09 01:45:31,992 - app_logger - dev-2952cd6 - INFO - Player b9d2cc4e-912d-4b51-aebe-6e3c8c2b8236 in room YYXA is offline; the room stops waiting for them
+2026-11-09 01:45:32,011 - app_logger - dev-2952cd6 - INFO - Player d2b33d78-8760-444f-8316-c594b89334c6 in room YYXA is offline; the room stops waiting for them
+2026-11-09 01:45:32,033 - app_logger - dev-2952cd6 - INFO - Player 0c3fed62-245b-4a31-a5f9-835da1c0a50d in room YYXA is offline; the room stops waiting for them
+2026-11-09 01:45:32,051 - app_logger - dev-2952cd6 - INFO - Player 7072d606-0e82-4b2d-b28c-0877526b0922 in room YYXA is offline; the room stops waiting for them
+2026-11-09 01:45:32,060 - app_logger - dev-2952cd6 - INFO - Player fae35306-381f-4c7f-8b7a-4565a3e6faeb in room YYXA is offline; the room stops waiting for them
+2026-11-09 01:45:32,088 - app_logger - dev-2952cd6 - INFO - Player 706c91fd-3e86-45a7-9f07-0ef49b4f0503 in room YYXA is offline; the room stops waiting for them
+2026-11-09 01:45:32,094 - app_logger - dev-2952cd6 - INFO - Player ee3979cd-0f06-46c3-822b-029991d597a7 in room YYXA is offline; the room stops waiting for them
+2026-11-09 01:45:32,101 - app_logger - dev-2952cd6 - INFO - Player c47797b4-1c0d-409a-9f14-edaa9be04cb7 in room YYXA is offline; the room stops waiting for them
+2026-11-09 01:45:32,124 - app_logger - dev-2952cd6 - INFO - Player 358c49c0-a618-4260-99c3-00c98a27d5b1 in room YYXA is offline; the room stops waiting for them
+2026-11-09 01:45:32,144 - app_logger - dev-2952cd6 - INFO - Player 3bd12d4e-0a81-44f5-8e74-dca8ebc66534 in room YYXA is offline; the room stops waiting for them
+2026-11-09 01:45:32,146 - app_logger - dev-2952cd6 - INFO - Player 67b8536e-9454-4564-b3ba-9e0551633388 in room YYXA is offline; the room stops waiting for them
+2026-11-09 01:45:32,148 - app_logger - dev-2952cd6 - INFO - Player 9fb51035-2480-4963-8a05-a760e6ebc80b in room YYXA is offline; the room stops waiting for them
+2026-11-09 01:47:58,200 - app_logger - dev-2952cd6 - INFO - Player c6517fbb-1a36-4a29-8f4d-3e2e8ecc85c5 in room TWMT is offline; the room stops waiting for them
+2026-11-09 01:47:58,703 - app_logger - dev-2952cd6 - INFO - Player 902790be-ad91-4ae1-b492-4718a23d14df in room TWMT is offline; the room stops waiting for them
+2026-11-09 01:47:58,756 - app_logger - dev-2952cd6 - INFO - Player d51f7f60-37d0-4033-9534-7afa0ba2f4e1 in room TWMT is offline; the room stops waiting for them
+2026-11-09 01:47:58,784 - app_logger - dev-2952cd6 - INFO - Player 5b8ba1b9-ff86-455d-9dbb-04a2f6e09ded in room TWMT is offline; the room stops waiting for them
+2026-11-09 01:47:58,824 - app_logger - dev-2952cd6 - INFO - Player 7eaa9bcf-c513-4d7c-8b3d-76501c8985ba in room TWMT is offline; the room stops waiting for them
+2026-11-09 01:47:58,880 - app_logger - dev-2952cd6 - INFO - Player b5f5cd57-0c47-4a2a-aec7-0b13a3ef70ea in room TWMT is offline; the room stops waiting for them
+2026-11-09 01:47:58,936 - app_logger - dev-2952cd6 - INFO - Player eb5663af-a758-42e3-b82d-1b37282a7d7f in room TWMT is offline; the room stops waiting for them
+2026-11-09 01:47:59,187 - app_logger - dev-2952cd6 - INFO - Player 074f1405-9fdb-494b-94fb-656577d86470 in room TWMT is offline; the room stops waiting for them
+2026-11-09 01:47:59,200 - app_logger - dev-2952cd6 - INFO - Player d9477682-f240-4bd1-a37c-09a58aaaeee8 in room TWMT is offline; the room stops waiting for them
+2026-11-09 01:47:59,217 - app_logger - dev-2952cd6 - INFO - Player 9c0cf553-003d-407e-b791-2afb694406af in room TWMT is offline; the room stops waiting for them
+2026-11-09 01:47:59,230 - app_logger - dev-2952cd6 - INFO - Player ad2096c2-96f9-4d24-95a7-b1e25cb1f052 in room TWMT is offline; the room stops waiting for them
+2026-11-09 01:47:59,303 - app_logger - dev-2952cd6 - INFO - Player 70170ce3-5817-4c6f-ba95-2f5e2e766ef4 in room TWMT is offline; the room stops waiting for them
+2026-11-09 01:47:59,323 - app_logger - dev-2952cd6 - INFO - Player 9202f2d9-441a-4948-97cb-8c8b4f9dbafb in room TWMT is offline; the room stops waiting for them
+2026-11-09 01:47:59,355 - app_logger - dev-2952cd6 - INFO - Player cb65ae69-45f5-4fe4-8063-9877b5f7f612 in room TWMT is offline; the room stops waiting for them
+2026-11-09 01:47:59,361 - app_logger - dev-2952cd6 - INFO - Player fa67bc70-61fd-433b-af1c-232e0d9c4939 in room TWMT is offline; the room stops waiting for them
+2026-11-09 01:47:59,369 - app_logger - dev-2952cd6 - INFO - Player 68a06677-3253-4c43-935f-bb5c8aeb3bef in room TWMT is offline; the room stops waiting for them
+2026-11-09 01:47:59,383 - app_logger - dev-2952cd6 - INFO - Player 8f3ac7cb-3b79-42e1-be79-d21dfd320010 in room TWMT is offline; the room stops waiting for them
+2026-11-09 01:47:59,406 - app_logger - dev-2952cd6 - INFO - Player 937faab0-4fd9-4c5a-9f42-dec0c4644253 in room TWMT is offline; the room stops waiting for them
+2026-11-09 01:47:59,424 - app_logger - dev-2952cd6 - INFO - Player 84bc3ff9-7f51-4e91-bced-89e835a19f07 in room TWMT is offline; the room stops waiting for them
+2026-11-09 01:47:59,439 - app_logger - dev-2952cd6 - INFO - Player 05abc89f-e9aa-4760-8ac9-cec8df79470d in room TWMT is offline; the room stops waiting for them
+2026-11-09 01:47:59,451 - app_logger - dev-2952cd6 - INFO - Player 5fb5fdc1-7239-40c8-aa3a-bb0fe8173d50 in room TWMT is offline; the room stops waiting for them
+2026-11-09 01:47:59,462 - app_logger - dev-2952cd6 - INFO - Player a72c55a0-2541-4ddf-a482-69f5a6b6840e in room TWMT is offline; the room stops waiting for them
+2026-11-09 01:47:59,507 - app_logger - dev-2952cd6 - INFO - Player 70d93da5-791d-4b54-b97b-48f7e5860ce0 in room TWMT is offline; the room stops waiting for them
+2026-11-09 01:47:59,523 - app_logger - dev-2952cd6 - INFO - Player 7d112e1e-7c07-4206-a7cc-f1020594f453 in room TWMT is offline; the room stops waiting for them
+2026-11-09 01:47:59,538 - app_logger - dev-2952cd6 - INFO - Player c57de030-0fff-4e40-8e0e-43194d8df67c in room TWMT is offline; the room stops waiting for them
+2026-11-09 01:47:59,551 - app_logger - dev-2952cd6 - INFO - Player d33c084f-5099-4b29-9d2c-ce73ef754b21 in room TWMT is offline; the room stops waiting for them
+2026-11-09 01:47:59,562 - app_logger - dev-2952cd6 - INFO - Player 7d453824-197b-4c95-bb98-66bee3e0c207 in room TWMT is offline; the room stops waiting for them
+2026-11-09 01:47:59,584 - app_logger - dev-2952cd6 - INFO - Player e2de0642-219a-4587-9174-73baed953017 in room TWMT is offline; the room stops waiting for them
+2026-11-09 01:47:59,587 - app_logger - dev-2952cd6 - INFO - Player 82442a76-661d-422f-8adb-9f7737cd5c7d in room TWMT is offline; the room stops waiting for them
+2026-11-09 01:48:00,405 - app_logger - dev-2952cd6 - INFO - Player 5db7aace-9563-4181-bed9-f49c03458301 in room TWMT is offline; the room stops waiting for them
+2026-11-09 01:48:09,139 - app_logger - dev-2952cd6 - INFO - Player f78e35da-108d-4b4e-9a4f-26e5633e03c3 in room MMTM is offline; the room stops waiting for them
+2026-11-09 01:48:22,656 - app_logger - dev-2952cd6 - INFO - Player dd499e87-4b58-4022-9bcd-802b572efcf5 in room HYHA is offline; the room stops waiting for them
+2026-11-09 01:48:28,902 - app_logger - dev-2952cd6 - INFO - Player 15beaac1-f493-47f9-80be-769f2abf0b0c in room YAMW is offline; the room stops waiting for them
+2026-11-09 01:49:03,878 - app_logger - dev-2952cd6 - INFO - Player ae6db932-5eaa-4b27-9d44-65debe023b9f in room HXAE is offline; the room stops waiting for them
+2026-11-09 01:49:03,933 - app_logger - dev-2952cd6 - INFO - Player 32d97b3c-68aa-42d5-bf55-6b45c279855b in room HXAE is offline; the room stops waiting for them
+2026-11-09 01:49:04,001 - app_logger - dev-2952cd6 - INFO - Player ef603205-5022-4f48-ab6c-1ab97b3484b0 in room HXAE is offline; the room stops waiting for them
+2026-11-09 01:49:04,026 - app_logger - dev-2952cd6 - INFO - Player 97e60527-5f4a-43b1-b86e-d91a4803e70a in room HXAE is offline; the room stops waiting for them
+2026-11-09 01:49:21,444 - app_logger - dev-2952cd6 - INFO - Player 0e4c7de0-31ed-42e4-98bf-6981196cdf92 in room RTMY is offline; the room stops waiting for them
+2026-11-09 01:49:21,455 - app_logger - dev-2952cd6 - INFO - Player 79a04a23-fc7a-4925-8213-a32c2b4f1e55 in room RTMY is offline; the room stops waiting for them
+2026-11-09 01:49:21,542 - app_logger - dev-2952cd6 - INFO - Player ff9e4946-84de-454c-a43c-fe72f293265d in room RTMY is offline; the room stops waiting for them
+2026-11-09 01:49:45,359 - app_logger - dev-2952cd6 - INFO - Player 5378dbe1-c7d9-46ac-bb6d-ba12dc962c36 in room TYMW is offline; the room stops waiting for them
+2026-11-09 01:49:45,380 - app_logger - dev-2952cd6 - INFO - Player 0ea1850e-24a4-4dda-a36a-771a495ede54 in room TYMW is offline; the room stops waiting for them
+2026-11-09 01:49:45,483 - app_logger - dev-2952cd6 - INFO - Player 4f57095a-b002-43b4-9080-03e12225bc35 in room TYMW is offline; the room stops waiting for them
+2026-11-09 01:50:09,812 - app_logger - dev-2952cd6 - INFO - Player d8a801cd-5ae2-4d31-a776-b5eb5d28db85 in room AYMM is offline; the room stops waiting for them
+2026-11-09 01:50:09,830 - app_logger - dev-2952cd6 - INFO - Player 6f858a60-c5a0-451b-8865-e7a69d9eff7b in room AYMM is offline; the room stops waiting for them
+2026-11-09 01:50:09,892 - app_logger - dev-2952cd6 - INFO - Player af38aa12-22d2-4075-abc6-58818daa426e in room AYMM is offline; the room stops waiting for them
+2026-11-09 01:50:09,919 - app_logger - dev-2952cd6 - INFO - Player 63ddcb26-e7b5-4e73-9976-c8fa75bfb09a in room AYMM is offline; the room stops waiting for them
+2026-11-09 01:50:09,963 - app_logger - dev-2952cd6 - INFO - Player a86fd6a4-b1e6-41e0-a0e3-da3038febbb7 in room AYMM is offline; the room stops waiting for them
+2026-11-09 01:50:28,308 - app_logger - dev-2952cd6 - INFO - Player 0b4eeb93-fb7e-4284-9a78-6b66de1d25ac in room EEXW is offline; the room stops waiting for them
+2026-11-09 01:50:28,406 - app_logger - dev-2952cd6 - INFO - Player c35be180-9505-428a-a1a6-fdfd53336be7 in room EEXW is offline; the room stops waiting for them
+2026-11-09 01:50:28,445 - app_logger - dev-2952cd6 - INFO - Player 89268706-27c6-4104-a6be-f0685f8ba418 in room EEXW is offline; the room stops waiting for them
+2026-11-09 01:50:28,461 - app_logger - dev-2952cd6 - INFO - Player 69939c96-966e-41f5-9ffe-d46d8400b8d0 in room EEXW is offline; the room stops waiting for them
+2026-11-09 01:50:48,314 - app_logger - dev-2952cd6 - INFO - Player b84e8d32-e5e4-4360-a3c2-08c7bb131a91 in room TYME is offline; the room stops waiting for them
+2026-11-09 01:50:48,513 - app_logger - dev-2952cd6 - INFO - Player 39b129a5-a9af-4c45-84fb-41c37af0bc20 in room TYME is offline; the room stops waiting for them
+2026-11-09 01:50:48,552 - app_logger - dev-2952cd6 - INFO - Player 77c16948-5fdd-4247-92d0-6261df16f4c3 in room TYME is offline; the room stops waiting for them
+2026-11-09 01:50:48,556 - app_logger - dev-2952cd6 - INFO - Player 221e6b2f-16a1-43b9-a5eb-5de68553ba86 in room TYME is offline; the room stops waiting for them
+2026-11-09 01:51:07,327 - app_logger - dev-2952cd6 - INFO - Player c85fe588-af57-4cb0-aef2-29e2617b8068 in room WHMM is offline; the room stops waiting for them
+2026-11-09 01:51:43,576 - app_logger - dev-2952cd6 - INFO - Player 8f5aa32b-b872-481e-8445-977b1ac7db11 in room WHMM is offline; the room stops waiting for them
+2026-11-09 01:51:43,586 - app_logger - dev-2952cd6 - INFO - Player 0d86119a-c5db-4690-8c92-c44c5da69186 in room WHMM is offline; the room stops waiting for them
+2026-11-09 01:51:43,644 - app_logger - dev-2952cd6 - INFO - Player c85fe588-af57-4cb0-aef2-29e2617b8068 in room WHMM is offline; the room stops waiting for them
+2026-11-09 01:51:43,658 - app_logger - dev-2952cd6 - INFO - Player 125d8208-bbb3-4c0b-9ba2-744dc6058b25 in room WHMM is offline; the room stops waiting for them
+2026-11-09 01:52:07,582 - app_logger - dev-2952cd6 - INFO - Player 47c21c1c-2f2b-4945-a69d-f545fcbff15c in room RARW is offline; the room stops waiting for them

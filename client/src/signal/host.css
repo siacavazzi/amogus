@@ -229,22 +229,3 @@
 .hs-round--red { background: var(--sg-out); color: #fff; }
 .hs-ghost { appearance: none; border: 0; background: none; color: inherit; cursor: pointer; padding: 8px; border-radius: 12px; }
 .hs-ghost:hover { background: rgba(0, 0, 0, 0.12); }
-
-/* ---------- Task list picker ---------- */
-.hs-places { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-.hs-place {
-  appearance: none; border: 0; cursor: pointer; text-align: left; border-radius: 16px; padding: 12px 14px 14px; min-height: 76px;
-  background: #fff; color: var(--sg-round); font-family: var(--sg-font); display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 8px;
-}
-.hs-place b { font-weight: 900; font-size: 17px; line-height: 1.15; max-width: 100%; overflow-wrap: break-word; hyphens: auto; }
-.hs-place svg { flex: none; }
-.hs-place:disabled { opacity: 0.5; cursor: not-allowed; }
-.hs-areas { display: flex; flex-wrap: wrap; gap: 8px; }
-.hs-area {
-  appearance: none; border: 0; cursor: pointer; border-radius: 12px; padding: 10px 14px; min-height: 44px;
-  font: 800 16px var(--sg-font); color: #fff; background: rgba(255, 255, 255, 0.12);
-  display: inline-flex; align-items: center; gap: 6px;
-}
-.hs-area[aria-pressed='true'] { background: #fff; color: var(--sg-round); }
-.hs-back { justify-self: start; display: inline-flex; align-items: center; gap: 6px; }
-.hs-presets--two { grid-template-columns: 1fr 1fr; }

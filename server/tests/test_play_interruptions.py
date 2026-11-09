@@ -149,6 +149,29 @@ class PlayInterruptionTests(SocketGameTestCase):
         room = self.create_open_room(host)
         self.assertTrue(server_app.game_manager.get_game(room).collaborative_mode)
 
+    def _open_with_list(self, group_tasks):
+        host = self.make_client()
+        host.emit('create_game')
+        room = self.first_event(self.drain(host), 'game_created')['room_code']
+        game = server_app.game_manager.get_game(room)
+        game.task_list_applied = True
+        game.collaborative_tasks = [{'task': 'Water the plant', 'location': 'Kitchen'}]
+        host.emit('open_room', {'room_code': room, 'group_tasks': group_tasks})
+        self.drain(host)
+        return host, room, game
+
+    def test_host_with_no_lists_of_their_own_starts_with_everyone_adding_tasks(self):
+        host, room, game = self._open_with_list(True)
+        self.assertTrue(game.collaborative_mode)
+        # The host can still turn it off.
+        host.emit('toggle_collaborative_mode', {'room_code': room, 'enabled': False})
+        self.drain(host)
+        self.assertFalse(game.collaborative_mode)
+
+    def test_host_with_their_own_list_keeps_tasks_host_only(self):
+        _, _, game = self._open_with_list(False)
+        self.assertFalse(game.collaborative_mode)
+
     def test_rescued_meltdown_clears_every_code(self):
         from assets.room_protocol import room_state
         clients, room, ids, game = self.start_round()
