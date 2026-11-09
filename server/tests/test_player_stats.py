@@ -174,8 +174,11 @@ class SignedInPlayerPlaysARoundTests(SocketGameTestCase):
         self.add_tasks(clients[0], room_code, 12)
         self.drain_all(clients)
         self.start_game(clients[0], ids[0], clients)
+        # Roles are dealt at random; make the host the intruder and give the crew fresh real tasks.
         for p in game.players:
-            p.sus = p is not me and p.player_id == ids[0]
+            p.sus = p.player_id == ids[0]
+            if not p.sus:
+                game.assign_task(p)
         game.numIntruders, game.numCrew = 1, 3
 
         # Sam does a task and calls a meeting; the signed-out phones' work is never counted.
