@@ -35,6 +35,49 @@ describe('LobbyPage', () => {
     });
 
     describe('Creating a Game', () => {
+        afterEach(() => window.history.replaceState(null, '', '/'));
+        const onLaptop = () => {
+            localStorage.removeItem('sus_party_laptop_hosted_v1');
+            window.history.replaceState(null, '', '/play?mobile=false');
+        };
+
+        it('on a laptop, says first that everyone plays on a phone', () => {
+            onLaptop();
+            const { contextValue } = renderWithContext(<LobbyPage />);
+            fireEvent.click(screen.getByText(/Create New Game/i));
+            expect(screen.getByRole('dialog', { name: 'Everyone plays on a phone, you too' })).toBeInTheDocument();
+            expect(contextValue.socket.emit).not.toHaveBeenCalledWith('create_game', expect.anything());
+
+            // Hosting from a phone shows a code that opens /play there, and opens no room here.
+            fireEvent.click(screen.getByRole('button', { name: /Host from my phone instead/ }));
+            expect(screen.getByTestId('laptop-phone-qr').getAttribute('data-url')).toBe('http://localhost/play?from=laptop');
+            expect(contextValue.socket.emit).not.toHaveBeenCalledWith('create_game', expect.anything());
+            fireEvent.click(screen.getByRole('button', { name: /Back/ }));
+            fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+            expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+            fireEvent.click(screen.getByText(/Create New Game/i));
+            fireEvent.click(screen.getByRole('button', { name: /Set up on this laptop/ }));
+            expect(contextValue.socket.emit).toHaveBeenCalledWith('create_game', expect.anything());
+        });
+
+        it('never stops a phone with the laptop note', () => {
+            const { contextValue } = renderWithContext(<LobbyPage />);
+            fireEvent.click(screen.getByText(/Create New Game/i));
+            expect(screen.queryByRole('dialog', { name: 'Everyone plays on a phone, you too' })).not.toBeInTheDocument();
+            expect(contextValue.socket.emit).toHaveBeenCalledWith('create_game', expect.anything());
+        });
+
+        it('skips the phone note on a laptop that has hosted before', () => {
+            onLaptop();
+            const hosted = jest.spyOn(window.localStorage, 'getItem').mockImplementation(key => (key === 'sus_party_laptop_hosted_v1' ? '1' : null));
+            const { contextValue } = renderWithContext(<LobbyPage />);
+            fireEvent.click(screen.getByText(/Create New Game/i));
+            hosted.mockRestore();
+            expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+            expect(contextValue.socket.emit).toHaveBeenCalledWith('create_game', expect.anything());
+        });
+
         it('emits create_game event when create button is clicked', () => {
             const { contextValue } = renderWithContext(<LobbyPage />);
             

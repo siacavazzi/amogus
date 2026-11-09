@@ -82,10 +82,26 @@ async function addExampleList(page) {
     await expect(page.locator('.hs-listrow__meta').first()).toHaveText(/\d+ tasks · [A-Z0-9]{6}/);
 }
 
+// Reads the code of a list in "Your saved lists".
+async function savedListCode(page, name) {
+    const meta = page.locator('.hs-listrow', { hasText: name }).first().locator('.hs-listrow__meta');
+    await expect(meta).toHaveText(/\d+ tasks · [A-Z0-9]{6}/);
+    return (await meta.textContent()).split('·').pop().trim();
+}
+
+// Create New Game. A laptop first says everyone plays on a phone; carry on setting up there.
+async function tapCreateNewGame(page) {
+    await page.getByText('Create New Game').first().click();
+    const setUpHere = page.getByRole('button', { name: /Set up on this laptop/ });
+    const taskList = page.getByRole('heading', { name: 'Task list' });
+    await expect(setUpHere.or(taskList)).toBeVisible();
+    if (await setUpHere.isVisible()) await setUpHere.click();
+}
+
 async function setUpRoom(page, settings = {}) {
     await page.goto('/play');
     await skipTutorialPrompt(page);
-    await page.getByText('Create New Game').first().click();
+    await tapCreateNewGame(page);
     if (settings.groupTasks) {
         await page.getByRole('button', { name: /Create Tasks with Group/ }).click();
     } else {
@@ -445,6 +461,6 @@ function expectNoPageErrors(pages) {
 }
 
 module.exports = {
-    lock, goOffline, goOnline, tapAndConfirm, expectTappable, PHONE, addExampleList, openPage, closeAll, skipTutorialPrompt, openPhones, openPhone, openReactor, createRoom, createRoomOnPhone, gatherRoom, readyUp, slideUntilGone, connectReactor, joinRoom, enterName, revealRoles, revealAllRoles, swipe, hold, callMeeting, vote,
+    tapCreateNewGame, lock, goOffline, goOnline, tapAndConfirm, expectTappable, PHONE, addExampleList, savedListCode, openPage, closeAll, skipTutorialPrompt, openPhones, openPhone, openReactor, createRoom, createRoomOnPhone, gatherRoom, readyUp, slideUntilGone, connectReactor, joinRoom, enterName, revealRoles, revealAllRoles, swipe, hold, callMeeting, vote,
     continueAfterResults, voteOutIntruder, roundButton, addTasks, openVent, playCard, dismissMessage, expectLobby, expectNoPageErrors, sleep,
 };

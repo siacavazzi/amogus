@@ -2,6 +2,8 @@ import React from 'react';
 import '../signal/signal.css';
 import '../signal/host.css';
 import { t, tk } from '../i18n';
+import GroupRecap from './GroupRecap';
+import { buildRoomInviteUrl } from '../utils/inviteLinks';
 
 const TITLES = {
     room_not_open: tk('Ask the host to open the room'),
@@ -20,18 +22,25 @@ function playedOn(seconds) {
 }
 
 // An invite link to a game that is over. Its own tasks come back when the link carried the game's token.
+// Anyone with the link can start the next game. If a friend already did, the link joins that room.
 function GameEnded({ status, onStartNew, onChangeCode, busy }) {
     const saved = status.saved_game;
+    const live = status.group_room;
+    const joinUrl = live ? buildRoomInviteUrl(live.room_code, window.location.origin, null, live.link_token) : '';
     return (
         <section className="hs-entry sg sg-a sg-rise" role="status" aria-live="polite" aria-atomic="true">
-            <h2>{t('This game has ended')}</h2>
-            <p>{saved
+            <h2>{joinUrl ? t('Your group is playing') : t('This game has ended')}</h2>
+            <p>{joinUrl
+                ? t('Your group is in room {room_code} right now.', { room_code: live.room_code })
+                : saved
                 ? t('It was played on {date}. Start a new game to play it again with the same {count} tasks.', { date: playedOn(saved.played_at), count: saved.task_count })
                 : t('Start a new game, or enter the code for a game that is on now.')}</p>
+            <GroupRecap recap={status.group_recap} style={{ margin: '0 0 12px' }} />
             <div className="hs-entry__actions">
-                <button type="button" onClick={onStartNew} disabled={busy} className="sg-btn sg-btn-blue">
+                {joinUrl && <a href={joinUrl} className="sg-btn sg-btn-blue" data-testid="join-group-room">{t('Join your group')}</a>}
+                {!joinUrl && <button type="button" onClick={onStartNew} disabled={busy} className="sg-btn sg-btn-blue">
                     {saved ? t('Play it again') : t('Start a new game')}
-                </button>
+                </button>}
                 <button type="button" onClick={onChangeCode} disabled={busy} className="sg-link">{t('Enter a code')}</button>
             </div>
         </section>

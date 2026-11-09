@@ -118,6 +118,10 @@ class Game:
         self.host_token = None
         # Rides on invite links and QR codes, so an old link finds this game's tasks after the room is gone.
         self.link_token = new_link_token()
+        # The group this room belongs to: its own token, or the group of the link it was started from.
+        self.group_id = self.link_token
+        self.group_via = None
+        self.group_return = None  # Set at the room's first round: did this group play before?
         
         # Reactor (desktop) support - must be set before CardDeck is created
         self.has_reactor = False

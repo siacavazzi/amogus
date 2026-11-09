@@ -251,6 +251,9 @@ class EventLogIndex:
                 'number': event.get('round_number'), 'end': None, 'outcome': 'in_progress',
                 'end_state': None, 'win': None, 'duration': None,
                 'anon': [d for d in event.get('anon_device_ids') or [] if isinstance(d, str)],
+                'group': event.get('group') if isinstance(event.get('group'), str) else None,
+                'group_return': event.get('group_return') is True,
+                'group_via': event.get('group_via') if isinstance(event.get('group_via'), str) else None,
             }
             for device in rnd['anon']:
                 self._device(device, ts)
@@ -437,6 +440,12 @@ def _window(index, start, end, feedback):
             devices.add(j['anon'])
     returning = {d for d in devices if index.device_first_seen.get(d, start) < start}
 
+    # Groups: rooms started from a group's link (old invite, saved game, welcome back card), and
+    # the groups among them that played before on another day. Keyed by a hash of the group, no people.
+    first_rounds = [rs[0] for rs in rounds_by_room.values()]
+    from_links = [rnd for rnd in first_rounds if rnd.get('group_via')]
+    returning_groups = {rnd['group'] for rnd in first_rounds if rnd.get('group_return') and rnd.get('group')}
+
     seats = sum(len(room['participants']) for room in played_rooms)
     durations = [rnd['duration'] for rnd in rounds if rnd['duration']]
 
@@ -472,7 +481,9 @@ def _window(index, start, end, feedback):
             'biggest_round': max((r['players'] for r in rounds), default=0),
             'median_round_seconds': round(statistics.median(durations)) if durations else None,
             'sessions': len(sessions), 'in_progress': in_progress,
+            'rooms_from_group_links': len(from_links), 'returning_groups': len(returning_groups),
         },
+        'group_links': _ranked(Counter(rnd['group_via'] for rnd in from_links)),
         'local_hours': _local_hours(rounds, index.rooms),
         'group_sizes': [{'key': label, 'count': sum(1 for r in rounds if _bucket(r['players'], SIZE_BUCKETS) == label)}
                         for _, _, label in SIZE_BUCKETS],

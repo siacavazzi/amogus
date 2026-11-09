@@ -1,4 +1,4 @@
-import { savedGameUrl, rememberSavedGame, readPendingSavedGame, shareLink } from '../../utils/savedGame';
+import { savedGameUrl, rememberSavedGame, readPendingSavedGame, readPendingGroup, keepSavedGame, shareLink } from '../../utils/savedGame';
 import { installMethod } from '../../utils/installPrompt';
 
 describe('saved game links', () => {
@@ -19,6 +19,22 @@ describe('saved game links', () => {
         expect(readPendingSavedGame(2000)).toBe('ZN5QF2');
         expect(readPendingSavedGame(1000 + 31 * 24 * 60 * 60 * 1000)).toBe('');
         expect(rememberSavedGame('?list=<script>')).toBe('');
+    });
+
+    it("carries the game's group token, so the next game stays in the same group", () => {
+        expect(savedGameUrl('zn5qf2', 'https://susparty.com', { group: 'tokenAAAAAAA' }))
+            .toBe('https://susparty.com/play?list=ZN5QF2&utm_source=saved-game#group=tokenAAAAAAA');
+        expect(savedGameUrl('zn5qf2', 'https://susparty.com', { group: 'bad token' })).not.toContain('group=');
+        rememberSavedGame('?list=ZN5QF2', 1000, '#group=tokenAAAAAAA');
+        expect(readPendingGroup(2000)).toEqual({ group_link: 'tokenAAAAAAA', group_via: 'saved_link' });
+        rememberSavedGame('?list=ZN5QF2&group=tokenCCCCCCC', 1000, '');   // an address from before the # move
+        expect(readPendingGroup(2000)).toEqual({ group_link: 'tokenCCCCCCC', group_via: 'saved_link' });
+        rememberSavedGame('?list=ZN5QF2&from=welcome', 1000, '#group=tokenAAAAAAA');
+        expect(readPendingGroup(2000)).toEqual({ group_link: 'tokenAAAAAAA', group_via: 'welcome_back' });
+        keepSavedGame('ZN5QF2', 1000, { group: 'tokenBBBBBBB', via: 'old_link' });
+        expect(readPendingGroup(2000)).toEqual({ group_link: 'tokenBBBBBBB', group_via: 'old_link' });
+        rememberSavedGame('?list=ZN5QF2', 1000, '');
+        expect(readPendingGroup(2000)).toBeNull();
     });
 
     it('uses the share sheet, and the clipboard when there is none', async () => {

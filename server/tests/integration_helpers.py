@@ -14,6 +14,7 @@ if str(SERVER_DIR) not in sys.path:
 import app as server_app  # noqa: E402
 from assets.card import Card  # noqa: E402
 from assets.game_links import GameLinks  # noqa: E402
+from assets.groups import GroupBook  # noqa: E402
 
 
 class NoopStatsTracker:
@@ -77,6 +78,7 @@ class SocketGameTestCase(unittest.TestCase):
         links_dir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, links_dir, True)
         server_app.game_links = GameLinks(str(Path(links_dir) / 'game_links.json'))
+        server_app.group_book = GroupBook(str(Path(links_dir) / 'groups.json'))
 
     def make_client(self):
         return protocol_client(self.socketio.test_client(self.flask_app))

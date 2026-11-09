@@ -29,6 +29,7 @@ class GameManager:
         self.speaker = speaker
         self.config = config
         self.games = {}  # {room_code: Game}
+        self.round_end_listeners = []  # Called with the game after each round's end stats
         self.player_to_game = {}  # {player_id: room_code}
         self.sid_to_game = {}  # {socket_sid: room_code}
         self.lock = Lock()
@@ -82,7 +83,7 @@ class GameManager:
             )
             
             # Hook end-of-game reporting via Game's optional callback
-            game.on_end_callback = self.stats_tracker.record_game_ended
+            game.on_end_callback = self._round_ended
             game.on_abort_callback = self.stats_tracker.record_round_abandoned
             # Looked up per call: tests swap the tracker after the manager exists.
             game.on_event_callback = lambda event, room, player_id=None, **fields: \
@@ -96,6 +97,15 @@ class GameManager:
         # Record outside the lock (StatsTracker has its own lock)
         self.stats_tracker.record_game_created(room_code, game.acquisition, game)
         return room_code, game
+
+    def _round_ended(self, game):
+        """End-of-round stats, then anything else that wants to know (the group score)."""
+        self.stats_tracker.record_game_ended(game)
+        for listener in list(self.round_end_listeners):
+            try:
+                listener(game)
+            except Exception:
+                logging.getLogger('app_logger').exception('Round end listener failed')
 
     def resolve_room_code(self, room_code):
         """The live room a typed code means: exact match first, then with look-alikes fixed."""
