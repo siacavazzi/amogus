@@ -681,7 +681,9 @@ def handle_open_room(data):
         record_usage('room_opened', game, flush=True,
                      setup_seconds=round(max(0, time.monotonic() - game.lobby_started_monotonic), 3))
         # "Create Tasks with Group" opens with no list: everyone writes the tasks, as promised.
-        if not game.task_list_applied and not game.collaborative_tasks:
+        # A host with no saved lists of their own also starts with everyone adding tasks.
+        # Either way the host can turn it off in the lobby.
+        if (not game.task_list_applied and not game.collaborative_tasks) or data.get('group_tasks') is True:
             game.collaborative_mode = True
     game.is_open = True
     logger.info(f"Room {room_code} is now open for players")
