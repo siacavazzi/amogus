@@ -26,7 +26,7 @@ from assets.task_list_manager import TaskListManager
 from assets.accounts import AccountStore, owner_key
 from assets.auth_routes import AuthRoutes
 from assets.game_links import GameLinks, clean_link_token
-from assets.groups import GroupBook, GROUP_VIA, group_log_id
+from assets.groups import GroupBook, GROUP_VIA
 from assets.selfie_store import SelfieStore
 from assets.version import VERSION, VERSION_INFO
 from config import (
@@ -90,6 +90,7 @@ def group_room_started(game):
         return
     game._group_counted = True
     game.group_return = group_book.room_started(game.group_id)
+    game.group_log = group_book.log_id(game.group_id)
 
 
 def group_round_ended(game):
@@ -543,11 +544,13 @@ def health_check():
     }, 200
 
 
-@app.route('/api/group')
+@app.route('/api/group', methods=['POST'])
 def group_summary():
     """The welcome back card's look-up: the group's score so far and a room it's playing in now.
-    Only counts come back; the token is the group's own secret from its link."""
-    token = clean_link_token(request.args.get('g'))
+    Only counts come back. The token is the group's own secret from its link, so it comes in the
+    body: a query string would land in the web server's access log next to the IP address."""
+    body = request.get_json(silent=True)
+    token = clean_link_token(body.get('g') if isinstance(body, dict) else None)
     group = game_links.group_of(token) if token else None
     if not group:
         return {'recap': None, 'room': None}, 200, {'Cache-Control': 'no-store'}

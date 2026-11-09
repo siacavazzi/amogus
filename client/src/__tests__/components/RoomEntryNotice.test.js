@@ -51,7 +51,7 @@ describe('RoomEntryNotice', () => {
         expect(screen.getByText('Your group is playing')).toBeInTheDocument();
         const link = screen.getByRole('link', { name: 'Join your group' });
         expect(link.getAttribute('href')).toContain('room=HEMY');
-        expect(link.getAttribute('href')).toContain('g=tokenBBBBBBB');
+        expect(link.getAttribute('href')).toContain('#g=tokenBBBBBBB');
         expect(screen.queryByRole('button', { name: 'Play it again' })).toBeNull();
     });
 });

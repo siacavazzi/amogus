@@ -26,7 +26,11 @@ export default function WelcomeBackCard({ style }) {
     useEffect(() => {
         if (!token || typeof fetch !== 'function') return undefined;
         let live = true;
-        fetch(`${API}/api/group?g=${encodeURIComponent(token)}`, { credentials: 'omit' })
+        // In the body, never the address: addresses end up in the web server's log with an IP.
+        fetch(`${API}/api/group`, {
+            method: 'POST', credentials: 'omit',
+            headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ g: token }),
+        })
             .then(response => (response.ok ? response.json() : null))
             .then(body => { if (live && body) setGroup(body); })
             .catch(() => { /* The card works without the score. */ });

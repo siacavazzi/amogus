@@ -7,7 +7,6 @@ import logging
 import os
 import re
 import time
-from assets.groups import group_log_id
 from logging.handlers import RotatingFileHandler
 from threading import Lock
 from uuid import uuid4
@@ -260,7 +259,7 @@ class StatsTracker:
         """Which group played (a one-way hash, never the link token) and whether it came back."""
         group_return = getattr(game, 'group_return', None) or {}
         return {
-            'group': group_log_id(getattr(game, 'group_id', None)),
+            'group': getattr(game, 'group_log', None),
             'group_via': getattr(game, 'group_via', None),
             'group_return': group_return.get('returning'),
             'group_rooms_before': group_return.get('rooms_before'),

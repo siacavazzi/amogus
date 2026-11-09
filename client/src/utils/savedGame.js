@@ -3,7 +3,9 @@
 // iOS Safari clearing site storage after a week away.
 export const SAVED_GAME_PARAM = 'list';
 // The game's link token, so a game started from this link stays in the same group (and keeps its score).
+// It goes after the '#', which browsers never send to the server (so no web server log holds it).
 export const GROUP_PARAM = 'group';
+const hashParams = (hash) => new URLSearchParams(String(hash || '').replace(/^#/, ''));
 // Marks a link the welcome back card opened, so the log can tell it from a link in a chat.
 const FROM_PARAM = 'from';
 const isGroupToken = (value) => typeof value === 'string' && /^[A-Za-z0-9_-]{8,32}$/.test(value);
@@ -19,17 +21,17 @@ export function normalizeListCode(value) {
 export function savedGameUrl(code, origin = window.location.origin, { group = '', from = '' } = {}) {
     const url = new URL('/play', origin);
     if (normalizeListCode(code)) url.searchParams.set(SAVED_GAME_PARAM, normalizeListCode(code));
-    if (normalizeListCode(code) && isGroupToken(group)) url.searchParams.set(GROUP_PARAM, group);
     if (from === 'welcome') url.searchParams.set(FROM_PARAM, from);
     url.searchParams.set('utm_source', 'saved-game');
+    if (normalizeListCode(code) && isGroupToken(group)) url.hash = `${GROUP_PARAM}=${group}`;
     return url.toString();
 }
 
 /** Keeps a saved game the page was opened with until this phone next creates a room. */
-export function rememberSavedGame(search = window.location.search, now = Date.now()) {
+export function rememberSavedGame(search = window.location.search, now = Date.now(), hash = window.location.hash) {
     const params = new URLSearchParams(search || '');
     return keepSavedGame(params.get(SAVED_GAME_PARAM), now, {
-        group: params.get(GROUP_PARAM),
+        group: hashParams(hash).get(GROUP_PARAM) || params.get(GROUP_PARAM),
         via: params.get(FROM_PARAM) === 'welcome' ? 'welcome_back' : 'saved_link',
     });
 }

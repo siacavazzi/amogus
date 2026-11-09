@@ -7,10 +7,14 @@ sent with an IP address, and a group is forgotten 90 days after its last round.
 
 The gameplay log only ever sees a one-way hash of the group key, so a log line can say
 "this group came back after 6 days" without carrying the token that unlocks the group's tasks.
+The hash is salted with a random value kept only in the group's entry here. When the group is
+forgotten, so is the salt: from then on nobody, even with the old link, can tell which log
+lines were that group's.
 """
 import hashlib
 import json
 import os
+import secrets
 import time
 from threading import Lock
 
@@ -24,10 +28,10 @@ CREW_WINS = ('victory',)
 INTRUDER_WINS = ('sus_victory', 'meltdown_fail')
 
 
-def group_log_id(group):
+def group_log_id(group, salt):
     """What the gameplay log keeps instead of the group key."""
     group = clean_link_token(group)
-    return hashlib.sha256(f'sus-party-group:{group}'.encode()).hexdigest()[:12] if group else None
+    return hashlib.sha256(f'{salt}:{group}'.encode()).hexdigest()[:12] if group and salt else None
 
 
 class GroupBook:
@@ -54,6 +58,7 @@ class GroupBook:
             entry = self.groups.get(group)
             before = dict(entry) if entry else None
             entry = entry or {'first_played': now, 'rooms': 0, 'rounds': 0, 'crew_wins': 0, 'intruder_wins': 0}
+            entry.setdefault('salt', secrets.token_hex(16))
             entry['rooms'] += 1
             entry['last_room_at'] = entry['last_played'] = now
             self.groups[group] = entry
@@ -63,6 +68,13 @@ class GroupBook:
         since = max(0, now - before.get('last_played', now))
         return {'rooms_before': before.get('rooms', 0), 'hours_since_last': round(since / 3600, 1),
                 'returning': since >= SAME_VISIT_SECONDS}
+
+    def log_id(self, group):
+        """The group's id for the gameplay log, or None for a group this book doesn't hold."""
+        group = clean_link_token(group)
+        with self.lock:
+            entry = self.groups.get(group)
+            return group_log_id(group, entry.get('salt')) if entry else None
 
     def round_ended(self, group, end_state, now=None):
         group = clean_link_token(group)

@@ -3,7 +3,7 @@ import tempfile
 import time
 
 from server.tests.integration_helpers import SocketGameTestCase, server_app
-from assets.groups import GroupBook, MAX_AGE_SECONDS, group_log_id
+from assets.groups import GroupBook, MAX_AGE_SECONDS
 from assets.stats_tracker import StatsTracker
 
 
@@ -108,15 +108,18 @@ class GroupLinkTests(SocketGameTestCase):
         error = self.entry_error(late)
         self.assertEqual({'room_code': new_room, 'link_token': second.link_token}, error['group_room'])
 
-        response = self.flask_app.test_client().get(f'/api/group?g={first.link_token}')
+        response = self.flask_app.test_client().post('/api/group', json={'g': first.link_token})
         body = response.get_json()
         self.assertEqual(new_room, body['room']['room_code'])
         self.assertEqual(1, body['recap']['rounds'])
         self.assertEqual('no-store', response.headers['Cache-Control'])
 
     def test_the_group_api_knows_nothing_without_a_real_token(self):
-        body = self.flask_app.test_client().get('/api/group?g=nope').get_json()
-        self.assertEqual({'recap': None, 'room': None}, body)
+        client = self.flask_app.test_client()
+        self.assertEqual({'recap': None, 'room': None}, client.post('/api/group', json={'g': 'nope'}).get_json())
+        self.assertEqual({'recap': None, 'room': None}, client.post('/api/group', data='x').get_json())
+        # Never in the address, which the web server logs with the IP.
+        self.assertIn(client.get('/api/group?g=tokenAAAAAAA').status_code, (404, 405))
 
     def test_save_link_hands_out_the_games_token(self):
         clients, room, ids, game = self.setup_started_game(3)
@@ -133,7 +136,8 @@ class GroupLogTests(SocketGameTestCase):
             with open(tracker.events_path, encoding='utf-8') as f:
                 text = f.read()
             started = [json.loads(line) for line in text.splitlines() if '"round_started"' in line][-1]
-            self.assertEqual(group_log_id(game.group_id), started['group'])
+            self.assertEqual(server_app.group_book.log_id(game.group_id), started['group'])
+            self.assertRegex(started['group'], r'^[0-9a-f]{12}$')
             self.assertFalse(started['group_return'])
             self.assertNotIn(game.link_token, text)
             self.assertNotIn(game.group_id, text)
@@ -150,8 +154,13 @@ class GroupBookStoreTests(SocketGameTestCase):
             reloaded = GroupBook(path)
             self.assertEqual(1, reloaded.recap('groupAAAAAAA', now=now)['intruder_wins'])
             self.assertIsNone(reloaded.recap('groupAAAAAAA', now=now + MAX_AGE_SECONDS + 1))
+            old_log_id = reloaded.log_id('groupAAAAAAA')
             reloaded.room_started('groupBBBBBBB', now=now + MAX_AGE_SECONDS + 1)
             self.assertNotIn('groupAAAAAAA', reloaded.groups)
+            # The salt went with it: the same link starts a new group whose log id doesn't match.
+            self.assertIsNone(reloaded.log_id('groupAAAAAAA'))
+            reloaded.room_started('groupAAAAAAA', now=now + MAX_AGE_SECONDS + 2)
+            self.assertNotEqual(old_log_id, reloaded.log_id('groupAAAAAAA'))
 
     def test_bad_keys_are_ignored(self):
         with tempfile.TemporaryDirectory() as folder:

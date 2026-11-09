@@ -33,11 +33,11 @@ describe('Welcome back card', () => {
             rememberLastGame({ code: 'ZN5QF2', taskCount: 33, group: 'tokenAAAAAAA' });
             render(<WelcomeBackCard />);
             await waitFor(() => expect(screen.getByTestId('group-recap')).toBeInTheDocument());
-            expect(global.fetch).toHaveBeenCalledWith('/api/group?g=tokenAAAAAAA', expect.anything());
+            expect(global.fetch).toHaveBeenCalledWith('/api/group', expect.objectContaining({ method: 'POST', body: JSON.stringify({ g: 'tokenAAAAAAA' }) }));
             expect(screen.getByTestId('group-recap-crew')).toHaveTextContent('5');
             expect(screen.getByTestId('group-recap-intruders')).toHaveTextContent('4');
             const href = screen.getByRole('link', { name: 'Play it again' }).getAttribute('href');
-            expect(href).toContain('group=tokenAAAAAAA');
+            expect(href).toContain('#group=tokenAAAAAAA');
             expect(href).toContain('from=welcome');
         });
 
@@ -47,7 +47,7 @@ describe('Welcome back card', () => {
             render(<WelcomeBackCard />);
             const link = await screen.findByRole('link', { name: 'Join your group' });
             expect(link.getAttribute('href')).toContain('room=RSJO');
-            expect(link.getAttribute('href')).toContain('g=tokenBBBBBBB');
+            expect(link.getAttribute('href')).toContain('#g=tokenBBBBBBB');
         });
 
         it('works as before when the phone has no group token', () => {
