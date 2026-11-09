@@ -242,7 +242,7 @@ export default function SignInSheet({ open, onClose, title, startWithEmail = fal
                     <h2 id="sp-acct-title" className="sp-acct__title">{title || t('Sign in')}</h2>
                     <button type="button" className="sp-acct__close" onClick={onClose} aria-label={t('Close')}>×</button>
                 </div>
-                <p className="sp-acct__lede">{t('Keep your task lists on any phone or laptop. Only hosts need this; players never sign in.')}</p>
+                <p className="sp-acct__lede">{t('Keep your task lists and game stats on any phone or laptop. Signing in is optional; nobody needs it to play.')}</p>
                 <SignInForm onSignedIn={onClose} startWithEmail={startWithEmail} />
             </div>
         </div>

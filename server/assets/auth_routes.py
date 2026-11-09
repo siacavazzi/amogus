@@ -10,6 +10,7 @@ after a week away.
   GET  /api/auth/google/start        open Google (in a pop-up, so the host's room stays connected)
   GET  /api/auth/google/callback     Google sends the host back here
   POST /api/account/adopt            {device_id}: move this browser's saved lists into the account
+  GET  /api/account/stats            the signed-in player's game stats (My stats)
   POST /api/account/ticket           a one-minute ticket that signs in the already-open socket
   POST /api/auth/sign-out
   POST /api/account/delete
@@ -52,7 +53,8 @@ def google_configured():
 
 
 class AuthRoutes:
-    def __init__(self, app, store: AccountStore, task_list_manager, channel='prod', on_account_deleted=None):
+    def __init__(self, app, store: AccountStore, task_list_manager, channel='prod', on_account_deleted=None,
+                 player_stats=None):
         self.app = app
         self.store = store
         self.lists = task_list_manager
@@ -62,6 +64,7 @@ class AuthRoutes:
         self.cookie_name = f'sp_session{suffix}'
         self.google_cookie = f'sp_google{suffix}'
         self.on_account_deleted = on_account_deleted
+        self.player_stats = player_stats
         # Swapped out in tests.
         self.send_code = sign_in_email.send_code
         self.fetch_google_token = self._fetch_google_token
@@ -339,6 +342,16 @@ class AuthRoutes:
             response.headers['Cache-Control'] = 'no-store'
             return response
 
+        @app.route('/api/account/stats', methods=['GET'])
+        def account_stats():
+            account, _, _ = self.current_account()
+            if not account:
+                return jsonify({'ok': False, 'reason': 'signed_out'}), 401
+            stats = self.player_stats.summary(account['id']) if self.player_stats else None
+            response = make_response(jsonify({'ok': True, 'stats': stats}))
+            response.headers['Cache-Control'] = 'no-store'
+            return response
+
         @app.route('/api/account/ticket', methods=['POST'])
         def account_ticket():
             if not self.same_origin():
@@ -365,6 +378,8 @@ class AuthRoutes:
             if not account:
                 return jsonify({'ok': False, 'reason': 'signed_out'}), 401
             self.lists.release_owner(owner_key(account['id']))
+            if self.player_stats:
+                self.player_stats.delete(account['id'])
             self.store.delete(account['id'])
             if self.on_account_deleted:
                 self.on_account_deleted(account['id'])

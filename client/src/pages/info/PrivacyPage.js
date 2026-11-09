@@ -6,7 +6,7 @@ import './InfoPage.css';
 function PrivacyPage() {
     usePageMeta({
         title: 'Privacy | Sus Party',
-        description: 'What Sus Party stores, why, and how to delete it. Players never need an account; hosts can sign in to keep their task lists.',
+        description: 'What Sus Party stores, why, and how to delete it. Nobody needs an account to play; signing in keeps your task lists and game stats.',
         canonical: 'https://susparty.com/privacy',
     });
 
@@ -30,16 +30,18 @@ function PrivacyPage() {
                         kept for two weeks. We use no ads and no third-party tracking scripts.
                     </p>
 
-                    <h2>Host accounts</h2>
+                    <h2>Accounts</h2>
                     <p>
-                        Hosts can sign in, with Google or with a code sent to their email, so their saved task lists
-                        follow them to any phone or laptop. Accounts are for people 13 or older. For an account we keep:
+                        Anyone 13 or older can sign in, with Google or with a code sent to their email, so their saved
+                        task lists and game stats follow them to any phone or laptop. Signing in is optional; the game
+                        works the same without it. For an account we keep:
                     </p>
                     <ul>
                         <li>your email address,</li>
                         <li>your Google account ID and first name, if you signed in with Google,</li>
                         <li>when you made the account and last used it,</li>
-                        <li>which task lists are yours.</li>
+                        <li>which task lists are yours,</li>
+                        <li>your game stats (below).</li>
                     </ul>
                     <p>
                         That's all. We don't get your contacts, photos or anything else from Google. We only email you
@@ -51,10 +53,20 @@ function PrivacyPage() {
                         signing in.
                     </p>
 
+                    <h2>Game stats</h2>
+                    <p>
+                        When you play while signed in on that phone, each game you finish adds one line to your stats:
+                        when it ended, whether you were crew or intruder, whether your side won, whether you made it to
+                        the end, how many players were in the game, and what you did (tasks done, cards played, meetings
+                        called, votes). It never holds the other players' names or photos, the room code, or anything
+                        about your phone. Only you can see your stats, on <a href="/account/stats">My stats</a>.
+                        Nothing is recorded for anyone who isn't signed in.
+                    </p>
+
                     <h2>Deleting your account</h2>
                     <p>
-                        Go to <a href="/account">My lists</a> and tap Delete my account. Your email, Google ID and
-                        sign-in are deleted right away. Task lists you made still open with their code (people you shared
+                        Go to <a href="/account">My lists</a> and tap Delete my account. Your email, Google ID,
+                        sign-in and game stats are deleted right away. Task lists you made still open with their code (people you shared
                         them with may be using them), but they are no longer linked to you.
                     </p>
 

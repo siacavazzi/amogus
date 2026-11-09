@@ -10,6 +10,7 @@ import FaqPage from './pages/info/FaqPage';
 import AboutPage from './pages/info/AboutPage';
 import PrivacyPage from './pages/info/PrivacyPage';
 import AccountPage from './pages/account/AccountPage';
+import StatsPage from './pages/account/StatsPage';
 import AmongUsIrlPage from './pages/seo/AmongUsIrlPage';
 import HowToPlayIrlPage from './pages/seo/HowToPlayIrlPage';
 import TaskIdeasPage from './pages/seo/TaskIdeasPage';
@@ -84,6 +85,7 @@ function getRoute() {
 
   if (normalizedPath === '/privacy') return 'privacy';
   if (normalizedPath === '/account') return 'account';
+  if (normalizedPath === '/account/stats') return 'account-stats';
 
   if (normalizedPath === '/among-us-irl' || normalizedPath.startsWith('/among-us-irl/')) {
     return 'among-us-irl';
@@ -235,6 +237,7 @@ function App() {
 
   if (route === 'privacy') return <PrivacyPage />;
   if (route === 'account') return <AccountPage />;
+  if (route === 'account-stats') return <StatsPage />;
 
   if (route === 'among-us-irl') {
     return <AmongUsIrlPage />;

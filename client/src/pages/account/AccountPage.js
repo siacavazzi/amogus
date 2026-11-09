@@ -10,7 +10,7 @@ import '../../account/account.css';
 // /account: the host's saved lists, sign out, and delete the account.
 function AccountPage() {
     usePageMeta({
-        title: 'My lists | Sus Party',
+        title: 'My account | Sus Party',
         description: 'Your saved Sus Party task lists.',
         canonical: 'https://susparty.com/account',
     });
@@ -42,7 +42,7 @@ function AccountPage() {
         body = (
             <section className="info-body info-prose">
                 <h2>{t('Your account is deleted')}</h2>
-                <p>{t('Your email and sign-in are gone. Lists you made still open with their code, but they are no longer linked to anyone.')}</p>
+                <p>{t('Your email, sign-in and game stats are gone. Lists you made still open with their code, but they are no longer linked to anyone.')}</p>
                 <p><a href="/play">{t('Back to Sus Party')}</a></p>
             </section>
         );
@@ -51,7 +51,7 @@ function AccountPage() {
             <section className="info-body">
                 <div className="sp-acct__card" style={{ maxWidth: 440, border: '1px solid #dde0ea' }}>
                     <p className="sp-acct__cardtitle">{t('Sign in')}</p>
-                    <p className="sp-acct__lede">{t('Keep your task lists on any phone or laptop. Only hosts need this; players never sign in.')}</p>
+                    <p className="sp-acct__lede">{t('Keep your task lists and game stats on any phone or laptop. Signing in is optional; nobody needs it to play.')}</p>
                     {signInAvailable(current) ? <SignInForm /> : <p className="sp-acct__muted">{t('Sign-in isn\'t available right now.')}</p>}
                 </div>
             </section>
@@ -60,6 +60,7 @@ function AccountPage() {
         body = (
             <section className="info-body info-prose">
                 <p>{t('Signed in as {email}', { email: current.account.email || current.account.name })}</p>
+                <p><a href="/account/stats" data-testid="account-stats-link">{t('See my game stats')}</a></p>
                 <h2>{t('Your task lists')}</h2>
                 {lists === null && <p>{t('Loading…')}</p>}
                 {lists && lists.length === 0 && <p>{t('No saved lists yet. Lists you make or load while signed in show up here.')}</p>}
@@ -80,7 +81,7 @@ function AccountPage() {
                         <button type="button" className="sp-acct__btn sp-acct__btn--danger" onClick={() => setConfirmDelete(true)}>{t('Delete my account')}</button>
                     ) : (
                         <div className="sp-acct__card" style={{ border: '2px solid #c0182c' }}>
-                            <p className="sp-acct__lede">{t('This deletes your email and sign-in for good. Your lists will still open with their code, but you won\'t see them here any more.')}</p>
+                            <p className="sp-acct__lede">{t('This deletes your email, sign-in and game stats for good. Your lists will still open with their code, but you won\'t see them here any more.')}</p>
                             <button type="button" className="sp-acct__btn sp-acct__btn--danger" onClick={async () => { if (await deleteAccount()) setDeleted(true); }}>
                                 {t('Yes, delete my account')}
                             </button>
@@ -88,6 +89,8 @@ function AccountPage() {
                         </div>
                     )}
                 </div>
+                <h2>{t('About your stats')}</h2>
+                <p>{t('Only you can see them. We count games you play while signed in on that phone: your role, if your side won, and what you did. Nothing about the other players, and nothing for anyone who isn\'t signed in.')}</p>
                 <p><a href="/privacy">{t('Privacy')}</a></p>
             </section>
         );

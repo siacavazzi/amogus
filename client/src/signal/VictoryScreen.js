@@ -3,6 +3,7 @@ import { t } from '../i18n';
 import EndGameButtons from '../components/EndGameButtons';
 import DeathSummary from '../components/DeathSummary';
 import GameStats from '../components/GameStats';
+import StatsLink from '../account/StatsLink';
 import { Confetti, Face, vibrate } from './index';
 
 // Game over: the screen splits open in the winners' colour and their faces drop in.
@@ -46,6 +47,7 @@ export default function VictoryScreen({ tone, kicker, title, line, winners, winn
         <div style={{ background: '#fff', borderRadius: 22, padding: 14, color: 'var(--sg-ink)' }}>
           <EndGameButtons />
         </div>
+        <StatsLink />
         <DeathSummary title={summaryTitle} showSurvivors={showSurvivors} />
         <GameStats />
       </div>

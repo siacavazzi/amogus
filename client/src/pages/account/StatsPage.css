@@ -1,0 +1,201 @@
+/* My stats, in the Signal look of the dashboard: Archivo, flat colour, heavy numbers.
+   Blue is the crew (and "won"), orange the intruder, gray everything else. Light and dark. */
+
+.st-shell {
+  --st-page: #f2f1ec;
+  --st-card: #ffffff;
+  --st-ink: #101317;
+  --st-ink-2: #4a4e56;
+  --st-muted: #6b6f77;
+  --st-line: #e3e2dc;
+  --st-axis: #c6c5bd;
+  --st-crew: #1b4fd8;
+  --st-crew-track: #dbe4fb;
+  --st-intruder: #eb6834;
+  --st-intruder-track: #fbe1d6;
+  --st-rest: #c4c3bb;
+  --st-hero: #1b4fd8;
+  --st-hero-ink: #ffffff;
+  --st-tip: #101317;
+  --st-tip-ink: #ffffff;
+  min-height: 100dvh;
+  background: var(--st-page);
+  color: var(--st-ink);
+  font-family: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  padding-bottom: 48px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .st-shell {
+    --st-page: #0b0d10;
+    --st-card: #16191e;
+    --st-ink: #f0efec;
+    --st-ink-2: #c3c2b7;
+    --st-muted: #9a9da4;
+    --st-line: #2a2d33;
+    --st-axis: #3b3e45;
+    --st-crew: #4f7cff;
+    --st-crew-track: #1f2b4d;
+    --st-intruder: #d95926;
+    --st-intruder-track: #3d2318;
+    --st-rest: #4a4d54;
+    --st-hero: #1440b3;
+    --st-tip: #f0efec;
+    --st-tip-ink: #101317;
+    color-scheme: dark;
+  }
+}
+
+.st-shell p { margin: 0; }
+.st-shell a { color: inherit; }
+
+.st-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 16px;
+}
+.st-brand { font-weight: 900; font-size: 18px; letter-spacing: -0.02em; text-decoration: none; }
+.st-tabs { display: flex; gap: 4px; background: var(--st-card); border: 1px solid var(--st-line); border-radius: 999px; padding: 4px; }
+.st-tabs a {
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 14px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  color: var(--st-ink-2);
+  white-space: nowrap;
+}
+.st-tabs a[aria-current='page'] { background: var(--st-ink); color: var(--st-page); }
+
+.st-main { max-width: 760px; margin: 0 auto; padding: 0 16px; display: grid; gap: 16px; }
+.st-title { margin: 8px 0 0; font-size: clamp(36px, 10vw, 56px); font-weight: 900; letter-spacing: -0.045em; line-height: 0.95; }
+.st-h2 { margin: 0 0 14px; font-size: 18px; font-weight: 900; letter-spacing: -0.01em; }
+.st-muted { color: var(--st-muted); font-weight: 600; line-height: 1.4; }
+
+.st-card { background: var(--st-card); border-radius: 20px; padding: 20px; border: 1px solid var(--st-line); }
+
+/* Hero: the one number the page leads with. */
+.st-hero { background: var(--st-hero); color: var(--st-hero-ink); border-radius: 24px; padding: 24px 20px; }
+.st-hero__eyebrow { font-weight: 800; font-size: 16px; opacity: 0.9; }
+.st-hero__num { font-size: clamp(72px, 24vw, 120px); font-weight: 900; letter-spacing: -0.06em; line-height: 0.9; margin-top: 10px !important; font-variant-numeric: tabular-nums; }
+.st-hero__label { font-size: 22px; font-weight: 900; letter-spacing: -0.02em; }
+.st-hero__note { margin-top: 6px !important; font-weight: 700; opacity: 0.85; }
+.st-badges { list-style: none; margin: 18px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.st-badges li {
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+/* Win rate meters. */
+.st-meters { display: grid; gap: 18px; }
+@media (min-width: 560px) { .st-meters { grid-template-columns: 1fr 1fr; gap: 24px; } }
+.st-meter__head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+.st-meter__label { font-weight: 800; color: var(--st-ink-2); }
+.st-meter__value { font-weight: 900; font-size: 32px; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.st-meter__bar { display: block; width: 100%; height: 12px; }
+.st-meter__note { margin-top: 6px !important; color: var(--st-muted); font-weight: 600; font-size: 14px; }
+
+.st-track--crew { fill: var(--st-crew-track); }
+.st-track--intruder { fill: var(--st-intruder-track); }
+.st-fill--crew { fill: var(--st-crew); }
+.st-fill--intruder { fill: var(--st-intruder); }
+.st-fill--rest { fill: var(--st-rest); }
+
+.st-legend { list-style: none; margin: 0 0 10px; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; font-weight: 700; color: var(--st-ink-2); }
+.st-legend li { display: inline-flex; align-items: center; gap: 6px; }
+.st-legend--small { margin: 10px 0 0; }
+.st-key { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.st-key--crew { background: var(--st-crew); }
+.st-key--intruder { background: var(--st-intruder); }
+.st-key--rest { background: var(--st-rest); }
+.st-key--hollow { background: transparent; box-shadow: inset 0 0 0 2px var(--st-ink-2); }
+
+/* Games each week. */
+.st-weeks__plot { position: relative; height: 140px; margin-left: 22px; }
+.st-weeks__svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.st-grid { stroke: var(--st-line); stroke-width: 1; }
+.st-axis { stroke: var(--st-axis); stroke-width: 1; }
+.st-weeks__svg g.is-active rect { opacity: 0.8; }
+.st-weeks__tick { position: absolute; left: -22px; font-size: 11px; color: var(--st-muted); transform: translateY(-50%); font-variant-numeric: tabular-nums; }
+.st-weeks__tick--top { top: 0; }
+.st-weeks__tick--mid { top: 50%; }
+.st-weeks__hits { position: absolute; inset: 0; display: flex; }
+.st-weeks__hit {
+  flex: 1 1 0;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  position: relative;
+  cursor: default;
+  border-radius: 6px;
+}
+.st-weeks__hit:hover, .st-weeks__hit:focus-visible { background: rgba(127, 127, 127, 0.08); outline: none; }
+.st-weeks__axis { display: flex; justify-content: space-between; margin: 6px 0 0 22px; font-size: 12px; color: var(--st-muted); font-weight: 600; }
+.st-tip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  background: var(--st-tip);
+  color: var(--st-tip-ink);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 13px;
+  text-align: left;
+  white-space: nowrap;
+  display: grid;
+  gap: 2px;
+  pointer-events: none;
+}
+.st-weeks__hit:nth-child(-n+3) .st-tip { left: 0; transform: none; }
+.st-weeks__hit:nth-last-child(-n+3) .st-tip { left: auto; right: 0; transform: none; }
+
+/* Last games strip. */
+.st-recent { overflow-x: auto; }
+.st-recent__svg { display: block; max-width: 100%; height: auto; }
+.st-chip { stroke-width: 2; fill: transparent; }
+.st-chip--crew { stroke: var(--st-crew); }
+.st-chip--intruder { stroke: var(--st-intruder); }
+.st-chip--crew.is-won { fill: var(--st-crew); stroke: none; }
+.st-chip--intruder.is-won { fill: var(--st-intruder); stroke: none; }
+
+/* Number tiles. */
+.st-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+@media (min-width: 560px) { .st-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.st-tile { border: 1px solid var(--st-line); border-radius: 14px; padding: 14px; min-width: 0; }
+.st-tile__value { font-size: 32px; font-weight: 900; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; line-height: 1; }
+.st-tile__label { margin-top: 6px !important; font-weight: 800; font-size: 14px; color: var(--st-ink-2); overflow-wrap: anywhere; }
+.st-tile__note { margin-top: 2px !important; font-size: 12px; color: var(--st-muted); font-weight: 600; }
+
+/* No games yet. */
+.st-empty { text-align: center; padding: 32px 20px; }
+.st-empty .st-empty__big { font-size: 96px; font-weight: 900; letter-spacing: -0.06em; line-height: 0.9; color: var(--st-crew); }
+.st-empty h2 { margin: 12px 0 6px; font-size: 22px; font-weight: 900; }
+.st-empty p { color: var(--st-ink-2); font-weight: 600; line-height: 1.4; }
+.st-btn {
+  display: inline-block;
+  margin-top: 16px;
+  background: var(--st-crew);
+  color: #fff !important;
+  text-decoration: none;
+  font-weight: 900;
+  padding: 12px 20px;
+  border-radius: 999px;
+}
+
+.st-privacy { color: var(--st-ink-2); font-size: 14px; line-height: 1.45; padding: 4px 4px 0; }
+.st-privacy h2 { font-size: 15px; font-weight: 900; margin: 0 0 6px; color: var(--st-ink); }
+.st-privacy p + p { margin-top: 6px !important; }
+
+/* The sign-in form inside the card keeps its own light styling; give it room. */
+.st-card .sp-acct__form, .st-card form { margin-top: 12px; }

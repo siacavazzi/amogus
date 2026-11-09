@@ -24,6 +24,7 @@ from assets.utils import *
 from assets.taskHandler import *
 from assets.task_list_manager import TaskListManager
 from assets.accounts import AccountStore, owner_key
+from assets.player_stats import PlayerStatsStore
 from assets.auth_routes import AuthRoutes
 from assets.game_links import GameLinks, clean_link_token
 from assets.groups import GroupBook, GROUP_VIA
@@ -121,15 +122,35 @@ def live_group_room(group, exclude=None):
 # or from a ticket after signing in on a page that's already connected.
 account_store = AccountStore(os.path.join(os.path.dirname(__file__), 'data'))
 account_by_sid = {}
+# Game stats for signed-in players only (the "My stats" page). A phone that isn't signed in gets
+# nothing recorded; see assets/player_stats.py.
+player_stats = PlayerStatsStore(os.path.join(os.path.dirname(__file__), 'data'))
+game_manager.round_end_listeners.append(player_stats.record_round)
 
 
 def unbind_account_sids(account_id):
     for sid in [sid for sid, owner in account_by_sid.items() if owner == account_id]:
         account_by_sid.pop(sid, None)
+    # A deleted account stops collecting stats at once, even in a round that's still going.
+    for game in list(game_manager.games.values()):
+        for player in list(game.players) + list(getattr(game, 'waiting_players', [])):
+            if player.account_id == account_id:
+                player.account_id = None
+                player.stat_tally = {}
+
+
+def link_account(player, sid):
+    """Remember which account (if any) the phone playing as this player is signed in to."""
+    if player is None:
+        return
+    account_id = account_by_sid.get(sid)
+    if account_id != player.account_id:
+        player.stat_tally = {}
+    player.account_id = account_id
 
 
 auth_routes = AuthRoutes(app, account_store, task_list_manager, channel=VERSION_INFO.get('channel', 'prod'),
-                         on_account_deleted=unbind_account_sids)
+                         on_account_deleted=unbind_account_sids, player_stats=player_stats)
 
 
 def list_owner(data, key='player_id'):
@@ -975,6 +996,7 @@ def handleRejoin(data):
     logger.info(f"Player {player_id} rejoining room {room_code}, creator_player_id={game.creator_player_id}")
     record_reconnect(game, player)
     player.reconnect(request.sid)
+    link_account(player, request.sid)
     game_manager.update_sid(player_id, request.sid)
     join_room(room_code)
 
@@ -1218,6 +1240,7 @@ def handle_join(data):
         if player:
             record_reconnect(game, player)
             player.reconnect(sid)
+            link_account(player, sid)
             player.username = unique_name(game, username, player)
             game_manager.update_sid(player_id, sid)
             join_room(existing_room)
@@ -1262,6 +1285,7 @@ def handle_join(data):
         return
 
     player = game.addPlayer(sid, unique_name(game, username), selfie_filename, pic=pic)
+    link_account(player, sid)
     game_manager.register_player(player.player_id, room_code, sid)
     join_room(room_code)
     
@@ -1307,6 +1331,7 @@ def player_game_joins_when(player):
 def join_waiting_list(game, room_code, sid, username, selfie_filename, pic):
     """A phone that arrived mid-round: on the waiting list now, dealt in at the next round."""
     player = game.add_waiting_player(sid, unique_name(game, username), selfie_filename, pic=pic)
+    link_account(player, sid)
     game_manager.register_player(player.player_id, room_code, sid)
     join_room(room_code)
     record_usage('player_joined', game, player.player_id, is_creator=False, waiting_for_next_round=True,
@@ -1394,6 +1419,8 @@ def start_room(game, test_mode=False):
     game.game_running = True
     game.test_mode = test_mode
     game.assignRoles()
+    for player in game.players:
+        player.stat_tally = {}
     group_room_started(game)
     game_manager.stats_tracker.record_game_started(game)
     if not test_mode:
@@ -1671,6 +1698,7 @@ def handleTaskComplete(data):
         previous = game.crew_score / game.taskGoal * 100 if game.taskGoal else 0
         game.crew_score += 1
         game.stats['tasks_completed'] += 1
+        player.count_stat('tasks')
         game.emit_to_room('crew_score', {'score': game.crew_score})
         percentage = game.crew_score / game.taskGoal * 100 if game.taskGoal else 0
         for threshold in (20, 50, 80, 95):
@@ -1718,9 +1746,12 @@ def playCard(data):
         extra_data = data.get('extra_data')
         had_meeting, had_meltdown = bool(game.meeting), bool(game.active_meltdown)
         accepted = card.play_card(player, extra_data)
+        if accepted:
+            player.count_stat('cards')
         record_usage('card_played' if accepted else 'card_rejected', game, player_id,
                      card_action=card.action, **({} if accepted else {'reason': 'effect_unavailable'}))
         if not had_meeting and game.meeting:
+            player.count_stat('meetings')
             record_usage('meeting_started', game, player_id, trigger='card')
         if not had_meltdown and game.active_meltdown:
             record_usage('meltdown_started', game, player_id, trigger='card')
@@ -1754,6 +1785,7 @@ def handleMeeting(data):
         return {'ok': True, 'meeting_id': game.meeting.id}
     if not game or not game.start_meeting(player):
         return command_error('A meeting cannot start now.')
+    player.count_stat('meetings')
     record_usage('meeting_started', game, player.player_id)
     return {'ok': True}
 
@@ -1940,6 +1972,9 @@ def handle_bind_account(data):
     if not account_id or not account_store.get(account_id):
         return {'ok': False}
     account_by_sid[request.sid] = account_id
+    game, _ = game_manager.get_game_by_sid(request.sid)
+    if game:
+        link_account(game.getPlayerBySid(request.sid), request.sid)
     return {'ok': True}
 
 
@@ -1947,6 +1982,9 @@ def handle_bind_account(data):
 def handle_unbind_account(data=None):
     """After signing out: this socket goes back to the browser's own lists."""
     account_by_sid.pop(request.sid, None)
+    game, _ = game_manager.get_game_by_sid(request.sid)
+    if game:
+        link_account(game.getPlayerBySid(request.sid), request.sid)
     return {'ok': True}
 
 
