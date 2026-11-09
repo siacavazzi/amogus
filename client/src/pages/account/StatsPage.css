@@ -179,7 +179,7 @@
 
 /* No games yet. */
 .st-empty { text-align: center; padding: 32px 20px; }
-.st-empty__big { font-size: 96px; font-weight: 900; letter-spacing: -0.06em; line-height: 0.9; color: var(--st-crew); }
+.st-empty .st-empty__big { font-size: 96px; font-weight: 900; letter-spacing: -0.06em; line-height: 0.9; color: var(--st-crew); }
 .st-empty h2 { margin: 12px 0 6px; font-size: 22px; font-weight: 900; }
 .st-empty p { color: var(--st-ink-2); font-weight: 600; line-height: 1.4; }
 .st-btn {

@@ -20,6 +20,7 @@ CREW_WINS = {'victory'}
 INTRUDER_WINS = {'sus_victory', 'meltdown_fail'}
 TAKEDOWN_CAUSES = {'murdered', 'murdered_during_task'}
 WEEK = 7 * 24 * 3600
+MIN_PLAYERS = 3
 WEEKS_SHOWN = 12
 RECENT_SHOWN = 20
 # Plenty for anyone, and a cap so one account can't grow the file without end.
@@ -39,16 +40,18 @@ def winner_of(end_state):
 def rows_for_round(game, ended_at=None):
     """One row per signed-in player for a round that just ended, or [] when it doesn't count.
 
-    Practice games (test mode), synthetic load-test rooms and rounds too small to be logged as
-    a real round (under 3 players) don't count, same as the game's own records.
+    Practice games (test mode) and rounds under 3 players don't count, same as the game's own
+    records. Rooms marked as test traffic still count here: only a signed-in account gets a row,
+    and the browser tests need to see their own rounds.
     """
-    if (getattr(game, 'test_mode', False) or getattr(game, 'synthetic', False)
-            or not getattr(game, '_stats_start_recorded', False)):
+    if getattr(game, 'test_mode', False):
         return []
     winner = winner_of(getattr(game, 'end_state', None))
     if not winner:
         return []
     players = [player for player in getattr(game, 'players', []) if not getattr(player, 'waiting', False)]
+    if len(players) < MIN_PLAYERS:
+        return []
     # Intruders win together, so the crew they took down is the team's, shared by every intruder.
     takedowns = sum(1 for player in players if not player.sus and player.death_cause in TAKEDOWN_CAUSES)
     started = getattr(game, 'round_started_at', None)

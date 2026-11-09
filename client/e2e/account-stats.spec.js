@@ -13,7 +13,8 @@ async function signInOnStatsPage(page, email) {
     const form = page.getByRole('button', { name: 'Email me a code' });
     const available = await form.first().waitFor({ timeout: 8000 }).then(() => true, () => false);
     if (!available) return false;
-    await form.first().click();
+    // With Google on, the email field opens from its button; without it, the field shows at once.
+    if (!(await page.locator('#sp-acct-email').isVisible())) await form.first().click();
     await page.locator('#sp-acct-email').fill(email);
     await page.locator('#sp-acct-email').press('Enter');
     const code = (await page.getByTestId('dev-code').textContent()).replace(/\D/g, '');

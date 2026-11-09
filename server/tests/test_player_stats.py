@@ -24,8 +24,8 @@ def player(name, account_id=None, sus=False, alive=True, cause=None, tally=None)
 
 def finished_round(players, end_state, **extra):
     now = time.time()
-    fields = dict(players=players, end_state=end_state, test_mode=False, synthetic=False,
-                  _stats_start_recorded=True, round_started_at=now - 600, end_time=now, round_id='r1')
+    fields = dict(players=players, end_state=end_state, test_mode=False,
+                  round_started_at=now - 600, end_time=now, round_id='r1')
     fields.update(extra)
     return SimpleNamespace(**fields)
 
@@ -70,10 +70,7 @@ class RowsForRoundTests(unittest.TestCase):
     def test_practice_tiny_and_unfinished_rounds_dont_count(self):
         players = [player('Sam', 'a_sam'), player('X', sus=True), player('Y')]
         self.assertEqual([], rows_for_round(finished_round(players, 'victory', test_mode=True)))
-        self.assertEqual([], rows_for_round(finished_round(players, 'victory', synthetic=True)))
-        unstarted = finished_round(players, 'victory')
-        unstarted._stats_start_recorded = False
-        self.assertEqual([], rows_for_round(unstarted))
+        self.assertEqual([], rows_for_round(finished_round(players[:2], 'victory')))
         self.assertEqual([], rows_for_round(finished_round(players, None)))
 
     def test_one_row_per_account_even_on_two_phones(self):
@@ -84,6 +81,7 @@ class RowsForRoundTests(unittest.TestCase):
         late = player('Late', 'a_late')
         late.waiting = True
         game = finished_round([player('X', sus=True), player('Y'), player('Z'), late], 'victory')
+        self.assertEqual(3, len([p for p in game.players if not p.waiting]))
         self.assertEqual([], rows_for_round(game))
 
 
@@ -176,7 +174,6 @@ class SignedInPlayerPlaysARoundTests(SocketGameTestCase):
         self.add_tasks(clients[0], room_code, 12)
         self.drain_all(clients)
         self.start_game(clients[0], ids[0], clients)
-        game._stats_start_recorded = True  # the test stats tracker doesn't log rounds
         for p in game.players:
             p.sus = p is not me and p.player_id == ids[0]
         game.numIntruders, game.numCrew = 1, 3
