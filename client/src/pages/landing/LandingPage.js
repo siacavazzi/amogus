@@ -70,7 +70,7 @@ const FAQS = [
     { q: 'Do I need a laptop?', a: 'No. It’s optional. A laptop or desktop in the middle becomes the reactor: it shows the room code, task progress and the meltdown. Phones work on their own.' },
 ];
 
-const DESCRIPTION = 'Play Among Us in real life: a free website, not an app. Everyone moves around a real place doing tasks, with secret roles, meetings and votes for 3 to 20+ players.';
+const DESCRIPTION = 'Play Among Us in real life, free in your phone browser. Real tasks, secret roles, meetings and votes for 3 to 20+ players at parties, youth groups and classes.';
 
 // FAQPage markup so search engines and AI answers read the questions (above all: not an app).
 const SCHEMA = {
