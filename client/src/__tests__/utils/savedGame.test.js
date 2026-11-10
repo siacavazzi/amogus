@@ -1,4 +1,4 @@
-import { savedGameUrl, rememberSavedGame, readPendingSavedGame, readPendingGroup, keepSavedGame, shareLink } from '../../utils/savedGame';
+import { savedGameUrl, readSavedGameLink, rememberSavedGame, readPendingSavedGame, readPendingGroup, keepSavedGame, shareLink } from '../../utils/savedGame';
 import { installMethod } from '../../utils/installPrompt';
 
 describe('saved game links', () => {
@@ -7,6 +7,14 @@ describe('saved game links', () => {
         stored = {};
         localStorage.getItem.mockImplementation(key => stored[key] ?? null);
         localStorage.setItem.mockImplementation((key, value) => { stored[key] = value; });
+    });
+
+    it('reads the link the page was opened with, group from after the #', () => {
+        expect(readSavedGameLink('?list=zn5qf2&utm_source=saved-game', '#group=tokenAAAAAAA'))
+            .toEqual({ code: 'ZN5QF2', group: 'tokenAAAAAAA', via: 'saved_link' });
+        expect(readSavedGameLink('?list=ZN5QF2&from=welcome', '')).toEqual({ code: 'ZN5QF2', group: '', via: 'welcome_back' });
+        expect(readSavedGameLink('?list=ZN5QF2', '#group=bad token')).toEqual({ code: 'ZN5QF2', group: '', via: 'saved_link' });
+        expect(readSavedGameLink('?utm_source=saved-game', '#group=tokenAAAAAAA')).toBeNull();
     });
 
     it('carries the list code and tags the visit', () => {

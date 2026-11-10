@@ -226,6 +226,7 @@
   "Failed to save task list": "Impossible d'enregistrer la liste de tâches",
   "Failed to update task list. You may not be the owner.": "Impossible de mettre à jour la liste. Elle ne t'appartient peut-être pas.",
   "Feedback did not save. Try again.": "Ton avis n'a pas été enregistré. Réessaie.",
+  "Feedback did not save. Reconnect and try again.": "Ton avis n'a pas été enregistré. Reconnecte-toi et réessaie.",
   "Game not found": "Partie introuvable",
   "Give feedback after this round ends.": "Donne ton avis à la fin de la manche.",
   "Invalid task index": "Numéro de tâche invalide",
@@ -796,9 +797,7 @@
   },
   "Save this game": "Garder cette partie",
   "Link copied": "Lien copié",
-  "Send yourself the link to host it later with these tasks": "Envoie-toi le lien pour l’organiser plus tard avec ces tâches",
   "Send yourself the link to play again later": "Envoie-toi le lien pour rejouer plus tard",
-  "Our Sus Party game. Open it to host it again with the same tasks.": "Notre partie de Sus Party. Ouvre-la pour l’organiser à nouveau avec les mêmes tâches.",
   "Sus Party: the real-life social deduction game": "Sus Party : le jeu de déduction sociale en vrai",
   "Keep Sus Party on your home screen": "Garde Sus Party sur ton écran d’accueil",
   "Tap the Share button, then \"Add to Home Screen\", so your next game is one tap away.": "Touche le bouton Partager, puis « Sur l’écran d’accueil » : ta prochaine partie sera à un geste.",
@@ -978,5 +977,9 @@
   "Delete this list? It leaves your lists, but anyone with the code can still play it.": "Supprimer cette liste ? Elle quitte tes listes, mais toute personne qui a le code peut encore y jouer.",
   "Yes, delete": "Oui, supprimer",
   "Keep it": "La garder",
-  "Star the lists you use most to keep them at the top.": "Mets en favori les listes que tu utilises le plus pour les garder en haut."
+  "Star the lists you use most to keep them at the top.": "Mets en favori les listes que tu utilises le plus pour les garder en haut.",
+  "Opening your saved game…": "Ouverture de ta partie gardée…",
+  "Joining your group…": "Tu rejoins ton groupe…",
+  "Our Sus Party game. Open the link to play it again with the same tasks.": "Notre partie de Sus Party. Ouvre le lien pour la rejouer avec les mêmes tâches.",
+  "Send it to your group chat. The first to open it hosts, everyone else joins.": "Envoie-le dans le groupe de discussion. Le premier à l’ouvrir organise, les autres rejoignent."
 }

@@ -20,6 +20,7 @@ import ReactorNormal from "./pages/ReactorPage";
 import { isMobile as isMobileDevice } from "react-device-detect";
 import MeltdownInfo from "./pages/MeltdownInfo";
 import CrewVictoryScreen from "./pages/CrewVictory";
+import GameFeedback from "./components/GameFeedback";
 import IntruderVictoryScreen from "./pages/IntruderVictory";
 import NuclearMeltdownScreen from "./pages/MeltdownEnd";
 import ReactorWaiting from "./pages/ReactorWaiting";
@@ -234,22 +235,25 @@ const PageController = () => {
     };
 
     return (
-        <div>
-            {/* Facebook, Reddit, X... built-in browsers can drop the game: ask to move to Safari or Chrome. */}
-            <InAppBrowserWarning />
-            {/* Round pop-ups (meltdown over, last stand...) aren't for phones that are not in the round */}
-            {currentPage !== "waitingNextRound" && !(currentPage === "login" && roundRunningAtEntry) && <Modal />}
-            {running && isMobile && !endState && currentPage !== "waitingNextRound" && (
-                <ProgressBar
-                    score={crewScore}
-                    goalScore={taskGoal}
-                    sus={playerState?.sus}
-                />
-            )}
-            {SETUP_PAGES.has(currentPage)
-                ? <div className="sg-setup">{pages[currentPage]}</div>
-                : pages[currentPage]}
-        </div>
+        // The feedback prompt sits above the pages, so a Play Again reset doesn't close a half-written answer.
+        <GameFeedback>
+            <div>
+                {/* Facebook, Reddit, X... built-in browsers can drop the game: ask to move to Safari or Chrome. */}
+                <InAppBrowserWarning />
+                {/* Round pop-ups (meltdown over, last stand...) aren't for phones that are not in the round */}
+                {currentPage !== "waitingNextRound" && !(currentPage === "login" && roundRunningAtEntry) && <Modal />}
+                {running && isMobile && !endState && currentPage !== "waitingNextRound" && (
+                    <ProgressBar
+                        score={crewScore}
+                        goalScore={taskGoal}
+                        sus={playerState?.sus}
+                    />
+                )}
+                {SETUP_PAGES.has(currentPage)
+                    ? <div className="sg-setup">{pages[currentPage]}</div>
+                    : pages[currentPage]}
+            </div>
+        </GameFeedback>
     );
 };
 

@@ -226,6 +226,7 @@
   "Failed to save task list": "Aufgabenliste konnte nicht gespeichert werden",
   "Failed to update task list. You may not be the owner.": "Liste konnte nicht aktualisiert werden. Vielleicht gehört sie dir nicht.",
   "Feedback did not save. Try again.": "Feedback wurde nicht gespeichert. Versuch es noch mal.",
+  "Feedback did not save. Reconnect and try again.": "Feedback wurde nicht gespeichert. Verbinde dich neu und versuch es noch mal.",
   "Game not found": "Spiel nicht gefunden",
   "Give feedback after this round ends.": "Gib Feedback, wenn die Runde vorbei ist.",
   "Invalid task index": "Ungültige Aufgabennummer",
@@ -796,9 +797,7 @@
   },
   "Save this game": "Dieses Spiel speichern",
   "Link copied": "Link kopiert",
-  "Send yourself the link to host it later with these tasks": "Schick dir den Link, um es später mit diesen Aufgaben zu hosten",
   "Send yourself the link to play again later": "Schick dir den Link, um später wieder zu spielen",
-  "Our Sus Party game. Open it to host it again with the same tasks.": "Unser Sus-Party-Spiel. Öffne es, um es mit denselben Aufgaben wieder zu hosten.",
   "Sus Party: the real-life social deduction game": "Sus Party: das Social-Deduction-Spiel im echten Leben",
   "Keep Sus Party on your home screen": "Leg Sus Party auf deinen Home-Bildschirm",
   "Tap the Share button, then \"Add to Home Screen\", so your next game is one tap away.": "Tippe auf „Teilen“ und dann auf „Zum Home-Bildschirm“, dann ist dein nächstes Spiel nur einen Tipp entfernt.",
@@ -978,5 +977,9 @@
   "Delete this list? It leaves your lists, but anyone with the code can still play it.": "Diese Liste löschen? Sie verschwindet aus deinen Listen, aber wer den Code hat, kann sie weiter spielen.",
   "Yes, delete": "Ja, löschen",
   "Keep it": "Behalten",
-  "Star the lists you use most to keep them at the top.": "Markiere deine Lieblingslisten mit einem Stern, dann stehen sie oben."
+  "Star the lists you use most to keep them at the top.": "Markiere deine Lieblingslisten mit einem Stern, dann stehen sie oben.",
+  "Opening your saved game…": "Dein gespeichertes Spiel wird geöffnet…",
+  "Joining your group…": "Du kommst zu deiner Gruppe…",
+  "Our Sus Party game. Open the link to play it again with the same tasks.": "Unser Sus-Party-Spiel. Öffne den Link, um es mit denselben Aufgaben noch einmal zu spielen.",
+  "Send it to your group chat. The first to open it hosts, everyone else joins.": "Schick ihn in euren Gruppenchat. Wer ihn zuerst öffnet, hostet, alle anderen kommen dazu."
 }

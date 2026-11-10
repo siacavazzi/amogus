@@ -20,7 +20,7 @@ const NAMES = {
     typed: 'Typed by the host', builtin: 'Built-in tasks', unknown: 'Not recorded (older version)',
   },
   entry: {
-    typed: 'Typed the code', qr: 'Scanned the QR code', share_link: 'Share link', invite_link: 'Room link',
+    typed: 'Typed the code', qr: 'Scanned the QR code', share_link: 'Share link', invite_link: 'Room link', saved_link: 'Saved game link',
     host_return: 'Host coming back', unknown: 'Not recorded (older version)',
   },
   rejection: {

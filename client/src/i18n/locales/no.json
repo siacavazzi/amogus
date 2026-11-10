@@ -226,6 +226,7 @@
   "Failed to save task list": "Kunne ikke lagre oppgavelisten",
   "Failed to update task list. You may not be the owner.": "Kunne ikke oppdatere oppgavelisten. Kanskje er det ikke du som eier den.",
   "Feedback did not save. Try again.": "Tilbakemeldingen ble ikke lagret. Prøv igjen.",
+  "Feedback did not save. Reconnect and try again.": "Tilbakemeldingen ble ikke lagret. Koble til på nytt og prøv igjen.",
   "Game not found": "Fant ikke spillet",
   "Give feedback after this round ends.": "Gi tilbakemelding når runden er over.",
   "Invalid task index": "Ugyldig oppgavenummer",
@@ -796,9 +797,7 @@
   },
   "Save this game": "Lagre dette spillet",
   "Link copied": "Lenken er kopiert",
-  "Send yourself the link to host it later with these tasks": "Send deg selv lenken for å være vert senere med disse oppgavene",
   "Send yourself the link to play again later": "Send deg selv lenken for å spille igjen senere",
-  "Our Sus Party game. Open it to host it again with the same tasks.": "Sus Party-spillet vårt. Åpne det for å være vert igjen med de samme oppgavene.",
   "Sus Party: the real-life social deduction game": "Sus Party: det sosiale bløffspillet i virkeligheten",
   "Keep Sus Party on your home screen": "Ha Sus Party på hjemskjermen",
   "Tap the Share button, then \"Add to Home Screen\", so your next game is one tap away.": "Trykk på Del-knappen og så «Legg til på Hjem-skjerm», så er neste spill bare ett trykk unna.",
@@ -978,5 +977,9 @@
   "Delete this list? It leaves your lists, but anyone with the code can still play it.": "Slette denne listen? Den forsvinner fra listene dine, men alle som har koden kan fortsatt spille den.",
   "Yes, delete": "Ja, slett",
   "Keep it": "Behold den",
-  "Star the lists you use most to keep them at the top.": "Stjernemerk listene du bruker mest, så ligger de øverst."
+  "Star the lists you use most to keep them at the top.": "Stjernemerk listene du bruker mest, så ligger de øverst.",
+  "Opening your saved game…": "Åpner det lagrede spillet ditt…",
+  "Joining your group…": "Blir med i gruppen din…",
+  "Our Sus Party game. Open the link to play it again with the same tasks.": "Sus Party-spillet vårt. Åpne lenken for å spille det igjen med de samme oppgavene.",
+  "Send it to your group chat. The first to open it hosts, everyone else joins.": "Send den i gruppechatten. Den som åpner den først blir vert, alle andre blir med."
 }

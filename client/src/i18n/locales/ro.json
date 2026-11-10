@@ -226,6 +226,7 @@
   "Failed to save task list": "Lista de sarcini nu a putut fi salvată",
   "Failed to update task list. You may not be the owner.": "Lista nu a putut fi actualizată. Poate nu e a ta.",
   "Feedback did not save. Try again.": "Părerea nu a fost salvată. Încearcă din nou.",
+  "Feedback did not save. Reconnect and try again.": "Părerea nu a fost salvată. Reconectează-te și încearcă din nou.",
   "Game not found": "Jocul nu a fost găsit",
   "Give feedback after this round ends.": "Spune-ți părerea după ce se termină runda.",
   "Invalid task index": "Număr de sarcină invalid",
@@ -809,9 +810,7 @@
   },
   "Save this game": "Salvează acest joc",
   "Link copied": "Link copiat",
-  "Send yourself the link to host it later with these tasks": "Trimite-ți linkul ca să-l organizezi mai târziu cu aceste sarcini",
   "Send yourself the link to play again later": "Trimite-ți linkul ca să joci din nou mai târziu",
-  "Our Sus Party game. Open it to host it again with the same tasks.": "Jocul nostru Sus Party. Deschide-l ca să-l organizezi din nou cu aceleași sarcini.",
   "Sus Party: the real-life social deduction game": "Sus Party: jocul de deducție socială din viața reală",
   "Keep Sus Party on your home screen": "Păstrează Sus Party pe ecranul de pornire",
   "Tap the Share button, then \"Add to Home Screen\", so your next game is one tap away.": "Atinge butonul Partajează, apoi „Adaugă pe ecranul principal”, ca următorul joc să fie la o atingere distanță.",
@@ -995,5 +994,9 @@
   "Delete this list? It leaves your lists, but anyone with the code can still play it.": "Ștergi lista? Dispare din listele tale, dar oricine are codul o poate juca în continuare.",
   "Yes, delete": "Da, șterge",
   "Keep it": "Păstreaz-o",
-  "Star the lists you use most to keep them at the top.": "Marchează cu stea listele pe care le folosești cel mai des ca să rămână sus."
+  "Star the lists you use most to keep them at the top.": "Marchează cu stea listele pe care le folosești cel mai des ca să rămână sus.",
+  "Opening your saved game…": "Se deschide jocul tău salvat…",
+  "Joining your group…": "Intri la grupul tău…",
+  "Our Sus Party game. Open the link to play it again with the same tasks.": "Jocul nostru Sus Party. Deschide linkul ca să-l jucăm din nou cu aceleași sarcini.",
+  "Send it to your group chat. The first to open it hosts, everyone else joins.": "Trimite-l în chatul grupului. Cine îl deschide primul organizează, ceilalți intră."
 }

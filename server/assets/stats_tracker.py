@@ -388,14 +388,19 @@ class StatsTracker:
 
     # ---- end-of-round feedback ----
 
-    def record_game_feedback(self, game, rating, comment):
-        """Save optional feedback with no names, player ids, room codes or round ids."""
+    def record_game_feedback(self, game, rating, comment, ended_round=None):
+        """Save optional feedback with no names, player ids, room codes or round ids.
+
+        ended_round is the round that ended before Play Again reset the room, when the phone sends late.
+        """
+        outcome = ended_round['outcome'] if ended_round else game.end_state
+        test_mode = ended_round['test_mode'] if ended_round else getattr(game, 'test_mode', False)
         with self.lock:
             previous = self.data['game_feedback']
             self.data['game_feedback'] = (previous + [{
                 'id': str(uuid4()), 'submitted_at': time.time(), 'rating': rating, 'comment': comment,
-                'outcome': game.end_state,
-                'analytics_excluded': bool(getattr(game, 'test_mode', False) or getattr(game, 'synthetic', False)
+                'outcome': outcome, 'after_reset': bool(ended_round),
+                'analytics_excluded': bool(test_mode or getattr(game, 'synthetic', False)
                                            or self.environment != 'production'),
             }])[-500:]
             if not self._save_locked():
