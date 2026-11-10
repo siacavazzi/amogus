@@ -61,13 +61,27 @@ const SUSPECTS = [
 ];
 
 const FAQS = [
-    { q: 'Is it free?', a: 'Yes. No app, no ads, and players never need an account. Everyone opens susparty.com in their phone’s browser.' },
+    { q: 'Is Sus Party an app?', a: 'No. Sus Party is a website you open in your phone’s browser, with nothing to download from the App Store or Google Play, and it isn’t related to any app with a similar name. It’s also a physical game: players get up and move around a real place doing real tasks, instead of passing a phone around a table.' },
+    { q: 'Is it free?', a: 'Yes. It’s free to play with no ads, and players don’t need an account. Everyone opens susparty.com in their phone’s browser.' },
     { q: 'How many people can play?', a: '3 to 20+. Bigger groups get more intruders, and the task generator builds packs for up to 30 players.' },
     { q: 'Where do you play?', a: 'Anywhere people can walk around: a house, apartment, dorm, office, library or camp. Tasks are spread across rooms so people split up.' },
     { q: 'Do we need to be together?', a: 'Yes. The phones connect online, but everyone plays in the same place. Kills, bodies and meetings happen in real life.' },
     { q: 'What are the tasks?', a: 'Short real things, like flipping a bottle, counting fridge magnets or walking up the stairs. Pick a pack for your place or write your own.' },
     { q: 'Do I need a laptop?', a: 'No. It’s optional. A laptop or desktop in the middle becomes the reactor: it shows the room code, task progress and the meltdown. Phones work on their own.' },
 ];
+
+const DESCRIPTION = 'Play Among Us in real life: a free website, not an app. Everyone moves around a real place doing tasks, with secret roles, meetings and votes for 3 to 20+ players.';
+
+// FAQPage markup so search engines and AI answers read the questions (above all: not an app).
+const SCHEMA = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: FAQS.map((f) => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+};
 
 function Phone({ name, alt, className = '', loading = 'lazy' }) {
     return (
@@ -220,9 +234,10 @@ function WhoDidIt() {
 function LandingPage() {
     usePageMeta({
         title: 'Sus Party | Free Among Us IRL Game for 3 to 20+ Players',
-        description: 'Play Among Us in real life, free in your phone browser. Real tasks, secret roles, meetings and votes for 3 to 20+ players at parties, youth groups and classes.',
+        description: DESCRIPTION,
         canonical: 'https://susparty.com/',
         alternates: alternatesFor('home'),
+        schema: SCHEMA,
     });
 
     return (
@@ -239,7 +254,7 @@ function LandingPage() {
                         </p>
                         <div className="sl-hero__cta">
                             <a href="/play" className="sl-btn sl-btn--ink sl-btn--big sl-hero__start">Start a game <ArrowRight size="1em" /></a>
-                            <p className="sl-hero__facts">Free in the browser, for 3 to 20+ players.</p>
+                            <p className="sl-hero__facts">Free in the browser, for 3 to 20+ players. No app to download.</p>
                         </div>
                         <WelcomeBackCard style={{ marginTop: 18 }} />
                     </div>
@@ -254,6 +269,21 @@ function LandingPage() {
                     <strong>Hundreds of groups</strong> have hosted a game, <strong>nearly 900 people</strong> played in a
                     month, and the biggest game had <strong>over 40 phones</strong>.
                 </p>
+            </section>
+
+            {/* NO APP: Sus Party is a website, not something you install */}
+            <section className="sl-band sl-band--round sl-noapp" aria-labelledby="sl-noapp-h">
+                <div className="sl-wrap">
+                    <h2 id="sl-noapp-h" className="sl-h2">No app. Just a link.</h2>
+                    <p className="sl-body sl-noapp__body">
+                        Sus Party is a website, not an app. Open the link or type the code on any phone, iPhone or
+                        Android, and you’re in. Nothing to install, and no account needed to play.
+                    </p>
+                    <p className="sl-body sl-noapp__body">
+                        And it isn’t a game you play sitting down. Everyone gets up and moves around a real place,
+                        doing real tasks while someone sneaks around them.
+                    </p>
+                </div>
             </section>
 
             {/* HOW A ROUND GOES */}
@@ -348,13 +378,13 @@ function LandingPage() {
                 <div className="sl-wrap sl-seo">
                     <h2 id="sl-seo-heading" className="sl-h2 sl-h2--small">Plan your game</h2>
                     <p className="sl-body">
-                        Sus Party is a free browser app for playing Among Us in real life with 3 to 20+ people.
+                        Sus Party is a free browser game, not an app, for playing Among Us in real life with 3 to 20+ people.
                         Compare <a href="/social-deduction-games">social deduction games to play in person</a>,
                         plan an <a href="/among-us-birthday-party">Among Us birthday party</a>, or
                         find <a href="/party-games-for-10-people">party games for ten friends</a>.
                     </p>
                     <ul className="sl-links">
-                        <li><a href="/among-us-irl">Free Among Us IRL app</a></li>
+                        <li><a href="/among-us-irl">Among Us IRL, no app needed</a></li>
                         <li><a href="/how-to-play">How to play</a></li>
                         <li><a href="/among-us-irl-task-ideas">Task ideas at home</a></li>
                         <li><a href="/among-us-irl-task-generator">Task generator</a></li>

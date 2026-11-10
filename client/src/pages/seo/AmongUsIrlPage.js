@@ -37,12 +37,12 @@ const SCHEMA = {
     '@context': 'https://schema.org',
     '@graph': [
         {
-            '@type': 'SoftwareApplication',
+            '@type': 'WebApplication',
             name: 'Sus Party',
             applicationCategory: 'Game',
             operatingSystem: 'Any (browser-based)',
             description:
-                'Sus Party is a free browser game for in-person social deduction with private roles, task lists, meetings, and votes, for 3 to 20+ players.',
+                'Sus Party is a free browser game, with nothing to download, for in-person social deduction with private roles, task lists, meetings, and votes, for 3 to 20+ players.',
             url: 'https://susparty.com',
             offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
         },
@@ -75,8 +75,8 @@ function AmongUsIrlPage() {
                 <h1 className="seo-h1">Play Among Us in real life with Sus Party</h1>
                 <p className="seo-lead">
                     Someone heads to the kitchen for a task. Someone follows them a little too closely.
-                    A meeting starts, and suddenly everyone has an alibi. Sus Party is the free Among Us IRL app
-                    that turns your rooms into the map and your friends into the suspects.
+                    A meeting starts, and suddenly everyone has an alibi. Sus Party is the free Among Us IRL game,
+                    played in the phone browser with nothing to install, that turns your rooms into the map and your friends into the suspects.
                     It works for 3 players or 20+: a family night, a birthday, a class, or a whole youth group.
                 </p>
                 <div className="seo-actions">
