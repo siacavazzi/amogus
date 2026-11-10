@@ -797,9 +797,7 @@
   },
   "Save this game": "Salvar esta partida",
   "Link copied": "Link copiado",
-  "Send yourself the link to host it later with these tasks": "Envie o link para você mesmo para organizar depois com estas tarefas",
   "Send yourself the link to play again later": "Envie o link para você mesmo para jogar de novo depois",
-  "Our Sus Party game. Open it to host it again with the same tasks.": "Nossa partida de Sus Party. Abra para organizar de novo com as mesmas tarefas.",
   "Sus Party: the real-life social deduction game": "Sus Party: o jogo de dedução social na vida real",
   "Keep Sus Party on your home screen": "Deixe o Sus Party na sua tela de início",
   "Tap the Share button, then \"Add to Home Screen\", so your next game is one tap away.": "Toque no botão Compartilhar e depois em \"Adicionar à Tela de Início\": sua próxima partida fica a um toque.",
@@ -971,5 +969,9 @@
   "game played": {
     "one": "partida jogada",
     "other": "partidas jogadas"
-  }
+  },
+  "Opening your saved game…": "Abrindo sua partida salva…",
+  "Joining your group…": "Entrando no seu grupo…",
+  "Our Sus Party game. Open the link to play it again with the same tasks.": "Nossa partida de Sus Party. Abra o link para jogar de novo com as mesmas tarefas.",
+  "Send it to your group chat. The first to open it hosts, everyone else joins.": "Envie no chat do grupo. Quem abrir primeiro organiza, e o resto entra."
 }

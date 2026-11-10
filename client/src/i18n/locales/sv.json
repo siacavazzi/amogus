@@ -797,9 +797,7 @@
   },
   "Save this game": "Spara det här spelet",
   "Link copied": "Länken är kopierad",
-  "Send yourself the link to host it later with these tasks": "Skicka länken till dig själv för att vara värd senare med de här uppgifterna",
   "Send yourself the link to play again later": "Skicka länken till dig själv för att spela igen senare",
-  "Our Sus Party game. Open it to host it again with the same tasks.": "Vårt Sus Party-spel. Öppna det för att vara värd igen med samma uppgifter.",
   "Sus Party: the real-life social deduction game": "Sus Party: det sociala bluffspelet i verkligheten",
   "Keep Sus Party on your home screen": "Ha Sus Party på hemskärmen",
   "Tap the Share button, then \"Add to Home Screen\", so your next game is one tap away.": "Tryck på Dela-knappen och sedan ”Lägg till på hemskärmen”, så är nästa spel bara ett tryck bort.",
@@ -971,5 +969,9 @@
   "game played": {
     "one": "runda spelad",
     "other": "rundor spelade"
-  }
+  },
+  "Opening your saved game…": "Öppnar ditt sparade spel…",
+  "Joining your group…": "Går med i din grupp…",
+  "Our Sus Party game. Open the link to play it again with the same tasks.": "Vårt Sus Party-spel. Öppna länken för att spela det igen med samma uppgifter.",
+  "Send it to your group chat. The first to open it hosts, everyone else joins.": "Skicka den i gruppchatten. Den som öppnar den först blir värd, alla andra går med."
 }

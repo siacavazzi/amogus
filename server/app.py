@@ -79,6 +79,12 @@ game_links = GameLinks(os.path.join(os.path.dirname(__file__), 'data', 'game_lin
 group_book = GroupBook(os.path.join(os.path.dirname(__file__), 'data', 'groups.json'))
 
 
+# What a saved game link brings back besides the tasks. Locations come with the task list.
+SAVED_SETTINGS = ('vote_time', 'vote_threshold', 'meeting_quorum', 'late_join_live', 'meltdown_time', 'code_percent',
+                  'num_intruders', 'card_draw_probability', 'starting_cards', 'task_ratio', 'card_deck_preset',
+                  'card_deck_counts')
+
+
 def counts_for_group(game):
     """Real rounds only: no solo test games, at least 3 players (as in the stats). Automated test
     rooms keep a score too, so the browser tests can check it; the gameplay log leaves them out."""
@@ -112,7 +118,9 @@ def live_group_room(group, exclude=None):
         if game.is_open:
             live = any(player.active for player in game.players)
         else:
-            live = time.time() - getattr(game, 'created_at', 0) < 15 * 60
+            # A host who closed the page in setup has left it: the next friend starts a fresh room.
+            live = (time.time() - getattr(game, 'created_at', 0) < 15 * 60
+                    and is_sid_connected_to_room(game.creator_sid, game.room_code))
         if game.room_code != exclude and game.group_id == group and live:
             return {'room_code': game.room_code, 'link_token': game.link_token}
     return None
@@ -350,7 +358,7 @@ def room_not_found_message(room_code):
     return message
 
 
-ENTRY_METHODS = {'qr', 'share_link', 'invite_link', 'typed', 'host_return'}
+ENTRY_METHODS = {'qr', 'share_link', 'invite_link', 'saved_link', 'typed', 'host_return'}
 
 
 def entry_details(data, room_code):
@@ -371,7 +379,7 @@ def waiting_room(room_code):
     return f'waiting-to-open:{room_code}'
 
 
-LINK_ENTRY_METHODS = {'qr', 'share_link', 'invite_link'}
+LINK_ENTRY_METHODS = {'qr', 'share_link', 'invite_link', 'saved_link'}
 
 
 def saved_game_for_link(token):
@@ -601,26 +609,67 @@ def serve_client(path):
 @socketio.on('create_game')
 def handle_create_game(data=None):
     """Create a new game room and return the room code."""
+    create_room(data if isinstance(data, dict) else {})
+
+
+def create_room(data, group_via=None):
+    """A new room with this socket as its host. From a group's link it joins that group and starts
+    with the settings that game was played with (the host can still change them)."""
     sid = request.sid
-    acquisition = data.get('acquisition') if isinstance(data, dict) else None
+    acquisition = data.get('acquisition')
     room_code, game = game_manager.create_game(sid, acquisition, synthetic=sid in synthetic_sids)
     game.creator_sid = sid  # Track room creator
     game.host_token = secrets.token_urlsafe(16)
     # "Use this pack" on the task generator creates the room with the pack already loaded.
     game.last_setup_step = 'created'
-    game.setup_origin = 'generator' if isinstance(data, dict) and data.get('setup') == 'generated' else 'play_page'
+    game.setup_origin = 'generator' if data.get('setup') == 'generated' else 'play_page'
     # Started from a group's link (an old invite, a saved game link, the welcome back card): same group.
-    group = game_links.group_of(data.get('group_link')) if isinstance(data, dict) else None
+    group = game_links.group_of(data.get('group_link'))
     if group:
         game.group_id = group
-        game.group_via = data.get('group_via') if data.get('group_via') in GROUP_VIA else 'saved_link'
+        via = group_via or data.get('group_via')
+        game.group_via = via if via in GROUP_VIA else 'saved_link'
+        apply_saved_settings(game, data.get('group_link'))
     record_usage('host_entered', game, flush=True, setup_origin=game.setup_origin, group_via=game.group_via,
                  **StatsTracker.normalize_visit(acquisition))
     join_room(room_code)
-    
+
     logger.info(f"Game created with room code: {room_code}")
     emit('game_created', {'room_code': room_code, 'is_creator': True, 'host_token': game.host_token})
     emit('game_config', game.get_config())
+    return game
+
+
+def apply_saved_settings(game, token):
+    """The settings the linked game last played with, so "Save this game" brings back the whole game."""
+    entry = game_links.lookup(token) or {}
+    settings = {key: value for key, value in (entry.get('settings') or {}).items() if key in SAVED_SETTINGS}
+    if not settings:
+        return
+    try:
+        game.update_config(settings)
+    except (TypeError, ValueError):
+        logger.warning('Saved settings could not be applied to a new room')
+
+
+@socketio.on('open_saved_game')
+def handle_open_saved_game(data=None):
+    """A "Save this game" link opened: join the group's room if it is on now, else (with create)
+    open a new room with this phone as host. One step on the server, so two friends tapping the
+    link at once land in the same room instead of starting two."""
+    data = data if isinstance(data, dict) else {}
+    if game_manager.get_game_by_sid(request.sid)[0]:
+        # This page already got back into a room (its saved session): leave it there.
+        return {'action': 'busy'}
+    group = game_links.group_of(data.get('group_link'))
+    live = live_group_room(group)
+    if live:
+        return {'action': 'join', **live}
+    if data.get('create') is not True:
+        return {'action': 'none'}
+    via = data.get('group_via') if data.get('group_via') in GROUP_VIA else 'saved_link'
+    create_room(data, group_via=via)
+    return {'action': 'created'}
 
 
 @socketio.on('get_game_config')
@@ -1448,8 +1497,9 @@ def start_room(game, test_mode=False):
     group_room_started(game)
     game_manager.stats_tracker.record_game_started(game)
     if not test_mode:
+        config = game.get_config()
         game_links.remember(game.link_token, game.collaborative_tasks, game.locations, len(game.players),
-                            group=game.group_id)
+                            group=game.group_id, settings={key: config[key] for key in SAVED_SETTINGS})
     record_usage('round_host_started', game, game.creator_player_id, test_mode=test_mode)
     for player in game.players:
         if not player.sus:
