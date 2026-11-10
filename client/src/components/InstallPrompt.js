@@ -1,17 +1,20 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { DataContext } from '../GameContext';
-import { Download, X, ShareIos, MoreHorizontal, MoreVertical } from '../signal/icons';
+import { Download, X, ShareIos, MoreHorizontal, MoreVertical, Menu } from '../signal/icons';
 import { installMethod, promptInstall, installPromptDismissed, dismissInstallPrompt } from '../utils/installPrompt';
 import { sendClientMetric } from '../utils/clientMetrics';
 import { t, tk } from '../i18n';
 
-const SCROLL_STEP = tk('Scroll down and tap "Add to Home Screen"');
+// iOS 26's share sheet keeps "Add to Home Screen" behind "View More"; older iPhones list it further down.
+const SHEET_STEP = tk('Tap "View More" if you see it, then "Add to Home Screen"');
 // The browser's own buttons, step by step. {icon} is drawn the way the button looks on the phone.
 const STEPS = {
-    safari: [[tk('Tap the Share button {icon} at the bottom of Safari'), ShareIos], [SCROLL_STEP]],
-    safari_menu: [[tk('Tap {icon} next to the address bar, then "Share"'), MoreHorizontal], [SCROLL_STEP]],
-    chrome_ios: [[tk('Tap the Share button {icon} in Chrome\'s address bar'), ShareIos], [SCROLL_STEP]],
-    ios_menu: [[tk('Open your browser\'s menu, then tap {icon} "Share"'), ShareIos], [SCROLL_STEP]],
+    safari: [[tk('Tap the Share button {icon} at the bottom of Safari'), ShareIos], [SHEET_STEP]],
+    safari_menu: [[tk('Tap {icon} next to the address bar, then "Share"'), MoreHorizontal], [SHEET_STEP]],
+    chrome_ios: [[tk('Tap the Share button {icon} in Chrome\'s address bar'), ShareIos], [SHEET_STEP]],
+    firefox_ios: [[tk('Tap the Share button {icon} in Firefox\'s address bar'), ShareIos], [SHEET_STEP]],
+    ios_menu: [[tk('Open your browser\'s menu, then tap {icon} "Share"'), ShareIos], [SHEET_STEP]],
+    samsung: [[tk('Tap the menu button {icon} at the bottom'), Menu], [tk('Tap "Add page to", then "Home screen"')]],
     android_menu: [[tk('Tap the menu button {icon} in your browser'), MoreVertical], [tk('Tap "Add to Home screen" or "Install"')]],
 };
 

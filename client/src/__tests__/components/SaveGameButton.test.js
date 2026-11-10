@@ -51,7 +51,7 @@ describe('Save this game', () => {
         const spy = jest.spyOn(window.navigator, 'userAgent', 'get').mockReturnValue(chrome);
         renderWithContext(<EndGameButtons />, { roomCode: 'ABCD', isMobile: true, isRoomCreator: true });
         expect(screen.getByText(/in Chrome's address bar/)).toBeInTheDocument();
-        expect(screen.getByText(/Scroll down and tap "Add to Home Screen"/)).toBeInTheDocument();
+        expect(screen.getByText(/Tap "View More" if you see it, then "Add to Home Screen"/)).toBeInTheDocument();
         expect(screen.getByText(/not "Save this game"/)).toBeInTheDocument();
         spy.mockRestore();
     });

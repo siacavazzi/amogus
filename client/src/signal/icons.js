@@ -81,6 +81,7 @@ export const ShareIos = make('ShareIos', () => <path d="M12 3.5v11M8 7.5l4-4 4 4
 export const MoreHorizontal = make('MoreHorizontal', ({ c }) => (
   <g {...solid(c)}><circle cx="5" cy="12" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="19" cy="12" r="1.6" /></g>
 ));
+export const Menu = make('Menu', () => <path d="M4.5 6.5h15M4.5 12h15M4.5 17.5h15" />);
 export const MoreVertical = make('MoreVertical', ({ c }) => (
   <g {...solid(c)}><circle cx="12" cy="5" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="12" cy="19" r="1.6" /></g>
 ));

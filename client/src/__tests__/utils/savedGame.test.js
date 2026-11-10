@@ -64,11 +64,13 @@ describe('add to home screen', () => {
         expect(installMethod({ win: win(`${iphone} Version/18.6 Mobile/15E148 Safari/604.1`), prompt: null })).toBe('safari');
         expect(installMethod({ win: win(`${iphone} Version/26.1 Mobile/15E148 Safari/604.1`), prompt: null })).toBe('safari_menu');
         expect(installMethod({ win: win(`${iphone} CriOS/142.0.7444.77 Mobile/15E148 Safari/604.1`), prompt: null })).toBe('chrome_ios');
-        expect(installMethod({ win: win(`${iphone} FxiOS/144.0 Mobile/15E148 Safari/605.1.15`), prompt: null })).toBe('ios_menu');
+        expect(installMethod({ win: win(`${iphone} FxiOS/144.0 Mobile/15E148 Safari/605.1.15`), prompt: null })).toBe('firefox_ios');
+        expect(installMethod({ win: win(`${iphone} EdgiOS/142.0 Mobile/15E148 Safari/605.1.15`), prompt: null })).toBe('ios_menu');
         // Before iOS 16.4 only Safari could add to the home screen.
         expect(installMethod({ win: win('Mozilla/5.0 (iPhone; CPU iPhone OS 15_7 like Mac OS X) AppleWebKit/605.1.15 CriOS/120.0 Mobile/15E148 Safari/604.1'), prompt: null })).toBeNull();
         expect(installMethod({ win: win('Mozilla/5.0 (Linux; Android 14) Chrome/130 Mobile'), prompt: {} })).toBe('native');
         expect(installMethod({ win: win('Mozilla/5.0 (Linux; Android 14; Pixel 8) Gecko/130.0 Firefox/130.0'), prompt: null })).toBe('android_menu');
+        expect(installMethod({ win: win('Mozilla/5.0 (Linux; Android 14; SM-S921B) AppleWebKit/537.36 SamsungBrowser/28.0 Chrome/130 Mobile Safari/537.36'), prompt: null })).toBe('samsung');
         expect(installMethod({ win: win('Mozilla/5.0 (Windows NT 10.0) Chrome/142.0 Safari/537.36'), prompt: {} })).toBe('native');
         expect(installMethod({ win: win('Mozilla/5.0 (Windows NT 10.0) Firefox/144.0'), prompt: null })).toBeNull();
         // In-app browsers: Facebook, the Google app, and an Android webview.

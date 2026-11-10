@@ -25,8 +25,11 @@ export function isStandalone(win = window) {
  *   'safari'        iPhone Safari before iOS 26: the Share icon in the bottom bar
  *   'safari_menu'   iPhone Safari on iOS 26+: ⋯ next to the address bar, then Share
  *   'chrome_ios'    Chrome on iPhone: the Share icon in its address bar
- *   'ios_menu'      Firefox, Edge... on iPhone: the browser's menu, then Share
- *   'android_menu'  Android without the install event (Firefox, Samsung, Chrome before it is ready): ⋮ menu
+ *   'firefox_ios'   Firefox on iPhone: the Share icon in its address bar
+ *   'ios_menu'      Edge and other iPhone browsers: the browser's menu, then Share
+ *   'samsung'       Samsung Internet without the install event: ≡ at the bottom, then "Add page to"
+ *   'android_menu'  other Android browsers without the install event (Firefox, Chrome before it is ready): ⋮ menu
+ * On iOS 26 the share sheet can hide "Add to Home Screen" behind "View More" (every browser uses the same sheet).
  *   null            no way to do it (in-app browsers, old iPhones, computers without the event, already installed)
  * Our "Save this game" button opens a share sheet too, but that one never has Add to Home Screen in it.
  */
@@ -42,13 +45,14 @@ export function installMethod({ win = window, prompt = deferredPrompt } = {}) {
             // Other iPhone browsers got Add to Home Screen in iOS 16.4.
             const os = /OS (\d+)_(\d+)/.exec(ua);
             if (os && (Number(os[1]) < 16 || (Number(os[1]) === 16 && Number(os[2]) < 4))) return null;
-            return /CriOS/.test(ua) ? 'chrome_ios' : 'ios_menu';
+            if (/CriOS/.test(ua)) return 'chrome_ios';
+            return /FxiOS/.test(ua) ? 'firefox_ios' : 'ios_menu';
         }
         // Safari's version follows iOS (the OS number in the user agent stopped at 18 in iOS 26).
         const safari = /Version\/(\d+)/.exec(ua);
         return safari && Number(safari[1]) >= 26 ? 'safari_menu' : 'safari';
     }
-    if (/Android/.test(ua)) return 'android_menu';
+    if (/Android/.test(ua)) return /SamsungBrowser/.test(ua) ? 'samsung' : 'android_menu';
     return null;
 }
 
