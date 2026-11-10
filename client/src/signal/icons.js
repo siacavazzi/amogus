@@ -76,6 +76,14 @@ export const Share2 = make('Share2', ({ c }) => (
     <circle cx="18" cy="18.5" r="3" {...solid(c)} />
   </>
 ));
+// The browsers' own buttons, drawn the way they look, for "add to home screen" hints.
+export const ShareIos = make('ShareIos', () => <path d="M12 3.5v11M8 7.5l4-4 4 4M8.5 10.5H7a2 2 0 0 0-2 2V19a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6.5a2 2 0 0 0-2-2h-1.5" />);
+export const MoreHorizontal = make('MoreHorizontal', ({ c }) => (
+  <g {...solid(c)}><circle cx="5" cy="12" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="19" cy="12" r="1.6" /></g>
+));
+export const MoreVertical = make('MoreVertical', ({ c }) => (
+  <g {...solid(c)}><circle cx="12" cy="5" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="12" cy="19" r="1.6" /></g>
+));
 export const ExternalLink = make('ExternalLink', () => <path d="M13 4.5h6.5V11M19.5 4.5L11 13M17 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h4" />);
 export const Download = make('Download', () => <path d="M12 3.5v11M7 10l5 5 5-5M4.5 20h15" />);
 export const Save = make('Save', ({ id, c }) => (

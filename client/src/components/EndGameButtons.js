@@ -71,11 +71,12 @@ function EndGameButtons() {
                 {hasVoted ? <><Check size={20} strokeWidth={3} /> {t('Ready!')}</> : <><RotateCcw size={20} strokeWidth={3} /> {t('Play Again')}</>}
             </button>
             {!isReactor && <SaveGameButton onDone={() => feedback.savedRound(roundId)} />}
-            {!isReactor && <InstallPrompt />}
             <button onClick={handleLeaveRoom} className="sg-btn" style={{ background: 'transparent', color: 'var(--sg-ink)', minHeight: 48, padding: 10, fontWeight: 700, fontSize: 16 }}>
                 <LogOut size={18} />
                 <span>{t('Leave')}</span>
             </button>
+            {/* Below Leave: the hint is a nice-to-have, the buttons above it must fit on a phone. */}
+            {!isReactor && <InstallPrompt />}
         </div>
     );
 }

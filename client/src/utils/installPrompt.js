@@ -1,11 +1,12 @@
 // "Add to Home Screen" for hosts. An icon on the home screen is the reminder a web game otherwise
 // lacks. (On iOS the home-screen app has its own storage: lists saved in Safari don't move over.)
+import { detectInAppBrowser } from './inAppBrowser';
+
 const DISMISSED_KEY = 'sus_install_prompt_v1';
-const IN_APP = /FBAN|FBAV|FB_IAB|Instagram|Snapchat|musical_ly|TikTok|Line\/|Messenger/i;
 
 let deferredPrompt = null;
 if (typeof window !== 'undefined') {
-    // Chrome on Android offers its own install sheet, but only through this event, fired once early on.
+    // Chrome and Edge (Android and computers) offer their own install sheet, but only through this event, fired once early on.
     window.addEventListener('beforeinstallprompt', (event) => {
         event.preventDefault();
         deferredPrompt = event;
@@ -18,14 +19,37 @@ export function isStandalone(win = window) {
     } catch (_) { return false; }
 }
 
-/** 'native' (the browser's own install sheet), 'ios' (Share, then Add to Home Screen) or null. */
+/**
+ * How this browser adds a page to the home screen, so the hint can name the browser's own buttons:
+ *   'native'        the browser's own install sheet, opened by our button (Chrome/Edge on Android and computers)
+ *   'safari'        iPhone Safari before iOS 26: the Share icon in the bottom bar
+ *   'safari_menu'   iPhone Safari on iOS 26+: ⋯ next to the address bar, then Share
+ *   'chrome_ios'    Chrome on iPhone: the Share icon in its address bar
+ *   'ios_menu'      Firefox, Edge... on iPhone: the browser's menu, then Share
+ *   'android_menu'  Android without the install event (Firefox, Samsung, Chrome before it is ready): ⋮ menu
+ *   null            no way to do it (in-app browsers, old iPhones, computers without the event, already installed)
+ * Our "Save this game" button opens a share sheet too, but that one never has Add to Home Screen in it.
+ */
 export function installMethod({ win = window, prompt = deferredPrompt } = {}) {
-    const ua = win.navigator?.userAgent || '';
-    // In-app browsers (Facebook, Instagram...) can't add to the home screen, and an installed app needs no prompt.
-    if (IN_APP.test(ua) || isStandalone(win)) return null;
+    const nav = win.navigator || {};
+    const ua = nav.userAgent || '';
+    // In-app browsers (Facebook, Instagram, the Google app...) can't add to the home screen, and an installed app needs no prompt.
+    if (isStandalone(win) || detectInAppBrowser(ua, { standalone: nav.standalone === true })) return null;
     if (prompt) return 'native';
-    const ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && win.navigator?.maxTouchPoints > 1);
-    return ios ? 'ios' : null;
+    const ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && nav.maxTouchPoints > 1);
+    if (ios) {
+        if (/CriOS|FxiOS|EdgiOS|OPiOS|YaBrowser|DuckDuckGo|Brave/.test(ua)) {
+            // Other iPhone browsers got Add to Home Screen in iOS 16.4.
+            const os = /OS (\d+)_(\d+)/.exec(ua);
+            if (os && (Number(os[1]) < 16 || (Number(os[1]) === 16 && Number(os[2]) < 4))) return null;
+            return /CriOS/.test(ua) ? 'chrome_ios' : 'ios_menu';
+        }
+        // Safari's version follows iOS (the OS number in the user agent stopped at 18 in iOS 26).
+        const safari = /Version\/(\d+)/.exec(ua);
+        return safari && Number(safari[1]) >= 26 ? 'safari_menu' : 'safari';
+    }
+    if (/Android/.test(ua)) return 'android_menu';
+    return null;
 }
 
 export async function promptInstall() {

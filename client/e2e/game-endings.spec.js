@@ -30,6 +30,15 @@ test('the intruder wins once the crew is down to one', async ({ browser }) => {
     await expect(phones[0].getByText(`${intruder.person} got away with it.`)).toBeVisible();
     await expect(reactor.getByText('Intruders Win!')).toBeVisible();
 
+    // On a small phone the buttons show without scrolling, under the big headline.
+    const crewmate = phones.find(phone => phone !== intruder);
+    await crewmate.setViewportSize({ width: 375, height: 667 });
+    await crewmate.waitForTimeout(1500);
+    for (const name of [/Play Again/, /Save this game/, /Leave/]) {
+        const box = await crewmate.getByRole('button', { name }).boundingBox();
+        expect(box.y + box.height, `${name} fits on the screen`).toBeLessThanOrEqual(667);
+    }
+
     h.expectNoPageErrors([...phones, reactor]);
 });
 

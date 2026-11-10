@@ -59,11 +59,22 @@ describe('saved game links', () => {
 describe('add to home screen', () => {
     const win = (userAgent, extra = {}) => ({ navigator: { userAgent, ...extra }, matchMedia: () => ({ matches: false }) });
 
-    it('walks iPhone Safari through Share, uses Chrome\'s own sheet, and skips in-app browsers', () => {
-        expect(installMethod({ win: win('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) Safari/604.1'), prompt: null })).toBe('ios');
+    it('names the right buttons for each browser and skips in-app browsers', () => {
+        const iphone = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)';
+        expect(installMethod({ win: win(`${iphone} Version/18.6 Mobile/15E148 Safari/604.1`), prompt: null })).toBe('safari');
+        expect(installMethod({ win: win(`${iphone} Version/26.1 Mobile/15E148 Safari/604.1`), prompt: null })).toBe('safari_menu');
+        expect(installMethod({ win: win(`${iphone} CriOS/142.0.7444.77 Mobile/15E148 Safari/604.1`), prompt: null })).toBe('chrome_ios');
+        expect(installMethod({ win: win(`${iphone} FxiOS/144.0 Mobile/15E148 Safari/605.1.15`), prompt: null })).toBe('ios_menu');
+        // Before iOS 16.4 only Safari could add to the home screen.
+        expect(installMethod({ win: win('Mozilla/5.0 (iPhone; CPU iPhone OS 15_7 like Mac OS X) AppleWebKit/605.1.15 CriOS/120.0 Mobile/15E148 Safari/604.1'), prompt: null })).toBeNull();
         expect(installMethod({ win: win('Mozilla/5.0 (Linux; Android 14) Chrome/130 Mobile'), prompt: {} })).toBe('native');
-        expect(installMethod({ win: win('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0) [FBAN/FBIOS;FBAV/480.0]'), prompt: null })).toBeNull();
+        expect(installMethod({ win: win('Mozilla/5.0 (Linux; Android 14; Pixel 8) Gecko/130.0 Firefox/130.0'), prompt: null })).toBe('android_menu');
+        expect(installMethod({ win: win('Mozilla/5.0 (Windows NT 10.0) Chrome/142.0 Safari/537.36'), prompt: {} })).toBe('native');
+        expect(installMethod({ win: win('Mozilla/5.0 (Windows NT 10.0) Firefox/144.0'), prompt: null })).toBeNull();
+        // In-app browsers: Facebook, the Google app, and an Android webview.
+        expect(installMethod({ win: win(`${iphone} Mobile/15E148 [FBAN/FBIOS;FBAV/480.0]`), prompt: null })).toBeNull();
+        expect(installMethod({ win: win(`${iphone} GSA/390.0 Mobile/15E148 Safari/604.1`), prompt: null })).toBeNull();
+        expect(installMethod({ win: win('Mozilla/5.0 (Linux; Android 14; wv) Chrome/130 Mobile'), prompt: {} })).toBeNull();
         expect(installMethod({ win: win('Mozilla/5.0 (iPhone)', { standalone: true }), prompt: null })).toBeNull();
-        expect(installMethod({ win: win('Mozilla/5.0 (Linux; Android 14) Firefox/130'), prompt: null })).toBeNull();
     });
 });
