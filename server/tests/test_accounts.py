@@ -304,5 +304,58 @@ class ListOwnershipTests(AccountTestCase):
         self.assertEqual([], self.my_lists(fresh, 'ignored'))
 
 
+
+class StarAndDeleteListTests(AccountTestCase):
+    def test_my_lists_stars_a_list_to_the_top_and_deletes_another(self):
+        self.sign_in(self.http)
+        host = self.socket(self.http)
+        old = self.make_list(host, 'ignored', name='Old one')
+        new = self.make_list(host, 'ignored', name='New one')
+        self.lists.update_task_list(new, {'name': 'New one'})  # newest first by default
+        lists = self.http.get('/api/account/lists').get_json()['lists']
+        self.assertEqual([new, old], [item['code'] for item in lists])
+        self.assertEqual([False, False], [item['starred'] for item in lists])
+
+        self.assertTrue(self.http.post('/api/account/lists/star', json={'code': old.lower(), 'starred': True}).get_json()['ok'])
+        lists = self.http.get('/api/account/lists').get_json()['lists']
+        self.assertEqual([(old, True), (new, False)], [(item['code'], item['starred']) for item in lists])
+        # The game setup screen sees the same order.
+        self.assertEqual([old, new], self.my_lists(host, 'ignored'))
+
+        self.assertTrue(self.http.post('/api/account/lists/remove', json={'code': old}).get_json()['ok'])
+        self.assertEqual([new], [item['code'] for item in self.http.get('/api/account/lists').get_json()['lists']])
+        self.assertNotIn(old, json.dumps(self.lists.index.get('starred', {})))
+        # The code still loads for anyone who has it.
+        self.assertIsNotNone(self.lists.get_task_list(old))
+
+    def test_only_your_own_lists_and_only_signed_in(self):
+        stranger_list = self.make_list(self.socket(), 'device_someone1')
+        self.assertEqual(401, self.http.post('/api/account/lists/star', json={'code': stranger_list, 'starred': True}).status_code)
+        self.sign_in(self.http)
+        self.assertEqual(404, self.http.post('/api/account/lists/star', json={'code': stranger_list, 'starred': True}).status_code)
+        self.assertEqual(404, self.http.post('/api/account/lists/remove', json={'code': stranger_list}).status_code)
+        self.assertEqual(400, self.http.post('/api/account/lists/remove', json={'code': 5}).status_code)
+        self.assertIn(stranger_list, self.lists.index['player_lists']['device_someone1'])
+
+    def test_a_signed_out_browser_stars_at_setup_and_the_star_follows_it_into_the_account(self):
+        phone = self.socket()
+        first = self.make_list(phone, 'device_phone123', name='First')
+        second = self.make_list(phone, 'device_phone123', name='Second')
+        phone.get_received()
+        phone.emit('star_task_list', {'player_id': 'device_phone123', 'code': first, 'starred': True})
+        reply = [e for e in phone.get_received() if e['name'] == 'my_task_lists'][-1]['args'][0]
+        self.assertEqual([first, second], [item['code'] for item in reply['lists']])
+        self.assertTrue(reply['lists'][0]['starred'])
+
+        self.sign_in(self.http)
+        self.http.post('/api/account/adopt', json={'device_id': 'device_phone123'})
+        lists = self.http.get('/api/account/lists').get_json()['lists']
+        self.assertEqual([(first, True), (second, False)], [(item['code'], item['starred']) for item in lists])
+
+        # Unstarring puts it back in date order.
+        self.http.post('/api/account/lists/star', json={'code': first, 'starred': False})
+        lists = self.http.get('/api/account/lists').get_json()['lists']
+        self.assertEqual([False, False], [item['starred'] for item in lists])
+
 if __name__ == '__main__':
     unittest.main()

@@ -58,6 +58,18 @@ class TaskListManager:
             self.index = {"player_lists": {}, "code_to_name": {}}
             self._save_index()
 
+    def _starred(self, owner):
+        """The codes an owner starred (the index keeps them per owner, beside their saved lists)."""
+        return self.index.setdefault("starred", {}).get(owner, [])
+
+    def _drop_star(self, owner, code):
+        stars = self.index.setdefault("starred", {})
+        codes = [c for c in stars.get(owner, []) if c != code]
+        if codes:
+            stars[owner] = codes
+        else:
+            stars.pop(owner, None)
+
     def _save_index(self):
         """Save the index to disk."""
         with open(self.index_file, "w") as f:
@@ -308,6 +320,7 @@ class TaskListManager:
             List of task list summaries (code, name, task_count, updated_at)
         """
         codes = self.index["player_lists"].get(player_id, [])
+        starred = set(self._starred(player_id))
         result = []
         
         for code in codes:
@@ -319,12 +332,24 @@ class TaskListManager:
                     "task_count": len(task_list["tasks"]),
                     "locations": task_list["locations"],
                     "updated_at": task_list["updated_at"],
-                    "source_template": task_list.get("source_template")
+                    "source_template": task_list.get("source_template"),
+                    "starred": code in starred,
                 })
         
-        # Sort by most recently updated
-        result.sort(key=lambda x: x["updated_at"], reverse=True)
+        # Starred lists first, then the most recently updated
+        result.sort(key=lambda x: (not x["starred"], -x["updated_at"]))
         return result
+
+    def set_starred(self, code, owner, starred):
+        """Star or unstar one of an owner's saved lists. False when the list isn't in their lists."""
+        with self.lock:
+            if code not in self.index["player_lists"].get(owner, []):
+                return False
+            self._drop_star(owner, code)
+            if starred:
+                self.index["starred"].setdefault(owner, []).append(code)
+            self._save_index()
+            return True
 
     def remove_from_player_list(self, code, player_id):
         """
@@ -347,6 +372,7 @@ class TaskListManager:
             self.index["player_lists"][player_id] = [
                 c for c in player_lists if c != code
             ]
+            self._drop_star(player_id, code)
             self._save_index()
             
             print(f"Removed task list {code} from player {player_id}'s list")
@@ -382,6 +408,7 @@ class TaskListManager:
                 ]
             if code in self.index["code_to_name"]:
                 del self.index["code_to_name"][code]
+            self._drop_star(player_id, code)
             self._save_index()
             
             print(f"Deleted task list {code}")
@@ -397,9 +424,13 @@ class TaskListManager:
             return 0
         with self.lock:
             codes = self.index["player_lists"].pop(from_owner, [])
+            stars = self.index.setdefault("starred", {})
+            moved_stars = stars.pop(from_owner, [])
             if not codes:
                 return 0
             mine = self.index["player_lists"].setdefault(to_owner, [])
+            if moved_stars:
+                stars[to_owner] = list(dict.fromkeys(stars.get(to_owner, []) + moved_stars))
             for code in codes:
                 if code not in mine:
                     mine.append(code)
@@ -418,6 +449,7 @@ class TaskListManager:
         """Forget an owner (a deleted account): its lists stay playable by code, owned by nobody."""
         with self.lock:
             codes = self.index["player_lists"].pop(owner, [])
+            self.index.setdefault("starred", {}).pop(owner, None)
             for code in codes:
                 task_list = self.get_task_list(code)
                 if task_list and task_list.get("creator_id") == owner:

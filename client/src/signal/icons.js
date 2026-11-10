@@ -273,6 +273,9 @@ export const Timer = make('Timer', ({ id, c }) => (
   </>
 ));
 export const Activity = make('Activity', () => <path d="M2.5 12.5h4l2.5-7 5 13 2.5-6h5" />);
+// Star: outline for "not starred", solid for a starred list.
+export const Star = make('Star', () => <path d="M12 3.2l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 17l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z" />);
+export const StarFilled = make('StarFilled', ({ c }) => <path d="M12 3.2l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 17l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z" {...solid(c)} />);
 export const Check2 = Check;
 export const CheckCircle = make('CheckCircle', ({ id, c }) => (
   <Cut id={id} c={c} shape={<circle cx="12" cy="12" r="9.5" />} holes={<path d="M7.5 12.3l3 3 6-6.3" strokeWidth="2.8" fill="none" />} />

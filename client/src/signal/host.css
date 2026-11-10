@@ -229,3 +229,13 @@
 .hs-round--red { background: var(--sg-out); color: #fff; }
 .hs-ghost { appearance: none; border: 0; background: none; color: inherit; cursor: pointer; padding: 8px; border-radius: 12px; }
 .hs-ghost:hover { background: rgba(0, 0, 0, 0.12); }
+
+/* Saved lists: star to keep a list on top; delete asks on the row first. */
+.hs-star { color: inherit; }
+.hs-star--on { color: #ffc93c; }
+.hs-listrow[aria-current='true'] .hs-star--on { color: #c27c00; }
+.hs-confirm { background: #fff; color: var(--sg-ink); border-radius: 18px; padding: 14px 16px; display: grid; gap: 10px; }
+.hs-confirm p { margin: 0; font-weight: 800; font-size: 16px; line-height: 1.35; }
+.hs-confirm__row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.hs-confirm__row .sg-btn { width: 100%; min-height: 48px; font-size: 16px; padding: 10px 12px; }
+.hs-confirm__yes { background: var(--sg-out); color: #fff; }
