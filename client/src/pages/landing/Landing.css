@@ -226,6 +226,9 @@
 }
 .sl-proof__line strong { color: var(--sg-meet); font-weight: 900; }
 
+/* ---------- no app ---------- */
+.sl-noapp__body { max-width: 640px; }
+
 /* ---------- how a round goes ---------- */
 .sl-round {
   list-style: none;
