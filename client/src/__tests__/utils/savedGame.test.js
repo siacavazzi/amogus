@@ -1,5 +1,5 @@
 import { savedGameUrl, readSavedGameLink, rememberSavedGame, readPendingSavedGame, readPendingGroup, keepSavedGame, shareLink } from '../../utils/savedGame';
-import { installMethod } from '../../utils/installPrompt';
+import { installMethod, homeScreenStartPath } from '../../utils/installPrompt';
 
 describe('saved game links', () => {
     let stored;
@@ -78,5 +78,28 @@ describe('add to home screen', () => {
         expect(installMethod({ win: win(`${iphone} GSA/390.0 Mobile/15E148 Safari/604.1`), prompt: null })).toBeNull();
         expect(installMethod({ win: win('Mozilla/5.0 (Linux; Android 14; wv) Chrome/130 Mobile'), prompt: {} })).toBeNull();
         expect(installMethod({ win: win('Mozilla/5.0 (iPhone)', { standalone: true }), prompt: null })).toBeNull();
+    });
+});
+
+describe('opening from the home screen', () => {
+    const app = (pathname, search = '', standalone = true) => {
+        const store = {};
+        return {
+            navigator: { standalone }, matchMedia: () => ({ matches: false }), location: { pathname, search },
+            sessionStorage: { getItem: k => store[k] || null, setItem: (k, v) => { store[k] = v; } },
+        };
+    };
+
+    it('goes to the game start screen on launch, once', () => {
+        const win = app('/');
+        expect(homeScreenStartPath({ win })).toBe('/play?source=homescreen');
+        expect(homeScreenStartPath({ win })).toBeNull();
+    });
+
+    it('leaves browsers, game links and other pages alone', () => {
+        expect(homeScreenStartPath({ win: app('/', '', false) })).toBeNull();
+        expect(homeScreenStartPath({ win: app('/', '?room=ABCD') })).toBeNull();
+        expect(homeScreenStartPath({ win: app('/play') })).toBeNull();
+        expect(homeScreenStartPath({ win: app('/faq') })).toBeNull();
     });
 });

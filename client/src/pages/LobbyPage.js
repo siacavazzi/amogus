@@ -5,6 +5,7 @@ import { Plus, ArrowRight, Zap, Wifi, WifiOff, AlertTriangle, GraduationCap, Meg
 import { ReactorModeBanner } from '../components/ReactorModeBanner';
 import '../signal/reactor.css';
 import { dismissTutorialPrompt, shouldRecommendTutorial } from '../tutorial/tutorialStorage';
+import { isStandalone } from '../utils/installPrompt';
 import { getAcquisition } from '../seo/discovery';
 import RoomEntryNotice from '../components/RoomEntryNotice';
 import { getRoomCodeFromSearch, clearRoomCodeFromUrl } from '../utils/inviteLinks';
@@ -51,7 +52,8 @@ function LobbyPage() {
 
     useEffect(() => {
         // A phone that has finished a game has played, so it gets its welcome back card instead.
-        setShowTutorialPrompt(isMobile && !generatedSetup && !savedGameCode && !readLastGame() && !getRoomCodeFromSearch() && !roomEntryStatus && shouldRecommendTutorial());
+        // Nor does anyone who put the game on their home screen (on iPhone that app starts with empty storage).
+        setShowTutorialPrompt(isMobile && !isStandalone() && !generatedSetup && !savedGameCode && !readLastGame() && !getRoomCodeFromSearch() && !roomEntryStatus && shouldRecommendTutorial());
     }, [isMobile, roomEntryStatus, generatedSetup, savedGameCode]);
 
     // Listen for errors and success to reset the button states

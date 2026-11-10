@@ -20,6 +20,22 @@ export function isStandalone(win = window) {
 }
 
 /**
+ * Opened from the home screen icon: go straight to the game's start screen (create, join, welcome
+ * back) instead of the marketing home page. The manifest's start_url does this where the browser
+ * reads it; iPhones that saved the page's own address land on "/" and are moved here. Only on the
+ * first page of each launch, so the logo still reaches the home page.
+ */
+export function homeScreenStartPath({ win = window, storage = win.sessionStorage } = {}) {
+    if (!isStandalone(win)) return null;
+    try {
+        if (storage.getItem('sus_app_launched')) return null;
+        storage.setItem('sus_app_launched', '1');
+    } catch (_) { return null; }
+    const path = win.location.pathname.replace(/\/+$/, '') || '/';
+    return path === '/' && !win.location.search ? '/play?source=homescreen' : null;
+}
+
+/**
  * How this browser adds a page to the home screen, so the hint can name the browser's own buttons:
  *   'native'        the browser's own install sheet, opened by our button (Chrome/Edge on Android and computers)
  *   'safari'        iPhone Safari before iOS 26: the Share icon in the bottom bar
