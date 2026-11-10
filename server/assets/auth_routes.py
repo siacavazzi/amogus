@@ -342,6 +342,36 @@ class AuthRoutes:
             response.headers['Cache-Control'] = 'no-store'
             return response
 
+        @app.route('/api/account/lists/star', methods=['POST'])
+        def account_list_star():
+            if not self.same_origin():
+                return jsonify({'ok': False, 'reason': 'forbidden'}), 403
+            account, _, _ = self.current_account()
+            if not account:
+                return jsonify({'ok': False, 'reason': 'signed_out'}), 401
+            body = self.body()
+            code = body.get('code')
+            if not isinstance(code, str) or not code:
+                return jsonify({'ok': False, 'reason': 'bad_code'}), 400
+            if not self.lists.set_starred(code.upper(), owner_key(account['id']), bool(body.get('starred'))):
+                return jsonify({'ok': False, 'reason': 'not_yours'}), 404
+            return jsonify({'ok': True})
+
+        @app.route('/api/account/lists/remove', methods=['POST'])
+        def account_list_remove():
+            """Take a list off My lists. The list itself stays, so its code still works for anyone."""
+            if not self.same_origin():
+                return jsonify({'ok': False, 'reason': 'forbidden'}), 403
+            account, _, _ = self.current_account()
+            if not account:
+                return jsonify({'ok': False, 'reason': 'signed_out'}), 401
+            code = self.body().get('code')
+            if not isinstance(code, str) or not code:
+                return jsonify({'ok': False, 'reason': 'bad_code'}), 400
+            if not self.lists.remove_from_player_list(code.upper(), owner_key(account['id'])):
+                return jsonify({'ok': False, 'reason': 'not_yours'}), 404
+            return jsonify({'ok': True})
+
         @app.route('/api/account/stats', methods=['GET'])
         def account_stats():
             account, _, _ = self.current_account()

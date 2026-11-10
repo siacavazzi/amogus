@@ -2,10 +2,71 @@ import React, { useEffect, useState } from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from '../seo/SeoPageLayout';
 import { SignInForm } from '../../account/SignInSheet';
-import { deleteAccount, fetchAccountLists, signInAvailable, signOut, useAccount } from '../../account/accountStore';
+import { deleteAccount, fetchAccountLists, removeAccountList, signInAvailable, signOut, starAccountList, useAccount } from '../../account/accountStore';
+import { Star, StarFilled, Trash2 } from '../../signal/icons';
 import { t } from '../../i18n';
 import '../info/InfoPage.css';
 import '../../account/account.css';
+
+// Starred lists first, then the newest (the server sends them in this order too).
+export function sortLists(lists) {
+    return [...lists].sort((a, b) => (Boolean(b.starred) - Boolean(a.starred)) || ((b.updated_at || 0) - (a.updated_at || 0)));
+}
+
+// One saved list: star it, or delete it after a second tap (lots of players are kids).
+function ListRow({ list, onStar, onDelete }) {
+    const [confirming, setConfirming] = useState(false);
+    const [busy, setBusy] = useState(false);
+    return (
+        <li className="sp-acct__listrow" data-testid={`account-list-${list.code}`}>
+            <div className="sp-acct__listmain">
+                <button
+                    type="button"
+                    className={`sp-acct__icon${list.starred ? ' sp-acct__icon--on' : ''}`}
+                    aria-pressed={Boolean(list.starred)}
+                    aria-label={list.starred ? t('Unstar {name}', { name: list.name }) : t('Star {name}', { name: list.name })}
+                    title={list.starred ? t('Starred') : t('Star')}
+                    onClick={() => onStar(list)}
+                >
+                    {list.starred ? <StarFilled size={22} /> : <Star size={22} />}
+                </button>
+                <div className="sp-acct__listtext">
+                    <b>{list.name}</b>
+                    <span>{t('{tasks} tasks · {code}', { tasks: list.task_count, code: list.code })}</span>
+                </div>
+                <button
+                    type="button"
+                    className="sp-acct__icon"
+                    aria-label={t('Delete {name}', { name: list.name })}
+                    title={t('Delete')}
+                    onClick={() => setConfirming(true)}
+                    hidden={confirming}
+                >
+                    <Trash2 size={20} />
+                </button>
+            </div>
+            {confirming && (
+                <div className="sp-acct__confirm" role="group" aria-label={t('Delete {name}', { name: list.name })}>
+                    <p>{t('Delete this list? It leaves your lists, but anyone with the code can still play it.')}</p>
+                    <div className="sp-acct__confirmrow">
+                        <button
+                            type="button"
+                            className="sp-acct__btn sp-acct__btn--danger"
+                            disabled={busy}
+                            onClick={async () => {
+                                setBusy(true);
+                                if (!(await onDelete(list))) { setBusy(false); setConfirming(false); }
+                            }}
+                        >
+                            {t('Yes, delete')}
+                        </button>
+                        <button type="button" className="sp-acct__btn sp-acct__btn--line" onClick={() => setConfirming(false)}>{t('Keep it')}</button>
+                    </div>
+                </div>
+            )}
+        </li>
+    );
+}
 
 // /account: the host's saved lists, sign out, and delete the account.
 function AccountPage() {
@@ -31,9 +92,25 @@ function AccountPage() {
     useEffect(() => {
         if (!accountId) { setLists(null); return; }
         let live = true;
-        fetchAccountLists().then((reply) => { if (live) setLists(reply.ok ? reply.lists : []); }).catch(() => live && setLists([]));
+        fetchAccountLists().then((reply) => { if (live) setLists(reply.ok ? sortLists(reply.lists) : []); }).catch(() => live && setLists([]));
         return () => { live = false; };
     }, [accountId, current.listsVersion]);
+
+    const toggleStar = async (list) => {
+        const starred = !list.starred;
+        const mark = (value) => setLists((prev) => prev && sortLists(prev.map((item) => (item.code === list.code ? { ...item, starred: value } : item))));
+        mark(starred);
+        let ok = false;
+        try { ok = (await starAccountList(list.code, starred)).ok; } catch (_) { /* put it back below */ }
+        if (!ok) mark(!starred);
+    };
+
+    const removeList = async (list) => {
+        let ok = false;
+        try { ok = (await removeAccountList(list.code)).ok; } catch (_) { /* row stays */ }
+        if (ok) setLists((prev) => prev && prev.filter((item) => item.code !== list.code));
+        return ok;
+    };
 
     let body;
     if (!current.loaded) {
@@ -65,13 +142,14 @@ function AccountPage() {
                 {lists === null && <p>{t('Loading…')}</p>}
                 {lists && lists.length === 0 && <p>{t('No saved lists yet. Lists you make or load while signed in show up here.')}</p>}
                 {lists && lists.length > 0 && (
-                    <ul data-testid="account-lists">
-                        {lists.map((list) => (
-                            <li key={list.code}>
-                                <b>{list.name}</b> · {t('{tasks} tasks · {code}', { tasks: list.task_count, code: list.code })}
-                            </li>
-                        ))}
-                    </ul>
+                    <>
+                        <p className="sp-acct__muted">{t('Star the lists you use most to keep them at the top.')}</p>
+                        <ul className="sp-acct__lists" data-testid="account-lists">
+                            {lists.map((list) => (
+                                <ListRow key={list.code} list={list} onStar={toggleStar} onDelete={removeList} />
+                            ))}
+                        </ul>
+                    </>
                 )}
                 <p><a href="/play">{t('Host a game with your lists')}</a></p>
                 <h2>{t('Account')}</h2>

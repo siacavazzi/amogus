@@ -235,3 +235,47 @@ describe('GameConfigPage group tasks by default', () => {
         expect(contextValue.socket.emit).toHaveBeenCalledWith('open_room', { room_code: 'GRP2', group_tasks: false });
     });
 });
+
+describe('GameConfigPage saved lists: star and delete', () => {
+    beforeEach(() => {
+        localStorage.clear();
+        sessionStorage.clear();
+    });
+
+    const setup = () => {
+        const { contextValue } = renderWithContext(<GameConfigPage />, { roomCode: 'STAR1' });
+        act(() => {
+            contextValue.socket.on.mock.calls.filter(call => call[0] === 'my_task_lists').slice(-1)[0][1]({
+                lists: [
+                    { code: 'FAV001', name: 'Our house', task_count: 40, starred: true },
+                    { code: 'OLD001', name: 'Old party', task_count: 12, starred: false },
+                ],
+            });
+        });
+        contextValue.socket.emit.mockClear();
+        return contextValue;
+    };
+
+    it('stars a list', () => {
+        const contextValue = setup();
+        expect(screen.getByRole('button', { name: 'Unstar Our house' })).toHaveAttribute('aria-pressed', 'true');
+        fireEvent.click(screen.getByRole('button', { name: 'Star Old party' }));
+        expect(contextValue.socket.emit).toHaveBeenCalledWith('star_task_list', expect.objectContaining({ code: 'OLD001', starred: true }));
+        expect(screen.getByRole('button', { name: 'Unstar Old party' })).toHaveAttribute('aria-pressed', 'true');
+        // Starring doesn't pick the list.
+        expect(contextValue.socket.emit).not.toHaveBeenCalledWith('load_task_list', expect.anything());
+    });
+
+    it('asks before deleting, and "Keep it" deletes nothing', () => {
+        const contextValue = setup();
+        fireEvent.click(screen.getByRole('button', { name: 'Delete Old party' }));
+        expect(contextValue.socket.emit).not.toHaveBeenCalledWith('delete_task_list', expect.anything());
+        fireEvent.click(screen.getByRole('button', { name: 'Keep it' }));
+        expect(screen.queryByRole('button', { name: 'Yes, delete' })).not.toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Delete Old party' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Yes, delete' }));
+        expect(contextValue.socket.emit).toHaveBeenCalledWith('delete_task_list', expect.objectContaining({ code: 'OLD001' }));
+        expect(contextValue.socket.emit).not.toHaveBeenCalledWith('load_task_list', expect.anything());
+    });
+});

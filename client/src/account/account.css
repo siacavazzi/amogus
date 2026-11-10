@@ -148,3 +148,24 @@
 
 /* Placement */
 .sp-acct__corner { position: absolute; top: max(10px, env(safe-area-inset-top)); right: 12px; z-index: 5; }
+
+/* My lists: one row per saved list, with a star and a delete that asks first. */
+.sp-acct__lists { list-style: none; margin: 8px 0 16px; padding: 0; display: grid; gap: 8px; max-width: 560px; }
+.sp-acct__listrow { border: 1px solid #dde0ea; border-radius: 16px; background: #fff; color: #141726; padding: 6px; margin: 0; }
+.sp-acct__listmain { display: flex; align-items: center; gap: 6px; }
+.sp-acct__listtext { flex: 1; min-width: 0; display: grid; gap: 2px; padding: 4px 2px; }
+.sp-acct__listtext b { font-size: 17px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sp-acct__listtext span { font-size: 14px; color: #596079; }
+.sp-acct__icon {
+  appearance: none; border: 0; background: transparent; color: #596079; cursor: pointer; flex: none;
+  width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
+}
+.sp-acct__icon:hover { background: #eef1f8; }
+.sp-acct__icon:focus-visible { outline: 3px solid #1b4fd8; outline-offset: 1px; }
+.sp-acct__icon--on { color: #c27c00; }
+.sp-acct__icon[hidden] { display: none; }
+.sp-acct__confirm { border-top: 1px solid #eef1f8; margin: 6px 4px 2px; padding-top: 10px; display: grid; gap: 10px; }
+.sp-acct__confirm p { margin: 0; font-size: 15px; line-height: 1.4; }
+.sp-acct__confirmrow { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.info-prose .sp-acct__lists { padding-left: 0; }
+.info-prose .sp-acct__listrow { margin-bottom: 0; }

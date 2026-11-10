@@ -987,5 +987,13 @@
     "one": "joc jucat",
     "few": "jocuri jucate",
     "other": "de jocuri jucate"
-  }
+  },
+  "Starred": "Marcată cu stea",
+  "Star": "Marchează cu stea",
+  "Unstar {name}": "Scoate steaua de la {name}",
+  "Star {name}": "Marchează {name} cu stea",
+  "Delete this list? It leaves your lists, but anyone with the code can still play it.": "Ștergi lista? Dispare din listele tale, dar oricine are codul o poate juca în continuare.",
+  "Yes, delete": "Da, șterge",
+  "Keep it": "Păstreaz-o",
+  "Star the lists you use most to keep them at the top.": "Marchează cu stea listele pe care le folosești cel mai des ca să rămână sus."
 }

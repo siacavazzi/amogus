@@ -970,5 +970,13 @@
   "game played": {
     "one": "partie jouée",
     "other": "parties jouées"
-  }
+  },
+  "Starred": "Favori",
+  "Star": "Mettre en favori",
+  "Unstar {name}": "Retirer {name} des favoris",
+  "Star {name}": "Mettre {name} en favori",
+  "Delete this list? It leaves your lists, but anyone with the code can still play it.": "Supprimer cette liste ? Elle quitte tes listes, mais toute personne qui a le code peut encore y jouer.",
+  "Yes, delete": "Oui, supprimer",
+  "Keep it": "La garder",
+  "Star the lists you use most to keep them at the top.": "Mets en favori les listes que tu utilises le plus pour les garder en haut."
 }

@@ -136,6 +136,18 @@ export function fetchAccountLists() {
     return call('/api/account/lists');
 }
 
+/** Star or unstar one of the host's lists; starred lists sort to the top. */
+export function starAccountList(code, starred) {
+    return call('/api/account/lists/star', { method: 'POST', body: { code, starred } });
+}
+
+/** Take a list off My lists. Its code keeps working for anyone who has it. */
+export async function removeAccountList(code) {
+    const reply = await call('/api/account/lists/remove', { method: 'POST', body: { code } });
+    if (reply.ok) setState({ listsVersion: state.listsVersion + 1 });
+    return reply;
+}
+
 /** The signed-in player's game stats for My stats. */
 export function fetchAccountStats() {
     return call('/api/account/stats');

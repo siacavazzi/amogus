@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import { DataContext } from '../GameContext';
-import { Users, Play, ChevronDown, ChevronUp, List, Download, Trash2, Check, LogOut, MapPin, Settings, ArrowRight, ArrowLeft, X, Zap, Copy, Sparkles, Minus, Plus } from '../signal/icons';
+import { Users, Play, ChevronDown, ChevronUp, List, Download, Trash2, Check, Star, StarFilled, LogOut, MapPin, Settings, ArrowRight, ArrowLeft, X, Zap, Copy, Sparkles, Minus, Plus } from '../signal/icons';
 import { readGeneratedSetup, clearGameDraft } from './seo/gameDraft';
 import { readPendingSavedGame, clearPendingSavedGame } from '../utils/savedGame';
 import { AUTO_INTRUDERS_SUMMARY, AUTO_TASKS_SUMMARY, TASKS_PER_CREWMATE, playersForIntruders } from '../utils/intruders';
@@ -112,6 +112,24 @@ function getDeviceId() {
         localStorage.setItem('device_id', deviceId);
     }
     return deviceId;
+}
+
+// Asks before a saved list goes (lots of players are kids, and taps are easy).
+function DeleteListConfirm({ name, onYes, onNo }) {
+    const ref = useRef(null);
+    // The saved lists scroll in a short box; bring the question into view once.
+    useEffect(() => {
+        if (ref.current && ref.current.scrollIntoView) ref.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }, []);
+    return (
+        <div ref={ref} className="hs-confirm" role="group" aria-label={t('Delete {name}', { name })}>
+            <p>{t('Delete this list? It leaves your lists, but anyone with the code can still play it.')}</p>
+            <div className="hs-confirm__row">
+                <button type="button" className="sg-btn hs-confirm__yes" onClick={onYes}>{t('Yes, delete')}</button>
+                <button type="button" className="sg-btn sg-btn-line" onClick={onNo}>{t('Keep it')}</button>
+            </div>
+        </div>
+    );
 }
 
 function GameConfigPage() {
@@ -448,10 +466,18 @@ function GameConfigPage() {
         pickedViaRef.current = null;
     };
 
+    // Deleting asks first, on the row itself (lots of players are kids, and taps are easy).
+    const [confirmDeleteCode, setConfirmDeleteCode] = useState(null);
     const deleteTaskList = (code) => {
-        if (window.confirm('Are you sure you want to delete this task list?')) {
-            socket.emit('delete_task_list', { player_id: deviceId, code });
-        }
+        setConfirmDeleteCode(null);
+        socket.emit('delete_task_list', { player_id: deviceId, code });
+    };
+
+    const starTaskList = (list) => {
+        const starred = !list.starred;
+        // Show it at once; the server's reply brings the new order.
+        setMyTaskLists((prev) => prev.map((item) => (item.code === list.code ? { ...item, starred } : item)));
+        socket.emit('star_task_list', { player_id: deviceId, code: list.code, starred, lang: getLanguage() });
     };
 
     const handleOpenRoom = () => {
@@ -584,9 +610,10 @@ function GameConfigPage() {
                         <div className="hs-lists">
                             {myTaskLists.map((list) => {
                                 const selected = currentTaskList?.code === list.code;
+                                const confirming = confirmDeleteCode === list.code;
                                 return (
+                                    <React.Fragment key={list.code}>
                                     <div
-                                        key={list.code}
                                         role="button"
                                         tabIndex={0}
                                         aria-current={selected}
@@ -614,16 +641,39 @@ function GameConfigPage() {
                                             type="button"
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                deleteTaskList(list.code);
+                                                starTaskList(list);
+                                            }}
+                                            className={`hs-round hs-star${list.starred ? ' hs-star--on' : ''}`}
+                                            style={{ background: selected ? 'rgba(0,0,0,0.07)' : undefined }}
+                                            title={list.starred ? t('Starred') : t('Star')}
+                                            aria-pressed={Boolean(list.starred)}
+                                            aria-label={list.starred ? t('Unstar {name}', { name: list.name }) : t('Star {name}', { name: list.name })}
+                                        >
+                                            {list.starred ? <StarFilled size={20} /> : <Star size={20} />}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setConfirmDeleteCode(confirming ? null : list.code);
                                             }}
                                             className="hs-round"
                                             style={{ background: selected ? 'rgba(0,0,0,0.07)' : undefined, color: 'inherit' }}
                                             title={t('Delete')}
+                                            aria-expanded={confirming}
                                             aria-label={t('Delete {name}', { name: list.name })}
                                         >
                                             <Trash2 size={18} />
                                         </button>
                                     </div>
+                                    {confirming && (
+                                        <DeleteListConfirm
+                                            name={list.name}
+                                            onYes={() => deleteTaskList(list.code)}
+                                            onNo={() => setConfirmDeleteCode(null)}
+                                        />
+                                    )}
+                                    </React.Fragment>
                                 );
                             })}
                         </div>

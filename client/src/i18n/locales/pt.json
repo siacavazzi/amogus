@@ -970,5 +970,13 @@
   "game played": {
     "one": "partida jogada",
     "other": "partidas jogadas"
-  }
+  },
+  "Starred": "Favorita",
+  "Star": "Favoritar",
+  "Unstar {name}": "Tirar {name} dos favoritos",
+  "Star {name}": "Favoritar {name}",
+  "Delete this list? It leaves your lists, but anyone with the code can still play it.": "Apagar esta lista? Ela sai das suas listas, mas quem tiver o código ainda pode jogar.",
+  "Yes, delete": "Sim, apagar",
+  "Keep it": "Manter",
+  "Star the lists you use most to keep them at the top.": "Favorite as listas que você mais usa para deixá-las no topo."
 }

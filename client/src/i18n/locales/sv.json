@@ -970,5 +970,13 @@
   "game played": {
     "one": "runda spelad",
     "other": "rundor spelade"
-  }
+  },
+  "Starred": "Stjärnmärkt",
+  "Star": "Stjärnmärk",
+  "Unstar {name}": "Ta bort stjärnan från {name}",
+  "Star {name}": "Stjärnmärk {name}",
+  "Delete this list? It leaves your lists, but anyone with the code can still play it.": "Radera listan? Den försvinner från dina listor, men alla som har koden kan fortfarande spela den.",
+  "Yes, delete": "Ja, radera",
+  "Keep it": "Behåll den",
+  "Star the lists you use most to keep them at the top.": "Stjärnmärk listorna du använder mest så hamnar de högst upp."
 }

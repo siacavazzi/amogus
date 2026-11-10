@@ -2146,6 +2146,23 @@ def handle_delete_task_list(data):
         emit('error', {'message': 'Task list not in your saved lists.'})
 
 
+@socketio.on('star_task_list')
+def handle_star_task_list(data):
+    """Star or unstar one of the host's saved lists; starred lists sort to the top."""
+    player_id = list_owner(data)
+    code = data.get('code', '').upper() if isinstance(data.get('code'), str) else ''
+    if not player_id or not code:
+        emit('error', {'message': 'Player ID and code required'})
+        return
+    if task_list_manager.set_starred(code, player_id, bool(data.get('starred'))):
+        emit('my_task_lists', {
+            'lists': task_list_manager.get_player_task_lists(player_id),
+            'starter_template': task_list_manager.get_default_task_list_template(data.get('lang')),
+        })
+    else:
+        emit('error', {'message': 'Task list not in your saved lists.'})
+
+
 @socketio.on('duplicate_task_list')
 def handle_duplicate_task_list(data):
     """Duplicate a task list (for sharing/copying)."""

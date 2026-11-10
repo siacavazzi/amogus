@@ -970,5 +970,13 @@
   "game played": {
     "one": "runde spilt",
     "other": "runder spilt"
-  }
+  },
+  "Starred": "Stjernemerket",
+  "Star": "Stjernemerk",
+  "Unstar {name}": "Fjern stjernen fra {name}",
+  "Star {name}": "Stjernemerk {name}",
+  "Delete this list? It leaves your lists, but anyone with the code can still play it.": "Slette denne listen? Den forsvinner fra listene dine, men alle som har koden kan fortsatt spille den.",
+  "Yes, delete": "Ja, slett",
+  "Keep it": "Behold den",
+  "Star the lists you use most to keep them at the top.": "Stjernemerk listene du bruker mest, så ligger de øverst."
 }
