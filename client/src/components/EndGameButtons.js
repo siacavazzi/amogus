@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { DataContext } from '../GameContext';
 import { RotateCcw, LogOut, Check } from '../signal/icons';
-import GameFeedback, { PROMPT_DELAY_MS, PROMPT_AFTER_SAVE_MS } from './GameFeedback';
+import { useFeedbackPrompt } from './GameFeedback';
 import SaveGameButton from './SaveGameButton';
 import InstallPrompt from './InstallPrompt';
 import { t } from '../i18n';
@@ -10,9 +10,8 @@ function EndGameButtons() {
     const { socket, roomCode, resetVotes, isMobile, roundId } = useContext(DataContext);
     const [sending, setSending] = useState(false);
     // Play Again and Leave act straight away and call off the feedback prompt for this round.
-    const [skipFeedbackRound, setSkipFeedbackRound] = useState(null);
-    // The feedback prompt never covers Save this game: it waits until the player is done with it.
-    const [savedRound, setSavedRound] = useState(null);
+    // The prompt never covers Save this game either: it waits until the player is done with it.
+    const feedback = useFeedbackPrompt();
 
     const playerId = localStorage.getItem('player_id');
     // The reactor isn't a player, so it has no vote: its Play Again takes the room back to the lobby.
@@ -29,7 +28,7 @@ function EndGameButtons() {
     useEffect(() => setSending(false), [resetVotes]);
 
     const handlePlayAgain = () => {
-        setSkipFeedbackRound(roundId);
+        feedback.skipRound(roundId);
         if (!socket || sending) return;
         setSending(true);
         socket.emit('reset', isReactor
@@ -38,7 +37,7 @@ function EndGameButtons() {
     };
 
     const handleLeaveRoom = () => {
-        setSkipFeedbackRound(roundId);
+        feedback.skipRound(roundId);
         // Clear local storage first
         localStorage.removeItem('player_id');
         localStorage.removeItem('room_code');
@@ -71,13 +70,12 @@ function EndGameButtons() {
             >
                 {hasVoted ? <><Check size={20} strokeWidth={3} /> {t('Ready!')}</> : <><RotateCcw size={20} strokeWidth={3} /> {t('Play Again')}</>}
             </button>
-            {!isReactor && <SaveGameButton onDone={() => setSavedRound(roundId)} />}
+            {!isReactor && <SaveGameButton onDone={() => feedback.savedRound(roundId)} />}
             {!isReactor && <InstallPrompt />}
             <button onClick={handleLeaveRoom} className="sg-btn" style={{ background: 'transparent', color: 'var(--sg-ink)', minHeight: 48, padding: 10, fontWeight: 700, fontSize: 16 }}>
                 <LogOut size={18} />
                 <span>{t('Leave')}</span>
             </button>
-            {!hasVoted && skipFeedbackRound !== roundId && <GameFeedback key={roundId} delayMs={savedRound === roundId ? PROMPT_AFTER_SAVE_MS : PROMPT_DELAY_MS} />}
         </div>
     );
 }

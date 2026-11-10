@@ -226,6 +226,7 @@
   "Failed to save task list": "Kunne ikke lagre oppgavelisten",
   "Failed to update task list. You may not be the owner.": "Kunne ikke oppdatere oppgavelisten. Kanskje er det ikke du som eier den.",
   "Feedback did not save. Try again.": "Tilbakemeldingen ble ikke lagret. Prøv igjen.",
+  "Feedback did not save. Reconnect and try again.": "Tilbakemeldingen ble ikke lagret. Koble til på nytt og prøv igjen.",
   "Game not found": "Fant ikke spillet",
   "Give feedback after this round ends.": "Gi tilbakemelding når runden er over.",
   "Invalid task index": "Ugyldig oppgavenummer",

@@ -226,6 +226,7 @@
   "Failed to save task list": "Não foi possível salvar a lista de tarefas",
   "Failed to update task list. You may not be the owner.": "Não foi possível atualizar a lista. Talvez ela não seja sua.",
   "Feedback did not save. Try again.": "Sua opinião não foi salva. Tente de novo.",
+  "Feedback did not save. Reconnect and try again.": "Sua opinião não foi salva. Reconecte e tente de novo.",
   "Game not found": "Partida não encontrada",
   "Give feedback after this round ends.": "Dê sua opinião quando a rodada terminar.",
   "Invalid task index": "Número de tarefa inválido",

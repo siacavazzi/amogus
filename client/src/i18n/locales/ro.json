@@ -226,6 +226,7 @@
   "Failed to save task list": "Lista de sarcini nu a putut fi salvată",
   "Failed to update task list. You may not be the owner.": "Lista nu a putut fi actualizată. Poate nu e a ta.",
   "Feedback did not save. Try again.": "Părerea nu a fost salvată. Încearcă din nou.",
+  "Feedback did not save. Reconnect and try again.": "Părerea nu a fost salvată. Reconectează-te și încearcă din nou.",
   "Game not found": "Jocul nu a fost găsit",
   "Give feedback after this round ends.": "Spune-ți părerea după ce se termină runda.",
   "Invalid task index": "Număr de sarcină invalid",

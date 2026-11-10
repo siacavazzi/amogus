@@ -226,6 +226,7 @@
   "Failed to save task list": "Aufgabenliste konnte nicht gespeichert werden",
   "Failed to update task list. You may not be the owner.": "Liste konnte nicht aktualisiert werden. Vielleicht gehört sie dir nicht.",
   "Feedback did not save. Try again.": "Feedback wurde nicht gespeichert. Versuch es noch mal.",
+  "Feedback did not save. Reconnect and try again.": "Feedback wurde nicht gespeichert. Verbinde dich neu und versuch es noch mal.",
   "Game not found": "Spiel nicht gefunden",
   "Give feedback after this round ends.": "Gib Feedback, wenn die Runde vorbei ist.",
   "Invalid task index": "Ungültige Aufgabennummer",

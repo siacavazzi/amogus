@@ -106,3 +106,59 @@ class GameFeedbackTests(SocketGameTestCase):
         self.assertTrue(self.submit(comment='Another fun round.')['ok'])
         self.assertEqual(2, len(self.tracker.snapshot()['game_feedback']))
 
+
+    def reset_to_lobby(self):
+        self.clients[0].emit('reset', {'room_code': self.room, 'player_id': self.ids[0], 'force': True})
+        self.drain_all(self.clients)
+
+    def events(self):
+        return [json.loads(line) for line in Path(self.tracker.events_path).read_text().splitlines() if line.strip()]
+
+    def test_a_player_still_writing_when_play_again_resets_the_room_can_send_it(self):
+        self.finish()
+        ended_round = self.game.round_id
+        self.reset_to_lobby()
+        self.assertIsNone(self.game.end_state)
+        self.assertNotEqual(ended_round, self.game.round_id)
+        self.assertTrue(self.submit(round_id=ended_round, comment='Typed while the others tapped Play Again.')['ok'])
+        # Still one answer per player for that round, even after the reset.
+        self.assertTrue(self.submit(round_id=ended_round, comment='Sent twice.')['ok'])
+        rows = self.tracker.snapshot()['game_feedback']
+        self.assertEqual(1, len(rows))
+        self.assertEqual('victory', rows[0]['outcome'])
+        self.assertTrue(rows[0]['after_reset'])
+        # The lobby itself is not a round that ended.
+        self.assertFalse(self.submit(round_id=self.game.round_id)['ok'])
+
+    def test_late_feedback_closes_after_fifteen_minutes_or_once_the_next_round_ends(self):
+        self.finish()
+        ended_round = self.game.round_id
+        self.reset_to_lobby()
+        self.game.last_ended_round['reset_at'] -= server_app.FEEDBACK_AFTER_RESET_SECONDS + 1
+        self.assertFalse(self.submit(round_id=ended_round)['ok'])
+        self.game.last_ended_round['reset_at'] += server_app.FEEDBACK_AFTER_RESET_SECONDS + 1
+        self.start_game(self.clients[0], self.ids[0], self.clients)
+        self.assertTrue(self.submit(self.clients[1], player_id=self.ids[1], round_id=ended_round)['ok'])
+        self.finish()
+        self.assertFalse(self.submit(round_id=ended_round)['ok'])
+
+    def test_feedback_lifecycle_is_logged_without_the_rating_or_the_text(self):
+        self.assertFalse(self.submit(comment='Too early to say.')['ok'])
+        self.finish()
+        ended_round = self.game.round_id
+        for action in ['feedback_shown', 'feedback_open', 'feedback_later', 'feedback_snoozed',
+                       'feedback_abandoned', 'feedback_kept_open', 'not_an_action']:
+            self.clients[1].emit('client_metric', {'kind': 'end_screen_action', 'action': action})
+        self.reset_to_lobby()
+        self.assertTrue(self.submit(round_id=ended_round, rating='needs_work', comment='Secret words here.')['ok'])
+        events = self.events()
+        rejected = [e for e in events if e['event'] == 'feedback_rejected']
+        self.assertEqual(['wrong_round'], [e['reason'] for e in rejected])
+        saved = [e for e in events if e['event'] == 'feedback_saved']
+        self.assertEqual([True], [e['after_reset'] for e in saved])
+        actions = [e['action'] for e in events if e['event'] == 'end_screen_action']
+        self.assertEqual(['feedback_shown', 'feedback_open', 'feedback_later', 'feedback_snoozed',
+                          'feedback_abandoned', 'feedback_kept_open'], actions)
+        log = Path(self.tracker.events_path).read_text()
+        for text in ['Secret words here.', 'Too early to say.', 'needs_work']:
+            self.assertNotIn(text, log)
