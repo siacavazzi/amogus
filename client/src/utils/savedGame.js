@@ -36,6 +36,33 @@ export function rememberSavedGame(search = window.location.search, now = Date.no
     });
 }
 
+/** The saved game link this page was opened with (not one kept from before), or null. */
+export function readSavedGameLink(search = window.location.search, hash = window.location.hash) {
+    const params = new URLSearchParams(search || '');
+    const code = normalizeListCode(params.get(SAVED_GAME_PARAM));
+    if (!code) return null;
+    const group = hashParams(hash).get(GROUP_PARAM) || params.get(GROUP_PARAM);
+    return {
+        code,
+        group: isGroupToken(group) ? group : '',
+        via: params.get(FROM_PARAM) === 'welcome' ? 'welcome_back' : 'saved_link',
+    };
+}
+
+/** Takes the saved game out of the address once it is kept, so a reload doesn't open it twice. */
+export function clearSavedGameLinkFromUrl() {
+    try {
+        const url = new URL(window.location.href);
+        url.searchParams.delete(SAVED_GAME_PARAM);
+        url.searchParams.delete(FROM_PARAM);
+        url.searchParams.delete(GROUP_PARAM);
+        const hash = hashParams(url.hash);
+        hash.delete(GROUP_PARAM);
+        url.hash = hash.toString();
+        window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`);
+    } catch (_) { /* The address stays as it was. */ }
+}
+
 /** Keeps a list code an old invite link brought back, the same way as a saved game link. */
 export function keepSavedGame(value, now = Date.now(), { group = '', via = '' } = {}) {
     const code = normalizeListCode(value);

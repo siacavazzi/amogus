@@ -810,9 +810,7 @@
   },
   "Save this game": "Salvează acest joc",
   "Link copied": "Link copiat",
-  "Send yourself the link to host it later with these tasks": "Trimite-ți linkul ca să-l organizezi mai târziu cu aceste sarcini",
   "Send yourself the link to play again later": "Trimite-ți linkul ca să joci din nou mai târziu",
-  "Our Sus Party game. Open it to host it again with the same tasks.": "Jocul nostru Sus Party. Deschide-l ca să-l organizezi din nou cu aceleași sarcini.",
   "Sus Party: the real-life social deduction game": "Sus Party: jocul de deducție socială din viața reală",
   "Keep Sus Party on your home screen": "Păstrează Sus Party pe ecranul de pornire",
   "Tap the Share button, then \"Add to Home Screen\", so your next game is one tap away.": "Atinge butonul Partajează, apoi „Adaugă pe ecranul principal”, ca următorul joc să fie la o atingere distanță.",
@@ -988,5 +986,9 @@
     "one": "joc jucat",
     "few": "jocuri jucate",
     "other": "de jocuri jucate"
-  }
+  },
+  "Opening your saved game…": "Se deschide jocul tău salvat…",
+  "Joining your group…": "Intri la grupul tău…",
+  "Our Sus Party game. Open the link to play it again with the same tasks.": "Jocul nostru Sus Party. Deschide linkul ca să-l jucăm din nou cu aceleași sarcini.",
+  "Send it to your group chat. The first to open it hosts, everyone else joins.": "Trimite-l în chatul grupului. Cine îl deschide primul organizează, ceilalți intră."
 }

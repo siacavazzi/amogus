@@ -33,7 +33,7 @@ function SaveGameButton({ onDone }) {
         const outcome = await shareLink({
             url: savedGameUrl(code, window.location.origin, { group }),
             title: 'Sus Party',
-            text: code ? t('Our Sus Party game. Open it to host it again with the same tasks.') : t('Sus Party: the real-life social deduction game'),
+            text: code ? t('Our Sus Party game. Open the link to play it again with the same tasks.') : t('Sus Party: the real-life social deduction game'),
         });
         setResult(outcome);
         if (outcome !== 'failed') onDone?.();
@@ -54,7 +54,7 @@ function SaveGameButton({ onDone }) {
                 {result === 'copied' ? <><Check size={18} strokeWidth={3} /> {t('Link copied')}</> : <><Share2 size={18} /> {t('Save this game')}</>}
             </button>
             <p className="sg-small" style={{ textAlign: 'center', opacity: 0.7 }}>
-                {code ? t('Send yourself the link to host it later with these tasks') : t('Send yourself the link to play again later')}
+                {code ? t('Send it to your group chat. The first to open it hosts, everyone else joins.') : t('Send yourself the link to play again later')}
             </p>
         </div>
     );

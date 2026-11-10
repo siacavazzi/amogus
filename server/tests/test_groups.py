@@ -168,3 +168,82 @@ class GroupBookStoreTests(SocketGameTestCase):
             self.assertIsNone(book.room_started('../etc'))
             self.assertIsNone(book.recap(None))
             self.assertEqual({}, book.groups)
+
+
+class SavedGameLinkOpensRoomTests(SocketGameTestCase):
+    """A "Save this game" link in the group chat: the first friend to open it hosts a new room
+    with that game's tasks and settings, everyone after joins that room, and once that room is
+    over the next tap opens a fresh one again."""
+
+    def played_game(self):
+        clients, room, ids, game = self.setup_started_game(4)
+        game.end_state = 'victory'
+        game.emit_to_room('end_game', {'result': 'victory', 'stats': game.stats})
+        server_app.game_manager.delete_game(room)
+        return game
+
+    def open_link(self, client, token, create=True):
+        return client.emit('open_saved_game', {'group_link': token, 'create': create}, callback=True)
+
+    def test_first_tap_hosts_the_next_tap_joins_and_the_link_works_again_later(self):
+        first = self.played_game()
+        host = self.make_client()
+        self.assertEqual({'action': 'created'}, self.open_link(host, first.link_token))
+        room = self.first_event(self.drain(host), 'game_created')['room_code']
+        game = server_app.game_manager.get_game(room)
+        self.assertEqual(first.group_id, game.group_id)
+        self.assertEqual('saved_link', game.group_via)
+
+        # A friend taps while the host is still in setup: same room (they wait for it to open).
+        friend = self.make_client()
+        self.assertEqual({'action': 'join', 'room_code': room, 'link_token': game.link_token},
+                         self.open_link(friend, first.link_token))
+        self.assertEqual(1, len(server_app.game_manager.games))
+
+        # The host closes the page in setup: the next tap opens a fresh room instead of a dead one.
+        host.disconnect()
+        later = self.make_client()
+        self.assertEqual({'action': 'created'}, self.open_link(later, first.link_token))
+        self.drain(later)
+
+    def test_an_open_room_with_players_is_joined(self):
+        first = self.played_game()
+        clients, room, ids, game = GroupLinkTests.lobby_from_link(self, 3, first.link_token, via='saved_link')
+        phone = self.make_client()
+        self.assertEqual('join', self.open_link(phone, first.link_token)['action'])
+        phone.emit('join_game', {'room_code': room, 'entry_method': 'saved_link', 'link_token': game.link_token})
+        self.assertIsNotNone(self.first_event(self.drain(phone), 'game_joined'))
+
+    def test_a_laptop_asks_first_and_creates_nothing(self):
+        first = self.played_game()
+        laptop = self.make_client()
+        self.assertEqual({'action': 'none'}, self.open_link(laptop, first.link_token, create=False))
+        self.assertEqual({}, server_app.game_manager.games)
+
+    def test_a_page_already_back_in_a_room_stays_there(self):
+        first = self.played_game()
+        clients, room, ids, game = self.setup_lobby(3)
+        self.assertEqual({'action': 'busy'}, self.open_link(clients[1], first.link_token))
+        self.assertEqual(1, len(server_app.game_manager.games))
+
+    def test_the_new_room_starts_with_the_saved_settings(self):
+        clients, room, ids, game = self.setup_lobby(4)
+        clients[0].emit('update_game_config', {'room_code': room, 'config': {'vote_time': 45, 'meltdown_time': 75, 'num_intruders': 1}})
+        self.drain_all(clients)
+        self.add_tasks(clients[0], room, 12)
+        self.drain_all(clients)
+        self.start_game(clients[0], ids[0], clients)
+        token = game.link_token
+        server_app.game_manager.delete_game(room)
+
+        host = self.make_client()
+        self.open_link(host, token)
+        config = self.first_event(self.drain(host), 'game_config')
+        self.assertEqual((45, 75, 1), (config['vote_time'], config['meltdown_time'], config['num_intruders']))
+
+    def test_a_link_without_a_known_group_still_hosts(self):
+        host = self.make_client()
+        self.assertEqual({'action': 'created'}, self.open_link(host, None))
+        room = self.first_event(self.drain(host), 'game_created')['room_code']
+        game = server_app.game_manager.get_game(room)
+        self.assertEqual(game.link_token, game.group_id)

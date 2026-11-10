@@ -33,9 +33,8 @@ test("any player starts the group's next game from the welcome back card, and fr
     await expect(card.getByTestId('group-recap-rounds')).toContainText('1');
     await expect(card.getByTestId('group-recap-crew')).toContainText('1');
     await expect(card.getByTestId('group-recap-intruders')).toContainText('0');
+    // One tap: the card's link opens a room for the group straight away, with the game's tasks.
     await card.getByRole('link', { name: 'Play it again' }).click();
-    await expect(alex).toHaveURL(/from=welcome/);
-    await alex.getByText('Create New Game').first().click();
     await expect(alex.getByText('Use This Task List').first()).toBeVisible({ timeout: 20000 });
 
     // Jules opens the card a minute later: the group already has a room, so the card joins it.

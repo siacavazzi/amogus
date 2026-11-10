@@ -9,7 +9,7 @@ import { getAcquisition } from '../seo/discovery';
 import RoomEntryNotice from '../components/RoomEntryNotice';
 import { getRoomCodeFromSearch, clearRoomCodeFromUrl } from '../utils/inviteLinks';
 import { readGeneratedSetup, claimGeneratedRoomCreation } from './seo/gameDraft';
-import { rememberSavedGame, keepSavedGame, readPendingGroup } from '../utils/savedGame';
+import { rememberSavedGame, keepSavedGame, readPendingGroup, readSavedGameLink, clearSavedGameLinkFromUrl, clearPendingSavedGame } from '../utils/savedGame';
 import { t } from '../i18n';
 import LanguagePicker from '../components/LanguagePicker';
 import LaptopHostPrompt, { laptopHasHosted } from '../components/LaptopHostPrompt';
@@ -31,6 +31,10 @@ function LobbyPage() {
     const autoCreated = useRef(false);
     // A "Save this game" link: the tasks wait on this phone until it next creates a room.
     const [savedGameCode] = useState(() => rememberSavedGame());
+    // Opened from that link just now: join the group's room if it's on, else host a new one with these tasks.
+    const [savedGameLink] = useState(() => (readGeneratedSetup() || getRoomCodeFromSearch() ? null : readSavedGameLink()));
+    const [openingSavedGame, setOpeningSavedGame] = useState(() => (savedGameLink ? 'opening' : null));
+    const savedGameAsked = useRef(false);
 
     useEffect(() => {
         // A game that has ended is not a code to retry, so its code stays out of the box.
@@ -110,28 +114,81 @@ function LobbyPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [socket, generatedSetup]);
 
+    const joinRoom = (roomCode, join) => {
+        setIsJoining(true);
+        setError('');
+        setRoomEntryStatus(null);
+        const playerId = localStorage.getItem('player_id');
+        if (playerId && localStorage.getItem('room_code') === roomCode) {
+            socket.emit('rejoin', { player_id: playerId });
+        } else {
+            socket.emit('join_game', { room_code: roomCode, ...join });
+        }
+        clearTimeout(entryTimeout.current);
+        entryTimeout.current = setTimeout(() => {
+            setIsJoining(false);
+            setRoomEntryStatus({ code: 'connection_timeout', room_code: roomCode,
+                message: 'The room did not respond. Check your internet connection, then try again.' });
+        }, 10000);
+    };
+
     const handleJoinGame = (e) => {
         e?.preventDefault();
         if (inputRoomCode.length !== 4) {
             setError('Room code must be 4 letters');
             return;
         }
-        setIsJoining(true);
-        setError('');
-        setRoomEntryStatus(null);
-        const playerId = localStorage.getItem('player_id');
-        if (playerId && localStorage.getItem('room_code') === inputRoomCode) {
-            socket.emit('rejoin', { player_id: playerId });
-        } else {
-            socket.emit('join_game', { room_code: inputRoomCode, entry_method: 'typed' });
-        }
-        clearTimeout(entryTimeout.current);
-        entryTimeout.current = setTimeout(() => {
-            setIsJoining(false);
-            setRoomEntryStatus({ code: 'connection_timeout', room_code: inputRoomCode,
-                message: 'The room did not respond. Check your internet connection, then try again.' });
-        }, 10000);
+        joinRoom(inputRoomCode, { entry_method: 'typed' });
     };
+
+    // The server picks join or host in one step, so friends who tap the link together share a room.
+    // A laptop that has never hosted asks first (everyone plays on a phone), so it only looks.
+    const mounted = useRef(true);
+    useEffect(() => {
+        mounted.current = true;
+        return () => { mounted.current = false; };
+    }, []);
+    useEffect(() => {
+        if (!socket || !savedGameLink || savedGameAsked.current) return undefined;
+        clearSavedGameLinkFromUrl();
+        const ask = () => {
+            if (savedGameAsked.current) return;
+            savedGameAsked.current = true;
+            let answered = false;
+            setTimeout(() => { if (mounted.current && !answered) setOpeningSavedGame(null); }, 8000);
+            socket.emit('open_saved_game', {
+                group_link: savedGameLink.group || undefined,
+                group_via: savedGameLink.via,
+                create: isMobile || laptopHasHosted(),
+                acquisition: getAcquisition(),
+            }, (response) => {
+                answered = true;
+                if (!mounted.current) return;
+                const action = response?.action;
+                if (action === 'join' && response.room_code) {
+                    // Joining, not hosting: these tasks are the host's, so this phone doesn't keep them.
+                    clearPendingSavedGame();
+                    setInputRoomCode(response.room_code);
+                    setOpeningSavedGame('joining');
+                    joinRoom(response.room_code, { entry_method: 'saved_link', link_token: response.link_token });
+                } else if (action === 'created') {
+                    setIsCreating(true);
+                } else {
+                    setOpeningSavedGame(null);
+                    if (action === 'none') setShowLaptopPrompt(true);
+                }
+            });
+        };
+        if (socket.connected) ask();
+        else socket.once('connect', ask);
+        return () => { socket.off('connect', ask); };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [socket, savedGameLink]);
+
+    // Once the room answers (joined, waiting for the host, round already on), its own notice takes over.
+    useEffect(() => {
+        if (roomEntryStatus) setOpeningSavedGame(null);
+    }, [roomEntryStatus]);
 
     // An old invite link: start a new room, with that game's tasks when the link brought them back.
     const startFromEndedGame = () => {
@@ -158,6 +215,14 @@ function LobbyPage() {
         dismissTutorialPrompt();
         setShowTutorialPrompt(false);
     };
+
+    const savedGameNote = (openingSavedGame || savedGameCode) && !roomEntryStatus ? (
+        <p className="sg-small" role="status" data-testid="saved-game-note" style={{ background: '#fff', color: 'var(--sg-ink)', borderRadius: 14, padding: '10px 12px', fontWeight: 700 }}>
+            {openingSavedGame === 'joining' ? t('Joining your group…')
+                : openingSavedGame ? t('Opening your saved game…')
+                : t('Saved game ready. Create a new game to host it with the same tasks.')}
+        </p>
+    ) : null;
 
     const connectedLine = (
         <p className="sg-small" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, opacity: 0.7 }}>
@@ -202,11 +267,7 @@ function LobbyPage() {
                     </form>
 
                     {!savedGameCode && !generatedSetup && !roomEntryStatus && !getRoomCodeFromSearch() && <WelcomeBackCard style={{ margin: '0 auto' }} />}
-                    {savedGameCode && (
-                        <p className="sg-small" role="status" style={{ background: '#fff', color: 'var(--sg-ink)', borderRadius: 14, padding: '10px 12px', fontWeight: 700 }}>
-                            {t('Saved game ready. Create a new game to host it with the same tasks.')}
-                        </p>
-                    )}
+                    {savedGameNote}
                     <p className="sg-small sg-home__or">{t('or start one')}</p>
                     <button type="button" className="sg-btn sg-btn-ink" onClick={handleCreateGame} disabled={isCreating}>
                         {isCreating ? t('Creating Room...') : <><Plus size={22} /> {t('Create New Game')}</>}
@@ -260,6 +321,7 @@ function LobbyPage() {
                         {error && (
                             <p className="sg-home__error" role="alert"><AlertTriangle size={18} /> {error}</p>
                         )}
+                        {savedGameNote}
                         <form onSubmit={handleJoinGame} className="sg-home__join">
                             <label htmlFor="game-entry-code" className="sg-lede">{t('Enter Room Code')}</label>
                             <input
