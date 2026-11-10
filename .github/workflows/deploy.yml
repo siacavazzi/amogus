@@ -4,6 +4,9 @@ name: Deploy to beta
 # Manual only: Actions tab > "Deploy to beta" > Run workflow (branch main). Merging to main
 # no longer deploys, so several PRs can merge without each one waiting on a full beta deploy;
 # every PR is already tested by "Check a change" before it merges.
+# No tests run here, so beta updates in a few minutes: it builds, copies, restarts and checks
+# /health. "Run tests" (Actions tab) plays the whole suite on beta whenever you want it, and
+# "Promote beta to prod" always plays it again before anything reaches prod.
 # Open https://susparty.com/?beta=1 to use it, ?beta=0 to go back to prod.
 # The "Promote beta to prod" workflow copies what is on beta into prod.
 
@@ -19,9 +22,6 @@ concurrency:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-24.04
-    outputs:
-      matrix: ${{ steps.scope.outputs.matrix }}
-      specs: ${{ steps.scope.outputs.specs }}
 
     steps:
       # Promote copies beta into prod, so beta only ever runs merged code.
@@ -35,18 +35,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      # When everything between prod and main is site-only (.github/scripts/change-scope.py),
-      # the browser jobs below only open the site pages instead of playing every game.
-      - name: Decide which browser tests to play on beta
-        id: scope
-        run: |
-          prod="$(curl -sf https://susparty.com/api/version | jq -r '.commit // empty' || true)"
-          if [ -n "$prod" ] && git rev-parse --verify -q "$prod^{commit}" > /dev/null; then
-            python3 .github/scripts/change-scope.py "$prod" HEAD
-          else
-            python3 .github/scripts/change-scope.py --full
-          fi
 
       # Each deploy gets a version like 2026.10.17.42 (UTC build date + workflow
       # run number). The client build embeds it and the server reads version.json.
@@ -64,16 +52,7 @@ jobs:
             echo "REACT_APP_BUILT_AT=$BUILT_AT"
           } >> "$GITHUB_ENV"
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Run server tests
-        run: |
-          pip install -q -r server/requirements.txt pytest
-          python -m pytest server/tests -q
-
+      # No tests here (see the top of this file). "Run tests" plays them on beta by hand.
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -85,33 +64,11 @@ jobs:
         working-directory: ./client
         run: npm ci --legacy-peer-deps
 
-      - name: Run client tests
-        working-directory: ./client
-        run: npm test -- --watchAll=false
-        env:
-          CI: true
-
       - name: Build React app
         working-directory: ./client
         run: npm run build
         env:
           CI: false  # Don't treat warnings as errors
-
-      - name: Check production pages in browser
-        working-directory: ./client
-        run: node scripts/check-built-app.js
-
-      - name: Check crawl access and page metadata
-        working-directory: ./client
-        run: node scripts/check-seo.js
-
-      - name: Check Nginx page routing
-        # apt hung for hours on 2026-10-31 (two runs stuck installing nginx); fail fast instead.
-        timeout-minutes: 10
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y nginx
-          python3 deploy/tests/check-seo-nginx.py
 
       - name: Setup SSH
         run: |
@@ -212,56 +169,5 @@ jobs:
           echo
           echo "Beta version: $(curl -s --cookie 'sus_channel=beta' https://susparty.com/api/version)"
           echo "Prod version: $(curl -s https://susparty.com/api/version)"
-
-      # Scripted phones play whole games on beta over the real WebSocket: 5 players (join, tasks,
-      # both intruder cards, a reconnect, a meeting and vote, the win, two last stands), then 40.
-      # Their rooms are marked synthetic, so they stay out of usage stats.
-      - name: Check the server plays a full game (sockets only, no browser)
-        working-directory: ./client
-        run: |
-          node scripts/e2e-live.js https://susparty.com --beta --browser --expect-commit "$REACT_APP_COMMIT"
-          node scripts/e2e-live.js https://susparty.com --beta --players 40 --expect-commit "$REACT_APP_COMMIT"
-
-  # Real browser pages for the reactor and the phones play whole games on beta, split across
-  # parallel jobs. Each test makes its own room, so they don't get in each other's way.
-  browser:
-    name: Browser games on beta (${{ matrix.name }})
-    needs: build-and-deploy
-    runs-on: ubuntu-24.04
-    strategy:
-      fail-fast: false
-      # Every game in five shards, or only the site pages for a site-only release (see the scope step)
-      matrix: ${{ fromJSON(needs.build-and-deploy.outputs.matrix) }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-          cache-dependency-path: client/package-lock.json
-      - name: Install dependencies
-        working-directory: ./client
-        run: npm ci --legacy-peer-deps
-      - name: Install the test browser
-        working-directory: ./client
-        run: npx playwright install --with-deps ${{ matrix.project }}
-      - name: Play games in real browsers on beta
-        working-directory: ./client
-        run: npx playwright test -c e2e --project ${{ matrix.project }} --shard ${{ matrix.shard }} ${{ needs.build-and-deploy.outputs.specs }}
-        env:
-          E2E_BASE_URL: https://susparty.com
-          E2E_BETA: '1'
-          E2E_WEBKIT: ${{ matrix.project == 'webkit' && '1' || '' }}
-      - name: List known bugs
-        if: always()
-        working-directory: ./client
-        run: node scripts/e2e-summary.js >> "$GITHUB_STEP_SUMMARY"
-      - name: Keep the browser test report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: browser-${{ matrix.project }}-${{ strategy.job-index }}
-          path: |
-            client/e2e/report
-            client/e2e/results
-          if-no-files-found: ignore
+          beta_commit="$(curl -s --cookie 'sus_channel=beta' https://susparty.com/api/version | jq -r '.commit // empty')"
+          [ "$beta_commit" = "$REACT_APP_COMMIT" ] || { echo "Beta isn't running $REACT_APP_COMMIT (it says '$beta_commit')" >&2; exit 1; }

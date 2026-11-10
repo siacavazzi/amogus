@@ -1,0 +1,159 @@
+name: Run tests
+
+# Run by hand from the Actions tab whenever you want the whole suite: Actions > "Run tests" >
+# Run workflow. "Deploy to beta" no longer runs tests, so this is how beta gets checked before
+# a promote (which also replays the same games on beta itself before it touches prod).
+#
+# It plays against https://susparty.com/?beta=1 with the tests from the exact commit beta runs:
+#   1. server tests, client tests, the build and its page / crawl / Nginx checks
+#   2. scripted phones play full games on beta over sockets (5 and 40 players)
+#   3. real Chromium and Safari pages play every browser game on beta (five shards)
+# Test rooms are marked synthetic, so they stay out of usage stats. Nothing is deployed.
+#
+# To test a branch against a local server in CI instead, run "Check a change" on that branch.
+
+on:
+  workflow_dispatch:
+
+# Runners are pinned to Ubuntu 24.04: ubuntu-latest moved to 26.04, where the Playwright
+# version in client/package.json can't install its browsers.
+jobs:
+  beta:
+    name: Find the beta build
+    runs-on: ubuntu-24.04
+    outputs:
+      commit: ${{ steps.version.outputs.commit }}
+      sha: ${{ steps.version.outputs.sha }}
+      matrix: ${{ steps.scope.outputs.matrix }}
+      specs: ${{ steps.scope.outputs.specs }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Show what is on beta
+        id: version
+        run: |
+          beta="$(curl -sf --cookie 'sus_channel=beta' https://susparty.com/api/version)"
+          echo "Beta (testing): $beta"
+          echo "Prod: $(curl -s https://susparty.com/api/version)"
+          commit="$(echo "$beta" | jq -r '.commit // empty')"
+          if [ -z "$commit" ]; then
+            echo "Beta didn't say which commit it runs, so its tests can't be matched to it." >&2
+            exit 1
+          fi
+          echo "commit=$commit" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git rev-parse --verify "$commit^{commit}")" >> "$GITHUB_OUTPUT"
+      - name: Play every browser game
+        id: scope
+        run: python3 .github/scripts/change-scope.py --full
+
+  unit:
+    name: Server and client tests
+    needs: beta
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.beta.outputs.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run server tests
+        run: |
+          pip install -q -r server/requirements.txt pytest
+          python -m pytest server/tests -q
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+      - name: Install dependencies
+        working-directory: ./client
+        run: npm ci --legacy-peer-deps
+      - name: Run client tests
+        working-directory: ./client
+        run: npm test -- --watchAll=false
+        env:
+          CI: true
+      - name: Build React app
+        working-directory: ./client
+        run: npm run build
+        env:
+          CI: false
+      - name: Check production pages in browser
+        working-directory: ./client
+        run: node scripts/check-built-app.js
+      - name: Check crawl access and page metadata
+        working-directory: ./client
+        run: node scripts/check-seo.js
+      - name: Check Nginx page routing
+        timeout-minutes: 10
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y nginx
+          python3 deploy/tests/check-seo-nginx.py
+
+  socket-games:
+    name: Server plays full games on beta (sockets)
+    needs: beta
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.beta.outputs.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+      - name: Install dependencies
+        working-directory: ./client
+        run: npm ci --legacy-peer-deps
+      - name: Play full games with 5 and 40 players
+        working-directory: ./client
+        run: |
+          node scripts/e2e-live.js https://susparty.com --beta --browser --expect-commit "${{ needs.beta.outputs.commit }}"
+          node scripts/e2e-live.js https://susparty.com --beta --players 40 --expect-commit "${{ needs.beta.outputs.commit }}"
+
+  browser:
+    name: Browser games on beta (${{ matrix.name }})
+    needs: beta
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.beta.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.beta.outputs.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+      - name: Install dependencies
+        working-directory: ./client
+        run: npm ci --legacy-peer-deps
+      - name: Install the test browser
+        working-directory: ./client
+        run: npx playwright install --with-deps ${{ matrix.project }}
+      - name: Play games in real browsers on beta
+        working-directory: ./client
+        run: npx playwright test -c e2e --project ${{ matrix.project }} --shard ${{ matrix.shard }} ${{ needs.beta.outputs.specs }}
+        env:
+          E2E_BASE_URL: https://susparty.com
+          E2E_BETA: '1'
+          E2E_WEBKIT: ${{ matrix.project == 'webkit' && '1' || '' }}
+      - name: List known bugs
+        if: always()
+        working-directory: ./client
+        run: node scripts/e2e-summary.js >> "$GITHUB_STEP_SUMMARY"
+      - name: Keep the browser test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-${{ matrix.project }}-${{ strategy.job-index }}
+          path: |
+            client/e2e/report
+            client/e2e/results
+          if-no-files-found: ignore
