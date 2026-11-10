@@ -61,8 +61,8 @@ const SUSPECTS = [
 ];
 
 const FAQS = [
-    { q: 'Is Sus Party an app?', a: 'No. Sus Party is a website you open in your phone’s browser, with nothing to download from the App Store or Google Play, and it isn’t related to any app with a similar name. It’s also a physical game: players get up and move around a real place doing real tasks, instead of passing a phone around a table.' },
-    { q: 'Is it free?', a: 'Yes. It’s free to play with no ads, and players don’t need an account. Everyone opens susparty.com in their phone’s browser.' },
+    { q: 'Is Sus Party an app?', a: 'No, and that’s on purpose. Sus Party is a website you open in your phone’s browser, because a party game should start in seconds and downloads and setup are where groups give up. With a link, everyone joins from any phone and you’re playing in two minutes. It’s also a physical game: players get up and move around a real place doing real tasks, instead of sitting around one phone. It isn’t related to any app with a similar name.' },
+    { q: 'Is it free?', a: 'Yes, and the game will always be free to play. We don’t want to nickel-and-dime anyone. No ads, and players don’t need an account.' },
     { q: 'How many people can play?', a: '3 to 20+. Bigger groups get more intruders, and the task generator builds packs for up to 30 players.' },
     { q: 'Where do you play?', a: 'Anywhere people can walk around: a house, apartment, dorm, office, library or camp. Tasks are spread across rooms so people split up.' },
     { q: 'Do we need to be together?', a: 'Yes. The phones connect online, but everyone plays in the same place. Kills, bodies and meetings happen in real life.' },
@@ -276,13 +276,14 @@ function LandingPage() {
                 <div className="sl-wrap">
                     <h2 id="sl-noapp-h" className="sl-h2">No app. Just a link.</h2>
                     <p className="sl-body sl-noapp__body">
-                        Sus Party is a website, not an app. Open the link or type the code on any phone, iPhone or
-                        Android, and you’re in. Nothing to install, and no account needed to play.
+                        Sus Party is a website, not an app, and that’s on purpose. No download, no setup, no account
+                        needed to play. Open the link on any phone, iPhone or Android, and you’re in.
                     </p>
                     <p className="sl-body sl-noapp__body">
                         And it isn’t a game you play sitting down. Everyone gets up and moves around a real place,
                         doing real tasks while someone sneaks around them.
                     </p>
+                    <p className="sl-body sl-noapp__body"><strong>Free to play, and it always will be.</strong></p>
                 </div>
             </section>
 

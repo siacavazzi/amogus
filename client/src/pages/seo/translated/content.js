@@ -40,9 +40,9 @@ const fr = {
         ],
         irlLink: 'Comment jouer à Among Us en vrai →',
         faqs: [
-            ['Faut-il télécharger une appli ?', "Non. Sus Party est un site web, pas une appli : rien à télécharger sur l'App Store ou Google Play, et aucun lien avec une appli au nom proche. Tout se joue dans le navigateur du téléphone. Il faut juste une connexion internet."],
+            ['Faut-il télécharger une appli ?', "Non. Sus Party est un site web, pas une appli : rien à télécharger sur l'App Store ou Google Play, et aucun lien avec une appli au nom proche. Tout se joue dans le navigateur du téléphone. Il faut juste une connexion internet. C'est voulu : sans téléchargement ni installation, la partie démarre en deux minutes."],
             ['Combien de joueurs faut-il ?', "De 3 à 20+. Pour une première partie, 5 à 8 joueurs avec un intrus, c'est parfait."],
-            ["C'est gratuit ?", 'Oui, sans publicité et sans compte.'],
+            ["C'est gratuit ?", 'Oui, et le jeu restera toujours gratuit. Sans publicité, et sans compte pour jouer.'],
         ],
     },
     irl: {
@@ -108,9 +108,9 @@ const es = {
         ],
         irlLink: 'Cómo jugar Among Us en la vida real →',
         faqs: [
-            ['¿Hay que descargar una app?', 'No. Sus Party es un sitio web, no una app: no hay nada que descargar de App Store ni de Google Play, y no tiene relación con ninguna app de nombre parecido. Todo funciona en el navegador del teléfono. Solo se necesita internet.'],
+            ['¿Hay que descargar una app?', 'No. Sus Party es un sitio web, no una app: no hay nada que descargar de App Store ni de Google Play, y no tiene relación con ninguna app de nombre parecido. Todo funciona en el navegador del teléfono. Solo se necesita internet. Es a propósito: sin descargas ni instalación, la partida empieza en dos minutos.'],
             ['¿Cuántos jugadores se necesitan?', 'De 3 a 20+. Para la primera partida, de 5 a 8 jugadores con un intruso funciona muy bien.'],
-            ['¿Es gratis?', 'Sí, sin anuncios y sin cuenta.'],
+            ['¿Es gratis?', 'Sí, y el juego siempre será gratis. Sin anuncios y sin cuenta para jugar.'],
         ],
     },
     irl: {
@@ -176,9 +176,9 @@ const de = {
         ],
         irlLink: 'So spielt ihr Among Us im echten Leben →',
         faqs: [
-            ['Brauchen wir eine App?', 'Nein. Sus Party ist eine Website, keine App: Im App Store oder bei Google Play gibt es nichts zu laden, und mit Apps mit ähnlichem Namen hat Sus Party nichts zu tun. Alles läuft im Handy-Browser. Ihr braucht nur Internet.'],
+            ['Brauchen wir eine App?', 'Nein. Sus Party ist eine Website, keine App: Im App Store oder bei Google Play gibt es nichts zu laden, und mit Apps mit ähnlichem Namen hat Sus Party nichts zu tun. Alles läuft im Handy-Browser. Ihr braucht nur Internet. Das ist Absicht: Ohne Download und ohne Einrichtung startet das Spiel in zwei Minuten.'],
             ['Wie viele Spieler braucht man?', '3 bis 20+. Für die erste Runde passen 5 bis 8 Spieler mit einem Eindringling gut.'],
-            ['Ist es kostenlos?', 'Ja, ohne Werbung und ohne Konto.'],
+            ['Ist es kostenlos?', 'Ja, und das Spiel bleibt immer kostenlos. Ohne Werbung und ohne Konto zum Spielen.'],
         ],
     },
     irl: {
@@ -244,9 +244,9 @@ const ro = {
         ],
         irlLink: 'Cum se joacă Among Us în viața reală →',
         faqs: [
-            ['Trebuie să descărcăm o aplicație?', 'Nu. Sus Party este un site, nu o aplicație: nu aveți nimic de descărcat din App Store sau Google Play și nu are legătură cu nicio aplicație cu nume asemănător. Totul merge în browserul telefonului. Aveți nevoie doar de internet.'],
+            ['Trebuie să descărcăm o aplicație?', 'Nu. Sus Party este un site, nu o aplicație: nu aveți nimic de descărcat din App Store sau Google Play și nu are legătură cu nicio aplicație cu nume asemănător. Totul merge în browserul telefonului. Aveți nevoie doar de internet. E intenționat: fără descărcare și fără instalare, jocul începe în două minute.'],
             ['Câți jucători sunt necesari?', 'Între 3 și 20+. Pentru primul joc, 5–8 jucători cu un intrus merg foarte bine.'],
-            ['Este gratuit?', 'Da, fără reclame și fără cont.'],
+            ['Este gratuit?', 'Da, și jocul va rămâne mereu gratuit. Fără reclame și fără cont pentru a juca.'],
         ],
     },
     irl: {
@@ -312,9 +312,9 @@ const pt = {
         ],
         irlLink: 'Como jogar Among Us na vida real →',
         faqs: [
-            ['Precisa baixar algum app?', 'Não. Sus Party é um site, não um app: não tem nada para baixar na App Store ou no Google Play, e não tem relação com nenhum app de nome parecido. Tudo funciona no navegador do celular. Só precisa de internet.'],
+            ['Precisa baixar algum app?', 'Não. Sus Party é um site, não um app: não tem nada para baixar na App Store ou no Google Play, e não tem relação com nenhum app de nome parecido. Tudo funciona no navegador do celular. Só precisa de internet. É de propósito: sem download e sem instalação, a partida começa em dois minutos.'],
             ['Quantos jogadores precisa?', 'De 3 a 20+. Para o primeiro jogo, 5 a 8 jogadores com um intruso funciona muito bem.'],
-            ['É grátis?', 'Sim, sem anúncios e sem conta.'],
+            ['É grátis?', 'Sim, e o jogo vai ser sempre grátis. Sem anúncios e sem conta para jogar.'],
         ],
     },
     irl: {
@@ -380,9 +380,9 @@ const no = {
         ],
         irlLink: 'Slik spiller dere Among Us i virkeligheten →',
         faqs: [
-            ['Må vi laste ned en app?', 'Nei. Sus Party er et nettsted, ikke en app: Det er ingenting å laste ned fra App Store eller Google Play, og det har ingenting med apper med lignende navn å gjøre. Alt foregår i nettleseren på telefonen. Dere trenger bare internett.'],
+            ['Må vi laste ned en app?', 'Nei. Sus Party er et nettsted, ikke en app: Det er ingenting å laste ned fra App Store eller Google Play, og det har ingenting med apper med lignende navn å gjøre. Alt foregår i nettleseren på telefonen. Dere trenger bare internett. Det er med vilje: Uten nedlasting og oppsett er dere i gang på to minutter.'],
             ['Hvor mange spillere trengs?', '3 til 20+. Til første runde passer 5 til 8 spillere med én inntrenger fint.'],
-            ['Er det gratis?', 'Ja, uten reklame og uten konto.'],
+            ['Er det gratis?', 'Ja, og spillet vil alltid være gratis. Uten reklame og uten konto for å spille.'],
         ],
     },
     irl: {
@@ -448,9 +448,9 @@ const sv = {
         ],
         irlLink: 'Så spelar ni Among Us i verkligheten →',
         faqs: [
-            ['Behöver vi ladda ner en app?', 'Nej. Sus Party är en webbplats, inte en app: Det finns inget att ladda ner från App Store eller Google Play, och det har inget med appar med liknande namn att göra. Allt sker i mobilens webbläsare. Ni behöver bara internet.'],
+            ['Behöver vi ladda ner en app?', 'Nej. Sus Party är en webbplats, inte en app: Det finns inget att ladda ner från App Store eller Google Play, och det har inget med appar med liknande namn att göra. Allt sker i mobilens webbläsare. Ni behöver bara internet. Det är med flit: Utan nedladdning och installation är ni igång på två minuter.'],
             ['Hur många spelare behövs?', '3 till 20+. Första gången passar 5 till 8 spelare med en inkräktare bra.'],
-            ['Är det gratis?', 'Ja, utan reklam och utan konto.'],
+            ['Är det gratis?', 'Ja, och spelet kommer alltid att vara gratis. Utan reklam och utan konto för att spela.'],
         ],
     },
     irl: {
