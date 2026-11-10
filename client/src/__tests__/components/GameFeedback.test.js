@@ -1,9 +1,10 @@
 import React from 'react';
 import { act, fireEvent, waitFor } from '@testing-library/react';
 import { renderWithContext, screen } from '../../test-utils';
+import { DataContext } from '../../GameContext';
 import { configureTestStorage } from '../../testing/gameFlowHarness';
 import EndGameButtons from '../../components/EndGameButtons';
-import { PROMPT_DELAY_MS, PROMPT_AFTER_SAVE_MS } from '../../components/GameFeedback';
+import GameFeedback, { PROMPT_DELAY_MS, PROMPT_AFTER_SAVE_MS } from '../../components/GameFeedback';
 
 beforeAll(() => {
     // JSDOM lacks native dialog methods. Browser QA covers the real dialog.
@@ -17,11 +18,23 @@ beforeEach(() => {
 });
 afterEach(() => jest.useRealTimers());
 
-// The end screen asks for a "Save this game" code on its own; these tests are about the feedback prompt.
-const promptEmits = socket => socket.emit.mock.calls.filter(([event]) => event !== 'save_game_link');
+// The end screen asks for a "Save this game" code on its own, and the prompt reports what happened to it
+// (client_metric); these tests are about what the prompt sends.
+const promptEmits = socket => socket.emit.mock.calls.filter(([event]) => !['save_game_link', 'client_metric'].includes(event));
+const metrics = socket => socket.emit.mock.calls.filter(([event]) => event === 'client_metric').map(([, payload]) => payload.action);
 
+// The prompt wraps the whole page in the app (PageController), so a reset can swap the screen under it.
+const page = (contextValue, screenUi = <EndGameButtons />) => (
+    <DataContext.Provider value={contextValue}><GameFeedback>{screenUi}</GameFeedback></DataContext.Provider>
+);
 function resultScreen(overrides = {}) {
-    return renderWithContext(<EndGameButtons />, { endState: 'victory', isMobile: true, ...overrides });
+    return renderWithContext(<GameFeedback><EndGameButtons /></GameFeedback>, { endState: 'victory', isMobile: true, ...overrides });
+}
+// The group's Play Again sends the room back to the lobby: no end state, a new round id.
+function resetToLobby(result, overrides = {}) {
+    const lobby = { ...result.contextValue, endState: null, roundId: 'round-2', ...overrides };
+    result.rerender(page(lobby, <p>Lobby</p>));
+    return lobby;
 }
 function showPrompt(overrides = {}) {
     const result = resultScreen(overrides);
@@ -99,6 +112,9 @@ test('sends a rating and comment and waits for acceptance before it closes', asy
     act(() => request[2](null, { ok: true }));
     await waitFor(() => expect(screen.getByText('Thanks for the feedback!')).toBeInTheDocument());
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(metrics(contextValue.socket)).toEqual(['feedback_shown', 'feedback_open', 'feedback_sent']);
+    act(() => jest.advanceTimersByTime(4000));
+    expect(screen.queryByText('Thanks for the feedback!')).not.toBeInTheDocument();
     expect(contextValue.socket.emit).not.toHaveBeenCalledWith('reset', expect.anything());
     expect(contextValue.socket.emit).not.toHaveBeenCalledWith('leave_room', expect.anything());
 });
@@ -147,4 +163,66 @@ test('comes 2 seconds after the player is done with Save this game', async () =>
     } finally {
         delete navigator.share;
     }
+});
+
+test('keeps a half-written answer open when the group taps Play Again, and sends it for the round that ended', async () => {
+    const result = openForm();
+    fireEvent.click(screen.getByLabelText('Okay'));
+    fireEvent.change(screen.getByLabelText('Comment (optional)'), { target: { value: 'Needed more time to' } });
+    resetToLobby(result);
+    expect(screen.getByText('Lobby')).toBeInTheDocument();
+    expect(screen.getByRole('dialog')).toBeVisible();
+    expect(screen.getByLabelText('Comment (optional)')).toHaveValue('Needed more time to');
+    expect(screen.getByLabelText('Okay')).toBeChecked();
+    fireEvent.change(screen.getByLabelText('Comment (optional)'), { target: { value: 'Needed more time to vote.' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Send feedback' }));
+    const request = result.contextValue.socket.emit.mock.calls.find(([event]) => event === 'submit_feedback');
+    expect(request[1]).toEqual(expect.objectContaining({ round_id: 'round-1', rating: 'okay', comment: 'Needed more time to vote.' }));
+    act(() => request[2](null, { ok: true }));
+    await waitFor(() => expect(screen.getByText('Thanks for the feedback!')).toBeInTheDocument());
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(metrics(result.contextValue.socket)).toEqual(['feedback_shown', 'feedback_open', 'feedback_kept_open', 'feedback_sent']);
+});
+
+test('the three choices stay up through a reset too, and the lobby never asks again for that round', () => {
+    const result = showPrompt();
+    const lobby = resetToLobby(result);
+    expect(screen.getByRole('dialog')).toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: 'Maybe later' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    act(() => jest.advanceTimersByTime(PROMPT_DELAY_MS * 2));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    // The next round that ends asks again: one prompt per player per round.
+    result.rerender(page({ ...lobby, endState: 'sus_victory', roundId: 'round-3' }));
+    act(() => jest.advanceTimersByTime(PROMPT_DELAY_MS));
+    expect(screen.getByRole('dialog')).toBeVisible();
+    expect(metrics(result.contextValue.socket)).toEqual(['feedback_shown', 'feedback_kept_open', 'feedback_later', 'feedback_shown']);
+});
+
+test('a reset before the 20 seconds are up means no prompt for that round', () => {
+    const result = resultScreen();
+    act(() => jest.advanceTimersByTime(PROMPT_DELAY_MS - 5000));
+    resetToLobby(result);
+    act(() => jest.advanceTimersByTime(PROMPT_DELAY_MS));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(metrics(result.contextValue.socket)).toEqual([]);
+});
+
+test('a player who already tapped Play Again is not asked', () => {
+    resultScreen({ resetVotes: { current: 1, needed: 3, voters: ['test_player_id'] } });
+    act(() => jest.advanceTimersByTime(PROMPT_DELAY_MS + 2000));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+});
+
+test.each([
+    ["Don't ask again", false, 'feedback_snoozed'],
+    ['Maybe later', true, 'feedback_abandoned'],
+    ['Dismiss feedback', false, 'feedback_later'],
+])('logs how the prompt was closed (%s), never what was typed', (button, writing, action) => {
+    const result = writing ? openForm() : showPrompt();
+    if (writing) fireEvent.change(screen.getByLabelText('Comment (optional)'), { target: { value: 'private words' } });
+    fireEvent.click(screen.getByRole('button', { name: button }));
+    const sent = metrics(result.contextValue.socket);
+    expect(sent[sent.length - 1]).toBe(action);
+    expect(JSON.stringify(result.contextValue.socket.emit.mock.calls)).not.toContain('private words');
 });

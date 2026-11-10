@@ -888,7 +888,8 @@ def handle_register_reactor(data):
 # ============ PHONE-SIDE METRICS ============
 
 SETUP_STEPS = {'tasklist', 'settings'}
-END_SCREEN_ACTIONS = {'host_your_own', 'play_again', 'feedback_open', 'feedback_sent', 'how_to_play',
+END_SCREEN_ACTIONS = {'host_your_own', 'play_again', 'feedback_shown', 'feedback_open', 'feedback_sent',
+                      'feedback_later', 'feedback_snoozed', 'feedback_abandoned', 'feedback_kept_open', 'how_to_play',
                       'save_game_shared', 'save_game_copied', 'install_shown', 'install_added', 'install_dismissed'}
 IN_APP_ACTIONS = {'shown', 'already_dismissed', 'open_browser', 'copy_link', 'keep_playing'}
 IN_APP_APPS = {'wechat', 'messenger', 'instagram', 'facebook', 'threads', 'tiktok', 'snapchat', 'reddit',
@@ -1360,6 +1361,26 @@ def admit_waiting_list(game, room_code):
 
 
 FEEDBACK_RATINGS = {'fun', 'okay', 'needs_work'}
+# A phone may still be writing when the group's Play Again sends the room back to the lobby.
+FEEDBACK_AFTER_RESET_SECONDS = 15 * 60
+
+
+def feedback_rejected(game, reason, error):
+    # The reason label only: never the rating or the comment.
+    record_usage('feedback_rejected', game, reason=reason)
+    return {'ok': False, 'error': error}
+
+
+def feedback_round(game, round_id):
+    """(submitters, ended_round) for the round this feedback is about, or None if it can't take feedback now."""
+    if game.end_state and round_id == game.round_id:
+        return game.feedback_submitters, None
+    ended = game.last_ended_round
+    # The room was reset after the round ended; accept it until the next round ends or 15 minutes pass.
+    if (ended and not game.end_state and round_id == ended['round_id']
+            and time.monotonic() - ended['reset_at'] <= FEEDBACK_AFTER_RESET_SECONDS):
+        return ended['feedback_submitters'], ended
+    return None
 
 
 @socketio.on('submit_feedback')
@@ -1369,28 +1390,31 @@ def handle_game_feedback(data=None):
     data = data if isinstance(data, dict) else {}
     game, _ = game_manager.get_game_by_sid(request.sid)
     if not game:
-        return {'ok': False, 'error': 'Rejoin the room before you send feedback.'}
+        return feedback_rejected(None, 'no_room', 'Rejoin the room before you send feedback.')
     player = game.getPlayerBySid(request.sid)
     if not ((player and player.active) or request.sid == game.creator_sid):
-        return {'ok': False, 'error': 'Only players in this game can send feedback.'}
-    if not game.end_state or data.get('round_id') != game.round_id:
-        return {'ok': False, 'error': 'Give feedback after this round ends.'}
+        return feedback_rejected(game, 'not_player', 'Only players in this game can send feedback.')
+    target = feedback_round(game, data.get('round_id'))
+    if target is None:
+        return feedback_rejected(game, 'wrong_round', 'Give feedback after this round ends.')
+    submitters, ended_round = target
     rating = data.get('rating')
     comment = data.get('comment', '')
     if rating is not None and (not isinstance(rating, str) or rating not in FEEDBACK_RATINGS):
-        return {'ok': False, 'error': 'Choose one of the available ratings.'}
+        return feedback_rejected(game, 'invalid', 'Choose one of the available ratings.')
     if not isinstance(comment, str) or len(comment) > 1000:
-        return {'ok': False, 'error': 'Keep the comment within 1,000 characters.'}
+        return feedback_rejected(game, 'invalid', 'Keep the comment within 1,000 characters.')
     comment = comment.strip()
     if rating is None and not comment:
-        return {'ok': False, 'error': 'Add a rating or a comment.'}
+        return feedback_rejected(game, 'invalid', 'Add a rating or a comment.')
     submitter = player.player_id if player else 'host'
-    if submitter in game.feedback_submitters:
+    if submitter in submitters:
         return {'ok': True}
-    if not game_manager.stats_tracker.record_game_feedback(game, rating, comment):
-        return {'ok': False, 'error': 'Feedback did not save. Try again.'}
-    game.feedback_submitters.add(submitter)
-    # Nothing here goes to the gameplay event log: it carries room codes, and feedback stays anonymous.
+    if not game_manager.stats_tracker.record_game_feedback(game, rating, comment, ended_round=ended_round):
+        return feedback_rejected(game, 'save_failed', 'Feedback did not save. Try again.')
+    submitters.add(submitter)
+    # The gameplay log carries room codes, so it only learns that feedback was saved: never the rating or text.
+    record_usage('feedback_saved', game, after_reset=bool(ended_round))
     return {'ok': True}
 
 

@@ -39,6 +39,9 @@ class Game:
         self.command_results = OrderedDict()
         # Who already sent end-of-round feedback this round, so retries and reconnects don't add duplicates.
         self.feedback_submitters = set()
+        # The round that ended last. A phone still writing feedback when Play Again resets the room
+        # can send it for that round (see submit_feedback).
+        self.last_ended_round = None
         self.players = []
         # Phones that arrived mid-round. They are kept out of self.players, so no role, vote,
         # meltdown code or win check counts them, and join the lobby when the round ends.
@@ -337,9 +340,15 @@ class Game:
     def begin_round(self):
         """Invalidate snapshots and command results from the previous round."""
         with self.state_lock:
+            if self.end_state:
+                self.last_ended_round = {
+                    'round_id': self.round_id, 'outcome': self.end_state,
+                    'test_mode': bool(self.test_mode), 'reset_at': time.monotonic(),
+                    'feedback_submitters': self.feedback_submitters,
+                }
             self.round_id = str(uuid4())
             self.command_results.clear()
-            self.feedback_submitters.clear()
+            self.feedback_submitters = set()
             self.revision += 1
             return self.round_id
 

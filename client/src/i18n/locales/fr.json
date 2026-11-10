@@ -226,6 +226,7 @@
   "Failed to save task list": "Impossible d'enregistrer la liste de tâches",
   "Failed to update task list. You may not be the owner.": "Impossible de mettre à jour la liste. Elle ne t'appartient peut-être pas.",
   "Feedback did not save. Try again.": "Ton avis n'a pas été enregistré. Réessaie.",
+  "Feedback did not save. Reconnect and try again.": "Ton avis n'a pas été enregistré. Reconnecte-toi et réessaie.",
   "Game not found": "Partie introuvable",
   "Give feedback after this round ends.": "Donne ton avis à la fin de la manche.",
   "Invalid task index": "Numéro de tâche invalide",

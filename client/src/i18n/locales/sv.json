@@ -226,6 +226,7 @@
   "Failed to save task list": "Kunde inte spara uppgiftslistan",
   "Failed to update task list. You may not be the owner.": "Kunde inte uppdatera uppgiftslistan. Det kanske inte är du som äger den.",
   "Feedback did not save. Try again.": "Din feedback sparades inte. Försök igen.",
+  "Feedback did not save. Reconnect and try again.": "Din feedback sparades inte. Anslut igen och försök på nytt.",
   "Game not found": "Spelet hittades inte",
   "Give feedback after this round ends.": "Ge feedback när omgången är slut.",
   "Invalid task index": "Ogiltigt uppgiftsnummer",
