@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
+import { emitAsPlayer } from '../utils/playerCommand';
 import { DataContext } from "../GameContext";
 import AnimationOverlay from "../components/AnimationOverlay";
 import MUECustomSlider from "../components/swiper";
@@ -100,6 +101,7 @@ const CrewmemberPage = ({
   onTutorialCompleteTask = null,
   tutorialHighlightTarget = null,
 }) => {
+  const game = useContext(DataContext);
   const {
     task,
     socket,
@@ -119,7 +121,7 @@ const CrewmemberPage = ({
     completeTask,
     taskCompletionPending,
     taskCompletionError,
-  } = useContext(DataContext);
+  } = game;
 
   const sus = !!playerState?.sus;
   // Once tasks hit 100% everyone knows who the intruders are.
@@ -139,7 +141,7 @@ const CrewmemberPage = ({
 
   const reportEliminated = () => {
     if (!window.confirm('Did the intruder get you? This ends the game.')) return;
-    socket?.emit('player_dead', {
+    emitAsPlayer(game, 'player_dead', {
       player_id: playerState?.player_id || localStorage.getItem('player_id'),
       round_id: roundId,
     });

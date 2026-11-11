@@ -13,6 +13,8 @@ import { getLanguage, t } from './i18n';
 import './i18n/serverMessages';
 import { attachAccountSocket } from './account/accountStore';
 import { createRequestId, emitVolatileWithAck, SOCKET_COMMAND_TIMEOUT_MS } from './utils/socketCommand';
+import { takeCrashReport } from './components/CrashGuard';
+import { isPageHidden, rejoinPayload } from './utils/browserTab';
 
 // Allow URL param override for testing: ?mobile=true or ?mobile=false
 const urlParams = new URLSearchParams(window.location.search);
@@ -28,6 +30,12 @@ const isTestTraffic = () => {
 };
 
 const DataContext = createContext();
+
+// The server's answer when this socket no longer holds the player's seat (app.py room_event).
+export function isObsoleteSession(result) {
+    return result?.ok === false
+        && (result.reason === 'obsolete_session' || /^Reconnect before you send/.test(result.error || ''));
+}
 
 // The host's key to a room they are still setting up (they have no player yet), so a
 // dropped connection or a reload can take the setup screen back.
@@ -67,6 +75,12 @@ export default function GameContext({ children }) {
     const [roundId, setRoundId] = useState(null);
     const [lobbyState, setLobbyState] = useState(null);
     const [roomEntryStatus, setRoomEntryStatus] = useState(null);
+    // Another tab of the game took this player's seat (see rejoin on the server). This tab says so
+    // and stops rejoining by itself until the player taps Play here or comes back to it.
+    const [sessionMoved, setSessionMoved] = useState(false);
+    const sessionMovedRef = useRef(false);
+    const reclaimRef = useRef(null);
+    const reclaimSeatRef = useRef(null);
 
     // united states
     const [gameState, setGameState] = useState({}); // <--- USE this PLEASE we need to refactor this shit
@@ -365,6 +379,46 @@ export default function GameContext({ children }) {
         });
     }, [applyRoomSnapshot]);
 
+    // Take the seat back for a tap made in this tab, then the tap can be sent again.
+    const reclaimSeat = useCallback(() => {
+        const socket = socketRef.current;
+        const playerId = localStorage.getItem('player_id');
+        if (!socket?.connected || !playerId) return Promise.resolve(false);
+        if (reclaimRef.current) return reclaimRef.current;
+        const attempt = emitVolatileWithAck(socket, 'rejoin', rejoinPayload(playerId, { claim: true }))
+            .then((response) => {
+                if (response?.ok !== true) return false;
+                sessionMovedRef.current = false;
+                setSessionMoved(false);
+                if (response.state) applyRoomSnapshot(response.state);
+                return true;
+            })
+            .catch(() => false)
+            .finally(() => { reclaimRef.current = null; });
+        reclaimRef.current = attempt;
+        return attempt;
+    }, [applyRoomSnapshot]);
+    reclaimSeatRef.current = reclaimSeat;
+
+    /**
+     * Send a player command. If the server says this socket no longer holds the player's seat
+     * (another tab took it, or a reconnect raced the tap), take the seat back and send it once more.
+     */
+    const sendAsPlayer = useCallback((eventName, payload, onResult) => {
+        const socket = socketRef.current;
+        if (!socket) return;
+        socket.emit(eventName, payload, (result) => {
+            if (isObsoleteSession(result)) {
+                reclaimSeat().then((reclaimed) => {
+                    if (reclaimed && socketRef.current) socketRef.current.emit(eventName, payload, onResult);
+                    else if (onResult) onResult(result);
+                });
+                return;
+            }
+            if (onResult) onResult(result);
+        });
+    }, [reclaimSeat]);
+
     const completeTask = useCallback(async (assignment = task) => {
         if (taskCompletionRef.current) return taskCompletionRef.current;
 
@@ -413,6 +467,8 @@ export default function GameContext({ children }) {
                 try {
                     response = await emitVolatileWithAck(socket, 'complete_task', request, SOCKET_COMMAND_TIMEOUT_MS);
                     commandError = null;
+                    // Another tab held the seat: take it back for this tap and send it again.
+                    if (attempt === 0 && isObsoleteSession(response) && await reclaimSeat()) continue;
                     break;
                 } catch (error) {
                     commandError = error;
@@ -449,7 +505,7 @@ export default function GameContext({ children }) {
             if (taskCompletionRef.current === completion) taskCompletionRef.current = null;
             setTaskCompletionPending(false);
         }
-    }, [connected, playerState, roundId, running, task, requestRoomState, roomCode, applyRoomSnapshot]);
+    }, [connected, playerState, roundId, running, task, requestRoomState, roomCode, applyRoomSnapshot, reclaimSeat]);
 
     // Keep phones awake while a game runs, so a phone in a pocket doesn't lock and miss a
     // meeting. The browser drops the lock whenever the page is hidden, so take it again on return.
@@ -487,7 +543,8 @@ export default function GameContext({ children }) {
                     const savedRoomCode = localStorage.getItem('room_code') || roomVersionRef.current.roomCode;
                     if (playerId && savedRoomCode) {
                         console.log('Refreshing the room after returning to the page...');
-                        socketRef.current.emit('rejoin', { player_id: playerId });
+                        // Coming back to this tab takes the seat back from another tab of the game.
+                        socketRef.current.emit('rejoin', rejoinPayload(playerId));
                         requestRoomState(socketRef.current, savedRoomCode, playerId);
                     } else if (!isMobile && savedRoomCode) {
                         socketRef.current.emit('register_reactor', { room_code: savedRoomCode });
@@ -537,6 +594,9 @@ export default function GameContext({ children }) {
         socketRef.current.on('connect', () => {
             dropTracker.clear();
             setConnected(true);
+            // A crash before this page load (see CrashGuard) reports itself now that we have a socket.
+            const crash = takeCrashReport();
+            if (crash) sendClientMetric(socketRef.current, crash);
             // Try to rejoin existing game if we have a player_id
             let playerId = localStorage.getItem('player_id');
             let roomCode = localStorage.getItem('room_code');
@@ -568,10 +628,10 @@ export default function GameContext({ children }) {
                     entry_method: inviteEntryMethod,
                     link_token: getLinkTokenFromSearch() || undefined,
                 });
+            } else if (playerId && sessionMovedRef.current) {
+                // Another tab has the game. Wait for the player to come back to this one or tap Play here.
             } else if (playerId) {
-                socketRef.current.emit('rejoin', {
-                    player_id: playerId,
-                });
+                socketRef.current.emit('rejoin', rejoinPayload(playerId));
                 requestRoomState(socketRef.current, roomCode || localStorage.getItem('room_code'), playerId);
             } else if (isMobile && roomCode && readHostToken(roomCode)) {
                 // A phone host coming back to a room they were still setting up.
@@ -621,7 +681,14 @@ export default function GameContext({ children }) {
             setRoomOpen(true);
         });
 
+        socketRef.current.on('session_moved', () => {
+            sessionMovedRef.current = true;
+            setSessionMoved(true);
+        });
+
         socketRef.current.on('game_joined', (data) => {
+            sessionMovedRef.current = false;
+            setSessionMoved(false);
             setRoomEntryStatus(null);
             clearRoomCodeFromUrl();
             console.log('Joined game:', data, 'is_creator:', data.is_creator);
@@ -671,11 +738,18 @@ export default function GameContext({ children }) {
         socketRef.current.on('rejoin_failed', (data) => {
             console.log('Rejoin failed:', data);
             const previousRoomCode = localStorage.getItem('room_code');
+            // A phone that left a room in a past visit gets here on page load. Its old room is long gone:
+            // clear it quietly and show the normal start screen (and the welcome back card), not an error.
+            // Only a page that was in the room just now hears that the room went away.
+            const wasInRoom = inRoomRef.current;
+            sessionMovedRef.current = false;
+            setSessionMoved(false);
             // Clear stale session data
             localStorage.removeItem('player_id');
             localStorage.removeItem('room_code');
             sessionStorage.removeItem('is_room_creator');
             resetGameState();
+            if (!wasInRoom) return;
             setRoomEntryStatus({ code: 'session_not_found', room_code: previousRoomCode,
                 message: data.message || t('Your previous session is no longer available. Ask the host for a new invite.') });
         });
@@ -685,6 +759,13 @@ export default function GameContext({ children }) {
             const inviteRoomCode = autoJoinInviteRef.current;
             if (data.scope === 'room_entry') {
                 setRoomEntryStatus({ ...data, room_code: data.room_code || inviteRoomCode });
+                return;
+            }
+            // This socket lost the player's seat. "Reconnect before you send this command" asked for
+            // something the player can't do; take the seat back instead (the command is resent where it can be).
+            if (data.reason === 'obsolete_session') {
+                // Only for the tab in front: a background tab's own refresh must not pull the seat back.
+                if (!sessionMovedRef.current && !isPageHidden()) reclaimSeatRef.current?.();
                 return;
             }
             // Check if this is a "game/room not found" error - clear stale data
@@ -1109,7 +1190,7 @@ export default function GameContext({ children }) {
     }, []);
 
     function handleCallMeeting() {
-        socketRef.current.emit("meeting", {
+        sendAsPlayer("meeting", {
             player_id: playerState?.player_id || playerState?.playerId || localStorage.getItem('player_id'),
             round_id: roundId,
         });
@@ -1199,6 +1280,9 @@ export default function GameContext({ children }) {
         completeTask,
         taskCompletionPending,
         taskCompletionError,
+        sessionMoved,
+        reclaimSeat,
+        sendAsPlayer,
         // Reset votes for play again
         resetVotes,
         // Phone or reactor screen (same ?mobile= override as everywhere else)
@@ -1262,6 +1346,9 @@ export default function GameContext({ children }) {
         completeTask,
         taskCompletionPending,
         taskCompletionError,
+        sessionMoved,
+        reclaimSeat,
+        sendAsPlayer,
         testMode,
         switchTestRole,
         waitingForNextRound,

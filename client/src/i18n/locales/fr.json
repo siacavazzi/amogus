@@ -981,5 +981,11 @@
   "Opening your saved game…": "Ouverture de ta partie gardée…",
   "Joining your group…": "Tu rejoins ton groupe…",
   "Our Sus Party game. Open the link to play it again with the same tasks.": "Notre partie de Sus Party. Ouvre le lien pour la rejouer avec les mêmes tâches.",
-  "Send it to your group chat. The first to open it hosts, everyone else joins.": "Envoie-le dans le groupe de discussion. Le premier à l’ouvrir organise, les autres rejoignent."
+  "Send it to your group chat. The first to open it hosts, everyone else joins.": "Envoie-le dans le groupe de discussion. Le premier à l’ouvrir organise, les autres rejoignent.",
+  "Oops, something went wrong": "Oups, un problème est survenu",
+  "This screen hit a problem. If you were in a game, Try again usually puts you back in it.": "Cet écran a rencontré un problème. Si tu étais dans une partie, Réessayer te la rend en général.",
+  "Back to the main screen": "Retour à l'écran principal",
+  "Your game is open in another tab": "Ta partie est ouverte dans un autre onglet",
+  "You opened Sus Party again, so your game moved there. Play there, or tap Play here to keep playing in this tab.": "Tu as rouvert Sus Party, donc ta partie est passée là-bas. Joue là-bas, ou touche Jouer ici pour continuer dans cet onglet.",
+  "Play here": "Jouer ici"
 }

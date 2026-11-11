@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
-import { DataContext } from "../GameContext";
+import { DataContext, isObsoleteSession } from "../GameContext";
 import LeaveGameButton from "../components/LeaveGameButton";
 import { Face } from "../signal";
 import { Skull } from "../signal/icons";
 import { emitVolatileWithAck } from "../utils/socketCommand";
+import { emitAsPlayer } from "../utils/playerCommand";
 import { t, tn } from '../i18n';
 
 export default function VotingPage({ tutorialMode = false, tutorialHighlightTarget = null }) {
-  const { players, socket, setMessage, meetingState, vetoVotes, votes, playerState, roundId, connected } = useContext(DataContext);
+  const game = useContext(DataContext);
+  const { players, socket, setMessage, meetingState, vetoVotes, votes, playerState, roundId, connected, reclaimSeat } = game;
   const highlightPlayers = tutorialMode && (tutorialHighlightTarget === 'players' || tutorialHighlightTarget === 'vote-flow');
   const highlightActions = tutorialMode && (tutorialHighlightTarget === 'actions' || tutorialHighlightTarget === 'vote-flow');
 
@@ -19,9 +21,12 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
   const deathPendingRef = useRef(false);
   const mountedRef = useRef(true);
   const playerId = playerState?.player_id || playerState?.playerId || localStorage.getItem('player_id');
-  const canVote = connected && playerState?.alive !== false && !deathPending && meetingState.stage === 'voting';
+  // The screen is picked one render after the room changes, so this page draws once more after the
+  // meeting is gone (last stand, or a phone waking after the vote). Unguarded, that blanked phones on prod.
+  const voting = meetingState?.stage === 'voting';
+  const canVote = connected && playerState?.alive !== false && !deathPending && voting;
   // Intruders can't be killed, so they never get the button (on prod one tapped it by mistake).
-  const showDeathReport = !tutorialMode && !playerState?.sus && playerState?.alive !== false && meetingState.stage === 'voting';
+  const showDeathReport = !tutorialMode && !playerState?.sus && playerState?.alive !== false && voting;
 
   useEffect(() => {
     mountedRef.current = true;
@@ -50,7 +55,7 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
   const handleVote = () => {
     if (!canVote || deathPendingRef.current) return;
     if (selectedPlayer) {
-      socket.emit("vote", {
+      emitAsPlayer(game, "vote", {
         player_id: playerId,
         votedFor: selectedPlayer.player_id,
         round_id: meetingState?.round_id || roundId,
@@ -66,7 +71,7 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
 
   const handleVeto = () => {
     if (!canVote || deathPendingRef.current) return;
-    socket.emit("veto", {
+    emitAsPlayer(game, "veto", {
       player_id: playerId,
       round_id: meetingState?.round_id || roundId,
       meeting_id: meetingState?.id || meetingState?.meeting_id,
@@ -83,11 +88,16 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
     deathPendingRef.current = true;
     setDeathPending(true);
     try {
-      const result = await emitVolatileWithAck(socket, 'player_dead', {
+      const report = {
         player_id: playerId,
         round_id: meetingState?.round_id || roundId,
         meeting_id: meetingState?.id || meetingState?.meeting_id,
-      });
+      };
+      let result = await emitVolatileWithAck(socket, 'player_dead', report);
+      // Another tab of the game held the seat: take it back for this tap and report again.
+      if (isObsoleteSession(result) && reclaimSeat && await reclaimSeat()) {
+        result = await emitVolatileWithAck(socket, 'player_dead', report);
+      }
       if (!result?.ok) throw new Error(result?.error ? t(result.error) : t('The death report failed. Try again.'));
     } catch (error) {
       if (!mountedRef.current) return;

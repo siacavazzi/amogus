@@ -298,4 +298,95 @@ describe('GameContext socket reliability', () => {
         expect(currentContext.roomCode).toBe('ROOM');
         expect(currentContext.isRoomCreator).toBe(true);
     });
+
+    describe('a second tab of the game (bug hunt 11-11, prod room TMEX)', () => {
+        const pendingAck = (eventName) => game.socket.pendingAcks.findIndex((ack) => ack.eventName === eventName && !ack.settled);
+
+        it('says which tab it is, and whether it is in the background, when it rejoins', async () => {
+            await startRoom();
+            expect(game.socket.lastEmit('rejoin')[1]).toEqual({
+                player_id: 'player-1', tab_id: expect.any(String), hidden: false,
+            });
+        });
+
+        it('takes the seat back and sends a task again when another tab held the seat', async () => {
+            await startRoom();
+            let result;
+            act(() => { result = currentContext.completeTask(); });
+            await act(async () => {
+                game.socket.ack(pendingAck('complete_task'), {
+                    ok: false, reason: 'obsolete_session', error: 'Reconnect before you send this command.',
+                });
+            });
+            const rejoins = game.socket.emits('rejoin');
+            expect(rejoins[rejoins.length - 1][1]).toEqual(expect.objectContaining({ player_id: 'player-1', hidden: false }));
+            await act(async () => {
+                game.socket.ack(pendingAck('rejoin'), { ok: true, state: roomSnapshot({ revision: 2 }) });
+            });
+            expect(game.socket.emits('complete_task')).toHaveLength(2);
+            const request = game.socket.lastEmit('complete_task')[1];
+            await act(async () => {
+                game.socket.ack(pendingAck('complete_task'), { ok: true, request_id: request.request_id, state: roomSnapshot({ revision: 3, crew_score: 1 }) });
+            });
+            await expect(result).resolves.toBe(true);
+            expect(currentContext.taskCompletionError).toBeNull();
+        });
+
+        it('resends a vote through sendAsPlayer after taking the seat back', async () => {
+            await startRoom();
+            const onResult = jest.fn();
+            act(() => currentContext.sendAsPlayer('vote', { player_id: 'player-1', votedFor: 'player-2' }, onResult));
+            // A plain socket.io acknowledgment (no .timeout()) hands back the result alone.
+            const plainAck = (response) => {
+                const record = game.socket.pendingAcks[pendingAck('vote')];
+                record.settled = true;
+                record.callback(response);
+            };
+            await act(async () => {
+                plainAck({ ok: false, reason: 'obsolete_session', error: 'Reconnect before you send this command.' });
+            });
+            await act(async () => { game.socket.ack(pendingAck('rejoin'), { ok: true, state: roomSnapshot({ revision: 2 }) }); });
+            expect(game.socket.emits('vote')).toHaveLength(2);
+            await act(async () => { plainAck({ ok: true }); });
+            expect(onResult).toHaveBeenCalledWith({ ok: true });
+        });
+
+        it('shows "open in another tab" when another tab takes the seat, and stops pulling it back by itself', async () => {
+            await startRoom();
+            await game.serverEmit('session_moved', { room_code: 'ROOM' });
+            expect(currentContext.sessionMoved).toBe(true);
+
+            const rejoinsBefore = game.socket.emits('rejoin').length;
+            await game.serverEmit('connect');
+            expect(game.socket.emits('rejoin')).toHaveLength(rejoinsBefore);
+
+            let reclaimed;
+            act(() => { reclaimed = currentContext.reclaimSeat(); });
+            expect(game.socket.lastEmit('rejoin')[1]).toEqual(expect.objectContaining({ hidden: false }));
+            await act(async () => { game.socket.ack(pendingAck('rejoin'), { ok: true, state: roomSnapshot({ revision: 2 }) }); });
+            await expect(reclaimed).resolves.toBe(true);
+            expect(currentContext.sessionMoved).toBe(false);
+        });
+    });
+
+    describe('a phone coming back after its room is gone (bug hunt 11-11)', () => {
+        it('clears the old session quietly on page load instead of showing an error', async () => {
+            game = renderWithLiveGameContext(
+                <ContextProbe capture={(contextValue) => { currentContext = contextValue; }} />,
+                { localStorage: { player_id: 'old-player', room_code: 'XYAH' } }
+            );
+            await game.serverEmit('connect');
+            await game.serverEmit('rejoin_failed', { message: 'Your previous session is no longer available. Ask the host for a new invite.' });
+            expect(currentContext.roomEntryStatus).toBeNull();
+            expect(game.storage.getLocal('player_id')).toBeNull();
+            expect(game.storage.getLocal('room_code')).toBeNull();
+        });
+
+        it('still tells a page that was in the room that the room went away', async () => {
+            await startRoom();
+            await game.serverEmit('game_joined', { room_code: 'ROOM', is_creator: false, is_open: true });
+            await game.serverEmit('rejoin_failed', { message: 'Your previous session is no longer available. Ask the host for a new invite.' });
+            expect(currentContext.roomEntryStatus).toEqual(expect.objectContaining({ code: 'session_not_found', room_code: 'ROOM' }));
+        });
+    });
 });

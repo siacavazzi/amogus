@@ -4,6 +4,7 @@ import './index.css';
 import './signal/signal.css';
 import App from './App';
 import BetaBadge from './components/BetaBadge';
+import CrashGuard from './components/CrashGuard';
 import { CLIENT_VERSION } from './version';
 import { installTranslateGuard } from './utils/translateGuard';
 
@@ -15,7 +16,10 @@ console.info(`Sus Party ${CLIENT_VERSION.version}${CLIENT_VERSION.commit ? ` (${
 const rootElement = document.getElementById('root');
 const tree = (
     <React.StrictMode>
-        <App />
+        {/* A crash reloads the page once, then shows a way out, instead of a blank phone. */}
+        <CrashGuard>
+            <App />
+        </CrashGuard>
         <BetaBadge />
     </React.StrictMode>
 );

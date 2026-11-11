@@ -4,6 +4,7 @@ import { DataContext } from '../GameContext';
 import CameraCapture from '../components/CameraCapture';
 import Avatar, { getAvatar } from '../components/Avatar';
 import AvatarPicker, { takenAvatars, isAvatarLocked, randomFreeAvatar } from '../components/AvatarPicker';
+import { getTabId } from '../utils/browserTab';
 import RoomEntryNotice from '../components/RoomEntryNotice';
 import { clearRoomCodeFromUrl } from '../utils/inviteLinks';
 import LeaveGameButton from '../components/LeaveGameButton';
@@ -73,7 +74,7 @@ function LoginPage() {
         let playerId = localStorage.getItem('player_id');
         const storedRoomCode = roomCode || localStorage.getItem('room_code');
         // The avatar also stands in for a selfie that fails to load.
-        socket.emit('join', { player_id: playerId, username: username, selfie: selfie, pic: pic, room_code: storedRoomCode });
+        socket.emit('join', { player_id: playerId, username: username, selfie: selfie, pic: pic, room_code: storedRoomCode, tab_id: getTabId() });
     };
 
     const handleEnterTasks = () => {

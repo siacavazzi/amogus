@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
+import { emitAsPlayer } from '../utils/playerCommand';
 import { DataContext } from '../GameContext';
 import MUECustomSlider from '../components/swiper';
 import LeaveGameButton from '../components/LeaveGameButton';
@@ -10,7 +11,8 @@ import { t } from '../i18n';
 
 // Every phone floods yellow at once: the meeting is the loudest moment in the game.
 const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = null }) => {
-  const { playerState, players, meetingState, socket, roundId, connected } = useContext(DataContext);
+  const game = useContext(DataContext);
+  const { playerState, players, meetingState, socket, roundId, connected } = game;
   const highlightReadySlider = tutorialMode && tutorialHighlightTarget === 'ready-slider';
   const [origin] = useState(() => takeOrigin());
 
@@ -39,12 +41,8 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
       meeting_id: meetingState?.id || meetingState?.meeting_id,
     };
     // On prod 26 ready slides came from a socket that had reconnected but never rejoined, and
-    // the server threw them away while the meeting waited. Rejoin, then send the slide again.
-    socket.emit('ready', payload, (result) => {
-      if (result?.ok !== false || !/^Reconnect before/.test(result?.error || '')) return;
-      socket.once('game_joined', () => socket.emit('ready', payload));
-      socket.emit('rejoin', { player_id: playerId });
-    });
+    // the server threw them away while the meeting waited. sendAsPlayer rejoins and sends it again.
+    emitAsPlayer(game, 'ready', payload);
   };
 
   const handleImDead = () => {
@@ -53,7 +51,7 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
       return;
     }
     if (socket) {
-      socket.emit('player_dead', {
+      emitAsPlayer(game, 'player_dead', {
         player_id: playerState?.player_id || playerState?.playerId || localStorage.getItem('player_id'),
         round_id: meetingState?.round_id || roundId,
         meeting_id: meetingState?.id || meetingState?.meeting_id,

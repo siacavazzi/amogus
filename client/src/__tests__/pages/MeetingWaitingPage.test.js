@@ -45,7 +45,7 @@ describe('MeetingWaitingPage', () => {
             player_id: expect.any(String),
             round_id: 'round-8',
             meeting_id: 'meeting-8',
-        }), expect.any(Function));
+        }));
 
         const confirm = jest.spyOn(window, 'confirm').mockReturnValue(true);
         fireEvent.click(screen.getByRole('button', { name: /I've Been Killed/i }));
@@ -68,29 +68,16 @@ describe('MeetingWaitingPage', () => {
         expect(screen.getByRole('button', { name: /Ready up/i })).toBeInTheDocument();
     });
 
-    it('rejoins and slides again when the server says this socket must reconnect first', () => {
-        const { contextValue } = renderWithContext(<MeetingWaitingPage />, meetingContext);
-        const { socket } = contextValue;
-        socket.once = jest.fn();
-
+    it('sends the ready slide through sendAsPlayer, which takes the seat back and resends if needed', () => {
+        // On prod 26 ready slides came from a socket that had lost the seat; GameContext's sendAsPlayer
+        // rejoins and sends them again (tested in GameContext.socketReliability.test.js).
+        const sendAsPlayer = jest.fn();
+        renderWithContext(<MeetingWaitingPage />, { ...meetingContext, sendAsPlayer });
         fireEvent.click(screen.getByRole('button', { name: /Ready up/i }));
-        const readyCall = socket.emit.mock.calls.find(call => call[0] === 'ready');
-        readyCall[2]({ ok: false, error: 'Reconnect before you send this command.' });
-
-        expect(socket.emit).toHaveBeenCalledWith('rejoin', { player_id: readyCall[1].player_id });
-        const [event, afterRejoin] = socket.once.mock.calls[0];
-        expect(event).toBe('game_joined');
-        afterRejoin();
-        expect(socket.emit.mock.calls.filter(call => call[0] === 'ready')).toHaveLength(2);
-    });
-
-    it('does not rejoin when the slide simply arrived after the meeting moved on', () => {
-        const { contextValue } = renderWithContext(<MeetingWaitingPage />, meetingContext);
-        const { socket } = contextValue;
-        socket.once = jest.fn();
-        fireEvent.click(screen.getByRole('button', { name: /Ready up/i }));
-        socket.emit.mock.calls.find(call => call[0] === 'ready')[2]({ ok: false, error: 'This meeting is no longer in the ready phase.' });
-        expect(socket.emit).not.toHaveBeenCalledWith('rejoin', expect.anything());
+        expect(sendAsPlayer).toHaveBeenCalledWith('ready', expect.objectContaining({
+            round_id: 'round-8',
+            meeting_id: 'meeting-8',
+        }), undefined);
     });
 
     it('in a big game, says how many need to be ready before voting opens', () => {

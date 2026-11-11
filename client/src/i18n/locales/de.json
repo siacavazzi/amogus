@@ -981,5 +981,11 @@
   "Opening your saved game…": "Dein gespeichertes Spiel wird geöffnet…",
   "Joining your group…": "Du kommst zu deiner Gruppe…",
   "Our Sus Party game. Open the link to play it again with the same tasks.": "Unser Sus-Party-Spiel. Öffne den Link, um es mit denselben Aufgaben noch einmal zu spielen.",
-  "Send it to your group chat. The first to open it hosts, everyone else joins.": "Schick ihn in euren Gruppenchat. Wer ihn zuerst öffnet, hostet, alle anderen kommen dazu."
+  "Send it to your group chat. The first to open it hosts, everyone else joins.": "Schick ihn in euren Gruppenchat. Wer ihn zuerst öffnet, hostet, alle anderen kommen dazu.",
+  "Oops, something went wrong": "Hoppla, da ist etwas schiefgelaufen",
+  "This screen hit a problem. If you were in a game, Try again usually puts you back in it.": "Dieser Bildschirm hatte ein Problem. Warst du in einem Spiel, bringt dich „Nochmal versuchen“ meist dorthin zurück.",
+  "Back to the main screen": "Zurück zum Hauptbildschirm",
+  "Your game is open in another tab": "Dein Spiel ist in einem anderen Tab geöffnet",
+  "You opened Sus Party again, so your game moved there. Play there, or tap Play here to keep playing in this tab.": "Du hast Sus Party noch einmal geöffnet, deshalb ist dein Spiel dorthin gewechselt. Spiel dort weiter oder tippe auf Hier spielen, um in diesem Tab weiterzuspielen.",
+  "Play here": "Hier spielen"
 }

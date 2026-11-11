@@ -981,5 +981,11 @@
   "Opening your saved game…": "Åpner det lagrede spillet ditt…",
   "Joining your group…": "Blir med i gruppen din…",
   "Our Sus Party game. Open the link to play it again with the same tasks.": "Sus Party-spillet vårt. Åpne lenken for å spille det igjen med de samme oppgavene.",
-  "Send it to your group chat. The first to open it hosts, everyone else joins.": "Send den i gruppechatten. Den som åpner den først blir vert, alle andre blir med."
+  "Send it to your group chat. The first to open it hosts, everyone else joins.": "Send den i gruppechatten. Den som åpner den først blir vert, alle andre blir med.",
+  "Oops, something went wrong": "Oi, noe gikk galt",
+  "This screen hit a problem. If you were in a game, Try again usually puts you back in it.": "Denne skjermen fikk et problem. Hvis du var i et spill, får Prøv igjen deg vanligvis tilbake.",
+  "Back to the main screen": "Tilbake til hovedskjermen",
+  "Your game is open in another tab": "Spillet ditt er åpent i en annen fane",
+  "You opened Sus Party again, so your game moved there. Play there, or tap Play here to keep playing in this tab.": "Du åpnet Sus Party på nytt, så spillet ditt flyttet dit. Spill der, eller trykk Spill her for å fortsette i denne fanen.",
+  "Play here": "Spill her"
 }
