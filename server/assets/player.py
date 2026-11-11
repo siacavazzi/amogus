@@ -91,6 +91,7 @@ class Player:
         self.pic = pic
         self.selfie = selfie  # Filename of selfie image (e.g., "abc123.jpg")
         self.active = True
+        self.tab_id = None  # The browser tab that holds this seat (see rejoin in app.py)
         self.disconnected_at = None
         # Offline long enough that the room stops waiting for them (see app.mark_absent_if_still_gone)
         self.absent = False

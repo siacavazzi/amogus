@@ -1,5 +1,6 @@
 // src/pages/IntruderPage.jsx
 import React, { useContext, useEffect, useState } from 'react';
+import { emitAsPlayer } from '../utils/playerCommand';
 import { DataContext } from '../GameContext';
 import LeaveGameButton from '../components/LeaveGameButton';
 import { LogOut, Zap, MapPin, AlertTriangle, X, Send, FileText, MessageSquare } from '../signal/icons';
@@ -80,6 +81,7 @@ const IntruderPage = ({
   onTutorialCardFocusChange,
   tutorialHighlightTarget = null,
 }) => {
+  const game = useContext(DataContext);
   const {
     playerState,
     socket,
@@ -88,7 +90,7 @@ const IntruderPage = ({
     taskLocations,
     intrudersRevealed,
     killCooldown = 0,
-  } = useContext(DataContext);
+  } = game;
 
   // Check if intruders have been revealed (tasks 100%)
   const isCompromised = !!intrudersRevealed;
@@ -125,7 +127,7 @@ const IntruderPage = ({
       setShowTauntModal(true);
     } else {
       // Normal card play
-      socket.emit('play_card', { player_id: localStorage.getItem('player_id'), card_id: id });
+      emitAsPlayer(game, 'play_card', { player_id: localStorage.getItem('player_id'), card_id: id });
     }
   }
 
@@ -134,7 +136,7 @@ const IntruderPage = ({
       return;
     }
     
-    socket.emit('play_card', {
+    emitAsPlayer(game, 'play_card', {
       player_id: localStorage.getItem('player_id'),
       card_id: selectedCardId,
       extra_data: {
@@ -153,7 +155,7 @@ const IntruderPage = ({
       return;
     }
 
-    socket.emit('play_card', {
+    emitAsPlayer(game, 'play_card', {
       player_id: localStorage.getItem('player_id'),
       card_id: selectedCardId,
       extra_data: {

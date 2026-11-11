@@ -981,5 +981,11 @@
   "Opening your saved game…": "Öppnar ditt sparade spel…",
   "Joining your group…": "Går med i din grupp…",
   "Our Sus Party game. Open the link to play it again with the same tasks.": "Vårt Sus Party-spel. Öppna länken för att spela det igen med samma uppgifter.",
-  "Send it to your group chat. The first to open it hosts, everyone else joins.": "Skicka den i gruppchatten. Den som öppnar den först blir värd, alla andra går med."
+  "Send it to your group chat. The first to open it hosts, everyone else joins.": "Skicka den i gruppchatten. Den som öppnar den först blir värd, alla andra går med.",
+  "Oops, something went wrong": "Hoppsan, något gick fel",
+  "This screen hit a problem. If you were in a game, Try again usually puts you back in it.": "Den här skärmen fick ett problem. Om du var i ett spel tar Försök igen dig oftast tillbaka.",
+  "Back to the main screen": "Tillbaka till huvudskärmen",
+  "Your game is open in another tab": "Ditt spel är öppet i en annan flik",
+  "You opened Sus Party again, so your game moved there. Play there, or tap Play here to keep playing in this tab.": "Du öppnade Sus Party igen, så ditt spel flyttade dit. Spela där, eller tryck på Spela här för att fortsätta i den här fliken.",
+  "Play here": "Spela här"
 }

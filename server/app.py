@@ -344,8 +344,8 @@ def record_reconnect(game, player):
 def command_error(message, game=None, player=None, reason='condition_not_met'):
     record_usage('command_rejected', game, player.player_id if player else None,
                  command=(getattr(request, 'event', {}) or {}).get('message'), reason=reason)
-    emit('error', {'message': message})
-    result = {'ok': False, 'error': message}
+    emit('error', {'message': message, 'reason': reason})
+    result = {'ok': False, 'error': message, 'reason': reason}
     if game and (player or game.is_reactor(request.sid) or game.creator_sid == request.sid):
         result['state'] = room_state(game, player, request.sid)
     return result
@@ -972,7 +972,9 @@ def handle_client_metric(data=None):
         record_usage('client_error', game, error_type=clean_label(data.get('error_type'), 40) or 'unknown',
                      screen=clean_label(data.get('screen'), 60), where=clean_label(data.get('where'), 80),
                      client_version=clean_label(data.get('client_version'), 40),
-                     unhandled_rejection=data.get('unhandled_rejection') is True)
+                     unhandled_rejection=data.get('unhandled_rejection') is True,
+                     # Set when the crash guard caught a render error: it reloaded once, or showed its screen.
+                     recovery=data.get('recovery') if data.get('recovery') in ('reload', 'crash_screen') else None)
     elif kind == 'in_app_browser' and data.get('action') in IN_APP_ACTIONS:
         # The phone opened the game inside Facebook, Reddit, X...: the pop-up asks to move to a real browser.
         record_usage('in_app_browser', game, action=data['action'],
@@ -1043,9 +1045,29 @@ def handleRejoin(data):
         emit('rejoin_failed', {'message': 'Your previous session is no longer available. Ask the host for a new invite.'})
         return
     
+    # Scanning the QR code again or tapping the invite twice opens a second tab with the same saved
+    # player. The seat follows the tab the player is looking at: a tab that rejoins from the background
+    # (its socket came back while hidden) does not take a seat that another tab is using, and a tab
+    # that loses the seat is told, so it can say "open in another tab" instead of refusing every tap.
+    # On prod one player's seat moved between 9 connections and their taps were refused for 23 min.
+    tab_id = clean_label(data.get('tab_id'), 40, r'[A-Za-z0-9-]+')
+    previous_sid = player.sid
+    seat_in_use = bool(previous_sid and previous_sid != request.sid and player.active
+                       and is_sid_connected_to_room(previous_sid, room_code))
+    other_tab = seat_in_use and not (tab_id and tab_id == getattr(player, 'tab_id', None))
+    if other_tab and data.get('hidden') is True:
+        record_usage('reconnect_deferred', game, player.player_id, reason='open_elsewhere')
+        emit('session_moved', {'room_code': room_code})
+        return {'ok': False, 'error': 'This game is open in another tab.', 'reason': 'open_elsewhere'}
+
     logger.info(f"Player {player_id} rejoining room {room_code}, creator_player_id={game.creator_player_id}")
     record_reconnect(game, player)
     player.reconnect(request.sid)
+    player.tab_id = tab_id
+    if other_tab and not game.is_reactor(previous_sid):
+        socketio.emit('session_moved', {'room_code': room_code}, to=previous_sid)
+        leave_room(room_code, sid=previous_sid)
+        game_manager.unregister_sid(previous_sid)
     link_account(player, request.sid)
     game_manager.update_sid(player_id, request.sid)
     join_room(room_code)
@@ -1290,6 +1312,7 @@ def handle_join(data):
         if player:
             record_reconnect(game, player)
             player.reconnect(sid)
+            player.tab_id = clean_label(data.get('tab_id'), 40, r'[A-Za-z0-9-]+')
             link_account(player, sid)
             player.username = unique_name(game, username, player)
             game_manager.update_sid(player_id, sid)
@@ -1335,6 +1358,7 @@ def handle_join(data):
         return
 
     player = game.addPlayer(sid, unique_name(game, username), selfie_filename, pic=pic)
+    player.tab_id = clean_label(data.get('tab_id'), 40, r'[A-Za-z0-9-]+')
     link_account(player, sid)
     game_manager.register_player(player.player_id, room_code, sid)
     join_room(room_code)

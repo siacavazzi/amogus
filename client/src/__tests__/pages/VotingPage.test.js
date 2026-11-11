@@ -29,6 +29,16 @@ describe('VotingPage', () => {
         },
     };
 
+    describe('When the meeting is already gone', () => {
+        // The screen is chosen one render after the room changes: this page draws once with no meeting
+        // (last stand during the vote, or a phone waking after it ended). It blanked phones on prod.
+        it.each([null, undefined])('renders without crashing when meetingState is %s', (meetingState) => {
+            renderWithContext(<VotingPage />, { ...votingContext, meetingState, socket: createControlledSocket() });
+            expect(screen.queryByRole('button', { name: /I've Been Killed/i })).toBeNull();
+            expect(screen.getByRole('button', { name: /Veto Meeting/i })).toBeDisabled();
+        });
+    });
+
     describe('Death reports during voting', () => {
         afterEach(() => {
             jest.useRealTimers();

@@ -6,6 +6,7 @@ import { ReactorModeBanner } from '../components/ReactorModeBanner';
 import '../signal/reactor.css';
 import { dismissTutorialPrompt, shouldRecommendTutorial } from '../tutorial/tutorialStorage';
 import { getAcquisition } from '../seo/discovery';
+import { rejoinPayload } from '../utils/browserTab';
 import RoomEntryNotice from '../components/RoomEntryNotice';
 import { getRoomCodeFromSearch, clearRoomCodeFromUrl } from '../utils/inviteLinks';
 import { readGeneratedSetup, claimGeneratedRoomCreation } from './seo/gameDraft';
@@ -120,7 +121,7 @@ function LobbyPage() {
         setRoomEntryStatus(null);
         const playerId = localStorage.getItem('player_id');
         if (playerId && localStorage.getItem('room_code') === roomCode) {
-            socket.emit('rejoin', { player_id: playerId });
+            socket.emit('rejoin', rejoinPayload(playerId, { claim: true }));
         } else {
             socket.emit('join_game', { room_code: roomCode, ...join });
         }

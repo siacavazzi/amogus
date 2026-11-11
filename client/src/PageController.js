@@ -29,6 +29,7 @@ import VotingPage from "./pages/VotingPage";
 import MeetingResultPage from "./pages/MeetingResultsPage";
 import GameConfigPage from "./pages/GameConfigPage";
 import WaitingNextRoundPage from "./pages/WaitingNextRoundPage";
+import OpenElsewhere from "./components/OpenElsewhere";
 
 // Screens that still lean on the Signal setup flatten layer (see signal/setup.css): the
 // reactor's desktop home and the selfie camera on the join screen. The other setup screens
@@ -62,6 +63,8 @@ const PageController = () => {
         taskCreationMode,
         waitingForNextRound,
         roundRunningAtEntry,
+        sessionMoved,
+        reclaimSeat,
     } = useContext(DataContext);
 
     const [currentPage, setCurrentPage] = useState("connecting");
@@ -233,6 +236,9 @@ const PageController = () => {
             </p>
         ),
     };
+
+    // Another tab of the game holds this player's seat: say so instead of a screen that refuses taps.
+    if (sessionMoved) return <OpenElsewhere onPlayHere={reclaimSeat} />;
 
     return (
         // The feedback prompt sits above the pages, so a Play Again reset doesn't close a half-written answer.
