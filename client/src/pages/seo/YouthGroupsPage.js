@@ -17,14 +17,14 @@ const SCHEMA = {
 
 export default function YouthGroupsPage() {
     usePageMeta({
-        title: 'Among Us IRL for Youth Groups and Libraries | Sus Party',
+        title: 'Among Us Style Game for Youth Groups and Libraries | Sus Party',
         description: DESCRIPTION, canonical: CANONICAL, schema: SCHEMA,
     });
     return (
         <SeoPageLayout>
             <header className="seo-hero">
                 <p className="seo-eyebrow">Program guide · Libraries, classrooms, youth groups, camps</p>
-                <h1 className="seo-h1">Among Us IRL for youth groups, libraries and classrooms</h1>
+                <h1 className="seo-h1">An Among Us style game for youth groups, libraries and classrooms</h1>
                 <p className="seo-lead">
                     A real-life Among Us-inspired game fits a library program, a club meeting, or a youth group game night.
                     Players walk to simple tasks, watch each other, and argue their case at a meeting.

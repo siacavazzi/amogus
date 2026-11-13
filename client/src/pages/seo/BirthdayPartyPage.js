@@ -106,6 +106,7 @@ function BirthdayPartyPage() {
                 <nav className="seo-links" aria-label="More help for the host">
                     <p className="seo-links__title">Before you share the code</p>
                     <ul className="seo-links__list">
+                        <li><a href="/among-us-irl">See how Among Us IRL works on phones</a></li>
                         <li><a href="/how-to-play-among-us-irl">Read the sample round and vote rules</a></li>
                         <li><a href="/party-games-for-10-people">Choose a warm-up game for ten guests</a></li>
                         <li><a href="/social-deduction-games">Compare other social deduction games</a></li>

@@ -33,10 +33,10 @@ const QUICK_PAGES = {
     },
 
     '/among-us-party-game': {
-        title: 'Among Us Party Game for Real Life, Free on Phones | Sus Party',
+        title: 'Among Us Party Game for Themed Parties, Free on Phones | Sus Party',
         description: 'Turn an Among Us party into a real game. Sus Party gives every guest a secret role on their phone and real tasks around the venue. Free, no app download, 3 to 20+ players.',
         eyebrow: 'Among Us party game · For any party',
-        h1: 'The Among Us party game, played for real',
+        h1: 'The game to play at an Among Us themed party',
         lead: 'Throwing an Among Us themed party? Sus Party is the game to play at it. Guests get crewmate or intruder roles on their phones, do real tasks around your place, and vote out whoever they think is sus.',
         pack: { href: gen('venue=house&players=12&style=75'), label: 'Start with the 12-player party pack' },
         sections: [
@@ -51,7 +51,7 @@ const QUICK_PAGES = {
                 h2: 'Make it feel like a party',
                 body: [
                     'Put a laptop or desktop in the meeting room to show the shared game screen. Use party cups and plates as task props. Hand the winning team the first slice of cake. Keep rounds short so new guests can rotate in.',
-                    'Throwing it for a birthday? See the guides for an <a href="/among-us-birthday-party">Among Us birthday party</a> and an <a href="/among-us-party-for-kids">Among Us party for kids</a>.',
+                    'Throwing it for a birthday? See the guides for an <a href="/among-us-birthday-party">Among Us birthday party</a> and an <a href="/among-us-party-for-kids">Among Us party for kids</a>. New to the game? Start with <a href="/among-us-irl">how Among Us IRL works</a>.',
                 ],
             },
         ],

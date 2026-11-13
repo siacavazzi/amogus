@@ -108,7 +108,7 @@ function SocialDeductionPage() {
                     <ul className="seo-links__list">
                         <li><a href="/party-games-for-10-people">Party games for ten people at home</a></li>
                         <li><a href="/among-us-birthday-party">An Among Us-inspired birthday game</a></li>
-                        <li><a href="/among-us-irl">Play Among Us in real life with Sus Party</a></li>
+                        <li><a href="/among-us-irl">Among Us IRL with Sus Party</a></li>
                     </ul>
                 </nav>
             </main>

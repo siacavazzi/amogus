@@ -86,7 +86,14 @@ http {
             for route in routes:
                 if route.get('prerender') is False:
                     continue
-                for suffix in ['', '?utm_source=seo-check'] + (['/'] if route['path'] != '/' else []):
+                if route['path'] != '/':
+                    for suffix in ['/', '/?utm_source=seo-check']:
+                        headers, _ = request(route['path'] + suffix)
+                        assert re.match(r'HTTP/\S+ 301', headers), (route['path'] + suffix, headers)
+                        location = re.search(r'^location:\s*(.+)$', headers, re.I | re.M).group(1).strip()
+                        expected = route['path'] + suffix[1:]
+                        assert location.endswith(expected) and '//' not in location.split('://', 1)[-1], (location, expected)
+                for suffix in ['', '?utm_source=seo-check']:
                     headers, body = request(route['path'] + suffix)
                     assert re.match(r'HTTP/\S+ 200', headers), (route['path'], headers)
                     assert 'location:' not in headers.lower(), (route['path'], headers)
@@ -118,7 +125,7 @@ http {
             headers, _ = request('/play?beta=0', cookie='sus_channel=beta')
             assert re.search(r'^set-cookie:\s*sus_channel=;.*Max-Age=0', headers, re.I | re.M), headers
             assert not re.search(r'^x-robots-tag:', headers, re.I | re.M), headers
-            print(f'PASS {len(routes)} routes on Nginx: direct 200 responses, slash and query variants, canonical tags, crawl access, and host redirects.')
+            print(f'PASS {len(routes)} routes on Nginx: direct 200 responses, slash redirects, query variants, canonical tags, crawl access, and host redirects.')
         finally:
             process.terminate()
             process.wait(timeout=10)
