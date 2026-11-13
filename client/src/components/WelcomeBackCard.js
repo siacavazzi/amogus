@@ -5,6 +5,7 @@ import { readLastGame, dismissLastGame } from '../utils/lastGame';
 import { savedGameUrl } from '../utils/savedGame';
 import { t } from '../i18n';
 import { ENDPOINT } from '../ENDPOINT';
+import { isBetaChannel } from './BetaBadge';
 
 // The dev server (port 3000) doesn't serve /api; the game server does.
 const API = typeof window !== 'undefined' && window.location.port === '3000' ? ENDPOINT : '';
@@ -27,7 +28,8 @@ export default function WelcomeBackCard({ style }) {
         if (!token || typeof fetch !== 'function') return undefined;
         let live = true;
         // In the body, never the address: addresses end up in the web server's log with an IP.
-        fetch(`${API}/api/group`, {
+        // No cookies go with it, so the beta cookie can't route it: a beta page says so in the address.
+        fetch(`${API}/api/group${isBetaChannel() ? '?beta=1' : ''}`, {
             method: 'POST', credentials: 'omit',
             headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ g: token }),
         })
