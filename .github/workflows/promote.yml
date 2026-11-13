@@ -148,7 +148,8 @@ jobs:
           ssh-keyscan -H ${{ secrets.DROPLET_IP }} >> ~/.ssh/known_hosts
 
       # Games live in the server's memory, so a restart ends every round in progress. Wait up
-      # to 20 minutes for real rounds to finish (test rooms don't count), unless forced.
+      # to 20 minutes for real rounds to finish (test rooms and finished rounds still on the win
+      # screen don't count), unless forced.
       - name: Wait for rounds in progress on prod to finish
         if: ${{ !inputs.force }}
         run: |
@@ -157,8 +158,10 @@ jobs:
             rounds="$(echo "$health" | jq -r '.rounds_running // 0')"
             rooms="$(echo "$health" | jq -r '.rooms_in_use // 0')"
             echo "$(date -u +%H:%M) prod: $rounds rounds running, $rooms rooms with people in them"
+            # What each live round is doing (rooms on the win screen are not counted)
+            echo "$health" | jq -r '.live_rounds // [] | .[] | "  - \(.state), \(.players_connected) phones connected, \(.minutes_in // "?") min in"'
             if [ "$rounds" = "0" ]; then
-              if [ "$rooms" != "0" ]; then echo "::warning::$rooms lobbies with people in them will need to reconnect after the restart"; fi
+              if [ "$rooms" != "0" ]; then echo "::warning::$rooms rooms with people in them (lobbies or win screens) will need to reconnect after the restart"; fi
               exit 0
             fi
             [ "$minute" = 20 ] || sleep 60
