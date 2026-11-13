@@ -50,6 +50,16 @@ describe('Welcome back card', () => {
             expect(link.getAttribute('href')).toContain('#g=tokenBBBBBBB');
         });
 
+        it('asks the beta server on a beta page, because the request carries no cookies', async () => {
+            const cookie = jest.spyOn(document, 'cookie', 'get').mockReturnValue('sus_channel=beta');
+            respond({ recap: { rooms: 1, rounds: 1, crew_wins: 1, intruder_wins: 0 }, room: null });
+            rememberLastGame({ code: 'ZN5QF2', taskCount: 33, group: 'tokenAAAAAAA' });
+            render(<WelcomeBackCard />);
+            await waitFor(() => expect(screen.getByTestId('group-recap')).toBeInTheDocument());
+            expect(global.fetch).toHaveBeenCalledWith('/api/group?beta=1', expect.objectContaining({ credentials: 'omit', body: JSON.stringify({ g: 'tokenAAAAAAA' }) }));
+            cookie.mockRestore();
+        });
+
         it('works as before when the phone has no group token', () => {
             global.fetch = jest.fn();
             rememberLastGame({ code: 'ZN5QF2', taskCount: 33 });
