@@ -86,6 +86,7 @@ function HowToPlayIrlPage() {
                     Make your living room the meeting point and the rest of the house the task map.
                     Crew members follow their phone lists. Intruders pretend to belong.
                     This guide takes you from a task pack to the first accusation, using Sus Party’s actual rules.
+                    New to the idea? Start with the <a href="/among-us-irl">Among Us IRL overview</a>.
                 </p>
                 <div className="seo-actions">
                     <a href="/among-us-irl-task-generator?venue=house&players=8&movement=normal" className="seo-btn--primary">

@@ -59,7 +59,7 @@ const SCHEMA = {
 
 function AmongUsIrlPage() {
     usePageMeta({
-        title: 'Among Us IRL: Free App for 3 to 20+ Players | Sus Party',
+        title: 'Among Us IRL: Free Web App for 3 to 20+ Players | Sus Party',
         description:
             'Play Among Us in real life for free. Phones deal secret roles, real tasks, meetings and votes for 3 to 20+ players at home, at school, or at a youth group. No install.',
         canonical: 'https://susparty.com/among-us-irl',
@@ -72,7 +72,7 @@ function AmongUsIrlPage() {
         <SeoPageLayout languagePage="irl">
             <div className="seo-hero">
                 <p className="seo-eyebrow">Sus Party · Free browser game</p>
-                <h1 className="seo-h1">Play Among Us in real life with Sus Party</h1>
+                <h1 className="seo-h1">Among Us IRL: play it in real life on your phones</h1>
                 <p className="seo-lead">
                     Someone heads to the kitchen for a task. Someone follows them a little too closely.
                     A meeting starts, and suddenly everyone has an alibi. Sus Party is the free Among Us IRL game,

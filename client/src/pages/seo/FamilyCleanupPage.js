@@ -15,7 +15,7 @@ const SCHEMA = {
 
 export default function FamilyCleanupPage() {
     usePageMeta({
-        title: 'Make Cleaning Fun for Kids with Among Us IRL | Sus Party',
+        title: 'Make Cleaning Fun for Kids with an Among Us Style Game | Sus Party',
         description: DESCRIPTION, canonical: 'https://susparty.com/make-cleaning-fun-for-kids', schema: SCHEMA,
     });
     return (

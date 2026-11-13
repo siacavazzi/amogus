@@ -190,6 +190,7 @@ export default function PrintableTaskCardsPage() {
                 <nav className="seo-links" aria-label="More Among Us IRL guides">
                     <p className="seo-links__title">Plan the rest of the game</p>
                     <ul className="seo-links__list">
+                        <li><a href="/among-us-irl">Play Among Us IRL on phones instead</a></li>
                         <li><a href="/among-us-irl-task-ideas">Among Us IRL task ideas by room</a></li>
                         <li><a href="/how-to-play-among-us-irl">Full rules for Among Us IRL</a></li>
                         <li><a href="/among-us-party-for-kids">Run an Among Us party for kids</a></li>
