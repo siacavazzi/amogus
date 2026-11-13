@@ -564,13 +564,39 @@ def health_check():
     # rounds to finish before it restarts the server and drops them.
     in_use = [game for game in list(game_manager.games.values())
               if not getattr(game, 'synthetic', False) and any(player.active for player in game.players)]
+    # A round that has ended (win screen) keeps game_running on until Play Again or a reset,
+    # so it is not counted: restarting then costs that group nothing.
+    live = [game for game in in_use if round_in_progress(game)]
     return {
         'status': 'healthy',
         'games': len(game_manager.games),
         'rooms_in_use': len(in_use),
-        'rounds_running': sum(1 for game in in_use if game.game_running),
+        'rounds_running': len(live),
+        # What each live round is doing, so a waiting deploy can say what holds it.
+        # No room codes: this page is public and a code lets anyone into the room.
+        'live_rounds': [round_summary(game) for game in live],
         'version': VERSION,
     }, 200
+
+
+def round_in_progress(game):
+    return bool(game.game_running) and not game.end_state
+
+
+def round_summary(game):
+    meltdown = game.active_meltdown
+    if game.meeting:
+        state = 'meeting'
+    elif meltdown and getattr(meltdown, 'meltdown_active', False):
+        state = 'meltdown'
+    else:
+        state = 'tasks'
+    started = getattr(game, 'round_started_at', None)
+    return {
+        'state': state,
+        'players_connected': sum(1 for player in game.players if player.active),
+        'minutes_in': round((time.time() - started) / 60) if started else None,
+    }
 
 
 @app.route('/api/group', methods=['POST'])
