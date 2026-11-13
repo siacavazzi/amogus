@@ -15,8 +15,12 @@ async function startSetup(page) {
 }
 
 async function signInWithCode(page, scope, email) {
-    await scope.getByRole('button', { name: 'Email me a code' }).click();
-    await page.locator('#sp-acct-email').fill(email);
+    // The setup-screen card opens the email box with this button; the sign-in sheet shows the box
+    // straight away, and there the same label is the send button (disabled until an email is typed).
+    await scope.waitFor();
+    const emailBox = page.locator('#sp-acct-email');
+    if (!(await emailBox.isVisible())) await scope.getByRole('button', { name: 'Email me a code' }).click();
+    await emailBox.fill(email);
     await page.locator('#sp-acct-email').press('Enter');
     const code = (await page.getByTestId('dev-code').textContent()).replace(/\D/g, '');
     await page.locator('#sp-acct-code').fill(code);
