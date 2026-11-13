@@ -51,6 +51,8 @@
     max-width: 1160px;
     margin: 0 auto;
     padding: 18px 20px;
+    /* Opened from the home screen there is no address bar: keep clear of the clock and notch. */
+    padding-top: calc(18px + env(safe-area-inset-top, 0px));
     position: relative;
     z-index: 2;
 }
@@ -185,7 +187,7 @@
 
 @media (max-width: 700px) {
     .site-page { font-size: 17px; }
-    .site-nav { padding: 14px 16px; gap: 16px; }
+    .site-nav { padding: calc(14px + env(safe-area-inset-top, 0px)) 16px 14px; gap: 16px; }
     .site-footer { padding: 40px 16px 32px; }
     .site-brand { font-size: 1.25rem; }
     .site-nav__links { gap: 12px; }

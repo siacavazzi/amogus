@@ -45,4 +45,14 @@ describe('Save this game', () => {
         expect(screen.getByText('Keep Sus Party on your home screen')).toBeInTheDocument();
         spy.mockRestore();
     });
+
+    it('points Chrome on iPhone at Chrome\'s own Share button, not Save this game', () => {
+        const chrome = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/142.0 Mobile/15E148 Safari/604.1';
+        const spy = jest.spyOn(window.navigator, 'userAgent', 'get').mockReturnValue(chrome);
+        renderWithContext(<EndGameButtons />, { roomCode: 'ABCD', isMobile: true, isRoomCreator: true });
+        expect(screen.getByText(/in Chrome's address bar/)).toBeInTheDocument();
+        expect(screen.getByText(/Tap "View More" if you see it, then "Add to Home Screen"/)).toBeInTheDocument();
+        expect(screen.getByText(/not "Save this game"/)).toBeInTheDocument();
+        spy.mockRestore();
+    });
 });
