@@ -10,12 +10,6 @@ const plain = html => html.replace(/<[^>]+>/g, '');
 // Copy comes from quickPages.js in this repo, never from users.
 const Html = ({ as: Tag = 'p', html, ...rest }) => <Tag {...rest} dangerouslySetInnerHTML={{ __html: html }} />;
 
-const STEPS = [
-    ['Pick a task pack', 'Choose the rooms you will use and how many people are playing. Each task is something small and real, like stacking three cups.'],
-    ['Share the room code', 'Friends open susparty.com on their phones and type the four-letter code. No app or account.'],
-    ['Play', 'Phones deal the secret roles. Crew do tasks, intruders fake them and tap people out. Find a body, meet up, vote.'],
-];
-
 const RELATED = [
     ['/among-us-irl', 'Among Us IRL: the full guide'],
     ['/how-to-play-among-us-irl', 'How to play: rules and a sample round'],
@@ -24,9 +18,7 @@ const RELATED = [
     ['/party-games-on-your-phone', 'Party games with phones'],
     ['/game-night-ideas', 'Game night with no moderator'],
     ['/sus-games', 'Sus games'],
-    ['/among-us-party-game', 'Among Us party game'],
     ['/mafia-game-app', 'Mafia game app'],
-    ['/chore-game-app', 'Chore game app'],
 ];
 
 function QuickPage({ path }) {
@@ -66,9 +58,9 @@ function QuickPage({ path }) {
             <main className="seo-content">
                 <section className="seo-section">
                     <p className="seo-section__kicker">How it works</p>
-                    <h2>Set up in about five minutes</h2>
+                    <h2>{page.stepsTitle}</h2>
                     <ol className="seo-steps">
-                        {STEPS.map(([title, text], index) => (
+                        {page.steps.map(([title, text], index) => (
                             <li className="seo-step" key={title}>
                                 <span className="seo-step__num" aria-hidden="true">{index + 1}</span>
                                 <div><h3>{title}</h3><p>{text}</p></div>
@@ -100,9 +92,9 @@ function QuickPage({ path }) {
                     </div>
                 </section>
 
-                <GameSetupCta title="Ready to find out who is sus?" href={page.pack.href}
+                <GameSetupCta title={page.cta.title} href={page.pack.href}
                     label={page.pack.label} secondaryHref="/play" secondaryLabel="Join with a room code">
-                    Open the task pack, check the rooms, and press “Use this pack”. Your game is created with the tasks loaded.
+                    {page.cta.text}
                 </GameSetupCta>
 
                 <nav className="seo-links" aria-label="Related guides">

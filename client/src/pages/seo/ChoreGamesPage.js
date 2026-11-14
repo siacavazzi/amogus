@@ -196,7 +196,7 @@ function ChoreGamesPage() {
                         The crew wins by voting out every intruder at a meeting, so the chores get done while everyone
                         watches for whoever is only pretending. The intruder can bluff about their jobs but never undoes finished work. The parent plays too, which kids love, because now
                         Mom might be the suspect. Read <a href="/how-to-play">how to play</a> for the full rules, or
-                        see more ideas in <a href="/make-cleaning-fun-for-kids">make cleaning fun for kids</a> and
+                        see more ideas in <a href="/among-us-chores">Among Us chores</a> and
                         the <a href="/family-cleaning-routine">family cleaning routine</a> guide.
                     </p>
                 </section>

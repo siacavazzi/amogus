@@ -10,6 +10,13 @@ const QUICK_PAGES = {
         h1: 'The sus game you play in real life',
         lead: 'Sus Party is a free party game where one or more friends are secretly the intruder. Everyone else does small real tasks around the house. Then you all argue about who was acting sus.',
         pack: { href: gen('venue=house&players=10&style=75'), label: 'Start with the 10-player house pack' },
+        stepsTitle: 'From link to first accusation',
+        steps: [
+            ['Open the house pack', 'It starts with ten players and short tasks like stacking three cups. Swap in rooms you actually have.'],
+            ['Send the room code', 'Friends open susparty.com on their phones and type the four-letter code. Nothing to download.'],
+            ['Watch who acts weird', 'Roles appear on each phone. Do your tasks, keep an eye on everyone, and call a meeting when something feels off.'],
+        ],
+        cta: { title: 'Somebody here is sus.', text: 'Open the house pack, check the rooms, and press \u201cUse this pack\u201d. Your game is created with the tasks loaded.' },
         sections: [
             {
                 h2: 'Like Among Us, but the map is your house',
@@ -24,41 +31,18 @@ const QUICK_PAGES = {
                     'They said they were in the kitchen, but nobody saw them there. They walked away right before the body was found. They are very calm about all of it. That is the whole game: watch people, remember who was where, and decide whose story falls apart.',
                 ],
             },
+            {
+                h2: 'How to play the intruder without looking sus',
+                body: [
+                    'Stand at a task for about as long as it would really take. Pick a story early and stick to it. Do not be the first to accuse someone, and do not be the last to agree. Tap people out when nobody else is in the room, then walk somewhere busy.',
+                    'Crew can turn this around: ask people to describe the task they just did. Real crew remember the details. Intruders tend to keep it vague.',
+                ],
+            },
         ],
         faqs: [
             { q: 'Do we need to know Among Us?', a: 'No. The rules take about two minutes to explain, and there is a short tutorial in the app.' },
             { q: 'How many players?', a: 'At least 3, and it works for 20+. The game picks one intruder for every five players on Auto.' },
             { q: 'Is Sus Party the official Among Us?', a: 'No. Sus Party is an independent game, not made or endorsed by Innersloth.' },
-        ],
-    },
-
-    '/among-us-party-game': {
-        title: 'Among Us Party Game for Themed Parties, Free on Phones | Sus Party',
-        description: 'Turn an Among Us party into a real game. Sus Party gives every guest a secret role on their phone and real tasks around the venue. Free, no app download, 3 to 20+ players.',
-        eyebrow: 'Among Us party game · For any party',
-        h1: 'The game to play at an Among Us themed party',
-        lead: 'Throwing an Among Us themed party? Sus Party is the game to play at it. Guests get crewmate or intruder roles on their phones, do real tasks around your place, and vote out whoever they think is sus.',
-        pack: { href: gen('venue=house&players=12&style=75'), label: 'Start with the 12-player party pack' },
-        sections: [
-            {
-                h2: 'Why it works at a party',
-                body: [
-                    'Guests do not need to sit still or know the rules ahead of time. They walk around, do quick tasks, run into each other, and gossip. Late arrivals can join the next round with the same room code.',
-                    'The host sets up once, about five minutes before people arrive: pick a task pack, check the rooms, and open the room. After that the app runs the game, so the host plays too.',
-                ],
-            },
-            {
-                h2: 'Make it feel like a party',
-                body: [
-                    'Put a laptop or desktop in the meeting room to show the shared game screen. Use party cups and plates as task props. Hand the winning team the first slice of cake. Keep rounds short so new guests can rotate in.',
-                    'Throwing it for a birthday? See the guides for an <a href="/among-us-birthday-party">Among Us birthday party</a> and an <a href="/among-us-party-for-kids">Among Us party for kids</a>. New to the game? Start with <a href="/among-us-irl">how Among Us IRL works</a>.',
-                ],
-            },
-        ],
-        faqs: [
-            { q: 'What ages is it for?', a: 'Anyone who can read a short task on a phone. Kids and adults play the same game, often together.' },
-            { q: 'How long does a round take?', a: 'About 10 to 20 minutes. Most parties play three or four rounds.' },
-            { q: 'Can we play outside?', a: 'Yes. Add the yard or garden as an area in the task pack.' },
         ],
     },
 
@@ -69,6 +53,13 @@ const QUICK_PAGES = {
         h1: 'Mafia with phones, and nobody has to be the narrator',
         lead: 'Sus Party is a free game like Mafia, crossed with Among Us in real life. Phones hand out the secret roles and count the votes, so everyone gets to play, including the person who organized it.',
         pack: { href: gen('venue=house&players=10&style=50'), label: 'Start with the 10-player house pack' },
+        stepsTitle: 'Run it without a narrator',
+        steps: [
+            ['Choose the rooms', 'The house pack fills each room with quick tasks. Edit or remove any of them.'],
+            ['Everyone joins on their phone', 'Players type the room code at susparty.com. The phones deal the roles, so nobody sees who got what.'],
+            ['Play, then vote', 'Meetings and votes run on the phones and the result is counted for you. The organizer plays like everyone else.'],
+        ],
+        cta: { title: 'Give the narrator a role too.', text: 'Open the house pack, check the rooms, and press \u201cUse this pack\u201d. The game deals the roles and counts the votes.' },
         sections: [
             {
                 h2: 'How it is like Mafia',
@@ -83,6 +74,13 @@ const QUICK_PAGES = {
                     'That means the clues are real. Who left the kitchen right before the body was found? Who was nowhere near their task? It also means nobody sits around waiting. Even players who are out keep the secret and watch the rest unfold.',
                 ],
             },
+            {
+                h2: 'Mafia roles and their Sus Party match',
+                body: [
+                    '<strong>Mafia</strong> are the intruders: they pick off players in secret and try to blend in. <strong>Villagers</strong> are the crew: they win by voting out every intruder, or by finishing all the tasks first. There is no doctor or detective. Instead, intruders get sabotage cards that cause trouble for the crew, and the crew gets clues from watching who was where.',
+                    'Like a good Mafia game, it gets better with more people. Groups of 8 to 15 get two intruders on Auto and long, loud meetings.',
+                ],
+            },
         ],
         faqs: [
             { q: 'How many players?', a: 'At least 3, and it works well for 20+. On Auto, the game picks one intruder for every five players.' },
@@ -91,34 +89,6 @@ const QUICK_PAGES = {
         ],
     },
 
-    '/chore-game-app': {
-        title: 'Chore Game App: Turn Cleaning Into a Party Game | Sus Party',
-        description: 'A free chore game app for families and roommates. Sus Party turns real chores into Among Us style tasks on your phones, with a hidden intruder to catch.',
-        eyebrow: 'Chore game app · Families and roommates',
-        h1: 'A chore game app that makes cleaning a game',
-        lead: 'Sus Party turns your to-do list into an Among Us style game. Every chore becomes a task on someone\'s phone. One player is secretly the intruder. Finish the chores, catch the intruder, and the house is clean.',
-        pack: { href: gen('preset=cleanup&players=4'), label: 'Start with the household chores pack' },
-        sections: [
-            {
-                h2: 'How the chore game works',
-                body: [
-                    'Open the chores pack and pick the rooms that need work. Each player gets real jobs on their phone, like loading the dishwasher, putting shoes away or wiping the table. When they finish, they mark it done and get the next one.',
-                    'Meanwhile one player is the intruder. They still pitch in to look busy, but their goal is to tap people out without getting caught. Meetings stop the cleaning for a minute of accusations, then everyone gets back to it.',
-                ],
-            },
-            {
-                h2: 'Who it is for',
-                body: [
-                    'Families with kids who need a reason to tidy up, roommates splitting the Sunday reset, and anyone hosting a party who wants the cleanup to be the afterparty. For more ideas, see <a href="/chore-games-for-kids">chore games for kids</a> and <a href="/among-us-chores">Among Us chores</a>.',
-                ],
-            },
-        ],
-        faqs: [
-            { q: 'How many people do we need?', a: 'Three or more. A family of four is a great size.' },
-            { q: 'Can we add our own chores?', a: 'Yes. Edit any task or add your own before you start the game.' },
-            { q: 'Is it free?', a: 'Yes. No ads, no account, no download.' },
-        ],
-    },
 };
 
 export const QUICK_PAGE_PATHS = Object.keys(QUICK_PAGES);

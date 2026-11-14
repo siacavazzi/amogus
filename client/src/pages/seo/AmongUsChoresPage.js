@@ -210,8 +210,8 @@ export default function AmongUsChoresPage() {
                     </ul>
                     <p>
                         Avoid paying per chore inside the game. It turns every meeting into an argument about money.
-                        For more ways to make tidying less of a battle, read <a href="/make-cleaning-fun-for-kids">how to make
-                        cleaning fun for kids</a> or browse other <a href="/chore-games-for-kids">chore games for kids</a>.
+                        For more ways to make tidying less of a battle, browse other <a href="/chore-games-for-kids">chore games for kids</a>
+                        or set up a <a href="/family-cleaning-routine">weekly family cleaning routine</a>.
                     </p>
                 </section>
 
@@ -269,7 +269,7 @@ export default function AmongUsChoresPage() {
 
                 <GameSetupCta title="Give the chore chart a secret intruder."
                     href={CLEANUP_URL} label="Open the cleanup preset for four"
-                    secondaryHref="/make-cleaning-fun-for-kids" secondaryLabel="More cleanup ideas for kids">
+                    secondaryHref="/chore-games-for-kids" secondaryLabel="More chore games for kids">
                     Start with the family cleanup tasks, swap in your real chores, share the room code, and play together. Free in your phone browsers.
                 </GameSetupCta>
             </main>

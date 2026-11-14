@@ -22,7 +22,6 @@ import AdultPartyPage from './pages/seo/AdultPartyPage';
 import MurderMysteryPage from './pages/seo/MurderMysteryPage';
 import AdultBirthdayPage from './pages/seo/AdultBirthdayPage';
 import GameNightPage from './pages/seo/GameNightPage';
-import FamilyCleanupPage from './pages/seo/FamilyCleanupPage';
 import TraitorsAtHomePage from './pages/seo/TraitorsAtHomePage';
 import PhonePartyPage from './pages/seo/PhonePartyPage';
 import QuickPage from './pages/seo/QuickPage';
@@ -50,10 +49,6 @@ const StylePreview = lazy(() => import('./preview/StylePreview'));
 function getRoute() {
   const roomCode = getRoomCodeFromSearch();
   const normalizedPath = window.location.pathname.replace(/\/+$/, '') || '/';
-
-  if (normalizedPath === '/make-cleaning-fun-for-kids' || normalizedPath.startsWith('/make-cleaning-fun-for-kids/')) {
-    return 'family-cleanup';
-  }
 
   if (normalizedPath === '/among-us-irl-task-generator' || normalizedPath.startsWith('/among-us-irl-task-generator/')) {
     return 'task-generator';
@@ -274,7 +269,6 @@ function App() {
   if (route === 'murder-mystery') return <MurderMysteryPage />;
   if (route === 'adult-birthday') return <AdultBirthdayPage />;
   if (route === 'game-night') return <GameNightPage />;
-  if (route === 'family-cleanup') return <FamilyCleanupPage />;
   if (route === 'traitors-at-home') return <TraitorsAtHomePage />;
   if (route === 'phone-party') return <PhonePartyPage />;
   if (route === 'sleepover') return <SleepoverPage />;

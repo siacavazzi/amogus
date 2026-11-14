@@ -135,6 +135,12 @@ http {
             headers, _ = request('/how-to-play.html')
             assert re.match(r'HTTP/\S+ 301', headers), headers
             assert re.search(r'^location:.*/how-to-play\s*$', headers, re.I | re.M), headers
+            for old_path, new_path in [('/among-us-party-game', '/among-us-birthday-party'),
+                                       ('/make-cleaning-fun-for-kids', '/among-us-chores'),
+                                       ('/chore-game-app', '/among-us-chores')]:
+                headers, _ = request(old_path + '?utm_source=x')
+                assert re.match(r'HTTP/\S+ 301', headers), (old_path, headers)
+                assert re.search(r'^location:.*%s\?utm_source=x\s*$' % re.escape(new_path), headers, re.I | re.M), headers
             print(f'PASS {len(routes)} routes on Nginx: direct 200 responses, slash redirects, query variants, canonical tags, crawl access, and host redirects.')
         finally:
             process.terminate()

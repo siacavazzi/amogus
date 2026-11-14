@@ -93,9 +93,8 @@ class StatsTracker:
                  '/among-us-irl-task-ideas', '/among-us-irl-task-generator',
                  '/social-deduction-games', '/among-us-birthday-party', '/party-games-for-10-people',
                  '/party-games-for-adults', '/murder-mystery-party-game',
-                 '/birthday-party-games-for-adults', '/game-night-ideas',
-                 '/make-cleaning-fun-for-kids', '/traitors-at-home', '/party-games-on-your-phone',
-                 '/sleepover-games-for-teens', '/indoor-family-reunion-games', '/among-us-role-generator', '/among-us-chores', '/chore-games-for-kids', '/family-cleaning-routine', '/among-us-party-for-kids', '/among-us-irl-for-youth-groups', '/among-us-task-cards-printable', '/holiday-party-games-for-adults', '/sus-games', '/among-us-party-game', '/mafia-game-app', '/chore-game-app', '/how-to-play', '/faq', '/about'}
+                 '/birthday-party-games-for-adults', '/game-night-ideas', '/traitors-at-home', '/party-games-on-your-phone',
+                 '/sleepover-games-for-teens', '/indoor-family-reunion-games', '/among-us-role-generator', '/among-us-chores', '/chore-games-for-kids', '/family-cleaning-routine', '/among-us-party-for-kids', '/among-us-irl-for-youth-groups', '/among-us-task-cards-printable', '/holiday-party-games-for-adults', '/sus-games', '/mafia-game-app', '/how-to-play', '/faq', '/about'}
         source = value.get('source')
         page = value.get('landing_page')
         return {

@@ -91,13 +91,6 @@
     "prerender": true
   },
   {
-    "path": "/make-cleaning-fun-for-kids",
-    "canonical": "https://susparty.com/make-cleaning-fun-for-kids",
-    "priority": "0.8",
-    "changefreq": "monthly",
-    "prerender": true
-  },
-  {
     "path": "/traitors-at-home",
     "canonical": "https://susparty.com/traitors-at-home",
     "priority": "0.8",
@@ -189,22 +182,8 @@
     "prerender": true
   },
   {
-    "path": "/among-us-party-game",
-    "canonical": "https://susparty.com/among-us-party-game",
-    "priority": "0.8",
-    "changefreq": "monthly",
-    "prerender": true
-  },
-  {
     "path": "/mafia-game-app",
     "canonical": "https://susparty.com/mafia-game-app",
-    "priority": "0.8",
-    "changefreq": "monthly",
-    "prerender": true
-  },
-  {
-    "path": "/chore-game-app",
-    "canonical": "https://susparty.com/chore-game-app",
     "priority": "0.8",
     "changefreq": "monthly",
     "prerender": true
