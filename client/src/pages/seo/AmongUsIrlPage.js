@@ -223,8 +223,8 @@ function AmongUsIrlPage() {
                         <li>Choose nearby locations for a short, step-free route.</li>
                     </ul>
                     <p>
-                        For example, count the cushions on the shared living-room sofa.
-                        See <a href="/among-us-irl-task-ideas#vacation-house-tasks">vacation-house task examples</a>
+                        For example, fluff every cushion on the shared sofa.
+                        See <a href="/among-us-irl-task-ideas#living-room-tasks">living room and kitchen task ideas</a>
                         {' '}or <a href="/among-us-irl-task-generator?venue=airbnb&players=8&movement=normal">build an eight-player vacation-rental task list</a>.
                     </p>
                 </section>

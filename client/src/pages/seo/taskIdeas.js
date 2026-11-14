@@ -1,0 +1,222 @@
+// The task ideas page: 100 real-life tasks, grouped by place.
+// Rules for every task: one spot, 10 to 40 seconds, resets for the next player,
+// safe for kids, nothing private (no bathrooms, closed cupboards or appliances left on).
+
+export const TASK_SECTIONS = [
+    {
+        id: 'living-room-tasks',
+        label: 'Living room',
+        heading: 'Living room tasks',
+        intro: 'The living room is usually the busiest spot on the map, so keep these quick.',
+        generatorHref: '/among-us-irl-task-generator?venue=house&players=8',
+        tasks: [
+            'Fold the blanket on the sofa and lay it over the arm.',
+            'Fluff every cushion on the sofa.',
+            'Find the TV remote and set it in the middle of the coffee table.',
+            'Stack the books on the table from biggest to smallest.',
+            'Straighten one picture frame on the wall.',
+            'Lie flat on the sofa and count slowly to 15.',
+            'Take a board game off the shelf, open the lid, close it, and put it back.',
+            'Line up three books by color, then put them back.',
+            'Sit in every seat in the room for two seconds each.',
+            'Find something soft, something hard, and something round, and touch each one.',
+            'Read the first sentence of any book on the shelf out loud.',
+            'Do 10 jumping jacks in the middle of the room.',
+        ],
+    },
+    {
+        id: 'kitchen-tasks',
+        label: 'Kitchen and dining',
+        heading: 'Kitchen and dining room tasks',
+        intro: 'Set out plastic cups and a jug of water before the round. Keep the stove and anything sharp out of play.',
+        generatorHref: '/among-us-irl-task-generator?venue=apartment&players=8',
+        tasks: [
+            'Pour a glass of water and drink it at the table.',
+            'Stack three plastic cups into a pyramid, then unstack them.',
+            'Line up three jars or cans from shortest to tallest.',
+            'Set one place at the table with a plate, cup, and napkin, then clear it.',
+            'Put three fridge magnets in a straight line.',
+            'Fold the dish towel and hang it back up.',
+            'Wipe the table with a dry cloth.',
+            'Push every chair in around the table.',
+            'Salute the fridge and say, “All systems normal.”',
+            'Balance a spoon on your finger for five seconds.',
+            'Find something on the counter that starts with the letter B and hold it up.',
+            'Spin a bottle cap on the table three times.',
+        ],
+    },
+    {
+        id: 'hallway-tasks',
+        label: 'Hallway and front door',
+        heading: 'Hallway and front door tasks',
+        intro: 'Hallways connect everything, which makes them the best place to bump into an intruder.',
+        generatorHref: '/among-us-irl-task-generator?venue=house&players=8',
+        tasks: [
+            'Line up every pair of shoes by the door.',
+            'Straighten the doormat.',
+            'Hang up one coat or bag that is on the floor or a chair.',
+            'Walk heel to toe from one end of the hallway to the other.',
+            'Touch every door in the hallway without opening any.',
+            'Knock on the front door from the inside and say, “Room service.”',
+            'Stand by the front door and count slowly to 20.',
+            'Hop on one foot to the end of the hallway.',
+            'Tiptoe the length of the hallway like you are sneaking past a sleeping dog.',
+            'Put on any hat or scarf by the door, then hang it back up.',
+        ],
+    },
+    {
+        id: 'outdoor-tasks',
+        label: 'Backyard and outdoors',
+        heading: 'Backyard and outdoor tasks',
+        intro: 'Outdoor tasks spread the group out, which gives intruders room to work. Agree on the edges of the play area first.',
+        generatorHref: '/among-us-irl-task-generator?venue=house&players=8&room=Garden%20%2F%20Outdoor&room=Kitchen&room=Living%20Room',
+        tasks: [
+            'Walk one full lap around the yard.',
+            'Collect three sticks longer than your hand, then put them back where you found them.',
+            'Find a leaf, a stone, and something green, and line them up on the ground.',
+            'Draw a star in the dirt or sand with a stick.',
+            'Do five star jumps on the grass.',
+            'Touch the farthest fence and walk back.',
+            'Throw a ball at a tree until you hit it.',
+            'Toss a ball into a bucket from five steps away until it goes in.',
+            'Sit on a swing or garden chair for 15 seconds.',
+            'Fill a cup from the tap or hose and water one plant.',
+            'Kick a ball against a wall five times in a row.',
+            'Hop like a frog from the back door to the nearest tree.',
+        ],
+    },
+    {
+        id: 'classroom-tasks',
+        label: 'Classroom and school',
+        heading: 'Classroom and school tasks',
+        intro: 'Use rooms the teacher has approved, and set out markers, cards, and a symbol key before roles.',
+        generatorHref: '/among-us-irl-task-generator?venue=school&players=8',
+        tasks: [
+            'Write your name on the whiteboard, then erase it.',
+            'Draw a cat, a house, or a rocket on the board, then erase it.',
+            'Solve the sum on the board, write the answer under it, then erase your answer.',
+            'Decode a three-letter message with the teacher’s symbol key.',
+            'Put three chairs up on the desks, then put them back down.',
+            'Find your country on the map or globe.',
+            'Sort the markers in one cup by color.',
+            'Straighten the books on one shelf.',
+            'Sit at the teacher’s desk for ten seconds.',
+            'Open the blinds, then close them again.',
+            'Stack the books on one desk from biggest to smallest.',
+            'Spell the word on the task card backwards, out loud.',
+        ],
+    },
+    {
+        id: 'party-tasks',
+        label: 'Party supplies',
+        heading: 'Tasks with balloons, cups, and party supplies',
+        intro: 'Leftover balloons, paper plates, and plastic cups make great tasks. Give each one its own table or corner.',
+        generatorHref: '/among-us-irl-task-generator?venue=house&players=12&style=100',
+        tasks: [
+            'Tap a balloon 15 times without letting it touch the floor.',
+            'Stack ten plastic cups into a pyramid, then unstack them.',
+            'Bat a balloon from one wall to the other without catching it.',
+            'Toss a ping-pong ball into a cup from three steps away until it lands.',
+            'Blow a ping-pong ball across the table with a straw.',
+            'Balance a paper plate on your head and walk to the door.',
+            'Carry a cup of water across the room without spilling a drop.',
+            'Sign the birthday card or guest book.',
+            'Draw the birthday person’s face on the paper by the snack table.',
+            'Find the birthday person and give them a high five.',
+            'Dance by the speaker for 20 seconds.',
+            'Take one snack from the bowl and eat it at the snack table.',
+        ],
+    },
+    {
+        id: 'little-kids-tasks',
+        label: 'Little kids',
+        heading: 'Tasks for little kids (ages 4 to 7)',
+        intro: 'No reading needed. Read these out loud or pair each little one with an older buddy.',
+        generatorHref: '/among-us-irl-task-generator?venue=house&players=8&style=100',
+        tasks: [
+            'Find something red and touch it.',
+            'Sit three soft toys in a row.',
+            'Hop like a bunny to the door.',
+            'Roar like a lion three times.',
+            'Put the toy blocks back in their box.',
+            'Find a teddy and give it a hug.',
+            'Clap your hands ten times.',
+            'Waddle like a penguin to the window.',
+            'Touch your toes, then reach for the sky, three times.',
+            'Pat your head and rub your tummy for five seconds.',
+        ],
+    },
+    {
+        id: 'two-player-tasks',
+        label: 'Two-player tasks',
+        heading: 'Two-player tasks',
+        intro: 'These put two players together on purpose. Was that really a task, or was someone just following you?',
+        generatorHref: '/among-us-irl-task-generator?venue=house&players=8&style=100',
+        tasks: [
+            'Win a game of rock paper scissors against another player.',
+            'High-five another player without saying a word.',
+            'Make up a secret handshake with another player.',
+            'Thumb-wrestle another player, best of three.',
+            'Ask another player their favorite snack and remember it until the next meeting.',
+            'Copy another player’s moves like a mirror for ten seconds.',
+            'Tell another player a joke, good or terrible.',
+            'Give another player a compliment about their shoes.',
+            'Walk to the next room back to back with another player.',
+            'Play one round of a clapping game with another player.',
+        ],
+    },
+    {
+        id: 'silly-tasks',
+        label: 'Silly tasks',
+        heading: 'Silly tasks that work anywhere',
+        intro: 'Mix a few of these into any room. Everyone stops to watch, which is exactly when intruders strike.',
+        generatorHref: '/among-us-irl-task-generator?venue=house&players=8&style=100',
+        tasks: [
+            'Dance for 20 seconds without any music.',
+            'Freeze like a statue for 15 seconds, even if someone talks to you.',
+            'Do your best robot walk across the room.',
+            'Narrate what you are doing like a nature documentary for 15 seconds.',
+            'Give a ten-second speech about why you are definitely not the intruder.',
+            'Do your best evil laugh.',
+            'Give this room a five-star review out loud.',
+            'Moonwalk from one wall to the other.',
+            'Take a bow and say, “Thank you, thank you,” to an imaginary crowd.',
+            'Do a slow-motion run across the room.',
+        ],
+    },
+];
+
+export const TASK_COUNT = TASK_SECTIONS.reduce((total, section) => total + section.tasks.length, 0);
+
+// Number every task 1 to 100 across sections, so the page reads as one list.
+export function numberedSections(sections = TASK_SECTIONS) {
+    let next = 1;
+    return sections.map(section => {
+        const start = next;
+        next += section.tasks.length;
+        return { ...section, start };
+    });
+}
+
+export const FAQ = [
+    {
+        q: 'What are good Among Us tasks to do in real life?',
+        a: 'Short jobs at one spot that take 10 to 40 seconds and reset for the next player. Fold a blanket, stack cups into a pyramid, toss a ball into a bucket, or do 10 jumping jacks. Physical tasks work better than quizzes because other players can see you doing them, or see that you are not.',
+    },
+    {
+        q: 'How many tasks do you need?',
+        a: 'About three per player, spread over at least three places. Eight players need around 24 tasks. Tasks reset, so two players can be sent to the same one.',
+    },
+    {
+        q: 'How do players prove they finished a task?',
+        a: 'They do not have to. In Sus Party each player does the task at its place, then slides to mark it done on their phone. It runs on the honor system. When the crew finishes enough tasks, the intruders are revealed, and the crew still has to vote them out.',
+    },
+    {
+        q: 'What do intruders do during tasks?',
+        a: 'They pretend to do tasks while they wait for a moment alone with a crewmate, then tag them on the shoulder. In Sus Party, intruders also get sabotage cards on their phone.',
+    },
+    {
+        q: 'Are these tasks safe for kids?',
+        a: 'Yes. None of them use anything sharp or hot, or a private room. Skip any that do not fit your space, and use the little kids list for ages 4 to 7.',
+    },
+];

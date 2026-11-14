@@ -118,7 +118,7 @@ function GroupGamesPage() {
                 <nav className="seo-links" aria-label="More party plans">
                     <ul className="seo-links__list">
                         <li><a href="/among-us-birthday-party">Plan a birthday party game</a></li>
-                        <li><a href="/among-us-irl-task-ideas#vacation-house-tasks">Choose tasks for a vacation house</a></li>
+                        <li><a href="/among-us-irl-task-ideas#living-room-tasks">Choose tasks for shared rooms</a></li>
                         <li><a href="/among-us-irl-task-generator?venue=apartment&players=10">Prepare a room-to-room apartment setup</a></li>
                     </ul>
                 </nav>
