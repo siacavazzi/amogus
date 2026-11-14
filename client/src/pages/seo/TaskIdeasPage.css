@@ -1,0 +1,93 @@
+/* Task ideas page: one numbered list of tasks, grouped by place. */
+.ti-facts { display: flex; flex-wrap: wrap; gap: 6px 22px; list-style: none; padding: 0; margin: -10px 0 30px; }
+.ti-facts li { color: var(--sg-ink); font-size: .98rem; font-weight: 800; }
+.ti-facts li::before { content: '✓'; margin-right: 8px; }
+
+.ti-jump { margin-top: 24px; }
+.ti-jump ul { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 0; }
+.site-page .ti-jump a {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--site-soft); border-radius: 999px; padding: 8px 8px 8px 16px;
+    color: var(--site-ink); font-size: .95rem; font-weight: 800; text-decoration: none;
+}
+.ti-jump a span {
+    background: var(--sg-ink); color: var(--sg-meet); border-radius: 999px;
+    min-width: 28px; padding: 2px 8px; font-size: .8rem; text-align: center;
+}
+.site-page .ti-jump a:hover { background: var(--sg-meet); }
+
+.ti-section { padding-top: 48px; padding-bottom: 8px; }
+.seo-section .ti-range {
+    color: var(--site-accent); font-size: .85rem; font-weight: 900;
+    letter-spacing: .06em; text-transform: uppercase; margin: 0 0 10px;
+}
+
+.ti-list {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px;
+    list-style: none; padding: 0; margin: 8px 0 0;
+}
+.ti-list li {
+    display: flex; gap: 12px; align-items: flex-start;
+    background: var(--site-soft); border-radius: 14px; padding: 14px 16px;
+    color: var(--site-ink); font-size: 1rem; font-weight: 600; line-height: 1.4;
+}
+.ti-num {
+    flex: none; width: 30px; height: 30px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--sg-meet); color: var(--sg-ink); font-size: .82rem; font-weight: 900;
+}
+
+.ti-section__foot { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-top: 16px; }
+.ti-section__foot a { color: var(--site-link); font-weight: 800; }
+.ti-copy {
+    background: transparent; border: 2px solid var(--sg-ink); border-radius: 999px;
+    padding: 6px 16px; color: var(--sg-ink); font: inherit; font-size: .9rem; font-weight: 800; cursor: pointer;
+}
+.ti-copy:hover { background: var(--sg-ink); color: #fff; }
+
+.ti-steps { counter-reset: step; list-style: none; padding: 0; margin: 0 0 8px; }
+.ti-steps li {
+    counter-increment: step; position: relative; padding: 0 0 18px 52px;
+    color: var(--site-body); line-height: 1.6;
+}
+.ti-steps li::before {
+    content: counter(step); position: absolute; left: 0; top: -2px;
+    width: 36px; height: 36px; border-radius: 50%; background: var(--sg-round); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-weight: 900;
+}
+.ti-steps strong { color: var(--site-ink); }
+
+.ti-faq > div { border-top: 3px solid var(--site-rule); padding: 16px 0 8px; }
+.seo-section .ti-faq h3 { margin: 0 0 8px; }
+
+.seo-lead.ti-pitch { margin-top: -14px; font-size: 1.05rem; }
+
+/* Game band between the lists: soft panel with the five-screen round strip. */
+.ti-game {
+    margin: 48px 0 8px; padding: 36px 0 40px;
+    border-top: 3px solid var(--site-rule); border-bottom: 3px solid var(--site-rule);
+}
+.ti-game h2 {
+    color: var(--site-ink); font-size: var(--site-subheading); font-weight: 900;
+    letter-spacing: -0.035em; line-height: 1; margin: 0 0 16px;
+}
+.ti-game > p:not(.seo-section__kicker) { color: var(--site-body); line-height: 1.65; margin: 0 0 8px; }
+.ti-game .seo-section__kicker { margin: 0 0 14px; }
+/* The tour is wider than the reading column on desktop. */
+.ti-game .seo-tour { width: min(1120px, calc(100vw - 80px)); margin-left: 50%; transform: translateX(-50%); padding-bottom: 24px; }
+
+.ti-nudge {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px;
+    background: var(--sg-meet); border-radius: 22px; padding: 22px 24px; margin: 48px 0 0;
+}
+.ti-nudge p { margin: 0; color: var(--sg-ink); font-weight: 600; line-height: 1.5; flex: 1 1 320px; }
+
+@media (max-width: 640px) {
+    .ti-game .seo-tour { width: 100vw; }
+    .ti-list { grid-template-columns: 1fr; gap: 0; }
+    .ti-list li { background: none; border-radius: 0; padding: 12px 0; border-bottom: 1px solid var(--site-line); }
+    .ti-num { width: 26px; height: 26px; font-size: .75rem; }
+    .site-page .ti-jump a { padding: 6px 6px 6px 12px; font-size: .85rem; }
+    .ti-section { padding-top: 36px; }
+    .ti-steps li { padding-left: 48px; }
+}

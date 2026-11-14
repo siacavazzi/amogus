@@ -1,322 +1,214 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
 import GameplayScreenshots, { GameTour } from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
+import { TASK_SECTIONS, TASK_COUNT, FAQ, numberedSections } from './taskIdeas';
+import './TaskIdeasPage.css';
 
-const TASK_SECTIONS = [
-    {
-        id: 'shared-room-tasks',
-        label: 'Easy tasks for shared rooms at home',
-        intro: 'Turn the living room, dining area, and hallway into your map. These tasks use things already in the house, plus a few cards you set out before play.',
-        generatorHref: '/among-us-irl-task-generator?venue=house&players=8',
-        tasks: [
-            {
-                task: 'Count the chairs around the dining table.',
-                place: 'Dining area',
-                done: 'Record the count in your task notes.',
-            },
-            {
-                task: 'Count the pillows on the shared living-room sofa.',
-                place: 'Living room',
-                done: 'Record the count in your task notes.',
-            },
-            {
-                task: 'Read the title of a book from the open shared shelf.',
-                place: 'Living room',
-                done: 'Write the title in your task notes. Return the book to the same shelf.',
-            },
-            {
-                task: 'Count the visible framed pictures on one approved wall.',
-                place: 'Living room or hallway',
-                done: 'Record the count in your task notes.',
-            },
-            {
-                task: 'Place four host-provided cards in one straight row.',
-                place: 'Dining table',
-                done: 'Check that the row contains four cards.',
-            },
-        ],
-    },
-    {
-        id: 'kitchen-tasks',
-        label: 'Kitchen and dining tasks',
-        intro: 'Send the crew to count mugs, copy a signal, or arrange cups. Use visible shared items and set out any game materials before the round.',
-        generatorHref: '/among-us-irl-task-generator?venue=apartment&players=8',
-        tasks: [
-            {
-                task: 'Count the mugs on the open shelf.',
-                place: 'Kitchen',
-                done: 'Record the count in your task notes.',
-            },
-            {
-                task: 'Copy the three-symbol signal from a host-provided card.',
-                place: 'Kitchen table',
-                done: 'Compare your copy with the card, then leave the card for the next player.',
-            },
-            {
-                task: 'Name the color of the soap bottle beside the sink.',
-                place: 'Kitchen sink',
-                done: 'Record the color in your task notes. Leave the bottle in place.',
-            },
-            {
-                task: 'Count the magnets on the outside of the refrigerator.',
-                place: 'Kitchen',
-                done: 'Record the count in your task notes.',
-            },
-            {
-                task: 'Arrange three host-provided paper cups in a row.',
-                place: 'Kitchen table',
-                done: 'Check that the row contains three cups. Leave appliances off.',
-            },
-        ],
-    },
-    {
-        id: 'classroom-tasks',
-        label: 'Classroom task examples',
-        intro: 'Use a teacher-approved room and shared materials. Set out markers, index cards, and a symbol-to-letter key before roles.',
-        generatorHref: '/among-us-irl-task-generator?venue=school&players=8',
-        setupHref: '/among-us-irl#classroom-setup',
-        tasks: [
-            {
-                task: 'Count the markers in the shared supply cup.',
-                place: 'Classroom supply table',
-                done: 'Record the count in your task notes.',
-            },
-            {
-                task: 'Decode a three-symbol message with the teacher’s letter key.',
-                place: 'Classroom table',
-                done: 'Write the three decoded letters in order. Leave the key for the next player.',
-            },
-            {
-                task: 'Count the markers in the whiteboard tray.',
-                place: 'Classroom board',
-                done: 'Record the count in your task notes.',
-            },
-            {
-                task: 'Arrange three teacher-approved index cards in a row.',
-                place: 'Classroom table',
-                done: 'Check that the row contains three cards.',
-            },
-            {
-                task: 'Count the public posters on one approved wall.',
-                place: 'Classroom wall',
-                done: 'Record the count in your task notes.',
-            },
-            {
-                task: 'Read the time from the classroom wall clock.',
-                place: 'Classroom',
-                done: 'Record the time in your task notes.',
-            },
-        ],
-    },
-    {
-        id: 'vacation-house-tasks',
-        label: 'Vacation-house task examples',
-        intro: 'Use an approved living room or dining area. Set out a small tray with cards and coasters before roles.',
-        generatorHref: '/among-us-irl-task-generator?venue=airbnb&players=8',
-        setupHref: '/among-us-irl#vacation-house-setup',
-        tasks: [
-            {
-                task: 'Count the cushions on the shared living-room sofa.',
-                place: 'Living room',
-                done: 'Record the count in your task notes. Leave each cushion in place.',
-            },
-            {
-                task: 'Count the coasters on the shared dining table.',
-                place: 'Dining area',
-                done: 'Record the count in your task notes.',
-            },
-            {
-                task: 'Arrange cards labeled north, east, south, and west into a compass.',
-                place: 'Dining table',
-                done: 'Put north at the top, then east, south, and west clockwise. Shuffle the cards afterward.',
-            },
-            {
-                task: 'Read the title of a game box on the open shared shelf.',
-                place: 'Shared game shelf',
-                done: 'Write the title in your task notes. Leave the box in place.',
-            },
-            {
-                task: 'Arrange three host-provided coasters in a triangle.',
-                place: 'Dining table',
-                done: 'Check that the three coasters form a triangle. Return them to their place.',
-            },
-            {
-                task: 'Count the open doorways from the meeting point without entering a room.',
-                place: 'Approved shared hallway',
-                done: 'Record the count in your task notes.',
-            },
-        ],
-    },
-    {
-        id: 'playful-tasks',
-        label: 'Playful tasks with somewhere to go',
-        intro: 'Give players an excuse for suspicious behavior. Assign each job to a separate location.',
-        generatorHref: '/among-us-irl-task-generator?venue=house&players=8&style=100',
-        tasks: [
-            { task: 'Patrol the hallway like a robot for ten seconds.', place: 'Hallway', done: 'Walk the patrol route for ten seconds.' },
-            { task: 'Inspect a cushion like a detective for ten seconds.', place: 'Living room', done: 'Inspect the cushion, then return it to its place.' },
-            { task: 'Salute the fridge and announce, “All systems operational.”', place: 'Kitchen', done: 'Stand beside the fridge, salute, and make the announcement.' },
-            { task: 'Pretend to scan two objects with an invisible scanner.', place: 'Living room', done: 'Visit each object and scan it.' },
-            { task: 'Give a dramatic weather report from the doorway.', place: 'Hallway', done: 'Reach the doorway and give a ten-second report.' },
-        ],
-    },
-];
-
-const TASK_COUNT = TASK_SECTIONS.reduce((total, section) => total + section.tasks.length, 0);
+const PAGE_URL = 'https://susparty.com/among-us-irl-task-ideas';
+const SECTIONS = numberedSections(TASK_SECTIONS);
 
 const SCHEMA = {
     '@context': 'https://schema.org',
-    '@type': 'ItemList',
-    name: `${TASK_COUNT} Free Among Us Tasks to Do in Real Life`,
-    description:
-        'Physical task ideas for kitchens, living rooms, and hallways, plus classroom and vacation-house examples. Use them in a real-life Sus Party game.',
-    url: 'https://susparty.com/among-us-irl-task-ideas',
-    itemListElement: TASK_SECTIONS.map((section, index) => ({
-        '@type': 'ListItem',
-        position: index + 1,
-        name: section.label,
-    })),
+    '@graph': [
+        {
+            '@type': 'ItemList',
+            name: `${TASK_COUNT} Among Us tasks to do in real life`,
+            description: 'Real-life Among Us task ideas for the living room, kitchen, hallway, backyard, classroom, and parties, plus tasks for little kids and two players.',
+            url: PAGE_URL,
+            numberOfItems: TASK_COUNT,
+            itemListElement: SECTIONS.flatMap(section => section.tasks.map((task, index) => ({
+                '@type': 'ListItem',
+                position: section.start + index,
+                name: task,
+            }))),
+        },
+        {
+            '@type': 'FAQPage',
+            mainEntity: FAQ.map(item => ({
+                '@type': 'Question',
+                name: item.q,
+                acceptedAnswer: { '@type': 'Answer', text: item.a },
+            })),
+        },
+    ],
 };
 
 const TIPS = [
-    {
-        title: 'Name one place',
-        body: 'State the room or surface for each task. Remove tasks that need a private room or a closed cupboard.',
-    },
-    {
-        title: 'Give one finish check',
-        body: 'State what the player records or arranges. A count, title, or clear layout gives each player a finish check.',
-    },
-    {
-        title: 'Respect the venue',
-        body: 'Set out shared materials before roles. Keep appliances and anything the venue marks private out of play.',
-    },
-    {
-        title: 'Give players a route',
-        body: 'Spread tasks across at least two locations. Use nearby areas and edit each job for your group.',
-    },
+    { title: 'One spot', body: 'Tie every task to a place. Players walk there, and everyone else can see who went where.' },
+    { title: '10 to 40 seconds', body: 'Long enough to be watched, short enough that nobody waits around.' },
+    { title: 'Resets by itself', body: 'Unstack the cups, put the book back. The next player sent there finds it ready.' },
+    { title: 'Nothing to check', body: 'Skip quizzes and answers. Doing the task in plain sight is the whole point.' },
 ];
+
+function CopyButton({ section }) {
+    const [copied, setCopied] = useState(false);
+    const copy = async () => {
+        try {
+            await navigator.clipboard.writeText(section.tasks.join('\n'));
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch (_) { /* Clipboard can be blocked. The list is still on the page. */ }
+    };
+    return (
+        <button type="button" className="ti-copy" onClick={copy} aria-live="polite">
+            {copied ? 'Copied' : `Copy these ${section.tasks.length}`}
+        </button>
+    );
+}
 
 function TaskIdeasPage() {
     usePageMeta({
-        title: `Among Us Tasks in Real Life: ${TASK_COUNT} Free Ideas at Home | Sus Party`,
+        title: `${TASK_COUNT} Among Us Tasks in Real Life: Ideas for Home, School and Parties | Sus Party`,
         description:
-            `A free list of ${TASK_COUNT} easy Among Us tasks to do in real life at home, in a classroom, or at a vacation house, for kids and adults. Copy them or build your own task list.`,
-        canonical: 'https://susparty.com/among-us-irl-task-ideas',
+            `A free list of ${TASK_COUNT} real-life Among Us tasks, sorted by room: living room, kitchen, hallway, backyard, classroom, and party tasks, plus easy ones for little kids. All kid-safe.`,
+        canonical: PAGE_URL,
         ogImage: 'https://susparty.com/og-image.jpg?v=2',
         schema: SCHEMA,
     });
 
     return (
-        <SeoPageLayout>
+        <SeoPageLayout className="ti-page">
             <div className="seo-hero">
                 <p className="seo-eyebrow">
-                    <a href="/among-us-irl" style={{ color: "inherit" }}>
-                        Among Us IRL
-                    </a>{' '}
-                    › Task ideas
+                    <a href="/among-us-irl" style={{ color: 'inherit' }}>Among Us IRL</a> › Task ideas
                 </p>
-                <h1 className="seo-h1">Among Us tasks in real life: {TASK_COUNT} free ideas for home</h1>
+                <h1 className="seo-h1">{TASK_COUNT} Among Us tasks to do in real life</h1>
                 <p className="seo-lead">
-                    Counting mugs gets a lot more suspicious when someone follows you into the kitchen.
-                    Here is a free list of easy Among Us IRL tasks for the kitchen, living room, hallway, classroom,
-                    and vacation house, for kids and adults. Sus Party turns your home into the map. Use these tasks,
-                    then let the game handle secret roles, task lists, meetings, and votes on everyone’s phones.
+                    Good real-life tasks are short jobs at one spot that reset for the next player:
+                    fold a blanket, stack cups into a pyramid, toss a ball into a bucket. Here are {TASK_COUNT},
+                    sorted by place, all safe for kids. Pick the ones that fit your house, school, or party.
                 </p>
+                <p className="seo-lead ti-pitch">
+                    Then play them in Sus Party, a free website that deals secret roles, hands each player
+                    their next task, and runs the meetings and votes on everyone’s phone.
+                </p>
+                <ul className="ti-facts" aria-label="What every task has">
+                    <li>10 to 40 seconds each</li>
+                    <li>Resets for the next player</li>
+                    <li>Kid-safe</li>
+                </ul>
                 <div className="seo-actions">
                     <a href="/among-us-irl-task-generator?venue=house&players=8" className="seo-btn--primary">
-                        Build a free house task pack →
+                        Turn these into a game →
                     </a>
-                    <a href="/play" className="seo-btn--secondary">
-                        Play Sus Party
+                    <a href="/among-us-task-cards-printable" className="seo-btn--secondary">
+                        Print task cards
                     </a>
                 </div>
             </div>
 
-            <GameTour />
-
             <div className="seo-content">
-                <div className="seo-highlight">
-                    <p>Everyone plays together in the same place. Each person needs a phone browser and internet. No account or download.</p>
-                    <p>For counts and titles, use paper or a phone note. Do the task in the room, then slide to mark it complete in Sus Party. The game uses the honor system and does not check answers.</p>
-                </div>
-                <nav className="seo-links" aria-label="Jump to task ideas">
-                    <p className="seo-links__title">Pick tasks for your space</p>
-                    <ul className="seo-links__list">
-                        {TASK_SECTIONS.map((section) => (
-                            <li key={section.id}><a href={'#' + section.id}>{section.label}</a></li>
+                <nav className="ti-jump" aria-label="Jump to a place">
+                    <p className="seo-links__title">Jump to a place</p>
+                    <ul>
+                        {SECTIONS.map(section => (
+                            <li key={section.id}>
+                                <a href={'#' + section.id}>
+                                    {section.label} <span>{section.tasks.length}</span>
+                                </a>
+                            </li>
                         ))}
                     </ul>
                 </nav>
 
-                {TASK_SECTIONS.map((section) => (
-                    <section className="seo-section" id={section.id} key={section.id}>
-                        <p className="seo-section__kicker">Task list</p>
-                        <h2>{section.label}</h2>
-                        <p>{section.intro}</p>
-                        {section.setupHref && (
+                {SECTIONS.map((section, sectionIndex) => (
+                    <React.Fragment key={section.id}>
+                    {sectionIndex === 2 && (
+                        <section className="ti-game" aria-labelledby="ti-game-title">
+                            <p className="seo-section__kicker">How the game works</p>
+                            <h2 id="ti-game-title">Where these tasks go in a round</h2>
                             <p>
-                                Review the <a href={section.setupHref}>venue setup guide</a> before you use these examples.
+                                In Sus Party every phone shows its player one task at a time. The crew walks
+                                the house doing them. The intruders only pretend, and tag people when nobody is
+                                looking. Then someone finds a body, everyone meets, and the group votes.
                             </p>
-                        )}
-                        <div className="seo-task-grid">
-                            {section.tasks.map((item) => (
-                                <article className="seo-task-item" key={item.task}>
-                                    <strong>{item.task}</strong>
-                                    <p><strong>Place:</strong> {item.place}</p>
-                                    <p><strong>Done when:</strong> {item.done}</p>
-                                </article>
+                            <GameTour title="A round on the phone, start to finish" />
+                            <div className="seo-actions">
+                                <a href="/play" className="seo-btn--primary">Start a free game →</a>
+                                <a href="/how-to-play-among-us-irl" className="seo-btn--secondary">Read the rules</a>
+                            </div>
+                        </section>
+                    )}
+                    {sectionIndex === 5 && (
+                        <aside className="ti-nudge" aria-label="Play Sus Party">
+                            <p><strong>Halfway there.</strong> Already have enough tasks? Open a room, type them in, and everyone joins with a code. Free, no download.</p>
+                            <a href="/play" className="seo-btn--primary">Play Sus Party →</a>
+                        </aside>
+                    )}
+                    <section className="seo-section ti-section" id={section.id}>
+                        <p className="ti-range">Tasks {section.start} to {section.start + section.tasks.length - 1}</p>
+                        <h2>{section.heading}</h2>
+                        <p>{section.intro}</p>
+                        <ol className="ti-list" start={section.start}>
+                            {section.tasks.map((task, index) => (
+                                <li key={task}>
+                                    <span className="ti-num" aria-hidden="true">{section.start + index}</span>
+                                    <span>{task}</span>
+                                </li>
                             ))}
+                        </ol>
+                        <div className="ti-section__foot">
+                            <CopyButton section={section} />
+                            <a href={section.generatorHref}>Build a game with tasks like these →</a>
                         </div>
-                        <p style={{ marginTop: 16 }}>
-                            <a href={section.generatorHref}>Generate a task list for this setup →</a>
-                        </p>
                     </section>
+                    </React.Fragment>
                 ))}
 
-                <GameplayScreenshots screens={['task-list', 'next-task']} />
-
-                <GameSetupCta title="Put your house tasks into a real game"
-                    href="/among-us-irl-task-generator?venue=house&players=8" label="Build your house task pack"
-                    secondaryLabel="Play Sus Party">
-                    Select your rooms and player count, review the tasks, then choose “Use this pack.”
-                    Sus Party creates your room with the tasks loaded, deals the
-                    secret roles and runs the round while your group plays in person.
-                </GameSetupCta>
+                <section className="seo-section" id="play-with-these-tasks">
+                    <p className="seo-section__kicker">From list to game</p>
+                    <h2>Play with these tasks</h2>
+                    <ol className="ti-steps">
+                        <li><strong>Pick about three tasks per player</strong> from at least three places. Eight players need around 24.</li>
+                        <li><strong>Open a free room</strong> on a laptop or phone at susparty.com. Type your tasks in, or let the <a href="/among-us-irl-task-generator?venue=house&players=8">task generator</a> build the list and load it for you.</li>
+                        <li><strong>Everyone joins on their phone</strong> with the room code. No app or account. Sus Party deals the secret roles and hands each player their next task.</li>
+                    </ol>
+                    <GameplayScreenshots screens={['crew-task', 'next-task']} />
+                </section>
 
                 <section className="seo-section" id="write-good-tasks">
-                    <p className="seo-section__kicker">Host notes</p>
-                    <h2>Make the tasks fit your house</h2>
-                    <div className="seo-cards seo-cards--2" style={{ marginTop: 20 }}>
-                        {TIPS.map((tip) => (
+                    <p className="seo-section__kicker">Write your own</p>
+                    <h2>What makes a good real-life task</h2>
+                    <div className="seo-cards seo-cards--2">
+                        {TIPS.map(tip => (
                             <div className="seo-card" key={tip.title}>
                                 <h3>{tip.title}</h3>
                                 <p>{tip.body}</p>
                             </div>
                         ))}
                     </div>
-                    <p style={{ marginTop: 16 }}>
-                        The task generator has presets for{' '}
-                        <a href="/among-us-irl-task-generator?venue=house&players=8">houses</a>,{' '}
-                        <a href="/among-us-irl-task-generator?venue=apartment&players=8">apartments</a>,{' '}
-                        <a href="/among-us-irl-task-generator?venue=school&players=8">schools</a>,{' '}
-                        <a href="/among-us-irl-task-generator?venue=airbnb&players=8">vacation rentals</a>,{' '}
-                        <a href="/among-us-irl-task-generator?venue=dorm&players=8">dorms</a>,{' '}
-                        <a href="/among-us-irl-task-generator?venue=office&players=8">offices</a>, and{' '}
-                        <a href="/among-us-irl-task-generator?venue=other&players=8">other spaces</a>.
-                    </p>
+                </section>
+
+                <GameSetupCta title="Skip the list making"
+                    href="/among-us-irl-task-generator?venue=house&players=8" label="Build a task list for your space"
+                    secondaryLabel="Play Sus Party">
+                    Pick your rooms and player count. The generator writes the task list, then
+                    “Use this pack” opens a room with the tasks already loaded.
+                </GameSetupCta>
+
+                <section className="seo-section" id="task-faq">
+                    <p className="seo-section__kicker">Questions</p>
+                    <h2>Real-life task questions</h2>
+                    <div className="ti-faq">
+                        {FAQ.map(item => (
+                            <div key={item.q}>
+                                <h3>{item.q}</h3>
+                                <p>{item.a}</p>
+                            </div>
+                        ))}
+                    </div>
                 </section>
 
                 <nav className="seo-links" aria-label="Related Among Us IRL guides">
                     <p className="seo-links__title">Related guides</p>
                     <ul className="seo-links__list">
-                        <li><a href="/how-to-play-among-us-irl">Learn the rules for your first Among Us IRL round</a></li>
+                        <li><a href="/how-to-play-among-us-irl">Rules for your first round</a></li>
+                        <li><a href="/among-us-task-cards-printable">Printable task cards</a></li>
                         <li><a href="/among-us-irl#classroom-setup">Set up a classroom game</a></li>
-                        <li><a href="/among-us-irl#vacation-house-setup">Set up a vacation-house game</a></li>
+                        <li><a href="/among-us-party-for-kids">Plan a kids party</a></li>
                         <li><a href="/how-to-play-among-us-irl#access-options">Plan a low-movement round</a></li>
-                        <li><a href="/among-us-birthday-party">Build a birthday game around the tasks</a></li>
                     </ul>
                 </nav>
             </div>
