@@ -254,7 +254,7 @@ function WhoDidIt() {
 
 function LandingPage() {
     usePageMeta({
-        title: 'Sus Party | Free Among Us IRL Game for 3 to 20+ Players',
+        title: 'Sus Party | Free Among Us-Inspired Party Game for 3 to 20+ Players',
         description: DESCRIPTION,
         canonical: 'https://susparty.com/',
         alternates: alternatesFor('home'),
@@ -268,7 +268,7 @@ function LandingPage() {
                 <SiteNav />
                 <div className="sl-wrap sl-hero__grid">
                     <div className="sl-hero__text">
-                        <h1 className="sl-title">Among Us IRL</h1>
+                        <h1 className="sl-title">Spot the intruder</h1>
                         <p className="sl-lede">
                             Like Among Us or Mafia, but at your party. Everyone gets a secret role on their
                             phone, spreads out to do real tasks, and tries to catch the intruder.
