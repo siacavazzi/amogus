@@ -73,14 +73,35 @@ const FAQS = [
 const DESCRIPTION = 'Play Among Us in real life, free in your phone browser. Real tasks, secret roles, meetings and votes for 3 to 20+ players at parties, youth groups and classes.';
 
 // FAQPage markup so search engines and AI answers read the questions (above all: not an app).
+// WebSite + Organization tell Google the site's name and logo, so results and AI answers
+// show "Sus Party" for susparty.com instead of guessing from page titles.
 const SCHEMA = {
     '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: FAQS.map((f) => ({
-        '@type': 'Question',
-        name: f.q,
-        acceptedAnswer: { '@type': 'Answer', text: f.a },
-    })),
+    '@graph': [
+        {
+            '@type': 'WebSite',
+            '@id': 'https://susparty.com/#website',
+            name: 'Sus Party',
+            url: 'https://susparty.com/',
+            publisher: { '@id': 'https://susparty.com/#organization' },
+        },
+        {
+            '@type': 'Organization',
+            '@id': 'https://susparty.com/#organization',
+            name: 'Sus Party',
+            url: 'https://susparty.com/',
+            logo: 'https://susparty.com/logo512.png',
+            email: 'support@susparty.com',
+        },
+        {
+            '@type': 'FAQPage',
+            mainEntity: FAQS.map((f) => ({
+                '@type': 'Question',
+                name: f.q,
+                acceptedAnswer: { '@type': 'Answer', text: f.a },
+            })),
+        },
+    ],
 };
 
 function Phone({ name, alt, className = '', loading = 'lazy' }) {
