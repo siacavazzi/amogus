@@ -73,14 +73,35 @@ const FAQS = [
 const DESCRIPTION = 'Play Among Us in real life, free in your phone browser. Real tasks, secret roles, meetings and votes for 3 to 20+ players at parties, youth groups and classes.';
 
 // FAQPage markup so search engines and AI answers read the questions (above all: not an app).
+// WebSite + Organization tell Google the site's name and logo, so results and AI answers
+// show "Sus Party" for susparty.com instead of guessing from page titles.
 const SCHEMA = {
     '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: FAQS.map((f) => ({
-        '@type': 'Question',
-        name: f.q,
-        acceptedAnswer: { '@type': 'Answer', text: f.a },
-    })),
+    '@graph': [
+        {
+            '@type': 'WebSite',
+            '@id': 'https://susparty.com/#website',
+            name: 'Sus Party',
+            url: 'https://susparty.com/',
+            publisher: { '@id': 'https://susparty.com/#organization' },
+        },
+        {
+            '@type': 'Organization',
+            '@id': 'https://susparty.com/#organization',
+            name: 'Sus Party',
+            url: 'https://susparty.com/',
+            logo: 'https://susparty.com/logo512.png',
+            email: 'support@susparty.com',
+        },
+        {
+            '@type': 'FAQPage',
+            mainEntity: FAQS.map((f) => ({
+                '@type': 'Question',
+                name: f.q,
+                acceptedAnswer: { '@type': 'Answer', text: f.a },
+            })),
+        },
+    ],
 };
 
 function Phone({ name, alt, className = '', loading = 'lazy' }) {
@@ -233,7 +254,7 @@ function WhoDidIt() {
 
 function LandingPage() {
     usePageMeta({
-        title: 'Sus Party | Free Among Us IRL Game for 3 to 20+ Players',
+        title: 'Sus Party | Free Among Us-Inspired Party Game for 3 to 20+ Players',
         description: DESCRIPTION,
         canonical: 'https://susparty.com/',
         alternates: alternatesFor('home'),
@@ -247,7 +268,7 @@ function LandingPage() {
                 <SiteNav />
                 <div className="sl-wrap sl-hero__grid">
                     <div className="sl-hero__text">
-                        <h1 className="sl-title">Among Us IRL</h1>
+                        <h1 className="sl-title">Spot the intruder</h1>
                         <p className="sl-lede">
                             Like Among Us or Mafia, but at your party. Everyone gets a secret role on their
                             phone, spreads out to do real tasks, and tries to catch the intruder.

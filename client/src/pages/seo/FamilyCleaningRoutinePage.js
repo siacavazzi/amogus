@@ -127,7 +127,7 @@ export default function FamilyCleaningRoutinePage() {
                     </ul>
                     <p>
                         For more formats, see these <a href="/chore-games-for-kids">chore games for kids</a> and ideas to
-                        {' '}<a href="/make-cleaning-fun-for-kids">make cleaning fun for kids</a>.
+                        {' '}<a href="/among-us-chores">Among Us chores</a>.
                     </p>
                     <h3>The family chore game with a secret intruder</h3>
                     <p>
@@ -190,7 +190,6 @@ export default function FamilyCleaningRoutinePage() {
                     <ul className="seo-links__list">
                         <li><a href="/chore-games-for-kids">Chore games for kids of different ages</a></li>
                         <li><a href="/among-us-chores">Turn chores into Among Us tasks</a></li>
-                        <li><a href="/make-cleaning-fun-for-kids">Make cleaning fun for kids</a></li>
                         <li><a href="/how-to-play">Learn how a Sus Party round works</a></li>
                     </ul>
                 </nav>

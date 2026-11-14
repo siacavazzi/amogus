@@ -31,7 +31,7 @@ import './HowToPlayPage.css';
 
 function HowToPlayPage() {
   usePageMeta({
-    title: 'How to Play Sus Party | Among Us-Inspired IRL Game',
+    title: 'How to Play Sus Party: Hosting, Tasks, Cards and Votes',
     description: 'Set up your first Sus Party game at home. Learn how to host, join with a room code, add real-life tasks, use sabotage cards, and run meetings and votes.',
     canonical: 'https://susparty.com/how-to-play',
     documentClass: 'htp-document',

@@ -54,7 +54,7 @@ http {
     fastcgi_temp_path fastcgi_temp;
     uwsgi_temp_path uwsgi_temp;
     scgi_temp_path scgi_temp;
-    types { text/html html; text/plain txt; application/xml xml; }
+    types { text/html html; text/plain txt; application/xml xml; application/javascript js; text/css css; }
     include site.conf;
 }
 ''')
@@ -72,16 +72,16 @@ http {
                 except OSError:
                     time.sleep(0.1)
 
-            def request(path, host='susparty.com', scheme='https', cookie=None):
+            def request(path, host='susparty.com', scheme='https', cookie=None, extra=(), fail=True):
                 port = https_port if scheme == 'https' else http_port
                 subprocess.run([
-                    'curl', '--silent', '--show-error', '--fail', '--max-time', '10', '--noproxy', '*',
+                    'curl', '--silent', '--show-error', *(['--fail'] if fail else []), '--max-time', '10', '--noproxy', '*',
                     '--cacert', str(certificate), '--resolve', f'{host}:{port}:127.0.0.1',
                     '--dump-header', str(root / 'headers'), '--output', str(root / 'body'),
-                    *(['--cookie', cookie] if cookie else []),
+                    *(['--cookie', cookie] if cookie else []), *extra,
                     f'{scheme}://{host}:{port}{path}',
                 ], check=True)
-                return (root / 'headers').read_text(), (root / 'body').read_text()
+                return (root / 'headers').read_text(), (root / 'body').read_text(errors='replace')
 
             for route in routes:
                 if route.get('prerender') is False:
@@ -125,6 +125,22 @@ http {
             headers, _ = request('/play?beta=0', cookie='sus_channel=beta')
             assert re.search(r'^set-cookie:\s*sus_channel=;.*Max-Age=0', headers, re.I | re.M), headers
             assert not re.search(r'^x-robots-tag:', headers, re.I | re.M), headers
+            # Hashed build files: compressed, cached for a year, and a real 404 when missing.
+            bundle = next((repo / 'client/build/static/js').glob('main.*.js')).name
+            headers, _ = request(f'/static/js/{bundle}', extra=('--header', 'Accept-Encoding: gzip'))
+            assert re.search(r'^content-encoding:\s*gzip', headers, re.I | re.M), headers
+            assert re.search(r'^cache-control:.*max-age=31536000.*immutable', headers, re.I | re.M), headers
+            headers, _ = request('/static/js/missing.js', fail=False)
+            assert re.match(r'HTTP/\S+ 404', headers), headers
+            headers, _ = request('/how-to-play.html')
+            assert re.match(r'HTTP/\S+ 301', headers), headers
+            assert re.search(r'^location:.*/how-to-play\s*$', headers, re.I | re.M), headers
+            for old_path, new_path in [('/among-us-party-game', '/among-us-birthday-party'),
+                                       ('/make-cleaning-fun-for-kids', '/among-us-chores'),
+                                       ('/chore-game-app', '/among-us-chores')]:
+                headers, _ = request(old_path + '?utm_source=x')
+                assert re.match(r'HTTP/\S+ 301', headers), (old_path, headers)
+                assert re.search(r'^location:.*%s\?utm_source=x\s*$' % re.escape(new_path), headers, re.I | re.M), headers
             print(f'PASS {len(routes)} routes on Nginx: direct 200 responses, slash redirects, query variants, canonical tags, crawl access, and host redirects.')
         finally:
             process.terminate()

@@ -36,7 +36,6 @@ export function SiteFooter({ languagePage = 'home' }) {
                     <a href="/murder-mystery-party-game">Murder mystery party</a>
                     <a href="/birthday-party-games-for-adults">Adult birthday game</a>
                     <a href="/among-us-birthday-party">Among Us birthday party</a>
-                    <a href="/make-cleaning-fun-for-kids">Family cleanup game</a>
                     <a href="/party-games-for-10-people">Games for 10 people</a>
                     <a href="/game-night-ideas">Game night</a>
                     <a href="/traitors-at-home">Traitors-style party</a>
@@ -63,9 +62,7 @@ export function SiteFooter({ languagePage = 'home' }) {
                 </div>
                 <div>
                     <a href="/sus-games">Sus games</a>
-                    <a href="/among-us-party-game">Among Us party game</a>
                     <a href="/mafia-game-app">Mafia game app</a>
-                    <a href="/chore-game-app">Chore game app</a>
                 </div>
             </nav>
             <p className="site-footer__contact">

@@ -1,0 +1,34 @@
+# Sus Party
+
+> Sus Party (susparty.com) is a free real-life party game inspired by Among Us and Mafia. It is a website, not an app: everyone opens susparty.com in a phone browser and joins with a room code, with nothing to download. Players get secret roles, walk around a real place doing real tasks, call meetings and vote out the intruders. It works for 3 to 20+ players at parties, sleepovers, youth groups and classrooms. A laptop can optionally show the room code and task progress. Sus Party is independent and not affiliated with Innersloth or Among Us.
+
+Sus Party is not the "SusParty" mobile app from app stores; that is a different product by a different developer.
+
+## Play
+
+- [Host or join a game](https://susparty.com/play): create a room and share the code
+- [How to play Sus Party](https://susparty.com/how-to-play): hosting, tasks, sabotage cards, meetings and votes
+- [FAQ](https://susparty.com/faq): player counts, setup, phones, and the optional laptop screen
+
+## Among Us in real life
+
+- [Among Us IRL](https://susparty.com/among-us-irl): play Among Us in real life on your phones
+- [How to play Among Us in real life](https://susparty.com/how-to-play-among-us-irl): rules and setup
+- [Among Us task ideas](https://susparty.com/among-us-irl-task-ideas): real-life tasks for home, school and parties
+- [Task generator](https://susparty.com/among-us-irl-task-generator): build a room-by-room task list
+- [Role generator](https://susparty.com/among-us-role-generator): deal secret roles on one shared phone
+- [Printable task cards](https://susparty.com/among-us-task-cards-printable)
+
+## Groups and occasions
+
+- [Among Us party for kids](https://susparty.com/among-us-party-for-kids)
+- [Among Us birthday party](https://susparty.com/among-us-birthday-party)
+- [Youth groups, libraries and classrooms](https://susparty.com/among-us-irl-for-youth-groups)
+- [Among Us chores for families](https://susparty.com/among-us-chores)
+- [Traitors at home](https://susparty.com/traitors-at-home)
+
+## About
+
+- [About Sus Party](https://susparty.com/about)
+- [Privacy](https://susparty.com/privacy)
+- Contact: support@susparty.com

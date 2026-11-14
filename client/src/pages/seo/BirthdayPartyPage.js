@@ -14,7 +14,7 @@ const SCHEMA = {
 
 function BirthdayPartyPage() {
     usePageMeta({
-        title: 'Among Us Birthday Party Game at Home | Sus Party',
+        title: 'Among Us Birthday Party Game: Birthdays and Themed Parties | Sus Party',
         description: 'Make an Among Us-inspired game the main birthday activity. Plan the rooms, prepare real tasks, teach one practice round, and use Sus Party to run the game.',
         canonical: 'https://susparty.com/among-us-birthday-party', schema: SCHEMA,
     });
@@ -88,6 +88,19 @@ function BirthdayPartyPage() {
                     href="/among-us-irl-task-generator?venue=house&players=10&movement=normal&style=mix" label="Prepare tasks for ten guests">
                     This setup opens the house preset with ten players and a mix of task styles. Change the guest count and areas, review the list, then carry it into host setup.
                 </GameSetupCta>
+                <section className="seo-section">
+                    <h2>Not a birthday? Any Among Us themed party works</h2>
+                    <p>
+                        The same plan works for any Among Us themed party, from a class celebration to a teen hangout. Guests
+                        do not need to know the rules ahead of time. They walk around, do quick tasks, run into each other, and
+                        gossip. Late arrivals join the next round with the same room code.
+                    </p>
+                    <p>
+                        Put a laptop in the meeting room to show the shared game screen, use party cups and plates as task props,
+                        and keep rounds short so new guests can rotate in. Planning for younger kids? See the
+                        {' '}<a href="/among-us-party-for-kids">Among Us party plan for ages 7 to 12</a>.
+                    </p>
+                </section>
                 <section className="seo-section">
                     <h2>Keep the party easy to host</h2>
                     <ul className="seo-list">
