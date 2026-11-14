@@ -60,7 +60,30 @@
 .ti-faq > div { border-top: 3px solid var(--site-rule); padding: 16px 0 8px; }
 .seo-section .ti-faq h3 { margin: 0 0 8px; }
 
+.seo-lead.ti-pitch { margin-top: -14px; font-size: 1.05rem; }
+
+/* Game band between the lists: soft panel with the five-screen round strip. */
+.ti-game {
+    margin: 48px 0 8px; padding: 36px 0 40px;
+    border-top: 3px solid var(--site-rule); border-bottom: 3px solid var(--site-rule);
+}
+.ti-game h2 {
+    color: var(--site-ink); font-size: var(--site-subheading); font-weight: 900;
+    letter-spacing: -0.035em; line-height: 1; margin: 0 0 16px;
+}
+.ti-game > p:not(.seo-section__kicker) { color: var(--site-body); line-height: 1.65; margin: 0 0 8px; }
+.ti-game .seo-section__kicker { margin: 0 0 14px; }
+/* The tour is wider than the reading column on desktop. */
+.ti-game .seo-tour { width: min(1120px, calc(100vw - 80px)); margin-left: 50%; transform: translateX(-50%); padding-bottom: 24px; }
+
+.ti-nudge {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px;
+    background: var(--sg-meet); border-radius: 22px; padding: 22px 24px; margin: 48px 0 0;
+}
+.ti-nudge p { margin: 0; color: var(--sg-ink); font-weight: 600; line-height: 1.5; flex: 1 1 320px; }
+
 @media (max-width: 640px) {
+    .ti-game .seo-tour { width: 100vw; }
     .ti-list { grid-template-columns: 1fr; gap: 0; }
     .ti-list li { background: none; border-radius: 0; padding: 12px 0; border-bottom: 1px solid var(--site-line); }
     .ti-num { width: 26px; height: 26px; font-size: .75rem; }

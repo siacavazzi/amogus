@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { usePageMeta } from '../../seo/usePageMeta';
 import SeoPageLayout from './SeoPageLayout';
-import GameplayScreenshots from './GameplayScreenshots';
+import GameplayScreenshots, { GameTour } from './GameplayScreenshots';
 import GameSetupCta from './GameSetupCta';
 import { TASK_SECTIONS, TASK_COUNT, FAQ, numberedSections } from './taskIdeas';
 import './TaskIdeasPage.css';
@@ -80,6 +80,10 @@ function TaskIdeasPage() {
                     fold a blanket, stack cups into a pyramid, toss a ball into a bucket. Here are {TASK_COUNT},
                     sorted by place, all safe for kids. Pick the ones that fit your house, school, or party.
                 </p>
+                <p className="seo-lead ti-pitch">
+                    Then play them in Sus Party, a free website that deals secret roles, hands each player
+                    their next task, and runs the meetings and votes on everyone’s phone.
+                </p>
                 <ul className="ti-facts" aria-label="What every task has">
                     <li>10 to 40 seconds each</li>
                     <li>Resets for the next player</li>
@@ -109,8 +113,31 @@ function TaskIdeasPage() {
                     </ul>
                 </nav>
 
-                {SECTIONS.map(section => (
-                    <section className="seo-section ti-section" id={section.id} key={section.id}>
+                {SECTIONS.map((section, sectionIndex) => (
+                    <React.Fragment key={section.id}>
+                    {sectionIndex === 2 && (
+                        <section className="ti-game" aria-labelledby="ti-game-title">
+                            <p className="seo-section__kicker">How the game works</p>
+                            <h2 id="ti-game-title">Where these tasks go in a round</h2>
+                            <p>
+                                In Sus Party every phone shows its player one task at a time. The crew walks
+                                the house doing them. The intruders only pretend, and tag people when nobody is
+                                looking. Then someone finds a body, everyone meets, and the group votes.
+                            </p>
+                            <GameTour title="A round on the phone, start to finish" />
+                            <div className="seo-actions">
+                                <a href="/play" className="seo-btn--primary">Start a free game →</a>
+                                <a href="/how-to-play-among-us-irl" className="seo-btn--secondary">Read the rules</a>
+                            </div>
+                        </section>
+                    )}
+                    {sectionIndex === 5 && (
+                        <aside className="ti-nudge" aria-label="Play Sus Party">
+                            <p><strong>Halfway there.</strong> Already have enough tasks? Open a room, type them in, and everyone joins with a code. Free, no download.</p>
+                            <a href="/play" className="seo-btn--primary">Play Sus Party →</a>
+                        </aside>
+                    )}
+                    <section className="seo-section ti-section" id={section.id}>
                         <p className="ti-range">Tasks {section.start} to {section.start + section.tasks.length - 1}</p>
                         <h2>{section.heading}</h2>
                         <p>{section.intro}</p>
@@ -127,6 +154,7 @@ function TaskIdeasPage() {
                             <a href={section.generatorHref}>Build a game with tasks like these →</a>
                         </div>
                     </section>
+                    </React.Fragment>
                 ))}
 
                 <section className="seo-section" id="play-with-these-tasks">
