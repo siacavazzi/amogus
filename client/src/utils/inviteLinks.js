@@ -1,3 +1,5 @@
+import { isBetaChannel, markChannel } from './channel';
+
 export const ROOM_QUERY_PARAM = 'room';
 export const ROOM_QUERY_PARAM_ALIAS = 'room_code';
 // Tags where a join link came from, so the event log can split joins by channel.
@@ -53,13 +55,17 @@ export function clearRoomCodeFromUrl() {
     window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
 }
 
-export function buildRoomInviteUrl(roomCode, origin = window.location.origin, via = null, linkToken = '') {
+// A browser on beta hands out beta links (see utils/channel), or the friend who opens one lands on
+// the regular site, where the room doesn't exist. The beta mark goes in the query string (nginx
+// reads it there); the group token stays after the '#'.
+export function buildRoomInviteUrl(roomCode, origin = window.location.origin, via = null, linkToken = '', { beta = isBetaChannel() } = {}) {
     const normalizedRoomCode = normalizeRoomCode(roomCode);
     if (!normalizedRoomCode) return '';
 
     const url = new URL('/play', origin);
     url.searchParams.set(ROOM_QUERY_PARAM, normalizedRoomCode);
     if (via) url.searchParams.set(VIA_QUERY_PARAM, via);
+    markChannel(url, beta);
     if (isLinkToken(linkToken)) url.hash = `${LINK_TOKEN_PARAM}=${linkToken}`;
     return url.toString();
 }
@@ -69,12 +75,12 @@ export const JOIN_VIA_QUERY_PARAM = 'via';
 
 // The link the reactor's QR code opens: the invite link, marked as a scan. A reactor on the
 // beta channel (a cookie set by ?beta=1) hands phones the beta too, or they would join prod.
-export function buildRoomQrUrl(roomCode, { origin = window.location.origin, beta = false, linkToken = '' } = {}) {
-    const inviteUrl = buildRoomInviteUrl(roomCode, origin, null, linkToken);
+export function buildRoomQrUrl(roomCode, { origin = window.location.origin, beta = isBetaChannel(), linkToken = '' } = {}) {
+    const inviteUrl = buildRoomInviteUrl(roomCode, origin, null, linkToken, { beta: false });
     if (!inviteUrl) return '';
 
     const url = new URL(inviteUrl);
     url.searchParams.set(JOIN_VIA_QUERY_PARAM, 'qr');
-    if (beta) url.searchParams.set('beta', '1');
+    markChannel(url, beta);
     return url.toString();
 }

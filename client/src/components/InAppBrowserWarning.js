@@ -4,6 +4,7 @@ import { X } from '../signal/icons';
 import { DataContext } from '../GameContext';
 import { sendClientMetric } from '../utils/clientMetrics';
 import { buildRoomInviteUrl } from '../utils/inviteLinks';
+import { withChannel } from '../utils/channel';
 import {
     IN_APP_NAMES, currentInAppBrowser, openInBrowserUrl, rememberDismissed, wasDismissed,
 } from '../utils/inAppBrowser';
@@ -63,7 +64,8 @@ export default function InAppBrowserWarning() {
     if (!detected || !open) return null;
 
     const copy = COPY[detected.os] || COPY.other;
-    const link = (roomCode && buildRoomInviteUrl(roomCode)) || window.location.href;
+    // Safari or Chrome has its own cookies, so a page on beta says beta in the link it hands over.
+    const link = (roomCode && buildRoomInviteUrl(roomCode)) || withChannel(window.location.href);
     const openUrl = openInBrowserUrl(link, detected.os);
     const appName = IN_APP_NAMES[detected.app];
 

@@ -3,7 +3,8 @@ import '../signal/signal.css';
 import '../signal/host.css';
 import { t, tk } from '../i18n';
 import GroupRecap from './GroupRecap';
-import { buildRoomInviteUrl } from '../utils/inviteLinks';
+import { buildRoomInviteUrl, normalizeRoomCode } from '../utils/inviteLinks';
+import { BETA_PARAM, isBetaChannel } from '../utils/channel';
 
 const TITLES = {
     room_not_open: tk('Ask the host to open the room'),
@@ -21,12 +22,22 @@ function playedOn(seconds) {
     }
 }
 
+function BetaHint({ href }) {
+    return (
+        <p className="sg-small" data-testid="beta-room-hint">
+            {t('This phone is on the beta, which only has rooms made on the beta.')}{' '}
+            <a href={href} data-testid="open-on-regular-site" style={{ color: 'inherit', fontWeight: 800, textDecoration: 'underline' }}>{t('Look on the regular site')}</a>
+        </p>
+    );
+}
+
 // An invite link to a game that is over. Its own tasks come back when the link carried the game's token.
 // Anyone with the link can start the next game. If a friend already did, the link joins that room.
 function GameEnded({ status, onStartNew, onChangeCode, busy }) {
     const saved = status.saved_game;
     const live = status.group_room;
     const joinUrl = live ? buildRoomInviteUrl(live.room_code, window.location.origin, null, live.link_token) : '';
+    const regularSite = regularSiteRoomUrl(status);
     return (
         <section className="hs-entry sg sg-a sg-rise" role="status" aria-live="polite" aria-atomic="true">
             <h2>{joinUrl ? t('Your group is playing') : t('This game has ended')}</h2>
@@ -36,6 +47,7 @@ function GameEnded({ status, onStartNew, onChangeCode, busy }) {
                 ? t('It was played on {date}. Start a new game to play it again with the same {count} tasks.', { date: playedOn(saved.played_at), count: saved.task_count })
                 : t('Start a new game, or enter the code for a game that is on now.')}</p>
             <GroupRecap recap={status.group_recap} style={{ margin: '0 0 12px' }} />
+            {regularSite && <BetaHint href={regularSite} />}
             <div className="hs-entry__actions">
                 {joinUrl && <a href={joinUrl} className="sg-btn sg-btn-blue" data-testid="join-group-room">{t('Join your group')}</a>}
                 {!joinUrl && <button type="button" onClick={onStartNew} disabled={busy} className="sg-btn sg-btn-blue">
@@ -47,16 +59,31 @@ function GameEnded({ status, onStartNew, onChangeCode, busy }) {
     );
 }
 
+// A phone on beta only sees rooms made on beta. When a code or link matches nothing here, the room
+// may be on the regular site (a friend's phone isn't on beta): offer to look there. That link turns
+// beta off. A link to a game this beta did play (its tasks came back) needs no such offer.
+export function regularSiteRoomUrl(status, beta = isBetaChannel()) {
+    const code = normalizeRoomCode(status?.room_code);
+    const unknownHere = status?.code === 'room_not_found'
+        || (status?.code === 'game_ended' && !status.saved_game && !status.group_room);
+    if (!beta || !unknownHere || !code) return '';
+    const url = new URL(buildRoomInviteUrl(code, window.location.origin, null, '', { beta: false }));
+    url.searchParams.set(BETA_PARAM, '0');
+    return url.toString();
+}
+
 export default function RoomEntryNotice({ status, onRetry, onChangeCode, onStartNew, busy = false }) {
     if (!status) return null;
     if (status.code === 'game_ended' && onStartNew) return <GameEnded status={status} onStartNew={onStartNew} onChangeCode={onChangeCode} busy={busy} />;
     // The server holds a phone that came before the host opened the room and joins it on Open.
     const waiting = status.code === 'room_not_open' && status.waiting;
+    const regularSite = regularSiteRoomUrl(status);
     return (
         <section className="hs-entry sg sg-a sg-rise" role="status" aria-live="polite" aria-atomic="true">
             {status.room_code && <p className="hs-entry__room">{t('Room {room_code}', { room_code: status.room_code })}</p>}
             <h2>{waiting ? t('Waiting for the host to open the room') : (TITLES[status.code] ? t(TITLES[status.code]) : t('Room unavailable'))}</h2>
             <p>{t(status.message)}</p>
+            {regularSite && <BetaHint href={regularSite} />}
             {waiting && <p data-testid="waiting-to-open" className="sg-small" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}><span className="hs-dot" aria-hidden="true" /> {t('Keep this page open')}</p>}
             <div className="hs-entry__actions">
                 {!waiting && (
