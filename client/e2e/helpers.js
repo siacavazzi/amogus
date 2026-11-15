@@ -202,7 +202,7 @@ async function joinRoom(page, code) {
 async function nextToAvatars(page, say = text => text) {
     await page.getByText(say('Next: Take a selfie')).click();
     const join = page.getByRole('button', { name: say('Join Game'), exact: true });
-    const avatars = page.getByText(say('Pick an avatar instead'));
+    const avatars = page.getByText(say('Pick an avatar instead'), { exact: true });
     await expect(join.or(avatars)).toBeVisible();
     if (!(await join.isVisible())) await avatars.click({ timeout: 3000 }).catch(() => {});
     await expect(join).toBeVisible();
