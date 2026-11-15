@@ -37,14 +37,14 @@ test('an avatar someone has is locked for the next player', async ({ browser }) 
     const [host, guest] = await h.openPhones(browser, ['Sam', 'Alex']);
     const code = await h.createRoomOnPhone(host);
     await host.getByPlaceholder(/name/i).first().fill('Sam');
-    await host.getByText('Next: Choose Avatar').click();
+    await h.nextToAvatars(host);
     const picked = host.getByRole('radio', { checked: true });
     const label = await picked.getAttribute('aria-label');
     await host.getByRole('button', { name: 'Join Game', exact: true }).click();
 
     await guest.goto(`/play?room=${code}`);
     await guest.getByPlaceholder(/name/i).first().fill('Alex');
-    await guest.getByText('Next: Choose Avatar').click();
+    await h.nextToAvatars(guest);
     const taken = guest.getByRole('radio', { name: `${label}, taken by Sam` });
     await expect(taken).toBeDisabled();
     await expect(taken).not.toBeChecked();
@@ -59,7 +59,7 @@ test('a long name keeps the avatar screen on the phone', async ({ browser }) => 
     const code = await h.createRoomOnPhone(host);
     await guest.goto(`/play?room=${code}`);
     await guest.getByPlaceholder(/name/i).first().fill(guest.person);
-    await guest.getByText('Next: Choose Avatar').click();
+    await h.nextToAvatars(guest);
     const join = guest.getByRole('button', { name: 'Join Game', exact: true });
     const box = await join.boundingBox();
     expect(box.x + box.width).toBeLessThanOrEqual(390);

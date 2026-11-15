@@ -32,7 +32,7 @@ test('someone who opens the invite link mid-round is told to wait, then joins th
     await late.goto(`/play?room=${code}`);
     await expect(late.getByTestId('round-on-notice')).toBeVisible();
     await late.getByPlaceholder(/name/i).first().fill('Kai');
-    await late.getByText('Next: Choose Avatar').click();
+    await h.nextToAvatars(late);
     await late.getByRole('button', { name: 'Join Game', exact: true }).click();
     await expect(late.getByTestId('waiting-next-round')).toBeVisible();
 

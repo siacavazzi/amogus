@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect, useRef, useMemo } from 'react';
-import { ChevronLeft, Camera, ArrowRight, Shuffle } from '../signal/icons';
+import { ChevronLeft, Camera, ArrowRight, Shuffle, User } from '../signal/icons';
 import { DataContext } from '../GameContext';
 import CameraCapture from '../components/CameraCapture';
 import Avatar, { getAvatar } from '../components/Avatar';
@@ -11,16 +11,32 @@ import LeaveGameButton from '../components/LeaveGameButton';
 import { t } from '../i18n';
 import LanguagePicker from '../components/LanguagePicker';
 
+// Set when this browser has no camera or the player refused it, so the join screen
+// goes straight to the avatars next time. Tapping "Take a selfie instead" clears it.
+const CAMERA_BLOCKED_KEY = 'sp_camera_blocked';
+
+function cameraBlocked() {
+    try { return localStorage.getItem(CAMERA_BLOCKED_KEY) === '1'; } catch { return false; }
+}
+
+function rememberCameraBlocked(blocked) {
+    try {
+        if (blocked) localStorage.setItem(CAMERA_BLOCKED_KEY, '1');
+        else localStorage.removeItem(CAMERA_BLOCKED_KEY);
+    } catch { /* storage off: ask again next time */ }
+}
+
 function LoginPage() {
     const [username, setUsername] = useState('');
-    const [step, setStep] = useState('username'); // 'username', 'avatar', 'camera', 'joining'
+    const [step, setStep] = useState('username'); // 'username', 'camera', 'avatar', 'joining'
     const [showContent, setShowContent] = useState(false);
+    const [cameraMissing, setCameraMissing] = useState(false);
     const lastSelfie = useRef(null);
     const scrollRef = useRef(null);
     const { setPlayerState, socket, setTaskEntry, roomCode, roomEntryStatus, setRoomEntryStatus, players, waitingPlayers, roundRunningAtEntry, lateJoinLive } = useContext(DataContext);
 
-    // Avatars other players in the room already have. The camera only opens if
-    // the player explicitly chooses a selfie instead.
+    // Avatars other players in the room already have. A selfie comes first; the avatar is the
+    // fallback, and also stands in for a selfie that fails to load or has been deleted.
     const takenBy = useMemo(() => takenAvatars([...(players || []), ...(waitingPlayers || [])], localStorage.getItem('player_id')), [players, waitingPlayers]);
     const [pic, setPic] = useState(() => randomFreeAvatar(takenBy));
     const avatar = getAvatar(pic);
@@ -58,12 +74,25 @@ function LoginPage() {
     const handleUsernameSubmit = (e) => {
         e.preventDefault();
         if (username.trim()) {
-            setStep('avatar');
+            setStep(cameraBlocked() ? 'avatar' : 'camera');
         }
     };
 
     const handleCameraCapture = (imageData) => {
         joinGame(imageData);
+    };
+
+    const openCamera = () => {
+        rememberCameraBlocked(false);
+        setCameraMissing(false);
+        setStep('camera');
+    };
+
+    // No camera, or the player said no: go to the avatars, and skip the camera next time.
+    const handleCameraUnavailable = (reason) => {
+        if (reason === 'NotAllowedError' || reason === 'NotFoundError' || reason === 'unsupported') rememberCameraBlocked(true);
+        setCameraMissing(true);
+        setStep('avatar');
     };
 
     const joinGame = (selfie) => {
@@ -87,7 +116,7 @@ function LoginPage() {
                 {(step === 'avatar' || step === 'camera') ? (
                     <button
                         type="button"
-                        onClick={() => setStep(step === 'camera' ? 'avatar' : 'username')}
+                        onClick={() => setStep('username')}
                         className="sg-btn sg-btn-ghost sg-join__back"
                     >
                         <ChevronLeft size={20} /> {t('Back')}
@@ -132,15 +161,34 @@ function LoginPage() {
                             maxLength={24}
                         />
                         <button type="submit" className="sg-btn sg-btn-white" disabled={!username.trim()}>
-                            {t('Next: Choose Avatar')} <ArrowRight size={22} />
+                            {cameraBlocked() ? t('Next: Choose Avatar') : t('Next: Take a selfie')} <ArrowRight size={22} />
                         </button>
                         <LanguagePicker style={{ alignSelf: 'center', opacity: 0.85 }} />
                     </form>
                 )}
 
-                {/* Step 2: avatar (selfie is opt-in from here) */}
+                {/* Step 2: selfie first */}
+                {step === 'camera' && (
+                    <div className="sg-join__form">
+                        <h1 className="sg-big sg-h2">{t('Take a selfie')}</h1>
+                        <CameraCapture
+                            onCapture={handleCameraCapture}
+                            onCancel={() => setStep('avatar')}
+                            onUnavailable={handleCameraUnavailable}
+                        />
+                        <button type="button" onClick={() => setStep('avatar')} className="sg-link" style={{ alignSelf: 'center', display: 'inline-flex', gap: 8, alignItems: 'center' }}>
+                            <User size={18} />
+                            <span>{t('Pick an avatar instead')}</span>
+                        </button>
+                    </div>
+                )}
+
+                {/* Step 2b: avatar, the fallback */}
                 {step === 'avatar' && (
                     <div className="sg-join__form">
+                        {cameraMissing && (
+                            <p className="sg-small" role="status" style={{ opacity: 0.8 }}>{t("Your camera isn't available here, so pick an avatar instead.")}</p>
+                        )}
                         <div className="sg-join__me">
                             <div className="sg-join__face"><Avatar id={pic} className="w-full h-full" /></div>
                             <div style={{ minWidth: 0 }}>
@@ -170,29 +218,21 @@ function LoginPage() {
                             </button>
                         </div>
 
-                        <button type="button" onClick={() => setStep('camera')} className="sg-link" style={{ alignSelf: 'center', display: 'inline-flex', gap: 8, alignItems: 'center' }}>
+                        <button type="button" onClick={openCamera} className="sg-link" style={{ alignSelf: 'center', display: 'inline-flex', gap: 8, alignItems: 'center' }}>
                             <Camera size={18} />
                             <span>{t('Take a selfie instead')}</span>
                         </button>
                     </div>
                 )}
 
-                {/* Step 2b: camera (only after the player asks for it) */}
-                {step === 'camera' && (
-                    <div className="sg-join__form">
-                        <h1 className="sg-big sg-h2">{t('Take a selfie')}</h1>
-                        <p className="sg-small" style={{ opacity: 0.75 }}>{t('Other players see it on their phones during the game.')}</p>
-                        <CameraCapture
-                            onCapture={handleCameraCapture}
-                            onCancel={() => setStep('avatar')}
-                        />
-                    </div>
-                )}
-
                 {/* Step 3: joining */}
                 {step === 'joining' && (
                     <div className="sg-center" style={{ gap: 14, minHeight: '60vh' }}>
-                        <div className="sg-join__face sg-a sg-bounce"><Avatar id={pic} className="w-full h-full" /></div>
+                        <div className="sg-join__face sg-a sg-bounce">
+                            {lastSelfie.current
+                                ? <img src={lastSelfie.current} alt="" className="w-full h-full" style={{ objectFit: 'cover', borderRadius: 'inherit' }} />
+                                : <Avatar id={pic} className="w-full h-full" />}
+                        </div>
                         <h2 className="sg-big sg-h2">{t('Joining game...')}</h2>
                         <p className="sg-lede" style={{ opacity: 0.8 }}>{t('Get ready to be sus!')}</p>
                     </div>

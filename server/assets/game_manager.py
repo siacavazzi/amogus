@@ -327,6 +327,16 @@ class GameManager:
         order = {'playing': 0, 'lobby': 1, 'idle': 2}
         return sorted(live, key=lambda g: (order[g['status']], -(g['last_activity'] or 0)))
 
+    def photos_in_use(self):
+        """Photo filenames that players in live rooms still point to."""
+        in_use = set()
+        for game in list(self.games.values()):
+            with game.state_lock:
+                for player in list(game.players) + list(game.waiting_players):
+                    if player.selfie:
+                        in_use.add(player.selfie)
+        return in_use
+
     def _start_cleanup_thread(self):
         """Start a background thread to clean up inactive games."""
         def cleanup_loop():
@@ -334,7 +344,7 @@ class GameManager:
                 time.sleep(300)  # Check every 5 minutes
                 self._cleanup_inactive_games()
                 if self.selfie_store:
-                    self.selfie_store.cleanup_expired()
+                    self.selfie_store.sweep(self.photos_in_use())
         
         thread = Thread(target=cleanup_loop, daemon=True)
         thread.start()

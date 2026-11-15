@@ -6,7 +6,7 @@ import './InfoPage.css';
 const FAQS = [
     {
         q: 'What happens to my selfie?',
-        a: 'Your selfie is optional. A current room connection is required to view it. Photos expire after 24 hours. The server deletes expired photos at startup and during its five-minute cleanup cycle. It also deletes your photo when you leave the room or when the room closes. A temporary disconnect keeps your photo available for your return, within the same 24-hour limit.',
+        a: 'Your selfie is optional, and you can pick an avatar instead. Only phones and screens connected to your room can see it, and only while you are in the room. It is deleted when you leave the room or when the room closes, and it is never kept longer than 12 hours. If your phone drops off for a moment, your photo waits for you to come back. Photos are never saved to your stats or game records, and the server clears out any leftover photos every few minutes and every time it restarts.',
     },
     {
         q: 'Is Sus Party free?',

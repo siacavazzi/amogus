@@ -63,10 +63,10 @@ game_config = {
 # Shared speaker controller (disabled for hosted multi-game mode typically)
 speaker = SonosController(enabled=SONOS_ENABLED, default_volume=SPEAKER_VOLUME, ignore_bedroom_speakers=IGNORE_BEDROOM_SPEAKERS)
 
-# Photos expire independently of room activity, including after a restart.
+# Rooms live in memory, so no photo on disk belongs to anyone after a restart.
 SELFIES_DIR = os.path.join(os.path.dirname(__file__), 'selfies')
 selfie_store = SelfieStore(SELFIES_DIR)
-selfie_store.cleanup_expired()
+selfie_store.delete_all()
 
 # Game manager handles multiple concurrent games
 game_manager = GameManager(socketio, speaker, game_config, selfie_store=selfie_store)

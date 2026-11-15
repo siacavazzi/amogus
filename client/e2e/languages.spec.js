@@ -27,7 +27,7 @@ async function joinInLanguage(page, code) {
     }
     await snap(page, '1-name');
     await name.fill(page.person);
-    await page.getByText(say(page, 'Next: Choose Avatar')).click();
+    await h.nextToAvatars(page, text => say(page, text));
     await page.getByRole('button', { name: say(page, 'Join Game'), exact: true }).click();
     await expect(page.getByText(say(page, 'You'), { exact: true })).toBeVisible();
 }

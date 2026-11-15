@@ -1,4 +1,10 @@
-"""Store temporary player photos and remove expired files."""
+"""Store temporary player photos and delete them as soon as no room needs them.
+
+A photo lives only as long as its player is in a live room. It is deleted when the player
+leaves or is dropped, when the room closes, at every server start (rooms live in memory, so
+none survive a restart), and by the cleanup sweep for any file no live player points to.
+SELFIE_RETENTION_SECONDS is a hard cap on top of that, for a room that stays open very long.
+"""
 import base64
 import logging
 import os
@@ -8,7 +14,9 @@ from pathlib import Path
 from uuid import uuid4
 
 
-SELFIE_RETENTION_SECONDS = 24 * 60 * 60
+SELFIE_RETENTION_SECONDS = 12 * 60 * 60
+# A photo saved by a join that is still being handled has no player yet; the sweep leaves it alone.
+ORPHAN_GRACE_SECONDS = 60
 MAX_SELFIE_BYTES = 256 * 1024
 SELFIE_NAME = re.compile(r'[0-9a-f]{32}\.jpg')
 logger = logging.getLogger('app_logger')
@@ -65,11 +73,42 @@ class SelfieStore:
             return True
         return (time.time() if now is None else now) - modified >= SELFIE_RETENTION_SECONDS
 
+    def _photo_names(self):
+        try:
+            return [path.name for path in self.directory.iterdir() if self.path(path.name) is not None]
+        except OSError:
+            logger.exception('Selfie listing failed')
+            return []
+
+    def _age(self, filename, now):
+        path = self.path(filename)
+        try:
+            return now - path.lstat().st_mtime
+        except OSError:
+            return None
+
     def cleanup_expired(self):
         now = time.time()
-        try:
-            for path in self.directory.iterdir():
-                if self.path(path.name) is not None and self.expired(path.name, now):
-                    self.delete(path.name)
-        except OSError:
-            logger.exception('Selfie cleanup failed')
+        for name in self._photo_names():
+            if self.expired(name, now):
+                self.delete(name)
+
+    def delete_all(self):
+        """Delete every photo. Used at start-up, when no room (and so no player) exists yet."""
+        names = self._photo_names()
+        for name in names:
+            self.delete(name)
+        return len(names)
+
+    def sweep(self, in_use, now=None):
+        """Delete expired photos and photos no live player points to. Returns how many went."""
+        now = time.time() if now is None else now
+        in_use = set(in_use)
+        deleted = 0
+        for name in self._photo_names():
+            age = self._age(name, now)
+            orphan = name not in in_use and (age is None or age >= ORPHAN_GRACE_SECONDS)
+            if orphan or self.expired(name, now):
+                self.delete(name)
+                deleted += 1
+        return deleted
