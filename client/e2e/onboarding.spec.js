@@ -191,7 +191,8 @@ test("a player's photo is deleted from the server when they leave", async ({ bro
     await expect(host.locator('img[src*="/selfies/"]')).toHaveCount(0);
 });
 
-test('a phone that refuses the camera picks an avatar, and skips the camera next time', async ({ browser }) => {
+test('a phone that refuses the camera picks an avatar, and skips the camera next time', async ({ browser, browserName }) => {
+    test.skip(browserName === 'webkit', "Playwright's WebKit has no camera to refuse; the camera tests run in Chromium");
     const [host, guest] = await h.openPhones(browser, ['Sam', 'Alex']);
     await guest.addInitScript(() => {
         navigator.mediaDevices.getUserMedia = async () => { throw new DOMException('Permission denied', 'NotAllowedError'); };
