@@ -1,3 +1,5 @@
+import { isBetaChannel, markChannel } from './channel';
+
 // "Save this game": a link any player keeps (in a text to themselves or the group chat) that
 // opens host setup with that night's tasks. The link lives in their messages, so it survives
 // iOS Safari clearing site storage after a week away.
@@ -18,11 +20,13 @@ export function normalizeListCode(value) {
     return /^[A-Z0-9]{6}$/.test(code) ? code : '';
 }
 
-export function savedGameUrl(code, origin = window.location.origin, { group = '', from = '' } = {}) {
+export function savedGameUrl(code, origin = window.location.origin, { group = '', from = '', beta = isBetaChannel() } = {}) {
     const url = new URL('/play', origin);
     if (normalizeListCode(code)) url.searchParams.set(SAVED_GAME_PARAM, normalizeListCode(code));
     if (from === 'welcome') url.searchParams.set(FROM_PARAM, from);
     url.searchParams.set('utm_source', 'saved-game');
+    // A game saved on beta reopens on beta, where its tasks and group live.
+    markChannel(url, beta);
     if (normalizeListCode(code) && isGroupToken(group)) url.hash = `${GROUP_PARAM}=${group}`;
     return url.toString();
 }

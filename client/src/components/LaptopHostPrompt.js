@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ArrowLeft, Monitor, Smartphone, X } from '../signal/icons';
 import RoomQrCode from './RoomQrCode';
-import { isBetaChannel } from './BetaBadge';
+import { isBetaChannel, markChannel } from '../utils/channel';
 import { t } from '../i18n';
 
 // Set once a phone has joined a room this laptop showed, so a laptop that has hosted before
@@ -19,7 +19,7 @@ export function rememberLaptopHosted() {
 export function phoneStartUrl({ origin = window.location.origin, beta = isBetaChannel() } = {}) {
     const url = new URL('/play', origin);
     url.searchParams.set('from', 'laptop');
-    if (beta) url.searchParams.set('beta', '1');
+    markChannel(url, beta);
     return url.toString();
 }
 

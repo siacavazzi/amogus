@@ -111,6 +111,8 @@ test("the host's Invite button shares a link that brings a friend straight in", 
     const shared = await host.waitForFunction(() => window.sharedInvite).then(handle => handle.jsonValue());
     expect(shared.url).toContain(`room=${code}`);
     expect(shared.text).toContain(code);
+    // A host on beta shares a beta link, or the friend's phone opens the regular site and finds no room.
+    expect(new URL(shared.url).searchParams.get('beta')).toBe(process.env.E2E_BETA === '1' ? '1' : null);
 
     await friend.goto(shared.url);
     await h.enterName(friend);

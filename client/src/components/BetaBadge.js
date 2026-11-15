@@ -1,8 +1,7 @@
 import React from 'react';
+import { isBetaChannel } from '../utils/channel';
 
-export function isBetaChannel() {
-  return typeof document !== 'undefined' && /(?:^|;\s*)sus_channel=beta(?:;|$)/.test(document.cookie);
-}
+export { isBetaChannel };
 
 // Shown on every page while this browser is opted into the beta (?beta=1).
 function BetaBadge() {
