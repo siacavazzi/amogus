@@ -171,7 +171,8 @@ class WeekendReadinessTests(SocketGameTestCase):
                                         'extra_data': {'target_player_id': crew.player_id, **extra}})
                 self.assertNotIn(card, intruder.cards)
                 self.assertEqual(1, len(game.stats[stat]))
-        self.assertEqual('Dance', crew.fake_task['task'])
+        fakes = [player.priority for player in self.crew(game) if player.priority]
+        self.assertEqual(['Dance'], [task['task'] for task in fakes])
         events = self.drain(self.client_for_player(clients, ids, crew))
         self.assertEqual({'message': 'Found you'}, self.first_event(events, 'taunt_received'))
 

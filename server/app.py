@@ -18,7 +18,7 @@ from flask_cors import CORS
 from assets.game_manager import GameManager
 from assets.stats_tracker import StatsTracker
 from assets.room_codes import ROOM_CODE_ALPHABET, has_unused_letters, clean_room_code
-from assets import client_info
+from assets import client_info, task_hand
 from assets.sonosHandler import SonosController
 from assets.utils import *
 from assets.taskHandler import *
@@ -1137,9 +1137,9 @@ def handleRejoin(data):
             emit("meltdown_code", player.meltdown_code, to=player.sid)
             logger.debug(f"Sent meltdown code to player {player.player_id}")
         
-        if player.get_task():
+        if player.get_task() or player.stolen:
             logger.info("Sending task to player")
-            emit("task", {**metadata(game), "task": player.get_task()}, to=player.sid)
+            task_hand.emit_hand(game, player)
 
     emit('room_state', room_state(game, player, request.sid))
     return {'ok': True, 'state': room_state(game, player, request.sid)}
@@ -1537,7 +1537,8 @@ def start_room(game, test_mode=False):
         if player.sid:
             socketio.emit('room_state', room_state(game, player, player.sid), to=player.sid)
             if player.task:
-                socketio.emit('task', {**metadata(game), 'task': player.task}, to=player.sid)
+                task_hand.emit_hand(game, player)
+    task_hand.start_priority_clock(game)
     game.speaker.play_sound('theme')
     return {'ok': True}
 
@@ -1563,7 +1564,7 @@ def handle_test_switch_role(data):
     sendPlayerList(game, game.room_code)
     socketio.emit('room_state', room_state(game, player, player.sid), to=player.sid)
     if player.task:
-        socketio.emit('task', {**metadata(game), 'task': player.task}, to=player.sid)
+        task_hand.emit_hand(game, player)
     return {'ok': True, 'sus': player.sus}
 
 
@@ -1786,44 +1787,101 @@ def handleTaskComplete(data):
         return command_error('This player cannot complete a task now.', game, player, reason='inactive_task_player')
     if game.meeting or game.active_hack > 0 or game.active_meltdown:
         return command_error('Wait until the current event ends before you complete the task.', game, player, reason='task_blocked_by_event')
-    if not player.task or player.task.get('assignment_id') != assignment_id:
-        return command_error('This task already changed. Use the current task.', game, player, reason='stale_assignment')
-    is_fake = bool(player.task.get('is_fake'))
-    if is_fake:
-        game.stats['fake_tasks_completed'].append({'player_name': player.username, 'task_text': player.task.get('task', '')})
-        emit('fake_task_completed', {**metadata(game), 'task': player.task.get('task'), 'location': player.task.get('location')})
-    else:
-        previous = game.crew_score / game.taskGoal * 100 if game.taskGoal else 0
-        game.crew_score += 1
-        game.stats['tasks_completed'] += 1
-        player.count_stat('tasks')
-        game.emit_to_room('crew_score', {'score': game.crew_score})
-        percentage = game.crew_score / game.taskGoal * 100 if game.taskGoal else 0
-        for threshold in (20, 50, 80, 95):
-            if previous < threshold <= percentage:
-                game.speaker.play_sound(f'{threshold}_percent_tasks')
-                break
-        if percentage >= 100 and not game.intruders_revealed:
-            game.on_tasks_complete(player)
-            if game.meeting and game.meeting.trigger == 'tasks_complete':
-                record_usage('meeting_started', game, game.meeting.player_who_started_it.player_id, trigger='tasks_complete')
-    finished_task = player.task
-    assigned_at = getattr(player, 'task_assigned_monotonic', None)
-    task_seconds = round(time.monotonic() - assigned_at, 1) if assigned_at is not None else None
-    if task_seconds is not None and not is_fake:
-        game.task_seconds.append(task_seconds)
-    queued_task = player.fake_task
-    player.fake_task = None
-    game.assign_task(player, queued_task)
-    emit('task', {**metadata(game), 'task': player.task})
+    with game.state_lock:
+        where, index = player.find_assignment(assignment_id)
+        if not where:
+            return command_error('This task already changed. Use the current task.', game, player, reason='stale_assignment')
+        finished_task = player.priority if where == 'priority' else player.hand[index]
+        if game.denied_location and (finished_task.get('location') or '').lower() == game.denied_location.lower():
+            return command_error('That area is blocked right now. Do another task.', game, player, reason='area_blocked')
+        is_fake = bool(finished_task.get('is_fake'))
+        is_priority = where == 'priority'
+        if is_fake:
+            game.stats['fake_tasks_completed'].append({'player_name': player.username, 'task_text': finished_task.get('task', '')})
+            emit('fake_task_completed', {**metadata(game), 'task': finished_task.get('task'), 'location': finished_task.get('location')})
+        else:
+            previous = game.crew_score / game.taskGoal * 100 if game.taskGoal else 0
+            game.crew_score += 1
+            game.stats['tasks_completed'] += 1
+            player.round_tasks_done += 1
+            player.count_stat('tasks')
+            if is_priority:
+                player.swaps += 1
+                game.stats['priority_tasks_completed'] = game.stats.get('priority_tasks_completed', 0) + 1
+            game.emit_to_room('crew_score', {'score': game.crew_score})
+            percentage = game.crew_score / game.taskGoal * 100 if game.taskGoal else 0
+            for threshold in (20, 50, 80, 95):
+                if previous < threshold <= percentage:
+                    game.speaker.play_sound(f'{threshold}_percent_tasks')
+                    break
+            if percentage >= 100 and not game.intruders_revealed:
+                game.on_tasks_complete(player)
+                if game.meeting and game.meeting.trigger == 'tasks_complete':
+                    record_usage('meeting_started', game, game.meeting.player_who_started_it.player_id, trigger='tasks_complete')
+        player.last_task_location = finished_task.get('location')
+        assigned_at = finished_task.get('assigned_monotonic')
+        task_seconds = round(time.monotonic() - assigned_at, 1) if assigned_at is not None else None
+        if task_seconds is not None and not is_fake:
+            game.task_seconds.append(task_seconds)
+        if player.selected_assignment == assignment_id:
+            player.selected_assignment = None
+        if is_priority:
+            task_hand.end_priority(player)
+        else:
+            task_hand.replace_in_hand(game, player, index)
+        game.revision += 1
+        task_hand.emit_hand(game, player)
     response = {'ok': True, 'request_id': request_id, 'state': room_state(game, player, request.sid)}
     game.command_results[key] = {'assignment_id': assignment_id, 'response': copy.deepcopy(response)}
     while len(game.command_results) > 256:
         game.command_results.popitem(last=False)
-    record_usage('task_completed', game, player.player_id, is_fake=is_fake, crew_score=game.crew_score,
+    record_usage('task_completed', game, player.player_id, is_fake=is_fake, is_priority=is_priority, crew_score=game.crew_score,
                  task_goal=game.taskGoal, task_seconds=task_seconds,
                  task_key=StatsTracker.task_key(finished_task), round_seconds=game.round_seconds())
     return response
+
+
+@socketio.on("swap_task")
+@room_event()
+def handleSwapTask(data):
+    """Trade one task in your hand for a new one. Swaps are earned by finishing Priority tasks."""
+    game, player, room = get_game_and_player(data.get('player_id'))
+    if not game or not player:
+        return command_error('Game session not found.')
+    if data.get('round_id') != game.round_id:
+        return command_error('This command belongs to an earlier round.', game, player, reason='stale_round')
+    with game.state_lock:
+        if not game.game_running or game.end_state or not player.alive or player.sus:
+            return command_error('This player cannot swap a task now.', game, player, reason='inactive_task_player')
+        if game.meeting or game.active_hack > 0 or game.active_meltdown:
+            return command_error('Wait until the current event ends before you swap.', game, player, reason='task_blocked_by_event')
+        if player.swaps <= 0:
+            return command_error('You have no swaps. Finish a Priority task to earn one.', game, player, reason='no_swaps')
+        where, index = player.find_assignment(data.get('assignment_id'))
+        if where != 'hand':
+            return command_error('This task already changed. Use the current task.', game, player, reason='stale_assignment')
+        if not task_hand.replace_in_hand(game, player, index):
+            return command_error('No other task to swap in right now.', game, player, reason='no_tasks')
+        player.swaps -= 1
+        game.revision += 1
+        task_hand.emit_hand(game, player)
+        record_usage('task_swapped', game, player.player_id, round_seconds=game.round_seconds())
+        return {'ok': True, 'state': room_state(game, player, request.sid)}
+
+
+@socketio.on("select_task")
+@room_event()
+def handleSelectTask(data):
+    """The task a player tapped as the one they're doing (None to let go)."""
+    game, player, room = get_game_and_player(data.get('player_id'))
+    if not game or not player:
+        return
+    with game.state_lock:
+        assignment_id = data.get('assignment_id')
+        if assignment_id is None:
+            player.selected_assignment = None
+        elif player.find_assignment(assignment_id)[0]:
+            player.selected_assignment = assignment_id
 
 
 # ============ CARD HANDLING ============

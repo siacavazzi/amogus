@@ -103,8 +103,7 @@ class Player:
         self.late_join = False
 
         self.alive = True
-        self.task = None
-        self.fake_task = None
+        self._clear_tasks()
         self.meltdown_code = None
         
         # Death tracking
@@ -140,8 +139,7 @@ class Player:
         """Reset player state for a new game (keeps identity)."""
         self.sus = False
         self.alive = True
-        self.task = None
-        self.fake_task = None
+        self._clear_tasks()
         self.meltdown_code = None
         self.death_cause = None
         self.death_message = None
@@ -157,6 +155,53 @@ class Player:
         self.death_message = get_death_message(cause, task_name)
         self.ready = True  # Dead players are always ready
         return self.death_message
+
+    def _clear_tasks(self):
+        """A crewmate holds a hand of tasks (see assets/task_hand.py), plus now and then one
+        timed Priority task. Intruders hold none, but may hold tasks stolen with a card."""
+        self.hand = []
+        self.priority = None
+        self.swaps = 0
+        self.selected_assignment = None
+        self.next_priority_in = None
+        self.priority_idle = 0
+        self.round_tasks_done = 0
+        self.last_task_location = None
+        self.stolen = None
+
+    @property
+    def task(self):
+        """The task this player is doing: the one they picked, else the first in their hand."""
+        hand = getattr(self, 'hand', None) or []
+        picked = getattr(self, 'selected_assignment', None)
+        if picked:
+            priority = getattr(self, 'priority', None)
+            if priority and priority.get('assignment_id') == picked:
+                return priority
+            for task in hand:
+                if task.get('assignment_id') == picked:
+                    return task
+        return hand[0] if hand else None
+
+    @task.setter
+    def task(self, value):
+        if value is None:
+            self.hand = []
+            self.priority = None
+            self.selected_assignment = None
+        else:
+            self.hand = [value]
+
+    def find_assignment(self, assignment_id):
+        """('hand', index) or ('priority', None) for a task this player holds, else (None, None)."""
+        if not assignment_id:
+            return None, None
+        if self.priority and self.priority.get('assignment_id') == assignment_id:
+            return 'priority', None
+        for index, task in enumerate(self.hand):
+            if task.get('assignment_id') == assignment_id:
+                return 'hand', index
+        return None, None
 
     def get_task(self):
         return self.task

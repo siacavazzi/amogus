@@ -6,6 +6,7 @@ from collections import OrderedDict
 from uuid import uuid4
 from assets.game_links import new_link_token
 from assets.player import Player
+from assets import task_hand
 from assets.taskHandler import *
 from assets.meltdown import *
 from assets.card import *
@@ -308,6 +309,13 @@ class Game:
         start = getattr(self, 'round_started_monotonic', None)
         return round(max(0, time.monotonic() - start), 3) if start is not None else None
 
+    def intruders_left(self):
+        """Intruders still among the living, for the round screen. None (shown as "?") once someone
+        joined mid-round: a count that went up would point at the latecomer."""
+        if not self.game_running or getattr(self, 'late_joins', 0):
+            return None
+        return sum(1 for player in self.players if player.sus and player.alive)
+
     def living_counts(self):
         living = [player for player in self.players if player.alive]
         return {
@@ -319,9 +327,9 @@ class Game:
         """Task timing for the round summary: no task text, only durations and counts."""
         seconds = sorted(self.task_seconds)
         now = time.monotonic()
-        held = [now - player.task_assigned_monotonic for player in self.players
-                if player.alive and not player.sus and player.task
-                and getattr(player, 'task_assigned_monotonic', None) is not None]
+        held = [now - task['assigned_monotonic'] for player in self.players
+                if player.alive and not player.sus for task in player.hand
+                if task.get('assigned_monotonic') is not None]
         return {
             'median_task_seconds': round(seconds[len(seconds) // 2], 1) if seconds else None,
             'slowest_task_seconds': round(seconds[-1], 1) if seconds else None,
@@ -486,13 +494,15 @@ class Game:
         with self.state_lock:
             self.last_activity = time.time()
             player_sids = [player.sid for player in self.players if player.sid]
-            public = self._add_state_metadata({'action': action, 'list': self.player_view()})
+            public = self._add_state_metadata({'action': action, 'list': self.player_view(),
+                                               'intruders_left': self.intruders_left()})
             if self.room_code:
                 self.socket.emit('game_data', public, room=self.room_code, skip_sid=player_sids or None)
             for player in self.players:
                 if player.sid:
                     self.socket.emit('game_data', self._add_state_metadata(
-                        {'action': action, 'list': self.player_view(player)}), to=player.sid)
+                        {'action': action, 'list': self.player_view(player),
+                         'intruders_left': self.intruders_left()}), to=player.sid)
 
     def start_hack(self, duration):
         with self.state_lock:
@@ -695,7 +705,7 @@ class Game:
             self.socket.emit('game_data', self._add_state_metadata({
                 'action': 'start_game', 'late_join': True, 'list': self.player_view(player)}), to=player.sid)
             if player.task:
-                self.socket.emit('task', self._add_state_metadata({'task': player.task}), to=player.sid)
+                task_hand.emit_hand(self, player)
             if player.sus:
                 for other in self.players:
                     if other.sus and other.alive and other is not player:
@@ -710,23 +720,14 @@ class Game:
         return self.task_handler.get_task(self.denied_location)
 
     def assign_task(self, player, task=None):
-        """Assign a room task or queued fake task with round-scoped identity."""
+        """Deal a crewmate a full hand of tasks (see assets/task_hand.py). Returns the first."""
         with self.state_lock:
-            if task is None:
-                if not self.task_handler.tasks and self.collaborative_tasks:
-                    self.task_handler.tasks = [saved_task.copy() for saved_task in self.collaborative_tasks]
-                    random.shuffle(self.task_handler.tasks)
-                assigned_task = self.getTask()
-            else:
-                assigned_task = task.copy()
-
-            assigned_task['assignment_id'] = str(uuid4())
-            assigned_task['round_id'] = self.round_id
-            player.task = assigned_task
-            player.task_assigned_monotonic = time.monotonic()
+            if task is not None:
+                player.hand.append(task_hand._stamp(self, task))
+            task_hand.fill_hand(self, player)
             self.revision += 1
-            return assigned_task
-    
+            return player.hand[0] if player.hand else None
+
     def reveal_intruders(self):
         """Reveal intruder identities to all players when tasks reach 100%.
         
@@ -982,6 +983,10 @@ class Game:
                 return False  # Both players know who the intruder is; a 1-1 vote can't resolve.
             for player in self.players:
                 player.ready = not player.alive
+                if player.stolen:
+                    # Stolen tasks are an alibi until the next meeting.
+                    player.stolen = None
+                    task_hand.emit_hand(self, player)
             self.meeting = Meeting(self.vote_time, self.socket, player_who_started_it, self, trigger=trigger)
             self.revision += 1
             self.stats['meetings_called'] += 1

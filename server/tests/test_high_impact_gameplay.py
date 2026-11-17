@@ -348,7 +348,7 @@ class HighImpactGameplayTests(unittest.TestCase):
         self.assertFalse(game.game_running)
         self.assertEqual(new_host_id, game.creator_player_id)
 
-    def test_fake_task_stays_queued_through_rejoin_and_does_not_score(self):
+    def test_fake_task_is_a_priority_that_survives_rejoin_and_does_not_score(self):
         clients, room_code, player_ids, game = self.setup_started_game(
             3,
             config={
@@ -358,8 +358,6 @@ class HighImpactGameplayTests(unittest.TestCase):
             },
         )
         intruder = next(player for player in game.players if player.sus)
-        target = next(player for player in game.players if not player.sus)
-        original_task = target.task.copy()
         fake_card = next(card for card in intruder.cards if card.action == "Fake Task")
 
         clients[player_ids.index(intruder.player_id)].emit(
@@ -367,33 +365,32 @@ class HighImpactGameplayTests(unittest.TestCase):
             {
                 "player_id": intruder.player_id,
                 "card_id": fake_card.id,
-                "extra_data": {
-                    "target_player_id": target.player_id,
-                    "task_text": "fake after reconnect",
-                    "task_location": "Kitchen",
-                },
+                "extra_data": {"task_text": "fake after reconnect", "task_location": "Kitchen"},
             },
         )
         for client in clients:
             self.drain(client)
+        # The game picks who gets it: a crewmate without a Priority task.
+        target = next(player for player in game.players if player.priority)
+        self.assertFalse(target.sus)
+        self.assertTrue(target.priority["is_fake"])
+        hand_before = [task["assignment_id"] for task in target.hand]
 
         rejoin_client = self.make_client()
         rejoin_client.emit("rejoin", {"player_id": target.player_id})
-        rejoin_events = self.drain(rejoin_client)
-        shown_task = self.first_event(rejoin_events, "task")["task"]
+        shown = self.first_event(self.drain(rejoin_client), "task")
+        self.assertEqual("fake after reconnect", shown["priority"]["task"])
+        # A phone can never tell a fake from a real Priority task.
+        self.assertNotIn("is_fake", shown["priority"])
+        self.assertEqual(hand_before, [task["assignment_id"] for task in shown["hand"]])
 
-        self.assertEqual(original_task, shown_task)
+        rejoin_client.emit("complete_task", {"player_id": target.player_id,
+                                             "assignment_id": target.priority["assignment_id"]})
+        events = self.drain(rejoin_client)
+        self.assertTrue(any(event.get("name") == "fake_task_completed" for event in events))
         self.assertEqual(0, game.crew_score)
-
-        rejoin_client.emit("complete_task", {"player_id": target.player_id})
-        task_after_real_completion = self.first_event(self.drain(rejoin_client), "task")["task"]
-        self.assertEqual("fake after reconnect", task_after_real_completion["task"])
-        self.assertTrue(task_after_real_completion["is_fake"])
-        self.assertEqual(1, game.crew_score)
-
-        rejoin_client.emit("complete_task", {"player_id": target.player_id})
-        self.drain(rejoin_client)
-        self.assertEqual(1, game.crew_score)
+        self.assertIsNone(target.priority)
+        self.assertEqual(0, target.swaps)
 
 
 if __name__ == "__main__":

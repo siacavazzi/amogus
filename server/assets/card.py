@@ -6,6 +6,9 @@ import uuid
 import time
 from threading import Thread
 from assets.utils import *
+from assets import task_hand
+
+RALLY_EARLIEST_SECONDS = 60  # Rally can't open a round: the crew hasn't spread out yet
 
 CARD_DECK_PRESET_DEFAULT = 'default'
 CARD_DECK_PRESET_CUSTOM = 'custom'
@@ -19,6 +22,9 @@ CARD_DECK_COUNT_KEYS = [
     'remote_sabotage',
     'shorten_meltdown',
     'area_denial_per_location',
+    'steal_tasks',
+    'reshuffle',
+    'rally',
 ]
 
 DEFAULT_CARD_DECK_COUNTS = {
@@ -29,6 +35,9 @@ DEFAULT_CARD_DECK_COUNTS = {
     'remote_sabotage': 3,
     'shorten_meltdown': 3,
     'area_denial_per_location': 2,
+    'steal_tasks': 3,
+    'reshuffle': 1,
+    'rally': 1,
 }
 
 CARD_DECK_PRESETS = {
@@ -41,6 +50,9 @@ CARD_DECK_PRESETS = {
         'remote_sabotage': 0,
         'shorten_meltdown': 0,
         'area_denial_per_location': 0,
+        'steal_tasks': 0,
+        'reshuffle': 0,
+        'rally': 0,
     },
     'sabotage_heavy': {
         'self_report': 0,
@@ -50,6 +62,9 @@ CARD_DECK_PRESETS = {
         'remote_sabotage': 6,
         'shorten_meltdown': 6,
         'area_denial_per_location': 3,
+        'steal_tasks': 0,
+        'reshuffle': 2,
+        'rally': 0,
     },
     'no_reactor_cards': {
         'self_report': 4,
@@ -59,6 +74,9 @@ CARD_DECK_PRESETS = {
         'remote_sabotage': 0,
         'shorten_meltdown': 0,
         'area_denial_per_location': 2,
+        'steal_tasks': 3,
+        'reshuffle': 1,
+        'rally': 1,
     },
 }
 
@@ -184,46 +202,13 @@ class Card:
             else:
                 remove_card = False
         elif self.action == 'Fake Task':
-            # Requires extra_data with: target_player_id, task_text, task_location
-            if not extra_data:
-                print("Fake Task card requires extra_data")
-                remove_card = False
-            else:
-                target_player_id = extra_data.get('target_player_id')
-                task_text = extra_data.get('task_text', 'Do something suspicious')
-                task_location = extra_data.get('task_location', 'Other')
-                
-                # Find the target player
-                target_player = None
-                for p in self.game.players:
-                    if p.player_id == target_player_id:
-                        target_player = p
-                        break
-                
-                if target_player and not target_player.sus and target_player.alive:
-                    task_text = task_text[:200]
-                    task_location = task_location[:80]
-                    # Set the fake task - will be shown after current task is completed
-                    target_player.fake_task = {
-                        'task': task_text,
-                        'location': task_location,
-                        'is_fake': True  # Mark as fake for potential future use
-                    }
-                    self.game.stats['fake_tasks_sent'].append({
-                        'sender_name': player.username,
-                        'target_name': target_player.username,
-                        'task_text': task_text,
-                        'task_location': task_location
-                    })
-                    # Play the 'sus' sound
-                    self.game.speaker.play_sound('sus')
-                    # Notify other intruders
-                    self.notify_intruders(player)
-                    send_message_to_player(self.socket, player, f"Fake task sent to {target_player.username}")
-                    print(f"Fake task '{task_text}' at '{task_location}' queued for {target_player.username}")
-                else:
-                    send_message_to_player(self.socket, player, "Invalid target - must be alive crewmate")
-                    remove_card = False
+            remove_card = self._play_fake_task(player, extra_data or {})
+        elif self.action == 'Steal Tasks':
+            remove_card = self._play_steal_tasks(player, extra_data or {})
+        elif self.action == 'Reshuffle':
+            remove_card = self._play_reshuffle(player)
+        elif self.action == 'Rally':
+            remove_card = self._play_rally(player, extra_data or {})
         elif self.action == 'Taunt Message':
             if not extra_data:
                 print("Taunt Message card requires extra_data")
@@ -284,6 +269,101 @@ class Card:
         self.game.emit_player_list()
         return accepted
 
+    def _crewmate(self, player_id):
+        target = next((p for p in self.game.players if p.player_id == player_id), None)
+        if target and not target.sus and target.alive and not getattr(target, 'waiting', False):
+            return target
+        return None
+
+    def _location(self, extra_data):
+        location = str(extra_data.get('task_location') or extra_data.get('location') or '')[:task_hand.LOCATION_MAX_CHARS]
+        known = set(self.game.locations or []) | {task.get('location') for task in (self.game.collaborative_tasks or [])}
+        return location if location in known else None
+
+    def _play_fake_task(self, player, extra_data):
+        """A fake Priority task. The intruder picks where and what; the game hands it to the
+        crewmate most due a Priority and tells the intruder who."""
+        task_text = str(extra_data.get('task_text') or '').strip()[:task_hand.FAKE_TASK_MAX_CHARS]
+        task_location = self._location(extra_data) or 'Other'
+        if not task_text:
+            send_message_to_player(self.socket, player, "Write the fake task first.")
+            return False
+        target = task_hand.pick_fake_task_target(self.game, task_location)
+        if not target:
+            send_message_to_player(self.socket, player, "Every crewmate has a Priority task right now. Keep the card and try again soon.")
+            return False
+        task_hand.give_priority(self.game, target, {'task': task_text, 'location': task_location}, fake=True)
+        task_hand.emit_hand(self.game, target)
+        self.game.stats['fake_tasks_sent'].append({
+            'sender_name': player.username,
+            'target_name': target.username,
+            'task_text': task_text,
+            'task_location': task_location
+        })
+        self.game.speaker.play_sound('sus')
+        self.notify_intruders(player)
+        where = '' if task_location == 'Other' else f" {task_location},"
+        send_message_to_player(self.socket, player, f"Fake task sent to {target.username}.{where} {task_hand.PRIORITY_SECONDS} s to get there.")
+        return True
+
+    def _play_steal_tasks(self, player, extra_data):
+        """See a crewmate's tasks and take them: they get new ones, you keep these as an alibi."""
+        target = self._crewmate(extra_data.get('target_player_id'))
+        if not target or not target.hand:
+            send_message_to_player(self.socket, player, "Choose a living crewmate.")
+            return False
+        stolen = [{'task': task.get('task'), 'location': task.get('location')} for task in target.hand]
+        player.stolen = {'from': target.username, 'tasks': stolen}
+        task_hand.redeal_hand(self.game, target)
+        if target.sid:
+            self.socket.emit('tasks_stolen', self.game._add_state_metadata({}), to=target.sid)
+        task_hand.emit_hand(self.game, target)
+        task_hand.emit_hand(self.game, player)
+        self.game.stats.setdefault('tasks_stolen', []).append({'sender_name': player.username, 'target_name': target.username})
+        self.game.speaker.play_sound('sus')
+        self.notify_intruders(player)
+        return True
+
+    def _play_reshuffle(self, player):
+        """Every living crewmate's hand is dealt again. Priority tasks stay."""
+        crew = task_hand.eligible_crew(self.game)
+        if not crew:
+            return False
+        for target in crew:
+            task_hand.redeal_hand(self.game, target)
+            task_hand.emit_hand(self.game, target)
+        self.game.emit_to_room('tasks_reshuffled', {})
+        self.game.speaker.play_sound('sus')
+        self.notify_intruders(player)
+        return True
+
+    def _play_rally(self, player, extra_data):
+        """Every living crewmate gets a real Priority task in one area, all at once. They are
+        real: each crewmate who makes it gets the point and a swap. That is the card's price."""
+        location = self._location(extra_data)
+        if not location or location == 'Other':
+            send_message_to_player(self.socket, player, "Choose an area for the Rally.")
+            return False
+        seconds = self.game.round_seconds() or 0
+        if seconds < RALLY_EARLIEST_SECONDS:
+            send_message_to_player(self.socket, player, "Rally works after the first minute. Keep the card for later.")
+            return False
+        crew = task_hand.eligible_crew(self.game)
+        given = set()
+        for target in crew:
+            task = task_hand.draw_task(self.game, avoid_texts=given, location=location)
+            if not task:
+                continue
+            given.add(task.get('task'))
+            task_hand.give_priority(self.game, target, task)
+            task_hand.emit_hand(self.game, target)
+        if not given:
+            send_message_to_player(self.socket, player, f"There are no tasks in {location}. Keep the card.")
+            return False
+        self.game.speaker.play_sound('sus')
+        self.notify_intruders(player)
+        return True
+
     def export(self):
         return json.dumps({
             "action":self.action,
@@ -340,12 +420,12 @@ class CardDeck:
             Card('EMP', 'Disable all devices for the duration', self, duration=60),
             Card('EMP', 'Disable all devices for the duration', self, duration=60),
 
-            Card('Fake Task', 'Send a fake task to a crewmate of your choice', self, requires_input=True),
-            Card('Fake Task', 'Send a fake task to a crewmate of your choice', self, requires_input=True),
-            Card('Fake Task', 'Send a fake task to a crewmate of your choice', self, requires_input=True),
-            Card('Fake Task', 'Send a fake task to a crewmate of your choice', self, requires_input=True),
-            Card('Fake Task', 'Send a fake task to a crewmate of your choice', self, requires_input=True),
-            Card('Fake Task', 'Send a fake task to a crewmate of your choice', self, requires_input=True),
+            Card('Fake Task', 'Send a fake Priority task', self, requires_input=True),
+            Card('Fake Task', 'Send a fake Priority task', self, requires_input=True),
+            Card('Fake Task', 'Send a fake Priority task', self, requires_input=True),
+            Card('Fake Task', 'Send a fake Priority task', self, requires_input=True),
+            Card('Fake Task', 'Send a fake Priority task', self, requires_input=True),
+            Card('Fake Task', 'Send a fake Priority task', self, requires_input=True),
 
             Card('Taunt Message', 'Send a message to a crewmate of your choice', self, requires_input=True),
             Card('Taunt Message', 'Send a message to a crewmate of your choice', self, requires_input=True),
@@ -355,6 +435,16 @@ class CardDeck:
             Card('Taunt Message', 'Send a message to a crewmate of your choice', self, requires_input=True),
             
         ]
+
+        self.cards.extend([
+            Card('Steal Tasks', "See a crewmate's tasks and take them", self, requires_input=True),
+            Card('Steal Tasks', "See a crewmate's tasks and take them", self, requires_input=True),
+            Card('Steal Tasks', "See a crewmate's tasks and take them", self, requires_input=True),
+            Card('Reshuffle', "Every crewmate's tasks are dealt again", self),
+        ])
+        # Rally only where the crew is winning big: rounds with a lone intruder.
+        if (getattr(self.game, 'round_intruder_count', None) or getattr(self.game, 'numIntruders', 1) or 1) <= 1 and self._task_areas():
+            self.cards.append(Card('Rally', 'Send every crewmate to one area', self, requires_input=True))
 
         # Only add reactor-dependent cards if a reactor is present
         if has_reactor:
@@ -371,9 +461,9 @@ class CardDeck:
         # Location based cards invoked programmatically since locations shouldn't be hardcoded
         for location in self.locations:
             if location != 'Other':
-                self.cards.append(Card('Area Denial', 'Stop sending tasks to a specific location', self, duration=120, countdown=True, location=location))
+                self.cards.append(Card('Area Denial', "Lock an area: its tasks can't be done", self, duration=120, countdown=True, location=location))
                 if random.random() > 0.4:
-                    self.cards.append(Card('Area Denial', 'Stop sending tasks to a specific location', self, duration=60, countdown=True, location=location))
+                    self.cards.append(Card('Area Denial', "Lock an area: its tasks can't be done", self, duration=60, countdown=True, location=location))
 
     def _build_configured_deck(self, counts, has_reactor):
         self.cards = []
@@ -386,10 +476,18 @@ class CardDeck:
             self.cards.append(Card('EMP', 'Disable all devices for the duration', self, duration=emp_durations[i % len(emp_durations)]))
 
         for _ in range(counts.get('fake_task', 0)):
-            self.cards.append(Card('Fake Task', 'Send a fake task to a crewmate of your choice', self, requires_input=True))
+            self.cards.append(Card('Fake Task', 'Send a fake Priority task', self, requires_input=True))
 
         for _ in range(counts.get('taunt_message', 0)):
             self.cards.append(Card('Taunt Message', 'Send a message to a crewmate of your choice', self, requires_input=True))
+
+        for _ in range(counts.get('steal_tasks', 0)):
+            self.cards.append(Card('Steal Tasks', "See a crewmate's tasks and take them", self, requires_input=True))
+        for _ in range(counts.get('reshuffle', 0)):
+            self.cards.append(Card('Reshuffle', "Every crewmate's tasks are dealt again", self))
+        if self._task_areas():
+            for _ in range(counts.get('rally', 0)):
+                self.cards.append(Card('Rally', 'Send every crewmate to one area', self, requires_input=True))
 
         include_reactor_cards = has_reactor and getattr(self.game, 'card_deck_preset', CARD_DECK_PRESET_DEFAULT) != 'no_reactor_cards'
         if include_reactor_cards:
@@ -405,7 +503,10 @@ class CardDeck:
         for location in self.locations:
             if location != 'Other':
                 for i in range(area_denial_count):
-                    self.cards.append(Card('Area Denial', 'Stop sending tasks to a specific location', self, duration=area_denial_durations[i % len(area_denial_durations)], countdown=True, location=location))
+                    self.cards.append(Card('Area Denial', "Lock an area: its tasks can't be done", self, duration=area_denial_durations[i % len(area_denial_durations)], countdown=True, location=location))
+
+    def _task_areas(self):
+        return [location for location in self.locations if location and location != 'Other']
 
     def draw_card(self, probability=1):
         if random.random() > probability:

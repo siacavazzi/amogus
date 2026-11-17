@@ -3,6 +3,7 @@ import copy
 import json
 
 from assets.scaling import minimum_tasks as minimum_tasks_for
+from assets import task_hand
 
 
 def metadata(game):
@@ -78,7 +79,9 @@ def room_state(game, player=None, sid=None):
         **metadata(game), 'running': game.game_running, 'room_open': game.is_open,
         'is_creator': game.creator_sid == sid,
         'players': [json.loads(p) for p in game.player_view(player)],
-        'task': player.task if player else None, 'crew_score': game.crew_score,
+        'task': task_hand._public(player.task) if player else None, 'crew_score': game.crew_score,
+        'hand': task_hand.hand_state(game, player) if player else None,
+        'intruders_left': game.intruders_left(),
         'task_goal': game.taskGoal, 'meeting': json.loads(game.meeting.to_json()) if game.meeting else None,
         'votes': game.meeting.compute_vote_counts() if game.meeting else {},
         'veto_votes': len(game.meeting.veto_votes) if game.meeting else 0,
