@@ -47,7 +47,7 @@ test('a latecomer waits out the round, then plays the next one', async ({ browse
     await expect(late.getByText('Crewmates Win!')).toHaveCount(0);
 
     // Play Again needs only the five who played.
-    for (const phone of phones) await phone.getByRole('button', { name: /Play Again/ }).click();
+    for (const phone of phones) await h.playAgain(phone);
     for (const phone of phones) await h.expectLobby(phone);
     await h.expectLobby(late);
     await expect(late.getByText('You', { exact: true })).toBeVisible();

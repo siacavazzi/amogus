@@ -43,7 +43,7 @@ test('five phones and a reactor play a round, then play again', async ({ browser
     await expect(reactor.getByText('Crewmates Win!')).toBeVisible();
 
     // Everyone taps Play Again and the room is back in the lobby.
-    for (const phone of phones) await phone.getByRole('button', { name: /Play Again/ }).click();
+    for (const phone of phones) await h.playAgain(phone);
     for (const phone of phones) await h.expectLobby(phone);
     await h.expectLobby(reactor);
 

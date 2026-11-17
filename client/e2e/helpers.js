@@ -381,6 +381,13 @@ async function readyUp(phones) {
     }));
 }
 
+// The end screen's Play Again. A phone that won a medal sees it full screen first, so close it.
+async function playAgain(page, options) {
+    const medal = page.getByTestId('my-medal');
+    if (await appears(medal, 1500)) await page.getByRole('button', { name: 'See the round' }).click().catch(() => {});
+    await page.getByRole('button', { name: /Play Again/ }).click(options);
+}
+
 // Each voter taps a name and confirms.
 async function vote(votes) {
     for (const [phone, target] of votes) {
@@ -479,5 +486,5 @@ function expectNoPageErrors(pages) {
 
 module.exports = {
     tapCreateNewGame, lock, goOffline, goOnline, tapAndConfirm, expectTappable, PHONE, addExampleList, savedListCode, openPage, closeAll, skipTutorialPrompt, openPhones, openPhone, openReactor, createRoom, createRoomOnPhone, gatherRoom, readyUp, slideUntilGone, connectReactor, joinRoom, enterName, nextToAvatars, revealRoles, revealAllRoles, swipe, hold, callMeeting, vote,
-    continueAfterResults, voteOutIntruder, roundButton, addTasks, openVent, playCard, dismissMessage, expectLobby, expectNoPageErrors, sleep,
+    continueAfterResults, voteOutIntruder, playAgain, roundButton, addTasks, openVent, playCard, dismissMessage, expectLobby, expectNoPageErrors, sleep,
 };
