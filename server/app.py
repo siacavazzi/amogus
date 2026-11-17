@@ -30,6 +30,7 @@ from assets.game_links import GameLinks, clean_link_token
 from assets.groups import GroupBook, GROUP_VIA
 from assets.selfie_store import SelfieStore
 from assets.version import VERSION, VERSION_INFO
+from assets.spectator import record as record_spectator
 from config import (
     LOCATIONS, VOTE_TIME, VOTE_THRESHOLD, MELTDOWN_TIME, CODE_PERCENT,
     NUMBER_OF_INTRUDERS, AUTO_INTRUDERS, CARD_DRAW_PROBABILITY, STARTING_CARDS, TASK_RATIO,
@@ -1812,6 +1813,8 @@ def handleTaskComplete(data):
     task_seconds = round(time.monotonic() - assigned_at, 1) if assigned_at is not None else None
     if task_seconds is not None and not is_fake:
         game.task_seconds.append(task_seconds)
+    record_spectator(game, 'fake_done' if is_fake else 'task', player,
+                     location=(finished_task or {}).get('location'))
     queued_task = player.fake_task
     player.fake_task = None
     game.assign_task(player, queued_task)

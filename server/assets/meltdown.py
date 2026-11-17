@@ -5,6 +5,7 @@ from contextlib import nullcontext
 import eventlet
 
 from assets.scaling import meltdown_codes_needed
+from assets.spectator import record as record_spectator
 
 
 class Meltdown:
@@ -165,6 +166,8 @@ class Meltdown:
                     self.game.active_meltdown = None
                 self.speaker.play_sound("meltdown_over")
                 self.emit_to_room('meltdown_end')
+                if self.game:
+                    record_spectator(self.game, 'meltdown_over')
                 if self.game and hasattr(self.game, 'admit_latecomers'):
                     self.game.admit_latecomers()
             else:
