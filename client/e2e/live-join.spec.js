@@ -13,7 +13,7 @@ async function arriveLate(browser, code, name) {
     await late.goto(`/play?room=${code}`);
     await expect(late.getByTestId('round-on-notice')).toHaveText(/as crew or intruder/);
     await late.getByPlaceholder(/name/i).first().fill(name);
-    await late.getByText('Next: Choose Avatar').click();
+    await h.nextToAvatars(late);
     await late.getByRole('button', { name: 'Join Game', exact: true }).click();
     return late;
 }

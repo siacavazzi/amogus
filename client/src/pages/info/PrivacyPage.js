@@ -24,8 +24,8 @@ function PrivacyPage() {
                 <section className="info-body info-prose">
                     <h2>Playing a game</h2>
                     <p>
-                        The name and photo a player picks are used for that room only. Photos are deleted within a
-                        day. The server keeps game records (how many players, how long a round took, who won) so we
+                        The name and photo a player picks are used for that room only. A photo is deleted when the
+                        player leaves or the room closes, and is never kept longer than 12 hours. The server keeps game records (how many players, how long a round took, who won) so we
                         can see what works and fix what doesn't, and its request logs, which include IP addresses, are
                         kept for two weeks. We use no ads and no third-party tracking scripts.
                     </p>

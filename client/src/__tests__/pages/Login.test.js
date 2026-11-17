@@ -3,8 +3,8 @@
  *
  * Game Flow Context:
  * - After joining a room, players land on this page
- * - Players enter a username, then pick an avatar or opt in to a selfie
- * - The camera is only requested after the player chooses a selfie
+ * - Players enter a username, then take a selfie; avatars are the fallback
+ * - No camera, or a refused camera, sends the player to the avatars (and skips the camera next time)
  * - After login, players go to PreGamePage to wait for game start
  */
 import React from 'react';
@@ -13,21 +13,37 @@ import LoginPage from '../../pages/Login';
 
 // Mock the CameraCapture component since it requires browser camera APIs
 jest.mock('../../components/CameraCapture', () => {
-    return function MockCameraCapture({ onCapture, onCancel }) {
+    return function MockCameraCapture({ onCapture, onCancel, onUnavailable }) {
         return (
             <div data-testid="camera-capture">
                 <button onClick={() => onCapture('mock-image-data')}>Capture</button>
                 <button onClick={onCancel}>Skip</button>
+                <button onClick={() => onUnavailable('NotAllowedError')}>Deny camera</button>
+                <button onClick={() => onUnavailable('NotReadableError')}>Camera busy</button>
             </div>
         );
     };
 });
 
-const goToAvatarStep = async (overrides) => {
+const submitName = (overrides) => {
     const result = renderWithContext(<LoginPage />, overrides);
     const input = screen.getByPlaceholderText(/Enter your name/i);
     fireEvent.change(input, { target: { value: 'TestPlayer' } });
     fireEvent.submit(input.closest('form'));
+    return result;
+};
+
+const goToCameraStep = async (overrides) => {
+    const result = submitName(overrides);
+    await waitFor(() => {
+        expect(screen.getByTestId('camera-capture')).toBeInTheDocument();
+    });
+    return result;
+};
+
+const goToAvatarStep = async (overrides) => {
+    const result = await goToCameraStep(overrides);
+    fireEvent.click(screen.getByText('Pick an avatar instead'));
     await waitFor(() => {
         expect(screen.getByRole('radiogroup', { name: 'Avatar' })).toBeInTheDocument();
     });
@@ -59,17 +75,25 @@ describe('LoginPage', () => {
             expect(input.value).toBe('TestPlayer');
         });
 
-        it('proceeds to the avatar picker after username submission', async () => {
-            await goToAvatarStep();
+        it('offers the selfie next', () => {
+            renderWithContext(<LoginPage />);
+            fireEvent.change(screen.getByPlaceholderText(/Enter your name/i), { target: { value: 'TestPlayer' } });
 
-            expect(screen.getAllByRole('radio')).toHaveLength(18);
+            expect(screen.getByRole('button', { name: /Next: Take a selfie/ })).toBeInTheDocument();
+        });
+
+        it('opens the selfie camera first after username submission', async () => {
+            await goToCameraStep();
+
+            expect(screen.queryByRole('radiogroup', { name: 'Avatar' })).not.toBeInTheDocument();
         });
     });
 
     describe('Avatar Step', () => {
-        it('does not open the camera until the player asks for a selfie', async () => {
+        it('shows all avatars when the player picks one instead of a selfie', async () => {
             await goToAvatarStep();
 
+            expect(screen.getAllByRole('radio')).toHaveLength(18);
             expect(screen.queryByTestId('camera-capture')).not.toBeInTheDocument();
         });
 
@@ -128,17 +152,45 @@ describe('LoginPage', () => {
     });
 
     describe('Selfie Step', () => {
-        const goToCameraStep = async () => {
-            const result = await goToAvatarStep();
-            fireEvent.click(screen.getByText(/Take a selfie instead/i));
-            await waitFor(() => {
-                expect(screen.getByTestId('camera-capture')).toBeInTheDocument();
-            });
-            return result;
-        };
+        it('goes back to the camera from the avatars', async () => {
+            await goToAvatarStep();
 
-        it('opens the camera when the player chooses a selfie', async () => {
+            fireEvent.click(screen.getByText(/Take a selfie instead/i));
+
+            expect(screen.getByTestId('camera-capture')).toBeInTheDocument();
+        });
+
+        it('falls back to the avatars when the camera is refused, and skips it next time', async () => {
             await goToCameraStep();
+
+            fireEvent.click(screen.getByText('Deny camera'));
+
+            expect(screen.getByRole('radiogroup', { name: 'Avatar' })).toBeInTheDocument();
+            expect(screen.getByText(/camera isn't available here/)).toBeInTheDocument();
+            expect(localStorage.setItem).toHaveBeenCalledWith('sp_camera_blocked', '1');
+        });
+
+        it('goes straight to the avatars when the camera was refused before', async () => {
+            const getItem = localStorage.getItem.getMockImplementation();
+            localStorage.getItem.mockImplementation((key) => (key === 'sp_camera_blocked' ? '1' : getItem?.(key) ?? null));
+            submitName();
+
+            await waitFor(() => expect(screen.getByRole('radiogroup', { name: 'Avatar' })).toBeInTheDocument());
+            expect(screen.queryByTestId('camera-capture')).not.toBeInTheDocument();
+
+            fireEvent.click(screen.getByText(/Take a selfie instead/i));
+            expect(screen.getByTestId('camera-capture')).toBeInTheDocument();
+            expect(localStorage.removeItem).toHaveBeenCalledWith('sp_camera_blocked');
+            localStorage.getItem.mockImplementation(getItem);
+        });
+
+        it('asks for the camera again next time when it was only busy', async () => {
+            await goToCameraStep();
+
+            fireEvent.click(screen.getByText('Camera busy'));
+
+            expect(screen.getByRole('radiogroup', { name: 'Avatar' })).toBeInTheDocument();
+            expect(localStorage.setItem).not.toHaveBeenCalledWith('sp_camera_blocked', '1');
         });
 
         it('emits join with the selfie and the chosen avatar as a fallback', async () => {
@@ -162,12 +214,12 @@ describe('LoginPage', () => {
             expect(screen.getByRole('radiogroup', { name: 'Avatar' })).toBeInTheDocument();
         });
 
-        it('returns to the avatar picker when back is clicked', async () => {
+        it('returns to the name step when back is clicked', async () => {
             await goToCameraStep();
 
             fireEvent.click(screen.getByText(/Back/i));
 
-            expect(screen.getByRole('radiogroup', { name: 'Avatar' })).toBeInTheDocument();
+            expect(screen.getByPlaceholderText(/Enter your name/i)).toBeInTheDocument();
         });
     });
 });

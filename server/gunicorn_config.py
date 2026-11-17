@@ -21,6 +21,25 @@ keepalive = 5
 
 # Logging
 accesslog = f"/var/log/amogus/access{SUFFIX}.log"
+
+
+from gunicorn.glogging import Logger  # noqa: E402
+
+
+class PhotoQuietLogger(Logger):
+    """Leave player photo requests out of the access log.
+
+    A photo URL carries its filename and a connection token, and players are often kids.
+    nginx already skips /selfies/ (access_log off); this keeps gunicorn's own log the same.
+    """
+
+    def access(self, resp, req, environ, request_time):
+        if (environ or {}).get('PATH_INFO', '').startswith('/selfies/'):
+            return
+        super().access(resp, req, environ, request_time)
+
+
+logger_class = PhotoQuietLogger
 errorlog = f"/var/log/amogus/error{SUFFIX}.log"
 loglevel = "info"
 capture_output = True

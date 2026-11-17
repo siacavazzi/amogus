@@ -197,9 +197,20 @@ async function joinRoom(page, code) {
     await enterName(page);
 }
 
+// After the name the selfie camera comes first; this takes the avatar route instead. Phones
+// with no camera (Playwright's WebKit) land on the avatars by themselves. `say` translates.
+async function nextToAvatars(page, say = text => text) {
+    await page.getByText(say('Next: Take a selfie')).click();
+    const join = page.getByRole('button', { name: say('Join Game'), exact: true });
+    const avatars = page.getByText(say('Pick an avatar instead'), { exact: true });
+    await expect(join.or(avatars)).toBeVisible();
+    if (!(await join.isVisible())) await avatars.click({ timeout: 3000 }).catch(() => {});
+    await expect(join).toBeVisible();
+}
+
 async function enterName(page) {
     await page.getByPlaceholder(/name/i).first().fill(page.person);
-    await page.getByText('Next: Choose Avatar').click();
+    await nextToAvatars(page);
     await page.getByRole('button', { name: 'Join Game', exact: true }).click();
     await expect(page.getByText('You', { exact: true })).toBeVisible();
 }
@@ -461,6 +472,6 @@ function expectNoPageErrors(pages) {
 }
 
 module.exports = {
-    tapCreateNewGame, lock, goOffline, goOnline, tapAndConfirm, expectTappable, PHONE, addExampleList, savedListCode, openPage, closeAll, skipTutorialPrompt, openPhones, openPhone, openReactor, createRoom, createRoomOnPhone, gatherRoom, readyUp, slideUntilGone, connectReactor, joinRoom, enterName, revealRoles, revealAllRoles, swipe, hold, callMeeting, vote,
+    tapCreateNewGame, lock, goOffline, goOnline, tapAndConfirm, expectTappable, PHONE, addExampleList, savedListCode, openPage, closeAll, skipTutorialPrompt, openPhones, openPhone, openReactor, createRoom, createRoomOnPhone, gatherRoom, readyUp, slideUntilGone, connectReactor, joinRoom, enterName, nextToAvatars, revealRoles, revealAllRoles, swipe, hold, callMeeting, vote,
     continueAfterResults, voteOutIntruder, roundButton, addTasks, openVent, playCard, dismissMessage, expectLobby, expectNoPageErrors, sleep,
 };

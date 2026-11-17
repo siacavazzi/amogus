@@ -123,8 +123,8 @@ test("the host's Invite button shares a link that brings a friend straight in", 
 async function joinWithSelfie(guest, code) {
     await guest.goto(`/play?room=${code}`);
     await nameField(guest).fill(guest.person);
-    await guest.getByText('Next: Choose Avatar').click();
-    await guest.getByText('Take a selfie instead').click();
+    // The camera opens straight after the name: photos come first, avatars are the fallback.
+    await guest.getByText('Next: Take a selfie').click();
     const ready = () => guest.waitForFunction(() => document.querySelector('video')?.videoWidth > 0);
     await ready();
     await guest.getByTitle('Take Photo').click();
@@ -170,6 +170,51 @@ test('the camera turns off once the selfie is taken', async ({ browser, browserN
 
     const live = () => guest.evaluate(() => window.cameraStreams.flatMap(stream => stream.getTracks()).filter(track => track.readyState === 'live').length);
     await expect.poll(live, { timeout: 3000 }).toBe(0);
+});
+
+test("a player's photo is deleted from the server when they leave", async ({ browser, browserName }) => {
+    test.skip(browserName === 'webkit', "Playwright's WebKit has no fake camera; the camera tests run in Chromium");
+    const [host, guest] = await h.openPhones(browser, ['Sam', 'Alex']);
+    const code = await h.createRoomOnPhone(host);
+    await h.enterName(host);
+    await joinWithSelfie(guest, code);
+    const photo = host.locator('img[src*="/selfies/"]').first();
+    await expect(photo).toBeVisible();
+    const url = await photo.getAttribute('src');
+    const status = () => host.evaluate(src => fetch(src, { cache: 'no-store' }).then(response => response.status), url);
+    expect(await status()).toBe(200);
+
+    await h.tapAndConfirm(guest.getByRole('button', { name: 'Leave room' }));
+
+    // Same viewer, same token: the photo itself is gone, not just hidden from the list.
+    await expect.poll(status).toBe(404);
+    await expect(host.locator('img[src*="/selfies/"]')).toHaveCount(0);
+});
+
+test('a phone that refuses the camera picks an avatar, and skips the camera next time', async ({ browser, browserName }) => {
+    test.skip(browserName === 'webkit', "Playwright's WebKit has no camera to refuse; the camera tests run in Chromium");
+    const [host, guest] = await h.openPhones(browser, ['Sam', 'Alex']);
+    await guest.addInitScript(() => {
+        navigator.mediaDevices.getUserMedia = async () => { throw new DOMException('Permission denied', 'NotAllowedError'); };
+    });
+    const code = await h.createRoomOnPhone(host);
+    await h.enterName(host);
+
+    await guest.goto(`/play?room=${code}`);
+    await nameField(guest).fill(guest.person);
+    await guest.getByText('Next: Take a selfie').click();
+    await expect(guest.getByText(/camera isn't available here/)).toBeVisible();
+    await expect(guest.getByRole('radiogroup', { name: 'Avatar' })).toBeVisible();
+    await guest.getByRole('button', { name: 'Join Game', exact: true }).click();
+    await expect(guest.getByText('You', { exact: true })).toBeVisible();
+
+    // Back on the join screen later (a new room, say), the same phone goes straight to the avatars.
+    await guest.evaluate(() => { localStorage.removeItem('player_id'); localStorage.removeItem('room_code'); });
+    await guest.goto(`/play?room=${code}`);
+    await nameField(guest).fill('Alex2');
+    await expect(guest.getByText('Next: Choose Avatar')).toBeVisible();
+
+    h.expectNoPageErrors([host, guest]);
 });
 
 test("a task pack from the generator becomes the room's tasks", async ({ browser }) => {

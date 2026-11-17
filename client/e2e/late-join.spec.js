@@ -25,7 +25,7 @@ test('a latecomer waits out the round, then plays the next one', async ({ browse
     await late.goto(`/play?room=${code}`);
     await expect(late.getByTestId('round-on-notice')).toBeVisible();
     await late.getByPlaceholder(/name/i).first().fill('Morgan');
-    await late.getByText('Next: Choose Avatar').click();
+    await h.nextToAvatars(late);
     await late.getByRole('button', { name: 'Join Game', exact: true }).click();
     await expect(late.getByTestId('waiting-next-round')).toBeVisible();
     await expect(late.getByText("You're in!")).toBeVisible();
@@ -72,7 +72,7 @@ test('a latecomer who leaves the waiting list is gone from the next round', asyn
     const late = await h.openPhone(browser, 'Morgan');
     await late.goto(`/play?room=${code}`);
     await late.getByPlaceholder(/name/i).first().fill('Morgan');
-    await late.getByText('Next: Choose Avatar').click();
+    await h.nextToAvatars(late);
     await late.getByRole('button', { name: 'Join Game', exact: true }).click();
     await expect(late.getByTestId('waiting-next-round')).toBeVisible();
 

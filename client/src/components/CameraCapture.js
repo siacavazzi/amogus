@@ -3,7 +3,9 @@ import { Camera, RotateCcw, Check, X } from '../signal/icons';
 import { CircleIconButton, SecondaryButton, ButtonGroup } from './ui';
 import { t } from '../i18n';
 
-function CameraCapture({ onCapture, onCancel }) {
+// onUnavailable(reason), when given, is called instead of showing the camera error, so the
+// join screen can fall back to avatars. reason is the browser's error name, or 'unsupported'.
+function CameraCapture({ onCapture, onCancel, onUnavailable }) {
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
     const streamRef = useRef(null);
@@ -11,6 +13,9 @@ function CameraCapture({ onCapture, onCancel }) {
     const [capturedImage, setCapturedImage] = useState(null);
     const [error, setError] = useState(null);
     const [facingMode, setFacingMode] = useState('user'); // 'user' for front camera
+    // Kept in a ref so a new callback on every parent render doesn't restart the camera.
+    const unavailableRef = useRef(onUnavailable);
+    unavailableRef.current = onUnavailable;
 
     // Stops whatever camera stream is open. Each start bumps the request number, so a stream
     // that arrives after a newer start (or after the screen closed) is stopped, not kept.
@@ -30,6 +35,7 @@ function CameraCapture({ onCapture, onCancel }) {
         try {
             // Check if we're in a secure context (HTTPS or localhost)
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                if (unavailableRef.current) { unavailableRef.current('unsupported'); return; }
                 setError('Camera not available. Make sure you\'re using HTTPS or localhost.');
                 return;
             }
@@ -55,6 +61,7 @@ function CameraCapture({ onCapture, onCancel }) {
             setError(null);
         } catch (err) {
             if (request !== requestRef.current) return;
+            if (unavailableRef.current) { unavailableRef.current(err?.name || 'unknown'); return; }
             console.error('Error accessing camera:', err);
             if (err.name === 'NotAllowedError') {
                 setError('Camera permission denied. Please allow camera access to take a selfie.');
@@ -147,7 +154,7 @@ function CameraCapture({ onCapture, onCancel }) {
     return (
         <div className="flex flex-col items-center">
             <p className="text-gray-400 text-xs text-center mb-3">
-                {t('Photos are optional. Room participants can view them during play. Photos expire after 24 hours and are deleted when you leave or the host closes the room.')}
+                {t('Photos are optional. Only this room sees yours, during the game. It is deleted when you leave or the room closes, and never kept longer than 12 hours.')}
             </p>
             {/* Hidden canvas for capturing */}
             <canvas ref={canvasRef} className="hidden" />
