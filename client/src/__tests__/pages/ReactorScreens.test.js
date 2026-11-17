@@ -56,6 +56,26 @@ describe('Reactor round screen', () => {
         expect(screen.getByRole('progressbar', { name: 'Progress: 75%' })).toBeInTheDocument();
     });
 
+    it('swaps the task bar for the EMP screen while phones are down', () => {
+        renderWithContext(<ReactorPage />, { crewScore: 3, taskGoal: 4, hackTime: 45, roomCode: 'ABCD' });
+        expect(screen.getByTestId('reactor-emp')).toBeInTheDocument();
+        expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+    });
+
+    it('plays the EMP hit, then shows how long the phones stay down', () => {
+        jest.useFakeTimers();
+        try {
+            renderWithContext(<ReactorPage />, { crewScore: 3, taskGoal: 4, hackTime: 45, roomCode: 'ABCD' });
+            expect(screen.getByTestId('emp-hit')).toBeInTheDocument();
+            act(() => { jest.advanceTimersByTime(1100); });
+            expect(screen.queryByTestId('emp-hit')).not.toBeInTheDocument();
+            expect(screen.getByText('Devices down')).toBeInTheDocument();
+            expect(screen.getByText('0:45')).toBeInTheDocument();
+        } finally {
+            jest.useRealTimers();
+        }
+    });
+
     it('shows the meeting roll call of living players', () => {
         renderWithContext(<ReactorPage />, {
             meetingState: { stage: 'waiting', player_who_started_it: 'Alice' }, players: mockPlayers, hackTime: 0,

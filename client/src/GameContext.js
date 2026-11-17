@@ -3,6 +3,7 @@ import { io } from "socket.io-client";
 import { ENDPOINT } from './ENDPOINT';
 import { AudioHandler } from './AudioHandler';
 import FakeTaskReveal from './components/FakeTaskReveal';
+import { GlitchHost } from './signal/Glitch';
 import { markHasPlayedGame } from './tutorial/tutorialStorage';
 import { parseCards } from './utils/cardCopy';
 import { isMobile as isMobileDevice } from 'react-device-detect';
@@ -1362,6 +1363,7 @@ export default function GameContext({ children }) {
         <DataContext.Provider value={contextValue}>
             <AudioHandler />
             {children}
+            <GlitchHost />
             {/* Fake Task Reveal Animation */}
             {fakeTaskReveal && (
                 <FakeTaskReveal

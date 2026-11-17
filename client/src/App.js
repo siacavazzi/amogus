@@ -46,6 +46,7 @@ import { usePageMeta } from './seo/usePageMeta';
 import { applyDocumentLanguage } from './i18n';
 
 const StylePreview = lazy(() => import('./preview/StylePreview'));
+const FxPreview = lazy(() => import('./preview/FxPreview'));
 
 function getRoute() {
   const roomCode = getRoomCodeFromSearch();
@@ -213,6 +214,9 @@ function App() {
 
   if (process.env.NODE_ENV === 'development' && window.location.pathname === '/style-preview') {
     return <Suspense fallback={<div>Loading preview…</div>}><StylePreview /></Suspense>;
+  }
+  if (process.env.NODE_ENV === 'development' && window.location.pathname === '/fx-preview') {
+    return <Suspense fallback={<div>Loading preview…</div>}><FxPreview /></Suspense>;
   }
 
   if (route === 'game') {

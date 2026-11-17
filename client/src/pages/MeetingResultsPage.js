@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useContext } from "react";
 import { DataContext } from "../GameContext";
 import LeaveGameButton from "../components/LeaveGameButton";
-import { Face, Letters, vibrate } from "../signal";
+import { Confetti, Face, Letters, vibrate } from "../signal";
+import { ImpactBurst } from "../signal/Burst";
 import { t, tn } from '../i18n';
 import { localizeDeathMessage } from '../i18n/deathMessages';
 
@@ -66,11 +67,13 @@ export default function MeetingResultPage({ tutorialMode = false, tutorialHighli
     return (
       <>
         <p className="sg-lede">{revealed ? t('Ejected') : t('The votes are in')}</p>
-        <div style={{ height: 150, display: 'grid', placeItems: 'center' }}>
+        <div style={{ height: 150, display: 'grid', placeItems: 'center', position: 'relative' }}>
+          {/* Caught: a pow burst as they're thrown out. Not an intruder: they go grey and float off. */}
+          {revealed && wasIntruder && <ImpactBurst size={300} delay={760} color="var(--sg-ink)" />}
           <Face
             player={votedOutPlayer}
             size={150}
-            className={revealed ? (wasIntruder ? 'sg-fling' : 'sg-drift') : 'sg-wobble'}
+            className={revealed ? (wasIntruder ? 'sg-fling' : 'sg-drift sg-grey') : 'sg-wobble'}
             style={revealed ? { animationDelay: '700ms' } : null}
           />
         </div>
@@ -120,6 +123,8 @@ export default function MeetingResultPage({ tutorialMode = false, tutorialHighli
       {onDark && !wasIntruder && (
         <div aria-hidden="true" className="sg-drain" style={{ position: 'fixed', inset: 0, zIndex: -1, background: 'var(--sg-dark)' }} />
       )}
+
+      {onDark && wasIntruder && <Confetti colors={['#ffffff', '#ffc21a', '#ffffff']} top="34%" delay={1300} count={22} />}
 
       {!tutorialMode && <LeaveGameButton className="sg-corner" />}
 

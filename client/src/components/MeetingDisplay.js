@@ -5,6 +5,7 @@ import { Check } from '../signal/icons';
 import { Face, Words } from '../signal';
 import '../signal/reactor.css';
 import { readyNeeded } from '../utils/meetingQuorum';
+import { AlarmRings, CallBadge } from '../signal/Burst';
 import { t, tk } from '../i18n';
 
 // The reactor's meeting screen: the same yellow flood the phones get, with the roll call big
@@ -29,14 +30,20 @@ const MeetingDisplay = ({ message = tk('Meeting called'), stage = 'waiting', cal
       <div className="sg sg-screen sg-meet sg-flood sg-rx" style={{ '--fy': '50%' }} role="status">
         <div className="sg-stripes" />
         <div className="sg-rx__main">
-          <h1 className="sg-rx__meet">
+          <h1 className="sg-rx__meet" style={{ position: 'relative', isolation: 'isolate' }}>
+            <AlarmRings size={360} delay={340} />
             <Words text={t('EMERGENCY')} delay={380} />
             <br />
             <Words text={t('MEETING')} delay={520} />
           </h1>
 
           <div className="sg-a sg-rise" style={{ display: 'flex', alignItems: 'center', gap: 18, animationDelay: '800ms' }}>
-            {caller && <Face player={caller} size={84} className="sg-a sg-pop" style={{ animationDelay: '820ms' }} />}
+            {caller && (
+              <div style={{ position: 'relative' }}>
+                <Face player={caller} size={84} className="sg-a sg-pop" style={{ animationDelay: '820ms' }} />
+                <CallBadge delay={1050} size={34} />
+              </div>
+            )}
             <div style={{ textAlign: caller ? 'left' : 'center' }}>
               <p className="sg-rx__lede">{callerName ? t('{name} called it', { name: callerName }) : t(message)}</p>
               <p className="sg-rx__note">
