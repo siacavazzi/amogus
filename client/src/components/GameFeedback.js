@@ -16,7 +16,7 @@ const THANKS_MS = 4000;
 
 // The result screen tells the prompt when this player tapped Play Again or Leave (no prompt this
 // round) or finished with Save this game (prompt sooner). Without a provider these do nothing.
-const FeedbackPromptContext = createContext({ skipRound: () => {}, savedRound: () => {} });
+const FeedbackPromptContext = createContext({ skipRound: () => {}, savedRound: () => {}, open: false });
 export const useFeedbackPrompt = () => useContext(FeedbackPromptContext);
 
 // "How was this game?" after a round, on phones only. Every part of it is optional.
@@ -43,7 +43,8 @@ export default function GameFeedback({ children = null, delayMs = PROMPT_DELAY_M
         && skippedRound !== roundId && askedRound !== roundId);
     const wait = savedRoundId === roundId ? PROMPT_AFTER_SAVE_MS : delayMs;
 
-    const controls = useMemo(() => ({ skipRound: setSkippedRound, savedRound: setSavedRoundId }), []);
+    // `open` lets other pop-ups (what's new) wait their turn instead of stacking on top.
+    const controls = useMemo(() => ({ skipRound: setSkippedRound, savedRound: setSavedRoundId, open: Boolean(prompt) }), [prompt]);
     const metric = useCallback((action) => sendClientMetric(socket, { kind: 'end_screen_action', action }), [socket]);
 
     useEffect(() => {

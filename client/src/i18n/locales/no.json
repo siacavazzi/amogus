@@ -997,5 +997,11 @@
   "Back to the main screen": "Tilbake til hovedskjermen",
   "Your game is open in another tab": "Spillet ditt er åpent i en annen fane",
   "You opened Sus Party again, so your game moved there. Play there, or tap Play here to keep playing in this tab.": "Du åpnet Sus Party på nytt, så spillet ditt flyttet dit. Spill der, eller trykk Spill her for å fortsette i denne fanen.",
-  "Play here": "Spill her"
+  "Play here": "Spill her",
+  "Here's what's new": "Dette er nytt",
+  "Play your last game again with the same tasks, in one tap.": "Spill forrige spill på nytt med de samme oppgavene, med ett trykk.",
+  "Share your game link with your group. Next time, everyone lands in the same game.": "Del lenken til spillet med gruppen din. Neste gang havner alle i samme spill.",
+  "Hosts can star their favorite task lists and keep them safe with an account.": "Verter kan stjernemerke oppgavelistene de liker best og ta vare på dem med en konto.",
+  "Sus Party now speaks Norwegian and Swedish.": "Sus Party snakker nå norsk og svensk.",
+  "Voting is smoother, with fewer glitches.": "Avstemningen går smidigere, med færre feil."
 }

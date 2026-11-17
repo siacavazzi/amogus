@@ -10,6 +10,8 @@ const PHONE = {
 };
 const DESKTOP = { viewport: { width: 1440, height: 900 } };
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+// The release id in src/whatsNew.js: phones that have "seen" it skip the "what's new" pop-up.
+const WHATS_NEW_ID = (/\bid: '([^']+)'/.exec(require('fs').readFileSync(require('path').join(__dirname, '../src/whatsNew.js'), 'utf8')) || [])[1];
 // Hold "see your role" on every phone; returns the phones that turned out to be intruders.
 async function revealAllRoles(phones) {
     const intruders = [];
@@ -28,7 +30,7 @@ const appears = (locator, timeout = 3000) => locator.first().waitFor({ state: 'v
 // A fresh browser per person, marked as test traffic (and on beta, when testing beta).
 const openContexts = new Set();
 
-async function openPage(browser, name, { feedbackPrompt = false, ...options } = {}) {
+async function openPage(browser, name, { feedbackPrompt = false, whatsNew = false, ...options } = {}) {
     const context = await browser.newContext(options);
     openContexts.add(context);
     // Runs in every document, including the blank page a new tab starts on, where storage is off.
@@ -39,6 +41,12 @@ async function openPage(browser, name, { feedbackPrompt = false, ...options } = 
         await context.addInitScript(() => {
             try { localStorage.setItem('sus_party_feedback_snoozed_until', String(Date.now() + 365 * 24 * 3600 * 1000)); } catch (_) { /* about:blank */ }
         });
+    }
+    // Likewise "what's new": tests that aren't about it start on a phone that has already read it.
+    if (!whatsNew && WHATS_NEW_ID) {
+        await context.addInitScript(id => {
+            try { if (!localStorage.getItem('sus_whats_new_v1')) localStorage.setItem('sus_whats_new_v1', JSON.stringify({ seen: id })); } catch (_) { /* about:blank */ }
+        }, WHATS_NEW_ID);
     }
     if (BETA) {
         const { hostname } = new URL(process.env.E2E_BASE_URL);

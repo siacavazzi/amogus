@@ -6,6 +6,7 @@ import { SiteNav, SiteFooter } from '../../components/SiteChrome';
 import Avatar from '../../components/Avatar';
 import { ArrowRight } from '../../signal/icons';
 import WelcomeBackCard from '../../components/WelcomeBackCard';
+import WhatsNew from '../../components/WhatsNew';
 import { ROOM_QUERY_PARAM, VIA_QUERY_PARAM } from '../../utils/inviteLinks';
 
 // Screens captured from a real 8-phone game on the current build (public/images/landing).
@@ -257,6 +258,7 @@ function LandingPage() {
                             <p className="sl-hero__facts">Free in the browser, for 3 to 20+ players. No app to download.</p>
                         </div>
                         <WelcomeBackCard style={{ marginTop: 18 }} />
+                        <WhatsNew />
                     </div>
                     <HeroScene />
                     <JoinForm />
