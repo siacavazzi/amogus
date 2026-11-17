@@ -88,24 +88,6 @@
     ],
     "device_tlymrbobamw8lumvn": [
       "U49WTU"
-    ],
-    "device_rne6wpxuamwl1kcr1": [
-      "Y3XGRZ"
-    ],
-    "device_vqm93rwoqmwl1kut7": [
-      "RT8YGB"
-    ],
-    "device_52jrsni1rmwl1llfx": [
-      "HMW63X"
-    ],
-    "device_epz9t5a9zmwl1mk9k": [
-      "PGXASQ"
-    ],
-    "device_kq4voba4imwl1mzq0": [
-      "C3RLBY"
-    ],
-    "device_wehlzminemwl1nv6n": [
-      "WPEUK5"
     ]
   },
   "code_to_name": {
@@ -137,13 +119,6 @@
     "TAPLL9": "Example List",
     "C5VVX2": "Example List",
     "96GEVQ": "Example List",
-    "U49WTU": "Example List",
-    "Y3XGRZ": "Example List",
-    "RT8YGB": "Example List",
-    "HMW63X": "Example List",
-    "PGXASQ": "Example List",
-    "C3RLBY": "Example List",
-    "WPEUK5": "Example List"
-  },
-  "starred": {}
+    "U49WTU": "Example List"
+  }
 }
