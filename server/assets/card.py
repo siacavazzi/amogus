@@ -1,6 +1,7 @@
 import random
 
 from assets.scaling import deck_copies
+from assets import awards
 import json
 import uuid
 import time
@@ -209,6 +210,7 @@ class Card:
                         'location': task_location,
                         'is_fake': True  # Mark as fake for potential future use
                     }
+                    awards.note_prank_sent(self.game, player, target_player)
                     self.game.stats['fake_tasks_sent'].append({
                         'sender_name': player.username,
                         'target_name': target_player.username,

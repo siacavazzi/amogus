@@ -205,6 +205,9 @@ class SignedInPlayerPlaysARoundTests(SocketGameTestCase):
         if game.meeting:
             game.meeting.end_meeting()
         self.assertEqual('victory', game.end_state)
+        # Sam called the meeting that caught the intruder: the round's one medal.
+        self.assertEqual([('called_it', ids[1])], [(a['medal'], a['player_id']) for a in game.stats['awards']])
+        self.assertEqual(1, other.round_tally.get('tasks'))  # medals count everyone's work
 
         reply = http.get('/api/account/stats').get_json()
         stats = reply['stats']
@@ -212,12 +215,15 @@ class SignedInPlayerPlaysARoundTests(SocketGameTestCase):
         self.assertEqual({'games': 1, 'wins': 1}, stats['crew'])
         self.assertEqual((1, 1, 1, 1), (stats['tasks'], stats['meetings'], stats['votes'], stats['sharp_votes']))
         self.assertEqual(3, stats['players_met'])
+        self.assertEqual({'called_it': 1}, stats['medals']['counts'])
+        self.assertEqual(1, stats['medals']['total'])
         # Only one account exists in the stats file: nobody signed out was recorded.
         self.assertEqual(1, self.stats.db.execute('SELECT COUNT(*) FROM rounds').fetchone()[0])
 
         # Delete the account: its stats go with it.
         self.assertTrue(http.post('/api/account/delete').get_json()['ok'])
         self.assertEqual(0, self.stats.db.execute('SELECT COUNT(*) FROM rounds').fetchone()[0])
+        self.assertEqual(0, self.stats.db.execute('SELECT COUNT(*) FROM medals').fetchone()[0])
         self.assertIsNone(me.account_id)
 
     def test_signed_out_requests_get_no_stats(self):

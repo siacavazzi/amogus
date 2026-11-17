@@ -121,9 +121,13 @@ class Player:
         # for its stats page. Both stay empty for everyone else (see assets/player_stats.py).
         self.account_id = None
         self.stat_tally = {}
+        # Everyone's counts for this round's medals (assets/awards.py). In memory only, never stored.
+        self.round_tally = {}
 
     def count_stat(self, key, amount=1):
-        """Add to this round's count for the player's account stats. Nothing for signed-out players."""
+        """Add to this round's counts: always for the round's medals, and for the player's account
+        stats only when signed in."""
+        self.round_tally[key] = self.round_tally.get(key, 0) + amount
         if self.account_id:
             self.stat_tally[key] = self.stat_tally.get(key, 0) + amount
 
@@ -149,6 +153,7 @@ class Player:
         self.ready = False
         self.late_join = False
         self.stat_tally = {}
+        self.round_tally = {}
     
     def set_death(self, cause, task_name=None):
         """Set the death cause and generate a death message."""

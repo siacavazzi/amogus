@@ -1,4 +1,5 @@
 import json
+from assets import awards
 import math
 import time
 from collections import Counter
@@ -273,6 +274,7 @@ class Meeting:
                 final_votes = self.compute_vote_counts()
                 self.final_votes = final_votes
                 self.voted_out = self.determine_voted_out(final_votes)
+                awards.note_vote_result(self, self.votes, self.voted_out)
                 self.reason = 'votes'  # Set before the ejection, which can end the round and log this meeting.
                 if self.voted_out:
                     self.game.stats['players_voted_out'] += 1
