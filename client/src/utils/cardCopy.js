@@ -16,14 +16,29 @@ const CARD_COPY = {
     'Area Denial': {
         name: () => t('Area Denial'),
         does: ({ location, duration }) => (duration
-            ? t('No tasks go to {location} for {minutes} min.', { location: location || t('one room'), minutes: Math.round(duration / 60 * 10) / 10 })
-            : t('No tasks go to {location} for a while.', { location: location || t('one room') })),
+            ? t("Lock {location} for {minutes} min: its tasks can't be done.", { location: location || t('one room'), minutes: Math.round(duration / 60 * 10) / 10 })
+            : t("Lock {location} for a while: its tasks can't be done.", { location: location || t('one room') })),
         when: () => t('Keep the crew away from where you plan to strike.'),
     },
     'Fake Task': {
         name: () => t('Fake Task'),
-        does: () => t('Send a crewmate on a made-up errand.'),
+        does: () => t('Send a made-up Priority task. It goes to the crewmate most due one.'),
         when: () => t('Send them somewhere quiet, then meet them there.'),
+    },
+    'Steal Tasks': {
+        name: () => t('Steal Tasks'),
+        does: () => t("See a crewmate's tasks and take them. They get new ones."),
+        when: () => t('Pretend to do their tasks until the next meeting.'),
+    },
+    'Reshuffle': {
+        name: () => t('Reshuffle'),
+        does: () => t('Every crewmate gets a new hand of tasks.'),
+        when: () => t('Play it when the crew are spread out and busy.'),
+    },
+    'Rally': {
+        name: () => t('Rally'),
+        does: () => t('Every crewmate gets a real Priority task in one area, all at once.'),
+        when: () => t('Pull everyone into one place, then strike somewhere empty.'),
     },
     'Taunt Message': {
         name: () => t('Taunt Message'),

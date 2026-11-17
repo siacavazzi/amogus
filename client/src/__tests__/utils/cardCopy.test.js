@@ -7,7 +7,7 @@ describe('cardCopy', () => {
 
     it('fills in the card numbers', () => {
         expect(cardCopy({ action: 'EMP', duration: 60 }).does).toMatch(/60s/);
-        expect(cardCopy({ action: 'Area Denial', location: 'Kitchen', duration: 120 }).does).toBe('No tasks go to Kitchen for 2 min.');
+        expect(cardCopy({ action: 'Area Denial', location: 'Kitchen', duration: 120 }).does).toBe("Lock Kitchen for 2 min: its tasks can't be done.");
         expect(cardCopy({ action: 'Shorten Meltdown', duration: 12 }).does).toMatch(/12s less/);
     });
 

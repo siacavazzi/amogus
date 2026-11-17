@@ -180,9 +180,13 @@ def pick_fake_task_target(game, location):
 def priority_tick(game):
     """One second of the Priority clock. Call with the room lock held. Returns changed players."""
     if not game.game_running or game.end_state or game.meeting or game.active_meltdown:
+        game.priority_clock_paused = True
         return []
     if game.intruders_revealed:
         return []
+    # Phones count a Priority down on their own; after a pause, send everyone the true time left.
+    resumed = getattr(game, 'priority_clock_paused', False)
+    game.priority_clock_paused = False
     changed = []
     for player in eligible_crew(game):
         if player.priority:
@@ -203,6 +207,8 @@ def priority_tick(game):
                 changed.append(player)
             else:
                 player.next_priority_in = random.randint(*NEXT_PRIORITY_SECONDS)
+    if resumed:
+        changed += [player for player in eligible_crew(game) if player.priority and player not in changed]
     return changed
 
 

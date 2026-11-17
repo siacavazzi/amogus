@@ -248,7 +248,8 @@ const PageController = () => {
                 <InAppBrowserWarning />
                 {/* Round pop-ups (meltdown over, last stand...) aren't for phones that are not in the round */}
                 {currentPage !== "waitingNextRound" && !(currentPage === "login" && roundRunningAtEntry) && <Modal />}
-                {running && isMobile && !endState && currentPage !== "waitingNextRound" && (
+                {/* The round screen draws its own bar in its header */}
+                {running && isMobile && !endState && currentPage !== "waitingNextRound" && currentPage !== "crewmember" && (
                     <ProgressBar
                         score={crewScore}
                         goalScore={taskGoal}

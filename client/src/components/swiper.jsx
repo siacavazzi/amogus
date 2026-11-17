@@ -19,6 +19,9 @@ const MUECustomSlider = ({
   backgroundColor = "transparent",
   disabled = false,
   pending = false,
+  // Fills the track behind the label while the slider can't be used, e.g. the 15 s kill cooldown:
+  // { fraction: 0..1, color }
+  meter = null,
 }) => {
   const sliderRef = useRef(null);
   const containerRef = useRef(null);
@@ -109,7 +112,7 @@ const MUECustomSlider = ({
 
     setIsSuccess(true);
     if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
-    setTimeout(() => resetSlider(true), 400);
+    setTimeout(() => resetSlider(true), 700);
   }, [disabled, isSuccess, onSuccess, pending, resetSlider]);
 
   useEffect(() => {
@@ -213,6 +216,8 @@ const MUECustomSlider = ({
   const knobFg = onYellow ? 'var(--sg-meet)' : 'var(--sg-round)';
   const trackBg = onYellow ? 'rgba(26, 20, 0, 0.14)' : 'rgba(0, 0, 0, 0.22)';
   const fillBg = onYellow ? 'rgba(26, 20, 0, 0.16)' : 'rgba(255, 255, 255, 0.22)';
+  // Done: the whole track fills green and the knob turns into a tick (no full-screen flash).
+  const doneGreen = '#3ddc97';
 
   return (
     <>
@@ -237,15 +242,23 @@ const MUECustomSlider = ({
           <div
             ref={containerRef}
             className="relative flex items-center px-1 overflow-hidden rounded-full"
-            style={{ height: SLIDER_HEIGHT, background: trackBg, opacity: isDisabled && !isSuccess && !isRequestPending && !pending ? 0.6 : 1 }}
+            style={{ height: SLIDER_HEIGHT, background: trackBg, opacity: isDisabled && !isSuccess && !isRequestPending && !pending && !meter ? 0.6 : 1 }}
           >
+          {meter && (
+            <div
+              data-testid="slider-meter"
+              className="absolute left-0 top-0 h-full sg-slide-meter"
+              style={{ width: `${Math.round(Math.min(1, Math.max(0, meter.fraction)) * 100)}%`, background: meter.color || 'var(--sg-out)' }}
+            />
+          )}
           {/* Fill follows the knob */}
           <div
             className="absolute left-0 top-0 h-full rounded-full"
             style={{
-              width: `calc(${Math.min(progressPercent, 100)}% + ${SLIDER_HANDLE_SIZE})`,
-              background: fillBg,
-              opacity: progressPercent > 0 ? 1 : 0,
+              width: isSuccess ? '100%' : `calc(${Math.min(progressPercent, 100)}% + ${SLIDER_HANDLE_SIZE})`,
+              background: isSuccess ? doneGreen : fillBg,
+              opacity: progressPercent > 0 || isSuccess ? 1 : 0,
+              transition: isSuccess ? 'background-color 200ms ease, width 200ms ease' : 'none',
             }}
           />
 
@@ -277,7 +290,7 @@ const MUECustomSlider = ({
             }}
           >
             {isSuccess ? (
-              <Check size={28} strokeWidth={3.5} />
+              <Check size={28} strokeWidth={3.5} style={{ color: '#0b6b3f' }} className="sg-a sg-pop" />
             ) : (
               <div className="flex items-center">
                 <ChevronRight size={22} strokeWidth={3.5} />

@@ -82,6 +82,9 @@ class TaskHandTests(SocketGameTestCase):
             task_hand.priority_tick(game)
         self.assertEqual(task_hand.PRIORITY_SECONDS, crew.priority['time_left'])
         game.meeting = None
+        with game.state_lock:
+            resumed = task_hand.priority_tick(game)
+        self.assertIn(crew, resumed)  # phones get the true time left after a meeting
 
         crew.priority['time_left'] = 1
         with game.state_lock:

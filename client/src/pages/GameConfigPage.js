@@ -19,6 +19,9 @@ const DEFAULT_CARD_DECK_COUNTS = {
     remote_sabotage: 3,
     shorten_meltdown: 3,
     area_denial_per_location: 2,
+    steal_tasks: 3,
+    reshuffle: 1,
+    rally: 1,
 };
 
 const CARD_DECK_PRESETS = [
@@ -52,11 +55,14 @@ const CARD_DECK_PRESETS = [
 const CARD_COUNT_CONTROLS = [
     { key: 'self_report', label: tk('Self Report'), description: tk('Call a body-found meeting.') },
     { key: 'emp', label: tk('EMP'), description: tk('Temporarily disable player devices.') },
-    { key: 'fake_task', label: tk('Fake Task'), description: tk('Send fake tasks to crewmates.') },
+    { key: 'fake_task', label: tk('Fake Task'), description: tk('Send a fake Priority task to a crewmate.') },
     { key: 'taunt_message', label: tk('Taunt Message'), description: tk('Send anonymous taunts to crewmates.') },
     { key: 'remote_sabotage', label: tk('Remote Sabotage'), description: tk('Trigger reactor meltdown remotely.') },
     { key: 'shorten_meltdown', label: tk('Shorten Meltdown'), description: tk('Reduce the next meltdown timer.') },
     { key: 'area_denial_per_location', label: tk('Area Denial / Location'), description: tk('Cards created for each enabled location.') },
+    { key: 'steal_tasks', label: tk('Steal Tasks'), description: tk("See a crewmate's tasks and take them.") },
+    { key: 'reshuffle', label: tk('Reshuffle'), description: tk('Deal every crewmate a new hand of tasks.') },
+    { key: 'rally', label: tk('Rally'), description: tk('Games with one intruder only. Send every crewmate to one area.') },
 ];
 
 // Defined outside GameConfigPage: a component made inside it is a new type each render, so

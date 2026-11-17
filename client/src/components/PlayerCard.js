@@ -6,14 +6,14 @@ import { Skull, Vote, Radiation, DoorOpen, UserX, Shield } from '../signal/icons
 import { t } from '../i18n';
 import { localizeDeathMessage } from '../i18n/deathMessages';
 
-function getSelfieUrl(filename, access) {
+export function getSelfieUrl(filename, access) {
   if (!filename || !access?.sid || !access?.token) return null;
   const query = new URLSearchParams({ sid: access.sid, token: access.token });
   return `${ENDPOINT}/selfies/${encodeURIComponent(filename)}?${query}`;
 }
 
 // Show the selfie until it fails to load (e.g. expired), then fall back to the avatar.
-function useSelfieFallback(selfieUrl) {
+export function useSelfieFallback(selfieUrl) {
   const [failedUrl, setFailedUrl] = useState(null);
   const shownUrl = selfieUrl && selfieUrl !== failedUrl ? selfieUrl : null;
   return [shownUrl, () => setFailedUrl(selfieUrl)];

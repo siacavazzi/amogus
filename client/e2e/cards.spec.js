@@ -30,19 +30,22 @@ test('taunt, fake task, EMP and self report reach the other phones', async ({ br
     await expect(intruder.getByText(`Taunt sent to ${target.person}`)).toBeVisible();
     await h.dismissMessage(intruder);
 
-    // Fake task: it's the target's next task, and finishing it gives the trick away.
+    // Fake task: the game hands it as a Priority task to the crewmate most due one, and says who.
+    // Finishing it gives the trick away.
     await h.playCard(intruder, 'Fake Task');
     const fake = intruder.getByRole('dialog', { name: 'Send Fake Task' });
-    await fake.getByRole('combobox').first().selectOption({ label: target.person });
     await fake.getByRole('textbox').fill('Count the spoons in the kitchen');
     await fake.getByRole('button', { name: /Send Task/ }).click();
+    const sent = intruder.getByText(/Fake task sent to /);
+    await expect(sent).toBeVisible();
+    const fooledName = /Fake task sent to (.+?)\./.exec(await sent.textContent())[1];
+    const fooled = crew.find(phone => phone.person === fooledName);
     await h.dismissMessage(intruder);
-    await h.dismissMessage(target);
-    await h.swipe(target);
-    await expect(target.getByText('Count the spoons in the kitchen')).toBeVisible();
+    await expect(fooled.getByTestId('priority-task')).toContainText('Count the spoons in the kitchen');
     await h.sleep(1500);
-    await h.swipe(target);
-    await expect(target.getByText('FAKE TASK!')).toBeVisible();
+    await fooled.getByTestId('priority-task').getByRole('button').first().click();
+    await h.swipe(fooled);
+    await expect(fooled.getByText('FAKE TASK!')).toBeVisible();
 
     // EMP: every crew phone goes down for a while.
     await h.playCard(intruder, 'EMP');
@@ -58,7 +61,7 @@ test('taunt, fake task, EMP and self report reach the other phones', async ({ br
     h.expectNoPageErrors([...phones, reactor]);
 });
 
-test('area denial keeps new tasks out of the denied room', async ({ browser }) => {
+test('area denial locks the denied room and keeps new tasks out of it', async ({ browser }) => {
     const phones = await h.openPhones(browser, ['Sam', 'Alex', 'Jules', 'Riley']);
     await h.gatherRoom({
         host: phones[0], phones,
@@ -74,14 +77,14 @@ test('area denial keeps new tasks out of the denied room', async ({ browser }) =
     await expect(effect).toContainText('Area Denial');
     const denied = (await effect.locator('.sg-effect__text').last().textContent()).trim();
 
-    // Every task handed out while it's active is somewhere else.
+    // Tasks already in that room lock, and every task dealt while it's active is somewhere else.
     const worker = crew[0];
+    const openTasks = worker.locator('[data-testid="hand-task"]:not(.is-locked)');
     for (let i = 0; i < 4; i++) {
         await h.swipe(worker);
         await h.sleep(2000);
-        // Tasks with no room ("Other") show no location chip, so check the chip only when there is one.
         await expect(worker.getByTestId('current-task')).toBeVisible();
-        await expect(worker.getByTestId('task-location').getByText(denied, { exact: true })).toHaveCount(0);
+        await expect(openTasks.getByTestId('task-location').getByText(denied, { exact: true })).toHaveCount(0);
     }
 
     h.expectNoPageErrors(phones);

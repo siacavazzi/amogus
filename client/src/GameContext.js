@@ -93,6 +93,13 @@ export default function GameContext({ children }) {
     const [audioEnabled, setAudioEnabled] = useState(false);
     const [running, setRunning] = useState(false);
     const [task, setTask] = useState(undefined);
+    // The hand of tasks: { hand: [...], priority, swaps, tasks_done, stolen } (server/assets/task_hand.py)
+    const [handState, setHandState] = useState(null);
+    // Intruders still among the living; null once someone joined mid-round (shown as "?")
+    const [intrudersLeft, setIntrudersLeft] = useState(null);
+    // Bumped when an intruder steals this phone's tasks, so the screen can glitch
+    const [tasksStolenAt, setTasksStolenAt] = useState(0);
+    const [tasksReshuffledAt, setTasksReshuffledAt] = useState(0);
     const [taskCompletionPending, setTaskCompletionPending] = useState(false);
     const [taskCompletionError, setTaskCompletionError] = useState(null);
     const [crewScore, setCrewScore] = useState(0);
@@ -163,6 +170,8 @@ export default function GameContext({ children }) {
         setTaskCompletionPending(false);
         setTaskCompletionError(null);
         setTask(undefined)
+        setHandState(null)
+        setIntrudersLeft(null)
         setRunning(false)
         setCrewScore(0);
         setSusPoints(0);
@@ -336,6 +345,8 @@ export default function GameContext({ children }) {
         }
         setRunning(!!snapshot.running);
         setTask(snapshot.task || undefined);
+        setHandState(snapshot.hand || null);
+        setIntrudersLeft(snapshot.intruders_left ?? null);
         setCrewScore(snapshot.crew_score ?? 0);
         setTaskGoal(snapshot.task_goal ?? 1);
         setMeetingState(snapshot.meeting || undefined);
@@ -506,6 +517,32 @@ export default function GameContext({ children }) {
             setTaskCompletionPending(false);
         }
     }, [connected, playerState, roundId, running, task, requestRoomState, roomCode, applyRoomSnapshot, reclaimSeat]);
+
+    // Trade one task in the hand for a new one (needs a swap, earned from Priority tasks).
+    const swapTask = useCallback(async (assignment) => {
+        const socket = socketRef.current;
+        const playerId = playerState?.player_id || localStorage.getItem('player_id');
+        if (!socket?.connected || !assignment?.assignment_id) return false;
+        try {
+            const response = await emitVolatileWithAck(socket, 'swap_task', {
+                player_id: playerId, round_id: roundId, assignment_id: assignment.assignment_id,
+            }, SOCKET_COMMAND_TIMEOUT_MS);
+            if (response?.state) applyRoomSnapshot(response.state);
+            return response?.ok === true;
+        } catch (error) {
+            return false;
+        }
+    }, [playerState, roundId, applyRoomSnapshot]);
+
+    // The task this player tapped as the one they're doing (null to let go). Death messages use it.
+    const selectTask = useCallback((assignment) => {
+        const socket = socketRef.current;
+        if (!socket?.connected) return;
+        socket.emit('select_task', {
+            player_id: playerState?.player_id || localStorage.getItem('player_id'),
+            assignment_id: assignment?.assignment_id || null,
+        });
+    }, [playerState]);
 
     // Keep phones awake while a game runs, so a phone in a pocket doesn't lock and miss a
     // meeting. The browser drops the lock whenever the page is hidden, so take it again on return.
@@ -975,6 +1012,25 @@ export default function GameContext({ children }) {
                 setRunning(true)
             }
             setTask(data.task);
+            if (data.hand !== undefined) {
+                setHandState({
+                    hand: data.hand || [],
+                    priority: data.priority || null,
+                    swaps: data.swaps || 0,
+                    tasks_done: data.tasks_done || 0,
+                    stolen: data.stolen || null,
+                    received_at: Date.now(),
+                });
+            }
+        });
+
+        socketRef.current.on('tasks_stolen', (data) => {
+            if (data && !acceptRoomData(data)) return;
+            setTasksStolenAt(Date.now());
+        });
+
+        socketRef.current.on('tasks_reshuffled', () => {
+            setTasksReshuffledAt(Date.now());
         });
 
         // Handle fake task completion - show reveal animation
@@ -1124,6 +1180,7 @@ export default function GameContext({ children }) {
                 return;
             }
             let me;
+            if (data.intruders_left !== undefined) setIntrudersLeft(data.intruders_left);
             if (data.action === "player_list" || data.action === "start_game" || data.action === "rejoin") {
                 if (Array.isArray(data.list)) {
                     // Safely parse each player from a JSON string to an object
@@ -1225,6 +1282,12 @@ export default function GameContext({ children }) {
         running,
         task,
         setTask,
+        handState,
+        swapTask,
+        selectTask,
+        intrudersLeft,
+        tasksStolenAt,
+        tasksReshuffledAt,
         crewScore,
         showAnimation,
         setShowAnimation,
@@ -1317,6 +1380,12 @@ export default function GameContext({ children }) {
         dialog,
         running,
         task,
+        handState,
+        swapTask,
+        selectTask,
+        intrudersLeft,
+        tasksStolenAt,
+        tasksReshuffledAt,
         crewScore,
         showAnimation,
         meetingState,
