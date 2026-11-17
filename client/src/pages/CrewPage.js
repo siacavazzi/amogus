@@ -233,9 +233,11 @@ function IntruderCard({ card, armed, onTap }) {
   return (
     <div className={`sg-tcard t-in ${armed ? 'is-picked' : ''}`} data-testid="hand-card">
       <button type="button" className="sg-tcard__pick" onClick={onTap} aria-pressed={armed}>
-        <span className="sg-tcard__text">{copy.name}</span>
+        <span className="sg-tcard__text" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <StarFilled size={16} style={{ color: '#e0a400', flexShrink: 0 }} />
+          {copy.name}
+        </span>
         <span className="sg-tcard__meta">
-          <StarFilled size={14} style={{ color: '#e0a400' }} />
           <span>{armed ? t('Playing… tap again to stop') : copy.does}</span>
         </span>
       </button>
@@ -544,11 +546,6 @@ const CrewmemberPage = ({
       <div className="sg-hand" data-testid="task-hand">
         <div className="sg-hand__head">
           <h2>{t('Your tasks')}</h2>
-          {killCooldown > 0 && (
-            <span className="sg-pill sg-num" data-testid="crew-kill-cooldown" style={{ fontSize: 13, padding: '6px 10px' }}>
-              {t('Next kill in {killCooldown}s', { killCooldown })}
-            </span>
-          )}
         </div>
         {cards.map((card) => (
           <IntruderCard key={card.id} card={card} armed={armedId === card.id} onTap={() => tapCard(card)} />

@@ -301,7 +301,6 @@ describe('CrewPage', () => {
             renderWithContext(<CrewmemberPage setShowSusPage={mockSetShowSusPage} />, { ...intruderContext, killCooldown: 10 });
 
             expect(screen.getByTestId('slider-trigger')).toBeDisabled();
-            expect(screen.getByTestId('crew-kill-cooldown')).toHaveTextContent('Next kill in 10s');
             expect(screen.getByTestId('task-slider')).toHaveTextContent('Next kill in 10s');
         });
     });
