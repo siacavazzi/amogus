@@ -999,5 +999,47 @@
   "Back to the main screen": "Zurück zum Hauptbildschirm",
   "Your game is open in another tab": "Dein Spiel ist in einem anderen Tab geöffnet",
   "You opened Sus Party again, so your game moved there. Play there, or tap Play here to keep playing in this tab.": "Du hast Sus Party noch einmal geöffnet, deshalb ist dein Spiel dorthin gewechselt. Spiel dort weiter oder tippe auf Hier spielen, um in diesem Tab weiterzuspielen.",
-  "Play here": "Hier spielen"
+  "Play here": "Hier spielen",
+  "Medals": "Medaillen",
+  "None yet": "Noch keine",
+  "Medals are handed out at the end of each round. Win one while signed in and it lands here.": "Medaillen gibt es am Ende jeder Runde. Gewinn eine, während du angemeldet bist, dann landet sie hier.",
+  "Round awards": "Medaillen der Runde",
+  "You got a medal": "Du hast eine Medaille",
+  "See the round": "Zur Runde",
+  "Called it": "Richtig getippt",
+  "Called the meeting that caught an intruder": "Hat das Meeting einberufen, das einen Eindringling erwischt hat",
+  "Prankster": "Spaßvogel",
+  "Got someone to do a fake task": "Hat jemanden eine falsche Aufgabe machen lassen",
+  "Task machine": "Aufgabenmaschine",
+  "Most tasks done": "Die meisten Aufgaben erledigt",
+  "Core saver": "Kernretter",
+  "Their code helped stop a meltdown": "Ihr Code half, eine Kernschmelze zu stoppen",
+  "Undercover": "Undercover",
+  "Intruder nobody voted for": "Eindringling, für den niemand gestimmt hat",
+  "Card shark": "Kartenhai",
+  "Intruder who played the most cards": "Eindringling mit den meisten gespielten Karten",
+  "Sharp eye": "Adlerauge",
+  "Voted for an intruder the most": "Hat am öftesten für einen Eindringling gestimmt",
+  "Last one standing": "Als Letztes dabei",
+  "Still in when almost all the crew was out": "Noch dabei, als fast die ganze Crew raus war",
+  "Caught {name}": "Hat {name} erwischt",
+  "Caught an intruder": "Hat einen Eindringling erwischt",
+  "{right} of {votes} votes on an intruder": "{right} von {votes} Stimmen gegen einen Eindringling",
+  "Stopped a meltdown": "Hat eine Kernschmelze gestoppt",
+  "Not one vote all round": "Die ganze Runde keine einzige Stimme",
+  "Got {name} to “{task}”": "Hat {name} „{task}“ machen lassen",
+  "Fooled {name} with a fake task": "Hat {name} mit einer falschen Aufgabe reingelegt",
+  "Still in at the end": "Am Ende noch dabei",
+  "{count} medal won": {
+    "one": "{count} Medaille gewonnen",
+    "other": "{count} Medaillen gewonnen"
+  },
+  "{count} task done": {
+    "one": "{count} Aufgabe erledigt",
+    "other": "{count} Aufgaben erledigt"
+  },
+  "{count} card played": {
+    "one": "{count} Karte gespielt",
+    "other": "{count} Karten gespielt"
+  }
 }

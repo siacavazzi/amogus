@@ -999,5 +999,47 @@
   "Back to the main screen": "Voltar para a tela principal",
   "Your game is open in another tab": "Sua partida está aberta em outra aba",
   "You opened Sus Party again, so your game moved there. Play there, or tap Play here to keep playing in this tab.": "Você abriu o Sus Party de novo, então sua partida foi para lá. Jogue lá, ou toque em Jogar aqui para continuar nesta aba.",
-  "Play here": "Jogar aqui"
+  "Play here": "Jogar aqui",
+  "Medals": "Medalhas",
+  "None yet": "Nenhuma ainda",
+  "Medals are handed out at the end of each round. Win one while signed in and it lands here.": "As medalhas saem no fim de cada rodada. Ganhe uma com a sessão iniciada e ela aparece aqui.",
+  "Round awards": "Medalhas da rodada",
+  "You got a medal": "Você ganhou uma medalha",
+  "See the round": "Ver a rodada",
+  "Called it": "Eu sabia",
+  "Called the meeting that caught an intruder": "Chamou a reunião que pegou um intruso",
+  "Prankster": "Pregador de peças",
+  "Got someone to do a fake task": "Fez alguém cumprir uma tarefa falsa",
+  "Task machine": "Máquina de tarefas",
+  "Most tasks done": "Mais tarefas feitas",
+  "Core saver": "Salvador do núcleo",
+  "Their code helped stop a meltdown": "O código trazido ajudou a parar uma fusão",
+  "Undercover": "Disfarçado",
+  "Intruder nobody voted for": "Intruso em quem ninguém votou",
+  "Card shark": "Mestre das cartas",
+  "Intruder who played the most cards": "Intruso que jogou mais cartas",
+  "Sharp eye": "Olho de águia",
+  "Voted for an intruder the most": "Votou mais vezes em um intruso",
+  "Last one standing": "Último de pé",
+  "Still in when almost all the crew was out": "Ainda no jogo quando quase toda a tripulação já tinha saído",
+  "Caught {name}": "Pegou {name}",
+  "Caught an intruder": "Pegou um intruso",
+  "{right} of {votes} votes on an intruder": "{right} de {votes} votos em um intruso",
+  "Stopped a meltdown": "Parou uma fusão",
+  "Not one vote all round": "Nenhum voto a rodada toda",
+  "Got {name} to “{task}”": "Fez {name} cumprir “{task}”",
+  "Fooled {name} with a fake task": "Enganou {name} com uma tarefa falsa",
+  "Still in at the end": "Ainda no jogo no fim",
+  "{count} medal won": {
+    "one": "{count} medalha ganha",
+    "other": "{count} medalhas ganhas"
+  },
+  "{count} task done": {
+    "one": "{count} tarefa feita",
+    "other": "{count} tarefas feitas"
+  },
+  "{count} card played": {
+    "one": "{count} carta jogada",
+    "other": "{count} cartas jogadas"
+  }
 }

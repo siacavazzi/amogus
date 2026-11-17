@@ -11,6 +11,7 @@ import re
 import time
 from functools import wraps
 from uuid import uuid4
+from assets import awards
 from assets.room_protocol import metadata, minimum_tasks, start_error_detail, can_start_test, lobby_state, room_state
 from flask import Flask, request, send_from_directory, abort, has_request_context
 from flask_socketio import SocketIO, emit, join_room, leave_room, close_room
@@ -1518,6 +1519,7 @@ def start_room(game, test_mode=False):
     game.assignRoles()
     for player in game.players:
         player.stat_tally = {}
+    awards.reset_round(game)
     group_room_started(game)
     game_manager.stats_tracker.record_game_started(game)
     if not test_mode:
@@ -1798,6 +1800,7 @@ def handleTaskComplete(data):
         is_priority = where == 'priority'
         if is_fake:
             game.stats['fake_tasks_completed'].append({'player_name': player.username, 'task_text': finished_task.get('task', '')})
+            awards.note_prank_done(game, player, finished_task.get('task', ''))
             emit('fake_task_completed', {**metadata(game), 'task': finished_task.get('task'), 'location': finished_task.get('location')})
         else:
             previous = game.crew_score / game.taskGoal * 100 if game.taskGoal else 0

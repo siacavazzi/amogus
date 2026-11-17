@@ -1,6 +1,7 @@
 import random
 
 from assets.scaling import deck_copies
+from assets import awards
 import json
 import uuid
 import time
@@ -293,6 +294,7 @@ class Card:
             send_message_to_player(self.socket, player, "Every crewmate has a Priority task right now. Keep the card and try again soon.")
             return False
         task_hand.give_priority(self.game, target, {'task': task_text, 'location': task_location}, fake=True)
+        awards.note_prank_sent(self.game, player, target)
         task_hand.emit_hand(self.game, target)
         self.game.stats['fake_tasks_sent'].append({
             'sender_name': player.username,

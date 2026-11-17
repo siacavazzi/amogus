@@ -1016,5 +1016,50 @@
   "Back to the main screen": "Înapoi la ecranul principal",
   "Your game is open in another tab": "Jocul tău e deschis în altă filă",
   "You opened Sus Party again, so your game moved there. Play there, or tap Play here to keep playing in this tab.": "Ai deschis din nou Sus Party, așa că jocul tău s-a mutat acolo. Joacă acolo sau atinge Joacă aici ca să continui în această filă.",
-  "Play here": "Joacă aici"
+  "Play here": "Joacă aici",
+  "Medals": "Medalii",
+  "None yet": "Încă niciuna",
+  "Medals are handed out at the end of each round. Win one while signed in and it lands here.": "Medaliile se dau la sfârșitul fiecărei runde. Câștigă una cât ești conectat și apare aici.",
+  "Round awards": "Medaliile rundei",
+  "You got a medal": "Ai primit o medalie",
+  "See the round": "Vezi runda",
+  "Called it": "Am zis eu",
+  "Called the meeting that caught an intruder": "A convocat ședința care a prins un intrus",
+  "Prankster": "Farsorul",
+  "Got someone to do a fake task": "A pus pe cineva să facă o sarcină falsă",
+  "Task machine": "Mașină de sarcini",
+  "Most tasks done": "Cele mai multe sarcini făcute",
+  "Core saver": "Salvatorul nucleului",
+  "Their code helped stop a meltdown": "Codul adus a ajutat la oprirea unei topiri",
+  "Undercover": "Sub acoperire",
+  "Intruder nobody voted for": "Intrus pentru care n-a votat nimeni",
+  "Card shark": "As la cărți",
+  "Intruder who played the most cards": "Intrusul care a jucat cele mai multe cărți",
+  "Sharp eye": "Ochi de vultur",
+  "Voted for an intruder the most": "A votat cel mai des un intrus",
+  "Last one standing": "Ultimul rămas",
+  "Still in when almost all the crew was out": "Încă în joc când aproape tot echipajul ieșise",
+  "Caught {name}": "L-a prins pe {name}",
+  "Caught an intruder": "A prins un intrus",
+  "{right} of {votes} votes on an intruder": "{right} din {votes} voturi pentru un intrus",
+  "Stopped a meltdown": "A oprit o topire",
+  "Not one vote all round": "Niciun vot toată runda",
+  "Got {name} to “{task}”": "L-a pus pe {name} să facă „{task}”",
+  "Fooled {name} with a fake task": "L-a păcălit pe {name} cu o sarcină falsă",
+  "Still in at the end": "Încă în joc la final",
+  "{count} medal won": {
+    "one": "{count} medalie câștigată",
+    "few": "{count} medalii câștigate",
+    "other": "{count} de medalii câștigate"
+  },
+  "{count} task done": {
+    "one": "{count} sarcină făcută",
+    "few": "{count} sarcini făcute",
+    "other": "{count} de sarcini făcute"
+  },
+  "{count} card played": {
+    "one": "{count} carte jucată",
+    "few": "{count} cărți jucate",
+    "other": "{count} de cărți jucate"
+  }
 }

@@ -999,5 +999,47 @@
   "Back to the main screen": "Tilbake til hovedskjermen",
   "Your game is open in another tab": "Spillet ditt er åpent i en annen fane",
   "You opened Sus Party again, so your game moved there. Play there, or tap Play here to keep playing in this tab.": "Du åpnet Sus Party på nytt, så spillet ditt flyttet dit. Spill der, eller trykk Spill her for å fortsette i denne fanen.",
-  "Play here": "Spill her"
+  "Play here": "Spill her",
+  "Medals": "Medaljer",
+  "None yet": "Ingen ennå",
+  "Medals are handed out at the end of each round. Win one while signed in and it lands here.": "Medaljer deles ut på slutten av hver runde. Vinn en mens du er logget inn, så havner den her.",
+  "Round awards": "Rundens medaljer",
+  "You got a medal": "Du fikk en medalje",
+  "See the round": "Se runden",
+  "Called it": "Visste det",
+  "Called the meeting that caught an intruder": "Kalte inn møtet som tok en inntrenger",
+  "Prankster": "Spøkefugl",
+  "Got someone to do a fake task": "Fikk noen til å gjøre en falsk oppgave",
+  "Task machine": "Oppgavemaskin",
+  "Most tasks done": "Flest oppgaver gjort",
+  "Core saver": "Kjerneredder",
+  "Their code helped stop a meltdown": "Koden hjalp med å stoppe en nedsmelting",
+  "Undercover": "Undercover",
+  "Intruder nobody voted for": "Inntrenger ingen stemte på",
+  "Card shark": "Korthai",
+  "Intruder who played the most cards": "Inntrengeren som spilte flest kort",
+  "Sharp eye": "Falkeblikk",
+  "Voted for an intruder the most": "Stemte oftest på en inntrenger",
+  "Last one standing": "Sist igjen",
+  "Still in when almost all the crew was out": "Fortsatt med da nesten hele mannskapet var ute",
+  "Caught {name}": "Tok {name}",
+  "Caught an intruder": "Tok en inntrenger",
+  "{right} of {votes} votes on an intruder": "{right} av {votes} stemmer på en inntrenger",
+  "Stopped a meltdown": "Stoppet en nedsmelting",
+  "Not one vote all round": "Ikke én stemme hele runden",
+  "Got {name} to “{task}”": "Fikk {name} til å «{task}»",
+  "Fooled {name} with a fake task": "Lurte {name} med en falsk oppgave",
+  "Still in at the end": "Fortsatt med på slutten",
+  "{count} medal won": {
+    "one": "{count} medalje vunnet",
+    "other": "{count} medaljer vunnet"
+  },
+  "{count} task done": {
+    "one": "{count} oppgave gjort",
+    "other": "{count} oppgaver gjort"
+  },
+  "{count} card played": {
+    "one": "{count} kort spilt",
+    "other": "{count} kort spilt"
+  }
 }

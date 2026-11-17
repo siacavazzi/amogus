@@ -59,8 +59,11 @@ function PrivacyPage() {
                         when it ended, whether you were crew or intruder, whether your side won, whether you made it to
                         the end, how many players were in the game, and what you did (tasks done, cards played, meetings
                         called, votes). It never holds the other players' names or photos, the room code, or anything
-                        about your phone. Only you can see your stats, on <a href="/account/stats">My stats</a>.
-                        Nothing is recorded for anyone who isn't signed in.
+                        about your phone. If you win a round award (a medal), your stats keep the medal's name and
+                        when you won it, never what it was for or who else was in the game. Only you can see your
+                        stats, on <a href="/account/stats">My stats</a>. Nothing is recorded for anyone who isn't
+                        signed in. The medals on the end screen are worked out in memory for that round and are not
+                        kept for anyone who isn't signed in.
                     </p>
 
                     <h2>Deleting your account</h2>

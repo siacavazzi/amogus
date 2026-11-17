@@ -6,6 +6,7 @@ import DeathSummary from '../components/DeathSummary';
 import GameStats from '../components/GameStats';
 import StatsLink from '../account/StatsLink';
 import { Confetti, Face, vibrate } from './index';
+import RoundAwards, { MyMedal } from './RoundAwards';
 
 // Game over: the screen splits open in the winners' colour and their faces drop in.
 export default function VictoryScreen({ tone, kicker, title, line, winners, winnersLabel, summaryTitle, showSurvivors }) {
@@ -50,16 +51,19 @@ export default function VictoryScreen({ tone, kicker, title, line, winners, winn
           </div>
         )}
         {crew && <Confetti colors={['#ffffff', '#ffc21a', '#ffffff']} top="30%" delay={900} count={24} />}
+        {!isMobile && <div style={{ width: '100%', marginTop: 18 }}><RoundAwards big /></div>}
       </div>
 
       <div className="w-full max-w-md mx-auto flex flex-col" style={{ gap: 18 }}>
         <div style={{ background: '#fff', borderRadius: 22, padding: 14, color: 'var(--sg-ink)' }}>
           <EndGameButtons />
         </div>
+        {isMobile && <RoundAwards />}
         <StatsLink />
         <DeathSummary title={summaryTitle} showSurvivors={showSurvivors} />
         <GameStats />
       </div>
+      {isMobile && <MyMedal />}
     </div>
   );
 }
