@@ -9,8 +9,10 @@
  * - Creates chaos and allows intruders to act unnoticed
  */
 import React from 'react';
+import { act } from '@testing-library/react';
 import { renderWithContext, screen } from '../../test-utils';
 import HackedPage from '../../pages/HackedPage';
+import { DataContext } from '../../GameContext';
 
 describe('HackedPage', () => {
     const mockSetHackTime = jest.fn();
@@ -73,5 +75,33 @@ describe('HackedPage', () => {
             const hackedElements = screen.getAllByText('HACKED');
             expect(hackedElements.length).toBeGreaterThan(0);
         });
+    });
+});
+
+describe('HackedPage animation', () => {
+    afterEach(() => jest.useRealTimers());
+
+    it('plays the bolt hit first, then shows the countdown and a recharging battery', () => {
+        jest.useFakeTimers();
+        const { container, rerender, contextValue } = renderWithContext(<HackedPage hackTime={30} />, { hackTime: 30 });
+        expect(screen.getByTestId('emp-hit')).toBeInTheDocument();
+        act(() => { jest.advanceTimersByTime(1100); });
+        expect(screen.queryByTestId('emp-hit')).not.toBeInTheDocument();
+        expect(container.querySelectorAll('.sg-emp-batt__seg.is-on')).toHaveLength(0);
+        rerender(<DataContext.Provider value={contextValue}><HackedPage hackTime={12} /></DataContext.Provider>);
+        // 18 of 30 seconds gone: three of five segments charged.
+        expect(container.querySelectorAll('.sg-emp-batt__seg.is-on')).toHaveLength(3);
+    });
+
+    it('skips the hit when the phone asks for less motion', () => {
+        const original = window.matchMedia;
+        window.matchMedia = (q) => ({ matches: q.includes('reduce'), addListener() {}, removeListener() {} });
+        try {
+            renderWithContext(<HackedPage hackTime={30} />, { hackTime: 30 });
+            expect(screen.queryByTestId('emp-hit')).not.toBeInTheDocument();
+            expect(screen.getByText('00:30')).toBeInTheDocument();
+        } finally {
+            window.matchMedia = original;
+        }
     });
 });

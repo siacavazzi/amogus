@@ -1,5 +1,6 @@
 import React, { useContext, useMemo, useState } from 'react';
 import './signal.css';
+import './fx.css';
 import { DataContext } from '../GameContext';
 import { ENDPOINT } from '../ENDPOINT';
 import Avatar, { getAvatar } from '../components/Avatar';

@@ -8,6 +8,7 @@ import RoomQrCode from "../components/RoomQrCode";
 import { isBetaChannel } from "../components/BetaBadge";
 import { buildRoomQrUrl } from "../utils/inviteLinks";
 import { Face } from "../signal";
+import { Bolt, EmpBattery, EmpHit, useEmpIntro, useEmpProgress } from "../signal/Emp";
 import "../signal/reactor.css";
 import { t } from '../i18n';
 
@@ -176,6 +177,15 @@ function ReactorNormal() {
         );
     }
 
+    if (hackTime > 0) {
+        return (
+            <>
+                <ReactorEmp hackTime={hackTime} roomCode={roomCode} leave={leave(false)} />
+                {showAverted && <MeltdownAvertedDisplay />}
+            </>
+        );
+    }
+
     return (
         <div className="sg sg-screen sg-round sg-rx">
             <div className="sg-rx__bar">
@@ -204,6 +214,43 @@ function ReactorNormal() {
             <div className="sg-rx__foot">{sabotage('sg-btn-red')}</div>
             <LateJoin roomCode={roomCode} waitingPlayers={waitingPlayers} live={lateJoinLive} linkToken={lobbyState?.link_token} />
             {showAverted && <MeltdownAvertedDisplay />}
+        </div>
+    );
+}
+
+// EMP on the laptop: the same yellow bolt strikes the screen, and everyone across the room
+// can see how long the phones stay down while the battery recharges.
+export function ReactorEmp({ hackTime, roomCode, leave }) {
+    const phase = useEmpIntro(false);
+    const progress = useEmpProgress(hackTime);
+    const left = Math.max(0, hackTime || 0);
+    const clock = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`;
+    return (
+        <div className="sg sg-screen sg-rx sg-rx--emp" role="status" data-testid="reactor-emp">
+            <div className="sg-rx__bar">
+                <p className="sg-rx__brand">Sus Party <span style={{ opacity: 0.7, fontWeight: 700 }}>{t('· Room {roomCode}', { roomCode })}</span></p>
+                {leave}
+            </div>
+            <EmpHit phase={phase} boltSize={240} />
+            {phase === 'down' && (
+            <div className="sg-rx__main sg-emp-on">
+                <div className="sg-rx-emp__row">
+                    <Bolt size={150} className="sg-rx-emp__strike" />
+                    <div style={{ display: 'grid', gap: 10, justifyItems: 'start', textAlign: 'left' }}>
+                        <p className="sg-rx__label">{t('HACKED')}</p>
+                        <h1 className="sg-big" style={{ fontSize: 'clamp(48px, 7vw, 110px)' }}>{t('Devices down')}</h1>
+                        <p className="sg-rx__lede" style={{ opacity: 0.75 }}>{t('An intruder played EMP')}</p>
+                    </div>
+                </div>
+                <div className="sg-rx-emp__row" style={{ marginTop: 'clamp(16px, 5vh, 56px)' }}>
+                    <EmpBattery progress={progress} width={400} />
+                    <div style={{ display: 'grid', gap: 4, justifyItems: 'start' }}>
+                        <p className="sg-rx__label">{t('Back in')}</p>
+                        <p key={left <= 10 ? left : 'steady'} className={`sg-rx-emp__count ${left <= 10 ? 'sg-tick' : ''}`}>{clock}</p>
+                    </div>
+                </div>
+            </div>
+            )}
         </div>
     );
 }

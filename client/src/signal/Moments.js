@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { DataContext } from '../GameContext';
-import { Face, vibrate } from './index';
+import { Face, Letters, vibrate } from './index';
 import { listCardNames } from '../utils/cardCopy';
 import { t } from '../i18n';
 
@@ -137,13 +137,37 @@ export function RevealedMoment({ intruderNames = [], onClose }) {
   );
 }
 
-// A taunt drops in from the top and nudges the phone. The screen behind stays as it was.
+// A pair of Side-Eye eyes (the Sus Party mark) that peek over the top of the taunt,
+// glance left and right, and duck back down. Whoever sent it is watching.
+function PeekingEyes() {
+  return (
+    <span className="sg-taunt-peek" aria-hidden="true">
+      <svg className="sg-taunt-peek__eyes" width="96" height="68" viewBox="0 0 96 68" focusable="false">
+        <rect x="0" y="0" width="96" height="84" rx="24" fill="var(--sg-ink)" />
+        <g className="sg-taunt-peek__lids">
+          <circle cx="29" cy="30" r="17" fill="#fff" />
+          <circle cx="67" cy="30" r="17" fill="#fff" />
+          <g className="sg-taunt-peek__pupils">
+            <circle cx="33" cy="33" r="9" fill="var(--sg-ink)" />
+            <circle cx="71" cy="33" r="9" fill="var(--sg-ink)" />
+          </g>
+        </g>
+      </svg>
+    </span>
+  );
+}
+
+// A taunt drops in from the top and nudges the phone, a pair of eyes peeks over it, and the
+// message types itself out. The screen behind stays as it was.
 export function TauntToast({ message, onClose }) {
   useEffect(() => {
     vibrate(60);
     const timer = setTimeout(onClose, 6000);
     return () => clearTimeout(timer);
   }, [onClose]);
+  const text = String(message || '');
+  // Typing never takes longer than about a second, however long the message.
+  const step = Math.max(8, Math.min(30, Math.floor(1000 / Math.max(1, text.length))));
   return (
     <button
       type="button"
@@ -153,7 +177,7 @@ export function TauntToast({ message, onClose }) {
         position: 'fixed',
         left: 14,
         right: 14,
-        top: 'calc(env(safe-area-inset-top, 0px) + 14px)',
+        top: 'calc(env(safe-area-inset-top, 0px) + 54px)',
         zIndex: 70,
         background: '#fff',
         color: 'var(--sg-ink)',
@@ -164,9 +188,12 @@ export function TauntToast({ message, onClose }) {
         boxShadow: '0 10px 24px rgba(0,0,0,.25)',
       }}
     >
+      <PeekingEyes />
       <span className="sg-nudge" style={{ display: 'block', animationDelay: '420ms' }}>
         <b id="modal-title" style={{ display: 'block', fontSize: 13, opacity: 0.6, fontWeight: 700 }}>{t('Anonymous message')}</b>
-        <span style={{ display: 'block', fontWeight: 900, fontSize: 21, lineHeight: 1.15, marginTop: 4 }}>{message}</span>
+        <span style={{ display: 'block', fontWeight: 900, fontSize: 21, lineHeight: 1.15, marginTop: 4 }}>
+          <Letters text={text} delay={520} step={step} />
+        </span>
         <span style={{ display: 'block', fontSize: 12, opacity: 0.5, fontWeight: 700, marginTop: 8 }}>{t('Tap to dismiss')}</span>
       </span>
     </button>
