@@ -6,6 +6,7 @@ from threading import Thread
 from uuid import uuid4
 
 import eventlet
+from assets.spectator import record as record_spectator
 
 
 # Big rooms never get every phone to slide ready (a ~40-player room froze twice on 2026-10-30).
@@ -259,6 +260,7 @@ class Meeting:
                 self.reason = 'veto'
                 print("Meeting ended early due to veto threshold...")
                 self.game.emit_to_room("meeting", self.to_json())
+                record_spectator(self.game, 'vote_skipped')
                 self.speaker.play_sound('veto')
             else:
                 print("Meeting over...")
@@ -284,6 +286,8 @@ class Meeting:
                     else:
                         death_cause = 'voted_out'
                     self.game.kill_player(self.voted_out, death_cause=death_cause)
+                else:
+                    record_spectator(self.game, 'nobody_out')
 
                 self.reason = 'votes'
                 self.votes = self.compute_vote_counts()

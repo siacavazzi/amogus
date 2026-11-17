@@ -99,4 +99,6 @@ def room_state(game, player=None, sid=None):
         'waiting': bool(player is not None and getattr(player, 'waiting', False)),
         'waiting_players': game.waiting_view(),
         'late_join_live': game.late_join_live, 'joins_when': game.waiting_joins_when(),
+        # Out players' live feed of the round; None for everyone else (see assets/spectator.py)
+        'spectator': game.spectator.view_for(player) if player is not None and getattr(game, 'spectator', None) else None,
     })

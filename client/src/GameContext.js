@@ -119,6 +119,8 @@ export default function GameContext({ children }) {
     const [resetVotes, setResetVotes] = useState({ current: 0, needed: 0, voters: [] })
     const [fakeTaskReveal, setFakeTaskReveal] = useState(null) // { task, location } when showing fake task animation
     const [intrudersRevealed, setIntrudersRevealed] = useState(null) // { intruder_names, intruder_ids, message } when tasks 100%
+    // Out players only: the round's live feed and who is still in (server/assets/spectator.py)
+    const [spectator, setSpectator] = useState(null)
     const [testMode, setTestMode] = useState(false) // One or two players trying the game
     const [lastStand, setLastStand] = useState(false) // 3-player rounds at 1 intruder vs 1 crew: no meetings
     // Joined mid-round: on the waiting list, dealt in when the room returns to the lobby
@@ -185,6 +187,7 @@ export default function GameContext({ children }) {
         setKillCooldown(0)
         setResetVotes({ current: 0, needed: 0, voters: [] })
         setIntrudersRevealed(null)
+        setSpectator(null)
         setTestMode(false)
         setLastStand(false)
         setWaitingForNextRound(false)
@@ -352,6 +355,7 @@ export default function GameContext({ children }) {
             ? (typeof snapshot.intruders_revealed === 'object' ? snapshot.intruders_revealed : true)
             : null);
         setActiveCards(Array.isArray(snapshot.active_cards) ? snapshot.active_cards : []);
+        setSpectator(snapshot.spectator && typeof snapshot.spectator === 'object' ? snapshot.spectator : null);
         setLastStand(!!snapshot.last_stand);
         setWaitingForNextRound(!!snapshot.waiting);
         if (Array.isArray(snapshot.waiting_players)) setWaitingPlayers(snapshot.waiting_players);
@@ -797,6 +801,16 @@ export default function GameContext({ children }) {
             applyRoomSnapshot(data);
         });
 
+        // Only sent to a phone whose player is out (the server never sends it to the living).
+        // A feed line can arrive a moment before the player list that says this phone is out.
+        socketRef.current.on('spectator', (data) => {
+            if (!data || typeof data !== 'object') return;
+            const current = roomVersionRef.current;
+            if (data.room_code && current.roomCode && data.room_code !== current.roomCode) return;
+            if (data.round_id && current.roundId && data.round_id !== current.roundId) return;
+            setSpectator(data);
+        });
+
         socketRef.current.on('waiting_players', (data) => {
             if (!acceptRoomData(data)) return;
             setWaitingPlayers(Array.isArray(data?.players) ? data.players : []);
@@ -916,6 +930,7 @@ export default function GameContext({ children }) {
             setTaskCreationMode(false);
             setResetVotes({ current: 0, needed: 0, voters: [] });
             setIntrudersRevealed(null);
+            setSpectator(null);
             setTestMode(false);
             setLastStand(false);
             // Anyone who waited out the round is in the lobby now, with everyone else.
@@ -1289,6 +1304,8 @@ export default function GameContext({ children }) {
         isMobile,
         // Intruder reveal (tasks 100%)
         intrudersRevealed,
+        // Out players' live feed of the round (null for everyone else)
+        spectator,
         // Test game for one or two players
         testMode,
         switchTestRole,
@@ -1342,6 +1359,7 @@ export default function GameContext({ children }) {
         taskCreationMode,
         resetVotes,
         intrudersRevealed,
+        spectator,
         lastStand,
         completeTask,
         taskCompletionPending,

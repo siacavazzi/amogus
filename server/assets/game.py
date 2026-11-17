@@ -5,6 +5,8 @@ import logging
 from collections import OrderedDict
 from uuid import uuid4
 from assets.game_links import new_link_token
+from assets.spectator import DEFAULT_SPECTATOR_VIEW, SpectatorFeed, sanitize_spectator_view
+from assets.spectator import record as record_spectator
 from assets.player import Player
 from assets.taskHandler import *
 from assets.meltdown import *
@@ -33,6 +35,9 @@ class Game:
     def __init__(self, socket, task_handler, speaker, task_ratio, meltdown_time, code_percent, locations, vote_time, card_draw_probability, numIntruders, starting_cards, vote_threshold, room_code=None, auto_intruders=False):
         self.state_lock = RLock()
         self.revision = 0
+        # What players who are out watch on their phones (see assets/spectator.py)
+        self.spectator_view = DEFAULT_SPECTATOR_VIEW
+        self.spectator = SpectatorFeed(self)
         self.round_id = str(uuid4())
         self.room_session_id = str(uuid4())
         self.round_number = 0
@@ -189,6 +194,7 @@ class Game:
             'card_deck_counts': self.card_deck_counts.copy(),
             'card_deck_count_keys': CARD_DECK_COUNT_KEYS,
             'card_deck_presets': get_available_card_deck_presets(),
+            'spectator_view': self.spectator_view,
         }
 
     def update_config(self, config):
@@ -218,6 +224,8 @@ class Game:
             self.vote_time = int(config['vote_time'])
         if 'vote_threshold' in config:
             self.vote_threshold = float(config['vote_threshold'])
+        if 'spectator_view' in config:
+            self.spectator_view = sanitize_spectator_view(config['spectator_view'])
         if 'meeting_quorum' in config:
             self.meeting_quorum = config['meeting_quorum'] is True
         if 'late_join_live' in config:
@@ -347,6 +355,7 @@ class Game:
                     'feedback_submitters': self.feedback_submitters,
                 }
             self.round_id = str(uuid4())
+            self.spectator.reset()
             self.command_results.clear()
             self.feedback_submitters = set()
             self.revision += 1
@@ -419,6 +428,7 @@ class Game:
             self.speaker.loop_sound("meltdown", meltdown_duration)
             self.card_deck.emit_active_cards()
             meltdown.start_countdown()
+            record_spectator(self, 'meltdown')
             return True
 
     def cancel_meltdown(self):
@@ -756,6 +766,7 @@ class Game:
         
         # Update player list so clients can show who is sus
         self.emit_player_list()
+        record_spectator(self, 'revealed')
 
     def resetRoles(self):
         for player in self.players:
@@ -987,6 +998,8 @@ class Game:
             self.stats['meetings_called'] += 1
             self.speaker.play_sound('meeting')
             self.emit_to_room("meeting", self.meeting.to_json())
+            record_spectator(self, 'meeting', None if trigger == 'tasks_complete' else player_who_started_it,
+                               trigger=trigger)
             return True
 
     def get_num_living_players(self):
@@ -1123,6 +1136,7 @@ class Game:
                        during='meeting' if self.meeting else 'meltdown' if self.active_meltdown else 'round',
                        round_seconds=self.round_seconds(), **self.living_counts())
         print(f"Player {player.username} died: {death_cause} - {death_message}")
+        record_spectator(self, 'out', player, cause=death_cause)
 
         if self.end_state:
             self.emit_player_list()

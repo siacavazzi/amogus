@@ -6,6 +6,7 @@ import uuid
 import time
 from threading import Thread
 from assets.utils import *
+from assets.spectator import record as record_spectator
 
 CARD_DECK_PRESET_DEFAULT = 'default'
 CARD_DECK_PRESET_CUSTOM = 'custom'
@@ -280,6 +281,13 @@ class Card:
         accepted = remove_card or discarded
         if accepted:
             self.game.stats['cards_played'] += 1
+            target = None
+            if self.action in ('Fake Task', 'Taunt Message') and extra_data:
+                target = self.game.getPlayerById(extra_data.get('target_player_id'))
+            record_spectator(self.game, 'card', player, card=self.action,
+                                    card_location=self.location if self.action == 'Area Denial' else None,
+                                    target_id=target.player_id if target else None,
+                                    target_name=target.username if target else None)
         self.card_deck.emit_active_cards()
         self.game.emit_player_list()
         return accepted
