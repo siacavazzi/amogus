@@ -1036,5 +1036,47 @@
   "{count} swap": {
     "one": "{count} byte",
     "other": "{count} byten"
+  },
+  "Medals": "Medaljer",
+  "None yet": "Inga än",
+  "Medals are handed out at the end of each round. Win one while signed in and it lands here.": "Medaljer delas ut i slutet av varje omgång. Vinn en medan du är inloggad så hamnar den här.",
+  "Round awards": "Omgångens medaljer",
+  "You got a medal": "Du fick en medalj",
+  "See the round": "Se omgången",
+  "Called it": "Visste det",
+  "Called the meeting that caught an intruder": "Kallade till mötet som fångade en inkräktare",
+  "Prankster": "Skojare",
+  "Got someone to do a fake task": "Fick någon att göra en falsk uppgift",
+  "Task machine": "Uppgiftsmaskin",
+  "Most tasks done": "Flest uppgifter klara",
+  "Core saver": "Härdräddare",
+  "Their code helped stop a meltdown": "Koden hjälpte till att stoppa en härdsmälta",
+  "Undercover": "Undercover",
+  "Intruder nobody voted for": "Inkräktare som ingen röstade på",
+  "Card shark": "Korthaj",
+  "Intruder who played the most cards": "Inkräktaren som spelade flest kort",
+  "Sharp eye": "Örnöga",
+  "Voted for an intruder the most": "Röstade oftast på en inkräktare",
+  "Last one standing": "Sist kvar",
+  "Still in when almost all the crew was out": "Fortfarande med när nästan hela besättningen var ute",
+  "Caught {name}": "Fångade {name}",
+  "Caught an intruder": "Fångade en inkräktare",
+  "{right} of {votes} votes on an intruder": "{right} av {votes} röster på en inkräktare",
+  "Stopped a meltdown": "Stoppade en härdsmälta",
+  "Not one vote all round": "Inte en enda röst hela omgången",
+  "Got {name} to “{task}”": "Fick {name} att ”{task}”",
+  "Fooled {name} with a fake task": "Lurade {name} med en falsk uppgift",
+  "Still in at the end": "Fortfarande med i slutet",
+  "{count} medal won": {
+    "one": "{count} medalj vunnen",
+    "other": "{count} medaljer vunna"
+  },
+  "{count} task done": {
+    "one": "{count} uppgift klar",
+    "other": "{count} uppgifter klara"
+  },
+  "{count} card played": {
+    "one": "{count} kort spelat",
+    "other": "{count} kort spelade"
   }
 }

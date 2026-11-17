@@ -5,6 +5,7 @@ import logging
 from collections import OrderedDict
 from uuid import uuid4
 from assets.game_links import new_link_token
+from assets import awards
 from assets.player import Player
 from assets import task_hand
 from assets.taskHandler import *
@@ -252,6 +253,14 @@ class Game:
                 self.cancel_meltdown()
                 if self.meeting:
                     self.meeting.log_end(self.meeting.reason or 'round_ended')
+
+            # The round's medals, worked out once when it ends; they ride along in stats.
+            if event == 'end_game' and 'awards' not in self.stats:
+                try:
+                    self.stats['awards'] = awards.compute(self)
+                except Exception:
+                    self.stats['awards'] = []
+                    logging.getLogger('app_logger').exception('Round awards failed')
 
             # Fire end-of-game stats callback once when the game ends
             if event == 'end_game' and not self._stats_recorded:

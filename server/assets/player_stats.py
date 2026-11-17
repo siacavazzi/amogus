@@ -84,6 +84,29 @@ def rows_for_round(game, ended_at=None):
     return rows
 
 
+def medals_for_round(game, ended_at):
+    """The round's medals that went to signed-in players: only the medal's name is kept, never
+    who it was against or what the task said."""
+    by_id = {p.player_id: p for p in getattr(game, 'players', [])}
+    out, seen = [], set()
+    for award in (getattr(game, 'stats', None) or {}).get('awards') or []:
+        player = by_id.get(award.get('player_id'))
+        account_id = getattr(player, 'account_id', None)
+        if account_id and (account_id, award['medal']) not in seen:
+            seen.add((account_id, award['medal']))
+            out.append({'account_id': account_id, 'ended_at': ended_at, 'medal': award['medal']})
+    return out
+
+
+def summarize_medals(medals):
+    """Medal case: how many of each, the total, and the latest few (newest first)."""
+    counts = {}
+    for m in medals:
+        counts[m['medal']] = counts.get(m['medal'], 0) + 1
+    return {'total': len(medals), 'counts': counts,
+            'recent': [{'medal': m['medal'], 'at': m['ended_at']} for m in reversed(medals[-6:])]}
+
+
 def summarize(rows, now=None):
     """The stats page's numbers from an account's rows, oldest first."""
     now = now or time.time()
@@ -150,6 +173,12 @@ class PlayerStatsStore:
                     sharp_votes INTEGER NOT NULL
                 );
                 CREATE INDEX IF NOT EXISTS rounds_account ON rounds(account_id, ended_at);
+                CREATE TABLE IF NOT EXISTS medals (
+                    account_id TEXT NOT NULL,
+                    ended_at REAL NOT NULL,
+                    medal TEXT NOT NULL
+                );
+                CREATE INDEX IF NOT EXISTS medals_account ON medals(account_id, ended_at);
             ''')
             self.db.commit()
 
@@ -177,7 +206,23 @@ class PlayerStatsStore:
         game._player_stats_round = round_id
         rows = rows_for_round(game)
         self.add_rounds(rows)
+        if rows:
+            self.add_medals(medals_for_round(game, rows[0]['ended_at']))
         return len(rows)
+
+    def add_medals(self, medals):
+        if not medals:
+            return
+        with self.lock:
+            self.db.executemany('INSERT INTO medals (account_id, ended_at, medal) VALUES (?, ?, ?)',
+                                [(m['account_id'], m['ended_at'], m['medal']) for m in medals])
+            self.db.commit()
+
+    def medals(self, account_id):
+        with self.lock:
+            found = self.db.execute('SELECT medal, ended_at FROM medals WHERE account_id = ? ORDER BY ended_at',
+                                    (account_id,)).fetchall()
+        return [dict(row) for row in found]
 
     def rows(self, account_id):
         with self.lock:
@@ -185,9 +230,12 @@ class PlayerStatsStore:
         return [dict(row) for row in found]
 
     def summary(self, account_id, now=None):
-        return summarize(self.rows(account_id), now=now)
+        out = summarize(self.rows(account_id), now=now)
+        out['medals'] = summarize_medals(self.medals(account_id))
+        return out
 
     def delete(self, account_id):
         with self.lock:
             self.db.execute('DELETE FROM rounds WHERE account_id = ?', (account_id,))
+            self.db.execute('DELETE FROM medals WHERE account_id = ?', (account_id,))
             self.db.commit()

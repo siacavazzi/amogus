@@ -3,6 +3,7 @@ import { usePageMeta } from '../../seo/usePageMeta';
 import { SignInForm } from '../../account/SignInSheet';
 import { fetchAccountStats, signInAvailable, useAccount } from '../../account/accountStore';
 import { getLanguage, t, tn } from '../../i18n';
+import { MEDALS, MEDAL_ORDER, Medal } from '../../signal/medals';
 import '../../account/account.css';
 import './StatsPage.css';
 
@@ -166,6 +167,36 @@ function highlights(stats) {
     return out.slice(0, 3);
 }
 
+/** Every medal there is: the ones you've won in colour with how many, the rest waiting in gray. */
+function MedalCase({ medals }) {
+    const counts = medals?.counts || {};
+    const total = medals?.total || 0;
+    return (
+        <section className="st-card" data-testid="stats-medals">
+            <div className="st-medals__head">
+                <h2 className="st-h2">{t('Medals')}</h2>
+                <p className="st-medals__total">{total > 0 ? tn(total, '{count} medal won', '{count} medals won') : t('None yet')}</p>
+            </div>
+            <ul className="st-medals">
+                {MEDAL_ORDER.map((id) => {
+                    const won = counts[id] || 0;
+                    return (
+                        <li key={id} className={`st-medal${won ? '' : ' st-medal--locked'}`} data-testid={`medal-${id}`}>
+                            <span className="st-medal__art">
+                                <Medal id={id} size={52} title="" />
+                                {won > 1 && <span className="st-medal__count">×{formatNumber(won)}</span>}
+                            </span>
+                            <b>{t(MEDALS[id].name)}</b>
+                            <span>{t(MEDALS[id].how)}</span>
+                        </li>
+                    );
+                })}
+            </ul>
+            {total === 0 && <p className="st-muted st-medals__note">{t('Medals are handed out at the end of each round. Win one while signed in and it lands here.')}</p>}
+        </section>
+    );
+}
+
 function StatsBody({ stats, name }) {
     if (!stats || stats.games === 0) {
         return (
@@ -195,6 +226,8 @@ function StatsBody({ stats, name }) {
                     </ul>
                 )}
             </section>
+
+            <MedalCase medals={stats.medals} />
 
             <section className="st-card">
                 <h2 className="st-h2">{t('Win rate')}</h2>

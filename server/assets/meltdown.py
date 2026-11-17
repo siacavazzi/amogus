@@ -5,6 +5,7 @@ from contextlib import nullcontext
 import eventlet
 
 from assets.scaling import meltdown_codes_needed
+from assets import awards
 
 
 class Meltdown:
@@ -28,6 +29,8 @@ class Meltdown:
         self.present_at_start = present
         self.started_at = None  # monotonic; set when the countdown starts
         self.wrong_pins = 0
+        self.pin_owner = {}  # pin -> the player whose phone showed it (for the Core saver medal)
+        self.entered_by = []
         self._end_logged = False
 
     def log_end(self, end_reason):
@@ -113,6 +116,7 @@ class Meltdown:
                 return
             for index, player in enumerate(self.living_players):
                 player.meltdown_code = self.valid_pins[index]
+                self.pin_owner.setdefault(self.valid_pins[index], player)
                 if player.sid:  # to=None would send the code to every room; an offline player gets it on rejoin
                     self.socketio.emit("meltdown_code", self.valid_pins[index], to=player.sid)
                 print(f"sending code {self.valid_pins[index]} to {player.sid}")
@@ -139,6 +143,8 @@ class Meltdown:
 
             self.valid_pins.remove(input_pin)
             self.codes_entered += 1
+            if self.pin_owner.get(input_pin):
+                self.entered_by.append(self.pin_owner[input_pin])
             if self.game:
                 self.game.revision += 1
             print("Valid PIN entered!")
@@ -153,6 +159,8 @@ class Meltdown:
             if not self._is_current_locked():
                 return False
             self.log_end('codes_entered' if success else 'time_ran_out')
+            if success:
+                awards.note_meltdown_saved(self.entered_by)
             self.meltdown_active = False
             # The codes die with the meltdown; a later room_state must not bring the code screen back.
             for player in self.living_players:

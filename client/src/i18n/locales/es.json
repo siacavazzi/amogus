@@ -1036,5 +1036,47 @@
   "{count} swap": {
     "one": "{count} cambio",
     "other": "{count} cambios"
+  },
+  "Medals": "Medallas",
+  "None yet": "Todavía ninguna",
+  "Medals are handed out at the end of each round. Win one while signed in and it lands here.": "Las medallas se entregan al final de cada ronda. Gana una con tu sesión iniciada y aparecerá aquí.",
+  "Round awards": "Medallas de la ronda",
+  "You got a medal": "Ganaste una medalla",
+  "See the round": "Ver la ronda",
+  "Called it": "Lo sabía",
+  "Called the meeting that caught an intruder": "Convocó la reunión que atrapó a un intruso",
+  "Prankster": "Bromista",
+  "Got someone to do a fake task": "Hizo que alguien hiciera una tarea falsa",
+  "Task machine": "Máquina de tareas",
+  "Most tasks done": "Más tareas hechas",
+  "Core saver": "Salvador del núcleo",
+  "Their code helped stop a meltdown": "Su código ayudó a detener una fusión",
+  "Undercover": "De incógnito",
+  "Intruder nobody voted for": "Intruso por el que nadie votó",
+  "Card shark": "As de las cartas",
+  "Intruder who played the most cards": "Intruso que jugó más cartas",
+  "Sharp eye": "Ojo de lince",
+  "Voted for an intruder the most": "Votó más veces por un intruso",
+  "Last one standing": "Último en pie",
+  "Still in when almost all the crew was out": "Seguía en juego cuando casi toda la tripulación estaba fuera",
+  "Caught {name}": "Atrapó a {name}",
+  "Caught an intruder": "Atrapó a un intruso",
+  "{right} of {votes} votes on an intruder": "{right} de {votes} votos a un intruso",
+  "Stopped a meltdown": "Detuvo una fusión",
+  "Not one vote all round": "Ni un voto en toda la ronda",
+  "Got {name} to “{task}”": "Hizo que {name} hiciera “{task}”",
+  "Fooled {name} with a fake task": "Engañó a {name} con una tarea falsa",
+  "Still in at the end": "Seguía en juego al final",
+  "{count} medal won": {
+    "one": "{count} medalla ganada",
+    "other": "{count} medallas ganadas"
+  },
+  "{count} task done": {
+    "one": "{count} tarea hecha",
+    "other": "{count} tareas hechas"
+  },
+  "{count} card played": {
+    "one": "{count} carta jugada",
+    "other": "{count} cartas jugadas"
   }
 }
