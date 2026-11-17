@@ -17,6 +17,9 @@ import LanguagePicker from '../components/LanguagePicker';
 import LaptopHostPrompt, { laptopHasHosted } from '../components/LaptopHostPrompt';
 import AccountButton from '../account/AccountButton';
 import WelcomeBackCard from '../components/WelcomeBackCard';
+import WhatsNew from '../components/WhatsNew';
+import { pendingWhatsNew } from '../utils/whatsNew';
+import { WHATS_NEW } from '../whatsNew';
 import { readLastGame } from '../utils/lastGame';
 
 function LobbyPage() {
@@ -54,7 +57,9 @@ function LobbyPage() {
     useEffect(() => {
         // A phone that has finished a game has played, so it gets its welcome back card instead.
         // Nor does anyone who put the game on their home screen (on iPhone that app starts with empty storage).
-        setShowTutorialPrompt(isMobile && !isStandalone() && !generatedSetup && !savedGameCode && !readLastGame() && !getRoomCodeFromSearch() && !roomEntryStatus && shouldRecommendTutorial());
+        setShowTutorialPrompt(isMobile && !isStandalone() && !generatedSetup && !savedGameCode && !readLastGame() && !getRoomCodeFromSearch() && !roomEntryStatus && shouldRecommendTutorial()
+            // A phone that has been here before gets "what's new" this time, not a second pop-up after it.
+            && !pendingWhatsNew(WHATS_NEW));
     }, [isMobile, roomEntryStatus, generatedSetup, savedGameCode]);
 
     // Listen for errors and success to reset the button states
@@ -234,6 +239,12 @@ function LobbyPage() {
         </p>
     );
 
+    // Not while a join link, a saved game or a pack is opening, nor over another pop-up or a join in progress.
+    const whatsNew = (
+        <WhatsNew paused={showTutorialPrompt || showLaptopPrompt || isJoining || isCreating || Boolean(roomEntryStatus)
+            || Boolean(openingSavedGame) || Boolean(generatedSetup) || Boolean(getRoomCodeFromSearch())} />
+    );
+
     if (!isReactorDevice) {
         return (
             <div className="sg-screen sg-round sg-home">
@@ -304,6 +315,7 @@ function LobbyPage() {
                         </div>
                     </div>
                 )}
+                {whatsNew}
             </div>
         );
     }
@@ -353,6 +365,7 @@ function LobbyPage() {
                 <ReactorModeBanner className="sg-a sg-rise" />
             </div>
 
+            {whatsNew}
             {showLaptopPrompt && (
                 <LaptopHostPrompt
                     onSetUpHere={() => { setShowLaptopPrompt(false); handleCreateGame(); }}
