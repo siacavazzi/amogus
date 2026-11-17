@@ -8,6 +8,7 @@ import { readyNeeded } from '../utils/meetingQuorum';
 import { Check, Skull } from '../signal/icons';
 import { Face, Words, takeOrigin, vibrate } from '../signal';
 import { t } from '../i18n';
+import { AlarmRings, CallBadge } from '../signal/Burst';
 
 // Every phone floods yellow at once: the meeting is the loudest moment in the game.
 const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = null }) => {
@@ -73,14 +74,18 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
       {!tutorialMode && <LeaveGameButton className="sg-corner" />}
 
       <div className="sg-shake sg-center" style={{ animationDelay: '700ms', gap: 16, paddingTop: 12 }}>
-        <h1 className="sg-big sg-h1">
+        <h1 className="sg-big sg-h1" style={{ position: 'relative', isolation: 'isolate' }}>
+          <AlarmRings size={200} delay={380} />
           <Words text={t('EMERGENCY')} delay={420} />
           <br />
           <Words text={t('MEETING')} delay={560} />
         </h1>
 
         {caller && !tasksDone ? (
-          <Face player={caller} size={104} className="sg-a sg-pop" style={{ animationDelay: '820ms' }} />
+          <div style={{ position: 'relative' }}>
+            <Face player={caller} size={104} className="sg-a sg-pop" style={{ animationDelay: '820ms' }} />
+            <CallBadge delay={1050} size={38} />
+          </div>
         ) : null}
         <p className="sg-lede sg-a sg-rise" style={{ animationDelay: '1000ms' }}>
           {tasksDone ? t('Every task is done. The intruders are revealed.') : t('{name} called it', { name: meetingState?.player_who_started_it })}

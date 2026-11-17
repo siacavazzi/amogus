@@ -25,14 +25,17 @@ export function Bolt({ size = 160, className = '', style }) {
   );
 }
 
-// Remembers the longest time this EMP has had left, so the battery knows how full it is.
-export function useEmpProgress(secondsLeft) {
+// Remembers the longest time a countdown has had left, so a bar or battery knows how far
+// along it is (EMP battery, meltdown heat).
+export function useCountdownProgress(secondsLeft) {
   const total = useRef(0);
   const left = Math.max(0, secondsLeft || 0);
   if (left > total.current) total.current = left;
   if (!total.current) return 1;
   return Math.min(1, Math.max(0, 1 - left / total.current));
 }
+
+export const useEmpProgress = useCountdownProgress;
 
 const SEGMENTS = 5;
 
@@ -90,18 +93,18 @@ export function useEmpIntro(buzz = true) {
   return phase;
 }
 
-// Slices of the blue screen, some with a white bar standing in for text, that jump sideways
-// when the bolt lands.
+// Slices of the blue screen that jump sideways when the bolt lands.
 const SLICES = [
-  { top: 0, h: 18, dx: -24 },
-  { top: 18, h: 9, dx: 38, bar: '58%' },
-  { top: 27, h: 7, dx: -46, bar: '72%' },
-  { top: 34, h: 8, dx: 30, dark: true },
-  { top: 42, h: 10, dx: -18, bar: '40%' },
-  { top: 52, h: 16, dx: 52 },
-  { top: 68, h: 8, dx: -36, bar: '64%' },
-  { top: 76, h: 24, dx: 20 },
+  { top: 0, h: 22, dx: -24 },
+  { top: 22, h: 12, dx: 40 },
+  { top: 34, h: 8, dx: -46, dark: true },
+  { top: 42, h: 18, dx: 30 },
+  { top: 60, h: 10, dx: -36 },
+  { top: 70, h: 30, dx: 20 },
 ];
+
+// Yellow sparks thrown off where the bolt hits: [angle in degrees, distance in px].
+const SPARKS = [[-150, 120], [-30, 130], [200, 110], [20, 140], [-90, 150], [100, 120]];
 
 // The hit itself: a yellow bolt slams into the blue screen, the picture tears, then folds
 // into a yellow line and a dot.
@@ -114,10 +117,15 @@ export function EmpHit({ phase, boltSize = 150 }) {
           <span
             key={sl.top}
             className={`sg-emp-slice${sl.dark ? ' sg-emp-slice--dark' : ''}`}
-            style={{ top: `${sl.top}%`, height: `${sl.h}%`, '--dx': `${sl.dx}px`, '--bar': sl.bar }}
-          >
-            {sl.bar && <i className="sg-emp-slice__bar" />}
-          </span>
+            style={{ top: `${sl.top}%`, height: `${sl.h}%`, '--dx': `${sl.dx}px` }}
+          />
+        ))}
+        {SPARKS.map(([angle, dist]) => (
+          <i
+            key={angle}
+            className="sg-emp-zap"
+            style={{ '--tx': `${Math.round(Math.cos((angle * Math.PI) / 180) * dist)}px`, '--ty': `${Math.round(Math.sin((angle * Math.PI) / 180) * dist)}px`, '--rot': `${angle}deg` }}
+          />
         ))}
         <Bolt size={boltSize} className="sg-emp-strike" style={{ marginLeft: -boltSize / 2, marginTop: -boltSize * 0.75 }} />
       </div>

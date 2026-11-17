@@ -19,7 +19,23 @@
   background: var(--sg-round);
   animation: sg-emp-tear 0.36s steps(1, end) 0.2s both;
 }
-.sg-emp-slice__bar { position: absolute; left: 22px; top: 22%; bottom: 22%; width: var(--bar, 50%); border-radius: 8px; background: rgba(255, 255, 255, 0.92); }
+.sg-emp-zap {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 34px;
+  height: 14px;
+  margin: -7px 0 0 -17px;
+  background: var(--sg-meet);
+  clip-path: polygon(0 50%, 30% 0, 45% 55%, 70% 0, 100% 50%, 70% 100%, 55% 45%, 30% 100%);
+  opacity: 0;
+  animation: sg-emp-zap 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s both;
+}
+@keyframes sg-emp-zap {
+  0% { opacity: 1; transform: translate(0, 0) rotate(var(--rot)) scale(0.4); }
+  70% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(1.2); }
+}
 .sg-emp-slice--dark { background: var(--sg-ink); }
 .sg-emp-strike {
   position: absolute;
@@ -173,9 +189,9 @@
 
 /* ---------- Taunt: someone's watching ---------- */
 .sg-taunt-peek { position: absolute; left: 22px; bottom: 100%; width: 96px; height: 50px; overflow: hidden; pointer-events: none; }
-.sg-taunt-peek__eyes { position: absolute; left: 0; bottom: -18px; animation: sg-taunt-peek 2.6s cubic-bezier(0.3, 0, 0.2, 1) 0.45s both; }
-.sg-taunt-peek__lids { transform-box: fill-box; transform-origin: 50% 50%; animation: sg-taunt-blink 2.6s linear 0.45s both; }
-.sg-taunt-peek__pupils { animation: sg-taunt-glance 1.3s ease-in-out 0.8s both; }
+.sg-taunt-peek__eyes { position: absolute; left: 0; bottom: -18px; animation: sg-taunt-peek 2.6s cubic-bezier(0.3, 0, 0.2, 1) 0.8s both; }
+.sg-taunt-peek__lids { transform-box: fill-box; transform-origin: 50% 50%; animation: sg-taunt-blink 2.6s linear 0.8s both; }
+.sg-taunt-peek__pupils { animation: sg-taunt-glance 1.3s ease-in-out 1.15s both; }
 
 @keyframes sg-taunt-peek {
   0% { transform: translateY(70px); }
@@ -193,11 +209,94 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sg-emp-tv, .sg-emp-slice, .sg-emp-strike, .sg-rx-emp__strike, .sg-rx--emp .sg-rx__main,
+  .sg-emp-tv, .sg-emp-slice, .sg-emp-strike, .sg-emp-zap, .sg-rx-emp__strike, .sg-rx--emp .sg-rx__main,
   .sg-fake.is-stamped, .sg-taunt-peek__pupils, .sg-taunt-peek__lids { animation: none !important; }
   .sg-emp-on > *, .sg-emp-on > .sg-emp-batt, .sg-fake__stamp, .sg-fake__line, .sg-fake__ink { animation: sg-fade 0.2s ease both !important; }
   .sg-fake__stamp { transform: translate(-50%, -50%) rotate(-11deg); }
   .sg-emp-batt__seg.is-next, .sg-emp-spark { animation: none !important; }
   .sg-fake.is-torn .sg-fake__half--l, .sg-fake.is-torn .sg-fake__half--r { animation: sg-fade 0.3s ease reverse both !important; }
   .sg-taunt-peek { display: none; }
+}
+
+/* ---------- Glitch: the shared "this phone is being messed with" effect (Glitch.js) ---------- */
+/* The game's screens are position: fixed. A filter on #root makes it their containing block for
+   a moment, so it has to fill the glass or the screens would collapse to nothing. */
+html.sg-glitching #root { min-height: 100vh; min-height: 100dvh; filter: url(#sg-glitch-filter); }
+.sg-glitch {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(16, 19, 23, 0.16) 0 2px, transparent 2px 5px);
+  animation: sg-glitch-scan var(--ms, 650ms) ease both;
+}
+@keyframes sg-glitch-scan { 0% { opacity: 0; } 12%, 70% { opacity: 1; } 100% { opacity: 0; } }
+
+/* ---------- Meeting called: alarm rings + who called it ---------- */
+.sg-rings { position: absolute; left: 50%; top: 50%; z-index: -1; pointer-events: none; }
+.sg-rings i { position: absolute; inset: 0; border-radius: 50%; border: 8px solid; opacity: 0; animation: sg-ring 1.1s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+.sg-callbadge {
+  position: absolute;
+  right: -6px;
+  top: -6px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--sg-ink);
+  color: var(--sg-meet);
+  font-weight: 900;
+  line-height: 1;
+  box-shadow: 0 0 0 3px var(--sg-meet);
+  animation: sg-badge 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes sg-ring {
+  0% { opacity: 0.9; transform: scale(0.25); }
+  100% { opacity: 0; transform: scale(2.6); }
+}
+@keyframes sg-badge {
+  0% { transform: scale(0) rotate(-30deg); }
+  35% { transform: scale(1.2) rotate(8deg); }
+  55% { transform: rotate(-12deg); }
+  75% { transform: rotate(8deg); }
+  100% { transform: none; }
+}
+
+/* ---------- Voted out: pow burst for an intruder, grey drift for a crewmate ---------- */
+.sg-burst { position: absolute; left: 50%; top: 50%; pointer-events: none; }
+.sg-burst i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 10px;
+  height: 50%;
+  margin-left: -5px;
+  border-radius: 6px;
+  transform-origin: 50% 0;
+}
+.sg-burst i { animation: sg-burst 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes sg-burst {
+  0% { opacity: 1; clip-path: inset(var(--from) 0 calc(100% - var(--from)) 0); }
+  55% { opacity: 1; clip-path: inset(var(--from) 0 0 0); }
+  100% { opacity: 1; clip-path: inset(100% 0 0 0); }
+}
+.sg-grey { filter: grayscale(1); transition: filter 0.6s ease 0.4s; }
+
+/* ---------- Meltdown: the heat bar and the radiation sign ---------- */
+.sg-heat { position: relative; width: 100%; height: 18px; border-radius: 999px; background: rgba(255, 255, 255, 0.12); overflow: hidden; }
+.sg-heat__fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 999px; background: var(--sg-hazard); transition: width 0.9s linear, background-color 0.4s; }
+.sg-heat.is-hot .sg-heat__fill { background: var(--sg-out); }
+.sg-heat__tick { position: absolute; top: 4px; bottom: 4px; width: 3px; margin-left: -1px; background: var(--sg-ink); opacity: 0.6; border-radius: 2px; }
+.sg-radspin { display: inline-grid; place-items: center; animation: sg-radspin 0.9s cubic-bezier(0.3, 1.3, 0.5, 1) 0.35s both; }
+@keyframes sg-radspin {
+  0% { transform: scale(3) rotate(-180deg); opacity: 0; }
+  60% { transform: scale(0.9) rotate(10deg); opacity: 1; }
+  100% { transform: none; opacity: 1; }
+}
+.sg-slab-in { animation: sg-slab-in 0.5s cubic-bezier(0.34, 1.4, 0.64, 1) 0.1s both; }
+@keyframes sg-slab-in { 0% { transform: scale(0.6) translateY(60px); opacity: 0; } 100% { transform: none; opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .sg-rings, .sg-burst { display: none; }
+  .sg-callbadge, .sg-radspin, .sg-slab-in { animation: sg-fade 0.2s ease both !important; }
+  .sg-heat__fill { transition: none; }
 }

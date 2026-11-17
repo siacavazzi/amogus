@@ -4,15 +4,34 @@ import HackedPage from '../pages/HackedPage';
 import { ReactorEmp } from '../pages/ReactorPage';
 import FakeTaskReveal from '../components/FakeTaskReveal';
 import { TauntToast } from '../signal/Moments';
+import MeetingWaitingPage from '../pages/MeetingWaitingPage';
+import MeetingDisplay from '../components/MeetingDisplay';
+import MeetingResultPage from '../pages/MeetingResultsPage';
+import MeltdownInfo from '../pages/MeltdownInfo';
+import ReactorMeltdown from '../pages/MeltdownPage';
+import { GlitchHost, glitch } from '../signal/Glitch';
 import '../signal/reactor.css';
 
 // Development only (/fx-preview?fx=emp): plays one game moment on a loop-free stage so it
 // can be watched or recorded without a live room. Nothing here talks to the server.
-const context = {
-  socket: { emit: () => {}, on: () => {}, off: () => {} },
+const noop = () => {};
+const players = ['Sam', 'Alex', 'Jules', 'Morgan', 'Riley', 'Casey'].map((username, i) => ({
+  player_id: `p${i}`, username, pic: i + 1, alive: true, active: true, sus: i === 1, ready: i > 3,
+}));
+const baseContext = {
+  socket: { emit: noop, on: noop, off: noop },
   roomCode: 'LUNA',
   running: true,
-  players: [],
+  connected: true,
+  players,
+  playerState: players[0],
+  roundId: 'r1',
+  setMeetingState: noop,
+  setVotes: noop,
+  setVetoVotes: noop,
+  setCodesNeeded: noop,
+  codesNeeded: 2,
+  meltdownCode: '4821',
 };
 
 function TaskBackdrop() {
@@ -61,12 +80,36 @@ export default function FxPreview() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [on, fx, left]);
 
-  const laptop = fx === 'emp-laptop';
+  useEffect(() => {
+    if (!on || !fx.startsWith('melt') || left <= 0) return undefined;
+    const timer = setTimeout(() => setLeft((s) => s - 1), Number(params.get('tick')) || 1000);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [on, fx, left]);
+
+  useEffect(() => {
+    if (on && fx.startsWith('glitch')) glitch({ strength: fx === 'glitch-heavy' ? 'heavy' : 'light' });
+  }, [on, fx]);
+
+  const laptop = fx.endsWith('-laptop');
+  const meeting = { stage: 'waiting', player_who_started_it: 'Alex', id: 'm1' };
+  const caught = params.get('who') === 'crew' ? 'p3' : 'p1';
+  const context = {
+    ...baseContext,
+    meetingState: fx.startsWith('vote') ? { stage: 'over', voted_out: caught, intruders_left: 0, id: 'm1' } : meeting,
+    meltdownTimer: left,
+  };
   return (
     <DataContext.Provider value={context}>
+      <GlitchHost />
       {laptop ? <ReactorBackdrop /> : <TaskBackdrop />}
+      {on && fx === 'meeting' && <MeetingWaitingPage />}
+      {on && fx === 'meeting-laptop' && <MeetingDisplay stage="waiting" callerName="Alex" meeting={meeting} players={players} />}
+      {on && fx === 'vote' && <MeetingResultPage />}
+      {on && fx === 'melt' && left > 0 && <MeltdownInfo />}
+      {on && fx === 'melt-laptop' && left > 0 && <ReactorMeltdown />}
       {on && fx === 'emp' && left > 0 && <HackedPage hackTime={left} />}
-      {on && laptop && left > 0 && <ReactorEmp hackTime={left} roomCode="LUNA" leave={null} />}
+      {on && fx === 'emp-laptop' && left > 0 && <ReactorEmp hackTime={left} roomCode="LUNA" leave={null} />}
       {on && fx === 'fake' && <FakeTaskReveal task="Stack three mugs into a tower" location="Kitchen" onComplete={() => setOn(false)} />}
       {on && fx === 'taunt' && <TauntToast message="I saw you skip that task 👀" onClose={() => setOn(false)} />}
     </DataContext.Provider>

@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { DataContext } from '../GameContext';
 import { Face, Letters, vibrate } from './index';
+import { glitch } from './Glitch';
 import { listCardNames } from '../utils/cardCopy';
 import { t } from '../i18n';
 
@@ -160,6 +161,10 @@ function PeekingEyes() {
 // A taunt drops in from the top and nudges the phone, a pair of eyes peeks over it, and the
 // message types itself out. The screen behind stays as it was.
 export function TauntToast({ message, onClose }) {
+  // The phone glitches first, as if someone just got into it, then the message drops in.
+  useEffect(() => {
+    glitch();
+  }, []);
   useEffect(() => {
     vibrate(60);
     const timer = setTimeout(onClose, 6000);
@@ -174,6 +179,7 @@ export function TauntToast({ message, onClose }) {
       onClick={onClose}
       className="sg sg-a sg-drop"
       style={{
+        animationDelay: '360ms',
         position: 'fixed',
         left: 14,
         right: 14,
@@ -189,10 +195,10 @@ export function TauntToast({ message, onClose }) {
       }}
     >
       <PeekingEyes />
-      <span className="sg-nudge" style={{ display: 'block', animationDelay: '420ms' }}>
+      <span className="sg-nudge" style={{ display: 'block', animationDelay: '780ms' }}>
         <b id="modal-title" style={{ display: 'block', fontSize: 13, opacity: 0.6, fontWeight: 700 }}>{t('Anonymous message')}</b>
         <span style={{ display: 'block', fontWeight: 900, fontSize: 21, lineHeight: 1.15, marginTop: 4 }}>
-          <Letters text={text} delay={520} step={step} />
+          <Letters text={text} delay={880} step={step} />
         </span>
         <span style={{ display: 'block', fontSize: 12, opacity: 0.5, fontWeight: 700, marginTop: 8 }}>{t('Tap to dismiss')}</span>
       </span>

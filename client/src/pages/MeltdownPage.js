@@ -4,6 +4,8 @@ import { AlertTriangle, Check, Radiation } from "../signal/icons";
 import { markMeltdownAverted } from "../components/MeltdownAverted";
 import "../signal/reactor.css";
 import { t, tn } from '../i18n';
+import { HeatBar } from "../signal/Burst";
+import { useCountdownProgress } from "../signal/Emp";
 
 function ReactorMeltdown() {
     const {
@@ -23,6 +25,7 @@ function ReactorMeltdown() {
     const [totalCodesNeeded, setTotalCodesNeeded] = useState(null); // Track initial codes for progress
 
     const inputRefs = useRef([]);
+    const heat = useCountdownProgress(meltdownTimer);
 
     // Keep track of previous codesNeeded to detect changes
     const prevCodesNeededRef = useRef(codesNeeded);
@@ -193,10 +196,10 @@ function ReactorMeltdown() {
             {/* Hazard stripes fill the room's screen: the one thing that moves */}
             <div className="sg-hazard" />
 
-            <div className="sg-rx__main">
+            <div className="sg-rx__main sg-slab-in">
                 <div className={`sg-rx__slab${slabTone}`}>
                     <p className="sg-rx__alert">
-                        <Radiation size={24} />
+                        <span className="sg-radspin"><Radiation size={24} /></span>
                         <span>{t('MELTDOWN IN PROGRESS')}</span>
                     </p>
 
@@ -208,6 +211,7 @@ function ReactorMeltdown() {
                             {meltdownTimer}<small>s</small>
                         </span>
                     </p>
+                    <HeatBar progress={heat} style={{ maxWidth: 640, height: 22 }} />
                     {hot ? (
                         <p className="sg-rx__msg">
                             <AlertTriangle size={30} />
