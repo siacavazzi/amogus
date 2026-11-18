@@ -355,6 +355,15 @@ describe('CrewPage', () => {
             await waitFor(() => expect(contextValue.setAudio).toHaveBeenCalledWith('complete_task'));
         });
 
+        it('reminds the player to tap a task when they slide with none picked', () => {
+            renderWithContext(<CrewmemberPage setShowSusPage={mockSetShowSusPage} />, handContext());
+
+            fireEvent.pointerDown(screen.getByTestId('slider-trigger'));
+
+            expect(screen.getByRole('status')).toHaveTextContent('Tap the task you are doing first, then slide.');
+            expect(screen.getByTestId('task-hand')).toHaveClass('is-nudged');
+        });
+
         it('lets go of a task tapped twice', () => {
             const { contextValue } = renderWithContext(<CrewmemberPage setShowSusPage={mockSetShowSusPage} />, handContext());
             fireEvent.click(screen.getByText('Fold towels'));

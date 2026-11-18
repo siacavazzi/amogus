@@ -446,6 +446,7 @@
 .sg-tcard { position: relative; display: flex; align-items: center; gap: 8px; min-height: 84px; box-sizing: border-box;
   padding: 12px 14px 12px 16px; border-radius: 20px; background: #fff; color: var(--sg-ink); overflow: hidden;
   transition: background-color .25s, color .25s, outline-color .2s; outline: 0 solid transparent; outline-offset: 3px; }
+.sg-hand.is-nudged .sg-tcard:not(.is-locked):not(.is-empty) { animation: sg-nudge 0.5s ease; outline: 4px solid var(--sg-meet); }
 .sg-tcard.is-picked { outline: 4px solid var(--sg-meet); }
 .sg-tcard.is-locked { background: rgba(255, 255, 255, 0.28); color: #fff; }
 .sg-tcard.is-empty { justify-content: center; text-align: center; background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.8);
@@ -474,6 +475,7 @@
 .sg-pri { position: relative; overflow: hidden; isolation: isolate; border-radius: 22px; padding: 14px 16px; background: var(--sg-meet);
   color: var(--sg-ink); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); outline: 0 solid transparent; outline-offset: 3px;
   animation: sg-pri-in 520ms cubic-bezier(.2, 1.4, .4, 1) both; }
+.sg-hand.is-nudged .sg-pri { animation: sg-nudge 0.5s ease; outline: 4px solid #fff; }
 .sg-pri.is-picked { outline: 4px solid #fff; }
 .sg-pri::after { content: ""; position: absolute; inset: -20%; pointer-events: none; z-index: 2; transform: translateX(-120%);
   background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, 0.65) 50%, transparent 62%);
@@ -504,6 +506,6 @@
   font-weight: 800; font-size: 15px; text-align: center; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35); }
 @media (prefers-reduced-motion: reduce) {
   .sg-rh__fill, .sg-rh__fill::after, .sg-rh__pill, .sg-hand__swaps, .sg-tcard, .sg-tcard__tag, .sg-tcard__swap, .sg-tcard__arm,
-  .sg-pri, .sg-pri::after, .sg-hand.is-stolen .sg-tcard, .sg-hand.is-stolen .sg-tcard__text, .sg-screen.is-glitching, .sg-slide-meter {
+  .sg-pri, .sg-pri::after, .sg-hand.is-stolen .sg-tcard, .sg-hand.is-nudged .sg-tcard, .sg-hand.is-stolen .sg-tcard__text, .sg-screen.is-glitching, .sg-slide-meter {
     animation: none !important; transition: none !important; }
 }

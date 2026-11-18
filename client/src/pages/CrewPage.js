@@ -333,6 +333,7 @@ const CrewmemberPage = ({
   const [toast, setToast] = useState(null);
   const [armedId, setArmedId] = useState(null);
   const [swapping, setSwapping] = useState(false);
+  const [nudge, setNudge] = useState(false);
   const armTimer = useRef(null);
   const [intruderDone, bumpIntruderDone] = useIntruderCount(roundId, sus && !tutorialMode);
   const { open: openCardSheet, sheet } = useCardSheets(game);
@@ -498,7 +499,7 @@ const CrewmemberPage = ({
   const currentId = (picked || [...(view.priority ? [view.priority] : []), ...view.hand].find((item) => !isLocked(item)))?.assignment_id;
 
   const renderCrewHand = () => (
-    <div className={`sg-hand ${stealing ? 'is-stolen' : ''}`} data-testid="task-hand">
+    <div className={`sg-hand ${stealing ? 'is-stolen' : ''} ${nudge ? 'is-nudged' : ''}`} data-testid="task-hand">
       <div className="sg-hand__head">
         <h2>{t('Your tasks')}</h2>
         {swaps > 0 && (
@@ -569,6 +570,14 @@ const CrewmemberPage = ({
     );
   };
 
+  // Swiping before picking a task used to just do nothing. Now the cards shake and a hint says why.
+  const nudgeToPick = () => {
+    if (sus || picked || !allTasks.length || taskCompletionPending || tasksComplete) return;
+    setNudge(true);
+    setTimeout(() => setNudge(false), 600);
+    setToast(t('Tap the task you are doing first, then slide.'));
+  };
+
   const crewSliderText = () => {
     if (taskCompletionPending) return t('Confirming task…');
     if (!allTasks.length) return t('No task assigned');
@@ -636,6 +645,8 @@ const CrewmemberPage = ({
       {showSlider && (
         <div className="fixed bottom-0 left-0 right-0 z-20">
           <div
+            data-testid="slider-area"
+            onPointerDownCapture={nudgeToPick}
             className={`max-w-xl mx-auto ${highlightSlider ? 'animate-pulse' : ''}`}
             style={highlightSlider ? { borderRadius: 999, outline: '4px solid #fff', outlineOffset: -8 } : {}}
           >
