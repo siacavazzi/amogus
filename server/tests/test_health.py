@@ -32,3 +32,32 @@ class HealthTests(SocketGameTestCase):
         room = self.create_open_room(client, config={'num_intruders': 1})
         self.join_player(client, room, 'Bot')
         self.assertEqual(0, self.health()['rooms_in_use'])
+
+    def test_finished_round_on_win_screen_does_not_count(self):
+        # Prod 2026-11-13: a group sat on the win screen with phones still connected and held a
+        # promote for 20 minutes, because game_running stays on until Play Again.
+        clients, room, ids, game = self.setup_started_game(4, config={'num_intruders': 1})
+        for crewmate in self.crew(game)[:2]:
+            game.kill_player(crewmate.player_id)
+        self.assertEqual('sus_victory', game.end_state)
+        self.assertTrue(game.game_running)
+        body = self.health()
+        self.assertEqual((1, 0), (body['rooms_in_use'], body['rounds_running']))
+        self.assertEqual([], body['live_rounds'])
+
+    def test_live_round_says_what_it_is_doing(self):
+        clients, room, ids, game = self.setup_started_game(5, config={'num_intruders': 1})
+        [live] = self.health()['live_rounds']
+        self.assertEqual('tasks', live['state'])
+        self.assertEqual(5, live['players_connected'])
+        self.assertNotIn(room, str(self.health()))
+
+    def test_meeting_and_vote_still_count(self):
+        clients, room, ids, game = self.setup_started_game(5, config={'num_intruders': 1})
+        caller = self.crew(game)[0]
+        self.client_for_player(clients, ids, caller).emit('meeting', {'player_id': caller.player_id})
+        self.drain_all(clients)
+        self.assertTrue(game.meeting)
+        body = self.health()
+        self.assertEqual(1, body['rounds_running'])
+        self.assertEqual('meeting', body['live_rounds'][0]['state'])
