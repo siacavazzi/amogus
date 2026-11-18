@@ -936,6 +936,15 @@ function PreGamePage() {
                                         {serverLobbyState.auto_intruders ? t(' (Auto: 1 per 5 players)') : ''}
                                     </p>
                                 )}
+                                {isHost && !canStartTestGame && serverLobbyState?.roles_next?.length > 0 && (
+                                    <p className="hs-hint" data-testid="lobby-roles-next">
+                                        {serverLobbyState.roles_next.length > 1
+                                            ? t('Plus a secret Hacker and a secret Detective')
+                                            : serverLobbyState.roles_next[0] === 'hacker'
+                                                ? t('Plus a secret Hacker')
+                                                : t('Plus a secret Detective')}
+                                    </p>
+                                )}
                                 {canStartTestGame && (
                                     <p className="hs-hint">
                                         {tn(players.length, 'Only {count} player so far. Starting now runs a test game.', 'Only {count} players so far. Starting now runs a test game.')}

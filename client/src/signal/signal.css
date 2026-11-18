@@ -507,3 +507,37 @@
   .sg-pri, .sg-pri::after, .sg-hand.is-stolen .sg-tcard, .sg-hand.is-stolen .sg-tcard__text, .sg-screen.is-glitching, .sg-slide-meter {
     animation: none !important; transition: none !important; }
 }
+
+/* Secret roles (components/RolePanels.js) */
+.sg-rh__pill b + b { font-size: 14px; }
+.sg-role-bar { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.sg-role-btn { appearance: none; border: 2px solid rgba(255, 255, 255, 0.6); background: rgba(0, 0, 0, 0.2); color: #fff;
+  font: inherit; font-weight: 900; font-size: 15px; padding: 10px 16px; border-radius: 16px; display: inline-flex; align-items: center;
+  gap: 8px; cursor: pointer; min-height: 44px; }
+.sg-role-btn.is-ready { background: #fff; color: var(--sg-deep); border-color: #fff; animation: sg-pop 0.42s cubic-bezier(.2, 1.5, .4, 1) both; }
+.sg-role-btn:disabled { opacity: 0.6; cursor: default; }
+.sg-role-btn--ink { border-color: rgba(26, 20, 0, 0.5); background: rgba(26, 20, 0, 0.08); color: var(--sg-ink); }
+.sg-pick-list { display: grid; gap: 8px; }
+.sg-pick { appearance: none; border: 2px solid rgba(0, 0, 0, 0.12); background: #fff; color: var(--sg-ink); font: inherit; font-weight: 800;
+  font-size: 17px; padding: 12px 14px; border-radius: 16px; display: flex; align-items: center; gap: 12px; text-align: left; cursor: pointer; }
+.sg-pick.is-on { border-color: var(--sg-deep); outline: 3px solid var(--sg-deep); }
+.sg-pick small { display: block; font-size: 13px; font-weight: 700; opacity: 0.7; }
+.sg-verdict { border-radius: 20px; padding: 18px; text-align: center; font-weight: 900; }
+.sg-verdict b { display: block; font-size: 30px; line-height: 1.1; margin-top: 4px; }
+.sg-verdict--intruder { background: var(--sg-out); color: #fff; }
+.sg-verdict--hacker { background: #3a0d12; color: #fff; }
+.sg-verdict--not_intruder { background: var(--sg-ok); color: #0b3d22; }
+.sg-history { display: grid; gap: 12px; }
+.sg-history h4 { margin: 0 0 4px; font-size: 15px; font-weight: 900; }
+.sg-history li { font-size: 15px; font-weight: 700; line-height: 1.35; }
+.sg-trail { display: grid; gap: 4px; justify-items: center; font-weight: 800; }
+.sg-trail small { font-size: 12px; letter-spacing: 0.08em; opacity: 0.75; }
+.sg-hacker-cards .sg-tcard { background: #2a0a10; color: #fff; }
+.sg-hacker-cards .sg-tcard.is-empty { background: rgba(255, 255, 255, 0.08); }
+.sg-hacker-glitch { position: fixed; inset: 0; z-index: 80; pointer-events: none; mix-blend-mode: hard-light;
+  background: repeating-linear-gradient(0deg, rgba(224, 38, 58, 0.85) 0 3px, rgba(30, 0, 6, 0.75) 3px 6px),
+    radial-gradient(circle at 30% 40%, rgba(255, 80, 90, 0.7), transparent 60%);
+  animation: sg-static 120ms steps(2) infinite, sg-static-out 3s linear both; }
+@keyframes sg-static { 0% { transform: translateY(0); filter: contrast(1.4); } 50% { transform: translateY(-3px) skewX(3deg); filter: contrast(2) hue-rotate(-15deg); } 100% { transform: translateY(2px); } }
+@keyframes sg-static-out { 0%, 90% { opacity: 1; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .sg-hacker-glitch { animation: sg-static-out 3s linear both; } }

@@ -55,6 +55,11 @@ export const SERVER_MESSAGES = [
     tk('Username is required'),
     tk('You do not own this task list. Use "Save As New" to create your own copy.'),
     tk('You join at the start of the next round.'),
+    tk('The Hacker started a meltdown.'),
+    tk('No card to pick right now.'),
+    tk('No check to use right now.'),
+    tk('Your check opens when the meeting ends.'),
+    tk('Invalid taunt - choose a player who is still in and enter a message'),
     tk('Your previous session is no longer available. Ask the host for a new invite.'),
 ];
 
@@ -64,6 +69,17 @@ export const SERVER_TEMPLATES = [
     tk('Add {missing} more tasks to start. {players} players need {needed}; the room has {have}.'),
     tk('Add {missing} more task to start. {players} players need {needed}; the room has {have}.'),
     tk('Task list not found: {code}'),
+    // The Hacker and the Detective (server/assets/roles.py, card.py, app.py)
+    tk('{name} is on your side.'),
+    tk('{name} is the Hacker.'),
+    tk('The Hacker sent {name} to {location}.'),
+    tk('The Hacker sent {name} a fake task.'),
+    tk('The Hacker sent {name} a taunt.'),
+    tk('The Hacker locked {location} for {seconds} seconds.'),
+    tk('The Hacker set off an EMP for {seconds} seconds.'),
+    tk('The Hacker shortened the next meltdown by {seconds} seconds.'),
+    tk('The Hacker played {card}.'),
+    tk('Your next card is ready in {seconds} s.'),
 ];
 
 registerTemplates(SERVER_TEMPLATES);

@@ -74,7 +74,9 @@ export function useCardSheets(game) {
   const [text, setText] = useState('');
   const [area, setArea] = useState('');
 
-  const crewmates = players.filter((p) => p.alive && !p.sus && !p.waiting);
+  // The Hacker can't tell sides apart, so their list is everyone else who is still in.
+  const me = localStorage.getItem('player_id');
+  const crewmates = players.filter((p) => p.alive && !p.sus && !p.waiting && p.player_id !== me);
   const areas = taskLocations.length > 0 ? taskLocations : ['Other'];
   const rallyAreas = areas.filter((loc) => loc && loc !== 'Other');
 

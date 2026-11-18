@@ -5,6 +5,7 @@ import { Check } from '../signal/icons';
 import { Face, Words } from '../signal';
 import '../signal/reactor.css';
 import { readyNeeded } from '../utils/meetingQuorum';
+import { HackerTrail } from './RolePanels';
 import { t, tk } from '../i18n';
 
 // The reactor's meeting screen: the same yellow flood the phones get, with the roll call big
@@ -44,6 +45,8 @@ const MeetingDisplay = ({ message = tk('Meeting called'), stage = 'waiting', cal
               </p>
             </div>
           </div>
+
+          <HackerTrail trail={meeting?.hacker_trail} big />
 
           {alive.length > 0 && (
             <div className={`sg-rx__roll${crowd} sg-a sg-fade`} data-testid="reactor-roll" style={{ marginTop: 'clamp(6px, 2vh, 22px)', animationDelay: '1000ms' }}>

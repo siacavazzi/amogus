@@ -161,6 +161,7 @@ function GameConfigPage() {
         task_ratio: 'auto',
         card_deck_preset: 'default',
         card_deck_counts: DEFAULT_CARD_DECK_COUNTS,
+        roles: 'off',
     });
     
     const [showAdvanced, setShowAdvanced] = useState(false);
@@ -786,6 +787,28 @@ function GameConfigPage() {
                         ? t('The game picks 1 intruder per 5 players when you start: {summary}.', { summary: t(AUTO_INTRUDERS_SUMMARY) })
                         : t('Best for {min} to {max} players. Needs at least {needed} players to start.', { min: playersForIntruders(config.num_intruders)[0], max: playersForIntruders(config.num_intruders)[1], needed: config.num_intruders * 2 + 1 })}
                 </p>
+            </div>
+
+            {/* Secret roles: the Hacker and the Detective (server/assets/roles.py) */}
+            <div className="hs-panel">
+                <h2 className="hs-title">{t('Secret Roles')}</h2>
+                <div className="hs-presets" role="group" aria-label={t('Secret Roles')} data-testid="roles-setting">
+                    {[
+                        { value: 'off', label: t('Off'), description: t('Just crew and intruders.') },
+                        { value: 'auto', label: t('Hacker and Detective'), description: t('A secret Hacker joins the intruders at 6 to 9 players, a secret Detective joins the crew at 10 to 14, both from 15.') },
+                    ].map((option) => (
+                        <button
+                            key={option.value}
+                            type="button"
+                            onClick={() => updateConfig('roles', option.value)}
+                            aria-pressed={(config.roles || 'off') === option.value}
+                            className="hs-preset"
+                        >
+                            <b>{option.label}</b>
+                            <span>{option.description}</span>
+                        </button>
+                    ))}
+                </div>
             </div>
 
             {/* Advanced Settings (collapsed by default) */}

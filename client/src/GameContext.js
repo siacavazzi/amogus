@@ -97,6 +97,14 @@ export default function GameContext({ children }) {
     const [handState, setHandState] = useState(null);
     // Intruders still among the living; null once someone joined mid-round (shown as "?")
     const [intrudersLeft, setIntrudersLeft] = useState(null);
+    // Secret roles (server/assets/roles.py): what's in play this round, Hackers still in, the
+    // Detective's own checks and vote history, and the Hacker's meltdown code.
+    const [amongYou, setAmongYou] = useState(null);
+    const [hackersLeft, setHackersLeft] = useState(null);
+    const [detectiveState, setDetectiveState] = useState(null);
+    const [hackerCode, setHackerCode] = useState(undefined);
+    const [hackerGlitchAt, setHackerGlitchAt] = useState(0);
+    const [corruptedAt, setCorruptedAt] = useState(0);
     // Bumped when an intruder steals this phone's tasks, so the screen can glitch
     const [tasksStolenAt, setTasksStolenAt] = useState(0);
     const [tasksReshuffledAt, setTasksReshuffledAt] = useState(0);
@@ -347,6 +355,10 @@ export default function GameContext({ children }) {
         setTask(snapshot.task || undefined);
         setHandState(snapshot.hand || null);
         setIntrudersLeft(snapshot.intruders_left ?? null);
+        setHackersLeft(snapshot.hackers_left ?? null);
+        setAmongYou(snapshot.among_you || null);
+        setDetectiveState(snapshot.detective || null);
+        setHackerCode(snapshot.hacker_code || undefined);
         setCrewScore(snapshot.crew_score ?? 0);
         setTaskGoal(snapshot.task_goal ?? 1);
         setMeetingState(snapshot.meeting || undefined);
@@ -922,6 +934,7 @@ export default function GameContext({ children }) {
             setCodesNeeded(undefined);
             setMeltdownTimer(undefined);
             setMeltdownCode(undefined);
+            setHackerCode(undefined);
             isMobile && setDialog({ title: t("Meltdown averted"), body: t("The reactor is safe. Back to your tasks.") });
         });
 
@@ -955,6 +968,10 @@ export default function GameContext({ children }) {
             setIntrudersRevealed(null);
             setTestMode(false);
             setLastStand(false);
+            setAmongYou(null);
+            setHackersLeft(null);
+            setDetectiveState(null);
+            setHackerCode(undefined);
             // Anyone who waited out the round is in the lobby now, with everyone else.
             setWaitingForNextRound(false);
             setWaitingPlayers([]);
@@ -995,6 +1012,29 @@ export default function GameContext({ children }) {
 
         socketRef.current.on('meltdown_code', (data) => {
             setMeltdownCode(data)
+        });
+
+        // The Hacker's second, look-alike meltdown code.
+        socketRef.current.on('hacker_code', (data) => {
+            setHackerCode(data || undefined);
+        });
+
+        // Someone typed a hacker code at the reactor.
+        socketRef.current.on('code_corrupted', (data) => {
+            if (data && !acceptRoomData(data)) return;
+            setCorruptedAt(Date.now());
+            if (data?.codes_left !== undefined) setCodesNeeded(Math.max(0, data.codes_left));
+            if (data?.time_left !== undefined) setMeltdownTimer(data.time_left);
+        });
+
+        // The Hacker just played a card: their own phone flashes red static (the tell).
+        socketRef.current.on('hacker_glitch', () => {
+            setHackerGlitchAt(Date.now());
+        });
+
+        socketRef.current.on('detective_state', (data) => {
+            if (!acceptRoomData(data)) return;
+            setDetectiveState({ check_ready: !!data.check_ready, checks: data.checks || [], vote_history: data.vote_history || [] });
         });
 
         socketRef.current.on('meltdown_update', (data) => {
@@ -1181,6 +1221,8 @@ export default function GameContext({ children }) {
             }
             let me;
             if (data.intruders_left !== undefined) setIntrudersLeft(data.intruders_left);
+            if (data.hackers_left !== undefined) setHackersLeft(data.hackers_left);
+            if (data.among_you !== undefined) setAmongYou(data.among_you);
             if (data.action === "player_list" || data.action === "start_game" || data.action === "rejoin") {
                 if (Array.isArray(data.list)) {
                     // Safely parse each player from a JSON string to an object
@@ -1225,7 +1267,8 @@ export default function GameContext({ children }) {
                     setTaskCreationMode(false);  // Exit task creation mode
                     
                     isMobile && setDialog({ title: data.late_join ? t("You're in this round") : t("The game has started"),
-                        kind: 'role', sus: !!me.sus, otherIntruders, cards: parseCards(me.cards) });
+                        kind: 'role', sus: !!me.sus, role: me.role, otherIntruders, cards: parseCards(me.cards),
+                        amongYou: data.among_you || null });
 
                 } else if (data.action === "start_game") {
                     setRunning(true);
@@ -1253,6 +1296,23 @@ export default function GameContext({ children }) {
         });
     }
 
+
+    // The Detective checks one living player. Resolves to { result, name } or null.
+    const detectiveCheck = useCallback((targetId) => new Promise((resolve) => {
+        sendAsPlayer('detective_check', {
+            player_id: playerState?.player_id || localStorage.getItem('player_id'),
+            round_id: roundId,
+            target_id: targetId,
+        }, (response) => resolve(response?.ok ? response : null));
+    }), [playerState, roundId, sendAsPlayer]);
+
+    // The Hacker keeps one of the two cards they were offered.
+    const pickCard = useCallback((cardId) => new Promise((resolve) => {
+        sendAsPlayer('pick_card', {
+            player_id: playerState?.player_id || localStorage.getItem('player_id'),
+            card_id: cardId,
+        }, (response) => resolve(response?.ok === true));
+    }), [playerState, sendAsPlayer]);
 
     const switchTestRole = useCallback(() => {
         const socket = socketRef.current;
@@ -1286,6 +1346,14 @@ export default function GameContext({ children }) {
         swapTask,
         selectTask,
         intrudersLeft,
+        hackersLeft,
+        amongYou,
+        detectiveState,
+        detectiveCheck,
+        pickCard,
+        hackerCode,
+        hackerGlitchAt,
+        corruptedAt,
         tasksStolenAt,
         tasksReshuffledAt,
         crewScore,
@@ -1384,6 +1452,14 @@ export default function GameContext({ children }) {
         swapTask,
         selectTask,
         intrudersLeft,
+        hackersLeft,
+        amongYou,
+        detectiveState,
+        detectiveCheck,
+        pickCard,
+        hackerCode,
+        hackerGlitchAt,
+        corruptedAt,
         tasksStolenAt,
         tasksReshuffledAt,
         crewScore,

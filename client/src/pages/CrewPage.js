@@ -11,6 +11,8 @@ import { useCardSheets, needsSheet } from "../components/CardSheets";
 import { MapPin, Repeat, StarFilled, Lock } from "../signal/icons";
 import { rememberOrigin } from "../signal";
 import { cardCopy, parseCards } from "../utils/cardCopy";
+import { HackerGlitch, CardOfferSheet, DetectiveBar, useHackerWait } from "../components/RolePanels";
+import { roleName } from "../utils/roles";
 import { t, tn } from '../i18n';
 
 // Crewmates and intruders share this deep blue screen and it looks the same for both: a hand of
@@ -119,7 +121,7 @@ function Face({ playerState, selfieAccess }) {
 }
 
 // The top of the round screen: the crew's bar, then room code, intruders left and your photo.
-function RoundHeader({ crewScore, taskGoal, tasksDone, roomCode, intrudersLeft, playerState, selfieAccess, tutorialMode }) {
+function RoundHeader({ crewScore, taskGoal, tasksDone, roomCode, intrudersLeft, hackersLeft, playerState, selfieAccess, tutorialMode }) {
   const goal = Math.max(taskGoal || 0, 1);
   const percent = Math.max(0, Math.min(100, Math.round((crewScore / goal) * 100))) || 0;
   const known = Number.isFinite(intrudersLeft);
@@ -154,6 +156,9 @@ function RoundHeader({ crewScore, taskGoal, tasksDone, roomCode, intrudersLeft, 
               ? tn(intrudersLeft, '{count} intruder', '{count} intruders')
               : t('? intruders')}
           </b>
+          {Number.isFinite(hackersLeft) && (
+            <b className="sg-num" data-testid="hackers-left">{tn(hackersLeft, '+ {count} hacker', '+ {count} hackers')}</b>
+          )}
           <small>{t('STILL AMONG YOU')}</small>
         </span>
         <Face playerState={playerState} selfieAccess={selfieAccess} />
@@ -309,6 +314,8 @@ const CrewmemberPage = ({
     deniedLocation,
     meetingState,
     intrudersLeft,
+    hackersLeft,
+    hackerGlitchAt = 0,
     selfieAccess,
     swapTask,
     selectTask,
@@ -317,6 +324,9 @@ const CrewmemberPage = ({
   } = game;
 
   const sus = !!playerState?.sus;
+  // The Hacker plays like a crewmate (tasks, slider, meetings) and also holds cards.
+  const isHacker = playerState?.role === 'hacker';
+  const hackerWait = useHackerWait(isHacker ? hackerGlitchAt : 0);
   // Once tasks hit 100% everyone knows who the intruders are.
   const tasksComplete = !!intrudersRevealed;
   // Last stand (3-player rounds at 1v1): both players know who's who, so meetings are off.
@@ -476,6 +486,10 @@ const CrewmemberPage = ({
   // Intruder cards: tap, a bar fills for 2 s, then it plays. Cards that need a choice open a sheet.
   const tapCard = (card) => {
     clearTimeout(armTimer.current);
+    if (isHacker && hackerWait > 0 && armedId !== card.id) {
+      setToast(t('Your next card is ready in {seconds} s.', { seconds: hackerWait }));
+      return;
+    }
     if (armedId === card.id) {
       setArmedId(null);
       return;
@@ -538,6 +552,26 @@ const CrewmemberPage = ({
     </div>
   );
 
+  // The Hacker's cards sit under their tasks. A card arrives every 2 finished tasks.
+  const renderHackerCards = () => {
+    const cards = parseCards(playerState?.cards);
+    const empty = Math.max(0, HAND_SIZE - cards.length);
+    return (
+      <div className="sg-hand sg-hacker-cards" data-testid="hacker-cards" style={{ marginTop: 18 }}>
+        <div className="sg-hand__head">
+          <h2>{t('Hacker cards')}</h2>
+          {hackerWait > 0 && <span className="sg-hand__swaps" style={{ background: 'rgba(255,255,255,0.2)', color: '#fff' }}>{t('Next in {seconds} s', { seconds: hackerWait })}</span>}
+        </div>
+        {cards.map((card) => (
+          <IntruderCard key={card.id} card={card} armed={armedId === card.id} onTap={() => tapCard(card)} />
+        ))}
+        {Array.from({ length: empty }, (_, index) => (
+          <div key={`empty-${index}`} className="sg-tcard is-empty">{t('Every 2 tasks earns a card')}</div>
+        ))}
+      </div>
+    );
+  };
+
   // An intruder's hand looks like a crewmate's: cards as tasks, then stolen tasks, then empty slots.
   const renderIntruderHand = () => {
     const cards = parseCards(playerState?.cards);
@@ -580,12 +614,15 @@ const CrewmemberPage = ({
   return (
     <div className={`sg-screen sg-round sg-deep ${stealing ? 'is-glitching' : ''}`} style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)', paddingBottom: 130, gap: 14 }}>
       {sheet}
+      {isHacker && <HackerGlitch at={hackerGlitchAt} />}
+      {isHacker && !tutorialMode && <CardOfferSheet />}
       <RoundHeader
         crewScore={crewScore}
         taskGoal={taskGoal}
         tasksDone={sus ? intruderDone : tasksDone}
         roomCode={roomCode}
         intrudersLeft={intrudersLeft}
+        hackersLeft={hackersLeft}
         playerState={playerState}
         selfieAccess={selfieAccess}
         tutorialMode={tutorialMode}
@@ -606,13 +643,14 @@ const CrewmemberPage = ({
           </p>
         )}
         <TestModeBar />
+        {!tutorialMode && <DetectiveBar />}
       </div>
 
       <div className="w-full max-w-xl mx-auto">
         {peekRole ? (
           <div className="sg-a sg-pop" style={{ background: '#fff', color: 'var(--sg-deep)', borderRadius: 24, padding: '34px 22px', textAlign: 'center' }}>
             <p className="sg-small" style={{ opacity: 0.6 }}>{t('Your role')}</p>
-            <p className="sg-big sg-h2" style={{ marginTop: 8 }}>{t('Crewmate')}</p>
+            <p className="sg-big sg-h2" style={{ marginTop: 8 }}>{roleName(playerState?.role, false)}</p>
             <p className="sg-small" style={{ marginTop: 12, opacity: 0.6 }}>{t('Let go to hide it')}</p>
           </div>
         ) : tasksComplete && !sus ? (
@@ -629,8 +667,14 @@ const CrewmemberPage = ({
               </div>
             )}
             <p className="sg-lede" style={{ marginTop: 18, opacity: 0.85 }}>{t('Call a meeting and vote them out.')}</p>
+            {isHacker && renderHackerCards()}
           </div>
-        ) : sus ? renderIntruderHand() : renderCrewHand()}
+        ) : sus ? renderIntruderHand() : (
+          <>
+            {renderCrewHand()}
+            {isHacker && renderHackerCards()}
+          </>
+        )}
       </div>
 
       {showSlider && (
