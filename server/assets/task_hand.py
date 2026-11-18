@@ -214,7 +214,9 @@ def eligible_crew(game):
 def pick_fake_task_target(game, location):
     """The crewmate most due a Priority task: none showing, longest since their last one, and
     not already in that area (going by where they last finished a task)."""
-    candidates = [player for player in eligible_crew(game) if not player.priority]
+    # Never the Hacker: they are on the intruders' side, and the sender would learn it for free.
+    candidates = [player for player in eligible_crew(game)
+                  if not player.priority and not getattr(player, 'is_hacker', False)]
     if not candidates:
         return None
     wanted = (location or '').lower()

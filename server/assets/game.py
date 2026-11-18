@@ -8,6 +8,7 @@ from assets.game_links import new_link_token
 from assets import awards
 from assets.player import Player
 from assets import task_hand
+from assets import roles
 from assets.taskHandler import *
 from assets.meltdown import *
 from assets.card import *
@@ -74,6 +75,11 @@ class Game:
         self.card_draw_probability = card_draw_probability
         self.card_deck_preset = 'default'
         self.card_deck_counts = DEFAULT_CARD_DECK_COUNTS.copy()
+        # Hacker and Detective (assets/roles.py): 'auto' deals them by player count, 'off' never.
+        self.roles_mode = roles.ROLES_DEFAULT
+        self.round_roles = {}
+        self.hacker_trail = []  # The Hacker's cards since the last meeting, for the meeting screens
+        self.vote_history = []  # Who voted for whom in each finished meeting, for the Detective only
 
         # Tasks per player
         self.task_ratio = task_ratio
@@ -191,6 +197,7 @@ class Game:
             'card_deck_counts': self.card_deck_counts.copy(),
             'card_deck_count_keys': CARD_DECK_COUNT_KEYS,
             'card_deck_presets': get_available_card_deck_presets(),
+            'roles': self.roles_mode,
         }
 
     def update_config(self, config):
@@ -235,6 +242,8 @@ class Game:
                 self.auto_intruders = False
                 self.numIntruders = int(config['num_intruders'])
                 self.initial_numIntruders = self.numIntruders
+        if 'roles' in config:
+            self.roles_mode = roles.sanitize_mode(config['roles'])
         if 'card_draw_probability' in config:
             self.card_draw_probability = float(config['card_draw_probability'])
         if 'starting_cards' in config:
@@ -327,10 +336,13 @@ class Game:
 
     def living_counts(self):
         living = [player for player in self.players if player.alive]
-        return {
-            'living_crew': sum(1 for player in living if not player.sus),
+        counts = {
+            'living_crew': sum(1 for player in living if player.is_crew),
             'living_intruders': sum(1 for player in living if player.sus),
         }
+        if (self.round_roles or {}).get('hackers'):
+            counts['living_hackers'] = sum(1 for player in living if player.is_hacker)
+        return counts
 
     def task_summary(self):
         """Task timing for the round summary: no task text, only durations and counts."""
@@ -504,14 +516,18 @@ class Game:
             self.last_activity = time.time()
             player_sids = [player.sid for player in self.players if player.sid]
             public = self._add_state_metadata({'action': action, 'list': self.player_view(),
-                                               'intruders_left': self.intruders_left()})
+                                               'intruders_left': self.intruders_left(),
+                                               'hackers_left': roles.hackers_left(self),
+                                               'among_you': roles.among_you(self) if self.game_running else None})
             if self.room_code:
                 self.socket.emit('game_data', public, room=self.room_code, skip_sid=player_sids or None)
             for player in self.players:
                 if player.sid:
                     self.socket.emit('game_data', self._add_state_metadata(
                         {'action': action, 'list': self.player_view(player),
-                         'intruders_left': self.intruders_left()}), to=player.sid)
+                         'intruders_left': self.intruders_left(),
+                         'hackers_left': roles.hackers_left(self),
+                         'among_you': roles.among_you(self) if self.game_running else None}), to=player.sid)
 
     def start_hack(self, duration):
         with self.state_lock:
@@ -687,6 +703,7 @@ class Game:
         player.late_join = True
         self.players.append(player)
         player.sus = is_intruder
+        player.role = 'intruder' if is_intruder else 'crew'
         if player.sus:
             self.numIntruders += 1
             # What Start would have dealt them
@@ -829,10 +846,15 @@ class Game:
                     self.players[i].cards.append(card)
 
         random.shuffle(self.players)
+        # The Hacker and the Detective, when the host turned roles on (assets/roles.py)
+        roles.deal(self)
         print("assigning roles...")
         print(self.players)
 
-        numCrew = len(self.players) - self.numIntruders
+        # The Hacker isn't crew: their tasks don't count toward the goal and they don't count
+        # when the intruders outnumber the crew.
+        numCrew = sum(1 for player in self.players if player.is_crew)
+        self.numCrew = numCrew
         
         ratio = self.tasks_per_crewmate()
         self.taskGoal = max(numCrew, 1) * ratio if self.test_mode else numCrew * ratio
@@ -847,6 +869,7 @@ class Game:
             if player not in self.players or not player.alive:
                 return False
             player.sus = not player.sus
+            player.role = 'intruder' if player.sus else 'crew'
             if player.sus:
                 player.task = None
                 if not player.cards:
@@ -858,7 +881,7 @@ class Game:
                 self.assign_task(player)
             living = [p for p in self.players if p.alive]
             self.numIntruders = sum(1 for p in living if p.sus)
-            self.numCrew = len(living) - self.numIntruders
+            self.numCrew = sum(1 for p in living if p.is_crew)
             self.revision += 1
             return True
 
@@ -944,6 +967,9 @@ class Game:
         self.test_mode = False
         self.ruleset = 'standard'
         self.last_stand = False
+        self.round_roles = {}
+        self.hacker_trail = []
+        self.vote_history = []
         self.card_deck = CardDeck(self.locations, self.socket, self)
         self.reset_votes = set()  # Clear reset votes
         self.task_seconds = []
@@ -997,6 +1023,8 @@ class Game:
                     player.stolen = None
                     task_hand.emit_hand(self, player)
             self.meeting = Meeting(self.vote_time, self.socket, player_who_started_it, self, trigger=trigger)
+            # Where the Hacker's cards came from since the last meeting (see assets/roles.py)
+            self.meeting.hacker_trail = roles.meeting_trail(self)
             self.revision += 1
             self.stats['meetings_called'] += 1
             self.speaker.play_sound('meeting')
@@ -1097,8 +1125,8 @@ class Game:
                 return
             if self.ruleset != 'last_stand':
                 self.reveal_intruders()
-                caller = finisher if finisher and finisher.alive and not finisher.sus else next(
-                    (player for player in self.players if player.alive and not player.sus), None)
+                caller = finisher if finisher and finisher.alive and finisher.is_crew else next(
+                    (player for player in self.players if player.alive and player.is_crew), None)
                 if caller and not self.meeting:
                     self.start_meeting(caller, trigger='tasks_complete')
                 return
@@ -1133,7 +1161,7 @@ class Game:
         death_message = player.set_death(death_cause, task_name)
         self.revision += 1
         self.log_event('player_died', player.player_id, cause=death_cause,
-                       role='intruder' if player.sus else 'crew',
+                       role=roles.player_role(player),
                        during='meeting' if self.meeting else 'meltdown' if self.active_meltdown else 'round',
                        round_seconds=self.round_seconds(), **self.living_counts())
         print(f"Player {player.username} died: {death_cause} - {death_message}")
@@ -1142,7 +1170,11 @@ class Game:
             self.emit_player_list()
             return
 
-        if not player.sus:
+        if player.is_hacker:
+            # Out of the round like anyone else. The Hacker was never counted as crew or as a
+            # tagging intruder, so neither side's count moves and the round goes on.
+            player.card_offer = []
+        elif not player.sus:
             self.numCrew -= 1
             if (self.ruleset == 'last_stand' and not self.last_stand
                     and self.numCrew == 1 and self.numIntruders == 1):

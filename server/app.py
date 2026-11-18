@@ -19,7 +19,7 @@ from flask_cors import CORS
 from assets.game_manager import GameManager
 from assets.stats_tracker import StatsTracker
 from assets.room_codes import ROOM_CODE_ALPHABET, has_unused_letters, clean_room_code
-from assets import client_info, task_hand
+from assets import client_info, task_hand, roles
 from assets.sonosHandler import SonosController
 from assets.utils import *
 from assets.taskHandler import *
@@ -83,7 +83,7 @@ group_book = GroupBook(os.path.join(os.path.dirname(__file__), 'data', 'groups.j
 # What a saved game link brings back besides the tasks. Locations come with the task list.
 SAVED_SETTINGS = ('vote_time', 'vote_threshold', 'meeting_quorum', 'late_join_live', 'meltdown_time', 'code_percent',
                   'num_intruders', 'card_draw_probability', 'starting_cards', 'task_ratio', 'card_deck_preset',
-                  'card_deck_counts')
+                  'card_deck_counts', 'roles')
 
 
 def counts_for_group(game):
@@ -717,7 +717,7 @@ def handle_update_game_config(data):
 
 
 LOGGED_SETTINGS = ('vote_time', 'vote_threshold', 'meeting_quorum', 'late_join_live', 'meltdown_time', 'code_percent',
-                   'num_intruders', 'card_draw_probability', 'starting_cards', 'task_ratio', 'card_deck_preset')
+                   'num_intruders', 'card_draw_probability', 'starting_cards', 'task_ratio', 'card_deck_preset', 'roles')
 
 
 def record_settings_change(game, before, after):
@@ -1136,6 +1136,8 @@ def handleRejoin(data):
         
         if player.meltdown_code and game.active_meltdown:
             emit("meltdown_code", player.meltdown_code, to=player.sid)
+            if player.hacker_code:
+                emit("hacker_code", player.hacker_code, to=player.sid)
             logger.debug(f"Sent meltdown code to player {player.player_id}")
         
         if player.get_task() or player.stolen:
@@ -1802,6 +1804,14 @@ def handleTaskComplete(data):
             game.stats['fake_tasks_completed'].append({'player_name': player.username, 'task_text': finished_task.get('task', '')})
             awards.note_prank_done(game, player, finished_task.get('task', ''))
             emit('fake_task_completed', {**metadata(game), 'task': finished_task.get('task'), 'location': finished_task.get('location')})
+        elif player.is_hacker:
+            # The Hacker looks like crew, but their tasks earn cards, not crew progress. A sharp
+            # crewmate can notice the bar didn't move.
+            player.round_tasks_done += 1
+            if is_priority:
+                player.swaps += 1
+            if roles.on_task_done(game, player):
+                game.emit_player_list()
         else:
             previous = game.crew_score / game.taskGoal * 100 if game.taskGoal else 0
             game.crew_score += 1
@@ -1896,8 +1906,14 @@ def playCard(data):
     player_id = data.get('player_id')
     game, player, room_code = get_game_and_player(player_id)
     
-    if not game or not player or not game.game_running or game.end_state or not player.alive or not player.sus or game.meeting:
+    if not game or not player or not game.game_running or game.end_state or not player.alive or game.meeting:
         return command_error('This player cannot play a card now.')
+    if not (player.sus or player.is_hacker):
+        return command_error('This player cannot play a card now.')
+    wait = roles.play_wait(player)
+    if wait > 0:
+        record_usage('card_rejected', game, player_id, reason='hacker_wait')
+        return command_error(f'Your next card is ready in {wait} s.', game, player, reason='hacker_wait')
     
     card = player.get_card(data.get('card_id'))
     if card:
@@ -1917,6 +1933,41 @@ def playCard(data):
         print(data)
     else:
         record_usage('card_rejected', game, player_id, reason='card_not_in_hand')
+
+
+@socketio.on("pick_card")
+@room_event()
+def handlePickCard(data):
+    """The Hacker picks one of the two cards they were offered."""
+    game, player, room = get_game_and_player((data or {}).get('player_id'))
+    if not game or not player or not player.is_hacker or not game.game_running or game.end_state or not player.alive:
+        return command_error('No card to pick right now.', game, player, reason='no_offer')
+    with game.state_lock:
+        if not roles.pick_offer(game, player, data.get('card_id')):
+            return command_error('No card to pick right now.', game, player, reason='no_offer')
+    record_usage('hacker_card_picked', game, player.player_id, card_action=player.cards[-1].action)
+    game.emit_player_list()
+    return {'ok': True}
+
+
+@socketio.on("detective_check")
+@room_event()
+def handleDetectiveCheck(data):
+    """The Detective checks one living player: intruder, Hacker, or not an intruder."""
+    game, player = current_phase_player(data or {})
+    if not game or not player.is_detective:
+        return command_error('No check to use right now.', game, player, reason='no_check')
+    if game.meeting:
+        return command_error('Your check opens when the meeting ends.', game, player, reason='meeting')
+    with game.state_lock:
+        target = game.getPlayerById(data.get('target_id'))
+        result = roles.run_check(game, player, target)
+        if result is None:
+            return command_error('No check to use right now.', game, player, reason='no_check')
+        roles.emit_detective(game, player)
+    game.log_event('detective_checked', player.player_id, result=result,
+                   round_seconds=game.round_seconds(), **game.living_counts())
+    return {'ok': True, 'result': result, 'name': target.username, 'target_id': target.player_id}
 
 
 # ============ MEETING HANDLING ============

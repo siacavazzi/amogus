@@ -8,6 +8,7 @@ import time
 from threading import Thread
 from assets.utils import *
 from assets import task_hand
+from assets import roles
 
 RALLY_EARLIEST_SECONDS = 60  # Rally can't open a round: the crew hasn't spread out yet
 
@@ -166,6 +167,8 @@ class Card:
                     return
     
     def notify_intruders(self, player):
+        if player.is_hacker:
+            return  # The Hacker's ping leaves their name out (see _play_card_locked)
         for other_player in self.game.players:
             if (other_player is not player) and other_player.sus and other_player.alive:
                 send_message_to_player(self.socket, other_player, f"{player.username} played {self.action}")
@@ -182,6 +185,8 @@ class Card:
         """
         remove_card = True
         discarded = False
+        self._ping_target = None
+        self._ping_location = None
         
         if self.action == 'EMP':
             remove_card = self.game.start_hack(self.duration)
@@ -224,7 +229,11 @@ class Card:
                         target_player = p
                         break
 
-                if target_player and not target_player.sus and target_player.alive and message:
+                # The Hacker can't tell sides apart, so any other living player is a fair target.
+                fair = (target_player is not None and target_player is not player and target_player.alive
+                        and not getattr(target_player, 'waiting', False)
+                        and (player.is_hacker or not target_player.sus))
+                if fair and message:
                     if target_player.sid:
                         self.socket.emit('taunt_received', {
                             'message': message
@@ -236,10 +245,18 @@ class Card:
                     })
                     self.game.speaker.play_sound('sus')
                     self.notify_intruders(player)
-                    send_message_to_player(self.socket, player, f"Taunt sent to {target_player.username}")
+                    self._ping_target = target_player
+                    # A taunt between the Hacker and an intruder still lands, for laughs, and the
+                    # sender learns who they hit. The one taunted isn't told anything about sides.
+                    if player.is_hacker and target_player.sus:
+                        send_message_to_player(self.socket, player, f"{target_player.username} is on your side.")
+                    elif player.sus and target_player.is_hacker:
+                        send_message_to_player(self.socket, player, f"{target_player.username} is the Hacker.")
+                    else:
+                        send_message_to_player(self.socket, player, f"Taunt sent to {target_player.username}")
                     print(f"Taunt message sent to {target_player.username}: {message}")
                 else:
-                    send_message_to_player(self.socket, player, "Invalid taunt - choose an alive crewmate and enter a message")
+                    send_message_to_player(self.socket, player, "Invalid taunt - choose a player who is still in and enter a message")
                     remove_card = False
         elif self.action == 'Discard and Draw':
             remove_card = False
@@ -266,6 +283,10 @@ class Card:
         accepted = remove_card or discarded
         if accepted:
             self.game.stats['cards_played'] += 1
+            if player.is_hacker:
+                self.game.stats['hacker_cards_played'] = self.game.stats.get('hacker_cards_played', 0) + 1
+                roles.after_play(self.game, player, self,
+                                 roles.ping_for(self, self._ping_target, self._ping_location))
         self.card_deck.emit_active_cards()
         self.game.emit_player_list()
         return accepted
@@ -294,6 +315,7 @@ class Card:
             send_message_to_player(self.socket, player, "Every crewmate has a Priority task right now. Keep the card and try again soon.")
             return False
         task_hand.give_priority(self.game, target, {'task': task_text, 'location': task_location}, fake=True)
+        self._ping_target, self._ping_location = target, task_location
         awards.note_prank_sent(self.game, player, target)
         task_hand.emit_hand(self.game, target)
         self.game.stats['fake_tasks_sent'].append({

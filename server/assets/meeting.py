@@ -1,5 +1,6 @@
 import json
 from assets import awards
+from assets import roles
 import math
 import time
 from collections import Counter
@@ -48,6 +49,7 @@ class Meeting:
         self.ready_snapshot = None
         self._end_logged = False
         self._ballots = None  # Ballots cast, kept before self.votes becomes the per-player tally
+        self.hacker_trail = []  # The Hacker's cards since the last meeting (set by Game.start_meeting)
         for after in self.STALL_LOG_AFTER_SECONDS:
             eventlet.spawn_after(after, self.log_if_stalled)
         eventlet.spawn_after(self.AUTO_OPEN_AFTER_SECONDS, self.auto_open_voting)
@@ -105,7 +107,7 @@ class Meeting:
         present = len(self.game.present_living_players())
         self.game.log_event(
             'meeting_ended', meeting_id=self.id, trigger=self.trigger, end_reason=end_reason, outcome=outcome,
-            voted_out_role=('intruder' if voted_out.sus else 'crew') if voted_out else None,
+            voted_out_role=roles.player_role(voted_out) if voted_out else None,
             ready_stage_seconds=round((self.voting_opened_at or now) - self.opened_at, 1),
             voting_seconds=round(now - self.voting_opened_at, 1) if self.voting_opened_at else None,
             voting_opened_by=self.opened_by, ready_at_vote_open=self.ready_snapshot,
@@ -256,6 +258,8 @@ class Meeting:
                 player.ready = not player.alive
 
             self._ballots = len(self.votes)
+            # Who voted for whom, kept for the Detective's vote history before it becomes a tally.
+            ballots, vetoes = dict(self.votes), set(self.veto_votes)
             if early:
                 self.reason = 'veto'
                 print("Meeting ended early due to veto threshold...")
@@ -281,6 +285,8 @@ class Meeting:
                     voted_player = self.game.getPlayerById(self.voted_out)
                     if voted_player and voted_player.sus:
                         death_cause = 'voted_out_intruder'
+                    elif voted_player and voted_player.is_hacker:
+                        death_cause = 'voted_out_hacker'
                     elif voted_player:
                         death_cause = 'voted_out_innocent'
                     else:
@@ -292,12 +298,16 @@ class Meeting:
                 self.game.emit_to_room("meeting", self.to_json())
 
             self.log_end(self.reason)
+            roles.record_votes(self.game, self, ballots, vetoes)
             self.game.drawCards(probability=self.game.card_draw_probability)
             if self.game.last_stand and not self.game.end_state:
                 self.game.send_last_stand_notice()
             print(f"Final Votes: {self.votes}, Veto Votes: {len(self.veto_votes)}")
             self.game.meeting = None
             self.game.revision += 1
+            # The Detective's check after each meeting (assets/roles.py)
+            if not self.game.end_state:
+                roles.open_checks(self.game)
             # Phones that arrived during the meeting join the round now, if it is still safe.
             if not self.game.end_state and hasattr(self.game, 'admit_latecomers'):
                 self.game.admit_latecomers()
@@ -328,6 +338,11 @@ class Meeting:
         with self.game.state_lock:
             host_id = getattr(self.game, 'creator_player_id', None)
             host = self.game.getPlayerById(host_id) if host_id else None
+            # Only ever the tally. Until a vote is counted self.votes maps voter to target, and
+            # who voted for whom is the Detective's alone (their vote history).
+            votes = self.votes
+            if not all(isinstance(count, int) for count in votes.values()):
+                votes = self.compute_vote_counts()
             return json.dumps({
                 "id": self.id,
                 "room_code": self.game.room_code,
@@ -339,7 +354,8 @@ class Meeting:
                 "time_left": self.time_left,
                 "reason": self.reason,
                 "voted_out": self.voted_out,
-                "votes": self.votes,
+                "votes": votes,
+                "hacker_trail": list(getattr(self, 'hacker_trail', None) or []),
                 "veto_votes": len(self.veto_votes),
                 "host_name": host.username if host else None,
                 "host_override_in": self.host_override_in() if self.stage == 'waiting' else None,
