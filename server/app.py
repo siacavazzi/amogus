@@ -600,6 +600,9 @@ def version_info():
 @app.route('/<path:path>')
 def serve_client(path):
     """Serve the React client application."""
+    # An unknown or wrong-method API address stays a 404, never the app's page.
+    if path == 'api' or path.startswith('api/'):
+        abort(404)
     # A real file, then a prerendered page (build/play/index.html), else the React shell,
     # the same order as nginx's try_files.
     if path and os.path.isfile(os.path.join(CLIENT_BUILD_DIR, path)):
