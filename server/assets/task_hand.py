@@ -12,6 +12,10 @@ first meeting comes about 1.2 minutes in, and the median task takes 26 s (59 s a
 players). The first Priority shows 45 to 75 s in, the next 90 to 150 s after the last one ended,
 so a crewmate sees about 2 in an average round. The clock stops during meetings and meltdowns
 and keeps running during an EMP.
+
+The time to finish one adapts to the room: it starts at 60 s, and every few real Priority tasks
+the room looks at the last several. If more than 3 in 4 were finished in time it takes 5 s off
+(down to 30 s); if fewer, it gives 5 s back (up to 60 s). Fakes don't count, and look the same.
 """
 import random
 import time
@@ -23,6 +27,12 @@ from uuid import uuid4
 
 HAND_SIZE = 3
 PRIORITY_SECONDS = 60
+PRIORITY_MIN_SECONDS = 30
+PRIORITY_STEP_SECONDS = 5
+PRIORITY_TARGET_RATE = 0.75
+PRIORITY_WINDOW = 8         # recent real Priority tasks the room looks at
+PRIORITY_MIN_SAMPLE = 4     # no change until this many have ended
+PRIORITY_ADJUST_EVERY = 3   # and at most one change per this many
 FIRST_PRIORITY_SECONDS = (45, 75)
 NEXT_PRIORITY_SECONDS = (90, 150)
 FAKE_TASK_MAX_CHARS = 200
@@ -117,18 +127,55 @@ def redeal_hand(game, player):
     fill_hand(game, player)
 
 
+def priority_seconds(game):
+    """How long a Priority task lasts in this room right now."""
+    return getattr(game, 'priority_seconds', None) or PRIORITY_SECONDS
+
+
+def reset_priority_timing(game):
+    game.priority_seconds = PRIORITY_SECONDS
+    game.priority_results = []
+    game.priority_since_adjust = 0
+
+
+def record_priority_result(game, finished):
+    """A real Priority task ended (finished in time or not). Nudge the room's timer toward
+    PRIORITY_TARGET_RATE finished."""
+    results = getattr(game, 'priority_results', None)
+    if results is None:
+        reset_priority_timing(game)
+        results = game.priority_results
+    results.append(bool(finished))
+    del results[:-PRIORITY_WINDOW]
+    game.priority_since_adjust = getattr(game, 'priority_since_adjust', 0) + 1
+    if len(results) < PRIORITY_MIN_SAMPLE or game.priority_since_adjust < PRIORITY_ADJUST_EVERY:
+        return
+    rate = sum(results) / len(results)
+    seconds = priority_seconds(game)
+    if rate > PRIORITY_TARGET_RATE:
+        seconds = max(PRIORITY_MIN_SECONDS, seconds - PRIORITY_STEP_SECONDS)
+    elif rate < PRIORITY_TARGET_RATE:
+        seconds = min(PRIORITY_SECONDS, seconds + PRIORITY_STEP_SECONDS)
+    if seconds != priority_seconds(game):
+        game.priority_seconds = seconds
+        game.priority_since_adjust = 0
+
+
 def give_priority(game, player, task, fake=False):
     task = _stamp(game, task)
     if fake:
         task['is_fake'] = True
-    task['time_left'] = PRIORITY_SECONDS
+    task['seconds'] = priority_seconds(game)
+    task['time_left'] = task['seconds']
     player.priority = task
     player.next_priority_in = None
     return task
 
 
-def end_priority(player):
+def end_priority(player, game=None, finished=False):
     """The Priority task was done or ran out: start the clock to the next one."""
+    if game is not None and player.priority and not player.priority.get('is_fake'):
+        record_priority_result(game, finished)
     if player.selected_assignment and player.priority and player.selected_assignment == player.priority.get('assignment_id'):
         player.selected_assignment = None
     player.priority = None
@@ -143,7 +190,7 @@ def hand_state(game, player):
     priority = None
     if player.priority:
         priority = {**_public(player.priority), 'time_left': max(0, int(player.priority.get('time_left', 0))),
-                    'seconds': PRIORITY_SECONDS}
+                    'seconds': player.priority.get('seconds', PRIORITY_SECONDS)}
     return {
         'hand': [_public(task) for task in player.hand],
         'priority': priority,
@@ -192,7 +239,7 @@ def priority_tick(game):
         if player.priority:
             player.priority['time_left'] = player.priority.get('time_left', PRIORITY_SECONDS) - 1
             if player.priority['time_left'] <= 0:
-                end_priority(player)
+                end_priority(player, game, finished=False)
                 changed.append(player)
             continue
         player.priority_idle += 1
@@ -215,6 +262,7 @@ def priority_tick(game):
 def start_priority_clock(game):
     """Run the Priority clock for this round in the background."""
     round_id = game.round_id
+    reset_priority_timing(game)
 
     def run():
         while True:

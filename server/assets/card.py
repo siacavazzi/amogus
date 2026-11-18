@@ -305,7 +305,7 @@ class Card:
         self.game.speaker.play_sound('sus')
         self.notify_intruders(player)
         where = '' if task_location == 'Other' else f" {task_location},"
-        send_message_to_player(self.socket, player, f"Fake task sent to {target.username}.{where} {task_hand.PRIORITY_SECONDS} s to get there.")
+        send_message_to_player(self.socket, player, f"Fake task sent to {target.username}.{where} {task_hand.priority_seconds(self.game)} s to get there.")
         return True
 
     def _play_steal_tasks(self, player, extra_data):

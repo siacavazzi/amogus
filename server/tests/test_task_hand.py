@@ -92,6 +92,46 @@ class TaskHandTests(SocketGameTestCase):
         self.assertIsNone(crew.priority)
         self.assertGreaterEqual(crew.next_priority_in, task_hand.NEXT_PRIORITY_SECONDS[0])
 
+    def test_priority_timer_shortens_while_the_room_beats_three_in_four_and_eases_back(self):
+        clients, room, ids, game = self.start()
+        task_hand.reset_priority_timing(game)
+        for _ in range(3):
+            task_hand.record_priority_result(game, True)
+        self.assertEqual(60, task_hand.priority_seconds(game))  # too few to judge yet
+        task_hand.record_priority_result(game, True)
+        self.assertEqual(55, task_hand.priority_seconds(game))
+        for _ in range(2):
+            task_hand.record_priority_result(game, True)
+        self.assertEqual(55, task_hand.priority_seconds(game))  # one step at most every 3 results
+        task_hand.record_priority_result(game, True)
+        self.assertEqual(50, task_hand.priority_seconds(game))
+        for _ in range(30):
+            task_hand.record_priority_result(game, True)
+        self.assertEqual(task_hand.PRIORITY_MIN_SECONDS, task_hand.priority_seconds(game))
+
+        for _ in range(6):
+            task_hand.record_priority_result(game, False)
+        self.assertEqual(40, task_hand.priority_seconds(game))
+        crew = self.crew(game)[0]
+        task_hand.give_priority(game, crew, {'task': 'Quick job', 'location': 'Kitchen'})
+        self.assertEqual(40, crew.priority['time_left'])
+        self.assertEqual(40, task_hand.hand_state(game, crew)['priority']['seconds'])
+
+    def test_finished_and_expired_priorities_feed_the_timer_but_fakes_do_not(self):
+        clients, room, ids, game = self.start()
+        crew = self.crew(game)[0]
+        task_hand.give_priority(game, crew, {'task': 'Priority job', 'location': 'Kitchen'})
+        self.complete(clients, ids, game, crew, crew.priority['assignment_id'])
+        self.assertEqual([True], game.priority_results)
+        task_hand.give_priority(game, crew, {'task': 'Fake job', 'location': 'Kitchen'}, fake=True)
+        task_hand.end_priority(crew, game, finished=False)
+        self.assertEqual([True], game.priority_results)
+        task_hand.give_priority(game, crew, {'task': 'Slow job', 'location': 'Kitchen'})
+        crew.priority['time_left'] = 1
+        with game.state_lock:
+            task_hand.priority_tick(game)
+        self.assertEqual([True, False], game.priority_results)
+
     def test_area_denial_locks_tasks_already_in_hand(self):
         clients, room, ids, game = self.start()
         crew = self.crew(game)[0]

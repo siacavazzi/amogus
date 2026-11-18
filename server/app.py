@@ -1829,7 +1829,7 @@ def handleTaskComplete(data):
         if player.selected_assignment == assignment_id:
             player.selected_assignment = None
         if is_priority:
-            task_hand.end_priority(player)
+            task_hand.end_priority(player, game, finished=True)
         else:
             task_hand.replace_in_hand(game, player, index)
         game.revision += 1
