@@ -163,12 +163,15 @@ function TutorialPage() {
     return () => clearQueuedTimeouts();
   }, [clearQueuedTimeouts]);
 
+  // The slider shows its green tick for a moment (the round screen's task-done look), then move on.
   useEffect(() => {
-    if (crewTaskCompleted && !showAnimation && phase === 'crewTask') {
+    if (!crewTaskCompleted || phase !== 'crewTask') return undefined;
+    const timer = setTimeout(() => {
       setCrewTaskCompleted(false);
       setPhase('crewCallMeeting');
-    }
-  }, [crewTaskCompleted, phase, showAnimation]);
+    }, 700);
+    return () => clearTimeout(timer);
+  }, [crewTaskCompleted, phase]);
 
   useEffect(() => {
     if (phase === 'intruderCooldown' && killTriggered && killCooldown === 0) {
@@ -274,7 +277,6 @@ function TutorialPage() {
     if (!isIntruder) {
       if (phase !== 'crewTask') return;
       setCrewTaskCompleted(true);
-      setShowAnimation(true);
       return;
     }
 
