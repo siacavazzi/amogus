@@ -339,6 +339,13 @@ async function revealRoles(phones) {
 // Swipe a slider all the way across (finishing a task, or readying up for a meeting).
 // On the round screen a crewmate taps a task first, so tap the current one if none is picked.
 async function swipe(page) {
+    // A phone that took its seat back (Play here) shows the role pop-up again: close it first.
+    const peek = page.getByText('Hold to see it').first();
+    if (await peek.isVisible().catch(() => false)) {
+        const release = await hold(page, peek, 500);
+        await release();
+        await tapGotIt(page);
+    }
     const hand = page.getByTestId('task-hand');
     if (await hand.isVisible().catch(() => false) && await hand.locator('[aria-pressed="true"]').count() === 0) {
         const current = page.getByTestId('current-task').first();
