@@ -162,12 +162,13 @@ function RoundHeader({ crewScore, taskGoal, tasksDone, roomCode, intrudersLeft, 
   );
 }
 
+// A task with no set place (the host's "Other") says Anywhere, so every card has a place line.
 function Where({ location }) {
-  if (!location || location === 'Other') return null;
+  const anywhere = !location || location === 'Other';
   return (
-    <span data-testid="task-location" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+    <span data-testid="task-location" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, opacity: anywhere ? 0.7 : 1 }}>
       <MapPin size={15} strokeWidth={2.75} style={{ color: '#e0a400' }} />
-      {location}
+      {anywhere ? t('Anywhere') : location}
     </span>
   );
 }
