@@ -43,7 +43,9 @@ logger.info(f"Starting Sus Party {VERSION_INFO['channel']} server version {VERSI
 # Serve React build files
 CLIENT_BUILD_DIR = os.path.join(os.path.dirname(__file__), '..', 'client', 'build')
 
-app = Flask(__name__, static_folder=CLIENT_BUILD_DIR, static_url_path='')
+# Files are served by serve_client below. Flask's own static route would be /<path> too and win,
+# answering 404 for /play and other app pages when the server runs without nginx (local play).
+app = Flask(__name__, static_folder=CLIENT_BUILD_DIR, static_url_path='/_build')
 CORS(app, resources={r"/*": {"origins": '*'}})
 socketio = SocketIO(app, cors_allowed_origins="*")
 
@@ -598,10 +600,13 @@ def version_info():
 @app.route('/<path:path>')
 def serve_client(path):
     """Serve the React client application."""
-    # If file exists, Flask's static_folder will serve it
-    # Otherwise serve index.html for React routing
+    # A real file, then a prerendered page (build/play/index.html), else the React shell,
+    # the same order as nginx's try_files.
     if path and os.path.isfile(os.path.join(CLIENT_BUILD_DIR, path)):
         return app.send_static_file(path)
+    page = os.path.join(path.strip('/'), 'index.html') if path.strip('/') else ''
+    if page and os.path.isfile(os.path.join(CLIENT_BUILD_DIR, page)):
+        return app.send_static_file(page)
     return app.send_static_file('index.html')
 
 
