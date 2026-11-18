@@ -375,7 +375,15 @@ async function slideUntilGone(page) {
 }
 
 async function callMeeting(caller, phones) {
-    await caller.getByText('CALL MEETING').click();
+    // In Playwright's WebKit a tap can go through but never be acknowledged, so click() hangs
+    // until the meeting has moved on to voting (see tapGotIt). There it is sent from the page.
+    const button = caller.getByText('CALL MEETING');
+    if (isWebKit(caller)) {
+        await expect(button).toBeVisible();
+        await button.evaluate(element => element.click());
+    } else {
+        await button.click();
+    }
     await readyUp(phones);
 }
 
