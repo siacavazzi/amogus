@@ -1,0 +1,32 @@
+/* Round awards on the end screens (phone and laptop) and the "You got a medal" moment. */
+
+.aw-list { width: 100%; max-width: 28rem; margin: 0 auto; text-align: left; font-family: var(--sg-font); }
+.aw-title { font-weight: 900; letter-spacing: -0.02em; font-size: 22px; margin: 0 0 10px; }
+.aw-list ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.aw-row { display: flex; align-items: center; gap: 12px; background: rgba(0, 0, 0, 0.18); border-radius: 18px; padding: 10px 12px; }
+.aw-who { position: relative; flex: none; display: block; }
+.aw-badge { position: absolute; right: -10px; bottom: -8px; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35)); }
+.aw-text { display: grid; gap: 2px; min-width: 0; padding-left: 6px; }
+.aw-text b { font-weight: 900; font-size: 16px; line-height: 1.15; }
+.aw-text > span { font-weight: 600; font-size: 14px; opacity: 0.85; line-height: 1.25; overflow-wrap: anywhere; }
+
+/* Laptop: everyone crowds round, so the awards sit in a wide row of big cards. */
+.aw-list--big { max-width: 72rem; text-align: center; }
+.aw-list--big .aw-title { font-size: 26px; }
+.aw-list--big ul { grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 16px; }
+.aw-list--big .aw-badge { right: -16px; bottom: -12px; }
+.aw-list--big .aw-row { flex-direction: column; text-align: center; padding: 18px 14px 16px; gap: 14px; }
+.aw-list--big .aw-text { padding-left: 0; }
+.aw-list--big .aw-text b { font-size: 20px; }
+.aw-list--big .aw-text > span { font-size: 16px; }
+
+.aw-mine { z-index: 60; justify-content: space-between; }
+.aw-mine__art { position: relative; margin: 18px 0 10px; }
+.aw-mine__art img, .aw-mine__art > div { border: 5px solid #fff; box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35); }
+.aw-mine__medal { position: absolute; right: -26px; bottom: -34px; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.35)); }
+.aw-mine__next {
+  appearance: none; border: 0; cursor: pointer; width: 100%; max-width: 28rem; margin: 0 auto;
+  background: #fff; color: var(--sg-round); font-family: var(--sg-font); font-weight: 900; font-size: 18px;
+  border-radius: 18px; padding: 16px;
+}
+.aw-mine__next:focus-visible { outline: 3px solid var(--sg-meet); outline-offset: 3px; }

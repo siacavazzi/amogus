@@ -48,7 +48,7 @@ test('mashing Call Meeting, the ready slide and Vote counts each person once', a
     for (const phone of phones) await expect(phone.getByText('Crewmates Win!'), phone.person).toBeVisible({ timeout: 30000 });
 
     // Play Again mashed by everyone takes the room back to the lobby once, and the next round starts.
-    for (const phone of phones) await phone.getByRole('button', { name: /Play Again/ }).click({ clickCount: 2 }).catch(() => {});
+    for (const phone of phones) await h.playAgain(phone, { clickCount: 2 }).catch(() => {});
     for (const phone of phones) await h.expectLobby(phone);
     await phones[0].getByText('Start Game').click();
     await h.revealRoles(phones);

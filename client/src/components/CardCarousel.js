@@ -29,7 +29,7 @@ import { cardCopy } from '../utils/cardCopy';
 import {
     Zap, Clock, MapPin, Hand,
     Radiation, ClipboardX, Megaphone, Volume2, Ban, RefreshCw, FastForward,
-    Skull, MessageSquare,
+    Skull, MessageSquare, Eye, Shuffle,
 } from '../signal/icons';
 import { t } from '../i18n';
 
@@ -59,6 +59,9 @@ const CARD_THEMES = {
     'Area Denial':      { bg: SG.white,  fg: SG.red },
     'Discard and Draw': { bg: SG.yellow, fg: SG.ink },
     'Shorten Meltdown': { bg: SG.hazard, fg: SG.ink },
+    'Steal Tasks':      { bg: '#7b2cff', fg: SG.white },
+    'Reshuffle':        { bg: SG.blue,   fg: SG.white },
+    'Rally':            { bg: SG.yellow, fg: SG.ink },
 };
 const DEFAULT_THEME = { bg: SG.red, fg: SG.white };
 
@@ -80,6 +83,9 @@ const ACTION_ICONS = {
     'Area Denial': Ban,
     'Discard and Draw': RefreshCw,
     'Shorten Meltdown': FastForward,
+    'Steal Tasks': Eye,
+    'Reshuffle': Shuffle,
+    'Rally': MapPin,
 };
 function iconFor(action) {
     return ACTION_ICONS[action] || Skull;

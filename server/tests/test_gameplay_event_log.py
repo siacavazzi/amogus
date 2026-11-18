@@ -310,7 +310,7 @@ class TaskTimingTests(EventLogTestCase):
         clients, room, ids, game = self.setup_started_game(4, config=QUIET)
         crew = self.crew(game)[0]
         task = dict(crew.task)
-        crew.task_assigned_monotonic -= 40
+        crew.task['assigned_monotonic'] -= 40
         self.client_for_player(clients, ids, crew).emit('complete_task', {'player_id': crew.player_id})
         row = self.tracker.named('task_completed')[-1]
         self.assertGreaterEqual(row['task_seconds'], 40)

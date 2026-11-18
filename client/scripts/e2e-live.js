@@ -112,6 +112,7 @@ async function checkVersion() {
 const NO_CARDS = {
     self_report: 0, emp: 0, fake_task: 0, taunt_message: 0,
     remote_sabotage: 0, shorten_meltdown: 0, area_denial_per_location: 0,
+    steal_tasks: 0, reshuffle: 0, rally: 0,
 };
 
 // Host sets up a room with a small, known deck, everyone joins, and the round starts.
@@ -212,24 +213,29 @@ async function playGame() {
         const cards = self.get(intruder).cards.map(parse);
         const card = action => cards.find(item => item.action === action);
         assert.ok(card('Taunt Message') && card('Fake Task'), `Intruder hand: ${cards.map(item => item.action).join(', ')}`);
-        const [tauntTarget, fakeTarget] = crew;
+        const [tauntTarget] = crew;
         let mark = tauntTarget.mark();
         intruder.socket.emit('play_card', {
             player_id: ids.get(intruder), card_id: card('Taunt Message').id,
             extra_data: { target_player_id: ids.get(tauntTarget), message: 'E2E taunt' },
         });
         await tauntTarget.waitFor('taunt_received', data => data.message === 'E2E taunt', { since: mark });
+        // A fake task is a Priority task for the crewmate most due one; the game picks who.
+        const fakeMarks = new Map(crew.map(phone => [phone, phone.mark()]));
         intruder.socket.emit('play_card', {
             player_id: ids.get(intruder), card_id: card('Fake Task').id,
-            extra_data: { target_player_id: ids.get(fakeTarget), task_text: 'E2E fake task', task_location: 'Garage' },
+            extra_data: { task_text: 'E2E fake task', task_location: 'Garage' },
         });
         const handOf = (data, phone) => (data.list || []).map(parse).find(player => player.player_id === ids.get(phone))?.cards;
         await intruder.waitFor('game_data', data => handOf(data, intruder)?.length === 0);
-        await completeTask(fakeTarget);
-        const fakeTask = await currentTask(fakeTarget);
-        assert.equal(fakeTask.is_fake, true, 'Fake task arrives after the current task');
+        const isFake = data => data.priority?.task === 'E2E fake task';
+        const fakeTarget = await Promise.any(crew.map(phone => phone.waitFor('task', isFake, { since: fakeMarks.get(phone) }).then(() => phone)));
+        const fakeTask = fakeTarget.latest('task').priority;
+        assert.equal(fakeTask.is_fake, undefined, 'A phone never learns a Priority task is fake');
         mark = fakeTarget.mark();
-        await completeTask(fakeTarget);
+        await fakeTarget.command('complete_task', {
+            player_id: ids.get(fakeTarget), round_id: roundId, assignment_id: fakeTask.assignment_id, request_id: randomUUID(),
+        });
         await fakeTarget.waitFor('fake_task_completed', undefined, { since: mark });
         log('Intruder played a taunt and a fake task; both reached their targets');
 

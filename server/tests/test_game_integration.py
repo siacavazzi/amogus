@@ -1,4 +1,5 @@
 from server.tests.integration_helpers import SocketGameTestCase
+from assets import task_hand
 
 
 class GameIntegrationTests(SocketGameTestCase):
@@ -113,7 +114,7 @@ class GameIntegrationTests(SocketGameTestCase):
         self.assertEqual(1, self.first_event(rejoin_events, "crew_score")["score"])
         self.assertEqual(game.round_id, self.first_event(rejoin_events, "crew_score")["round_id"])
         self.assertEqual(game.taskGoal, self.first_event(rejoin_events, "task_goal"))
-        self.assertEqual(crew_player.task, self.first_event(rejoin_events, "task")["task"])
+        self.assertEqual(task_hand._public(crew_player.task), self.first_event(rejoin_events, "task")["task"])
 
     def test_task_completion_reveals_intruders_at_goal_without_ending_game(self):
         # 4 players: 3-player rounds use last-stand rules, where finishing tasks wins outright.
@@ -340,7 +341,7 @@ class GameIntegrationTests(SocketGameTestCase):
         self.assertEqual(0, self.first_event(rejoin_events, "crew_score")["score"])
         self.assertEqual(game.round_id, self.first_event(rejoin_events, "crew_score")["round_id"])
         self.assertEqual(game.taskGoal, self.first_event(rejoin_events, "task_goal"))
-        self.assertEqual(rejoining_player.task, self.first_event(rejoin_events, "task")["task"])
+        self.assertEqual(task_hand._public(rejoining_player.task), self.first_event(rejoin_events, "task")["task"])
 
     def test_self_report_card_starts_meeting_and_consumes_card(self):
         clients, room_code, player_ids, game = self.setup_started_game(

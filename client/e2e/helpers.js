@@ -337,7 +337,20 @@ async function revealRoles(phones) {
 }
 
 // Swipe a slider all the way across (finishing a task, or readying up for a meeting).
+// On the round screen a crewmate taps a task first, so tap the current one if none is picked.
 async function swipe(page) {
+    // A phone that took its seat back (Play here) shows the role pop-up again: close it first.
+    const peek = page.getByText('Hold to see it').first();
+    if (await peek.isVisible().catch(() => false)) {
+        const release = await hold(page, peek, 500);
+        await release();
+        await tapGotIt(page);
+    }
+    const hand = page.getByTestId('task-hand');
+    if (await hand.isVisible().catch(() => false) && await hand.locator('[aria-pressed="true"]').count() === 0) {
+        const current = page.getByTestId('current-task').first();
+        if (await current.isVisible().catch(() => false)) await current.click();
+    }
     const handle = page.getByRole('slider').first();
     await expect(handle).toBeVisible();
     const box = await handle.boundingBox();
@@ -362,7 +375,15 @@ async function slideUntilGone(page) {
 }
 
 async function callMeeting(caller, phones) {
-    await caller.getByText('CALL MEETING').click();
+    // In Playwright's WebKit a tap can go through but never be acknowledged, so click() hangs
+    // until the meeting has moved on to voting (see tapGotIt). There it is sent from the page.
+    const button = caller.getByText('CALL MEETING');
+    if (isWebKit(caller)) {
+        await expect(button).toBeVisible();
+        await button.evaluate(element => element.click());
+    } else {
+        await button.click();
+    }
     await readyUp(phones);
 }
 
@@ -373,6 +394,13 @@ async function readyUp(phones) {
         await expect(phone.getByText('Go to the meeting spot', { exact: false })).toBeVisible();
         await slideUntilGone(phone);
     }));
+}
+
+// The end screen's Play Again. A phone that won a medal sees it full screen first, so close it.
+async function playAgain(page, options) {
+    const medal = page.getByTestId('my-medal');
+    if (await appears(medal, 1500)) await page.getByRole('button', { name: 'See the round' }).click().catch(() => {});
+    await page.getByRole('button', { name: /Play Again/ }).click(options);
 }
 
 // Each voter taps a name and confirms.
@@ -473,5 +501,5 @@ function expectNoPageErrors(pages) {
 
 module.exports = {
     tapCreateNewGame, lock, goOffline, goOnline, tapAndConfirm, expectTappable, PHONE, addExampleList, savedListCode, openPage, closeAll, skipTutorialPrompt, openPhones, openPhone, openReactor, createRoom, createRoomOnPhone, gatherRoom, readyUp, slideUntilGone, connectReactor, joinRoom, enterName, nextToAvatars, revealRoles, revealAllRoles, swipe, hold, callMeeting, vote,
-    continueAfterResults, voteOutIntruder, roundButton, addTasks, openVent, playCard, dismissMessage, expectLobby, expectNoPageErrors, sleep,
+    continueAfterResults, voteOutIntruder, playAgain, roundButton, addTasks, openVent, playCard, dismissMessage, expectLobby, expectNoPageErrors, sleep,
 };

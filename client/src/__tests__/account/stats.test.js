@@ -82,3 +82,21 @@ test('no end-screen link and no sign-in nudge for a signed-out phone', async () 
     await act(async () => {});
     expect(container).toBeEmptyDOMElement();
 });
+
+test('the medal case shows won medals with counts and the rest still to win', async () => {
+    mockServer({ stats: { ...STATS, medals: { total: 3, counts: { task_machine: 2, called_it: 1 }, recent: [] } } });
+    render(<StatsPage />);
+    const medals = await screen.findByTestId('stats-medals');
+    expect(medals).toHaveTextContent('3 medals won');
+    expect(screen.getByTestId('medal-task_machine')).toHaveTextContent('×2');
+    expect(screen.getByTestId('medal-task_machine').className).not.toMatch(/locked/);
+    expect(screen.getByTestId('medal-card_shark').className).toMatch(/locked/);
+});
+
+test('no medals yet says how to win one', async () => {
+    mockServer();
+    render(<StatsPage />);
+    const medals = await screen.findByTestId('stats-medals');
+    expect(medals).toHaveTextContent('None yet');
+    expect(medals).toHaveTextContent('Medals are handed out at the end of each round.');
+});

@@ -166,6 +166,12 @@ export const createMockContextValue = (overrides = {}) => {
         lobbyState: null,
         setTask: jest.fn(),
         setTaskEntry: jest.fn(),
+        handState: null,
+        swapTask: jest.fn().mockResolvedValue(true),
+        selectTask: jest.fn(),
+        intrudersLeft: null,
+        tasksStolenAt: 0,
+        tasksReshuffledAt: 0,
         
         // Meeting state
         meetingState: null,

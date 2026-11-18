@@ -9,7 +9,15 @@ const h = require('./helpers');
 test.afterEach(h.closeAll);
 
 async function sabotageReachesPhones(reactor, phones) {
-    await reactor.getByRole('button', { name: /SABOTAGE CORE/ }).click();
+    // The big screen's first tap since it loaded: in Playwright's WebKit that tap can go through
+    // but never be acknowledged, so click() hangs (see tapGotIt). There it is sent from the page.
+    const button = reactor.getByRole('button', { name: /SABOTAGE CORE/ });
+    if (reactor.context().browser().browserType().name() === 'webkit') {
+        await expect(button).toBeEnabled();
+        await button.evaluate(element => element.click());
+    } else {
+        await button.click();
+    }
     await expect(reactor.getByText('CORE MELTDOWN')).toBeVisible({ timeout: 10000 });
     for (const phone of phones) await expect(phone.getByTestId('meltdown-code'), phone.person).toHaveText(/^\d{4}$/);
 }

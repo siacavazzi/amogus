@@ -131,6 +131,7 @@ class GameStateModelTests(unittest.TestCase):
         player = Player("sid", "player", "Crew", 0)
 
         first = game.assign_task(player)
+        player.hand = []  # the hand is used up, so the next deal refills from the saved room tasks
         second = game.assign_task(player)
 
         self.assertEqual("Calibrate engine", first["task"])

@@ -38,7 +38,7 @@ test('someone who opens the invite link mid-round is told to wait, then joins th
 
     // After the round, the latecomer is in the lobby for the next one without doing anything.
     await h.voteOutIntruder(phones.find(phone => phone !== intruder), phones, intruder);
-    for (const phone of phones) await phone.getByRole('button', { name: /Play Again/ }).click();
+    for (const phone of phones) await h.playAgain(phone);
     await h.expectLobby(host);
     await h.expectLobby(late);
     await expect(host.getByText('Kai')).toBeVisible();

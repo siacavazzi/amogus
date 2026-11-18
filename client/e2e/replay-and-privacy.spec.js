@@ -29,7 +29,7 @@ test('after Play Again the ghosts are back, roles are dealt again and progress s
     await h.vote(living.map(phone => [phone, phone === intruder ? caller : intruder]));
     await h.continueAfterResults(phones);
     for (const phone of phones) await expect(phone.getByText('Crewmates Win!'), phone.person).toBeVisible({ timeout: 30000 });
-    for (const phone of phones) await phone.getByRole('button', { name: /Play Again/ }).click();
+    for (const phone of phones) await h.playAgain(phone);
     for (const phone of phones) await h.expectLobby(phone);
 
     // Round two: everyone, the ghost included, gets a role and a live round screen.
@@ -54,7 +54,7 @@ test('Play Again goes through when the only phone left to tap goes offline', asy
 
     const holdout = phones[3];
     const tappers = phones.slice(0, 3);
-    for (const phone of tappers) await phone.getByRole('button', { name: /Play Again/ }).click();
+    for (const phone of tappers) await h.playAgain(phone);
     await expect(tappers[0].getByText('3 / 4 players ready')).toBeVisible();
     await holdout.context().close();
     for (const phone of tappers) await h.expectLobby(phone);

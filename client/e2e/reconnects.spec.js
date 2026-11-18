@@ -125,7 +125,7 @@ test('someone who leaves mid-round is gone from the lobby after Play Again', asy
     await expect(leaver.getByText('Create New Game')).toBeVisible();
 
     await h.voteOutIntruder(stayers.find(phone => phone !== intruder), stayers, intruder);
-    for (const phone of stayers) await phone.getByRole('button', { name: /Play Again/ }).click();
+    for (const phone of stayers) await h.playAgain(phone);
     await h.expectLobby(phones[0]);
     await expect(phones[0].getByText(leaver.person, { exact: true })).toHaveCount(0);
 

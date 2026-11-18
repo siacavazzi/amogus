@@ -117,7 +117,7 @@ test('thirty phones play a whole round with a meeting and vote, then start anoth
     for (const phone of phones) await expect(phone.getByText('Crewmates Win!'), phone.person).toBeVisible({ timeout: 30000 });
 
     // Everyone goes again.
-    for (const phone of phones) await phone.getByRole('button', { name: /Play Again/ }).click();
+    for (const phone of phones) await h.playAgain(phone);
     for (const phone of phones) await h.expectLobby(phone);
     await expect(host.getByRole('button', { name: 'Players (30)' })).toBeVisible();
     await host.getByText('Start Game').click();

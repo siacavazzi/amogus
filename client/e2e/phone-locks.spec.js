@@ -31,10 +31,12 @@ test('a phone locked mid-round for a minute comes back to its role and task', as
     await unlock();
 
     await expect(pocketed.getByText('CALL MEETING')).toBeVisible({ timeout: 30000 });
-    await expect(pocketed.getByTestId('current-task')).toHaveText(task);
+    // Its task is still in its hand (a Priority task can land on top while it is locked).
+    await expect(pocketed.getByTestId('hand-task').filter({ hasText: task })).toHaveCount(1);
     // And it can still play: its next tap goes through.
+    const current = (await pocketed.getByTestId('current-task').first().textContent()).trim();
     await h.swipe(pocketed);
-    await expect(pocketed.getByTestId('current-task')).not.toHaveText(task, { timeout: 15000 });
+    await expect(pocketed.getByTestId('current-task').first()).not.toHaveText(current, { timeout: 15000 });
 
     h.expectNoPageErrors(phones);
 });
