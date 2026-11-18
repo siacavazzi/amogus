@@ -383,8 +383,16 @@ async function callMeeting(caller, phones) {
 // longer than the server's 90 s fallback, which then opens voting before the last ones slide.
 async function readyUp(phones) {
     await Promise.all(phones.map(async (phone) => {
-        await expect(phone.getByText('Go to the meeting spot', { exact: false })).toBeVisible();
-        await slideUntilGone(phone);
+        try {
+            await expect(phone.getByText('Go to the meeting spot', { exact: false })).toBeVisible();
+            await slideUntilGone(phone);
+        } catch (error) {
+            // Say what this phone was showing, since CI screenshots aren't always reachable.
+            const dialogs = await phone.locator('[role="dialog"]').allInnerTexts().catch(() => []);
+            const text = await phone.locator('body').innerText().catch(() => '');
+            console.log(`[${phone.person}] could not ready up. Open dialogs: ${JSON.stringify(dialogs)}. Screen: ${JSON.stringify(text.slice(0, 600))}`);
+            throw error;
+        }
     }));
 }
 
