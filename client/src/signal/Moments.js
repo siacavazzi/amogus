@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { DataContext } from '../GameContext';
 import { Face, vibrate } from './index';
 import { listCardNames } from '../utils/cardCopy';
+import { amongYouText, roleName } from '../utils/roles';
 import { t } from '../i18n';
 
 // The role card is about 170px wide: a long role name ("Mannskapsmedlem", "Crewmitglied") shrinks to fit.
@@ -12,7 +13,25 @@ function roleFontSize(label) {
 // Role reveal. Both roles see the same blue screen and hold the card to peek; letting go
 // hides it again, so nobody reads a role over a shoulder. Intruders also see which cards
 // they hold, since most never found them in the vent on their own.
-export function RoleReveal({ title, sus, otherIntruders = [], cards = [], onClose }) {
+function roleLine(role, sus, otherIntruders) {
+  if (role === 'hacker') {
+    return t("You're on the intruders' side, but you can't tag anyone. Finish tasks to earn cards, then play them. You don't know who the intruders are.");
+  }
+  if (role === 'detective') {
+    return t("After each meeting, check one player to learn if they're an intruder. In meetings, see who voted for whom. Nobody knows you're the Detective.");
+  }
+  if (sus) {
+    return otherIntruders.length
+      ? t('With {names}', { names: otherIntruders.map((p) => p.username).join(', ') })
+      : t('Get them before they finish their tasks');
+  }
+  return t('Finish your tasks. Find the intruders.');
+}
+
+export function RoleReveal({ title, sus, role, otherIntruders = [], cards = [], amongYou = null, onClose }) {
+  const label = roleName(role, sus);
+  const among = amongYouText(amongYou);
+  const showCards = (sus || role === 'hacker') && cards.length > 0;
   const [peeking, setPeeking] = useState(false);
   const [seen, setSeen] = useState(false);
   const show = (e) => {
@@ -27,6 +46,7 @@ export function RoleReveal({ title, sus, otherIntruders = [], cards = [], onClos
       <div className="sg-center" style={{ gap: 18 }}>
         <p className="sg-lede" style={{ opacity: 0.85 }} id="modal-title">{title}</p>
         <p className="sg-big sg-h1 sg-a sg-rise">{t('Your role')}</p>
+        {among && <p className="sg-lede" data-testid="among-you" style={{ opacity: 0.9 }}>{among}</p>}
         <button
           type="button"
           onPointerDown={show}
@@ -40,7 +60,7 @@ export function RoleReveal({ title, sus, otherIntruders = [], cards = [], onClos
           style={{
             position: 'relative',
             width: 260,
-            height: 190,
+            height: role === 'hacker' || role === 'detective' ? 250 : 190,
             borderRadius: 26,
             border: '3px dashed rgba(255,255,255,0.55)',
             background: 'rgba(0,0,0,0.15)',
@@ -70,17 +90,15 @@ export function RoleReveal({ title, sus, otherIntruders = [], cards = [], onClos
                 animation: 'sg-pop .22s ease-out both',
               }}
             >
-              <span className="sg-big" style={{ fontSize: roleFontSize(sus ? t('Intruder') : t('Crewmate')) }}>{sus ? t('Intruder') : t('Crewmate')}</span>
-              <span style={{ fontWeight: 700, fontSize: 14, opacity: 0.75, padding: '0 14px' }}>
-                {sus
-                  ? otherIntruders.length
-                    ? t('With {names}', { names: otherIntruders.map((p) => p.username).join(', ') })
-                    : t('Get them before they finish their tasks')
-                  : t('Finish your tasks. Find the intruders.')}
+              <span className="sg-big" data-testid="role-name" style={{ fontSize: roleFontSize(label) }}>{label}</span>
+              <span style={{ fontWeight: 700, fontSize: role === 'hacker' || role === 'detective' ? 12 : 14, opacity: 0.75, padding: '0 14px', lineHeight: 1.25 }}>
+                {roleLine(role, sus, otherIntruders)}
               </span>
-              {sus && cards.length > 0 && (
+              {showCards && (
                 <span data-testid="role-cards" style={{ fontWeight: 700, fontSize: 13, opacity: 0.75, padding: '0 14px', lineHeight: 1.3 }}>
-                  {t('Your cards: {cards}. Tap ENTER VENT to play them.', { cards: listCardNames(cards) })}
+                  {role === 'hacker'
+                    ? t('Your card: {cards}. It is under your tasks.', { cards: listCardNames(cards) })
+                    : t('Your cards: {cards}. Tap ENTER VENT to play them.', { cards: listCardNames(cards) })}
                 </span>
               )}
             </span>

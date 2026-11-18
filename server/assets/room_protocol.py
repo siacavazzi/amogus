@@ -4,6 +4,7 @@ import json
 
 from assets.scaling import minimum_tasks as minimum_tasks_for
 from assets import task_hand
+from assets import roles
 
 
 def metadata(game):
@@ -65,6 +66,9 @@ def lobby_state(game):
         # Invite links and QR codes carry it, so an old link can find this game's tasks later.
         'link_token': getattr(game, 'link_token', None),
         'intruder_count': game.intruder_count_for_start(), 'auto_intruders': game.auto_intruders,
+        # Which secret roles the next round deals at this headcount (assets/roles.py)
+        'roles_mode': getattr(game, 'roles_mode', roles.ROLES_DEFAULT),
+        'roles_next': roles.next_round_roles(game),
     })
 
 
@@ -82,6 +86,10 @@ def room_state(game, player=None, sid=None):
         'task': task_hand._public(player.task) if player else None, 'crew_score': game.crew_score,
         'hand': task_hand.hand_state(game, player) if player else None,
         'intruders_left': game.intruders_left(),
+        'hackers_left': roles.hackers_left(game),
+        'among_you': roles.among_you(game) if game.game_running else None,
+        # The Detective's own check and vote history; None on every other phone.
+        'detective': roles.detective_state(game, player) if player else None,
         'task_goal': game.taskGoal, 'meeting': json.loads(game.meeting.to_json()) if game.meeting else None,
         'votes': game.meeting.compute_vote_counts() if game.meeting else {},
         'veto_votes': len(game.meeting.veto_votes) if game.meeting else 0,
@@ -97,6 +105,7 @@ def room_state(game, player=None, sid=None):
                      'codes_needed': max(game.active_meltdown.codes_needed - game.active_meltdown.codes_entered, 0)}
                     if game.active_meltdown else None,
         'meltdown_code': player.meltdown_code if player and game.active_meltdown else None,
+        'hacker_code': player.hacker_code if player and game.active_meltdown else None,
         'ruleset': game.ruleset, 'last_stand': game.last_stand,
         # Phones that joined mid-round and play from the next round (names and faces only)
         'waiting': bool(player is not None and getattr(player, 'waiting', False)),

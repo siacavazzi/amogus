@@ -23,7 +23,9 @@ export default function MeetingResultPage({ tutorialMode = false, tutorialHighli
     ? players.find((p) => p.player_id === meetingState.voted_out)
     : undefined;
   const ejected = !!meetingState?.voted_out && meetingState?.reason !== 'veto';
-  const wasIntruder = !!votedOutPlayer?.sus;
+  const wasHacker = votedOutPlayer?.role === 'hacker';
+  // A caught Hacker floods red like a caught intruder: the crew got one of the other side.
+  const wasIntruder = !!votedOutPlayer?.sus || wasHacker;
   // The server sends the count: crew phones aren't told who the other intruders are.
   // Once someone joined mid-round the count is withheld: a number that went up would name them.
   const intrudersHidden = !!meetingState?.intruders_hidden;
@@ -79,13 +81,16 @@ export default function MeetingResultPage({ tutorialMode = false, tutorialHighli
         <p className="sg-big sg-h3" style={{ minHeight: '2.2em', maxWidth: '13ch', lineHeight: 1.05, letterSpacing: '-0.02em' }}>
           {revealed && (
             <Letters
-              text={wasIntruder ? t('They were an intruder.') : t('They were not an intruder.')}
+              text={wasHacker ? t('They were the Hacker.') : wasIntruder ? t('They were an intruder.') : t('They were not an intruder.')}
               delay={wasIntruder ? 500 : 900}
               step={wasIntruder ? 30 : 55}
             />
           )}
         </p>
-        {phase === 'complete' && wasIntruder && (
+        {phase === 'complete' && wasHacker && (
+          <p className="sg-lede sg-a sg-fade">{t('No more Hacker cards. The intruders are still out there.')}</p>
+        )}
+        {phase === 'complete' && wasIntruder && !wasHacker && (
           <p className="sg-lede sg-a sg-fade">
             {intrudersHidden
               ? t('Intruders are still among you')

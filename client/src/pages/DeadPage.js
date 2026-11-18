@@ -14,6 +14,7 @@ const getDeathLabel = (cause) => {
   switch (cause) {
     case 'voted_out':
     case 'voted_out_intruder':
+    case 'voted_out_hacker':
     case 'voted_out_innocent':
       return t('Ejected');
     case 'murdered':

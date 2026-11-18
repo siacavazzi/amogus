@@ -12,6 +12,7 @@ function ReactorMeltdown() {
         codesNeeded,
         setCodesNeeded,
         roomCode,
+        corruptedAt,
     } = useContext(DataContext);
 
     const [pin, setPin] = useState(["", "", "", ""]);
@@ -23,6 +24,17 @@ function ReactorMeltdown() {
     const [totalCodesNeeded, setTotalCodesNeeded] = useState(null); // Track initial codes for progress
 
     const inputRefs = useRef([]);
+
+    // A hacker code was typed: it looks accepted for a moment, then the screen says CORRUPTED.
+    const [corrupted, setCorrupted] = useState(false);
+    useEffect(() => {
+        if (!corruptedAt || Date.now() - corruptedAt > 4000) return undefined;
+        setIsCorrectFlash(true);
+        setPin(["", "", "", ""]);
+        const show = setTimeout(() => { setIsCorrectFlash(false); setCorrupted(true); }, 900);
+        const hide = setTimeout(() => setCorrupted(false), 3600);
+        return () => { clearTimeout(show); clearTimeout(hide); };
+    }, [corruptedAt]);
 
     // Keep track of previous codesNeeded to detect changes
     const prevCodesNeededRef = useRef(codesNeeded);
@@ -186,7 +198,7 @@ function ReactorMeltdown() {
     };
 
     const hot = meltdownTimer <= 10;
-    const slabTone = isIncorrect ? " sg-rx__slab--wrong sg-shake" : isCorrectFlash ? " sg-rx__slab--right" : "";
+    const slabTone = isIncorrect || corrupted ? " sg-rx__slab--wrong sg-shake" : isCorrectFlash ? " sg-rx__slab--right" : "";
 
     return (
         <div className="sg sg-screen sg-rx sg-rx--melt">
@@ -238,6 +250,13 @@ function ReactorMeltdown() {
                             />
                         ))}
                     </div>
+
+                    {corrupted && (
+                        <p className="sg-rx__msg" role="alert" data-testid="code-corrupted">
+                            <AlertTriangle size={30} />
+                            <span>{t('CORRUPTED! One code undone, 10 seconds lost.')}</span>
+                        </p>
+                    )}
 
                     {isIncorrect && (
                         <p className="sg-rx__msg">

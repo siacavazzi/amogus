@@ -26,6 +26,11 @@ DEATH_MESSAGES = {
         "got spaced for being an intruder",
         "got killed by a mob of angry crewmates",
     ],
+    'voted_out_hacker': [
+        "had their hacking career cut short",
+        "got logged off by the crew",
+        "was unplugged by popular vote",
+    ],
     'murdered': [
         "was brutally eliminated while minding their own business",
         "got absolutely destroyed by an intruder",
@@ -113,6 +118,7 @@ class Player:
         # imposter vars
         self.sus = False
         self.cards = []
+        self._clear_role()
 
         self.ready = False
 
@@ -142,6 +148,7 @@ class Player:
     def reset(self):
         """Reset player state for a new game (keeps identity)."""
         self.sus = False
+        self._clear_role()
         self.alive = True
         self._clear_tasks()
         self.meltdown_code = None
@@ -160,6 +167,32 @@ class Player:
         self.death_message = get_death_message(cause, task_name)
         self.ready = True  # Dead players are always ready
         return self.death_message
+
+    def _clear_role(self):
+        """The round's role (see assets/roles.py). `sus` still means a tagging intruder; the
+        Hacker is on the intruders' side with sus False, the Detective is crew."""
+        self.role = 'crew'
+        # Hacker: two cards to pick one from, tasks toward the next card, when they last played
+        self.card_offer = []
+        self.hacker_tasks = 0
+        self.hacker_last_play = None
+        self.hacker_code = None
+        # Detective: a check is ready after each meeting; what earlier checks found
+        self.check_ready = False
+        self.checks = []
+
+    @property
+    def is_hacker(self):
+        return getattr(self, 'role', 'crew') == 'hacker'
+
+    @property
+    def is_detective(self):
+        return getattr(self, 'role', 'crew') == 'detective'
+
+    @property
+    def is_crew(self):
+        """On the crew's side: counts toward the task bar and the 'crew outnumbered' check."""
+        return not self.sus and not self.is_hacker
 
     def _clear_tasks(self):
         """A crewmate holds a hand of tasks (see assets/task_hand.py), plus now and then one
@@ -230,11 +263,14 @@ class Player:
             "active": self.active,
             "absent": self.absent,
             "sus": self.sus if show_role else False,
+            "role": getattr(self, 'role', 'crew') if show_role else None,
             "alive": self.alive,
             "pic": self.pic,
             "selfie": self.selfie,
             "meltdown_code": self.meltdown_code if show_secrets else None,
             "cards": [card.export() for card in self.cards if hasattr(card, 'export')] if show_secrets else [],
+            "card_offer": [card.export() for card in self.card_offer] if show_secrets else [],
+            "hacker_code": self.hacker_code if show_secrets else None,
             "ready": self.ready,
             "death_cause": self.death_cause,
             "death_message": self.death_message,

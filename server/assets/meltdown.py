@@ -6,6 +6,7 @@ import eventlet
 
 from assets.scaling import meltdown_codes_needed
 from assets import awards
+from assets import roles
 
 
 class Meltdown:
@@ -31,6 +32,9 @@ class Meltdown:
         self.wrong_pins = 0
         self.pin_owner = {}  # pin -> the player whose phone showed it (for the Core saver medal)
         self.entered_by = []
+        self.entered_pins = []  # In the order typed, so a hacker code can undo the last one
+        self.hacker_pins = {}   # pin -> the Hacker whose phone showed it (assets/roles.py)
+        self.corrupted = 0
         self._end_logged = False
 
     def log_end(self, end_reason):
@@ -42,7 +46,7 @@ class Meltdown:
             'meltdown_ended', end_reason=end_reason, trigger=self.trigger,
             codes_needed=self.codes_needed, codes_entered=self.codes_entered,
             codes_handed_out=self.num_players, present_at_start=self.present_at_start,
-            wrong_pins=self.wrong_pins, duration_seconds=self.duration,
+            wrong_pins=self.wrong_pins, hacker_codes_typed=self.corrupted, duration_seconds=self.duration,
             seconds_used=round(time.monotonic() - self.started_at, 1) if self.started_at else None,
             round_seconds=self.game.round_seconds(), **self.game.living_counts())
 
@@ -120,6 +124,11 @@ class Meltdown:
                 if player.sid:  # to=None would send the code to every room; an offline player gets it on rejoin
                     self.socketio.emit("meltdown_code", self.valid_pins[index], to=player.sid)
                 print(f"sending code {self.valid_pins[index]} to {player.sid}")
+            # The Hacker also gets a look-alike code that corrupts the reactor when typed.
+            self.hacker_pins = roles.hacker_codes(self, set(self.valid_pins))
+            for player in set(self.hacker_pins.values()):
+                if player.sid:
+                    self.socketio.emit("hacker_code", player.hacker_code, to=player.sid)
             if self.game:
                 self.game.revision += 1
 
@@ -136,12 +145,16 @@ class Meltdown:
                 self.emit_to_room("code_incorrect")
                 return False
 
+            if input_pin in self.hacker_pins:
+                return self._corrupt(input_pin)
+
             if input_pin not in self.valid_pins:
                 self.wrong_pins += 1
                 self.emit_to_room("code_incorrect")
                 return False
 
             self.valid_pins.remove(input_pin)
+            self.entered_pins.append(input_pin)
             self.codes_entered += 1
             if self.pin_owner.get(input_pin):
                 self.entered_by.append(self.pin_owner[input_pin])
@@ -152,6 +165,25 @@ class Meltdown:
             if self.codes_entered >= self.codes_needed:
                 self.end_meltdown(success=True)
             return True
+
+    def _corrupt(self, pin):
+        """A hacker code was typed: the last code entered stops counting (it can be typed again)
+        and the countdown loses HACKER_CODE_PENALTY_SECONDS. Each hacker code works once."""
+        hacker = self.hacker_pins.pop(pin)
+        hacker.hacker_code = None
+        self.corrupted += 1
+        if self.entered_pins:
+            self.valid_pins.append(self.entered_pins.pop())
+            self.codes_entered = max(0, self.codes_entered - 1)
+            if self.entered_by:
+                self.entered_by.pop()
+        self.time_left = max(1, self.time_left - roles.HACKER_CODE_PENALTY_SECONDS)
+        if self.game:
+            self.game.revision += 1
+        self.emit_to_room("code_corrupted", {'codes_left': self.codes_needed - self.codes_entered,
+                                             'time_left': self.time_left})
+        self.emit_to_room('meltdown_update', self.time_left)
+        return False
 
     def end_meltdown(self, success):
         """End this meltdown only while it still owns the active round."""
@@ -165,6 +197,7 @@ class Meltdown:
             # The codes die with the meltdown; a later room_state must not bring the code screen back.
             for player in self.living_players:
                 player.meltdown_code = None
+                player.hacker_code = None
             if self.game:
                 self.game.revision += 1
             self.speaker.stop()

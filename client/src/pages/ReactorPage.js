@@ -9,6 +9,7 @@ import { isBetaChannel } from "../components/BetaBadge";
 import { buildRoomQrUrl } from "../utils/inviteLinks";
 import { Face } from "../signal";
 import "../signal/reactor.css";
+import { amongYouText } from '../utils/roles';
 import { t } from '../i18n';
 
 const ARM_MS = 3000;
@@ -28,6 +29,7 @@ function ReactorNormal() {
         waitingPlayers,
         lateJoinLive,
         lobbyState,
+        amongYou,
      } = useContext(DataContext);
     const meeting = meetingState && meetingState.stage !== 'over';
     const [isSabotaging, setIsSabotaging] = useState(false);
@@ -199,6 +201,7 @@ function ReactorNormal() {
                     <div className="sg-rx__fill" style={{ width: `${percentage}%` }} />
                 </div>
                 <p className="sg-rx__lede">{t('At 100% the intruders are revealed')}</p>
+                {amongYouText(amongYou) && <p className="sg-rx__lede" data-testid="reactor-among-you" style={{ fontWeight: 900 }}>{amongYouText(amongYou)}</p>}
             </div>
 
             <div className="sg-rx__foot">{sabotage('sg-btn-red')}</div>

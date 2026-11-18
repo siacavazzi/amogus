@@ -7,6 +7,7 @@ import HostStartVoting from '../components/HostStartVoting';
 import { readyNeeded } from '../utils/meetingQuorum';
 import { Check, Skull } from '../signal/icons';
 import { Face, Words, takeOrigin, vibrate } from '../signal';
+import { DetectiveBar, HackerTrail } from '../components/RolePanels';
 import { t } from '../i18n';
 
 // Every phone floods yellow at once: the meeting is the loudest moment in the game.
@@ -88,6 +89,8 @@ const MeetingWaitingPage = ({ tutorialMode = false, tutorialHighlightTarget = nu
         <p className="sg-small sg-a sg-rise" style={{ animationDelay: '1090ms' }}>
           {t('Go to the meeting spot, then slide ready')}
         </p>
+        <HackerTrail trail={meetingState?.hacker_trail} />
+        {!tutorialMode && <DetectiveBar tone="meet" meeting />}
 
         {/* Roll call: everyone alive, filling in as they get there */}
         <div className="sg-row sg-a sg-fade" style={{ gap: 14, marginTop: 10, animationDelay: '1200ms' }}>

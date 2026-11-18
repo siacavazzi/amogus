@@ -236,6 +236,10 @@ class StatsTracker:
                 'card_deck_preset': getattr(game, 'card_deck_preset', None),
                 'meeting_quorum': getattr(game, 'meeting_quorum', None),
                 'auto_intruders': getattr(game, 'auto_intruders', None),
+                # Secret roles this round (assets/roles.py), so win rates can be checked per role
+                'roles_mode': getattr(game, 'roles_mode', None),
+                'hacker_count': (getattr(game, 'round_roles', None) or {}).get('hackers', 0),
+                'detective_count': (getattr(game, 'round_roles', None) or {}).get('detectives', 0),
                 'task_source': game.task_source() if hasattr(game, 'task_source') else None,
                 'task_list_via': getattr(game, 'task_list_via', None) if getattr(game, 'task_list_applied', False) else None,
                 'setup_origin': getattr(game, 'setup_origin', None),
@@ -313,6 +317,9 @@ class StatsTracker:
                 'fake_tasks_sent': stats.get('fake_tasks_sent', []),
                 'fake_tasks_completed': stats.get('fake_tasks_completed', []),
                 'taunts_sent': stats.get('taunts_sent', []),
+                'hacker_cards_played': stats.get('hacker_cards_played', 0),
+                'hacker_survived': any(p.alive for p in getattr(game, 'players', []) if getattr(p, 'is_hacker', False))
+                    if (getattr(game, 'round_roles', None) or {}).get('hackers') else None,
             }
 
             self._finish_round_locked(game, record, 'completed', 'game_result')

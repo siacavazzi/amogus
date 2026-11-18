@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import { DataContext, isObsoleteSession } from "../GameContext";
 import LeaveGameButton from "../components/LeaveGameButton";
+import { DetectiveBar, HackerTrail } from "../components/RolePanels";
 import { Face } from "../signal";
 import { Skull } from "../signal/icons";
 import { emitVolatileWithAck } from "../utils/socketCommand";
@@ -140,6 +141,10 @@ export default function VotingPage({ tutorialMode = false, tutorialHighlightTarg
           {tn(alivePlayers.length, '{count} player voting', '{count} players voting')}
           {meetingState?.started_by_host && meetingState?.host_name ? ` · ${t('{name} started it early', { name: meetingState.host_name })}` : ''}
         </p>
+        <div style={{ marginTop: 10, display: 'grid', gap: 10 }}>
+          <HackerTrail trail={meetingState?.hacker_trail} />
+          {!tutorialMode && <DetectiveBar tone="meet" meeting />}
+        </div>
       </div>
 
       {/* Players */}
